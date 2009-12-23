@@ -451,7 +451,7 @@ sw@debian:~/bester-online-shop-der-welt/public$</screen></para>
     <filename>hello-world.html</filename> Datei mit folgendem
     Inhalt:<programlisting>&lt;html&gt;
 &lt;body&gt;
-Hello World!
+&lt;p&gt;Hello World!&lt;/p&gt;
 &lt;/body&gt;
 &lt;/html&gt;</programlisting></para>
 
@@ -462,7 +462,7 @@ Hello World!
 sw@debian:~/bester-online-shop-der-welt/public$ <command>cat hello-world.html</command> 
 &lt;html&gt;
 &lt;body&gt;
-Hello World!
+&lt;p&gt;Hello World!&lt;/p&gt;
 &lt;/body&gt;
 &lt;/html&gt;
 sw@debian:~/bester-online-shop-der-welt/public$</screen></para>
@@ -496,12 +496,246 @@ sw@debian:~/bester-online-shop-der-welt$ ./script/server -b 192.168.248.134
       </mediaobject>
     </screenshot>
 
-    <para>Merkwürdigerweise hat aber</para>
+    <para>Merkwürdigerweise hat aber der Webserver keine Logging-Ausgabe
+    gemacht. Es scheint also, das statische HTML-Seiten aus dem
+    Unterverzeichnis <filename>public</filename> direkt und ohne weitere
+    Verarbeitung durch Rails ausgeliefert werden.</para>
 
-    <para></para>
+    <para>Mit <command>CTRL-C</command> beenden wir den Webserver.</para>
+  </section>
 
-    <para></para>
+  <section>
+    <title>Dynamisches Hello-World Beispiel mit ERB</title>
 
-    <para></para>
+    <para>Um eine dynamische Hello-World Seite zu erstellen benötigen wir
+    einen Controller und einen View. Da es sich bei der Erklärung von
+    Controllern und Views um ein typsiches Henne-Ei-Problem handelt, fange ich
+    jetzt einfach mal an und irgendwann wird es irgendwie Sinn machen.</para>
+
+    <para>Wir legen einen Controller mit dem Namen "example" und dem View
+    "hello-world" an.<screen>sw@debian:~/bester-online-shop-der-welt$ <command>./script/generate controller example hello-world</command> 
+      exists  app/controllers/
+      exists  app/helpers/
+      create  app/views/example
+      exists  test/functional/
+      create  test/unit/helpers/
+      create  app/controllers/example_controller.rb
+      create  test/functional/example_controller_test.rb
+      create  app/helpers/example_helper.rb
+      create  test/unit/helpers/example_helper_test.rb
+      create  app/views/example/hello-world.html.erb
+sw@debian:~/bester-online-shop-der-welt$ </screen></para>
+
+    <para>Die letzte Ausgabezeile enthält eine Datei
+    <filename>hello-world.html.erb</filename>. Schauen wir uns diese Datei
+    doch mal an.<screen>sw@debian:~/bester-online-shop-der-welt$ <command>cat app/views/example/hello-world.html.erb</command>
+&lt;h1&gt;Example#hello-world&lt;/h1&gt;
+&lt;p&gt;Find me in app/views/example/hello-world.html.erb&lt;/p&gt;
+sw@debian:~/bester-online-shop-der-welt$ </screen></para>
+
+    <para>Starten wir mal die Rails-Applikation.<screen>sw@debian:~/bester-online-shop-der-welt$ <command>./script/server -b 192.168.248.134</command>
+=&gt; Booting WEBrick
+=&gt; Rails 2.3.5 application starting on http://192.168.248.134:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2009-12-23 22:33:33] INFO  WEBrick 1.3.1
+[2009-12-23 22:33:33] INFO  ruby 1.9.1 (2009-12-07) [i686-linux]
+[2009-12-23 22:33:33] INFO  WEBrick::HTTPServer#start: pid=16563 port=3000
+</screen></para>
+
+    <para>Und jetzt schauen wir uns mit dem Webbrowser die URL
+    http://192.168.248.134:3000/example/hello-world an.</para>
+
+    <screenshot>
+      <info>
+        <title>Fehlermeldung beim hello-world Beispiel.</title>
+      </info>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="fehler-hello-world.png"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </screenshot>
+
+    <para>Das sieht nicht gut aus. Der Webserver gibt die gleiche
+    Fehlermeldung aus.<screen>Processing ApplicationController#hello-world (for 192.168.248.1 at 2009-12-23 22:35:05) [GET]
+
+SyntaxError (/home/sw/bester-online-shop-der-welt/app/controllers/example_controller.rb:2: syntax error, unexpected '-', expecting ';' or '\n'
+  def hello-world
+            ^
+/home/sw/bester-online-shop-der-welt/app/controllers/example_controller.rb:5: syntax error, unexpected keyword_end, expecting $end):
+  &lt;internal:prelude&gt;:8:in `synchronize'
+  /usr/local/lib/ruby/1.9.1/webrick/httpserver.rb:111:in `service'
+  /usr/local/lib/ruby/1.9.1/webrick/httpserver.rb:70:in `run'
+  /usr/local/lib/ruby/1.9.1/webrick/server.rb:183:in `block in start_thread'
+
+Rendered rescues/_trace (42.2ms)
+Rendered rescues/_request_and_response (1.2ms)
+Rendering rescues/layout (internal_server_error)
+</screen></para>
+
+    <para>Wenn man sich die Meldung so durchliesst, scheint es fast so zu
+    sein, das Rails das Minuszeichen zwischen hello und world nicht mag. Kein
+    Problem. Beenden wir mit CTRL-C den Webserver und erstellen einen View
+    hello_world (also mit einem Unterstrich und keinem Minus-Zeichen).<screen>sw@debian:~/bester-online-shop-der-welt$ <command>./script/generate controller example hello_world</command>
+      exists  app/controllers/
+      exists  app/helpers/
+      exists  app/views/example
+      exists  test/functional/
+      exists  test/unit/helpers/
+overwrite app/controllers/example_controller.rb? (enter "h" for help) [Ynaqdh] <command>Y</command>
+       force  app/controllers/example_controller.rb
+   identical  test/functional/example_controller_test.rb
+   identical  app/helpers/example_helper.rb
+   identical  test/unit/helpers/example_helper_test.rb
+      create  app/views/example/hello_world.html.erb
+sw@debian:~/bester-online-shop-der-welt$</screen></para>
+
+    <para>Dabei fragt Rails, ob die Datei
+    <filename>app/controllers/example_controller.rb</filename> überschrieben
+    werden soll. Sagen wir einfach mal Y für ja. Starten wir jetzt noch mal
+    die Rails-Applikation.<screen>sw@debian:~/bester-online-shop-der-welt$ ./script/server -b 192.168.248.134=&gt; Booting WEBrick
+=&gt; Rails 2.3.5 application starting on http://192.168.248.134:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2009-12-23 22:44:09] INFO  WEBrick 1.3.1
+[2009-12-23 22:44:09] INFO  ruby 1.9.1 (2009-12-07) [i686-linux]
+[2009-12-23 22:44:09] INFO  WEBrick::HTTPServer#start: pid=16572 port=3000
+</screen></para>
+
+    <para>Mit dem Webbrowser rufen wir die URL
+    http://192.168.248.134:3000/example/hello_world auf.</para>
+
+    <screenshot>
+      <info>
+        <title>hello_word.html.erb Ausgabe</title>
+      </info>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="hello-world-erb.png"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </screenshot>
+
+    <para>Wir bekommen die entsprechende Datei ausgeliefert und der Webserver
+    zeigt dies auch brav an.<screen>Processing ExampleController#hello_world (for 192.168.248.1 at 2009-12-23 22:45:14) [GET]
+Rendering example/hello_world
+Completed in 377ms (View: 376, DB: 0) | 200 OK [http://192.168.248.134/example/hello_world]
+</screen></para>
+
+    <para><important>
+        <para>Jetzt haben wir schon etwas sehr wichtiges gelernt: Rails hat
+        besondere Namenskonventionen. So sollte man kein Minus-Zeichen im
+        Namen eines Controllers oder eines Views verwenden.</para>
+      </important>Schauen wir uns mal die Datei
+    <filename>hello_world.html.erb</filename> an.<screen>sw@debian:~/bester-online-shop-der-welt$ cat app/views/example/hello_world.html.erb 
+&lt;h1&gt;Example#hello_world&lt;/h1&gt;
+&lt;p&gt;Find me in app/views/example/hello_world.html.erb&lt;/p&gt;
+sw@debian:~/bester-online-shop-der-welt$</screen></para>
+
+    <para>Da fehlt der saubere HTML-Anfang und das dazu gehörende Ende. Und
+    die Seite wird von uns nicht mit "hello_world.html", sondern nur mit
+    "hello_world" aufgerufen. Da fehlt ja die Datei-Endung! Alles sehr
+    merkwürdig.</para>
+
+    <para>Aber sind wir mal mutig und erweitern die Datei wie
+    folgt:<programlisting>&lt;h1&gt;Example#hello_world&lt;/h1&gt;
+&lt;p&gt;Find me in app/views/example/hello_world.html.erb&lt;/p&gt;
+&lt;p&gt;
+&lt;%= Time.now %&gt;
+&lt;/p&gt;</programlisting></para>
+
+    <para>Wieder die Rails-Applikation starten.<screen>sw@debian:~/bester-online-shop-der-welt$ ./script/server -b 192.168.248.134=&gt; Booting WEBrick
+=&gt; Rails 2.3.5 application starting on http://192.168.248.134:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2009-12-23 23:00:25] INFO  WEBrick 1.3.1
+[2009-12-23 23:00:25] INFO  ruby 1.9.1 (2009-12-07) [i686-linux]
+[2009-12-23 23:00:25] INFO  WEBrick::HTTPServer#start: pid=16596 port=3000
+</screen></para>
+
+    <para>Und noch mal mit dem Webbrowser auf
+    http://192.168.248.134:3000/example/hello_world zugreifen.</para>
+
+    <screenshot>
+      <info>
+        <title>hello_world.html.erb Beispiel mit Time.now Ruby Code.</title>
+      </info>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="hello-world-time-now.png"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </screenshot>
+
+    <para>Es wird die aktuelle Uhrzeit angezeigt und der Webserver gibt auch
+    die dazu passende Log-Meldung aus.<screen>Processing ExampleController#hello_world (for 192.168.248.1 at 2009-12-23 23:00:32) [GET]
+Rendering example/hello_world
+Completed in 1ms (View: 0, DB: 0) | 200 OK [http://192.168.248.134/example/hello_world]
+</screen></para>
+
+    <para>Ein Reload der Seite zeigt immer die aktuelle System-Uhrzeit.
+    </para>
+
+    <para>Es ist kein all zu komplexes Rätsel: Mit der Syntax <code>&lt;%=
+    [...] %&gt;</code> kann ich in html.erb-Dateien Ruby-Code ausführen und
+    das Ergebnis anzeigen lassen. Die Dateiendung "erb" steht dabei übrigens
+    für embedded Ruby.</para>
+
+    <para>Um Rails weiter zu erklären müssen wir uns erst einmal mit Ruby
+    beschäftigen. Deshalb wird es im nächsten Kapitel um Ruby-Grundlagen
+    gehen.</para>
+
+    <important>
+      <para>Falls es Ihnen nicht schnell genug geht: Ihre Geduld wird schon
+      bald belohnt werden. Aber der Einstieg in Ruby on Rails ist nicht
+      einfach und ohne Ruby-Grundlagen kommen wir hier nicht weiter.</para>
+    </important>
+  </section>
+
+  <section>
+    <title>Zusammenfassung</title>
+
+    <para>Sie haben das erste Kapitel geschaft. Der Status:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Ruby on Rails scheint für den Anfänger kompliziert zu
+        sein.</para>
+      </listitem>
+
+      <listitem>
+        <para>Mit dem Programm <application>rails</application> kann man neue
+        Rails-Applikationen erstellen.</para>
+      </listitem>
+
+      <listitem>
+        <para>Mit <application>./script/server</application> kann man einen
+        mitgelieferten Webserver starten.</para>
+      </listitem>
+
+      <listitem>
+        <para>Mit <application>./script/generate controller</application> kann
+        man einen Controller und einen View erstellen.</para>
+      </listitem>
+
+      <listitem>
+        <para>Was ein Controller oder ein View ist, wissen wir aber immer noch
+        nicht.</para>
+      </listitem>
+
+      <listitem>
+        <para>Aus irgend einem Grunde gibt es merkwürdige
+        Namenskonventionen.</para>
+      </listitem>
+
+      <listitem>
+        <para>Der Name dieses Kapitels scheint ein billiger Trick zu sein, um
+        den neugierigen Leser anzuködern.</para>
+      </listitem>
+    </itemizedlist>
   </section>
 </chapter>
