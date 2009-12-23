@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title>Schnelleinstieg</title>
+
+  <section xml:id="ruby19-und-rails-installation">
+    <title>Installation von Ruby 1.9 und Rails</title>
+
+    <para>Da das Kapitel "Schnelleinstieg" heißt und einen möglichst raschen
+    Lernerfolg zum Ziel hat, müssen wir uns auf eine Plattform einigen. Alle
+    die für Debian Linux sind, mögen jetzt die Hand heben. OK. Das ist die
+    Mehrheit. Die folgende Installationsanleitung setzt also ein frisch
+    installiertes Debian Linux 5.0 voraus. Für den Anfang reicht da auch eine
+    Virtuelle Maschine (z.B. VMware) als Spielwiese.<note>
+        <para>Es wird in dieser Anleitung nicht jeder Schritt und jeder Befehl
+        lang und breit erklärt. Ich gehe davon aus, das Sie sich mit der Linux
+        Kommandozeile so gut auskennen, das die jeweiligen Befehle
+        selbsterklärend sind.</para>
+      </note><warning>
+        <para>Wer es nicht für nötig hält sich an dieses Kochrezept zu halten
+        und lieber ein bereits installiertes Ruby oder ein anderes
+        Betriebssystem nimmt: Später nicht rumjammern, wenn was nicht
+        funktioniert!</para>
+
+        <para>Wenn man in später Ruby on Rails verstanden hat, ist immer noch
+        Zeit das alles auf dem eigenen Lieblingsbetriebssystem zum Laufen zu
+        bringen.</para>
+      </warning></para>
+
+    <para>Als erstes logen wir uns als Root ein bringen wir alles auf den
+    neuesten Stand der Dinge.<screen>debian:~# <command>aptitude update &amp;&amp; aptitude safe-upgrade</command>
+Treffer http://volatile.debian.org lenny/volatile Release.gpg
+Ign http://volatile.debian.org lenny/volatile/main Translation-de               
+Treffer http://security.debian.org lenny/updates Release.gpg                    
+Ign http://security.debian.org lenny/updates/main Translation-de
+Treffer http://volatile.debian.org lenny/volatile Release  
+Treffer http://security.debian.org lenny/updates Release   
+Ign http://volatile.debian.org lenny/volatile/main Packages/DiffIndex           
+Ign http://security.debian.org lenny/updates/main Packages/DiffIndex
+Ign http://volatile.debian.org lenny/volatile/main Sources/DiffIndex
+Ign http://security.debian.org lenny/updates/main Sources/DiffIndex
+Treffer http://volatile.debian.org lenny/volatile/main Packages
+Treffer http://security.debian.org lenny/updates/main Packages
+Treffer http://volatile.debian.org lenny/volatile/main Sources
+Treffer http://security.debian.org lenny/updates/main Sources
+Treffer http://ftp.de.debian.org lenny Release.gpg         
+Hole:1 http://ftp.de.debian.org lenny/main Translation-de [1820kB]
+Treffer http://ftp.de.debian.org lenny Release                                  
+Ign http://ftp.de.debian.org lenny/main Packages/DiffIndex                      
+Ign http://ftp.de.debian.org lenny/main Sources/DiffIndex                       
+Treffer http://ftp.de.debian.org lenny/main Packages                            
+Treffer http://ftp.de.debian.org lenny/main Sources                             
+1820kB wurden in 14s heruntergeladen (127kB/s)                                  
+Paketlisten werden gelesen... Fertig
+
+Paketlisten werden gelesen... Fertig
+AbhÃ¤ngigkeitsbaum wird aufgebaut       
+Lese Status-Informationen ein... Fertig
+Lese erweiterte Statusinformationen      
+Initialisiere Paketstatus... Fertig
+Lese Task-Beschreibungen... Fertig 
+Es werden keine Pakete installiert, aktualisiert oder entfernt.
+0 Pakete aktualisiert, 0 zusÃ¤tzlich installiert, 0 werden entfernt und 0 nicht aktualisiert.
+Muss 0B an Archiven herunterladen. Nach dem Entpacken werden 0B zusÃ¤tzlich belegt sein.
+Paketlisten werden gelesen... Fertig
+AbhÃ¤ngigkeitsbaum wird aufgebaut       
+Lese Status-Informationen ein... Fertig
+Lese erweiterte Statusinformationen      
+Initialisiere Paketstatus... Fertig
+Lese Task-Beschreibungen... Fertig 
+
+debian:~#</screen></para>
+
+    <para>Wir schlagen uns nicht mehr mit der alten 1.8er Ruby-Version rum,
+    sondern installieren Ruby 1.9. Und das der Einfachheit halber direkt von
+    der Quelle (bitte immer den aktuellen Downloadlink von
+    http://www.ruby-lang.org/en/downloads/ übernehmen). Zum Kompilieren
+    benötigen wir erst mal eine Buildumgebung. Und wo wir schon mal dabei
+    sind, installieren wir direkt noch die Datenbank
+    <application>sqlite3</application> und den Kommando-Zeilen Web-Browser
+    <application>w3m</application>, damit wir später schneller loslegen
+    können.<screen>debian:~# <command>aptitude -y install build-essential libssl-dev zlib1g-dev sqlite3 libsqlite3-dev w3m</command>
+Paketlisten werden gelesen... Fertig
+AbhÃ¤ngigkeitsbaum wird aufgebaut       
+Lese Status-Informationen ein... Fertig
+Lese erweiterte Statusinformationen      
+Initialisiere Paketstatus... Fertig
+Lese Task-Beschreibungen... Fertig 
+Die folgenden NEUEN Pakete werden zusÃ¤tzlich installiert:
+  binutils{a} build-essential bzip2{a} cpp{a} cpp-4.3{a} dpkg-dev{a} g++{a} 
+  g++-4.3{a} gcc{a} gcc-4.3{a} libc6-dev{a} libgmp3c2{a} libgomp1{a} 
+  libmpfr1ldbl{a} libsqlite3-0{a} libsqlite3-dev libssl-dev 
+  libstdc++6-4.3-dev{a} libtimedate-perl{a} linux-libc-dev{a} make{a} 
+  patch{a} sqlite3 zlib1g-dev 
+0 Pakete aktualisiert, 24 zusÃ¤tzlich installiert, 0 werden entfernt und 0 nicht aktualisiert.
+Muss 22,2MB an Archiven herunterladen. Nach dem Entpacken werden 67,9MB zusÃ¤tzlich belegt sein.
+Schreibe erweiterte Statusinformationen... Fertig
+Hole:1 http://security.debian.org lenny/updates/main linux-libc-dev 2.6.26-19lenny2 [750kB]
+
+[...]
+
+Richte build-essential ein (11.4) ...
+Paketlisten werden gelesen... Fertig             
+AbhÃ¤ngigkeitsbaum wird aufgebaut       
+Lese Status-Informationen ein... Fertig
+Lese erweiterte Statusinformationen       
+Initialisiere Paketstatus... Fertig
+Schreibe erweiterte Statusinformationen... Fertig
+Lese Task-Beschreibungen... Fertig               
+
+debian:~#</screen></para>
+
+    <para>Jetzt ein aktuelles (stable) Ruby 1.9 downloaden, entpacken und
+    bauen. Je nach Rechenpower Ihres Systems, ist das wahrscheinlich auch eine
+    gute Gelegenheit für eine Zigarettenpause oder um einen Kaffee zu
+    kochen.<screen>debian:~# <command>cd /usr/src/</command>
+debian:/usr/src# <command>wget ftp://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p376.tar.gz</command>
+--2009-12-23 19:34:15--  ftp://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p376.tar.gz
+           =&gt; `ruby-1.9.1-p376.tar.gz'
+AuflÃ¶sen des Hostnamen Â»ftp.ruby-lang.orgÂ«.... 221.186.184.68
+Verbindungsaufbau zu ftp.ruby-lang.org|221.186.184.68|:21... verbunden.
+Anmelden als anonymous ... Angemeldet!
+==&gt; SYST ... fertig.    ==&gt; PWD ... fertig.
+==&gt; TYPE I ... fertig.  ==&gt; CWD /pub/ruby/1.9 ... fertig.
+==&gt; SIZE ruby-1.9.1-p376.tar.gz ... 9073007
+==&gt; PASV ... fertig.    ==&gt; RETR ruby-1.9.1-p376.tar.gz ... fertig.
+LÃ¤nge: 9073007 (8,7M)
+
+100%[======================================&gt;] 9.073.007    107K/s   in 57s     
+
+2009-12-23 19:35:22 (155 KB/s) - Â»ruby-1.9.1-p376.tar.gzÂ« gespeichert [9073007]
+
+debian:/usr/src# <command>tar xzf ruby-1.9.1-p376.tar.gz</command> 
+debian:/usr/src# <command>cd ruby-1.9.1-p376</command>
+debian:/usr/src/ruby-1.9.1-p376# <command>./configure &amp;&amp; make &amp;&amp; make install</command>
+checking build system type... i686-pc-linux-gnu
+checking host system type... i686-pc-linux-gnu
+checking target system type... i686-pc-linux-gnu
+checking for gcc... gcc
+
+[...]
+
+Files:   512
+Classes: 1353
+Modules: 567
+Methods: 7486
+Elapsed: 66.5s
+./miniruby -I./lib -I.ext/common -I./- -r./ext/purelib.rb  ./instruby.rb --make="make" --dest-dir="" --extout=".ext" --mflags="" --make-flags="" --data-mode=0644 --prog-mode=0755 --installed-list .installed.list --install=rdoc --rdoc-output=".ext/rdoc"
+installing rdoc
+debian:/usr/src/ruby-1.9.1-p376#</screen></para>
+
+    <para>Noch mal kurz checken, ob Ruby 1.9 auch wirklich installiert
+    wurde.<screen>debian:/usr/src/ruby-1.9.1-p376# <command>cd</command>
+debian:~# <command>ruby -v</command>
+ruby 1.9.1p376 (2009-12-07 revision 26041) [i686-linux]
+debian:~# </screen></para>
+
+    <para>Ja, das sieht sehr gut aus. Jetzt führen wir für den Paketmanager
+    <application>gem</application> (der ist ab Ruby 1.9 automatisch mit dabei)
+    noch ein Update durch).<screen>debian:~# <command>gem update --system</command>
+Updating RubyGems
+Updating rubygems-update
+
+[...]
+
+RubyGems installed the following executables:
+/usr/local/bin/gem
+
+debian:~# </screen></para>
+
+    <para>Danach benutzen wir <application>gem</application> zum Installieren
+    von Rails. Benötigte andere Pakete werden dabei von
+    <application>gem</application> automatisch mit installiert.<screen>debian:~# <command>gem install rails</command>
+Successfully installed rake-0.8.7
+Successfully installed activesupport-2.3.5
+Successfully installed activerecord-2.3.5
+Successfully installed rack-1.0.1
+Successfully installed actionpack-2.3.5
+Successfully installed actionmailer-2.3.5
+Successfully installed activeresource-2.3.5
+Successfully installed rails-2.3.5
+8 gems installed
+Installing ri documentation for rake-0.8.7...
+Installing ri documentation for activesupport-2.3.5...
+Installing ri documentation for activerecord-2.3.5...
+Installing ri documentation for rack-1.0.1...
+Installing ri documentation for actionpack-2.3.5...
+Installing ri documentation for actionmailer-2.3.5...
+Installing ri documentation for activeresource-2.3.5...
+Updating class cache with 1382 classes...
+Installing RDoc documentation for rake-0.8.7...
+Installing RDoc documentation for activesupport-2.3.5...
+Installing RDoc documentation for activerecord-2.3.5...
+Installing RDoc documentation for rack-1.0.1...
+Installing RDoc documentation for actionpack-2.3.5...
+Installing RDoc documentation for actionmailer-2.3.5...
+Installing RDoc documentation for activeresource-2.3.5...
+debian:~#</screen></para>
+
+    <para>Und bevor wir es vergessen, installieren wir jetzt noch das Ruby-Gem
+    um auf die sqlite3 Datenbank zugreifen zu können.<screen>debian:~# <command>gem install sqlite3-ruby</command>
+Building native extensions.  This could take a while...
+Successfully installed sqlite3-ruby-1.2.5
+1 gem installed
+Installing ri documentation for sqlite3-ruby-1.2.5...
+Updating class cache with 2543 classes...
+Installing RDoc documentation for sqlite3-ruby-1.2.5...
+debian:~#</screen></para>
+
+    <para>Das ging doch Ratz-Fatz! Jetzt wechseln wir wieder zu einem normalen
+    User.</para>
+  </section>
+
+  <section xml:id="hello-world-statisch">
+    <title>Hello-World mit statischem HTML</title>
+
+    <para>Als erstes erstellen wir mit <application>rails</application> ein
+    neues Rails-Projekt mit dem Namen "bester-online-shop-der-welt"<screen>sw@debian:~$ <command>rails bester-online-shop-der-welt</command>
+      create  
+      create  app/controllers
+      create  app/helpers
+      create  app/models
+      create  app/views/layouts
+      create  config/environments
+      create  config/initializers
+      create  config/locales
+      create  db
+      create  doc
+      create  lib
+      create  lib/tasks
+      create  log
+      create  public/images
+      create  public/javascripts
+      create  public/stylesheets
+      create  script/performance
+      create  test/fixtures
+      create  test/functional
+      create  test/integration
+      create  test/performance
+      create  test/unit
+      create  vendor
+      create  vendor/plugins
+      create  tmp/sessions
+      create  tmp/sockets
+      create  tmp/cache
+      create  tmp/pids
+      create  Rakefile
+      create  README
+      create  app/controllers/application_controller.rb
+      create  app/helpers/application_helper.rb
+      create  config/database.yml
+      create  config/routes.rb
+      create  config/locales/en.yml
+      create  db/seeds.rb
+      create  config/initializers/backtrace_silencers.rb
+      create  config/initializers/inflections.rb
+      create  config/initializers/mime_types.rb
+      create  config/initializers/new_rails_defaults.rb
+      create  config/initializers/session_store.rb
+      create  config/environment.rb
+      create  config/boot.rb
+      create  config/environments/production.rb
+      create  config/environments/development.rb
+      create  config/environments/test.rb
+      create  script/about
+      create  script/console
+      create  script/dbconsole
+      create  script/destroy
+      create  script/generate
+      create  script/runner
+      create  script/server
+      create  script/plugin
+      create  script/performance/benchmarker
+      create  script/performance/profiler
+      create  test/test_helper.rb
+      create  test/performance/browsing_test.rb
+      create  public/404.html
+      create  public/422.html
+      create  public/500.html
+      create  public/index.html
+      create  public/favicon.ico
+      create  public/robots.txt
+      create  public/images/rails.png
+      create  public/javascripts/prototype.js
+      create  public/javascripts/effects.js
+      create  public/javascripts/dragdrop.js
+      create  public/javascripts/controls.js
+      create  public/javascripts/application.js
+      create  doc/README_FOR_APP
+      create  log/server.log
+      create  log/production.log
+      create  log/development.log
+      create  log/test.log
+sw@debian:~$</screen></para>
+
+    <para>Da wurde ja jetzt schon eine ganze Menge gemacht. Wechseln wir doch
+    mal in das gerade angelegt Verzeichnis und starten mit
+    <application>./script/server</application> die neue
+    Rails-Applikation.<screen>sw@debian:~$ <command>cd bester-online-shop-der-welt</command>
+sw@debian:~/bester-online-shop-der-welt$ <command>./script/server</command> 
+=&gt; Booting WEBrick
+=&gt; Rails 2.3.5 application starting on http://0.0.0.0:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2009-12-23 20:19:16] INFO  WEBrick 1.3.1
+[2009-12-23 20:19:16] INFO  ruby 1.9.1 (2009-12-07) [i686-linux]
+[2009-12-23 20:19:16] INFO  WEBrick::HTTPServer#start: pid=21586 port=3000
+</screen></para>
+
+    <para>hmmm... sieht so aus, als wenn wir jetzt unter der URL
+    http://0.0.0.0:3000 auf den entsprechenden Webserver zugreifen können.
+    Sollten Sie Debian mit einer grafischen GUI installiert haben, dann können
+    Sie diese URL jetzt mit Firefox oder einem sonstigen Webbrowser ansteuern.
+    Wer sich an die "Bitte minimal installieren"-Anweisung gehalten halt, kann
+    sich mit dem Browser w3m auf der Kommandozeile helfen. Dazu eine neue
+    Shell aufmachen und w3m mit der entsprechenden URI starten.<screen>sw@debian:~$ <command>w3m http://0.0.0.0:3000</command></screen></para>
+
+    <para>Man bekommt dann folgende Bildschirmausgabe:<screen>  â¢ [site:rubyonrails.org] [Search] the Rails site
+  â¢ Join the community
+
+      â¡ Ruby on Rails
+      â¡ Official weblog
+      â¡ Wiki
+  â¢ Browse the documentation
+
+      â¡ Rails API
+      â¡ Ruby standard library
+      â¡ Ruby core
+      â¡ Rails Guides
+
+Welcome aboard
+
+Youâre riding Ruby on Rails!
+
+About your applicationâs environment
+
+Getting started
+
+Hereâs how to get rolling:
+
+âª â â Viewing &lt;Ruby on Rails: Welcome aboard&gt;
+</screen></para>
+
+    <para>Sieht aber jetzt nicht sooo toll aus. Also versuchen wir es anders:
+    Wir stoppen mit CTRL+C den <application>WEBrick</application> Webserver
+    (das ist der den wir mit <application>./script/server</application>
+    gestartet haben) und schauen uns mal die Hilfe dazu an.<screen>^C[2009-12-23 21:02:50] INFO  going to shutdown ...
+[2009-12-23 21:02:50] INFO  WEBrick::HTTPServer#start done.
+Exiting
+sw@debian:~/bester-online-shop-der-welt$ <command>./script/server --help</command>
+Usage: server [options]
+    -p, --port=port                  Runs Rails on the specified port.
+                                     Default: 3000
+    -b, --binding=ip                 Binds Rails to the specified ip.
+                                     Default: 0.0.0.0
+    -c, --config=file                Use custom rackup configuration file
+    -d, --daemon                     Make server run as a Daemon.
+    -u, --debugger                   Enable ruby-debugging for the server.
+    -e, --environment=name           Specifies the environment to run this server under (test/development/production).
+                                     Default: development
+    -P, --path=/path                 Runs Rails app mounted at a specific path.
+                                     Default: /
+
+    -h, --help                       Show this help message.
+sw@debian:~/bester-online-shop-der-welt$</screen></para>
+
+    <para>Und siehe da, mit <parameter>-b</parameter> können wir dem Webserver
+    ein anderes Binding geben und somit auch von anderen Rechnern drauf
+    zugreifen. Nehmen wir mal an, das wir das der entsprechende Rechner mit
+    der IP-Adresse 192.168.248.134 eingerichtet wurde. <screen>sw@debian:~/bester-online-shop-der-welt$ <command>./script/server -b 192.168.248.134</command>
+=&gt; Booting WEBrick
+=&gt; Rails 2.3.5 application starting on http://192.168.248.134:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2009-12-23 21:07:39] INFO  WEBrick 1.3.1
+[2009-12-23 21:07:39] INFO  ruby 1.9.1 (2009-12-07) [i686-linux]
+[2009-12-23 21:07:39] INFO  WEBrick::HTTPServer#start: pid=16263 port=3000
+</screen></para>
+
+    <para>Jetzt können wir auch von aussen (z.B. vom Host-System, in dem der
+    virtuelle Rechner mit dem Debian-Linux läuft) auf das Railssystem
+    zugreifen und das sieht dann auch direkt schon viel schöner aus.</para>
+
+    <screenshot>
+      <info>
+        <title>Der Standard Welcome Screen von Ruby on Rails.</title>
+      </info>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="default-start-screen.png" scalefit="1"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </screenshot>
+
+    <para>Die Versuchung ist gross, jetzt auf den Link "About your
+    application’s environment" zu klicken. Also werden wir es mal
+    risikieren.</para>
+
+    <screenshot>
+      <info>
+        <title>Infofenster zur aktuellen Umgebung (Environment).</title>
+      </info>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="about-environment.png"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </screenshot>
+
+    <para>Gleichzeitg sehen wir wie der WEBrick Webserver fleissig
+    Informationen ausspuckt<screen>Processing Rails::InfoController#properties (for 192.168.248.1 at 2009-12-23 21:30:05) [GET]
+  SQL (3.2ms)    SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+
+Completed in 59ms (View: 18, DB: 3) | 200 OK [http://192.168.248.134/rails/info/properties]
+</screen></para>
+
+    <para>Der Klick auf den Link scheint also irgend eine Aktion ausgelöst zu
+    haben. Das merken wir uns für später und beenden erst mal mit
+    <command>CTRL-C</command> den Webserver.<screen>^C[2009-12-23 21:38:07] INFO  going to shutdown ...
+[2009-12-23 21:38:07] INFO  WEBrick::HTTPServer#start done.
+Exiting
+sw@debian:~/bester-online-shop-der-welt$</screen></para>
+
+    <para>Ziel dieses Unterkapitels ist es eine statische Hello-World HTML
+    Seite zu erstellen. Dann schauen wir uns doch mal das aktuelle Verzeichnis
+    an.<screen>sw@debian:~/bester-online-shop-der-welt$ <command>ls</command>
+app     db   lib  public    README  test  vendor
+config  doc  log  Rakefile  script  tmp
+sw@debian:~/bester-online-shop-der-welt$</screen></para>
+
+    <para>hmmmm... rein aus dem Bauch heraus könnte das Unterverzeichnis
+    <filename>public</filename> ein guter Kandidat dafür sein. Schauen wir mal
+    rein.<screen>sw@debian:~/bester-online-shop-der-welt$ <command>cd public</command>
+sw@debian:~/bester-online-shop-der-welt/public$ <command>ls</command>
+404.html  500.html     images      javascripts  stylesheets
+422.html  favicon.ico  index.html  robots.txt
+sw@debian:~/bester-online-shop-der-welt/public$</screen></para>
+
+    <para>Das sieht sehr gut aus. Dann erstellen wir doch mal mit unserem
+    Lieblingseditor - falls Sie noch keinen haben, probieren Sie einmal
+    <command>pico hello-world.html</command> aus - eine
+    <filename>hello-world.html</filename> Datei mit folgendem
+    Inhalt:<programlisting>&lt;html&gt;
+&lt;body&gt;
+Hello World!
+&lt;/body&gt;
+&lt;/html&gt;</programlisting></para>
+
+    <para>Sicherheitshalber überprüfen wir das noch mal mit
+    <application>cat</application> (sicher ist sicher).<screen>sw@debian:~/bester-online-shop-der-welt/public$ <command>ls</command>
+404.html  500.html     hello-world.html  index.html   robots.txt
+422.html  favicon.ico  images            javascripts  stylesheets
+sw@debian:~/bester-online-shop-der-welt/public$ <command>cat hello-world.html</command> 
+&lt;html&gt;
+&lt;body&gt;
+Hello World!
+&lt;/body&gt;
+&lt;/html&gt;
+sw@debian:~/bester-online-shop-der-welt/public$</screen></para>
+
+    <para>Jetzt sind wir mal mutig und probieren das aus. Sprich wir gehen
+    wieder in das Root-Verzeichnis der Rails-Application und starten den
+    Webserver neu.<screen>sw@debian:~/bester-online-shop-der-welt/public$ cd ..
+sw@debian:~/bester-online-shop-der-welt$ ./script/server -b 192.168.248.134
+=&gt; Booting WEBrick
+=&gt; Rails 2.3.5 application starting on http://192.168.248.134:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2009-12-23 21:49:02] INFO  WEBrick 1.3.1
+[2009-12-23 21:49:02] INFO  ruby 1.9.1 (2009-12-07) [i686-linux]
+[2009-12-23 21:49:02] INFO  WEBrick::HTTPServer#start: pid=16503 port=3000
+</screen></para>
+
+    <para>Und siehe da, ein Abruf von
+    http://192.168.248.134:3000/hello-world.html im Webbrowser bringt uns das
+    folgende Ergebnis.</para>
+
+    <screenshot>
+      <info>
+        <title>Aufruf der hello-world.html Seite.</title>
+      </info>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="hello-world-static.png"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </screenshot>
+
+    <para>Merkwürdigerweise hat aber</para>
+
+    <para></para>
+
+    <para></para>
+
+    <para></para>
+  </section>
+</chapter>
