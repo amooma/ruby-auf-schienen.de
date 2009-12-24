@@ -28,8 +28,8 @@
   <section>
     <title>Hello World</title>
 
-    <para>Ein einfaches Ruby hello-world.rb Programm besteht aus folgender
-    Zeile:<programlisting>puts "Hello World!"
+    <para>Ein einfaches Ruby <filename>hello-world.rb</filename> Programm
+    besteht aus folgender Zeile:<programlisting>puts 'Hello World!'
 </programlisting></para>
 
     <para>Und kann auf der Kommandozeile wie folgt aufgerufen werden:<screen>sw@debian:~/sandbox$ <command>ruby hello-world.rb</command> 
@@ -40,6 +40,25 @@ sw@debian:~/sandbox$ </screen></para>
         <para>Mit <application>puts</application> kann man Texte ausgeben.
         Diese Texte müssen in Anführungszeichen stehen.</para>
       </important></para>
+
+    <section>
+      <title>puts, print und p</title>
+
+      <para>Da man die Bildschirmausgabe in vielen Internet-Beispielen mal mit
+      <application>puts</application>, mal mit
+      <application>print</application> und mal mit
+      <application>p</application> sieht, hier kurz die Erläuterung anhand
+      eines Beispiels.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>puts 'test'</command>  # mit einer Zeilenschaltung
+test
+=&gt; nil
+irb(main):002:0&gt; <command>print 'test'</command> # ohne eine Zeilenschaltung
+test=&gt; nil
+irb(main):003:0&gt; <command>p 'test'</command>     # mit einer Zeilenschaltung
+"test"
+=&gt; "test"
+irb(main):004:0&gt; exit</screen></para>
+    </section>
   </section>
 
   <section>
@@ -51,7 +70,7 @@ sw@debian:~/sandbox$ </screen></para>
     <para><acronym>irb</acronym> steht für Interactive Ruby Shell und ist eine
     Art Sandbox in der man beliebig mit Ruby rumspielen kann. Ein Beispiel
     sagt mehr als tausend Worte:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>puts "Hello World!"</command>
+irb(main):001:0&gt; <command>puts 'Hello World!'</command>
 Hello World!
 =&gt; nil
 irb(main):003:0&gt; <command>exit</command>
@@ -62,106 +81,11 @@ sw@debian:~/sandbox$ </screen></para>
   </section>
 
   <section>
-    <title>Variabeln</title>
+    <title>Ruby ist Objekt-orientiert</title>
 
-    <para>Da Variablen zum Programmieren unerlässlich sind, fangen wir damit
-    mal an.</para>
-
-    <section>
-      <title>String</title>
-
-      <para>Ein String ist eine Zeichenkette und wird mit einfachen oder
-      doppelten Anführungszeichen eingegrenzt.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = "Das Haus hat ein blaues Dach."</command>
-=&gt; "Das Haus hat ein blaues Dach."
-irb(main):002:0&gt; <command>puts a</command>
-Das Haus hat ein blaues Dach.
-=&gt; nil
-irb(main):003:0&gt; <command>b = 'Das Rad ist rot.'</command>    
-=&gt; "Das Rad ist rot."
-irb(main):003:0&gt; <command>exit</command></screen></para>
-
-      <para>Mit "+" können Strings verkettet werden.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = 'abc'</command>
-=&gt; "abc"
-irb(main):002:0&gt; <command>b = '123'</command>
-=&gt; "123"
-irb(main):003:0&gt; <command>c = 'xyz'</command>
-=&gt; "xyz"
-irb(main):004:0&gt; <command>d = a + b + c</command>
-=&gt; "abc123xyz"
-irb(main):005:0&gt; <command>exit</command></screen></para>
-
-      <para>Innerhalb von doppelten Anführungszeichen werden sogenannte
-      Expressions mit der Syntax #{ ... } automatisch als ausgewertet und
-      anstatt der Expression eingefügt.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = 'abc'</command>
-=&gt; "abc"
-irb(main):002:0&gt; <command>b = '123'</command>
-=&gt; "123"
-irb(main):003:0&gt; <command>c = "Der Inhalt von b ist #{b}."</command>
-=&gt; "Der Inhalt von b ist 123."
-irb(main):004:0&gt; <command>exit</command>
-</screen></para>
-    </section>
-
-    <section>
-      <title>Integer (Fixnum)</title>
-
-      <para>Ein Integer ist in Ruby genauso ein Integer wie in anderen
-      Programmiersprachen. Hier ein paar Beispiele.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = 10</command>
-=&gt; 10
-irb(main):002:0&gt; <command>b = 20</command>
-=&gt; 20
-irb(main):003:0&gt; <command>c = a + b</command>
-=&gt; 30
-irb(main):004:0&gt; <command>d = c - b</command>
-=&gt; 10
-irb(main):005:0&gt; <command>e = d * a</command>
-=&gt; 100
-irb(main):006:0&gt; <command>exit</command>
-</screen></para>
-    </section>
-
-    <section>
-      <title>Real (Float)</title>
-
-      <para>Auch hier keine grosse Zauberrei. Beispiele für die Arbeit mit
-      Reals.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = 10.1</command>
-=&gt; 10.1
-irb(main):002:0&gt; <command>b = 10.5</command>
-=&gt; 10.5
-irb(main):003:0&gt; <command>c = a + b</command>
-=&gt; 20.6
-irb(main):004:0&gt; <command>d = a * b</command>
-=&gt; 106.05
-irb(main):005:0&gt; <command>exit</command>
-</screen></para>
-    </section>
-
-    <section>
-      <title>Boolean</title>
-
-      <para>Wahr und falsch oder besser true und false.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = true</command>
-=&gt; true
-irb(main):002:0&gt; <command>b = false</command>
-=&gt; false
-irb(main):003:0&gt; <command>exit</command>
-</screen></para>
-    </section>
-  </section>
-
-  <section>
-    <title>Stop! Das sind doch alles Objekte!</title>
-
-    <para>Vielleicht haben wir es uns eben mit den Variablen doch etwas zu
-    einfach gemacht. Ruby kennt nämlich keine Variablen im klassischen Sinn.
-    Ruby kennt nur Objekte. Alles ist ein Objekt (was ja fast schon zen-artig
-    ist). Die Klasse (Class) eines Ojektes lässt sich mit der Methode
-    <code>.class</code> rausfinden.</para>
+    <para>Ruby kennt nur Objekte. Alles ist ein Objekt (was ja fast schon
+    zen-artig ist). Die Klasse (Class) eines Ojektes lässt sich mit der
+    Methode <code>.class</code> rausfinden.</para>
 
     <important>
       <para>Sie haben keine Ahnung was eine Klasse und was ein Objekt ist?
@@ -174,6 +98,13 @@ irb(main):003:0&gt; <command>exit</command>
       <para>Lesen Sie bitte weiter und schauen Sie sich die Beispiele an.
       Stück für Stück wird das Puzzle dann klarer.</para>
     </important>
+
+    <note>
+      <para>Es gibt zwei Arten von Methoden (Class Method und Instance
+      Method). Ich will es an dieser Stelle nicht zu kompliziert machen und
+      übergehe diese "Feinheit" einfach mal. Die von uns hier benutzen
+      Methoden sind immer Instance Methoden.</para>
+    </note>
 
     <para>Schauen wir uns erst mal die Klasse String an.<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>a = 'Das Haus hat ein blaues Dach.'</command>
@@ -190,27 +121,38 @@ irb(main):001:0&gt; <command>'Das Haus hat ein blaues Dach.'.class</command>
 irb(main):002:0&gt; <command>exit</command>
 </screen></para>
 
-    <para>Interessant. Jetzt mal eine Zahl.<screen>sw@debian:~/sandbox$ <command>irb</command>
+    <para>Interessant. Jetzt mal ein Fixnum (Integer).<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>20.class</command>
 =&gt; Fixnum
 irb(main):002:0&gt; <command>exit</command>
 </screen></para>
 
-    <para>Und jetzt mal ein Float.<screen>sw@debian:~/sandbox$ <command>irb</command>
+    <para>Ein Float.<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>20.5555.class</command>
 =&gt; Float
 irb(main):002:0&gt; <command>exit</command>
 </screen></para>
 
-    <para>Ist doch cool wie Ruby das alles automagisch macht, oder?</para>
+    <para>Und zum Schluss Booleans und nil.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>true.class</command>
+=&gt; TrueClass
+irb(main):002:0&gt; <command>false.class</command>
+=&gt; FalseClass
+irb(main):003:0&gt; <command>nil.class</command>
+=&gt; NilClass
+irb(main):004:0&gt; <command>exit</command>
+</screen></para>
+
+    <para>Ruby erkennt also automagisch welche Art von Objekt es gerade
+    behandelt. Da haben wir schon mal eine Sorge weniger.</para>
 
     <section>
       <title>Von einem zum anderen (Konvertieren)</title>
 
-      <para>Logischerweise gibt es eine ganze Reihe von praktischen Methoden,
-      um Objekte von einer Klasse in eine andere zu wandeln. Als erstes
-      verwandelt wir mal mit der Methode <methodname>.to_s</methodname> ein
-      Fixnum in einen String.<screen>sw@debian:~/sandbox$ <command>irb</command>
+      <para>Logischerweise gibt es eine ganze Reihe von praktischen Instance
+      Methoden, um Objekte von einer Klasse in eine andere zu wandeln. Als
+      erstes verwandelt wir mal mit der Methode <methodname>.to_s</methodname>
+      ein Fixnum in einen String.<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>a = 10</command>
 =&gt; 10
 irb(main):002:0&gt; <command>a.class</command>
@@ -221,7 +163,7 @@ irb(main):004:0&gt; <command>exit</command>
 </screen></para>
 
       <para>Nichts anderes macht übrigens <application>puts</application>,
-      wenn man mit put ein Fixnum oder ein Float ausgibt (es fügt bei
+      wenn man mit puts ein Fixnum oder ein Float ausgibt (es fügt bei
       Nicht-Strings einfach die Methode <methodname>.to_s</methodname> hinzu
       und gibt das Ergebnis aus).</para>
 
@@ -237,8 +179,6 @@ irb(main):004:0&gt; <command>d.class</command>
 =&gt; Fixnum
 irb(main):005:0&gt; <command>exit</command>
 </screen></para>
-
-      <para></para>
     </section>
 
     <section>
@@ -259,8 +199,6 @@ irb(main):006:0&gt; <command>a.reverse</command>
 =&gt; ".suaH saD"
 irb(main):007:0&gt; <command>exit</command>
 </screen></para>
-
-      <para></para>
     </section>
 
     <section>
@@ -300,34 +238,59 @@ irb(main):014:0&gt; <command>exit</command>
 
       <para>Nun hat man nicht immer alle Methoden-Namen im Kopf, weiß aber das
       es für das spezielle Problem eine perfekte Methode gibt (passiert mir
-      ständig). Der einfachste Weg eine Liste der entsprechenden Methoden zu
-      bekommen ist dann sicherlich Google. Einfach "Ruby" und den Namen der
-      Klasse als Suchbegriff eingeben und dann bekommt man meist als ersten
-      Eintrag die offizielle Ruby Dokumentation angezeigt.</para>
+      ständig). </para>
 
-      <para>Wenn ich alle Methoden für die Klasse String suche, dann suche in
-      in Google nach "ruby string" und bekomme als ersten Treffe die URL
-      http://ruby-doc.org/core/classes/String.html. Auf dieser Seite bekomme
-      ich dann Beispiele zu allen Methoden. </para>
+      <section>
+        <title>http://ruby-doc.org via Google und Co.</title>
 
-      <para>Interessiert wie viele Methoden die Klasse String hat? Hier sind
-      sie: <methodname>%, *, +, &lt;&lt;, &lt;=&gt;, ==, ===, =~, [], []=,
-      ascii_only?, block_scanf, bytes, bytesize, capitalize, capitalize!,
-      casecmp, center, chars, chomp, chomp!, chop, chop!, chr, clear,
-      codepoints, concat, count, crypt, delete, delete!, downcase, downcase!,
-      dump, each_byte, each_char, each_codepoint, each_line, empty?, encode,
-      encode!, encoding, end_with?, eql?, ext, force_encoding, getbyte, gsub,
-      gsub!, hash, hex, include?, index, initialize_copy, insert, inspect,
-      intern, is_binary_data?, is_complex_yaml?, iseuc, isjis, issjis, isutf8,
-      kconv, length, lines, ljust, lstrip, lstrip!, match, next, next!, oct,
-      ord, parse_csv, partition, pathmap, pathmap_explode, pathmap_partial,
-      pathmap_replace, replace, reverse, reverse!, rindex, rjust, rpartition,
-      rstrip, rstrip!, scan, scanf, setbyte, shellescape, shellsplit, size,
-      slice, slice!, split, squeeze, squeeze!, start_with?, strip, strip!,
-      sub, sub!, succ, succ!, sum, swapcase, swapcase!, to_blob, to_d, to_f,
-      to_i, to_s, to_str, to_sym, to_yaml, toeuc, tojis, tolocale, tosjis,
-      toutf16, toutf32, toutf8, tr, tr!, tr_s, tr_s!, unpack, upcase, upcase!,
-      upto, valid_encoding?</methodname> </para>
+        <para>Unter http://ruby-doc.org finden Sie online eine optisch
+        aufbereitete und unter einander verlinkte Ruby Dokumentaion. Der
+        einfachste Weg dort eine Liste der Methoden zu bekommen ist sicherlich
+        eine Suchmaschine. Einfach "Ruby" und den Namen der Klasse als
+        Suchbegriff eingeben und dann bekommt man meist als ersten Eintrag
+        diese offizielle Ruby Dokumentation angezeigt.</para>
+
+        <para>Wenn ich alle Methoden für die Klasse String suche, dann suche
+        in in Google nach "ruby string" und bekomme als ersten Treffer die URL
+        http://ruby-doc.org/core/classes/String.html.<footnote>
+            <para>Wer ganz sicher gehen will, kann auch folgenden Suchstring
+            nehmen "String site:ruby-doc.org"</para>
+          </footnote> Auf dieser Seite bekomme ich dann Beispiele zu allen
+        Methoden.</para>
+
+        <screenshot>
+          <info>
+            <title>Screenshot der Ruby-Doku zur Classe String auf
+            ruby-doc.org</title>
+          </info>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="string-doku.png"></imagedata>
+            </imageobject>
+          </mediaobject>
+        </screenshot>
+
+        <para>Interessiert wie viele Methoden die Klasse String hat? Hier sind
+        sie: <methodname>%, *, +, &lt;&lt;, &lt;=&gt;, ==, ===, =~, [], []=,
+        ascii_only?, block_scanf, bytes, bytesize, capitalize, capitalize!,
+        casecmp, center, chars, chomp, chomp!, chop, chop!, chr, clear,
+        codepoints, concat, count, crypt, delete, delete!, downcase,
+        downcase!, dump, each_byte, each_char, each_codepoint, each_line,
+        empty?, encode, encode!, encoding, end_with?, eql?, ext,
+        force_encoding, getbyte, gsub, gsub!, hash, hex, include?, index,
+        initialize_copy, insert, inspect, intern, is_binary_data?,
+        is_complex_yaml?, iseuc, isjis, issjis, isutf8, kconv, length, lines,
+        ljust, lstrip, lstrip!, match, next, next!, oct, ord, parse_csv,
+        partition, pathmap, pathmap_explode, pathmap_partial, pathmap_replace,
+        replace, reverse, reverse!, rindex, rjust, rpartition, rstrip,
+        rstrip!, scan, scanf, setbyte, shellescape, shellsplit, size, slice,
+        slice!, split, squeeze, squeeze!, start_with?, strip, strip!, sub,
+        sub!, succ, succ!, sum, swapcase, swapcase!, to_blob, to_d, to_f,
+        to_i, to_s, to_str, to_sym, to_yaml, toeuc, tojis, tolocale, tosjis,
+        toutf16, toutf32, toutf8, tr, tr!, tr_s, tr_s!, unpack, upcase,
+        upcase!, upto, valid_encoding?</methodname></para>
+      </section>
 
       <section>
         <title>Hilfe per ri</title>
@@ -430,16 +393,14 @@ sw@debian:~/sandbox$</screen></para>
         "hello".gsub(/(?&lt;foo&gt;[aeiou])/, '{\k&lt;foo&gt;}')  #=&gt; "h{e}ll{o}"
 
 sw@debian:~/sandbox$</screen></para>
-
-        <para></para>
       </section>
     </section>
 
     <section>
-      <title>+ ist eine Methode?</title>
+      <title>"+" ist eine Methode?</title>
 
       <para>Wieso steht bei der Liste der Methoden beim
-      <classname>Strings</classname> auch das Pluszeichen? Schauen wir mal mit
+      <classname>String</classname> auch das Pluszeichen? Schauen wir mal mit
       <application>ri</application> nach.<screen>sw@debian:~/sandbox$ <command>ri String.+</command>
 --------------------------------------------------------------- String#+
      str + other_str   =&gt; new_str
@@ -571,8 +532,6 @@ irb(main):001:0&gt; <command>5.times { |i| puts i }</command>
 irb(main):002:0&gt; <command>exit</command>
 </screen></para>
 
-      <para></para>
-
       <section>
         <title>Blocks und Iteratoren</title>
 
@@ -626,6 +585,103 @@ Das blaue Haus.
 =&gt; 5
 irb(main):002:0&gt; <command>exit</command>
 </screen></para>
+      </section>
+    </section>
+
+    <section>
+      <title>Arrays und Hashes</title>
+
+      <para>Wie in vielen Programmiersprachen sind auch in Ruby Arrays und
+      Hashes beliebte Mechanismen, um Daten zu speichern.</para>
+
+      <section>
+        <title>Array</title>
+
+        <para>Spielen wir doch einmal ein wenig im irb.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = [1,2,3,4,5]</command>
+=&gt; [1, 2, 3, 4, 5]
+irb(main):002:0&gt; <command>a.class</command>
+=&gt; Array
+irb(main):003:0&gt; <command>exit</command>
+</screen></para>
+
+        <para>Das ist einfach und verständlich. Mal schauen, ob das so auch
+        mit Strings im Array funktioniert.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = ['Test', 'Apfelbaum', 'blau']</command>
+=&gt; ["Test", "Apfelbaum", "blau"]
+irb(main):002:0&gt; <command>a.class</command>
+=&gt; Array
+irb(main):003:0&gt; <command>a[1]</command>
+=&gt; "Apfelbaum"
+irb(main):004:0&gt; <command>a[1].class</command>
+=&gt; String
+irb(main):005:0&gt; <command>exit</command>
+</screen></para>
+
+        <para>Das geht auch. Dann fehlt nur noch ein Array mit einem Mix aus
+        beidem. Ist klar, das es gehen muss, weil das Array ja Objekte
+        speichert und es egal ist, welche Art von Objekten (sprich String,
+        Fixnum oder Float) das ist. Aber ein Versuch schadet ja nicht.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = [1, 2, 'Haus', 'Baum', 4]</command>
+=&gt; [1, 2, "Haus", "Baum", 4]
+irb(main):002:0&gt; <command>a.class</command>
+=&gt; Array
+irb(main):003:0&gt; <command>a[0]</command>
+=&gt; 1
+irb(main):004:0&gt; <command>a[0].class</command>
+=&gt; Fixnum
+irb(main):005:0&gt; <command>a[2]</command>
+=&gt; "Haus"
+irb(main):006:0&gt; <command>a[2].class</command>
+=&gt; String
+irb(main):007:0&gt; <command>exit</command>
+</screen></para>
+
+        <para>Schauen wir uns als nächstes mal die ri Hilfeseite zu Array
+        an.<screen>sw@debian:~/sandbox$ <command>ri Array</command>
+-------------------------------------------------- Class: Array &lt; Object
+     Arrays are ordered, integer-indexed collections of any object.
+     Array indexing starts at 0, as in C or Java. A negative index is
+     assumed to be relative to the end of the array---that is, an index
+     of -1 indicates the last element of the array, -2 is the next to
+     last element in the array, and so on.
+
+------------------------------------------------------------------------
+
+
+Includes:
+---------
+
+     Enumerable
+
+
+Class methods:
+--------------
+
+     [], new, try_convert
+
+
+Instance methods:
+-----------------
+
+     &amp;, *, +, -, &lt;&lt;, &lt;=&gt;, ==, [], []=, abbrev, assoc, at, clear,
+     collect, collect!, combination, compact, compact!, concat, count,
+     cycle, dclone, delete, delete_at, delete_if, drop, drop_while,
+     each, each_index, empty?, eql?, fetch, fill, find_index, first,
+     flatten, flatten!, frozen?, hash, include?, index, initialize_copy,
+     insert, inspect, join, last, length, map, map!, pack, permutation,
+     pop, pretty_print, pretty_print_cycle, product, push, rassoc,
+     reject, reject!, replace, reverse, reverse!, reverse_each, rindex,
+     sample, select, shelljoin, shift, shuffle, shuffle!, size, slice,
+     slice!, sort, sort!, take, take_while, to_a, to_ary, to_csv, to_s,
+     to_yaml, transpose, uniq, uniq!, unshift, values_at,
+     yaml_initialize, zip, |
+sw@debian:~/sandbox$</screen></para>
+
+        <para>Interessant ist dabei das Mixin der Klasse
+        <classname>Enumerable</classname>. </para>
+
+        <para></para>
       </section>
     </section>
   </section>
