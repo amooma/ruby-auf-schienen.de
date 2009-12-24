@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title>Ruby Grundlagen</title>
+
+  <section>
+    <title>Einleitung</title>
+
+    <para>Genauso wie dieses Buch Grundkenntnisse in HTML vorraussetzt, so
+    muss der werte Leser auch ein Grundverständnis von Programmierung
+    mitbringen. Gerade Ruby macht erst richtig Spass, wenn man sich mit
+    anderen Programmiersprachen schon die Zähne ausgebissen hat und dann im
+    Laufe des Buches (vielleicht ja schon in diesem Kapitel) die Genialheit
+    von Ruby versteht. </para>
+
+    <para>Ruby on Rails ist erst durch Ruby möglich geworden. Lustigerweise
+    ist Ruby eine schon über 10 Jahre alte Programmiersprache, die erst durch
+    Ruby on Rails richtig bekannt wurde. So hat sich eine Symbiose entwickelt.
+    Wer aber einmal vom Ruby-Fieber befallen wurde, der mag weder PHP noch
+    Perl anfassen oder schreiben.</para>
+  </section>
+
+  <section>
+    <title>Hello World</title>
+
+    <para>Ein einfaches Ruby hello-world.rb Programm besteht aus folgender
+    Zeile:<programlisting>puts "Hello World!"
+</programlisting></para>
+
+    <para>Und kann auf der Kommandozeile wie folgt aufgerufen werden:<screen>sw@debian:~/sandbox$ <command>ruby hello-world.rb</command> 
+Hello World!
+sw@debian:~/sandbox$ </screen></para>
+
+    <para><important>
+        <para>Mit <application>puts</application> kann man Texte ausgeben.
+        Diese Texte müssen in Anführungszeichen stehen.</para>
+      </important></para>
+  </section>
+
+  <section>
+    <title>irb</title>
+
+    <para>Ruby hat ein fast geniales Tool zum Ausprobieren von Ruby-Code:
+    irb</para>
+
+    <para><acronym>irb</acronym> steht für Interactive Ruby Shell und ist eine
+    Art Sandbox in der man beliebig mit Ruby rumspielen kann. Ein Beispiel
+    sagt mehr als tausend Worte:<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>puts "Hello World!"</command>
+Hello World!
+=&gt; nil
+irb(main):003:0&gt; <command>exit</command>
+sw@debian:~/sandbox$ </screen></para>
+
+    <para>In diesem Kapitel werden alle Beispiele innerhalb von
+    <application>irb</application> erarbeitet.</para>
+  </section>
+
+  <section>
+    <title>Variabeln</title>
+
+    <section>
+      <title>String</title>
+
+      <para>Ein String ist eine Zeichenkette und wird mit einfachen oder
+      doppelten Anführungszeichen eingegrenzt.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = "Das Haus hat ein blaues Dach."</command>
+=&gt; "Das Haus hat ein blaues Dach."
+irb(main):002:0&gt; <command>puts a</command>
+Das Haus hat ein blaues Dach.
+=&gt; nil
+irb(main):003:0&gt; <command>b = 'Das Rad ist rot.'</command>    
+=&gt; "Das Rad ist rot."
+irb(main):003:0&gt; <command>exit</command></screen></para>
+
+      <para>Mit "+" können Strings verkettet werden.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = 'abc'</command>
+=&gt; "abc"
+irb(main):002:0&gt; <command>b = '123'</command>
+=&gt; "123"
+irb(main):003:0&gt; <command>c = 'xyz'</command>
+=&gt; "xyz"
+irb(main):004:0&gt; <command>d = a + b + c</command>
+=&gt; "abc123xyz"
+irb(main):005:0&gt; <command>exit</command></screen></para>
+
+      <para>Innerhalb von doppelten Anführungszeichen werden sogenannte
+      Expressions mit der Syntax #{ ... } automatisch als ausgewertet und
+      anstatt der Expression eingefügt.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = 'abc'</command>
+=&gt; "abc"
+irb(main):002:0&gt; <command>b = '123'</command>
+=&gt; "123"
+irb(main):003:0&gt; <command>c = "Der Inhalt von b ist #{b}."</command>
+=&gt; "Der Inhalt von b ist 123."
+irb(main):004:0&gt; <command>exit</command>
+</screen></para>
+    </section>
+
+    <section>
+      <title>Integer (Fixnum)</title>
+
+      <para>Ein Integer ist in Ruby genauso ein Integer wie in anderen
+      Programmiersprachen. Hier ein paar Beispiele.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = 10</command>
+=&gt; 10
+irb(main):002:0&gt; <command>b = 20</command>
+=&gt; 20
+irb(main):003:0&gt; <command>c = a + b</command>
+=&gt; 30
+irb(main):004:0&gt; <command>d = c - b</command>
+=&gt; 10
+irb(main):005:0&gt; <command>e = d * a</command>
+=&gt; 100
+irb(main):006:0&gt; <command>exit</command>
+</screen></para>
+    </section>
+
+    <section>
+      <title>Real (Float)</title>
+
+      <para>Auch hier keine grosse Zauberrei. Beispiele für die Arbeit mit
+      Reals.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = 10.1</command>
+=&gt; 10.1
+irb(main):002:0&gt; <command>b = 10.5</command>
+=&gt; 10.5
+irb(main):003:0&gt; <command>c = a + b</command>
+=&gt; 20.6
+irb(main):004:0&gt; <command>d = a * b</command>
+=&gt; 106.05
+irb(main):005:0&gt; <command>exit</command>
+</screen></para>
+    </section>
+
+    <section>
+      <title>Boolean</title>
+
+      <para>Wahr und falsch oder besser true und false.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = true</command>
+=&gt; true
+irb(main):002:0&gt; <command>b = false</command>
+=&gt; false
+irb(main):003:0&gt; <command>exit</command>
+</screen></para>
+    </section>
+  </section>
+
+  <section>
+    <title>Doch alles Objekte</title>
+
+    <para>Vielleicht haben wir es uns eben mit den Variablen doch etwas zu
+    einfach gemacht. Ruby kennt nämlich keine Variablen. Ruby kennt nur
+    Objekte. Alles ist ein Objekt (was ja fast schon zen-artig ist). Die
+    Klasse (Class) eines Ojektes lässt sich mit der Methode
+    <code>.class</code> rausfinden.</para>
+
+    <important>
+      <para>Sie haben keine Ahnung was eine Klasse und was ein Objekt ist?
+      Keine Panik! Ich werde es keinem erzählen und man kann auch ganz gut
+      damit arbeiten, ohne sich grosse Gedanken darüber zu machen - Mit dem
+      Thema alleine könnte man ein ganzes Buch füllen. Ganz grob: Eine Klasse
+      ist ein Container für irgendwas und eine Methode verändert etwas in
+      diesem Container.</para>
+
+      <para>Lesen Sie bitte weiter und schauen Sie sich die Beispiele an.
+      Stück für Stück wird das Puzzle dann klarer.</para>
+    </important>
+
+    <para>Schauen wir uns erst mal die Klasse String an.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = 'Das Haus hat ein blaues Dach.'</command>
+=&gt; "Das Haus hat ein blaues Dach."
+irb(main):002:0&gt; <command>a.class</command>
+=&gt; String
+irb(main):003:0&gt; <command>exit</command>
+</screen></para>
+
+    <para>Und jetzt mal ohne einen Variablennamen. Also nur den Text in
+    Anführungszeichen.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>'Das Haus hat ein blaues Dach.'.class</command>
+=&gt; String
+irb(main):002:0&gt; <command>exit</command>
+</screen></para>
+
+    <para>Interessant. Jetzt mal eine Zahl.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>20.class</command>
+=&gt; Fixnum
+irb(main):002:0&gt; <command>exit</command>
+</screen></para>
+
+    <para>Und jetzt mal ein Float.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>20.5555.class</command>
+=&gt; Float
+irb(main):002:0&gt; <command>exit</command>
+</screen></para>
+
+    <para>Ist doch cool wie Ruby das alles automagisch macht, oder?</para>
+
+    <section>
+      <title>Von einem zum anderen (Konvertieren)</title>
+
+      <para>Logischerweise gibt es eine ganze Reihe von praktischen Methoden,
+      um Objekte von einer Klasse in eine andere zu wandeln. Als erstes
+      verwandelt wir mal mit der Methode <methodname>.to_s</methodname> ein
+      Fixnum in einen String.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = 10</command>
+=&gt; 10
+irb(main):002:0&gt; <command>a.class</command>
+=&gt; Fixnum
+irb(main):003:0&gt; <command>b = a.to_s</command>
+=&gt; "10"
+irb(main):004:0&gt; <command>exit</command>
+</screen></para>
+
+      <para>Nichts anderes macht übrigens <application>puts</application>,
+      wenn man mit put ein Fixnum oder ein Float ausgibt (es fügt bei
+      Nicht-Strings einfach die Methode <methodname>.to_s</methodname> hinzu
+      und gibt das Ergebnis aus).</para>
+
+      <para>Jetzt wandeln wir mal mit der Methode
+      <methodname>.to_i</methodname> ein Float in ein Fixnum um.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>c = 10.0</command>
+=&gt; 10.0
+irb(main):002:0&gt; <command>c.class</command>
+=&gt; Float
+irb(main):003:0&gt; <command>d = c.to_i</command>
+=&gt; 10
+irb(main):004:0&gt; <command>d.class</command>
+=&gt; Fixnum
+irb(main):005:0&gt; <command>exit</command>
+</screen></para>
+
+      <para></para>
+    </section>
+
+    <section>
+      <title>Weitere Beispiel-Methoden für String</title>
+
+      <para>Hier ein paar Beispiele für Methoden der Klasse String.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = 'Das Haus.'</command>
+=&gt; "Das Haus."
+irb(main):002:0&gt; <command>a.class</command>
+=&gt; String
+irb(main):003:0&gt; <command>a.size</command>
+=&gt; 9
+irb(main):004:0&gt; <command>a.downcase</command>
+=&gt; "das haus."
+irb(main):005:0&gt; <command>a.upcase</command>
+=&gt; "DAS HAUS."
+irb(main):006:0&gt; <command>a.reverse</command>
+=&gt; ".suaH saD"
+irb(main):007:0&gt; <command>exit</command>
+</screen></para>
+
+      <para></para>
+    </section>
+
+    <section>
+      <title>Verketten von Methoden</title>
+
+      <para>Man kommt nicht direkt drauf, aber wenn man sich an das Arbeiten
+      mit Ruby gewöhnt hat, dann ist es auch völlig selbstverständlich
+      verschiedene Methoden zu verketten.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = 'Das Haus.'</command>
+=&gt; "Das Haus."
+irb(main):002:0&gt; <command>a.class</command>
+=&gt; String
+irb(main):003:0&gt; <command>a.upcase.reverse</command>
+=&gt; ".SUAH SAD"
+irb(main):004:0&gt; <command>b = 'Das blaue Haus mit dem roten Dach.'</command>
+=&gt; "Das blaue Haus mit dem roten Dach."
+irb(main):005:0&gt; <command>b.class</command>
+=&gt; String
+irb(main):006:0&gt; <command>b.size</command>
+=&gt; 34
+irb(main):008:0&gt; <command>b.size.to_s</command>
+=&gt; "34"
+irb(main):009:0&gt; <command>b.size.to_s.reverse</command>
+=&gt; "43"
+irb(main):010:0&gt; <command>c = "Ein Beispiel: #{b.size.to_s.reverse}"</command>
+=&gt; "Ein Beispiel: 43"
+irb(main):011:0&gt; <command>c.class</command>
+=&gt; String
+irb(main):013:0&gt; <command>c.size</command>
+=&gt; 16
+irb(main):014:0&gt; <command>exit</command>
+</screen></para>
+    </section>
+
+    <section>
+      <title>Liste aller Methoden für eine bestimmte Klasse</title>
+
+      <para>Nun hat man nicht immer alle Methoden-Namen im Kopf, weiß aber das
+      es für das spezielle Problem eine perfekte Methode gibt (passiert mir
+      ständig). Der einfachste Weg eine Liste der entsprechenden Methoden zu
+      bekommen ist dann sicherlich Google. Einfach "Ruby" und den Namen der
+      Klasse als Suchbegriff eingeben und dann bekommt man meist als ersten
+      Eintrag die offizielle Ruby Dokumentation angezeigt.</para>
+
+      <para>Wenn ich alle Methoden für die Klasse String suche, dann suche in
+      in Google nach "ruby string" und bekomme als ersten Treffe die URL
+      http://ruby-doc.org/core/classes/String.html. Auf dieser Seite bekomme
+      ich dann Beispiele zu allen Methoden. </para>
+
+      <para>Interessiert wie viele Methoden die Klasse String hat? Hier sind
+      sie: <methodname>%, *, +, &lt;&lt;, &lt;=&gt;, ==, ===, =~, [], []=,
+      ascii_only?, block_scanf, bytes, bytesize, capitalize, capitalize!,
+      casecmp, center, chars, chomp, chomp!, chop, chop!, chr, clear,
+      codepoints, concat, count, crypt, delete, delete!, downcase, downcase!,
+      dump, each_byte, each_char, each_codepoint, each_line, empty?, encode,
+      encode!, encoding, end_with?, eql?, ext, force_encoding, getbyte, gsub,
+      gsub!, hash, hex, include?, index, initialize_copy, insert, inspect,
+      intern, is_binary_data?, is_complex_yaml?, iseuc, isjis, issjis, isutf8,
+      kconv, length, lines, ljust, lstrip, lstrip!, match, next, next!, oct,
+      ord, parse_csv, partition, pathmap, pathmap_explode, pathmap_partial,
+      pathmap_replace, replace, reverse, reverse!, rindex, rjust, rpartition,
+      rstrip, rstrip!, scan, scanf, setbyte, shellescape, shellsplit, size,
+      slice, slice!, split, squeeze, squeeze!, start_with?, strip, strip!,
+      sub, sub!, succ, succ!, sum, swapcase, swapcase!, to_blob, to_d, to_f,
+      to_i, to_s, to_str, to_sym, to_yaml, toeuc, tojis, tolocale, tosjis,
+      toutf16, toutf32, toutf8, tr, tr!, tr_s, tr_s!, unpack, upcase, upcase!,
+      upto, valid_encoding?</methodname> </para>
+
+      <section>
+        <title>Hilfe per ri</title>
+
+        <para>Es gibt noch eine eingebaute Hilfe (das Programm
+        <application>ri</application>) die wir anstatt Google auf der
+        Kommandozeile aufrufen können. Allerdings ist das dann nicht so schön
+        bunt. ;-)</para>
+
+        <para>Wenn Sie Informationen zur Klasse String suchen, dann können Sie
+        diese auf der Kommandozeile wie folgt ausgeben:<screen>sw@debian:~/sandbox$ <command>ri String</command>
+------------------------------------------------- Class: String &lt; Object
+     A +String+ object holds and manipulates an arbitrary sequence of
+     bytes, typically representing characters. String objects may be
+     created using +String::new+ or as literals.
+
+     Because of aliasing issues, users of strings should be aware of the
+     methods that modify the contents of a +String+ object. Typically,
+     methods with names ending in ``!'' modify their receiver, while
+     those without a ``!'' return a new +String+. However, there are
+     exceptions, such as +String#[]=+.
+
+     Enhance the String class with a XML escaped character version of
+     to_s.
+
+     User defined methods to be added to String.
+
+------------------------------------------------------------------------
+
+
+Includes:
+---------
+
+     Comparable
+
+
+Class methods:
+--------------
+
+     new, try_convert, yaml_new
+
+
+Instance methods:
+-----------------
+
+     %, *, +, &lt;&lt;, &lt;=&gt;, ==, ===, =~, [], []=, ascii_only?, block_scanf,
+     bytes, bytesize, capitalize, capitalize!, casecmp, center, chars,
+     chomp, chomp!, chop, chop!, chr, clear, codepoints, concat, count,
+     crypt, delete, delete!, downcase, downcase!, dump, each_byte,
+     each_char, each_codepoint, each_line, empty?, encode, encode!,
+     encoding, end_with?, eql?, ext, force_encoding, getbyte, gsub,
+     gsub!, hash, hex, include?, index, initialize_copy, insert,
+     inspect, intern, is_binary_data?, is_complex_yaml?, iseuc, isjis,
+     issjis, isutf8, kconv, length, lines, ljust, lstrip, lstrip!,
+     match, next, next!, oct, ord, parse_csv, partition, pathmap,
+     pathmap_explode, pathmap_partial, pathmap_replace, replace,
+     reverse, reverse!, rindex, rjust, rpartition, rstrip, rstrip!,
+     scan, scanf, setbyte, shellescape, shellsplit, size, slice, slice!,
+     split, squeeze, squeeze!, start_with?, strip, strip!, sub, sub!,
+     succ, succ!, sum, swapcase, swapcase!, to_blob, to_d, to_f, to_i,
+     to_s, to_str, to_sym, to_yaml, toeuc, tojis, tolocale, tosjis,
+     toutf16, toutf32, toutf8, tr, tr!, tr_s, tr_s!, unpack, upcase,
+     upcase!, upto, valid_encoding?
+sw@debian:~/sandbox$</screen></para>
+
+        <para>Suchen wir jetzt Informationen zu einer bestimmten Methode, dann
+        geht das auch mit ri. Als Beispiel nehmen wir mal gsub. Das ist eine
+        Methode, mit der man Elemente in einem String austauschen kann (immer
+        wieder praktisch).<screen>sw@debian:~/sandbox$ <command>ri String#gsub</command>
+------------------------------------------------------------ String#gsub
+     str.gsub(pattern, replacement)       =&gt; new_str
+     str.gsub(pattern) {|match| block }   =&gt; new_str
+
+     From Ruby 1.9.1
+------------------------------------------------------------------------
+     Returns a copy of _str_ with _all_ occurrences of _pattern_
+     replaced with either _replacement_ or the value of the block. The
+     _pattern_ will typically be a +Regexp+; if it is a +String+ then no
+     regular expression metacharacters will be interpreted (that is
+     +/\d/+ will match a digit, but +'\d'+ will match a backslash
+     followed by a 'd').
+
+     If a string is used as the replacement, special variables from the
+     match (such as +$&amp;+ and +$1+) cannot be substituted into it, as
+     substitution into the string occurs before the pattern match
+     starts. However, the sequences +\1+, +\2+, +\k&lt;group_name&gt;+, and so
+     on may be used to interpolate successive groups in the match.
+
+     In the block form, the current match string is passed in as a
+     parameter, and variables such as +$1+, +$2+, +$`+, +$&amp;+, and +$'+
+     will be set appropriately. The value returned by the block will be
+     substituted for the match on each call.
+
+     The result inherits any tainting in the original string or any
+     supplied replacement string.
+
+        "hello".gsub(/[aeiou]/, '*')                  #=&gt; "h*ll*"
+        "hello".gsub(/([aeiou])/, '&lt;\1&gt;')             #=&gt; "h&lt;e&gt;ll&lt;o&gt;"
+        "hello".gsub(/./) {|s| s[0].ord.to_s + ' '}   #=&gt; "104 101 108 108 111 "
+        "hello".gsub(/(?&lt;foo&gt;[aeiou])/, '{\k&lt;foo&gt;}')  #=&gt; "h{e}ll{o}"
+
+sw@debian:~/sandbox$</screen></para>
+
+        <para></para>
+      </section>
+    </section>
+
+    <section>
+      <title>+ ist eine Methode?</title>
+
+      <para>Wieso steht bei der Liste der Methoden beim
+      <classname>Strings</classname> auch das Pluszeichen? Schauen wir mal mit
+      <application>ri</application> nach.<screen>sw@debian:~/sandbox$ <command>ri String#+</command>
+--------------------------------------------------------------- String#+
+     str + other_str   =&gt; new_str
+
+     From Ruby 1.9.1
+------------------------------------------------------------------------
+     Concatenation---Returns a new +String+ containing _other_str_
+     concatenated to _str_.
+
+        "Hello from " + self.to_s   #=&gt; "Hello from main"
+
+sw@debian:~/sandbox$</screen></para>
+
+      <para>hmmm... mal schauen was da bei <classname>Fixnum</classname>
+      steht.<screen>sw@debian:~/sandbox$ <command>ri Fixnum#+</command>
+--------------------------------------------------------------- Fixnum#+
+     fix + numeric   =&gt;  numeric_result
+
+     From Ruby 1.9.1
+------------------------------------------------------------------------
+     Performs addition: the class of the resulting object depends on the
+     class of +numeric+ and on the magnitude of the result.
+
+sw@debian:~/sandbox$</screen></para>
+
+      <para>Spielen wir damit mal im irb.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; 10+10
+=&gt; 20
+irb(main):002:0&gt; 10+(10)
+=&gt; 20
+irb(main):003:0&gt; exit
+</screen></para>
+
+      <para>Aha! Das Pluszeichen ist tatsächlich eine Methode und diese
+      Methode nimmt den nächsten Wert als Parameter. Eigentlich müssten wir
+      diesen Wert in einer Klammer setzen, aber Ruby erspart mit durchdachter
+      Syntax.</para>
+
+      <section>
+        <title>Kann ich die Methode + überschreiben?</title>
+
+        <para>Ja, man kann alle Methoden auch durch eigene Methoden
+        überschreiben. Logischerweise macht das bei Methoden wie
+        <methodname>+</methodname> wenig Sinn, ausser man will damit seine
+        Programmierkollegen in den Wahnsinn treiben.</para>
+      </section>
+    </section>
+  </section>
+</chapter>
