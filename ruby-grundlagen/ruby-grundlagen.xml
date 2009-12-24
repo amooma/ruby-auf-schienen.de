@@ -64,6 +64,9 @@ sw@debian:~/sandbox$ </screen></para>
   <section>
     <title>Variabeln</title>
 
+    <para>Da Variablen zum Programmieren unerlässlich sind, fangen wir damit
+    mal an.</para>
+
     <section>
       <title>String</title>
 
@@ -152,12 +155,12 @@ irb(main):003:0&gt; <command>exit</command>
   </section>
 
   <section>
-    <title>Doch alles Objekte</title>
+    <title>Stop! Das sind doch alles Objekte!</title>
 
     <para>Vielleicht haben wir es uns eben mit den Variablen doch etwas zu
-    einfach gemacht. Ruby kennt nämlich keine Variablen. Ruby kennt nur
-    Objekte. Alles ist ein Objekt (was ja fast schon zen-artig ist). Die
-    Klasse (Class) eines Ojektes lässt sich mit der Methode
+    einfach gemacht. Ruby kennt nämlich keine Variablen im klassischen Sinn.
+    Ruby kennt nur Objekte. Alles ist ein Objekt (was ja fast schon zen-artig
+    ist). Die Klasse (Class) eines Ojektes lässt sich mit der Methode
     <code>.class</code> rausfinden.</para>
 
     <important>
@@ -393,7 +396,7 @@ sw@debian:~/sandbox$</screen></para>
         <para>Suchen wir jetzt Informationen zu einer bestimmten Methode, dann
         geht das auch mit ri. Als Beispiel nehmen wir mal gsub. Das ist eine
         Methode, mit der man Elemente in einem String austauschen kann (immer
-        wieder praktisch).<screen>sw@debian:~/sandbox$ <command>ri String#gsub</command>
+        wieder praktisch).<screen>sw@debian:~/sandbox$ <command>ri String.gsub</command>
 ------------------------------------------------------------ String#gsub
      str.gsub(pattern, replacement)       =&gt; new_str
      str.gsub(pattern) {|match| block }   =&gt; new_str
@@ -437,7 +440,7 @@ sw@debian:~/sandbox$</screen></para>
 
       <para>Wieso steht bei der Liste der Methoden beim
       <classname>Strings</classname> auch das Pluszeichen? Schauen wir mal mit
-      <application>ri</application> nach.<screen>sw@debian:~/sandbox$ <command>ri String#+</command>
+      <application>ri</application> nach.<screen>sw@debian:~/sandbox$ <command>ri String.+</command>
 --------------------------------------------------------------- String#+
      str + other_str   =&gt; new_str
 
@@ -451,7 +454,7 @@ sw@debian:~/sandbox$</screen></para>
 sw@debian:~/sandbox$</screen></para>
 
       <para>hmmm... mal schauen was da bei <classname>Fixnum</classname>
-      steht.<screen>sw@debian:~/sandbox$ <command>ri Fixnum#+</command>
+      steht.<screen>sw@debian:~/sandbox$ <command>ri Fixnum.+</command>
 --------------------------------------------------------------- Fixnum#+
      fix + numeric   =&gt;  numeric_result
 
@@ -462,12 +465,19 @@ sw@debian:~/sandbox$</screen></para>
 
 sw@debian:~/sandbox$</screen></para>
 
-      <para>Spielen wir damit mal im irb.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; 10+10
+      <para>Spielen wir damit mal im irb. Wir müssten ja dann das
+      <methodname>+</methodname> genauso wie jede andere Methode mit einem
+      Punkt an die Klasse hängen können und die zweite Zahl in einer Klammer
+      als Parameter anfügen.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>10 + 10</command>
 =&gt; 20
-irb(main):002:0&gt; 10+(10)
+irb(main):002:0&gt; <command>10+10</command>
 =&gt; 20
-irb(main):003:0&gt; exit
+irb(main):003:0&gt; <command>10.+10</command>
+=&gt; 20
+irb(main):004:0&gt; <command>10.+(10)</command>
+=&gt; 20
+irb(main):005:0&gt; <command>exit</command>
 </screen></para>
 
       <para>Aha! Das Pluszeichen ist tatsächlich eine Methode und diese
@@ -478,10 +488,144 @@ irb(main):003:0&gt; exit
       <section>
         <title>Kann ich die Methode + überschreiben?</title>
 
-        <para>Ja, man kann alle Methoden auch durch eigene Methoden
-        überschreiben. Logischerweise macht das bei Methoden wie
-        <methodname>+</methodname> wenig Sinn, ausser man will damit seine
-        Programmierkollegen in den Wahnsinn treiben.</para>
+        <para>Ja, man kann alle Methoden überschreiben. Logischerweise macht
+        das bei Methoden wie <methodname>+</methodname> wenig Sinn, ausser man
+        will damit seine Programmierkollegen in den Wahnsinn treiben. Damit
+        Sie mir glauben, führe ich jetzt im irb mal eine kleine Demo aus.
+        </para>
+
+        <para>Das Ziel ist es die Methode <methodname>+</methodname> für
+        Fixnum umzuschreiben. Als Ergebnis jeder Addition soll die Zahl 42
+        rauskommen.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>10 + 10</command>
+=&gt; 20
+irb(main):002:0&gt; <command>10 + 5555</command>
+=&gt; 5565
+irb(main):003:0&gt; <command>class Fixnum</command> 
+irb(main):004:1&gt; <command>def +(name, *args, &amp;blk)</command>
+irb(main):005:2&gt; <command>42</command>
+irb(main):006:2&gt; <command>end</command>
+irb(main):007:1&gt; <command>end</command>
+=&gt; nil
+irb(main):008:0&gt; <command>10 + 10</command>
+=&gt; 42
+irb(main):042:0&gt; <command>10 + 5555</command>
+=&gt; 42
+irb(main):042:0&gt; <command>exit</command>
+</screen></para>
+
+        <para>In den Zeilen 1 und 2 führen wir die normale Addition durch. In
+        den Zeilen 3 bis 7 definieren wir die Methode
+        <methodname>+</methodname> für die Klasse
+        <classname>Fixnum</classname> neu und danach führen wir noch einmal
+        die Berechnung durch. Dann allerdings mit anderen Ergebnissen.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>Schleifen</title>
+
+      <para>Wieder so eine Henne-Ei-Problem. Ich zeige mal ein Beispiel für
+      eine Schleife.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>5.times do |i|</command>
+irb(main):002:1* <command>puts i</command>
+irb(main):003:1&gt; <command>end</command>
+0
+1
+2
+3
+4
+=&gt; 5
+irb(main):004:0&gt; <command>exit</command>
+</screen>Es git also eine <classname>Fixnum</classname> Methode mit dem Namen
+      <methodname>times</methodname>. Schauen wir mal mir
+      <application>ri</application> nach:<screen>sw@debian:~/sandbox$ <command>ri Fixnum.times</command>
+---------------------------------------------------------- Integer#times
+     int.times {|i| block }     =&gt; int
+
+     From Ruby 1.9.1
+------------------------------------------------------------------------
+     Iterates block _int_ times, passing in values from zero to _int_ -
+     1.
+
+        5.times do |i|
+          print i, " "
+        end
+
+     _produces:_
+
+        0 1 2 3 4
+
+sw@debian:~/sandbox$</screen></para>
+
+      <para>Und wie es der Zufall will ist dort genau unser Beispiel
+      aufgeführt. Und es scheint auch noch eine andere Schreibweise zu geben.
+      Probieren wir die auch mal aus.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>5.times { |i| puts i }</command>
+0
+1
+2
+3
+4
+=&gt; 5
+irb(main):002:0&gt; <command>exit</command>
+</screen></para>
+
+      <para></para>
+
+      <section>
+        <title>Blocks und Iteratoren</title>
+
+        <para>Bei der Schleife<programlisting>5.times { |i| puts i }</programlisting>
+        ist <varname>i</varname> der Iterator und <code>puts i</code> der
+        Block.</para>
+
+        <para>Das ganze kann aber auch in der folgenden Form ausgedrückt
+        werden:<programlisting>5.times do |i|
+  puts i
+end</programlisting></para>
+
+        <para></para>
+      </section>
+
+      <section>
+        <title>Die upto Methode</title>
+
+        <para>Neben <methodname>times</methodname> gibt es noch die
+        <methodname>upto</methodname> Methode, um leicht eine Schleife zu
+        realisieren. ri gibt uns auch hier ein schönes Beispiel.<screen>sw@debian:~/sandbox$ <command>ri Fixnum.upto</command>
+----------------------------------------------------------- Integer#upto
+     int.upto(limit) {|i| block }     =&gt; int
+
+     From Ruby 1.9.1
+------------------------------------------------------------------------
+     Iterates _block_, passing in integer values from _int_ up to and
+     including _limit_.
+
+        5.upto(10) { |i| print i, " " }
+
+     _produces:_
+
+        5 6 7 8 9 10
+
+sw@debian:~/sandbox$</screen></para>
+      </section>
+
+      <section>
+        <title>Kein Interator benötigt?</title>
+
+        <para>Der Iterator ist ein Konstrukt, um den Inhalt des Blocks
+        mehrmals durchlaufen zu lassen. Dazu muss er aber als Zähler aber gar
+        nicht benutzt werden.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>5.times { puts 'Das blaue Haus.' }</command>
+Das blaue Haus.
+Das blaue Haus.
+Das blaue Haus.
+Das blaue Haus.
+Das blaue Haus.
+=&gt; 5
+irb(main):002:0&gt; <command>exit</command>
+</screen></para>
       </section>
     </section>
   </section>
