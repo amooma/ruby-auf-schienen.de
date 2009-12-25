@@ -8,15 +8,68 @@
          xmlns:db="http://docbook.org/ns/docbook">
   <title>Schnelleinstieg</title>
 
+  <section>
+    <title>Warum unbedingt Ruby 1.9?</title>
+
+    <para>Alle Bücher und Dokumentationen, die Sie bis jetzt gesehen haben
+    funktionierten auch mit Ruby 1.8. Warum also in alles in der Welt machen
+    wir jetzt so ein Bohei und nehmen nicht einfach Ruby 1.8 - Was mit etwas
+    Glück sogar schon auf Ihrem System installiert ist? So gross ist der
+    Unterschied zwischen 1.9 und 1.8 rein mathematisch gesehen ja gar nicht
+    (prozentual ist die Zahl 1,9 von 1,8 nur 5% höher)?!</para>
+
+    <para>Hier die Antworten:<itemizedlist>
+        <listitem>
+          <para>Der Unterscheid zwischen Ruby 1.9 und Ruby 1.8 ist gigantisch.
+          Lassen Sie sich durch die reine Versionszahl nicht beirren. Um mal
+          das einfachste Argument rauszunehmen: Ruby 1.9 ist viel schneller -
+          sprich performanter als Ruby 1.8. Was heißt "viel"? Je nach
+          Benchmark zwischen 2 und 4 mal so schnell (in Einzelbereichen sogar
+          Faktor 10 und mehr).</para>
+        </listitem>
+
+        <listitem>
+          <para>Die meisten Autoren sind schlicht un ergreifend zu faul, um
+          ihre Doku auf 1.9 upzugraden. Die Neu-Installation ist auch nicht
+          immer trivial (aus diesem Grunde setzen wir für den Schnelleinstieg
+          auf einen virtuellen PC mit einem frischen Betriebssystem).</para>
+        </listitem>
+
+        <listitem>
+          <para>Viele Rails Autoren kommen aus dem englischsprachigen Raum und
+          da kommt man mit Ruby 1.8 ganz gut zurecht. Für alle anderen
+          Sprachen sieht es aber schlechter aus. Erst mit der Version 1.9 gibt
+          es eine richtig gute Multi-Encoding-Umgebung. Man muss sogar sagen,
+          das Ruby 1.9 so ziemlich jeder anderen Programmiersprache
+          diesbezüglich davonrennt.<footnote>
+              <para>Der mässige Umgang mit UTF-8 und Co. in Ruby 1.8 ist fast
+              schon ironisch. Schließlich ist der Erfinder von Ruby (Yukihiro
+              Matsumoto a.k.a. Matz) ein Japaner und da sollte man davon
+              ausgehen, das nicht nur ASCII unterstützt wird. Der Grund für
+              die späte Implementierung waren allerdings die arrogante Art der
+              Entwicklung von UTF-8 bzw. UTF-16. Die entsprechenden Gremien
+              sahen sich am Anfang nicht veranlasst mal einen tieferen Blick
+              in die asiatische Schriftkultur zu werfen. Deshalb war der erste
+              Wurf für europäische Schriften OK, aber für den asiatischen
+              Kulturraum ein Witz. Es wurde nachgebessert und entsprechend zog
+              auch Ruby nach. Die Multi-Encoding-Unterstützung in Ruby 1.9 ist
+              dann auch so gut, das man auf andere Programmiersprachen mit
+              Mitleid herabblickt.</para>
+            </footnote></para>
+        </listitem>
+      </itemizedlist></para>
+  </section>
+
   <section xml:id="ruby19-und-rails-installation">
     <title>Installation von Ruby 1.9 und Rails</title>
 
     <para>Da das Kapitel "Schnelleinstieg" heißt und einen möglichst raschen
     Lernerfolg zum Ziel hat, müssen wir uns auf eine Plattform einigen. Alle
     die für Debian Linux sind, mögen jetzt die Hand heben. OK. Das ist die
-    Mehrheit. Die folgende Installationsanleitung setzt also ein frisch
-    installiertes Debian Linux 5.0 voraus. Für den Anfang reicht da auch eine
-    Virtuelle Maschine (z.B. VMware) als Spielwiese.<note>
+    Mehrheit. Die folgende Installationsanleitung setzt entsprechend ein
+    frisch installiertes Debian Linux 5.0 (Minimal-Version) voraus. Kein
+    frisch installiertes Debian 5.0 zur Hand? Dann bitte in einer virtuellen
+    Maschine (z.B. VMware) neu installieren.<note>
         <para>Es wird in dieser Anleitung nicht jeder Schritt und jeder Befehl
         lang und breit erklärt. Ich gehe davon aus, das Sie sich mit der Linux
         Kommandozeile so gut auskennen, das die jeweiligen Befehle
@@ -25,9 +78,10 @@
         <para>Wer es nicht für nötig hält sich an dieses Kochrezept zu halten
         und lieber ein bereits installiertes Ruby oder ein anderes
         Betriebssystem nimmt: Später nicht rumjammern, wenn was nicht
-        funktioniert!</para>
+        funktioniert! Und glauben Sie mir, es wird etwas nicht funktionieren!
+        An sonsten würde ich nicht den Aufwand betreiben.</para>
 
-        <para>Wenn man in später Ruby on Rails verstanden hat, ist immer noch
+        <para>Wenn Sie später Ruby on Rails verstanden hat, ist immer noch
         Zeit das alles auf dem eigenen Lieblingsbetriebssystem zum Laufen zu
         bringen.</para>
       </warning></para>
@@ -79,9 +133,9 @@ debian:~#</screen></para>
     <para>Wir schlagen uns nicht mehr mit der alten 1.8er Ruby-Version rum,
     sondern installieren Ruby 1.9. Und das der Einfachheit halber direkt von
     der Quelle (bitte immer den aktuellen Downloadlink von
-    http://www.ruby-lang.org/en/downloads/ übernehmen). Zum Kompilieren
-    benötigen wir erst mal eine Buildumgebung. Und wo wir schon mal dabei
-    sind, installieren wir direkt noch die Datenbank
+    <olink>http://www.ruby-lang.org/en/downloads/</olink> übernehmen). Zum
+    Kompilieren benötigen wir erst mal eine Buildumgebung. Und wo wir schon
+    mal dabei sind, installieren wir direkt noch die Datenbank
     <application>sqlite3</application> und den Kommando-Zeilen Web-Browser
     <application>w3m</application>, damit wir später schneller loslegen
     können.<screen>debian:~# <command>aptitude -y install build-essential libssl-dev zlib1g-dev sqlite3 libsqlite3-dev w3m</command>
@@ -677,8 +731,7 @@ Rendering example/hello_world
 Completed in 1ms (View: 0, DB: 0) | 200 OK [http://192.168.248.134/example/hello_world]
 </screen></para>
 
-    <para>Ein Reload der Seite zeigt immer die aktuelle System-Uhrzeit.
-    </para>
+    <para>Ein Reload der Seite zeigt immer die aktuelle System-Uhrzeit.</para>
 
     <para>Es ist kein all zu komplexes Rätsel: Mit der Syntax <code>&lt;%=
     [...] %&gt;</code> kann ich in html.erb-Dateien Ruby-Code ausführen und
