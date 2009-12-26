@@ -8,22 +8,24 @@
          xmlns:db="http://docbook.org/ns/docbook">
   <title>Ruby Grundlagen</title>
 
-  <section>
-    <title>Einleitung</title>
+  <para>Genauso wie dieses Buch Grundkenntnisse in HTML vorraussetzt, so muss
+  der Leser auch ein Grundverständnis von Programmierung mitbringen. Gerade
+  Ruby macht erst richtig Spass, wenn man sich mit anderen Programmiersprachen
+  schon die Zähne ausgebissen hat und dann im Laufe des Buches die Genialheit
+  von Ruby versteht.</para>
 
-    <para>Genauso wie dieses Buch Grundkenntnisse in HTML vorraussetzt, so
-    muss der werte Leser auch ein Grundverständnis von Programmierung
-    mitbringen. Gerade Ruby macht erst richtig Spass, wenn man sich mit
-    anderen Programmiersprachen schon die Zähne ausgebissen hat und dann im
-    Laufe des Buches (vielleicht ja schon in diesem Kapitel) die Genialheit
-    von Ruby versteht. </para>
-
-    <para>Ruby on Rails ist erst durch Ruby möglich geworden. Lustigerweise
-    ist Ruby eine schon über 10 Jahre alte Programmiersprache, die erst durch
-    Ruby on Rails richtig bekannt wurde. So hat sich eine Symbiose entwickelt.
-    Wer aber einmal vom Ruby-Fieber befallen wurde, der mag weder PHP noch
-    Perl anfassen oder schreiben.</para>
-  </section>
+  <para>Ruby on Rails ist erst durch Ruby möglich geworden. Lustigerweise ist
+  Ruby eine schon über 10 Jahre alte Programmiersprache, die erst durch Ruby
+  on Rails richtig bekannt wurde. So hat sich eine Symbiose entwickelt. Wer
+  aber einmal vom Ruby-Fieber befallen wurde, der mag kaum noch andere
+  Programmiersprachen benutzen.<important>
+      <para>Ich komme in diesem Kapitel nicht umher einige Sachen nicht zu
+      erwähnen und damit das Gesamtbild grob zu vereinfachen. An sonsten würde
+      das Kapitel wahrscheinlich 200 Seiten dicker werden. Wer sich intensiver
+      mit Ruby beschäftigen will, findet im Buch "The Ruby Programming
+      Language" vom Ruby-Erfinder Yukihiro Matsumoto eine ideale
+      Lektüre.</para>
+    </important></para>
 
   <section>
     <title>Hello World</title>
@@ -36,48 +38,103 @@
 Hello World!
 sw@debian:~/sandbox$ </screen></para>
 
-    <para><important>
-        <para>Mit <application>puts</application> kann man Texte ausgeben.
-        Diese Texte müssen in Anführungszeichen stehen.</para>
-      </important></para>
-
     <section>
-      <title>puts, print und p</title>
+      <title>puts und print</title>
 
-      <para>Da man die Bildschirmausgabe in vielen Internet-Beispielen mal mit
-      <application>puts</application>, mal mit
-      <application>print</application> und mal mit
-      <application>p</application> sieht, hier kurz die Erläuterung anhand
-      eines Beispiels.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>puts 'test'</command>  # mit einer Zeilenschaltung
-test
-=&gt; nil
-irb(main):002:0&gt; <command>print 'test'</command> # ohne eine Zeilenschaltung
-test=&gt; nil
-irb(main):003:0&gt; <command>p 'test'</command>     # mit einer Zeilenschaltung
-"test"
-=&gt; "test"
-irb(main):004:0&gt; exit</screen></para>
+      <para>Wer im Internet nach Beispiel zu Ruby sucht, findet zwei typische
+      Möglichkeiten Bildschirmausgaben zu starten:<itemizedlist>
+          <listitem>
+            <para><application>puts</application></para>
+
+            <para>Gibt einen String aus und bendet die Ausgabe mit einer
+            Zeilenschaltung.</para>
+          </listitem>
+
+          <listitem>
+            <para><application>print</application></para>
+
+            <para>Gibt einen String aus und bendet die Ausgabe nicht mit einer
+            Zeilenschaltung. Sollte der String selber eine Zeilenschaltung
+            enthalten, so wird diese normal ausgeben.</para>
+          </listitem>
+        </itemizedlist>Beispielprogramm (eine Erweiterung des
+      <filename>hello-world.rb</filename> Programmes):<programlisting>puts 'Hello World!'
+puts
+puts '------------'
+print 'Hello World!'
+print
+puts '------------'
+</programlisting>Die dazu gehörige Bildschirmausgabe:<screen>sw@debian:~/sandbox$ <command>ruby hello-world.rb</command> 
+Hello World!
+
+------------
+Hello World!------------
+sw@debian:~/sandbox$</screen></para>
     </section>
   </section>
 
   <section>
     <title>irb</title>
 
-    <para>Ruby hat ein fast geniales Tool zum Ausprobieren von Ruby-Code:
-    irb</para>
-
     <para><acronym>irb</acronym> steht für Interactive Ruby Shell und ist eine
-    Art Sandbox in der man beliebig mit Ruby rumspielen kann. Ein Beispiel
-    sagt mehr als tausend Worte:<screen>sw@debian:~/sandbox$ <command>irb</command>
+    Art Sandbox in der man beliebig mit Ruby rumspielen kann. irb wird mit der
+    Eingabe von <command>irb</command> auf der Shell gestartet und durch
+    Eingabe von <command>exit</command> wieder beendet. </para>
+
+    <para>Ein Beispiel sagt mehr als tausend Worte:<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>puts 'Hello World!'</command>
 Hello World!
 =&gt; nil
 irb(main):003:0&gt; <command>exit</command>
 sw@debian:~/sandbox$ </screen></para>
 
-    <para>In diesem Kapitel werden alle Beispiele innerhalb von
-    <application>irb</application> erarbeitet.</para>
+    <para>In diesem Kapitel werden viele Beispiele innerhalb von
+    <application>irb</application> erarbeitet. Sie werden auch später bei der
+    Arbeit oft innerhalb von irb neue Sachen ausprobieren, weil es so herlich
+    schnell und unkompliziert ist.</para>
+  </section>
+
+  <section>
+    <title>Kommentare</title>
+
+    <para>Ein Kommentar in einem Ruby-Programm wird mit einem
+    <code>#</code>-Zeichen eingeleitet und von einer Zeilenendschaltung
+    beendet. Als Beispiel erweitere ich das obige
+    <filename>hello-world.rb</filename> um einen Kommentar.<programlisting># Programm zum Anzeigen von "Hello World!"
+# by Stefan Wintermeyer
+
+puts 'Hello World!'</programlisting></para>
+
+    <para>Ein Kommentar kann auch nach einer Programmzeile
+    stehen:<programlisting># Programm zum Anzeigen von "Hello World!"
+# by Stefan Wintermeyer
+
+puts 'Hello World!' # Ausgabe</programlisting></para>
+
+    <para>Ein #-Zeichen innerhalb von Anführungszeichen wird nicht als Anfang
+    eines Kommentars behandelt. Beispielprogramm:<programlisting># Beispielprogramm
+# by Stefan Wintermeyer
+
+puts 'Hello World!'
+puts '############'
+puts
+puts '1#2#3#4#5#6#' # Kommentar dazu
+</programlisting> Die Bildschirmausgabe dazu:<screen>sw@debian:~/sandbox$ <command>ruby hello-world.rb</command> 
+Hello World!
+############
+
+1#2#3#4#5#6#
+sw@debian:~/sandbox$</screen></para>
+
+    <section>
+      <title>Kommentare im irb</title>
+
+      <para>Kommentar innerhalb von irb machen logischweise selten richtig
+      Sinn, da in irb erarbeiteter Code quasi Wegwerf-Code ist. Innerhalb
+      dieses Buches werden aber immer mal wieder Kommentare zur Erklärung auch
+      im irb benutzt. Diese können Sie problemlos mit kopieren und im irb
+      einfügen.</para>
+    </section>
   </section>
 
   <section>
@@ -147,6 +204,36 @@ irb(main):004:0&gt; <command>exit</command>
     behandelt. Da haben wir schon mal eine Sorge weniger.</para>
 
     <section>
+      <title>Methoden</title>
+
+      <para>An so einer Stelle sucht man immer nach einem guten Beispiel, aber
+      es fallen nur eigentlich unsinnige Beispiele ein. Das Problem ist dabei
+      die Prämisse, das man nur Wissen benutzen kann/darf, das bis zu dieser
+      Stelle schon im Buch beschrieben wurde.</para>
+
+      <para>Nehmen wir also an, das wir folgenden Code-Ablauf aus welchem
+      Grund auch immer häufig verwenden:<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>puts 'Hello World!'</command>
+Hello World!
+=&gt; nil
+irb(main):002:0&gt; <command>puts 'Hello World!'</command>
+Hello World!
+=&gt; nil
+irb(main):003:0&gt; <command>puts 'Hello World!'</command>
+Hello World!
+=&gt; nil
+irb(main):004:0&gt; <command>exit</command>
+</screen></para>
+
+      <para>Wir möchten also drei mal hintereinander den String 'Hello World!'
+      ausgeben. Da dies unseren täglichen Arbeitsablauf stark in die Länge
+      zieht, definieren wir jetzt eine Methode, mit der man das alles auf
+      einmal machen kann.</para>
+
+      <para></para>
+    </section>
+
+    <section>
       <title>Von einem zum anderen (Konvertieren)</title>
 
       <para>Logischerweise gibt es eine ganze Reihe von praktischen Instance
@@ -205,8 +292,8 @@ irb(main):007:0&gt; <command>exit</command>
       <title>Verketten von Methoden</title>
 
       <para>Man kommt nicht direkt drauf, aber wenn man sich an das Arbeiten
-      mit Ruby gewöhnt hat, dann ist es auch völlig selbstverständlich
-      verschiedene Methoden zu verketten.<screen>sw@debian:~/sandbox$ <command>irb</command>
+      mit Ruby gewöhnt hat, dann ist es auch völlig selbstverständlich (weil
+      logisch) verschiedene Methoden zu verketten.<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>a = 'Das Haus.'</command>
 =&gt; "Das Haus."
 irb(main):002:0&gt; <command>a.class</command>
@@ -243,16 +330,16 @@ irb(main):014:0&gt; <command>exit</command>
       <section>
         <title>http://ruby-doc.org via Google und Co.</title>
 
-        <para>Unter http://ruby-doc.org finden Sie online eine optisch
-        aufbereitete und unter einander verlinkte Ruby Dokumentaion. Der
-        einfachste Weg dort eine Liste der Methoden zu bekommen ist sicherlich
-        eine Suchmaschine. Einfach "Ruby" und den Namen der Klasse als
-        Suchbegriff eingeben und dann bekommt man meist als ersten Eintrag
+        <para>Unter <olink>http://ruby-doc.org</olink> finden Sie online eine
+        optisch aufbereitete und unter einander verlinkte Ruby Dokumentaion.
+        Der einfachste Weg dort eine Liste der Methoden zu bekommen ist
+        sicherlich eine Suchmaschine. Einfach "Ruby" und den Namen der Klasse
+        als Suchbegriff eingeben und dann bekommt man meist als ersten Eintrag
         diese offizielle Ruby Dokumentation angezeigt.</para>
 
         <para>Wenn ich alle Methoden für die Klasse String suche, dann suche
         in in Google nach "ruby string" und bekomme als ersten Treffer die URL
-        http://ruby-doc.org/core/classes/String.html.<footnote>
+        <olink>http://ruby-doc.org/core/classes/String.html</olink>.<footnote>
             <para>Wer ganz sicher gehen will, kann auch folgenden Suchstring
             nehmen "String site:ruby-doc.org"</para>
           </footnote> Auf dieser Seite bekomme ich dann Beispiele zu allen
@@ -484,6 +571,12 @@ irb(main):042:0&gt; <command>exit</command>
     </section>
 
     <section>
+      <title>Expressions</title>
+
+      <para></para>
+    </section>
+
+    <section>
       <title>Schleifen</title>
 
       <para>Wieder so eine Henne-Ei-Problem. Ich zeige mal ein Beispiel für
@@ -531,6 +624,12 @@ irb(main):001:0&gt; <command>5.times { |i| puts i }</command>
 =&gt; 5
 irb(main):002:0&gt; <command>exit</command>
 </screen></para>
+
+      <section>
+        <title>While und until</title>
+
+        <para></para>
+      </section>
 
       <section>
         <title>Blocks und Iteratoren</title>
