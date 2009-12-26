@@ -134,9 +134,14 @@ debian:~#</screen></para>
     sondern installieren Ruby 1.9. Und das der Einfachheit halber direkt von
     der Quelle (bitte immer den aktuellen Downloadlink von
     <olink>http://www.ruby-lang.org/en/downloads/</olink> übernehmen). Zum
-    Kompilieren benötigen wir erst mal eine Buildumgebung. Und wo wir schon
-    mal dabei sind, installieren wir direkt noch die Datenbank
-    <application>sqlite3</application> und den Kommando-Zeilen Web-Browser
+    Kompilieren benötigen wir eine Buildumgebung. Und wo wir schon mal dabei
+    sind, installieren wir direkt noch die Datenbank
+    <application>sqlite3</application><footnote>
+        <para>Ja, man könnte hier auch eine MySQL oder sonst was Datenbank
+        installieren. Brauchen wir aber alles nicht. Die sqlite3 ist für
+        unsere Entwicklungsumgebung perfekt geeignet. In der Produktivumgebung
+        kann man immer noch auf andere Datenbanken umsteigen.</para>
+      </footnote> und den Kommando-Zeilen Web-Browser
     <application>w3m</application>, damit wir später schneller loslegen
     können.<screen>debian:~# <command>aptitude -y install build-essential libssl-dev zlib1g-dev sqlite3 libsqlite3-dev w3m</command>
 Paketlisten werden gelesen... Fertig
@@ -169,10 +174,20 @@ Lese Task-Beschreibungen... Fertig
 
 debian:~#</screen></para>
 
-    <para>Jetzt ein aktuelles (stable) Ruby 1.9 downloaden, entpacken und
-    bauen. Je nach Rechenpower Ihres Systems, ist das wahrscheinlich auch eine
-    gute Gelegenheit für eine Zigarettenpause oder um einen Kaffee zu
-    kochen.<screen>debian:~# <command>cd /usr/src/</command>
+    <para>Jetzt überprüfen wir noch welche Ruby-Version installiert
+    ist.<screen>debian:~# ruby -v
+-bash: ruby: command not found
+debian:~#</screen></para>
+
+    <para>A-Ha! Natürlich ist noch keine installiert. Falls bei Ihnen eine
+    andere Meldung erscheinen sollte, dann müssen Sie noch mal auf Los zurück
+    und ein frisches und diesmal minimales Debian Linux 5.0
+    installieren.</para>
+
+    <para>Alle anderen: Ein aktuelles (stable) Ruby 1.9 downloaden, entpacken
+    und bauen. Je nach Rechenpower Ihres Systems, ist das wahrscheinlich auch
+    eine gute Gelegenheit einen Kaffee zu kochen oder mit dem Hund spazieren
+    zu gehen.<screen>debian:~# <command>cd /usr/src/</command>
 debian:/usr/src# <command>wget ftp://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p376.tar.gz</command>
 --2009-12-23 19:34:15--  ftp://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p376.tar.gz
            =&gt; `ruby-1.9.1-p376.tar.gz'
@@ -208,8 +223,7 @@ Elapsed: 66.5s
 installing rdoc
 debian:/usr/src/ruby-1.9.1-p376#</screen></para>
 
-    <para>Noch mal kurz checken, ob Ruby 1.9 auch wirklich installiert
-    wurde.<screen>debian:/usr/src/ruby-1.9.1-p376# <command>cd</command>
+    <para>Kurzer Check, ob Ruby 1.9 auch wirklich installiert wurde.<screen>debian:/usr/src/ruby-1.9.1-p376# <command>cd</command>
 debian:~# <command>ruby -v</command>
 ruby 1.9.1p376 (2009-12-07 revision 26041) [i686-linux]
 debian:~# </screen></para>
@@ -257,7 +271,8 @@ Installing RDoc documentation for activeresource-2.3.5...
 debian:~#</screen></para>
 
     <para>Und bevor wir es vergessen, installieren wir jetzt noch das Ruby-Gem
-    um auf die sqlite3 Datenbank zugreifen zu können.<screen>debian:~# <command>gem install sqlite3-ruby</command>
+    um auf die <application>sqlite3</application> Datenbank zugreifen zu
+    können.<screen>debian:~# <command>gem install sqlite3-ruby</command>
 Building native extensions.  This could take a while...
 Successfully installed sqlite3-ruby-1.2.5
 1 gem installed
@@ -274,7 +289,7 @@ debian:~#</screen></para>
     <title>Hello-World mit statischem HTML</title>
 
     <para>Als erstes erstellen wir mit <application>rails</application> ein
-    neues Rails-Projekt mit dem Namen "bester-online-shop-der-welt"<screen>sw@debian:~$ <command>rails bester-online-shop-der-welt</command>
+    neues Rails-Projekt mit dem Namen "beste-webseite-der-welt"<screen>sw@debian:~$ <command>rails beste-webseite-der-welt</command>
       create  
       create  app/controllers
       create  app/helpers
@@ -355,8 +370,8 @@ sw@debian:~$</screen></para>
     <para>Da wurde ja jetzt schon eine ganze Menge gemacht. Wechseln wir doch
     mal in das gerade angelegt Verzeichnis und starten mit
     <application>./script/server</application> die neue
-    Rails-Applikation.<screen>sw@debian:~$ <command>cd bester-online-shop-der-welt</command>
-sw@debian:~/bester-online-shop-der-welt$ <command>./script/server</command> 
+    Rails-Applikation.<screen>sw@debian:~$ <command>cd beste-webseite-der-welt</command>
+sw@debian:~/beste-webseite-der-welt$ <command>./script/server</command> 
 =&gt; Booting WEBrick
 =&gt; Rails 2.3.5 application starting on http://0.0.0.0:3000
 =&gt; Call with -d to detach
@@ -372,7 +387,8 @@ sw@debian:~/bester-online-shop-der-welt$ <command>./script/server</command>
     Sie diese URL jetzt mit Firefox oder einem sonstigen Webbrowser ansteuern.
     Wer sich an die "Bitte minimal installieren"-Anweisung gehalten halt, kann
     sich mit dem Browser w3m auf der Kommandozeile helfen. Dazu eine neue
-    Shell aufmachen und w3m mit der entsprechenden URI starten.<screen>sw@debian:~$ <command>w3m http://0.0.0.0:3000</command></screen></para>
+    Shell aufmachen und <application>w3m</application> mit der entsprechenden
+    URI starten.<screen>sw@debian:~$ <command>w3m http://0.0.0.0:3000</command></screen></para>
 
     <para>Man bekommt dann folgende Bildschirmausgabe:<screen>  â¢ [site:rubyonrails.org] [Search] the Rails site
   â¢ Join the community
@@ -401,12 +417,13 @@ Hereâs how to get rolling:
 </screen></para>
 
     <para>Sieht aber jetzt nicht sooo toll aus. Also versuchen wir es anders:
-    Wir stoppen mit CTRL+C den <application>WEBrick</application> Webserver
-    (das ist der den wir mit <application>./script/server</application>
-    gestartet haben) und schauen uns mal die Hilfe dazu an.<screen>^C[2009-12-23 21:02:50] INFO  going to shutdown ...
+    Wir stoppen mit <command>CTRL+C</command> den
+    <application>WEBrick</application> Webserver (das ist der den wir mit
+    <application>./script/server</application> gestartet haben) und schauen
+    uns mal die Hilfe dazu an.<screen>^C[2009-12-23 21:02:50] INFO  going to shutdown ...
 [2009-12-23 21:02:50] INFO  WEBrick::HTTPServer#start done.
 Exiting
-sw@debian:~/bester-online-shop-der-welt$ <command>./script/server --help</command>
+sw@debian:~/beste-webseite-der-welt$ <command>./script/server --help</command>
 Usage: server [options]
     -p, --port=port                  Runs Rails on the specified port.
                                      Default: 3000
@@ -421,12 +438,12 @@ Usage: server [options]
                                      Default: /
 
     -h, --help                       Show this help message.
-sw@debian:~/bester-online-shop-der-welt$</screen></para>
+sw@debian:~/beste-webseite-der-welt$</screen></para>
 
     <para>Und siehe da, mit <parameter>-b</parameter> können wir dem Webserver
     ein anderes Binding geben und somit auch von anderen Rechnern drauf
     zugreifen. Nehmen wir mal an, das wir das der entsprechende Rechner mit
-    der IP-Adresse 192.168.248.134 eingerichtet wurde. <screen>sw@debian:~/bester-online-shop-der-welt$ <command>./script/server -b 192.168.248.134</command>
+    der IP-Adresse 192.168.248.134 eingerichtet wurde. <screen>sw@debian:~/beste-webseite-der-welt$ <command>./script/server -b 192.168.248.134</command>
 =&gt; Booting WEBrick
 =&gt; Rails 2.3.5 application starting on http://192.168.248.134:3000
 =&gt; Call with -d to detach
@@ -482,22 +499,22 @@ Completed in 59ms (View: 18, DB: 3) | 200 OK [http://192.168.248.134/rails/info/
     <command>CTRL-C</command> den Webserver.<screen>^C[2009-12-23 21:38:07] INFO  going to shutdown ...
 [2009-12-23 21:38:07] INFO  WEBrick::HTTPServer#start done.
 Exiting
-sw@debian:~/bester-online-shop-der-welt$</screen></para>
+sw@debian:~/beste-webseite-der-welt$</screen></para>
 
     <para>Ziel dieses Unterkapitels ist es eine statische Hello-World HTML
     Seite zu erstellen. Dann schauen wir uns doch mal das aktuelle Verzeichnis
-    an.<screen>sw@debian:~/bester-online-shop-der-welt$ <command>ls</command>
+    an.<screen>sw@debian:~/beste-webseite-der-welt$ <command>ls</command>
 app     db   lib  public    README  test  vendor
 config  doc  log  Rakefile  script  tmp
-sw@debian:~/bester-online-shop-der-welt$</screen></para>
+sw@debian:~/beste-webseite-der-welt$</screen></para>
 
     <para>hmmmm... rein aus dem Bauch heraus könnte das Unterverzeichnis
     <filename>public</filename> ein guter Kandidat dafür sein. Schauen wir mal
-    rein.<screen>sw@debian:~/bester-online-shop-der-welt$ <command>cd public</command>
-sw@debian:~/bester-online-shop-der-welt/public$ <command>ls</command>
+    rein.<screen>sw@debian:~/beste-webseite-der-welt$ <command>cd public</command>
+sw@debian:~/beste-webseite-der-welt/public$ <command>ls</command>
 404.html  500.html     images      javascripts  stylesheets
 422.html  favicon.ico  index.html  robots.txt
-sw@debian:~/bester-online-shop-der-welt/public$</screen></para>
+sw@debian:~/beste-webseite-der-welt/public$</screen></para>
 
     <para>Das sieht sehr gut aus. Dann erstellen wir doch mal mit unserem
     Lieblingseditor - falls Sie noch keinen haben, probieren Sie einmal
@@ -510,21 +527,21 @@ sw@debian:~/bester-online-shop-der-welt/public$</screen></para>
 &lt;/html&gt;</programlisting></para>
 
     <para>Sicherheitshalber überprüfen wir das noch mal mit
-    <application>cat</application> (sicher ist sicher).<screen>sw@debian:~/bester-online-shop-der-welt/public$ <command>ls</command>
+    <application>cat</application> (sicher ist sicher).<screen>sw@debian:~/beste-webseite-der-welt/public$ <command>ls</command>
 404.html  500.html     hello-world.html  index.html   robots.txt
 422.html  favicon.ico  images            javascripts  stylesheets
-sw@debian:~/bester-online-shop-der-welt/public$ <command>cat hello-world.html</command> 
+sw@debian:~/beste-webseite-der-welt/public$ <command>cat hello-world.html</command> 
 &lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;Hello World!&lt;/p&gt;
 &lt;/body&gt;
 &lt;/html&gt;
-sw@debian:~/bester-online-shop-der-welt/public$</screen></para>
+sw@debian:~/beste-webseite-der-welt/public$</screen></para>
 
     <para>Jetzt sind wir mal mutig und probieren das aus. Sprich wir gehen
     wieder in das Root-Verzeichnis der Rails-Application und starten den
-    Webserver neu.<screen>sw@debian:~/bester-online-shop-der-welt/public$ cd ..
-sw@debian:~/bester-online-shop-der-welt$ ./script/server -b 192.168.248.134
+    Webserver neu.<screen>sw@debian:~/beste-webseite-der-welt/public$ cd ..
+sw@debian:~/beste-webseite-der-welt$ ./script/server -b 192.168.248.134
 =&gt; Booting WEBrick
 =&gt; Rails 2.3.5 application starting on http://192.168.248.134:3000
 =&gt; Call with -d to detach
@@ -567,7 +584,7 @@ sw@debian:~/bester-online-shop-der-welt$ ./script/server -b 192.168.248.134
     jetzt einfach mal an und irgendwann wird es irgendwie Sinn machen.</para>
 
     <para>Wir legen einen Controller mit dem Namen "example" und dem View
-    "hello-world" an.<screen>sw@debian:~/bester-online-shop-der-welt$ <command>./script/generate controller example hello-world</command> 
+    "hello-world" an.<screen>sw@debian:~/beste-webseite-der-welt$ <command>./script/generate controller example hello-world</command> 
       exists  app/controllers/
       exists  app/helpers/
       create  app/views/example
@@ -578,16 +595,16 @@ sw@debian:~/bester-online-shop-der-welt$ ./script/server -b 192.168.248.134
       create  app/helpers/example_helper.rb
       create  test/unit/helpers/example_helper_test.rb
       create  app/views/example/hello-world.html.erb
-sw@debian:~/bester-online-shop-der-welt$ </screen></para>
+sw@debian:~/beste-webseite-der-welt$ </screen></para>
 
     <para>Die letzte Ausgabezeile enthält eine Datei
     <filename>hello-world.html.erb</filename>. Schauen wir uns diese Datei
-    doch mal an.<screen>sw@debian:~/bester-online-shop-der-welt$ <command>cat app/views/example/hello-world.html.erb</command>
+    doch mal an.<screen>sw@debian:~/beste-webseite-der-welt$ <command>cat app/views/example/hello-world.html.erb</command>
 &lt;h1&gt;Example#hello-world&lt;/h1&gt;
 &lt;p&gt;Find me in app/views/example/hello-world.html.erb&lt;/p&gt;
-sw@debian:~/bester-online-shop-der-welt$ </screen></para>
+sw@debian:~/beste-webseite-der-welt$ </screen></para>
 
-    <para>Starten wir mal die Rails-Applikation.<screen>sw@debian:~/bester-online-shop-der-welt$ <command>./script/server -b 192.168.248.134</command>
+    <para>Starten wir mal die Rails-Applikation.<screen>sw@debian:~/beste-webseite-der-welt$ <command>./script/server -b 192.168.248.134</command>
 =&gt; Booting WEBrick
 =&gt; Rails 2.3.5 application starting on http://192.168.248.134:3000
 =&gt; Call with -d to detach
@@ -615,10 +632,10 @@ sw@debian:~/bester-online-shop-der-welt$ </screen></para>
     <para>Das sieht nicht gut aus. Der Webserver gibt die gleiche
     Fehlermeldung aus.<screen>Processing ApplicationController#hello-world (for 192.168.248.1 at 2009-12-23 22:35:05) [GET]
 
-SyntaxError (/home/sw/bester-online-shop-der-welt/app/controllers/example_controller.rb:2: syntax error, unexpected '-', expecting ';' or '\n'
+SyntaxError (/home/sw/beste-webseite-der-welt/app/controllers/example_controller.rb:2: syntax error, unexpected '-', expecting ';' or '\n'
   def hello-world
             ^
-/home/sw/bester-online-shop-der-welt/app/controllers/example_controller.rb:5: syntax error, unexpected keyword_end, expecting $end):
+/home/sw/beste-webseite-der-welt/app/controllers/example_controller.rb:5: syntax error, unexpected keyword_end, expecting $end):
   &lt;internal:prelude&gt;:8:in `synchronize'
   /usr/local/lib/ruby/1.9.1/webrick/httpserver.rb:111:in `service'
   /usr/local/lib/ruby/1.9.1/webrick/httpserver.rb:70:in `run'
@@ -632,7 +649,7 @@ Rendering rescues/layout (internal_server_error)
     <para>Wenn man sich die Meldung so durchliesst, scheint es fast so zu
     sein, das Rails das Minuszeichen zwischen hello und world nicht mag. Kein
     Problem. Beenden wir mit CTRL-C den Webserver und erstellen einen View
-    hello_world (also mit einem Unterstrich und keinem Minus-Zeichen).<screen>sw@debian:~/bester-online-shop-der-welt$ <command>./script/generate controller example hello_world</command>
+    hello_world (also mit einem Unterstrich und keinem Minus-Zeichen).<screen>sw@debian:~/beste-webseite-der-welt$ <command>./script/generate controller example hello_world</command>
       exists  app/controllers/
       exists  app/helpers/
       exists  app/views/example
@@ -644,12 +661,12 @@ overwrite app/controllers/example_controller.rb? (enter "h" for help) [Ynaqdh] <
    identical  app/helpers/example_helper.rb
    identical  test/unit/helpers/example_helper_test.rb
       create  app/views/example/hello_world.html.erb
-sw@debian:~/bester-online-shop-der-welt$</screen></para>
+sw@debian:~/beste-webseite-der-welt$</screen></para>
 
     <para>Dabei fragt Rails, ob die Datei
     <filename>app/controllers/example_controller.rb</filename> überschrieben
-    werden soll. Sagen wir einfach mal Y für ja. Starten wir jetzt noch mal
-    die Rails-Applikation.<screen>sw@debian:~/bester-online-shop-der-welt$ ./script/server -b 192.168.248.134=&gt; Booting WEBrick
+    werden soll. Geben Sie <command>Y</command> für ja ein. Starten wir jetzt
+    noch mal die Rails-Applikation.<screen>sw@debian:~/beste-webseite-der-welt$ ./script/server -b 192.168.248.134=&gt; Booting WEBrick
 =&gt; Rails 2.3.5 application starting on http://192.168.248.134:3000
 =&gt; Call with -d to detach
 =&gt; Ctrl-C to shutdown server
@@ -684,24 +701,145 @@ Completed in 377ms (View: 376, DB: 0) | 200 OK [http://192.168.248.134/example/h
         besondere Namenskonventionen. So sollte man kein Minus-Zeichen im
         Namen eines Controllers oder eines Views verwenden.</para>
       </important>Schauen wir uns mal die Datei
-    <filename>hello_world.html.erb</filename> an.<screen>sw@debian:~/bester-online-shop-der-welt$ cat app/views/example/hello_world.html.erb 
+    <filename>hello_world.html.erb</filename> an.<screen>sw@debian:~/beste-webseite-der-welt$ cat app/views/example/hello_world.html.erb 
 &lt;h1&gt;Example#hello_world&lt;/h1&gt;
 &lt;p&gt;Find me in app/views/example/hello_world.html.erb&lt;/p&gt;
-sw@debian:~/bester-online-shop-der-welt$</screen></para>
+sw@debian:~/beste-webseite-der-welt$</screen></para>
 
     <para>Da fehlt der saubere HTML-Anfang und das dazu gehörende Ende. Und
     die Seite wird von uns nicht mit "hello_world.html", sondern nur mit
     "hello_world" aufgerufen. Da fehlt ja die Datei-Endung! Alles sehr
     merkwürdig.</para>
 
-    <para>Aber sind wir mal mutig und erweitern die Datei wie
-    folgt:<programlisting>&lt;h1&gt;Example#hello_world&lt;/h1&gt;
+    <section>
+      <title>Was ist "erb"?</title>
+
+      <para>"erb" ist die Dateiendung für Dateien, in denen Ruby-Code in einer
+      bestimmten Syntax eingebettet ist. Das "html" davor dient als Indikator,
+      das es sich um eine HTML-Datei handelt. Wenn Sie schon mal mit PHP
+      gearbeitet haben, wird Ihnen das Prinzip bekannt sein.</para>
+
+      <section>
+        <title>application.html.erb</title>
+
+        <para>Bevor die Validierungs-Polizei vor der Tür steht, kümmern wir
+        uns als erstes mal um sauberes HTML und damit optional um ein
+        Grund-Layout der Seite. Ein geflügeltes Wort in der Rails-Community
+        ist "convention over configuration". Damit ist gemeint "Lehn Dich
+        zurück! Wir haben per Default schon einen guten Weg eingebaut. Den
+        kannst Du zwar verändern, aber wahrscheinlich willst Du das gar
+        nicht." In diesem Fall ist dieser Default-Weg die Datei
+        <filename>application.html.erb</filename> im Projekt-Unterverzeichnis
+        <filename>app/views/layouts</filename></para>
+
+        <para>Schauen wir uns einfach mal ein Beispiel für eine
+        <filename>application.html.erb</filename> Datei an:<programlisting>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd"&gt;
+
+&lt;html lang="de"&gt;
+&lt;head&gt;
+ &lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;
+ &lt;title&gt;untitled&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;%= yield %&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</programlisting></para>
+
+        <para>Alles standard HTML. Interessant ist die Zeile mit dem
+        <code>yield</code> Befehl:<programlisting>&lt;%= yield %&gt;</programlisting></para>
+
+        <para>Man kann es sich fast schon denken:<itemizedlist>
+            <listitem>
+              <para>Mit <code>&lt;%=</code> fängt ein Stück Ruby-Code in einer
+              erb-Datei an.</para>
+            </listitem>
+
+            <listitem>
+              <para>Mit <code>%&gt;</code> hört der Ruby-Code auf und es geht
+              mit HTML-Code weiter.</para>
+            </listitem>
+
+            <listitem>
+              <para><code>yield</code> ist ein Rails-Befehl der an dieser
+              Stelle die eigentlich aufgerufene HTML Datei einbindet.</para>
+            </listitem>
+          </itemizedlist></para>
+
+        <para>Wenn wir jetzt die Seite mit einem Webbrowser abrufen, bekommen
+        wir eine diesmal komplette HTML-Seite ausgeliefert:<programlisting>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd"&gt;
+
+&lt;html lang="de"&gt;
+&lt;head&gt;
+ &lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;
+ &lt;title&gt;untitled&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;h1&gt;Example#hello_world&lt;/h1&gt;
+&lt;p&gt;Find me in app/views/example/hello_world.html.erb&lt;/p&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</programlisting></para>
+
+        <para>Und ein Blick in das Log des Web-Servers zeigt uns was passiert
+        ist:<screen>sw@debian:~/beste-webseite-der-welt$ <command>./script/server -b 192.168.248.134</command>
+=&gt; Booting WEBrick
+=&gt; Rails 2.3.5 application starting on http://192.168.248.134:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2009-12-24 05:30:37] INFO  WEBrick 1.3.1
+[2009-12-24 05:30:37] INFO  ruby 1.9.1 (2009-12-07) [i686-linux]
+[2009-12-24 05:30:37] INFO  WEBrick::HTTPServer#start: pid=17261 port=3000
+
+
+Processing ExampleController#hello_world (for 192.168.248.1 at 2009-12-24 05:30:41) [GET]
+Rendering template within layouts/application
+Rendering example/hello_world
+Completed in 17ms (View: 16, DB: 0) | 200 OK [http://192.168.248.134/example/hello_world]
+</screen></para>
+
+        <para>Die Zeile <screen>Rendering template within layouts/application</screen>gibt
+        die Information aus, das unser Standard-Template
+        <filename>app/vies/layouts/application.html.erb</filename> gerendet
+        wurde und die nächste Zeile <screen>Rendering example/hello_world</screen>sagt,
+        das die Datei <filename>app/views/example/hello_world</filename>
+        gerendert wurde.</para>
+
+        <para>Und zum Schluss erfahren wir noch, das der gesamte Prozess 17ms
+        dauerte:<screen>Completed in 17ms (View: 16, DB: 0) | 200 OK [http://192.168.248.134/example/hello_world]</screen></para>
+      </section>
+    </section>
+  </section>
+
+  <section>
+    <title>Sneak-Preview</title>
+
+    <para>Um mit erb richtig Arbeiten zu können, brauchen Sie Ruby Know-How.
+    Das kommt erst im nächsten Kapitel und ist nicht in 5-Minuten gelesen.
+    Aber ich weiß ja wie das ist und deshalb gibt es hier zwei Mini-Beispiele
+    zum Anfixen. <important>
+        <para>Falls es Ihnen nicht schnell genug geht: Ihre Geduld wird schon
+        bald belohnt werden. Aber der Einstieg in Ruby on Rails ist nicht
+        trivial und ohne Ruby-Grundlagen kommen wir nicht weiter.</para>
+      </important></para>
+
+    <section>
+      <title>Time.now</title>
+
+      <para>Als erstes ein View, der uns die aktuelle Server-Uhrzeit
+      anzeigt:<programlisting>&lt;h1&gt;Example#hello_world&lt;/h1&gt;
 &lt;p&gt;Find me in app/views/example/hello_world.html.erb&lt;/p&gt;
 &lt;p&gt;
 &lt;%= Time.now %&gt;
 &lt;/p&gt;</programlisting></para>
 
-    <para>Wieder die Rails-Applikation starten.<screen>sw@debian:~/bester-online-shop-der-welt$ ./script/server -b 192.168.248.134=&gt; Booting WEBrick
+      <para>Wieder die Rails-Applikation starten.<screen>sw@debian:~/beste-webseite-der-welt$ ./script/server -b 192.168.248.134=&gt; Booting WEBrick
 =&gt; Rails 2.3.5 application starting on http://192.168.248.134:3000
 =&gt; Call with -d to detach
 =&gt; Ctrl-C to shutdown server
@@ -710,43 +848,71 @@ sw@debian:~/bester-online-shop-der-welt$</screen></para>
 [2009-12-23 23:00:25] INFO  WEBrick::HTTPServer#start: pid=16596 port=3000
 </screen></para>
 
-    <para>Und noch mal mit dem Webbrowser auf
-    http://192.168.248.134:3000/example/hello_world zugreifen.</para>
+      <para>Und noch mal mit dem Webbrowser auf
+      http://192.168.248.134:3000/example/hello_world zugreifen.</para>
 
-    <screenshot>
-      <info>
-        <title>hello_world.html.erb Beispiel mit Time.now Ruby Code.</title>
-      </info>
+      <screenshot>
+        <info>
+          <title>hello_world.html.erb Beispiel mit Time.now Ruby Code.</title>
+        </info>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="hello-world-time-now.png"></imagedata>
-        </imageobject>
-      </mediaobject>
-    </screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="hello-world-time-now.png"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
-    <para>Es wird die aktuelle Uhrzeit angezeigt und der Webserver gibt auch
-    die dazu passende Log-Meldung aus.<screen>Processing ExampleController#hello_world (for 192.168.248.1 at 2009-12-23 23:00:32) [GET]
+      <para>Es wird die aktuelle Uhrzeit angezeigt und der Webserver gibt auch
+      die dazu passende Log-Meldung aus.<screen>Processing ExampleController#hello_world (for 192.168.248.1 at 2009-12-23 23:00:32) [GET]
 Rendering example/hello_world
 Completed in 1ms (View: 0, DB: 0) | 200 OK [http://192.168.248.134/example/hello_world]
 </screen></para>
 
-    <para>Ein Reload der Seite zeigt immer die aktuelle System-Uhrzeit.</para>
+      <para>Ein Reload der Seite zeigt immer die aktuelle
+      System-Uhrzeit.</para>
 
-    <para>Es ist kein all zu komplexes Rätsel: Mit der Syntax <code>&lt;%=
-    [...] %&gt;</code> kann ich in html.erb-Dateien Ruby-Code ausführen und
-    das Ergebnis anzeigen lassen. Die Dateiendung "erb" steht dabei übrigens
-    für embedded Ruby.</para>
+      <para>Es ist kein all zu komplexes Rätsel: Mit der Syntax <code>&lt;%=
+      [...] %&gt;</code> kann ich in html.erb-Dateien Ruby-Code ausführen und
+      das Ergebnis anzeigen lassen. Die Dateiendung "erb" steht dabei übrigens
+      für embedded Ruby.</para>
 
-    <para>Um Rails weiter zu erklären müssen wir uns erst einmal mit Ruby
-    beschäftigen. Deshalb wird es im nächsten Kapitel um Ruby-Grundlagen
-    gehen.</para>
+      <para>Um Rails weiter zu erklären müssen wir uns erst einmal mit Ruby
+      beschäftigen. Deshalb wird es im nächsten Kapitel um Ruby-Grundlagen
+      gehen.</para>
+    </section>
 
-    <important>
-      <para>Falls es Ihnen nicht schnell genug geht: Ihre Geduld wird schon
-      bald belohnt werden. Aber der Einstieg in Ruby on Rails ist nicht
-      einfach und ohne Ruby-Grundlagen kommen wir hier nicht weiter.</para>
-    </important>
+    <section>
+      <title>Kleine Schleife</title>
+
+      <para>Das folgende kleine Programm definiert ein Array und liesst die
+      Werte dann einzelnd aus.<programlisting>&lt;h1&gt;Example#hello_world&lt;/h1&gt;
+&lt;p&gt;Find me in app/views/example/hello_world.html.erb&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;%- a = ['aaa', 'bbb', 'ccc'] %&gt;
+&lt;%- a.each do |wert| %&gt;
+  &lt;li&gt;
+  &lt;%= wert %&gt;
+  &lt;/li&gt;
+&lt;%- end %&gt;
+&lt;/ul&gt;
+</programlisting></para>
+
+      <para>Die Seite sieht fertig gerendet im Browser wie folgt aus:</para>
+
+      <screenshot>
+        <info>
+          <title>Screenshot des Browsers</title>
+        </info>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="hello_world_kleine_schleife.png"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </screenshot>
+    </section>
   </section>
 
   <section>
@@ -756,6 +922,10 @@ Completed in 1ms (View: 0, DB: 0) | 200 OK [http://192.168.248.134/example/hello
 
     <itemizedlist>
       <listitem>
+        <para>Ruby 1.9 ist viel besser als Ruby 1.8</para>
+      </listitem>
+
+      <listitem>
         <para>Ruby on Rails scheint für den Anfänger kompliziert zu
         sein.</para>
       </listitem>
@@ -763,6 +933,11 @@ Completed in 1ms (View: 0, DB: 0) | 200 OK [http://192.168.248.134/example/hello
       <listitem>
         <para>Mit dem Programm <application>rails</application> kann man neue
         Rails-Applikationen erstellen.</para>
+      </listitem>
+
+      <listitem>
+        <para>Der Projektname "beste-webseite-der-welt" war a) etwas lang und
+        b) etwas irreführend.</para>
       </listitem>
 
       <listitem>
@@ -776,8 +951,8 @@ Completed in 1ms (View: 0, DB: 0) | 200 OK [http://192.168.248.134/example/hello
       </listitem>
 
       <listitem>
-        <para>Was ein Controller oder ein View ist, wissen wir aber immer noch
-        nicht.</para>
+        <para>Was ein Controller oder ein View genau ist, wissen wir aber
+        immer noch nicht.</para>
       </listitem>
 
       <listitem>
