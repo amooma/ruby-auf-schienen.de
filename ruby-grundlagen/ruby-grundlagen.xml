@@ -339,14 +339,54 @@ irb(main):011:0&gt; <command>exit</command>
 </screen></para>
 
       <section>
-        <title>def initialize</title>
+        <title>private Methoden</title>
 
-        <para>Wenn man eine neue Instanz erstellt (also die Methode .new
-        aufruft), dann gibt es einen Mechanismus eine Art Start-Skript
-        ablaufen zu lassen. Dieser Mechanismus ist die Methode initialize. Die
-        Methode ist automatisch eine private Methode (das heißt, sie kann
-        nicht von aussen, sondern nur innerhalb der Class aufgerufen
-        werden).</para>
+        <para>Es ist häufig sinnvoll eine Methode nur innerhalb der eigenen
+        Class bzw. der eigenen Instance aufzurufen. Solche Methoden nennt man
+        private Methoden und sie werden innerhalb einer Class unterhalb des
+        Schlüsselwortes private aufgeführt.</para>
+
+        <para>irb Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>class Beispiel</command>         # Definition der Class Beispiel
+irb(main):002:1&gt; <command>def mach_was</command>           # Definition der Methode mach_was
+irb(main):003:2&gt; <command>puts 'Was'</command>           
+irb(main):004:2&gt; <command>end</command>
+irb(main):005:1&gt; <command>def mach_noch_was</command>      # Definition der Methode mach_noch_was
+irb(main):006:2&gt; <command>puts noch_was_machen</command>
+irb(main):007:2&gt; <command>end</command>
+irb(main):008:1&gt; 
+irb(main):009:1* <command>private</command>                # Start der private Methoden
+irb(main):010:1&gt; <command>def noch_was_machen</command>    # Definition der Methode noch_was_machen
+irb(main):011:2&gt; <command>puts 'Noch was.'</command>
+irb(main):012:2&gt; <command>end</command>
+irb(main):013:1&gt; <command>end</command>
+=&gt; nil
+irb(main):014:0&gt; <command>test = Beispiel.new</command>    # Neue Instance von Beispiel
+=&gt; #&lt;Beispiel:0x8bb6ffc&gt;
+irb(main):015:0&gt; <command>test.mach_was</command>          # Methode mach_was wird aufgerufen
+Was
+=&gt; nil
+irb(main):016:0&gt; <command>test.mach_noch_was</command>     # Methode mach_noch_was wird aufgerufen
+Noch was.
+
+=&gt; nil
+irb(main):017:0&gt; <command>test.noch_was_machen</command>   # Kann nicht von aussen aufgerufen werden.
+NoMethodError: private method `noch_was_machen' called for #&lt;Beispiel:0x8bb6ffc&gt;
+ from (irb):17
+ from /usr/local/bin/irb:12:in `&lt;main&gt;'
+irb(main):018:0&gt; <command>exit</command>
+</screen></para>
+      </section>
+
+      <section>
+        <title>initialize Methode</title>
+
+        <para>Wenn man eine neue Instanz erstellt (also die Methode
+        <methodname>.new</methodname> aufruft), dann gibt es einen Mechanismus
+        eine Art Start-Skript ablaufen zu lassen. Dieser Mechanismus ist die
+        Methode <methodname>initialize</methodname>. Die Methode ist
+        automatisch eine private Methode, auch wenn Sie nicht explizit im
+        Bereich private aufgeführt wird.</para>
 
         <para>irb Beispiel<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>class Beispiel</command>
@@ -616,9 +656,19 @@ rot
 rot
 sw@debian:~/sandbox$</screen></para>
 
-          <para></para>
+          <para>In der <methodname>initialize</methodname> Methode setzen wir
+          die Instance Variable <varname>@farbe</varname> auf den Wert
+          <parameter>weiss</parameter>. Die Methoden
+          <methodname>streich_alles_rot</methodname> und
+          <methodname>streich_alles_gelb</methodname> verändern diese Instance
+          Variable. Die Methode <methodname>streich_alles_rosa</methodname>
+          hingegen setzt nur eine lokale Variable mit dem Namen
+          <varname>farbe</varname> (es fehlt das
+          <varname>@</varname>-Zeichen).</para>
 
-          <para></para>
+          <para>Mit der Methode <methodname>farbe</methodname> können wir uns
+          ausserhalb der Instance den Wert von <varname>@farbe</varname>
+          ausgeben lassen.</para>
         </section>
       </section>
     </section>
@@ -952,48 +1002,6 @@ sw@debian:~/sandbox$</screen></para>
 sw@debian:~/sandbox$</screen></para>
         </section>
       </section>
-    </section>
-
-    <section>
-      <title>Hello World mit Klassen und Methoden</title>
-
-      <para>Bringen wir mal ein wenig Leben in das Theoretische Klassen- und
-      Methoden-Konstrukt. Definieren wir mal eine Class mit dem Namen
-      <classname>Person</classname> (Klassen fangen immer mit einem
-      Grossbuchstaben an):<programlisting>class Person
-
-end</programlisting></para>
-
-      <para>Jetzt definieren wir für diese Class einen Default-Wert für den
-      Namen der Person. Dies geschied mit der Methode initialize. Sie wird
-      immer dann aufgerufen, wenn ein neues Objekt der entsprechenden Class
-      generiert wird.<programlisting>class Person
-  def initialize(name = 'John Doe')
-    @name = name
-  end
-end</programlisting></para>
-
-      <para>Probieren wir das mal im irb aus.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>class Person</command>
-irb(main):002:1&gt; <command>def initialize(name = 'John Doe')</command>
-irb(main):003:2&gt; <command>@name = name</command>
-irb(main):004:2&gt; <command>end</command>
-irb(main):005:1&gt; <command>end</command>
-=&gt; nil
-irb(main):006:0&gt; <command>test = Person.new</command>
-=&gt; #&lt;Person:0xa118410 @name="John Doe"&gt;
-irb(main):007:0&gt; <command>@name</command>
-=&gt; nil
-irb(main):008:0&gt; <command>exit</command>
-</screen></para>
-
-      <para></para>
-
-      <para></para>
-
-      <para></para>
-
-      <para></para>
     </section>
   </section>
 
