@@ -406,6 +406,21 @@ irb(main):007:0&gt; <command>exit</command>
         dabei die Methode <methodname>initialize</methodname> abgearbeitet.
         Deshalb sieht man im irb die <application>puts</application>-Ausgabe
         aus der irb-Zeile 3. </para>
+
+        <para>Die new Methode aktzeptiert die bei der
+        <methodname>initialize</methodname> Methode angegebenen
+        Parameter:<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>class Beispiel</command>
+irb(main):002:1&gt; <command>def initialize(aaa)</command>   # Definition Parameter aaa
+irb(main):003:2&gt; <command>puts aaa</command>              # Ausgabe von aaa
+irb(main):004:2&gt; <command>end</command>
+irb(main):005:1&gt; <command>end</command>
+=&gt; nil
+irb(main):006:0&gt; <command>test = Beispiel.new('Hello World!')</command>
+Hello World!
+=&gt; #&lt;Beispiel:0x86bed84&gt;
+irb(main):007:0&gt; <command>exit</command>
+</screen></para>
       </section>
     </section>
 
@@ -501,6 +516,43 @@ irb(main):002:0&gt; <command>a.class</command>
 irb(main):003:0&gt; <command>42.2.class</command>
 =&gt; Float
 irb(main):004:0&gt; <command>exit</command>
+</screen></para>
+        </section>
+
+        <section>
+          <title>Einfache Berechnungen</title>
+
+          <para>Rechnen mit Integers und Floats ist so einfach, das man alles
+          anhand von ein paar Zeilen irb Code beschreiben kann:<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = 10</command>
+=&gt; 10
+irb(main):002:0&gt; <command>b = 23</command>
+=&gt; 23
+irb(main):003:0&gt; <command>a + b</command>          # Addition von zwei Fixnums
+=&gt; 33
+irb(main):004:0&gt; <command>(a + b).class</command>  # Das Ergebnis ist ein Fixnum.
+=&gt; Fixnum
+irb(main):005:0&gt; <command>c = a + b</command>
+=&gt; 33
+irb(main):006:0&gt; <command>c.class</command>
+=&gt; Fixnum
+irb(main):007:0&gt; <command>d = 3.14</command>
+=&gt; 3.14
+irb(main):008:0&gt; <command>e = a + d</command>      # Addition Fixnum und Float
+=&gt; 13.14
+irb(main):009:0&gt; <command>e.class</command>        # Das Ergebnis ist ein Float.
+=&gt; Float
+irb(main):010:0&gt; <command>a * b</command>
+=&gt; 230
+irb(main):011:0&gt; <command>(a * b).class</command>
+=&gt; Fixnum
+irb(main):012:0&gt; <command>(a * b * d).class</command>
+=&gt; Float
+irb(main):013:0&gt; <command>b - a</command>
+=&gt; 13
+irb(main):014:0&gt; <command>a += 1</command>         # a = a + 1
+=&gt; 11
+irb(main):015:0&gt; <command>exit</command>
 </screen></para>
         </section>
       </section>
@@ -609,7 +661,7 @@ irb(main):010:0&gt; <command>exit</command>
         </section>
 
         <section>
-          <title>Instance Variablen</title>
+          <title>Instance Variablen (@aaa)</title>
 
           <para>Instance Variablen gelten nur innerhalb einer Klasse, dort
           aber überall. Also quasi eine Mini-Version von Globalen Variablen.
@@ -678,6 +730,145 @@ sw@debian:~/sandbox$</screen></para>
 
       <para>Jetzt haben Sie ein wenig mehr Grundwissen und da können wir bei
       den Methoden ein kleine Stufe tiefer gehen.</para>
+
+      <section>
+        <title>getter und setter</title>
+
+        <para>Da Intance Variablen nur innerhalb der jeweiligen Instance
+        existieren, muss man um exportieren einer solchen Variable immer eine
+        getter Methode schreiben. Wenn wir eine Class
+        <classname>Raum</classname> definieren, die als Instance Variablen
+        <varname>@tueren</varname> und <varname>@fenster</varname> hat (für
+        die Anzahl der Türen und Fenster des Raumes), so können wir wie folgt
+        eine getter Methode für <methodname>tueren</methodname> und
+        <methodname>fenster</methodname> erstellen (Beispielprogramm
+        <filename>raum.rb</filename>):<programlisting>class Raum
+  def initialize
+    @tueren = 1     # ein neuer Raum hat eine Tuer
+    @fenster = 1    # ein neuer Raum hat ein Fenster
+  end
+
+  def tueren
+    @tueren         # der Wert von @tueren wird ausgeben
+  end
+
+  def fenster
+    @fenster        # der Wert von @fenster wird ausgegeben
+  end
+end
+
+wohnzimmer = Raum.new
+
+puts wohnzimmer.tueren
+puts wohnzimmer.fenster
+</programlisting></para>
+
+        <para>Die Ausführung des Programmes:<screen>sw@debian:~/sandbox$ <command>ruby raum.rb</command> 
+1
+1
+sw@debian:~/sandbox$</screen></para>
+
+        <para>Da dieses Problem so häufig auftritt, gibt es dafür schon eine
+        vorgefertigte getter Methode mit dem Namen
+        <methodname>attr_reader</methodname> die wie folgt im Programm
+        <filename>raum.rb</filename> angewendet werden würde:<programlisting>class Raum
+  def initialize
+    @tueren = 1
+    @fenster = 1
+  end
+
+  attr_reader :tueren, :fenster   # mit attr_reader werden automagisch
+end                               # die getter Methoden generiert
+                                  # Ein gutes Beispiel fuer Metaprogramming
+wohnzimmer = Raum.new
+
+puts wohnzimmer.tueren
+puts wohnzimmer.fenster
+</programlisting></para>
+
+        <para>Wenn man von Aussen die Anzahl der Türen oder Fenster verändern
+        will, so braucht man dafür eine setter Methode. Die kann wie folgt
+        realisiert werden:<programlisting>class Raum
+  def initialize
+    @tueren = 1
+    @fenster = 1
+  end
+
+  attr_reader :tueren, :fenster
+
+  def tueren=(value)             # setter fuer tueren
+    @tueren = value
+  end
+
+  def fenster=(value)            # setter fuer fenster
+    @fenster = value
+  end
+
+end
+
+wohnzimmer = Raum.new
+
+puts wohnzimmer.tueren
+puts wohnzimmer.fenster
+
+wohnzimmer.fenster = 2           # fenster wird neu geschrieben
+
+puts wohnzimmer.fenster
+</programlisting></para>
+
+        <para>Die entsprechende Ausgabe dazu:<screen>sw@debian:~/sandbox$ <command>ruby raum.rb</command>
+1
+1
+2
+sw@debian:~/sandbox$</screen></para>
+
+        <para>Natürlich gibt es dazu auch einen vorgefertigten Weg. Mit der
+        Methode <methodname>attr_writer</methodname> können Sie den Code von
+        raum.rb weiter vereinfachen:<programlisting>class Raum
+  def initialize
+    @tueren = 1
+    @fenster = 1
+  end
+
+  attr_reader :tueren, :fenster
+
+  attr_writer :tueren, :fenster
+
+end
+
+wohnzimmer = Raum.new
+
+puts wohnzimmer.tueren
+puts wohnzimmer.fenster
+
+wohnzimmer.fenster = 2
+
+puts wohnzimmer.fenster
+</programlisting></para>
+
+        <para>Und (wer hätte das gedacht!) es gibt auch eine Methode
+        <methodname>attr_accessor</methodname>, die getter und setter
+        kombiniert. Der Code für <filename>raum.rb</filename> sähe dann so
+        aus:<screen>class Raum
+  def initialize
+    @tueren = 1
+    @fenster = 1
+  end
+
+  attr_accessor :tueren, :fenster
+
+end
+
+wohnzimmer = Raum.new
+
+puts wohnzimmer.tueren
+puts wohnzimmer.fenster
+
+wohnzimmer.fenster = 2
+
+puts wohnzimmer.fenster
+</screen></para>
+      </section>
 
       <section>
         <title>Mitgelieferte Methoden bei String</title>
@@ -1006,7 +1197,7 @@ sw@debian:~/sandbox$</screen></para>
   </section>
 
   <section>
-    <title>Expressions</title>
+    <title>if und else</title>
 
     <para></para>
   </section>
