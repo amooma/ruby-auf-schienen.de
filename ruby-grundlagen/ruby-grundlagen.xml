@@ -158,8 +158,15 @@ sw@debian:~/sandbox$</screen></para>
     <title>Ruby ist Objekt-orientiert</title>
 
     <para>Ruby kennt nur Objekte. Alles ist ein Objekt (was ja fast schon
-    zen-artig ist). Die Klasse (Class) eines Ojektes lässt sich mit der
-    Methode <code>.class</code> rausfinden.</para>
+    zen-artig ist). Jedes Objekt ist eine Instance einer Klasse. Die Klasse
+    (Class) eines Objektes lässt sich mit der Methode <code>.class</code>
+    rausfinden.</para>
+
+    <para>Ein Objekt in Ruby ist eingekapselt und kann von Aussen nur mit den
+    Methoden des entsprechenden Objektes erreicht werden. Was das heißt? Ich
+    kann von Aussen keine Variable in einem Objekt dirket verändern. Das
+    entsprechende Objekt muss mir dafür eine Methode zur Verfügung
+    stellen.</para>
 
     <important>
       <para>Sie haben keine Ahnung was eine Klasse und was ein Objekt ist?
@@ -320,8 +327,8 @@ from /usr/local/bin/irb:12:in `&lt;main&gt;'
 
       <para>Das gibt eine Fehlermeldung, den
       <classname>Dies_und_das</classname> ist hier ein Klasse und kein Objekt.
-      Es funktioniert nur, wenn wir vorher ein neuen Objekt der Klasse
-      <classname>Dies_und_das</classname> mit der Methode
+      Es funktioniert nur, wenn wir vorher ein neuen Objekt (eine neue
+      Instance) der Klasse <classname>Dies_und_das</classname> mit der Methode
       <methodname>new</methodname> generiert haben:<screen>irb(main):009:0&gt; <command>abc = Dies_und_das.new</command>
 =&gt; #&lt;Dies_und_das:0x9ebb3f0&gt;
 irb(main):010:0&gt; <command>abc.drei_mal</command>
@@ -331,6 +338,36 @@ Hello World!
 =&gt; nil
 irb(main):011:0&gt; <command>exit</command>
 </screen></para>
+
+      <section>
+        <title>def initialize</title>
+
+        <para>Wenn man eine neue Instanz erstellt (also die Methode .new
+        aufruft), dann gibt es einen Mechanismus eine Art Start-Skript
+        ablaufen zu lassen. Dieser Mechanismus ist die Methode initialize. Die
+        Methode ist automatisch eine private Methode (das heißt, sie kann
+        nicht von aussen, sondern nur innerhalb der Klasse aufgerufen
+        werden).</para>
+
+        <para>irb Beispiel<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>class Beispiel</command>
+irb(main):002:1&gt; <command>def initialize</command>
+irb(main):003:2&gt; <command>puts 'Hello World!'</command>
+irb(main):004:2&gt; <command>end</command>
+irb(main):005:1&gt; <command>end</command>
+=&gt; nil
+irb(main):006:0&gt; <command>test = Beispiel.new</command>
+Hello World!
+=&gt; #&lt;Beispiel:0x99f1e24&gt;
+irb(main):007:0&gt; <command>exit</command>
+</screen></para>
+
+        <para>Die Instance <classname>test</classname> wird mit
+        <methodname>Beispiel.new</methodname> erstellt und als erstes wird
+        dabei die Methode <methodname>initialize</methodname> abgearbeitet.
+        Deshalb sieht man im irb die <application>puts</application>-Ausgabe
+        aus der irb-Zeile 3. </para>
+      </section>
     </section>
 
     <section>
@@ -338,6 +375,24 @@ irb(main):011:0&gt; <command>exit</command>
 
       <para>Wir wissen ja jetzt, das in Ruby alles ein Objekt ist. Also muss
       auch eine Variable ein Objekt sein. </para>
+
+      <section>
+        <title>Namenskonventionen</title>
+
+        <para>Normale Variablen werden kleingeschrieben. Konstanten fangen mit
+        einem Grossbuchstaben an.<important>
+            <para>Eine Konstante kann in Ruby auch mit einem neuen Wert
+            überschrieben werden (allerdings wird dabei eine Warnung
+            ausgegeben). Man sollte sich also nicht auf Unveränderlichkeit
+            einer Konstanten verlassen.</para>
+          </important> Auf der sicheren Seite ist man, wenn man nur
+        ASCII-Zeichen verwendet. Allerdings könnten Sie mit Ruby 1.9 und der
+        richtigen Codierung auch problemlos Sonderzeichen und Umlaute in einem
+        Variablennamen verwenden. Die Höfflichkeit gegenüber anderen (evt.
+        ausländischen) Programmierern die diese Zeichen vielleicht nicht fix
+        und fertig auf der Tastatur haben, ist aber Grund eher auf rein ASCII
+        zu gehen.</para>
+      </section>
 
       <section>
         <title>String</title>
@@ -410,6 +465,163 @@ irb(main):004:0&gt; <command>exit</command>
 </screen></para>
         </section>
       </section>
+
+      <section>
+        <title>Reichweite von Variablen</title>
+
+        <para>Variablen haben je nach Art eine unterschiedliche "Reichweite"
+        innerhalb der Ruby oder Ruby on Rails Applikation. Am besten zeigt
+        sich das mit diesem kleinen Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = 10</command>
+=&gt; 10
+irb(main):002:0&gt; <command>def test</command>
+irb(main):003:1&gt; <command>a = 20</command>
+irb(main):004:1&gt; <command>end</command>
+=&gt; nil
+irb(main):005:0&gt; <command>puts a</command>
+10
+=&gt; nil
+irb(main):006:0&gt; <command>test</command>
+=&gt; 20
+irb(main):007:0&gt; <command>puts a</command>
+10
+=&gt; nil
+irb(main):008:0&gt; <command>exit</command>
+</screen></para>
+
+        <para>Obwohl die Methode <methodname>test</methodname> den Wert der
+        Variable <varname>a</varname> auf 20 gesetzt hat, wurde dabei nur eine
+        lokale Variable gesetzt. Das vorher im Hauptprogramm gesetzte
+        <varname>a</varname> war davon nicht betroffen.</para>
+
+        <section>
+          <title>Lokale Variablen (aaa oder _aaa)</title>
+
+          <para>Lokale Variablen fangen entweder mit einem kleinen Buchstaben
+          oder mit einem Underscore (_) an. Ihre Reichweite beschränkt sich
+          auf die aktuelle Umgebung (z.B. auf die aktuelle Methode).
+          Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>aaa = 10</command>    # Lokale Variable aaa
+=&gt; 10
+irb(main):002:0&gt; <command>_bbb = 20</command>   # Lokale Variable _bbb
+=&gt; 20
+irb(main):003:0&gt; <command>puts aaa</command>
+10
+=&gt; nil
+irb(main):004:0&gt; <command>puts _bbb</command>
+20
+=&gt; nil
+irb(main):005:0&gt; <command>def test</command>    # Definition der Methode test
+irb(main):006:1&gt; <command>aaa = 1000</command>  # Lokale Variable aaa
+irb(main):007:1&gt; <command>_bbb = 2000</command> # Lokale Variable _bbb
+irb(main):008:1&gt; <command>puts aaa</command>    # Ausgabe von aaa
+irb(main):009:1&gt; <command>puts _bbb</command>   # Ausgabe von _bbb
+irb(main):010:1&gt; <command>end</command>         # Ende der Methode test
+=&gt; nil
+irb(main):011:0&gt; <command>puts aaa</command>
+10
+=&gt; nil
+irb(main):012:0&gt; <command>puts _bbb</command>
+20
+=&gt; nil
+irb(main):013:0&gt; <command>test</command>        # Aufruf der Methode test
+1000                         # siehe irb-Zeile 8
+2000                         # siehe irb-Ziele 9
+=&gt; nil
+irb(main):014:0&gt; <command>puts aaa</command>
+10
+=&gt; nil
+irb(main):015:0&gt; <command>puts _bbb</command>
+20
+=&gt; nil
+irb(main):016:0&gt; <command>exit</command>
+</screen></para>
+        </section>
+
+        <section>
+          <title>Globale Variablen ($aaa)</title>
+
+          <para>Eine globale Variable fäng mit einem
+          <varname>$</varname>-Zeichen an und ist im gesamten Programm
+          erreichbar. Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>$aaa = 10</command>
+=&gt; 10
+irb(main):002:0&gt; <command>puts $aaa</command>
+10
+=&gt; nil
+irb(main):003:0&gt; <command>def test</command>    # Definition der Methode test
+irb(main):004:1&gt; <command>$aaa = 20</command>
+irb(main):005:1&gt; <command>end</command>
+=&gt; nil
+irb(main):006:0&gt; <command>puts $aaa</command>   # Ausgabe von $aaa
+10
+=&gt; nil
+irb(main):007:0&gt; <command>test</command>        # Aufruf der Methode test
+=&gt; 20
+irb(main):008:0&gt; <command>puts $aaa</command>   # Ausgabe von $aaa
+20
+=&gt; nil
+irb(main):009:0&gt; <command>$aaa.class</command>
+=&gt; Fixnum
+irb(main):010:0&gt; <command>exit</command>
+</screen></para>
+
+          <para>Globale Variablen werden recht selten benutzt.</para>
+        </section>
+
+        <section>
+          <title>Instance Variablen</title>
+
+          <para>Instance Variablen gelten nur innerhalb einer Klasse, dort
+          aber überall. Also quasi eine Mini-Version von Globalen Variablen.
+          Im Gegensatz zu globalen Variablen findet man Instance Variablen in
+          einer Rails-Applikation an jeder Ecke. Wir gehen die Sachen über ein
+          Beispielprogramm mit dem Namen <filename>farbe.rb</filename>
+          an:<programlisting>class Wand
+  def initialize
+    @farbe = 'weiss'
+  end
+
+  def farbe
+    @farbe
+  end
+
+  def streich_alles_rot
+    @farbe = 'rot'
+  end
+
+  def streich_alles_gelb
+    @farbe = 'gelb'
+  end
+
+  def streich_alles_rosa
+    farbe = 'rosa'
+  end
+end
+
+meine_wand = Wand.new
+
+puts meine_wand.farbe
+
+meine_wand.streich_alles_rot
+
+puts meine_wand.farbe
+
+meine_wand.streich_alles_rosa
+
+puts meine_wand.farbe
+</programlisting>Wenn wir diese Programm starten, gibt es folgende
+          Ausgabe:<screen>sw@debian:~/sandbox$ <command>ruby farbe.rb</command>
+weiss
+rot
+rot
+sw@debian:~/sandbox$</screen></para>
+
+          <para></para>
+
+          <para></para>
+        </section>
+      </section>
     </section>
 
     <section>
@@ -419,8 +631,7 @@ irb(main):004:0&gt; <command>exit</command>
       den Methoden ein kleine Stufe tiefer gehen.</para>
 
       <section>
-        <title>Batteries included oder welche Methoden bei Klasse String
-        mitgeliefert werden</title>
+        <title>Mitgelieferte Methoden bei String</title>
 
         <para>Die meisten Klassen kommen von Hause aus schon mit einem ganzen
         Sack voll äusserst praktischer Methoden. Diese Methoden werden immer
