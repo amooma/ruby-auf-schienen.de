@@ -422,6 +422,50 @@ Hello World!
 irb(main):007:0&gt; <command>exit</command>
 </screen></para>
       </section>
+
+      <section>
+        <title>Vererben</title>
+
+        <para>Eine Class kann in eine andere Class vererbt werden. Von dieser
+        Möglichkeit wir in Rails sehr oft gebraucht gemacht (an sonsten würde
+        ich Sie damit hier nicht bemühen).</para>
+
+        <para>Im folgenden Beispiel generieren wir die Class
+        <classname>Literatur</classname> und fügen die Methode
+        <methodname>antwort_auf_alle_fragen_des_universums</methodname> hinzu.
+        Danach erstellen wir eine Class <classname>Allgemeinwissen</classname>
+        und vererben dorthin die Class <classname>Literatur</classname>. Die
+        Instance egon hat Zugriff auf alle Methoden und die Instance fritz nur
+        auf die der Class <classname>Literatur</classname>.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>class Literatur</command>
+irb(main):002:1&gt; <command>def antwort_auf_alle_fragen_des_universums</command>
+irb(main):003:2&gt; <command>42</command>
+irb(main):004:2&gt; <command>end</command>
+irb(main):005:1&gt; <command>end</command>
+=&gt; nil
+irb(main):006:0&gt; <command>class Allgemeinwissen &lt; Literatur</command>     
+irb(main):007:1&gt; <command>def pi</command>
+irb(main):008:2&gt; <command>3.14</command>
+irb(main):009:2&gt; <command>end</command>
+irb(main):010:1&gt; <command>end</command>
+=&gt; nil
+irb(main):011:0&gt; <command>fritz = Literatur.new</command>
+=&gt; #&lt;Literatur:0x90e7098&gt;
+irb(main):012:0&gt; <command>egon = Allgemeinwissen.new</command>
+=&gt; #&lt;Allgemeinwissen:0x90da0ac&gt;
+irb(main):013:0&gt; <command>egon.antwort_auf_alle_fragen_des_universums</command>
+=&gt; 42
+irb(main):014:0&gt; <command>egon.pi</command>
+=&gt; 3.14
+irb(main):015:0&gt; <command>fritz.antwort_auf_alle_fragen_des_universums</command>
+=&gt; 42
+irb(main):016:0&gt; <command>fritz.pi</command>
+NoMethodError: undefined method `pi' for #&lt;Literatur:0x90e7098&gt;
+ from (irb):21
+ from /usr/local/bin/irb:12:in `&lt;main&gt;'
+irb(main):017:0&gt; <command>exit</command>
+</screen></para>
+      </section>
     </section>
 
     <section>
@@ -1292,142 +1336,6 @@ sw@debian:~/sandbox$</screen></para>
   </section>
 
   <section>
-    <title>Arrays und Hashes</title>
-
-    <para>Wie in vielen Programmiersprachen sind auch in Ruby Arrays und
-    Hashes beliebte Mechanismen, um Daten zu speichern.</para>
-
-    <section>
-      <title>Array</title>
-
-      <para>Spielen wir doch einmal ein wenig im irb.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = [1,2,3,4,5]</command>
-=&gt; [1, 2, 3, 4, 5]
-irb(main):002:0&gt; <command>a.class</command>
-=&gt; Array
-irb(main):003:0&gt; <command>exit</command>
-</screen></para>
-
-      <para>Das ist einfach und verständlich. Mal schauen, ob das so auch mit
-      Strings im Array funktioniert.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = ['Test', 'Apfelbaum', 'blau']</command>
-=&gt; ["Test", "Apfelbaum", "blau"]
-irb(main):002:0&gt; <command>a.class</command>
-=&gt; Array
-irb(main):003:0&gt; <command>a[1]</command>
-=&gt; "Apfelbaum"
-irb(main):004:0&gt; <command>a[1].class</command>
-=&gt; String
-irb(main):005:0&gt; <command>exit</command>
-</screen></para>
-
-      <para>Das geht auch. Dann fehlt nur noch ein Array mit einem Mix aus
-      beidem. Ist klar, das es gehen muss, weil das Array ja Objekte speichert
-      und es egal ist, welche Art von Objekten (sprich String, Fixnum oder
-      Float) das ist. Aber ein Versuch schadet ja nicht.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = [1, 2, 'Haus', 'Baum', 4]</command>
-=&gt; [1, 2, "Haus", "Baum", 4]
-irb(main):002:0&gt; <command>a.class</command>
-=&gt; Array
-irb(main):003:0&gt; <command>a[0]</command>
-=&gt; 1
-irb(main):004:0&gt; <command>a[0].class</command>
-=&gt; Fixnum
-irb(main):005:0&gt; <command>a[2]</command>
-=&gt; "Haus"
-irb(main):006:0&gt; <command>a[2].class</command>
-=&gt; String
-irb(main):007:0&gt; <command>exit</command>
-</screen></para>
-
-      <para>Schauen wir uns als nächstes mal die ri Hilfeseite zu Array
-      an.<screen>sw@debian:~/sandbox$ <command>ri Array</command>
--------------------------------------------------- Class: Array &lt; Object
-     Arrays are ordered, integer-indexed collections of any object.
-     Array indexing starts at 0, as in C or Java. A negative index is
-     assumed to be relative to the end of the array---that is, an index
-     of -1 indicates the last element of the array, -2 is the next to
-     last element in the array, and so on.
-
-------------------------------------------------------------------------
-
-
-Includes:
----------
-
-     Enumerable
-
-
-Class methods:
---------------
-
-     [], new, try_convert
-
-
-Instance methods:
------------------
-
-     &amp;, *, +, -, &lt;&lt;, &lt;=&gt;, ==, [], []=, abbrev, assoc, at, clear,
-     collect, collect!, combination, compact, compact!, concat, count,
-     cycle, dclone, delete, delete_at, delete_if, drop, drop_while,
-     each, each_index, empty?, eql?, fetch, fill, find_index, first,
-     flatten, flatten!, frozen?, hash, include?, index, initialize_copy,
-     insert, inspect, join, last, length, map, map!, pack, permutation,
-     pop, pretty_print, pretty_print_cycle, product, push, rassoc,
-     reject, reject!, replace, reverse, reverse!, reverse_each, rindex,
-     sample, select, shelljoin, shift, shuffle, shuffle!, size, slice,
-     slice!, sort, sort!, take, take_while, to_a, to_ary, to_csv, to_s,
-     to_yaml, transpose, uniq, uniq!, unshift, values_at,
-     yaml_initialize, zip, |
-sw@debian:~/sandbox$</screen></para>
-
-      <para>Arrays können also auch (wie jede Class) mit der Methode new
-      erstellt werden. Einzelne neue Elemente können dann mit der Methode
-      <methodname>&lt;&lt;</methodname> hinzugefügt werden. Auch hierzu ein
-      Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = Array.new</command>
-=&gt; []
-irb(main):002:0&gt; <command>a.class</command>
-=&gt; Array
-irb(main):003:0&gt; <command>a &lt;&lt; 'erster Eintrag'</command>
-=&gt; ["erster Eintrag"]
-irb(main):004:0&gt; <command>a &lt;&lt; 'zweiter Eintrag'</command>
-=&gt; ["erster Eintrag", "zweiter Eintrag"]
-irb(main):005:0&gt; <command>a &lt;&lt; 'dritter Eintrag'</command>
-=&gt; ["erster Eintrag", "zweiter Eintrag", "dritter Eintrag"]
-irb(main):006:0&gt; <command>a.size</command>
-=&gt; 3
-irb(main):007:0&gt; <command>exit</command>
-</screen></para>
-
-      <para>Aber versuchen wir doch mal ein Array mit Einträgen aus einer
-      selbstdefinierten Klasse zu erstellen:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>class Tier</command>         # Definition einer Class Tier
-irb(main):002:1&gt; <command>def initialize(de_name,en_name)</command>
-irb(main):003:2&gt; <command>@de_name = de_name</command>
-irb(main):004:2&gt; <command>@en_name = en_name</command>
-irb(main):005:2&gt; <command>end</command>
-irb(main):006:1&gt; <command>def to_s</command>
-irb(main):007:2&gt; <command>@de_name + ' (' + @en_name + ')'</command>
-irb(main):008:2&gt; <command>end</command>
-irb(main):009:1&gt; <command>end</command>
-=&gt; nil
-irb(main):010:0&gt; <command>lumpi = Tier.new('Hund', 'Dog')</command>
-=&gt; #&lt;Tier:0x873b5c8 @de_name="Hund", @en_name="Dog"&gt;
-irb(main):011:0&gt; <command>hansi = Tier.new('Wellensittich', 'Budgerigar')</command>           
-=&gt; #&lt;Tier:0x86b60f8 @de_name="Wellensittich", @en_name="Budgerigar"&gt;
-irb(main):012:0&gt; <command>puts lumpi</command>         # puts wendet automatisch .to_s an
-Hund (Dog)
-=&gt; nil
-irb(main):013:0&gt; <command>puts hansi</command>
-Wellensittich (Budgerigar)
-=&gt; nil
-irb(main):014:0&gt; <command>exit</command>
-</screen></para>
-    </section>
-  </section>
-
-  <section>
     <title>if-Condition</title>
 
     <para>Eine Abstrakte if-Condition sieht so aus:<programlisting>if expression
@@ -1492,7 +1400,7 @@ end
     <title>Schleifen</title>
 
     <para>Es gibt verschiedenen Arten Schleifen in Ruby zu realisieren. Dabei
-    kommt im Rails-Umfeld vor allen Dingen die zweite Variante häufig zum
+    kommt im Rails-Umfeld vor allen Dingen die Interator-Variante häufig zum
     Einsatz.</para>
 
     <section>
@@ -1626,14 +1534,13 @@ irb(main):002:0&gt; <command>exit</command>
         ausgelöste Programm. Im Block hat man Zugriff auf die vom Iterator
         übergebene lokale Variable.</para>
       </section>
-    </section>
 
-    <section>
-      <title>Die upto Methode</title>
+      <section>
+        <title>upto Methode</title>
 
-      <para>Neben <methodname>times</methodname> gibt es noch die
-      <methodname>upto</methodname> Methode, um leicht eine Schleife zu
-      realisieren. ri gibt uns auch hier ein schönes Beispiel.<screen>sw@debian:~/sandbox$ <command>ri Fixnum.upto</command>
+        <para>Neben <methodname>times</methodname> gibt es noch die
+        <methodname>upto</methodname> Methode, um leicht eine Schleife zu
+        realisieren. ri gibt uns auch hier ein schönes Beispiel.<screen>sw@debian:~/sandbox$ <command>ri Fixnum.upto</command>
 ----------------------------------------------------------- Integer#upto
      int.upto(limit) {|i| block }     =&gt; int
 
@@ -1649,14 +1556,300 @@ irb(main):002:0&gt; <command>exit</command>
         5 6 7 8 9 10
 
 sw@debian:~/sandbox$</screen></para>
+      </section>
+    </section>
+  </section>
+
+  <section>
+    <title>Arrays und Hashes</title>
+
+    <para>Wie in vielen Programmiersprachen sind auch in Ruby Arrays und
+    Hashes beliebte Mechanismen, um Daten zu speichern.</para>
+
+    <section>
+      <title>Array</title>
+
+      <para>Eine Array ist eine Liste von Objekten. Spielen wir doch einmal
+      ein wenig im irb.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = [1,2,3,4,5]</command>
+=&gt; [1, 2, 3, 4, 5]
+irb(main):002:0&gt; <command>a.class</command>
+=&gt; Array
+irb(main):003:0&gt; <command>exit</command>
+</screen></para>
+
+      <para>Das ist einfach und verständlich. Mal schauen, ob das so auch mit
+      Strings im Array funktioniert.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = ['Test', 'Apfelbaum', 'blau']</command>
+=&gt; ["Test", "Apfelbaum", "blau"]
+irb(main):002:0&gt; <command>a.class</command>
+=&gt; Array
+irb(main):003:0&gt; <command>a[1]</command>
+=&gt; "Apfelbaum"
+irb(main):004:0&gt; <command>a[1].class</command>
+=&gt; String
+irb(main):005:0&gt; <command>exit</command>
+</screen></para>
+
+      <para>Das geht auch. Dann fehlt nur noch ein Array mit einem Mix aus
+      beidem. Ist klar, das es gehen muss, weil das Array ja Objekte speichert
+      und es egal ist, welche Art von Objekten (sprich String, Fixnum oder
+      Float) das ist. Aber ein Versuch schadet ja nicht.<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = [1, 2, 'Haus', 'Baum', 4]</command>
+=&gt; [1, 2, "Haus", "Baum", 4]
+irb(main):002:0&gt; <command>a.class</command>
+=&gt; Array
+irb(main):003:0&gt; <command>a[0]</command>
+=&gt; 1
+irb(main):004:0&gt; <command>a[0].class</command>
+=&gt; Fixnum
+irb(main):005:0&gt; <command>a[2]</command>
+=&gt; "Haus"
+irb(main):006:0&gt; <command>a[2].class</command>
+=&gt; String
+irb(main):007:0&gt; <command>exit</command>
+</screen></para>
+
+      <para>Schauen wir uns als nächstes mal die ri Hilfeseite zu Array
+      an.<screen>sw@debian:~/sandbox$ <command>ri Array</command>
+-------------------------------------------------- Class: Array &lt; Object
+     Arrays are ordered, integer-indexed collections of any object.
+     Array indexing starts at 0, as in C or Java. A negative index is
+     assumed to be relative to the end of the array---that is, an index
+     of -1 indicates the last element of the array, -2 is the next to
+     last element in the array, and so on.
+
+------------------------------------------------------------------------
+
+
+Includes:
+---------
+
+     Enumerable
+
+
+Class methods:
+--------------
+
+     [], new, try_convert
+
+
+Instance methods:
+-----------------
+
+     &amp;, *, +, -, &lt;&lt;, &lt;=&gt;, ==, [], []=, abbrev, assoc, at, clear,
+     collect, collect!, combination, compact, compact!, concat, count,
+     cycle, dclone, delete, delete_at, delete_if, drop, drop_while,
+     each, each_index, empty?, eql?, fetch, fill, find_index, first,
+     flatten, flatten!, frozen?, hash, include?, index, initialize_copy,
+     insert, inspect, join, last, length, map, map!, pack, permutation,
+     pop, pretty_print, pretty_print_cycle, product, push, rassoc,
+     reject, reject!, replace, reverse, reverse!, reverse_each, rindex,
+     sample, select, shelljoin, shift, shuffle, shuffle!, size, slice,
+     slice!, sort, sort!, take, take_while, to_a, to_ary, to_csv, to_s,
+     to_yaml, transpose, uniq, uniq!, unshift, values_at,
+     yaml_initialize, zip, |
+sw@debian:~/sandbox$</screen></para>
+
+      <para>Arrays können also auch (wie jede Class) mit der Methode new
+      erstellt werden. Einzelne neue Elemente können dann mit der Methode
+      <methodname>&lt;&lt;</methodname> hinzugefügt werden. Auch hierzu ein
+      Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>a = Array.new</command>
+=&gt; []
+irb(main):002:0&gt; <command>a.class</command>
+=&gt; Array
+irb(main):003:0&gt; <command>a &lt;&lt; 'erster Eintrag'</command>
+=&gt; ["erster Eintrag"]
+irb(main):004:0&gt; <command>a &lt;&lt; 'zweiter Eintrag'</command>
+=&gt; ["erster Eintrag", "zweiter Eintrag"]
+irb(main):005:0&gt; <command>a &lt;&lt; 'dritter Eintrag'</command>
+=&gt; ["erster Eintrag", "zweiter Eintrag", "dritter Eintrag"]
+irb(main):006:0&gt; <command>a.size</command>
+=&gt; 3
+irb(main):007:0&gt; <command>exit</command>
+</screen></para>
+
+      <para>Aber versuchen wir doch mal ein Array mit Einträgen aus einer
+      selbstdefinierten Klasse zu erstellen:<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>class Tier</command>              # Definition einer Class Tier
+irb(main):002:1&gt; <command>def initialize(de_name,en_name)</command>
+irb(main):003:2&gt; <command>@de_name = de_name</command>
+irb(main):004:2&gt; <command>@en_name = en_name</command>
+irb(main):005:2&gt; <command>end</command>
+irb(main):006:1&gt; <command>def to_s</command>
+irb(main):007:2&gt; <command>@de_name + ' (' + @en_name + ')'</command>
+irb(main):008:2&gt; <command>end</command>
+irb(main):009:1&gt; <command>end</command>
+=&gt; nil
+irb(main):010:0&gt; <command>lumpi = Tier.new('Hund', 'Dog')</command>
+=&gt; #&lt;Tier:0x873b5c8 @de_name="Hund", @en_name="Dog"&gt;
+irb(main):011:0&gt; <command>hansi = Tier.new('Wellensittich', 'Budgerigar')</command>           
+=&gt; #&lt;Tier:0x86b60f8 @de_name="Wellensittich", @en_name="Budgerigar"&gt;
+irb(main):012:0&gt; <command>haustiere = Array.new</command>   # haustiere ist ein Array
+=&gt; []
+irb(main):013:0&gt; <command>haustiere &lt;&lt; hansi</command>      # hansi wird dem Array hinzugefuegt
+=&gt; [#&lt;Tier:0x8d11f18 @de_name="Wellensittich", @en_name="Budgerigar"&gt;]
+irb(main):014:0&gt; <command>haustiere &lt;&lt; lumpi</command>      # lumpi wird dem Array hinzugefuegt
+=&gt; [#&lt;Tier:0x8d11f18 @de_name="Wellensittich", @en_name="Budgerigar"&gt;, #&lt;Tier:0x8d9751c @de_name="Hund", @en_name="Dog"&gt;]
+irb(main):015:0&gt; <command>haustiere.count</command>
+=&gt; 2
+irb(main):016:0&gt; <command>puts haustiere[1]</command>       # Ausgabe der Position 1
+Hund (Dog)
+=&gt; nil
+irb(main):017:0&gt; <command>puts haustiere[0]</command>       # Ausgabe der Position 0
+Wellensittich (Budgerigar)
+=&gt; nil
+irb(main):018:0&gt; <command>exit</command>
+</screen></para>
+
+      <section>
+        <title>Iterator (each)</title>
+
+        <para>Mit der Methode <methodname>each</methodname> kann man sich
+        Stück für Stück durch ein Array arbeiten. Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>einkaufsliste = ['Eier', 'Butter', 'Mehl']</command>
+=&gt; ["Eier", "Butter", "Mehl"]
+irb(main):002:0&gt; <command>einkaufsliste.each do |produkt|</command>
+irb(main):003:1* <command>puts produkt</command>
+irb(main):004:1&gt; <command>end</command>
+Eier
+Butter
+Mehl
+=&gt; ["Eier", "Butter", "Mehl"]
+irb(main):005:0&gt; <command>exit</command>
+</screen></para>
+
+        <para>Auch hier gibt Ihnen <application>ri</application> Hilfe und ein
+        Beispiel, falls Sie mal vergessen haben sollten wie
+        <methodname>each</methodname> anzuwenden ist:<screen>sw@debian:~/sandbox$ <command>ri Array.each</command>
+------------------------------------------------------------- Array#each
+     array.each {|item| block }   -&gt;   array
+
+     From Ruby 1.9.1
+------------------------------------------------------------------------
+     Calls _block_ once for each element in _self_, passing that element
+     as a parameter.
+
+        a = [ "a", "b", "c" ]
+        a.each {|x| print x, " -- " }
+
+     produces:
+
+        a -- b -- c --
+
+sw@debian:~/sandbox$</screen></para>
+      </section>
     </section>
 
     <section>
-      <title>Kein Interator benötigt?</title>
+      <title>Hash</title>
 
-      <para>Der Iterator ist ein Konstrukt, um den Inhalt des Blocks mehrmals
-      durchlaufen zu lassen. Dazu muss er aber als Zähler aber gar nicht
-      benutzt werden.</para>
+      <para>Ein Hash ist eine Liste aus Key-und-Value Paaren. Ein Beispiel mit
+      Strings als Key:<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>preisliste = { '6 Eier' =&gt; 1.2, '12 Eier' =&gt; 2, '500 gr Butter' =&gt; 0.99 }</command>
+=&gt; {"6 Eier"=&gt;1.2, "12 Eier"=&gt;2, "500 gr Butter"=&gt;0.99}
+irb(main):002:0&gt; <command>preisliste['12 Eier']</command>
+=&gt; 2
+irb(main):003:0&gt; <command>preisliste.count</command>
+=&gt; 3
+irb(main):004:0&gt; <command>exit</command>
+</screen></para>
+
+      <para>Die Benutzung von Symbols als Keys ist Speicher-Effizienter (auch
+      wenn, das bei diesem Beispiel natürlich keinen grossen Unterschied
+      macht):<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>farben = { :black =&gt; '#000000', :white =&gt; ':FFFFFF', :green =&gt; '#00C000', :blue =&gt; '#0000FF' }
+=&gt; {:black=&gt;"#000000", :white=&gt;":FFFFFF", :green=&gt;"#00C000", :blue=&gt;"#0000FF"}</command>
+irb(main):002:0&gt; <command>puts farben[:green]</command>
+#00C000
+=&gt; nil
+irb(main):003:0&gt; <command>exit</command>
+</screen></para>
+
+      <para>Natürlich können in Hashes nicht nur Strings, sondern auch selbst
+      definierte Class-en als Objekte im Value gespeichert werden (siehe
+      Array-Beispiel).</para>
+
+      <para>Wie zu Array gibt es auch zu Hash eine sehr gute ri
+      Hilfe-Seite:<screen>sw@debian:~/sandbox$ <command>ri Hash</command>
+--------------------------------------------------- Class: Hash &lt; Object
+     A +Hash+ is a collection of key-value pairs. It is similar to an
+     +Array+, except that indexing is done via arbitrary keys of any
+     object type, not an integer index. The order in which you traverse
+     a hash by either key or value may seem arbitrary, and will
+     generally not be in the insertion order.
+
+     Hashes have a _default value_ that is returned when accessing keys
+     that do not exist in the hash. By default, that value is +nil+.
+
+------------------------------------------------------------------------
+
+
+Includes:
+---------
+
+     Enumerable
+
+
+Class methods:
+--------------
+
+     [], new, try_convert
+
+
+Instance methods:
+-----------------
+
+     ==, [], []=, assoc, clear, compare_by_identity,
+     compare_by_identity?, default, default=, default_proc,
+     default_proc=, delete, delete_if, each, each_key, each_pair,
+     each_value, empty?, eql?, fetch, flatten, has_key?, has_value?,
+     hash, include?, initialize_copy, inspect, invert, key, key?, keys,
+     length, member?, merge, merge!, pretty_print, pretty_print_cycle,
+     rassoc, rehash, reject, reject!, replace, select, shift, size,
+     store, to_a, to_hash, to_s, to_yaml, update, value?, values,
+     values_at, yaml_initialize
+sw@debian:~/sandbox$</screen></para>
+
+      <section>
+        <title>Iterator (each)</title>
+
+        <para>Mit der Methode <methodname>each</methodname> kann man sich
+        Stück für Stück durch ein Hash arbeiten. Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>einkaufsliste = { 'Eier' =&gt; 6, 'Butter' =&gt; '500 gr' }</command>
+=&gt; {"Eier"=&gt;6, "Butter"=&gt;"500 gr"}
+irb(main):002:0&gt; <command>einkaufsliste.each do |key,value|</command>
+irb(main):003:1* <command>puts "Produkt: #{key} - Menge: #{value}"</command>
+irb(main):004:1&gt; <command>end</command>
+Produkt: Eier - Menge: 6
+Produkt: Butter - Menge: 500 gr
+=&gt; {"Eier"=&gt;6, "Butter"=&gt;"500 gr"}
+irb(main):005:0&gt; <command>exit</command>
+</screen></para>
+
+        <para>Auch hier gibt Ihnen <application>ri</application> Hilfe und ein
+        Beispiel, falls Sie mal vergessen haben sollten wie
+        <methodname>each</methodname> anzuwenden ist:<screen>sw@debian:~/sandbox$ <command>ri Hash.each</command>
+-------------------------------------------------------------- Hash#each
+     hsh.each {| key, value | block } -&gt; hsh
+     hsh.each_pair {| key, value | block } -&gt; hsh
+
+     From Ruby 1.9.1
+------------------------------------------------------------------------
+     Calls _block_ once for each key in _hsh_, passing the key-value
+     pair as parameters.
+
+        h = { "a" =&gt; 100, "b" =&gt; 200 }
+        h.each {|key, value| puts "#{key} is #{value}" }
+
+     _produces:_
+
+        a is 100
+        b is 200
+
+sw@debian:~/sandbox$</screen></para>
+      </section>
     </section>
   </section>
 </chapter>
