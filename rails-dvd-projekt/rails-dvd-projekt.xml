@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title>Rails - Ein erstes Projekt</title>
+
+  <para>Nachdem Sie sich im letzten Kapitel mühsam in die Ruby-Grundlagen
+  eingelesen haben, können wir jetzt spannender weitermachen. In diesem
+  Kapitel starten wir ein erstes Rails-Projekt und arbeiten uns damit Stück
+  für Stück in die Materie ein.</para>
+
+  <para>Auch in diesem Kapitel wird es manchmal hoppla-hopp gehen. Wir stossen
+  auf typische Henne-Ei-Probleme wir zum Beispiel: "Wie erkläre ich MVC
+  (Model-View-Controller)?". Ich habe mich für den "Wir fangen mal an und
+  erklären später."-Ansatz entschieden.</para>
+
+  <section>
+    <title>Projektbeschreibung</title>
+
+    <para>Um endlich mal Ordnung in unsere DVD-Sammlung (ich höre schon die
+    Stimmen "Wie, die benutzen immer noch DVDs und keine Blue-Rays?") zu
+    bringen erstellen wir eine Datenbank die über ein Webinterface bedienbar
+    ist.</para>
+  </section>
+
+  <section>
+    <title>Ein neues Rails-Projekt erstellen</title>
+
+    <para>Als aller erstes müssen wir mal ein neues Rails-Projekt erstellen.
+    Das geht aber ratz-fatz:<screen>sw@debian:~$ <command>rails dvd-sammlung</command>
+      create  
+      create  app/controllers
+      create  app/helpers
+      create  app/models
+      create  app/views/layouts
+      create  config/environments
+      create  config/initializers
+      create  config/locales
+      create  db
+      create  doc
+      create  lib
+      create  lib/tasks
+      create  log
+      create  public/images
+      create  public/javascripts
+      create  public/stylesheets
+      create  script/performance
+      create  test/fixtures
+      create  test/functional
+      create  test/integration
+      create  test/performance
+      create  test/unit
+      create  vendor
+      create  vendor/plugins
+      create  tmp/sessions
+      create  tmp/sockets
+      create  tmp/cache
+      create  tmp/pids
+      create  Rakefile
+      create  README
+      create  app/controllers/application_controller.rb
+      create  app/helpers/application_helper.rb
+      create  config/database.yml
+      create  config/routes.rb
+      create  config/locales/en.yml
+      create  db/seeds.rb
+      create  config/initializers/backtrace_silencers.rb
+      create  config/initializers/inflections.rb
+      create  config/initializers/mime_types.rb
+      create  config/initializers/new_rails_defaults.rb
+      create  config/initializers/session_store.rb
+      create  config/environment.rb
+      create  config/boot.rb
+      create  config/environments/production.rb
+      create  config/environments/development.rb
+      create  config/environments/test.rb
+      create  script/about
+      create  script/console
+      create  script/dbconsole
+      create  script/destroy
+      create  script/generate
+      create  script/runner
+      create  script/server
+      create  script/plugin
+      create  script/performance/benchmarker
+      create  script/performance/profiler
+      create  test/test_helper.rb
+      create  test/performance/browsing_test.rb
+      create  public/404.html
+      create  public/422.html
+      create  public/500.html
+      create  public/index.html
+      create  public/favicon.ico
+      create  public/robots.txt
+      create  public/images/rails.png
+      create  public/javascripts/prototype.js
+      create  public/javascripts/effects.js
+      create  public/javascripts/dragdrop.js
+      create  public/javascripts/controls.js
+      create  public/javascripts/application.js
+      create  doc/README_FOR_APP
+      create  log/server.log
+      create  log/production.log
+      create  log/development.log
+      create  log/test.log
+sw@debian:~$ </screen></para>
+
+    <para>Als erstes (so sollte man sich das direkt angewöhnen) prüfen wir
+    mal, ob die Installation funktioniert. Dazu starten wir den mitgelieferten
+    Server:<screen>sw@debian:~/dvd-sammlung$ <command>./script/server</command> 
+=&gt; Booting WEBrick
+=&gt; Rails 2.3.5 application starting on http://0.0.0.0:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2009-12-24 23:05:22] INFO  WEBrick 1.3.1
+[2009-12-24 23:05:22] INFO  ruby 1.9.1 (2009-12-07) [i686-linux]
+[2009-12-24 23:05:22] INFO  WEBrick::HTTPServer#start: pid=18474 port=3000
+</screen></para>
+
+    <para>Mit dieser Konfiguration können Sie einen Webbrowser auf dem
+    entsprechenden System mit der URL http://0.0.0.0:3000 oder einfacher mit
+    http://localhost:3000 starten und sehen dann folgenden Output:<screen>sw@debian:~$ <command>w3m -dump http://localhost:3000</command>
+  • [site:rubyonrails.org] [Search] the Rails site
+  • Join the community
+
+      □ Ruby on Rails
+      □ Official weblog
+      □ Wiki
+  • Browse the documentation
+
+      □ Rails API
+      □ Ruby standard library
+      □ Ruby core
+      □ Rails Guides
+
+Welcome aboard
+
+You’re riding Ruby on Rails!
+
+About your application’s environment
+
+Getting started
+
+Here’s how to get rolling:
+
+ 1. Use script/generate to create your models and controllers
+
+    To see all available options, run it without parameters.
+
+ 2. Set up a default route and remove or rename this file
+
+    Routes are set up in config/routes.rb.
+
+ 3. Create your database
+
+    Run rake db:migrate to create your database. If you're not using SQLite
+    (the default), edit config/database.yml with your username and password.
+
+ 
+sw@debian:~</screen></para>
+
+    <para>Den Webserver können Sie jederzeit mit <command>CTRL-C</command>
+    wieder beenden:<screen>^C[2009-12-24 23:10:00] INFO  going to shutdown ...
+[2009-12-24 23:10:00] INFO  WEBrick::HTTPServer#start done.
+Exiting
+sw@debian:~/dvd-sammlung$</screen></para>
+
+    <section>
+      <title>Andere IP-Adresse oder Port gewünscht?</title>
+
+      <para>Per default antwortet der eingebaute Rails-Webserver auf die
+      IP-Adresse 0.0.0.0 und den Port 3000. Damit lässt sich super auf einem
+      lokalen System entwickeln. Wenn Sie aber Ihren Webbrowser auf einem
+      anderen System laufen lassen, als Ihre Rails-Installation, können Sie
+      natürlich nicht auf dessen 0.0.0.0 IP-Adresse zugreifen. Sie können aber
+      problemlos beide Angaben ändern wie die eingebaute Hilfeseite
+      anzeigt:<screen>sw@debian:~/dvd-sammlung$ <command>./script/server -h</command>
+Usage: server [options]
+    -p, --port=port                  Runs Rails on the specified port.
+                                     Default: 3000
+    -b, --binding=ip                 Binds Rails to the specified ip.
+                                     Default: 0.0.0.0
+    -c, --config=file                Use custom rackup configuration file
+    -d, --daemon                     Make server run as a Daemon.
+    -u, --debugger                   Enable ruby-debugging for the server.
+    -e, --environment=name           Specifies the environment to run this server under (test/development/production).
+                                     Default: development
+    -P, --path=/path                 Runs Rails app mounted at a specific path.
+                                     Default: /
+
+    -h, --help                       Show this help message.
+sw@debian:~/dvd-sammlung$</screen></para>
+
+      <para>Sollten Sie zum Beispiel (wie ich es oft mache) Ihren Rails-Server
+      innerhalb einer VMware laufen lassen, aber von Ihrem Host-Betriebssystem
+      den Browser benutzen wollen, so können Sie den Server wie folgt
+      starten:<screen>sw@debian:~/dvd-sammlung$ <command>./script/server -b 192.168.248.134</command>
+=&gt; Booting WEBrick
+=&gt; Rails 2.3.5 application starting on http://192.168.248.134:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2009-12-24 23:19:28] INFO  WEBrick 1.3.1
+[2009-12-24 23:19:28] INFO  ruby 1.9.1 (2009-12-07) [i686-linux]
+[2009-12-24 23:19:28] INFO  WEBrick::HTTPServer#start: pid=18506 port=3000
+</screen></para>
+
+      <para>Damit wäre Ihr Rails-Entwicklungssystem über die URL
+      http://192.168.248.134:3000 ansteuerbar.</para>
+    </section>
+  </section>
+
+  <section>
+    <title>Scaffolding</title>
+
+    <para>Die typischen "Ich zeige Euch mal Ruby on Rails in 15 Minuten"
+    Videos arbeiten alle mit der Magie des Scaffolding. Leider ist das
+    meistens kontraproduktiv, weil man zwar sehr schnell ein Grundgerüst
+    stehen hat, aber danach erst mal im Regen steht (das alte "ohne
+    Ruby-Grundkenntnisse kommt man nicht weiter"-Problem schlägt dann
+    zu).</para>
+
+    <section>
+      <title>Datenbankmodell</title>
+
+      <para>Auch wenn wir jederzeit neue Felder in der Datenbank hinzufügen
+      können, so sollte man sich am Anfang möglichst weitreichende Gedanken
+      über ein gutes Datenbankmodell machen. Das erspart später dadurch
+      notwendige Umstrukturierungen.</para>
+
+      <para>Wir wollen DVDs katalogisieren. Dazu benötigen wir mindestens
+      folgende Datenbankfelder:<itemizedlist>
+          <listitem>
+            <para><varname>title</varname> - Titel oder Name der DVD</para>
+          </listitem>
+
+          <listitem>
+            <para><varname>production_year</varname> - Produktionsjahr</para>
+          </listitem>
+
+          <listitem>
+            <para><varname>duration</varname> - Abspieldauer</para>
+          </listitem>
+
+          <listitem>
+            <para><varname>plot</varname> - Story des Films</para>
+          </listitem>
+
+          <listitem>
+            <para><varname>rating</varname> - Bewertung (ein 5 Sterne
+            System)</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <section>
+        <title>Warum alles auf Englisch?</title>
+
+        <para>Ganz tief im Herzen liebt Rails die englische Sprache. Damit
+        muss man sich abfinden und versuchen diese Liebe zu übernehmen. So
+        verwenden sehr viele Mechanismen automagisch Plural oder Singular von
+        Englischen Wörtern. Wenn man sich damit anfreundet Datenbankfelder und
+        Datenbanken an sich mit englischen Wörter zu benennen, dann kann man
+        die ganze Macht dieser Magie ausnutzen. </para>
+      </section>
+
+      <section>
+        <title>Ist das jetzt ein Model (laut der MVC-Idee)?</title>
+
+        <para>Kurze Antwort: Ja. Wir müssen dem Model nur noch einen Namen
+        geben. Wie wäre es mit "dvd"?!</para>
+      </section>
+    </section>
+
+    <section>
+      <title>Scaffolding benutzen</title>
+
+      <para>Für unsere (noch?) recht einfache DVD-Datenbank ist Scaffolding
+      gut geeignet. Es gibt uns auf die Schnelle ein gutes Grundgerüst, auf
+      das wir dann aufbauen können.</para>
+
+      <section>
+        <title>./script/generate</title>
+
+        <para>Mit dem Rails-Skript <filename>./script/generate</filename> kann
+        man "Sachen" generieren (deshalb wohl der Name). Wer (wie ich) gerne
+        mal vergisst wie das Skript aufgerufen werden muss, der gibt einfach
+        <filename>./script/generate</filename> ein und bekommt die folgende
+        Hilfe angezeigt:<screen>sw@debian:~/dvd-sammlung$ <command>./script/generate</command> 
+Usage: ./script/generate generator [options] [args]
+
+Rails Info:
+    -v, --version                    Show the Rails version number and quit.
+    -h, --help                       Show this help message and quit.
+
+General Options:
+    -p, --pretend                    Run but do not make any changes.
+    -f, --force                      Overwrite files that already exist.
+    -s, --skip                       Skip files that already exist.
+    -q, --quiet                      Suppress normal output.
+    -t, --backtrace                  Debugging: show backtrace on errors.
+    -c, --svn                        Modify files with subversion. (Note: svn must be in path)
+    -g, --git                        Modify files with git. (Note: git must be in path)
+
+
+Installed Generators
+  Builtin: controller, helper, integration_test, mailer, metal, migration, model, observer, performance_test, plugin, resource, scaffold, session_migration
+
+More are available at http://wiki.rubyonrails.org/rails/pages/AvailableGenerators
+  1. Download, for example, login_generator.zip
+  2. Unzip to directory /home/sw/.rails/generators/login
+     to use the generator with all your Rails apps
+     or to /home/sw/dvd-sammlung/lib/generators/login
+     to use with this app only.
+  3. Run generate with no arguments for usage information
+       ./script/generate login
+
+Generator gems are also available:
+  1. gem search -r generator
+  2. gem install login_generator
+  3. ./script/generate login
+
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Interessant ist für uns der Teil in dem die "Installed
+        Generators" aufgelistet werden. Das sind die "Sachen" die dieses
+        Skript generieren kann. Wenn wir scaffold benutzen wollen und dazu
+        weitere Hilfe brauchen, dann geht dies wiederrum einfach mit der
+        eingebauten Hilfe:<screen>sw@debian:~/dvd-sammlung$ <command>./script/generate scaffold</command>
+Usage: ./script/generate scaffold ModelName [field:type, field:type]
+
+Options:
+        --skip-timestamps            Don't add timestamps to the migration file for this model
+        --skip-migration             Don't generate a migration file for this model
+        --force-plural               Forces the generation of a plural ModelName
+
+Rails Info:
+    -v, --version                    Show the Rails version number and quit.
+    -h, --help                       Show this help message and quit.
+
+General Options:
+    -p, --pretend                    Run but do not make any changes.
+    -f, --force                      Overwrite files that already exist.
+    -s, --skip                       Skip files that already exist.
+    -q, --quiet                      Suppress normal output.
+    -t, --backtrace                  Debugging: show backtrace on errors.
+    -c, --svn                        Modify files with subversion. (Note: svn must be in path)
+    -g, --git                        Modify files with git. (Note: git must be in path)
+
+Description:
+    Scaffolds an entire resource, from model and migration to controller and
+    views, along with a full test suite. The resource is ready to use as a
+    starting point for your RESTful, resource-oriented application.
+
+    Pass the name of the model (in singular form), either CamelCased or
+    under_scored, as the first argument, and an optional list of attribute
+    pairs.
+
+    Attribute pairs are column_name:sql_type arguments specifying the
+    model's attributes. Timestamps are added by default, so you don't have to
+    specify them by hand as 'created_at:datetime updated_at:datetime'.
+
+    You don't have to think up every attribute up front, but it helps to
+    sketch out a few so you can start working with the resource immediately.
+
+    For example, 'scaffold post title:string body:text published:boolean'
+    gives you a model with those three attributes, a controller that handles
+    the create/show/update/destroy, forms to create and edit your posts, and
+    an index that lists them all, as well as a map.resources :posts
+    declaration in config/routes.rb.
+
+    If you want to remove all the generated files, run
+    'script/destroy scaffold ModelName'.
+
+Examples:
+    `./script/generate scaffold post`
+    `./script/generate scaffold post title:string body:text published:boolean`
+    `./script/generate scaffold purchase order_id:integer amount:decimal`
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Wir müssen also nach <application>./script/generate
+        scaffold</application> den Namen des Models (bei uns "dvd") und danach
+        die Datenbankfelder mit den entsprechenden Feldtypen angeben.</para>
+      </section>
+
+      <section>
+        <title>Und los gehts</title>
+
+        <para>Dann legen wir mal los:<screen>sw@debian:~/dvd-sammlung$ <command>./script/generate scaffold dvd title:string production_year:integer duration:integer plot:text rating:integer</command>
+      exists  app/models/
+      exists  app/controllers/
+      exists  app/helpers/
+      create  app/views/dvds
+      exists  app/views/layouts/
+      exists  test/functional/
+      exists  test/unit/
+      create  test/unit/helpers/
+      exists  public/stylesheets/
+      create  app/views/dvds/index.html.erb
+      create  app/views/dvds/show.html.erb
+      create  app/views/dvds/new.html.erb
+      create  app/views/dvds/edit.html.erb
+      create  app/views/layouts/dvds.html.erb
+      create  public/stylesheets/scaffold.css
+      create  app/controllers/dvds_controller.rb
+      create  test/functional/dvds_controller_test.rb
+      create  app/helpers/dvds_helper.rb
+      create  test/unit/helpers/dvds_helper_test.rb
+       route  map.resources :dvds
+  dependency  model
+      exists    app/models/
+      exists    test/unit/
+      exists    test/fixtures/
+      create    app/models/dvd.rb
+      create    test/unit/dvd_test.rb
+      create    test/fixtures/dvds.yml
+      create    db/migrate
+      create    db/migrate/20091224213402_create_dvds.rb
+sw@debian:~/dvd-sammlung$</screen>Und schon ist alles fertig. Alledings ist in
+        der Datenbank noch keine entsprechende Tabelle angelegt.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>rake db:migrate</title>
+
+      <para>./script/generate scaffold hat uns schon alles eingerichtet.
+      Allerdings müssen wir noch in der Datenbank die Tabelle für unsere Daten
+      anlegen. Rails nimmt uns aber die Arbeit ab. Im Verzeichnis db/migrate
+      liegen Migrationsdateien, die mit einem Timestamp im Namen versehen
+      sind. Im Laufe eines Projektes werden es immer mehr. Sie könne mit dem
+      Tool <application>rake</application> in die Datenbank eingespielt
+      werden. Aber schauen wir uns erst mal den Inhalt der Migrationsdatei zum
+      Modell dvd an:<screen>sw@debian:~/dvd-sammlung$ <command>cat -n db/migrate/20091224213402_create_dvds.rb</command>
+     1 class CreateDvds &lt; ActiveRecord::Migration
+     2   def self.up
+     3     create_table :dvds do |t|
+     4       t.string :title
+     5       t.integer :production_year
+     6       t.integer :duration
+     7       t.text :plot
+     8       t.integer :rating
+     9 
+    10       t.timestamps
+    11     end
+    12   end
+    13 
+    14   def self.down
+    15     drop_table :dvds
+    16   end
+    17 end
+sw@debian:~/dvd-sammlung$</screen></para>
+
+      <para>Die in dieser Ruby-Datei angelegte Class
+      <classname>CreateDvds</classname> ist ein Kind der Klasse
+      <classname>ActiveRecord::Migration</classname> (siehe Zeile 1) und hat
+      zwei Methoden:<itemizedlist>
+          <listitem>
+            <para><methodname>self.up</methodname> (Zeile 2). Wird aufgerufen,
+            wenn die Migration durchgeführt wird.</para>
+          </listitem>
+
+          <listitem>
+            <para><methodname>self.down</methodname> (Zeile 14). Wird
+            aufgerufen, wenn für eine Migration ein Rollback durchgeführt
+            wird.</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <para>Führen wir mal eine Migration durch:<screen>sw@debian:~/dvd-sammlung$ <command>rake db:migrate</command>
+(in /home/sw/dvd-sammlung)
+==  CreateDvds: migrating =====================================================
+-- create_table(:dvds)
+   -&gt; 0.0012s
+==  CreateDvds: migrated (0.0024s) ============================================
+
+sw@debian:~/dvd-sammlung$</screen></para>
+
+      <para>Die Tabelle <varname>dvds</varname> wird angelegt. Dabei sehen
+      wir, das Tabellen-Namen automatisch den Plural der Models bekommen. Aber
+      welche Datenbank wird überhaupt benutzt? Das wird in der
+      Konfigurationsdatei <filename>config/database.yml</filename>
+      definiert:<screen>sw@debian:~/dvd-sammlung$ <command>cat -n config/database.yml</command> 
+     1 # SQLite version 3.x
+     2 #   gem install sqlite3-ruby (not necessary on OS X Leopard)
+     3 development:
+     4   adapter: sqlite3
+     5   database: db/development.sqlite3
+     6   pool: 5
+     7   timeout: 5000
+     8 
+     9 # Warning: The database defined as "test" will be erased and
+    10 # re-generated from your development database when you run "rake".
+    11 # Do not set this db to the same as development or production.
+    12 test:
+    13   adapter: sqlite3
+    14   database: db/test.sqlite3
+    15   pool: 5
+    16   timeout: 5000
+    17 
+    18 production:
+    19   adapter: sqlite3
+    20   database: db/production.sqlite3
+    21   pool: 5
+    22   timeout: 5000
+sw@debian:~/dvd-sammlung$</screen></para>
+
+      <para>Dort werden drei verschiedene Datenbanken im YAML-Format (siehe
+      http://www.yaml.org/ bzw. http://de.wikipedia.org/wiki/YAML) definiert.
+      Für uns wichtig ist erst mal nur die development-Datenbank (Zeile 3 bis
+      7). Per default benutzt Rails dort <application>sqlite3</application>.
+      sqlite3 mag nicht die richtige Wahl für die Analyse der weltweit
+      gesammelten Wetterdaten sein, aber für die schnelle und unkompliziete
+      Entwicklung von Rails-Anwendungen lernt man sie schnell zu schätzen. In
+      der Produktions-Umgebung kann man später immer noch auf "grosse"
+      Datenbanken wie MySQL umsteigen.<footnote>
+          <para>Es gibt unter einigen Entwicklern die Ansicht, das man auf
+          jeden Fall immer mit der gleichen Datenbank entwicklen soll, die man
+          später auch in der Produktion und im Testing benutzt. Ich verstehe
+          die Argumentation, bin aber anderer Ansicht. Wir werden das Thema
+          später bei der Definition von eigenen SQL-Abfragen noch mal
+          besprechen.</para>
+        </footnote></para>
+
+      <para>Um Ihre Neugierde zu befriedigen, schauen wir uns kurz noch die
+      Datenbank mit dem Command-Line-Tool <application>sqlite3</application>
+      an.<screen>sw@debian:~/dvd-sammlung$ <command>sqlite3 db/development.sqlite3</command> 
+SQLite version 3.5.9
+Enter ".help" for instructions
+sqlite&gt; <command>.tables</command> 
+dvds               schema_migrations
+sqlite&gt; <command>.schema dvds</command>
+CREATE TABLE "dvds" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar(255), "production_year" integer, "duration" integer, "plot" text, "rating" integer, "created_at" datetime, "updated_at" datetime);
+sqlite&gt; .quit
+sw@debian:~/dvd-sammlung$</screen></para>
+    </section>
+  </section>
+</chapter>
