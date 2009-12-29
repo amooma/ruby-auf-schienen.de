@@ -25,6 +25,14 @@
     Stimmen "Wie, die benutzen immer noch DVDs und keine Blue-Rays?") zu
     bringen erstellen wir eine Datenbank die über ein Webinterface bedienbar
     ist.</para>
+
+    <section>
+      <title>Erst mal keine Authentifizierung</title>
+
+      <para>Bei diesem ersten Projekt verzichten wir bewusst auf eine
+      Authentifizierung des Users. Dies folgt in späteren Kapiteln. Es geht
+      jetzt erst mal um das Grundverständnis für Rails.</para>
+    </section>
   </section>
 
   <section>
@@ -672,7 +680,7 @@ sw@debian:~/dvd-sammlung$</screen></para>
   </section>
 
   <section>
-    <title>Orientierung im neuen System</title>
+    <title>Start des Systems</title>
 
     <para>Bitte starten Sie Ihren Webserver:<screen>sw@debian:~/dvd-sammlung$ <command>./script/server</command> 
 =&gt; Booting WEBrick
@@ -687,32 +695,110 @@ sw@debian:~/dvd-sammlung$</screen></para>
     <para>Mit Scaffolding haben Sie direkt ein kleine Web-GUI zum
     Administrieren Ihrer DVD-Sammlung bekommen. Diese ist noch sehr
     rudimentär, aber ist ein guter Start.</para>
+  </section>
+
+  <section>
+    <title>Zugriff per HTTP-Protokoll</title>
+
+    <para>Gemäss der CRUD Idee (siehe http://de.wikipedia.org/wiki/CRUD)
+    bietet Rails ein RESTful Webinterface an. Was heisst das? Sie können auf
+    jede Resource innerhalb einer normalen Rails-Umgeben über definierte URLs
+    zugreifen und damit folgende Datenbank-Operationen ausführen:<itemizedlist>
+        <listitem>
+          <para>C für CREATE</para>
+
+          <para>SQL: <code>INSERT INTO dvds (title) VALUES ('Rain
+          Man')</code></para>
+        </listitem>
+
+        <listitem>
+          <para>R für READ</para>
+
+          <para>SQL: <code>SELECT * FROM dvds</code></para>
+        </listitem>
+
+        <listitem>
+          <para>U für UPDATE</para>
+
+          <para>SQL: <code>UPDATE dvds SET title = 'Rain Man' WHERE id =
+          1</code></para>
+        </listitem>
+
+        <listitem>
+          <para>D für DELETE</para>
+
+          <para>SQL: <code>DELETE FROM dvds WHERE id = 1</code></para>
+        </listitem>
+      </itemizedlist>Um die CRUD Idee besser erklären zu können, habe ich in
+    den nachfolgenden Beispielen drei Beispiel-Filme aus der Terminator-Reihe
+    in die Datenbank gefüttert.<qandaset>
+        <qandadiv>
+          <qandaentry>
+            <question>
+              <para>Warum wird um das RESTful Interface in Ruby on Rails so
+              ein Bohei gemacht?</para>
+            </question>
+
+            <answer>
+              <para>Damit bekommt man ein sauberes und für alle Programmierer
+              leicht verständliches Interface zu Ihrem System. Sie brauchen
+              nur die URI <uri>http://localhost:3000/dvds</uri> und das
+              Wissen, das es sich um ein RESTful Webdienst handelt und Sie
+              können direkt loslegen.</para>
+            </answer>
+          </qandaentry>
+
+          <qandaentry>
+            <question>
+              <para>Ist RESTful nur für die automatische Abfrage zwischen
+              Computern gut?</para>
+            </question>
+
+            <answer>
+              <para>Nein. RESTful ist auch ein guter Denkansatz, um URLs und
+              damit ganze Webseiten strukturierter zu gestalten.</para>
+            </answer>
+          </qandaentry>
+        </qandadiv>
+      </qandaset></para>
 
     <section>
-      <title>Zugriff per Webbrowser</title>
+      <title>HTML-Webbrowser</title>
 
-      <para></para>
+      <para>Sie können mit einem normalen Webbrowser alle CRUD Aktionen
+      ausführen und bekommen ein von Menschen leicht bedienbares
+      HTML-Interface.</para>
 
       <section>
         <title>index</title>
 
         <para>Die Liste aller aktuell gespeicherten DVDs bekommen Sie unter
-        der URL http://localhost:3000/dvds<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds</command>
-Received cookie: _dvd-sammlung_session=BAh7BjoPc2Vzc2lvbl9pZCIlMTY3YzQyZWQ0MDUzMmRhODNjN2RmMWI4ZGQ4ZjliYjE%3D--6d4f7386f420f1fd583e93991f731b4423604d6a
+        der URL <uri>http://localhost:3000/dvds</uri><screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds</command>
+Received cookie: _dvd-sammlung_session=BAh7BzoPc2Vzc2lvbl9pZCIlMjljNWZmNDdlNGVmMGU3OGMwODk4NWM0NmY2ZGZhYzQ6EF9jc3JmX3Rva2VuSSIxQ0VMamhTWHRodGc4c2o0ZndQVUtDUmYwbHZJWGp0SWRaV2JQMUFFdGFRYz0GOg1lbmNvZGluZyINVVMtQVNDSUk%3D--010ffc05a95aa7059e7266e4ced21836bb06cd3a
 Listing dvds
 
-Title Production year Duration Plot Rating
+       Title         Production year Duration Plot Rating
+The Terminator       1984                                 Show Edit Destroy
+Terminator 2         1992                                 Show Edit Destroy
+Terminator Salvation 2009                                 Show Edit Destroy
 
 
 New dvd
 sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Im Log des Webservers sehen Sie folgende Ausgabe:<screen>Processing DvdsController#index (for 127.0.0.1 at 2009-12-25 01:56:29) [GET]
+  Dvd Load (0.8ms)   SELECT * FROM "dvds" 
+Rendering template within layouts/dvds
+Rendering dvds/index
+Completed in 44ms (View: 41, DB: 1) | 200 OK [http://localhost/dvds]
+</screen></para>
       </section>
 
       <section>
         <title>new</title>
 
         <para>Eine neue DVD können Sie unter der URL
-        http://localhost:3000/dvds/new eintragen:<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds/new</command>
+        <uri>http://localhost:3000/dvds/new</uri> eintragen:<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds/new</command>
 Received cookie: _dvd-sammlung_session=BAh7BzoPc2Vzc2lvbl9pZCIlZThhNjAxZjE1MThlMzcyZmYzOGIxOTM1Y2JlZTM5MmI6EF9jc3JmX3Rva2VuSSIxdFBoTnFPTEJGbmgrajVQVmNoKzhnNVM1Z3N0aFFOYkdNaEpxNWJlbnpBbz0GOg1lbmNvZGluZyINVVMtQVNDSUk%3D--59c0c0badd6f26c43a0b0b5bcabebbf61c97ca76
 New dvd
 
@@ -754,49 +840,129 @@ Rating
 
 Back
 sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Im Log des Webservers sehen Sie folgende Ausgabe:<screen>Processing DvdsController#new (for 127.0.0.1 at 2009-12-25 01:57:38) [GET]
+Rendering template within layouts/dvds
+Rendering dvds/new
+Completed in 33ms (View: 10, DB: 0) | 200 OK [http://localhost/dvds/new]
+</screen></para>
+
+        <para>Nachdem Sie Beispieldaten eingegeben und auf Create geklickt
+        haben, werden Sie folgende Ausgabe im Log sehen:<screen>Processing DvdsController#create (for 127.0.0.1 at 2009-12-25 01:59:31) [POST]
+  Parameters: {"authenticity_token"=&gt;"DmNBZo3HfeQOxm2fSSJswuGkJpHHegddgbLNj1aCe/I=", "dvd"=&gt;{"title"=&gt;"Rain Man", "production_year"=&gt;"1988", "duration"=&gt;"", "plot"=&gt;"Geschichte zweier sehr ungleicher Br\xC3\xBCder.\r\n", "rating"=&gt;"5"}, "commit"=&gt;"Create"}
+  Dvd Create (0.2ms)   INSERT INTO "dvds" ("title", "production_year", "duration", "plot", "rating", "created_at", "updated_at") VALUES('Rain Man', 1988, NULL, 'Geschichte zweier sehr ungleicher Brüder.
+', 5, '2009-12-24 23:38:31', '2009-12-24 23:38:31')
+Redirected to http://localhost:3000/dvds/1
+Completed in 63ms (DB: 0) | 302 Found [http://localhost/dvds]
+</screen></para>
+
+        <para>Danach werden Sie auf die show-Seite dieses Eintrages
+        umgeleitet.</para>
       </section>
 
       <section>
         <title>show</title>
 
         <para>Eine einzelne DVD kann man sich mit der ID des Eintrages (hier
-        die 1) und der entsprechenden URL http://localhost:3000/dvds/show/1
-        anschauen. Alternativ geht auch die Kurzform
-        http://localhost:3000/dvds/1<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds/1</command>
-Received cookie: _dvd-sammlung_session=BAh7BjoPc2Vzc2lvbl9pZCIlM2JlNzQzNTY2OThiNjQ3NjA3NDQ1MTc0OTFhZWUxYzY%3D--5800246ee9363bf535b797a8bf67cf9617d9fe2b
-Title: Rain Man
+        die 1) und der entsprechenden URL
+        <uri>http://localhost:3000/dvds/show/1</uri> anschauen. Alternativ
+        geht auch die Kurzform <uri>http://localhost:3000/dvds/1</uri><screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds/1</command>
+Received cookie: _dvd-sammlung_session=BAh7BjoPc2Vzc2lvbl9pZCIlMTQ3YTgyNTU3OTUzZGUyYTc4NmIxYTE4MWNiYTZjYmM%3D--787ebfba94fba9eeb0ad1d9de51d2b3933230e2c
+Title: The Terminator
 
-Production year: 1988
+Production year: 1984
 
 Duration:
 
-Plot: Geschichte zweier sehr ungleicher Brüder.
+Plot:
 
-Rating: 5
+Rating:
 
 Edit | Back
 sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Im Log des Webservers sehen Sie folgende Ausgabe:<screen>Processing DvdsController#show (for 127.0.0.1 at 2009-12-25 01:59:32) [GET]
+  Parameters: {"id"=&gt;"1"}
+  Dvd Load (0.2ms)   SELECT * FROM "dvds" WHERE ("dvds"."id" = 1) 
+Rendering template within layouts/dvds
+Rendering dvds/show
+Completed in 12ms (View: 8, DB: 0) | 200 OK [http://localhost/dvds/1]
+</screen></para>
       </section>
 
       <section>
         <title>edit</title>
 
         <para>Den Eintrag dieser einzelnen DVD können Sie mit der URL
-        http://localhost:3000/dvds/edit/1 ändern.<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds/edit/1</command>
-Received cookie: _dvd-sammlung_session=BAh7BzoPc2Vzc2lvbl9pZCIlZmY5OWQyMTUwNzY0ZWQ2YWM0YmM0ZmFiOTUwN2Y5ZTE6EF9jc3JmX3Rva2VuSSIxdmZodUQ3eS9FdEVWMWwxM0l3ZDhFbWZYRndvU0hzTFhBU0doQWFWNzRiST0GOg1lbmNvZGluZyINVVMtQVNDSUk%3D--e3002ea604fd8499bab4551217e95b21e986852c
+        <uri>http://localhost:3000/dvds/edit/1</uri> ändern.<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds/edit/1</command>
+Received cookie: _dvd-sammlung_session=BAh7BzoPc2Vzc2lvbl9pZCIlOWM5YjM3MzRlZGJiZmY2ZWZlZjk4MTAxNTFjMmYyZGE6EF9jc3JmX3Rva2VuSSIxN3BpdmdxcVlIeEhuQmZSVEFPaVRDT1crb2hFeVZxMkMwYWNaYzRuVkV6ST0GOg1lbmNvZGluZyINVVMtQVNDSUk%3D--efd0399080f39207d6f46b731c4be6a179624322
 Editing dvd
 
 Title
-[Rain Man                      ]
+[The Terminator                ]
 
 Production year
-[1988                          ]
+[1984                          ]
 
 Duration
 [                              ]
 
 Plot
-[Geschichte zweier sehr ungleicher Brüder]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+
+Rating
+[                              ]
+
+[Update]
+
+Show | Back
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Im Log des Webservers sehen Sie folgende Ausgabe:<screen>Processing DvdsController#edit (for 127.0.0.1 at 2009-12-25 02:00:39) [GET]
+  Parameters: {"id"=&gt;"1"}
+  Dvd Load (0.2ms)   SELECT * FROM "dvds" WHERE ("dvds"."id" = 1) 
+Rendering template within layouts/dvds
+Rendering dvds/edit
+Completed in 14ms (View: 11, DB: 0) | 200 OK [http://localhost/dvds/edit/1]
+</screen></para>
+      </section>
+
+      <section>
+        <title>update</title>
+
+        <para>Beispielhaft füllen wir das Webinterface aus dem edit-Beispiel
+        wie folgt aus:<screen>Editing dvd
+
+Title
+[The Terminator                ]
+
+Production year
+[1984                          ]
+
+Duration
+[                              ]
+
+Plot
+[                                        ]
 [                                        ]
 [                                        ]
 [                                        ]
@@ -822,24 +988,231 @@ Rating
 
 [Update]
 
-Show | Back
-sw@debian:~/dvd-sammlung$</screen></para>
+Show | Back</screen></para>
+
+        <para>Danach klicken wir auf <command>[Update]</command>. Dabei sehen
+        wir im Webserver-Log folgende Ausgabe:<screen>Processing DvdsController#update (for 127.0.0.1 at 2009-12-25 02:03:55) [PUT]
+  Parameters: {"authenticity_token"=&gt;"z9rs1PeGoyeEvA1TyOZ000wPsS10OQFVdh2pa0AxA30=", "dvd"=&gt;{"title"=&gt;"The Terminator", "production_year"=&gt;"1984", "duration"=&gt;"", "plot"=&gt;"", "rating"=&gt;"5"}, "commit"=&gt;"Update", "id"=&gt;"1"}
+  Dvd Load (0.2ms)   SELECT * FROM "dvds" WHERE ("dvds"."id" = 1) 
+  Dvd Update (0.2ms)   UPDATE "dvds" SET "plot" = '', "rating" = 5, "updated_at" = '2009-12-25 01:03:55' WHERE "id" = 1
+Redirected to http://localhost:3000/dvds/1
+Completed in 406ms (DB: 0) | 302 Found [http://localhost/dvds/1]
+
+
+Processing DvdsController#show (for 127.0.0.1 at 2009-12-25 02:03:56) [GET]
+  Parameters: {"id"=&gt;"1"}
+  Dvd Load (0.2ms)   SELECT * FROM "dvds" WHERE ("dvds"."id" = 1) 
+Rendering template within layouts/dvds
+Rendering dvds/show
+Completed in 6ms (View: 3, DB: 0) | 200 OK [http://localhost/dvds/1]
+</screen></para>
+
+        <para>Nach dem Update des Eintrages, werden wir automatisch auf die
+        show-Seite des Eintrages umgeleitet.</para>
       </section>
 
       <section>
         <title>destroy</title>
 
         <para>Sie können den eben angelegten Datensatz mit der URL
-        http://localhost:3000/dvds/destroy/1 wieder aus der Datenbank
-        löschen.<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds/destroy/1</command>
-Received cookie: _dvd-sammlung_session=BAh7BjoPc2Vzc2lvbl9pZCIlODE5NjAyODdkNjIxNDI5ZTQ2NDUwYTQzYTk3YjVmZWM%3D--6353d304e9a7e1534d51c0bd2ceaef1ee60df645
+        <uri>http://localhost:3000/dvds/destroy/1</uri> wieder aus der
+        Datenbank löschen.<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds/destroy/1</command>
+Received cookie: _dvd-sammlung_session=BAh7BzoPc2Vzc2lvbl9pZCIlMDRhZDA2OGViMjhhMTg1YjMxNzk0ODQxNjExMjRhYWE6EF9jc3JmX3Rva2VuSSIxckQrR0hwVWRmak53RDh3ZDRhcjNpMVdZWFFtM1hkQUhEa0F6M3VqMHlVdz0GOg1lbmNvZGluZyINVVMtQVNDSUk%3D--79f2cb0361e0319908cf252987e08b4bf3746f00
 Listing dvds
 
-Title Production year Duration Plot Rating
+       Title         Production year Duration Plot Rating
+Terminator 2         1992                                 Show Edit Destroy
+Terminator Salvation 2009                                 Show Edit Destroy
 
 
 New dvd
 sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Im Log des Webservers sehen Sie folgende Ausgabe:<screen>Processing DvdsController#destroy (for 127.0.0.1 at 2009-12-25 02:05:48) [GET]
+  Parameters: {"id"=&gt;"1"}
+  Dvd Load (0.2ms)   SELECT * FROM "dvds" WHERE ("dvds"."id" = 1) 
+  Dvd Destroy (0.1ms)   DELETE FROM "dvds" WHERE "id" = 1
+Redirected to http://localhost:3000/dvds
+Completed in 386ms (DB: 0) | 302 Found [http://localhost/dvds/destroy/1]
+</screen></para>
+
+        <para>Nach dem destroy wird auf index umgeleitet.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>Per XML</title>
+
+      <para>Das XML-Interface erleichtert den Austausch von Daten zwischen
+      Maschinen. Dabei wird der ganze HTML-Balast abgeworfen und nur noch die
+      reinen Daten per XML ausgetauscht.<important>
+          <para>Damit diese Beispiele problemlos funktionieren, habe ich
+          <parameter>protect_from_forgery</parameter> in der
+          <filename>app/controllers/application_controller.rb</filename> durch
+          auskommentieren deaktiviert. Dadurch entfällt eine per default
+          aktivierte Sicherheitsschicht, die einen Token austauscht, um die
+          anonyme Interaktion von aussen zu underbinden. In späteren Kapiteln
+          besprechen wir Authentifizierungsmechanismen für diese Fälle.</para>
+        </important></para>
+
+      <section>
+        <title>index</title>
+
+        <para>Die Liste aller aktuell gespeicherten DVDs bekommen Sie unter
+        der URL <uri>http://localhost:3000/dvds.xml</uri><screen>sw@debian:~/dvd-sammlung$ <command>curl -X GET http://localhost:3000/dvds.xml</command>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;dvds type="array"&gt;
+  &lt;dvd&gt;
+    &lt;created-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/created-at&gt;
+    &lt;duration type="integer" nil="true"&gt;&lt;/duration&gt;
+    &lt;id type="integer"&gt;1&lt;/id&gt;
+    &lt;plot nil="true"&gt;&lt;/plot&gt;
+    &lt;production-year type="integer"&gt;1984&lt;/production-year&gt;
+    &lt;rating type="integer" nil="true"&gt;&lt;/rating&gt;
+    &lt;title&gt;The Terminator&lt;/title&gt;
+    &lt;updated-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/updated-at&gt;
+  &lt;/dvd&gt;
+  &lt;dvd&gt;
+    &lt;created-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/created-at&gt;
+    &lt;duration type="integer" nil="true"&gt;&lt;/duration&gt;
+    &lt;id type="integer"&gt;2&lt;/id&gt;
+    &lt;plot nil="true"&gt;&lt;/plot&gt;
+    &lt;production-year type="integer"&gt;1992&lt;/production-year&gt;
+    &lt;rating type="integer" nil="true"&gt;&lt;/rating&gt;
+    &lt;title&gt;Terminator 2&lt;/title&gt;
+    &lt;updated-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/updated-at&gt;
+  &lt;/dvd&gt;
+  &lt;dvd&gt;
+    &lt;created-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/created-at&gt;
+    &lt;duration type="integer" nil="true"&gt;&lt;/duration&gt;
+    &lt;id type="integer"&gt;3&lt;/id&gt;
+    &lt;plot nil="true"&gt;&lt;/plot&gt;
+    &lt;production-year type="integer"&gt;2009&lt;/production-year&gt;
+    &lt;rating type="integer" nil="true"&gt;&lt;/rating&gt;
+    &lt;title&gt;Terminator Salvation&lt;/title&gt;
+    &lt;updated-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/updated-at&gt;
+  &lt;/dvd&gt;
+&lt;/dvds&gt;
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Im Log des Webservers sehen Sie folgende Ausgabe:<screen>Processing DvdsController#index to xml (for 127.0.0.1 at 2009-12-25 02:11:09) [GET]
+  Dvd Load (0.9ms)   SELECT * FROM "dvds" 
+Completed in 494ms (View: 491, DB: 1) | 200 OK [http://0.0.0.0/dvds.xml]
+</screen></para>
+      </section>
+
+      <section>
+        <title>new</title>
+
+        <para>Um eine neue DVD einzutragen, benötigen Sie als erstes die
+        Felder die ausgefüllt werden müssen. Dazu können Sie die URL
+        <uri>http://localhost:3000/dvds/new.xml</uri> abrufen:<screen>sw@debian:~/dvd-sammlung$ <command>curl -X GET http://0.0.0.0:3000/dvds/new.xml</command>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;dvd&gt;
+  &lt;created-at type="datetime" nil="true"&gt;&lt;/created-at&gt;
+  &lt;duration type="integer" nil="true"&gt;&lt;/duration&gt;
+  &lt;plot nil="true"&gt;&lt;/plot&gt;
+  &lt;production-year type="integer" nil="true"&gt;&lt;/production-year&gt;
+  &lt;rating type="integer" nil="true"&gt;&lt;/rating&gt;
+  &lt;title nil="true"&gt;&lt;/title&gt;
+  &lt;updated-at type="datetime" nil="true"&gt;&lt;/updated-at&gt;
+&lt;/dvd&gt;
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Im Log des Webservers sehen Sie folgende Ausgabe:<screen>Processing DvdsController#new to xml (for 127.0.0.1 at 2009-12-25 02:12:34) [GET]
+Completed in 6ms (View: 2, DB: 0) | 200 OK [http://0.0.0.0/dvds/new.xml]
+</screen></para>
+
+        <para>Danach können Sie mit einem create Aufruf die Daten für einen
+        neuen Datensatz uploaden:<screen>sw@debian:~/dvd-sammlung$ <command>curl -X POST -d "&lt;dvd&gt;&lt;title&gt;Rain Man&lt;/title&gt;&lt;production-year&gt;1988&lt;/production-year&gt;&lt;/dvd&gt;" http://localhost:3000/dvds</command>
+&lt;html&gt;&lt;body&gt;You are being &lt;a href="http://localhost:3000/dvds/5"&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Ausgabe im Log:<screen>Processing DvdsController#create (for 127.0.0.1 at 2009-12-25 02:25:33) [POST]
+  Parameters: {"&lt;dvd&gt;&lt;title&gt;Rain Man&lt;/title&gt;&lt;production-year&gt;1988&lt;/production-year&gt;&lt;/dvd&gt;"=&gt;nil}
+  Dvd Create (0.3ms)   INSERT INTO "dvds" ("title", "production_year", "duration", "plot", "rating", "created_at", "updated_at") VALUES(NULL, NULL, NULL, NULL, NULL, '2009-12-25 01:25:33', '2009-12-25 01:25:33')
+Redirected to http://localhost:3000/dvds/5
+Completed in 52ms (DB: 0) | 302 Found [http://localhost/dvds]
+</screen></para>
+
+        <para>Danach werden Sie auf die show-Seite dieses Eintrages
+        umgeleitet.</para>
+      </section>
+
+      <section>
+        <title>show</title>
+
+        <para>Eine einzelne DVD kann man sich mit der ID des Eintrages (hier
+        die 1) und der entsprechenden URL
+        <uri>http://localhost:3000/dvds/show/1.xml</uri> anschauen. Alternativ
+        geht auch die Kurzform
+        <uri>http://localhost:3000/dvds/1.xml</uri><screen>sw@debian:~/dvd-sammlung$ <command>curl -X GET http://localhost:3000/dvds/1.xml</command>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;dvd&gt;
+  &lt;created-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/created-at&gt;
+  &lt;duration type="integer" nil="true"&gt;&lt;/duration&gt;
+  &lt;id type="integer"&gt;1&lt;/id&gt;
+  &lt;plot nil="true"&gt;&lt;/plot&gt;
+  &lt;production-year type="integer"&gt;1984&lt;/production-year&gt;
+  &lt;rating type="integer" nil="true"&gt;&lt;/rating&gt;
+  &lt;title&gt;The Terminator&lt;/title&gt;
+  &lt;updated-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/updated-at&gt;
+&lt;/dvd&gt;
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Im Log des Webservers sehen Sie folgende Ausgabe:<screen>Processing DvdsController#show to xml (for 127.0.0.1 at 2009-12-25 02:31:28) [GET]
+  Parameters: {"id"=&gt;"1"}
+  Dvd Load (0.2ms)   SELECT * FROM "dvds" WHERE ("dvds"."id" = 1) 
+Completed in 7ms (View: 3, DB: 0) | 200 OK [http://localhost/dvds/1.xml]
+</screen></para>
+      </section>
+
+      <section>
+        <title>edit - update</title>
+
+        <para>Zum Editieren eines Eintrages downloaden wir diesen Eintrag erst
+        wieder von der entsprechenden URL
+        <uri>http://localhost:3000/dvds/1.xml</uri><screen>sw@debian:~/dvd-sammlung$ <command>curl -X GET http://localhost:3000/dvds/1.xml</command>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;dvd&gt;
+  &lt;created-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/created-at&gt;
+  &lt;duration type="integer" nil="true"&gt;&lt;/duration&gt;
+  &lt;id type="integer"&gt;1&lt;/id&gt;
+  &lt;plot nil="true"&gt;&lt;/plot&gt;
+  &lt;production-year type="integer"&gt;1984&lt;/production-year&gt;
+  &lt;rating type="integer" nil="true"&gt;&lt;/rating&gt;
+  &lt;title&gt;The Terminator&lt;/title&gt;
+  &lt;updated-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/updated-at&gt;
+&lt;/dvd&gt;
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Danach posten wir den entsprechenden Eintrag neu (in diesem
+        Beispiel setzen wir das Rating auf 5 Sterne). Wichtig dabei ist, das
+        wir die <parameter>id</parameter> des Eintrages mit
+        übertragen:<screen>sw@debian:~/dvd-sammlung$ <command>curl -X PUT -d "&lt;dvd&gt;&lt;id&gt;1&lt;/id&gt;&lt;rating&gt;5&lt;/rating&gt;&lt;/dvd&gt;" http://localhost:3000/dvds/update/1.xml</command>
+sw@debian:~/dvd-sammlung$ </screen></para>
+
+        <para>Im Log des Webservers sehen Sie folgende Ausgabe:<screen>Processing DvdsController#update to xml (for 127.0.0.1 at 2009-12-25 02:46:31) [PUT]
+  Parameters: {"&lt;dvd&gt;&lt;id&gt;1&lt;/id&gt;&lt;rating&gt;5&lt;/rating&gt;&lt;/dvd&gt;"=&gt;nil, "id"=&gt;"1"}
+  Dvd Load (0.2ms)   SELECT * FROM "dvds" WHERE ("dvds"."id" = 1) 
+Completed in 5ms (View: 0, DB: 0) | 200 OK [http://localhost/dvds/update/1.xml]
+</screen></para>
+      </section>
+
+      <section>
+        <title>destroy</title>
+
+        <para>Sie können den eben angelegten Datensatz mit der URL
+        <uri>http://localhost:3000/dvds/destroy/1</uri> wieder aus der
+        Datenbank löschen.<screen>sw@debian:~/dvd-sammlung$ <command>curl -X DELETE http://localhost:3000/dvds/1.xml</command>
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Im Log des Webservers sehen Sie folgende Ausgabe:<screen>Processing DvdsController#destroy to xml (for 127.0.0.1 at 2009-12-25 02:49:40) [DELETE]
+  Parameters: {"id"=&gt;"1"}
+  Dvd Load (0.2ms)   SELECT * FROM "dvds" WHERE ("dvds"."id" = 1) 
+  Dvd Destroy (0.2ms)   DELETE FROM "dvds" WHERE "id" = 1
+Completed in 128ms (View: 0, DB: 0) | 200 OK [http://localhost/dvds/1.xml]
+</screen></para>
       </section>
     </section>
 
