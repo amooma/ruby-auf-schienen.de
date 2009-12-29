@@ -211,6 +211,76 @@ sw@debian:~/dvd-sammlung$</screen></para>
       <para>Damit wäre Ihr Rails-Entwicklungssystem über die URL
       http://192.168.248.134:3000 ansteuerbar.</para>
     </section>
+
+    <section>
+      <title>Es läuft schon ein Webserver</title>
+
+      <para>Einer der Gründe für das initiale Starten des Webservers am Anfang
+      des Projektes ist zu überprüfen, ob nicht schon ein Rails-Server auf dem
+      gleichen System läuft. In diesem Fall bekommen Sie die folgende
+      Fehlermeldung ausgegeben:<programlisting>sw@debian:~/dvd-sammlung$ <command>./script/server</command> 
+=&gt; Booting WEBrick
+=&gt; Rails 2.3.5 application starting on http://0.0.0.0:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2009-12-25 00:22:20] INFO  WEBrick 1.3.1
+[2009-12-25 00:22:20] INFO  ruby 1.9.1 (2009-12-07) [i686-linux]
+[2009-12-25 00:22:20] WARN  TCPServer Error: Address already in use - bind(2)
+Exiting
+/usr/local/lib/ruby/1.9.1/webrick/utils.rb:73:in `initialize': Address already in use - bind(2) (Errno::EADDRINUSE)
+ from /usr/local/lib/ruby/1.9.1/webrick/utils.rb:73:in `new'
+ from /usr/local/lib/ruby/1.9.1/webrick/utils.rb:73:in `block in create_listeners'
+ from /usr/local/lib/ruby/1.9.1/webrick/utils.rb:70:in `each'
+ from /usr/local/lib/ruby/1.9.1/webrick/utils.rb:70:in `create_listeners'
+ from /usr/local/lib/ruby/1.9.1/webrick/server.rb:74:in `listen'
+ from /usr/local/lib/ruby/1.9.1/webrick/server.rb:62:in `initialize'
+ from /usr/local/lib/ruby/1.9.1/webrick/httpserver.rb:24:in `initialize'
+ from /usr/local/lib/ruby/gems/1.9.1/gems/rack-1.0.1/lib/rack/handler/webrick.rb:10:in `new'
+ from /usr/local/lib/ruby/gems/1.9.1/gems/rack-1.0.1/lib/rack/handler/webrick.rb:10:in `run'
+ from /usr/local/lib/ruby/gems/1.9.1/gems/rails-2.3.5/lib/commands/server.rb:111:in `&lt;top (required)&gt;'
+ from ./script/server:3:in `require'
+ from ./script/server:3:in `&lt;main&gt;'
+sw@debian:~/dvd-sammlung$ </programlisting></para>
+
+      <para>Suchen Sie in so einem Fall bitte nach dem schon laufenden
+      Rails-System und beenden Sie es mit <command>CTRL-C</command>.
+      Alternativ können Sie natürlich Ihr neues System auf einem anderen Port
+      starten. Aber das erhöht nicht gerade die Übersichtlichkeit beim
+      Entwickeln. ;-)</para>
+    </section>
+  </section>
+
+  <section>
+    <title>Development Umgebung</title>
+
+    <para>Rails kennt drei verschiedene Arbeits-Umgebungen:<itemizedlist>
+        <listitem>
+          <para>Development</para>
+        </listitem>
+
+        <listitem>
+          <para>Testing</para>
+        </listitem>
+
+        <listitem>
+          <para>Production</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>Wir arbeiten in diesem Kapitel nur mit der Development Umgebung. So
+    bald Sie ein besseres Gefühl für Rails bekommen haben, starten wir mit
+    Tests und benötigen dafür die entsprechende Umgebung (dort wird z.B. beim
+    Start eines Tests die Test-Datenbank neu gefühlt und beim Beenden wird
+    gelöscht). Ganz zum Schluss erkläre ich Ihnen dann die verschiedenen
+    Szenarien, wie Sie Ihre Rails-Applikation aus der Development-Umgebung in
+    die Production-Umgebung ausrollen können.</para>
+
+    <para>Die Development-Umgebung bringt möglichst viel mit. So müssen Sie
+    nicht extra einen Webserver installieren, sondern können den eingebauten
+    Rails-Webserver benutzen. Der besticht nicht durch extreme Performance,
+    aber das benötien wir bei der Entwicklung ja auch nicht. Später kann man
+    dann auf grosse Systeme wie <application>Apache</application> umsteigen.
+    Das gleiche gilt für die Datenbank.</para>
   </section>
 
   <section>
@@ -535,6 +605,248 @@ sqlite&gt; <command>.schema dvds</command>
 CREATE TABLE "dvds" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar(255), "production_year" integer, "duration" integer, "plot" text, "rating" integer, "created_at" datetime, "updated_at" datetime);
 sqlite&gt; .quit
 sw@debian:~/dvd-sammlung$</screen></para>
+
+      <section>
+        <title>Rollback</title>
+
+        <para>Es soll schon vorgekommen sein, das übereilt eine Migration
+        durchgeführt wurde. Natürlich passiert weder Ihnen noch mir so was.
+        Aber falls mal ein Freund von Ihnen in diese Predulie gerät: Keine
+        Panik! Dafür benutzen wir ja Rails und Rails hat sich dazu schon etwas
+        ausgedacht. Dafür wurde in der Migrations-Class die Methode
+        <methodname>self.down</methodname> angelegt. Testweise können wir ja
+        mal unsere letzte Migration zurückrollen:<screen>sw@debian:~/dvd-sammlung$ <command>rake db:rollback</command>
+(in /home/sw/dvd-sammlung)
+==  CreateDvds: reverting =====================================================
+-- drop_table(:dvds)
+   -&gt; 0.0005s
+==  CreateDvds: reverted (0.0016s) ============================================
+
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Sie können alles auf einmal zurück-rollen oder auch nur einzelne
+        Migrationen. Mit dem Schalter <parameter>-T</parameter> bekommen Sie
+        eine Hilfe zu allen möglichen Wegen aufgezeigt:<screen>sw@debian:~/dvd-sammlung$ <command>rake -T db</command>
+(in /home/sw/dvd-sammlung)
+rake db:abort_if_pending_migrations  # Raises an error if there are pending m...
+rake db:charset                      # Retrieves the charset for the current ...
+rake db:collation                    # Retrieves the collation for the curren...
+rake db:create                       # Create the database defined in config/...
+rake db:create:all                   # Create all the local databases defined...
+rake db:drop                         # Drops the database for the current RAI...
+rake db:drop:all                     # Drops all the local databases defined ...
+rake db:fixtures:identify            # Search for a fixture given a LABEL or ID.
+rake db:fixtures:load                # Load fixtures into the current environ...
+rake db:migrate                      # Migrate the database through scripts i...
+rake db:migrate:down                 # Runs the "down" for a given migration ...
+rake db:migrate:redo                 # Rollbacks the database one migration a...
+rake db:migrate:reset                # Resets your database using your migrat...
+rake db:migrate:up                   # Runs the "up" for a given migration VE...
+rake db:reset                        # Drops and recreates the database from ...
+rake db:rollback                     # Rolls the schema back to the previous ...
+rake db:schema:dump                  # Create a db/schema.rb file that can be...
+rake db:schema:load                  # Load a schema.rb file into the database
+rake db:seed                         # Load the seed data from db/seeds.rb
+rake db:sessions:clear               # Clear the sessions table
+rake db:sessions:create              # Creates a sessions migration for use w...
+rake db:setup                        # Create the database, load the schema, ...
+rake db:structure:dump               # Dump the database structure to a SQL file
+rake db:test:clone                   # Recreate the test database from the cu...
+rake db:test:clone_structure         # Recreate the test databases from the d...
+rake db:test:load                    # Recreate the test database from the cu...
+rake db:test:prepare                 # Check for pending migrations and load ...
+rake db:test:purge                   # Empty the test database
+rake db:version                      # Retrieves the current schema version n...
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Aber spielen wir lieber unsere Migration wieder ein:<screen>sw@debian:~/dvd-sammlung$ <command>rake db:migrate</command>
+(in /home/sw/dvd-sammlung)
+==  CreateDvds: migrating =====================================================
+-- create_table(:dvds)
+   -&gt; 0.0011s
+==  CreateDvds: migrated (0.0021s) ============================================
+
+sw@debian:~/dvd-sammlung$</screen></para>
+      </section>
+    </section>
+  </section>
+
+  <section>
+    <title>Orientierung im neuen System</title>
+
+    <para>Bitte starten Sie Ihren Webserver:<screen>sw@debian:~/dvd-sammlung$ <command>./script/server</command> 
+=&gt; Booting WEBrick
+=&gt; Rails 2.3.5 application starting on http://0.0.0.0:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2009-12-25 00:26:24] INFO  WEBrick 1.3.1
+[2009-12-25 00:26:24] INFO  ruby 1.9.1 (2009-12-07) [i686-linux]
+[2009-12-25 00:26:24] INFO  WEBrick::HTTPServer#start: pid=18632 port=3000
+</screen></para>
+
+    <para>Mit Scaffolding haben Sie direkt ein kleine Web-GUI zum
+    Administrieren Ihrer DVD-Sammlung bekommen. Diese ist noch sehr
+    rudimentär, aber ist ein guter Start.</para>
+
+    <section>
+      <title>Zugriff per Webbrowser</title>
+
+      <para></para>
+
+      <section>
+        <title>index</title>
+
+        <para>Die Liste aller aktuell gespeicherten DVDs bekommen Sie unter
+        der URL http://localhost:3000/dvds<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds</command>
+Received cookie: _dvd-sammlung_session=BAh7BjoPc2Vzc2lvbl9pZCIlMTY3YzQyZWQ0MDUzMmRhODNjN2RmMWI4ZGQ4ZjliYjE%3D--6d4f7386f420f1fd583e93991f731b4423604d6a
+Listing dvds
+
+Title Production year Duration Plot Rating
+
+
+New dvd
+sw@debian:~/dvd-sammlung$</screen></para>
+      </section>
+
+      <section>
+        <title>new</title>
+
+        <para>Eine neue DVD können Sie unter der URL
+        http://localhost:3000/dvds/new eintragen:<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds/new</command>
+Received cookie: _dvd-sammlung_session=BAh7BzoPc2Vzc2lvbl9pZCIlZThhNjAxZjE1MThlMzcyZmYzOGIxOTM1Y2JlZTM5MmI6EF9jc3JmX3Rva2VuSSIxdFBoTnFPTEJGbmgrajVQVmNoKzhnNVM1Z3N0aFFOYkdNaEpxNWJlbnpBbz0GOg1lbmNvZGluZyINVVMtQVNDSUk%3D--59c0c0badd6f26c43a0b0b5bcabebbf61c97ca76
+New dvd
+
+Title
+[                              ]
+
+Production year
+[                              ]
+
+Duration
+[                              ]
+
+Plot
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+
+Rating
+[                              ]
+
+[Create]
+
+Back
+sw@debian:~/dvd-sammlung$</screen></para>
+      </section>
+
+      <section>
+        <title>show</title>
+
+        <para>Eine einzelne DVD kann man sich mit der ID des Eintrages (hier
+        die 1) und der entsprechenden URL http://localhost:3000/dvds/show/1
+        anschauen. Alternativ geht auch die Kurzform
+        http://localhost:3000/dvds/1<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds/1</command>
+Received cookie: _dvd-sammlung_session=BAh7BjoPc2Vzc2lvbl9pZCIlM2JlNzQzNTY2OThiNjQ3NjA3NDQ1MTc0OTFhZWUxYzY%3D--5800246ee9363bf535b797a8bf67cf9617d9fe2b
+Title: Rain Man
+
+Production year: 1988
+
+Duration:
+
+Plot: Geschichte zweier sehr ungleicher Brüder.
+
+Rating: 5
+
+Edit | Back
+sw@debian:~/dvd-sammlung$</screen></para>
+      </section>
+
+      <section>
+        <title>edit</title>
+
+        <para>Den Eintrag dieser einzelnen DVD können Sie mit der URL
+        http://localhost:3000/dvds/edit/1 ändern.<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds/edit/1</command>
+Received cookie: _dvd-sammlung_session=BAh7BzoPc2Vzc2lvbl9pZCIlZmY5OWQyMTUwNzY0ZWQ2YWM0YmM0ZmFiOTUwN2Y5ZTE6EF9jc3JmX3Rva2VuSSIxdmZodUQ3eS9FdEVWMWwxM0l3ZDhFbWZYRndvU0hzTFhBU0doQWFWNzRiST0GOg1lbmNvZGluZyINVVMtQVNDSUk%3D--e3002ea604fd8499bab4551217e95b21e986852c
+Editing dvd
+
+Title
+[Rain Man                      ]
+
+Production year
+[1988                          ]
+
+Duration
+[                              ]
+
+Plot
+[Geschichte zweier sehr ungleicher Brüder]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+
+Rating
+[5                             ]
+
+[Update]
+
+Show | Back
+sw@debian:~/dvd-sammlung$</screen></para>
+      </section>
+
+      <section>
+        <title>destroy</title>
+
+        <para>Sie können den eben angelegten Datensatz mit der URL
+        http://localhost:3000/dvds/destroy/1 wieder aus der Datenbank
+        löschen.<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds/destroy/1</command>
+Received cookie: _dvd-sammlung_session=BAh7BjoPc2Vzc2lvbl9pZCIlODE5NjAyODdkNjIxNDI5ZTQ2NDUwYTQzYTk3YjVmZWM%3D--6353d304e9a7e1534d51c0bd2ceaef1ee60df645
+Listing dvds
+
+Title Production year Duration Plot Rating
+
+
+New dvd
+sw@debian:~/dvd-sammlung$</screen></para>
+      </section>
+    </section>
+
+    <section>
+      <title>./script/console</title>
+
+      <para></para>
     </section>
   </section>
 </chapter>
