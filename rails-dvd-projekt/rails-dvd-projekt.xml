@@ -615,6 +615,45 @@ sqlite&gt; .quit
 sw@debian:~/dvd-sammlung$</screen></para>
 
       <section>
+        <title>Automatisch zugefügte Felder (id, created_at und
+        updated_at)</title>
+
+        <para>Rails ist so freundlich uns beim Scaffolding per Default immer
+        noch folgende Felder hinzuzufügen:<itemizedlist>
+            <listitem>
+              <para><varname>id</varname></para>
+
+              <para>Das ist die Unique-ID des Datensatzes. Das Feld wird von
+              der Datenbank automatisch hochgezählt. Für alle SQL-Fans:
+              AUTOINCREMENT NOT NULL</para>
+            </listitem>
+
+            <listitem>
+              <para><varname>created_at</varname></para>
+
+              <para>Das Feld wird von ActiveRecord automatisch beim Erstellen
+              eines Datensatzes gefüllt.</para>
+            </listitem>
+
+            <listitem>
+              <para><varname>updated_at</varname></para>
+
+              <para>Das Feld wird bei jeder Veränderung des Datensatzes
+              automatisch an die aktuelle Zeit angepasst.</para>
+            </listitem>
+          </itemizedlist></para>
+
+        <para>Am Anfang fragt man sich: "Muss das sein? Macht das wirklich
+        Sinn?". Aber mit der Zeit lernt man diese automatisch gehandelten
+        Felder lieben. </para>
+
+        <para>Falls Sie anderer Meinung sind: Sie können die Erstellung von
+        <varname>created_at</varname> und <varname>updated_at</varname> mit
+        dem Schalter <parameter>--skip-timestamps</parameter> beim Scaffolding
+        deaktivieren.</para>
+      </section>
+
+      <section>
         <title>Rollback</title>
 
         <para>Es soll schon vorgekommen sein, das übereilt eine Migration
@@ -1728,7 +1767,8 @@ Dvd.create({ :title =&gt; 'The Dark Knight', :production_year =&gt; 2008, :ratin
         <para>Mit <methodname>destroy</methodname> können Sie einen Datensatz
         löschen und dabei werden auch evt. vorhandene Abhängigkeiten beachtet
         (solche Abhängikeiten betrachten wir später). Vereinfacht kann man
-        sagen: "Lieber destroy nehmen, das ist sicherer."</para>
+        sagen: "Lieber destroy nehmen, das ist sicherer, weil das Rails-System
+        dann mehr mitdenkt."</para>
 
         <para>Beispiel:<screen>&gt;&gt; <command>Dvd.find_by_title('Hancock')</command>
 =&gt; #&lt;Dvd id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 06:03:15", updated_at: "2009-12-25 06:03:15"&gt;
@@ -1773,6 +1813,65 @@ Dvd.create({ :title =&gt; 'The Dark Knight', :production_year =&gt; 2008, :ratin
 &gt;&gt; <command>Dvd.find_by_title('Hancock')</command>
 =&gt; #&lt;Dvd id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 3, created_at: "2009-12-25 06:11:13", updated_at: "2009-12-25 06:11:51"&gt;
 &gt;&gt;</screen></para>
+
+      <section>
+        <title>Locking</title>
+
+        <para>Per Default benutzt Rails Optimistisches Locking der Datensätze.
+        Dies kann aber umgeschaltet werden. Da für die meisten User
+        Optimistisches Locking optimal ist und viele vor diesem Absatz nicht
+        mal über das Problem nachgedacht haben, werde ich nicht weiter drauf
+        eingehen, sondern auf die ri Hilfe verweisen. Wer pessimistisches
+        Locking benötigt, der findet dort die notwendigen Schalter.</para>
+
+        <para><screen>sw@debian:~/dvd-sammlung$ <command>ri ActiveRecord::Locking::Optimistic</command>
+------------------------------- Class: ActiveRecord::Locking::Optimistic
+
+What is Optimistic Locking
+--------------------------
+
+     Optimistic locking allows multiple users to access the same record
+     for edits, and assumes a minimum of conflicts with the data. It
+     does this by checking whether another process has made changes to a
+     record since it was opened, an ActiveRecord::StaleObjectError is
+     thrown if that has occurred and the update is ignored.
+
+     Check out ActiveRecord::Locking::Pessimistic for an alternative.
+
+
+Usage
+-----
+
+     Active Records support optimistic locking if the field
+     +lock_version+ is present. Each update to the record increments the
+     lock_version column and the locking facilities ensure that records
+     instantiated twice will let the last one saved raise a
+     StaleObjectError if the first was also updated. Example:
+
+       p1 = Person.find(1)
+       p2 = Person.find(1)
+     
+       p1.first_name = "Michael"
+       p1.save
+     
+       p2.first_name = "should fail"
+       p2.save # Raises a ActiveRecord::StaleObjectError
+
+     You're then responsible for dealing with the conflict by rescuing
+     the exception and either rolling back, merging, or otherwise apply
+     the business logic needed to resolve the conflict.
+
+     You must ensure that your database schema defaults the lock_version
+     column to 0.
+
+     This behavior can be turned off by setting
+     +ActiveRecord::Base.lock_optimistically = false+. To override the
+     name of the lock_version column, invoke the +set_locking_column+
+     method. This method uses the same syntax as +set_table_name+
+
+------------------------------------------------------------------------
+sw@debian:~/dvd-sammlung$</screen> </para>
+      </section>
     </section>
   </section>
 </chapter>
