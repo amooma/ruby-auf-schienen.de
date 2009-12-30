@@ -1215,11 +1215,564 @@ Completed in 128ms (View: 0, DB: 0) | 200 OK [http://localhost/dvds/1.xml]
 </screen></para>
       </section>
     </section>
+  </section>
+
+  <section>
+    <title>Zugriff per ./script/console</title>
+
+    <para>Sie haben im letzten Kapitel gelernt mit irb umzugehen. In Rails
+    gibt es noch was cooleres: <filename>./script/console</filename></para>
+
+    <para>Mit <filename>./script/console</filename> haben Sie nicht nur die
+    normalen irb Mechanismen, sondern auch direkt alle Class-en und Methoden
+    aus Ihrer Rails-Applikation. Und Sie können auf die Daten zugreifen. Diese
+    werden automagisch per ActiveRecord als Objekte zur Verfügung gestellt.
+    Zur Demonstration lade ich eine frische Datenbank mit drei Beispielfilmen
+    aus der Terminatorreihe.</para>
+
+    <para>Die Rails-Console kann parallel zum Webserver oder anstatt des
+    Webservers gestartet werden. Wir fangen wieder mit einer leeren Datenbank
+    an und starten die Console:<screen>sw@debian:~/dvd-sammlung$ ./script/console 
+Loading development environment (Rails 2.3.5)
+&gt;&gt;</screen></para>
 
     <section>
-      <title>./script/console</title>
+      <title>Neuen Datensatz anlegen</title>
 
-      <para></para>
+      <para>ActiveRecord stellt uns automagisch eine Class aus der Datenbank
+      <parameter>dvds</parameter> mit dem Namen <classname>Dvd</classname> zur
+      Verfügung. Diese Class hat eine Methode new und mit der können wir ein
+      neues Objekt erstellen.<screen>&gt;&gt; <command>terminator = Dvd.new</command>
+=&gt; #&lt;Dvd id: nil, title: nil, production_year: nil, duration: nil, plot: nil, rating: nil, created_at: nil, updated_at: nil&gt;
+&gt;&gt; </screen></para>
+
+      <para>Wir können uns sicherheitshalber noch mal die Class der Instance
+      terminator ausgeben lassen.<screen>&gt;&gt; <command>terminator.class</command>
+=&gt; Dvd(id: integer, title: string, production_year: integer, duration: integer, plot: text, rating: integer, created_at: datetime, updated_at: datetime)
+&gt;&gt;</screen></para>
+
+      <para>Das neue Objekt terminator hat automatsch Accessors zu den
+      einzelnen Datenfeldern. Schauen wir uns doch mal die für die Class
+      <classname>Dvd</classname> verfügbaren Instance-Methoden an:<screen>&gt;&gt; <command>Dvd.instance_methods(false)</command>
+=&gt; [:title, :title=, :title?, :production_year, :production_year=, :production_year?, :duration, :duration=, :duration?, :plot, :plot=, :plot?, :rating, :rating=, :rating?, :created_at, :created_at=, :created_at?, :updated_at, :updated_at=, :updated_at?, :id]
+&gt;&gt;</screen></para>
+
+      <para>Diese benutzen wir zum Füllen mit einem Beispieldatensatz.<screen>&gt;&gt; <command>terminator.title = 'The Terminator'</command>
+=&gt; "The Terminator"
+&gt;&gt; <command>terminator.production_year = 1984</command>
+=&gt; 1984
+&gt;&gt; <command>terminator</command>
+=&gt; #&lt;Dvd id: nil, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: nil, updated_at: nil&gt;
+&gt;&gt;</screen></para>
+
+      <para>Das Objekt ist allerdings noch nicht in der Datenbank gespeichert.
+      Das erfolgt erst durch Aufruf der Methode
+      <methodname>save</methodname>.<screen>&gt;&gt; <command>terminator.save</command>
+=&gt; true
+&gt;&gt;</screen></para>
+
+      <para>Alternative können wir einen zweiten Datensatz auch direkt mit der
+      Methode <methodname>create</methodname> anlegen.<screen>&gt;&gt; <command>Dvd.create({ :title =&gt; 'Terminator 2', :production_year =&gt; 1992 })</command>
+=&gt; #&lt;Dvd id: 2, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 03:31:29", updated_at: "2009-12-25 03:31:29"&gt;
+&gt;&gt;</screen></para>
+
+      <section>
+        <title>Hilfe zu create</title>
+
+        <para>Die Methode <methodname>create</methodname> gehört zu
+        <classname>ActiveRecord::Base</classname>. Die online Hilfe dazu kann
+        mit <application>ri</application> abgerufen werden.<screen>sw@debian:~/dvd-sammlung$ <command>ri ActiveRecord::Base.create</command>
+--------------------------------------------- ActiveRecord::Base::create
+     ActiveRecord::Base::create(attributes = nil, &amp;block) {|object| ...}
+
+     From gem activerecord-2.3.5
+------------------------------------------------------------------------
+     Creates an object (or multiple objects) and saves it to the
+     database, if validations pass. The resulting object is returned
+     whether the object was saved successfully to the database or not.
+
+     The +attributes+ parameter can be either be a Hash or an Array of
+     Hashes. These Hashes describe the attributes on the objects that
+     are to be created.
+
+     Examples
+
+       # Create a single new object
+       User.create(:first_name =&gt; 'Jamie')
+     
+       # Create an Array of new objects
+       User.create([{ :first_name =&gt; 'Jamie' }, { :first_name =&gt; 'Jeremy' }])
+     
+       # Create a single object and pass it into a block to set other attributes.
+       User.create(:first_name =&gt; 'Jamie') do |u|
+         u.is_admin = false
+       end
+     
+       # Creating an Array of new objects using a block, where the block is execut
+ed for each object:
+       User.create([{ :first_name =&gt; 'Jamie' }, { :first_name =&gt; 'Jeremy' }]) do |
+u|
+         u.is_admin = false
+       end
+
+sw@debian:~/dvd-sammlung$</screen></para>
+      </section>
+    </section>
+
+    <section>
+      <title>Alle Datensätze anzeigen</title>
+
+      <para>Der einfachste Weg alle Datensätze aus der Datenbank dvds
+      anzuzeigen ist:<screen>&gt;&gt; <command>Dvd.all</command>
+=&gt; [#&lt;Dvd id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 03:29:47", updated_at: "2009-12-25 03:29:47"&gt;, #&lt;Dvd id: 2, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 03:31:29", updated_at: "2009-12-25 03:31:29"&gt;]
+&gt;&gt;</screen></para>
+
+      <para>Was für eine Class ist <classname>Dvd.all</classname>? Schauen wir
+      mal nach.<screen>&gt;&gt; <command>Dvd.all.class</command>
+=&gt; Array
+&gt;&gt;</screen></para>
+
+      <para>Dann können wir ja die Iterator-Methode
+      <methodname>each</methodname> anwenden, um durch die einzelnen Elemente
+      des Arrays zu gehen. Damit können Sie sich als Beispiel alle Titel
+      ausgeben lassen.<screen>&gt;&gt; <command>Dvd.all.each { |dvd| puts dvd.title }</command>
+The Terminator
+Terminator 2
+=&gt; [#&lt;Dvd id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 03:29:47", updated_at: "2009-12-25 03:29:47"&gt;, #&lt;Dvd id: 2, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 03:31:29", updated_at: "2009-12-25 03:31:29"&gt;]
+&gt;&gt;</screen></para>
+    </section>
+
+    <section>
+      <title>Datensätze suchen</title>
+
+      <para>Es gibt in ActiveRecord::Base eine Methode find die es uns
+      ermöglicht ganz ohne SQL-Kenntnisse nach Daten in der Datenbank zu
+      suchen. </para>
+
+      <section>
+        <title>Nach ID suchen</title>
+
+        <para>Eine DVD nach der ID zu suchen ist der einfachste aller Fälle.
+        Suchen wir mal nach der DVD mit der ID 1:<screen>&gt;&gt; <command>Dvd.find(1)</command>
+=&gt; #&lt;Dvd id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 03:29:47", updated_at: "2009-12-25 03:29:47"&gt;
+&gt;&gt;</screen></para>
+      </section>
+
+      <section>
+        <title>Nach einem Feldinhalt suchen</title>
+
+        <para>Jetzt kommt ein wenig Ruby-Magie ins Spiel. Die Methode
+        <methodname>find</methodname> kann dynamisch erweitert werden. Am
+        einfachsten zeigt sich das mit ein paar Beispielen:<screen>&gt;&gt; <command>Dvd.find_by_title('The Terminator')</command>
+=&gt; #&lt;Dvd id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 03:29:47", updated_at: "2009-12-25 03:29:47"&gt;
+&gt;&gt; <command>Dvd.find_by_production_year(1984)</command>
+=&gt; #&lt;Dvd id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 03:29:47", updated_at: "2009-12-25 03:29:47"&gt;
+&gt;&gt; <command>Dvd.find_by_rating(nil)</command>
+=&gt; #&lt;Dvd id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 03:29:47", updated_at: "2009-12-25 03:29:47"&gt;
+&gt;&gt;</screen></para>
+
+        <para>Bei der letzten Suche zeigt sich dabei allerdings schon ein
+        Problem, denn <methodname>find_by_x</methodname> gibt immer nur den
+        ersten Treffer aus. Wenn man mehrere Treffer ausgeben will, muss man
+        <command>find_all_by_x</command> benutzen:<screen>&gt;&gt; <command>Dvd.find_all_by_rating(nil)</command>
+=&gt; [#&lt;Dvd id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 03:29:47", updated_at: "2009-12-25 03:29:47"&gt;, #&lt;Dvd id: 2, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 03:31:29", updated_at: "2009-12-25 03:31:29"&gt;]
+&gt;&gt; <command>Dvd.find_all_by_rating(nil).count</command>
+=&gt; 2
+&gt;&gt;</screen></para>
+
+        <para>Man kann die <methodname>find_all_by_x</methodname> oder
+        <methodname>find_by_x</methodname> Methoden beliebig mit dem String
+        <methodname>_and_</methodname> und weiteren Feldnamen
+        verlängern:<screen>&gt;&gt; <command>Dvd.find_all_by_duration_and_rating(nil,nil)</command>
+=&gt; [#&lt;Dvd id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 03:29:47", updated_at: "2009-12-25 03:29:47"&gt;, #&lt;Dvd id: 2, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 03:31:29", updated_at: "2009-12-25 03:31:29"&gt;]
+&gt;&gt; <command>Dvd.find_all_by_duration_and_rating(nil,nil).count</command>
+=&gt; 2
+&gt;&gt;</screen></para>
+      </section>
+
+      <section>
+        <title>Komplexere Suchen</title>
+
+        <para>Die Methode find ist sehr mächtig. Bevor ich einzelne Beispiele
+        gebe, möchte ich Sie schon mal auf die eingebaute Hilfe
+        verweisen:<screen>sw@debian:~/sandbox$ <command>ri ActiveRecord::Base.find</command>
+----------------------------------------------- ActiveRecord::Base::find
+     ActiveRecord::Base::find(*args)
+
+     From gem activerecord-2.3.5
+------------------------------------------------------------------------
+     Find operates with four different retrieval approaches:
+
+     *   Find by id - This can either be a specific id (1), a list of
+         ids (1, 5, 6), or an array of ids ([5, 6, 10]). If no record
+         can be found for all of the listed ids, then RecordNotFound
+         will be raised.
+
+     *   Find first - This will return the first record matched by the
+         options used. These options can either be specific conditions
+         or merely an order. If no record can be matched, +nil+ is
+         returned. Use +Model.find(:first, *args)+ or its shortcut
+         +Model.first(*args)+.
+
+     *   Find last - This will return the last record matched by the
+         options used. These options can either be specific conditions
+         or merely an order. If no record can be matched, +nil+ is
+         returned. Use +Model.find(:last, *args)+ or its shortcut
+         +Model.last(*args)+.
+
+     *   Find all - This will return all the records matched by the
+         options used. If no records are found, an empty array is
+         returned. Use +Model.find(:all, *args)+ or its shortcut
+         +Model.all(*args)+.
+
+     All approaches accept an options hash as their last parameter.
+
+     Parameters
+
+     *   +:conditions+ - An SQL fragment like "administrator = 1", +[
+         "user_name = ?", username ]+, or +["user_name = :user_name", {
+         :user_name =&gt; user_name }]+. See conditions in the intro.
+
+     *   +:order+ - An SQL fragment like "created_at DESC, name".
+
+     *   +:group+ - An attribute name by which the result should be
+         grouped. Uses the +GROUP BY+ SQL-clause.
+
+     *   +:having+ - Combined with +:group+ this can be used to filter
+         the records that a +GROUP BY+ returns. Uses the +HAVING+
+         SQL-clause.
+
+     *   +:limit+ - An integer determining the limit on the number of
+         rows that should be returned.
+
+     *   +:offset+ - An integer determining the offset from where the
+         rows should be fetched. So at 5, it would skip rows 0 through
+         4.
+
+     *   +:joins+ - Either an SQL fragment for additional joins like
+         "LEFT JOIN comments ON comments.post_id = id" (rarely needed),
+         named associations in the same form used for the +:include+
+         option, which will perform an +INNER JOIN+ on the associated
+         table(s), or an array containing a mixture of both strings and
+         named associations. If the value is a string, then the records
+         will be returned read-only since they will have attributes that
+         do not correspond to the table's columns. Pass +:readonly =&gt;
+         false+ to override.
+
+     *   +:include+ - Names associations that should be loaded
+         alongside. The symbols named refer to already defined
+         associations. See eager loading under Associations.
+
+     *   +:select+ - By default, this is "*" as in "SELECT * FROM", but
+         can be changed if you, for example, want to do a join but not
+         include the joined columns. Takes a string with the SELECT SQL
+         fragment (e.g. "id, name").
+
+     *   +:from+ - By default, this is the table name of the class, but
+         can be changed to an alternate table name (or even the name of
+         a database view).
+
+     *   +:readonly+ - Mark the returned records read-only so they
+         cannot be saved or updated.
+
+     *   +:lock+ - An SQL fragment like "FOR UPDATE" or "LOCK IN SHARE
+         MODE". +:lock =&gt; true+ gives connection's default exclusive
+         lock, usually "FOR UPDATE".
+
+     Examples
+
+       # find by id
+       Person.find(1)       # returns the object for ID = 1
+       Person.find(1, 2, 6) # returns an array for objects with IDs in (1, 2, 6)
+       Person.find([7, 17]) # returns an array for objects with IDs in (7, 17)
+       Person.find([1])     # returns an array for the object with ID = 1
+       Person.find(1, :conditions =&gt; "administrator = 1", :order =&gt; "created_on DE
+SC")
+
+     Note that returned records may not be in the same order as the ids
+     you provide since database rows are unordered. Give an explicit
+     +:order+ to ensure the results are sorted.
+
+     Examples
+
+       # find first
+       Person.find(:first) # returns the first object fetched by SELECT * FROM peo
+ple
+       Person.find(:first, :conditions =&gt; [ "user_name = ?", user_name])
+       Person.find(:first, :conditions =&gt; [ "user_name = :u", { :u =&gt; user_name }]
+)
+       Person.find(:first, :order =&gt; "created_on DESC", :offset =&gt; 5)
+     
+       # find last
+       Person.find(:last) # returns the last object fetched by SELECT * FROM peopl
+e
+       Person.find(:last, :conditions =&gt; [ "user_name = ?", user_name])
+       Person.find(:last, :order =&gt; "created_on DESC", :offset =&gt; 5)
+     
+       # find all
+       Person.find(:all) # returns an array of objects for all the rows fetched by
+ SELECT * FROM people
+       Person.find(:all, :conditions =&gt; [ "category IN (?)", categories], :limit =
+&gt; 50)
+       Person.find(:all, :conditions =&gt; { :friends =&gt; ["Bob", "Steve", "Fred"] }
+       Person.find(:all, :offset =&gt; 10, :limit =&gt; 10)
+       Person.find(:all, :include =&gt; [ :account, :friends ])
+       Person.find(:all, :group =&gt; "category")
+
+     Example for find with a lock: Imagine two concurrent transactions:
+     each will read +person.visits == 2+, add 1 to it, and save,
+     resulting in two saves of +person.visits = 3+. By locking the row,
+     the second transaction has to wait until the first is finished; we
+     get the expected +person.visits == 4+.
+
+       Person.transaction do
+         person = Person.find(1, :lock =&gt; true)
+         person.visits += 1
+         person.save!
+       end
+
+sw@debian:~/sandbox$ </screen></para>
+
+        <section>
+          <title>Such-Beispiele</title>
+
+          <para>Im folgenden werde ich per Fragen und Antwort ein
+          Beispielprobleme mit <methodname>find</methodname> lösen. Dazu werde
+          ich die Datenbank dvds reseten und wie folgt neu
+          befüllen:<programlisting>Dvd.create({ :title =&gt; 'The Terminator', :production_year =&gt; 1984 })
+Dvd.create({ :title =&gt; 'Terminator 2', :production_year =&gt; 1992 })
+Dvd.create({ :title =&gt; 'Terminator Salvation', :production_year =&gt; 2009 })
+Dvd.create({ :title =&gt; 'Rain Man', :production_year =&gt; 1988, :rating =&gt; 5 })
+Dvd.create({ :title =&gt; 'War of the Worlds', :production_year =&gt; 2005, :rating =&gt; 4 })
+Dvd.create({ :title =&gt; 'Collateral', :production_year =&gt; 2004, :rating =&gt; 5})
+Dvd.create({ :title =&gt; 'Miami Vice', :production_year =&gt; 2006, :rating =&gt; 5})
+Dvd.create({ :title =&gt; 'Hancock', :production_year =&gt; 2008, :rating =&gt;  4})
+Dvd.create({ :title =&gt; 'The Aviator', :production_year =&gt; 2004, :rating =&gt;  4})
+Dvd.create({ :title =&gt; 'Some Like It Hot', :production_year =&gt; 1959, :rating =&gt;  5})
+Dvd.create({ :title =&gt; 'W.', :production_year =&gt; 2008, :rating =&gt;  4})
+Dvd.create({ :title =&gt; 'Iron Man', :production_year =&gt; 2008, :rating =&gt;  5})
+Dvd.create({ :title =&gt; 'The Dark Knight', :production_year =&gt; 2008, :rating =&gt;  5})
+</programlisting></para>
+
+          <para><qandaset>
+              <qandadiv>
+                <qandaentry>
+                  <question>
+                    <para>Wie kann ich alle in der Datenbank enthaltenen Filme
+                    in das Objekt mit dem Namen <varname>alle_filme</varname>
+                    speichern?</para>
+                  </question>
+
+                  <answer>
+                    <para><screen>&gt;&gt; <command>alle_filme = Dvd.all</command>
+=&gt; [#&lt;Dvd id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;, #&lt;Dvd id: 2, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;, #&lt;Dvd id: 3, title: "Terminator Salvation", production_year: 2009, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;, #&lt;Dvd id: 4, title: "Rain Man", production_year: 1988, duration: nil, plot: nil, rating: 5, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;, #&lt;Dvd id: 5, title: "War of the Worlds", production_year: 2005, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;, #&lt;Dvd id: 6, title: "Collateral", production_year: 2004, duration: nil, plot: nil, rating: 5, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;, #&lt;Dvd id: 7, title: "Miami Vice", production_year: 2006, duration: nil, plot: nil, rating: 5, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;, #&lt;Dvd id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;, #&lt;Dvd id: 9, title: "The Aviator", production_year: 2004, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;, #&lt;Dvd id: 10, title: "Some Like It Hot", production_year: 1959, duration: nil, plot: nil, rating: 5, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;, #&lt;Dvd id: 11, title: "W.", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;, #&lt;Dvd id: 12, title: "Iron Man", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;, #&lt;Dvd id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;]
+&gt;&gt;</screen></para>
+                  </answer>
+                </qandaentry>
+
+                <qandaentry>
+                  <question>
+                    <para>Wie finde ich den ersten Film in der
+                    Datenbank?</para>
+                  </question>
+
+                  <answer>
+                    <para><screen>&gt;&gt; <command>Dvd.find(:first)</command>
+=&gt; #&lt;Dvd id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 04:55:02", updated_at: "2009-12-25 04:55:02"&gt;
+&gt;&gt;</screen>Oder noch kürzer mit der Methode
+                    <methodname>first</methodname>.<screen>&gt;&gt; <command>Dvd.first</command>
+=&gt; #&lt;Dvd id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 04:55:02", updated_at: "2009-12-25 04:55:02"&gt;
+&gt;&gt;</screen></para>
+                  </answer>
+                </qandaentry>
+
+                <qandaentry>
+                  <question>
+                    <para>Wie kann ich alle Filme die im Jahr 1984 produziert
+                    wurden suchen?</para>
+                  </question>
+
+                  <answer>
+                    <para><screen>&gt;&gt; <command>Dvd.find_all_by_production_year(1984)</command>
+=&gt; [#&lt;Dvd id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 04:55:02", updated_at: "2009-12-25 04:55:02"&gt;]
+&gt;&gt;</screen></para>
+                  </answer>
+                </qandaentry>
+
+                <qandaentry>
+                  <question>
+                    <para>Wie finde ich die Anzahl der im Jahr 1984
+                    produzierten Filme raus?</para>
+                  </question>
+
+                  <answer>
+                    <para><screen>&gt;&gt; <command>Dvd.find_all_by_production_year(1984).count</command>
+=&gt; 1
+&gt;&gt; <command>Dvd.find_all_by_production_year(1984).count.class</command>
+=&gt; Fixnum
+&gt;&gt;</screen></para>
+                  </answer>
+                </qandaentry>
+
+                <qandaentry>
+                  <question>
+                    <para>Ein Freund fragt mich nach einer Liste aller DVDs
+                    die Filme aus dem Jahr 2008 enthalten. Er hätte die
+                    Ausgabe gerne im YAML Format.</para>
+                  </question>
+
+                  <answer>
+                    <para><screen>&gt;&gt; <command>alle_2008er_5_sterne_dvds = Dvd.find_all_by_production_year_and_rating(2008,5)</command>
+=&gt; [#&lt;Dvd id: 12, title: "Iron Man", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;, #&lt;Dvd id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;]
+&gt;&gt; <command>puts alle_2008er_5_sterne_dvds.to_yaml</command>
+--- 
+- !ruby/object:Dvd 
+  attributes: 
+    id: "12"
+    title: Iron Man
+    production_year: "2008"
+    duration: 
+    plot: 
+    rating: "5"
+    created_at: 2009-12-25 05:13:53
+    updated_at: 2009-12-25 05:13:53
+  attributes_cache: {}
+
+- !ruby/object:Dvd 
+  attributes: 
+    id: "13"
+    title: The Dark Knight
+    production_year: "2008"
+    duration: 
+    plot: 
+    rating: "5"
+    created_at: 2009-12-25 05:13:53
+    updated_at: 2009-12-25 05:13:53
+  attributes_cache: {}
+
+=&gt; nil
+&gt;&gt;</screen></para>
+                  </answer>
+                </qandaentry>
+
+                <qandaentry>
+                  <question>
+                    <para>Alle 2008er Filme, alphabetisch nach Titeln
+                    sortiert.</para>
+                  </question>
+
+                  <answer>
+                    <para><screen>&gt;&gt; <command>Dvd.find_all_by_production_year(2008, :order =&gt; :title)</command>
+=&gt; [#&lt;Dvd id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;, #&lt;Dvd id: 12, title: "Iron Man", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;, #&lt;Dvd id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;, #&lt;Dvd id: 11, title: "W.", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;]
+&gt;&gt;</screen></para>
+                  </answer>
+                </qandaentry>
+
+                <qandaentry>
+                  <question>
+                    <para>Die find Methode an sich reicht mich nicht. Ich
+                    möchte auch noch selbst SQL einbauen. Wie kann ich nach
+                    allen Filmen suchen, die im Titel das Wort 'Terminator'
+                    enthalten.</para>
+                  </question>
+
+                  <answer>
+                    <para><screen>&gt;&gt; <command>Dvd.find(:all, :conditions =&gt; [ "title LIKE ?", '%Terminator%' ])</command>
+=&gt; [#&lt;Dvd id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;, #&lt;Dvd id: 2, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;, #&lt;Dvd id: 3, title: "Terminator Salvation", production_year: 2009, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;]
+&gt;&gt;</screen></para>
+                  </answer>
+                </qandaentry>
+              </qandadiv>
+            </qandaset></para>
+        </section>
+      </section>
+    </section>
+
+    <section>
+      <title>Einen Datensatz löschen</title>
+
+      <para>Es gibt die Methoden <methodname>delete</methodname> und
+      <methodname>destroy</methodname>, um Datensätze zu löschen. </para>
+
+      <section>
+        <title>delete</title>
+
+        <para>Mit delete können Sie einen Datensatz löschen. Dabei werden
+        allerdings keine Abhängigkeiten zu anderen Datensätzen beachtet.
+        Delete löscht also nur die eine Zeile in der Datenbank und sonst
+        nichts.<note>
+            <para>Für unseren jetzigen Kenntnisstand sind solche Abhänigkeiten
+            noch egal, aber in ein paar Seiten werden wir verschiedene
+            Tabellen mit einander verknüpfen und dann wird es entsprechende
+            Abhängigkeiten geben.</para>
+          </note> Die Instance wird nach dem Löschen des Datenbankfeldes
+        ge-freeze-st. Sie ist also noch da, kann aber nicht verändert
+        werden.</para>
+
+        <para>Beispiel:<screen>&gt;&gt; <command>Dvd.find_by_title('Hancock')</command>
+=&gt; #&lt;Dvd id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;
+&gt;&gt; <command>hancock = Dvd.find_by_title('Hancock')</command>
+=&gt; #&lt;Dvd id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;
+&gt;&gt; <command>hancock.delete</command>        # Das Feld in der DB wird geloescht.
+=&gt; #&lt;Dvd id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;
+&gt;&gt; <command>Dvd.find_by_title('Hancock')</command>
+=&gt; nil                   # Eine Suche bringt kein Ergebnis mehr.
+&gt;&gt; <command>hancock</command>               # Die Instance ist ge-freeze-st.
+=&gt; #&lt;Dvd id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 05:13:53", updated_at: "2009-12-25 05:13:53"&gt;
+</screen></para>
+      </section>
+
+      <section>
+        <title>destroy</title>
+
+        <para>Mit <methodname>destroy</methodname> können Sie einen Datensatz
+        löschen und dabei werden auch evt. vorhandene Abhängigkeiten beachtet
+        (solche Abhängikeiten betrachten wir später). Vereinfacht kann man
+        sagen: "Lieber destroy nehmen, das ist sicherer."</para>
+
+        <para>Beispiel:<screen>&gt;&gt; <command>Dvd.find_by_title('Hancock')</command>
+=&gt; #&lt;Dvd id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 06:03:15", updated_at: "2009-12-25 06:03:15"&gt;
+&gt;&gt; <command>hancock = Dvd.find_by_title('Hancock')</command>
+=&gt; #&lt;Dvd id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 06:03:15", updated_at: "2009-12-25 06:03:15"&gt;
+&gt;&gt; <command>hancock.destroy</command>
+=&gt; #&lt;Dvd id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 06:03:15", updated_at: "2009-12-25 06:03:15"&gt;
+&gt;&gt; <command>Dvd.find_by_title('Hancock')</command>
+=&gt; nil
+&gt;&gt; <command>hancock</command>
+=&gt; #&lt;Dvd id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 06:03:15", updated_at: "2009-12-25 06:03:15"&gt;
+&gt;&gt;</screen></para>
+      </section>
+    </section>
+
+    <section>
+      <title>Einen Datensatz verändern</title>
+
+      <para>Das Verändern eines Datensatzes erfolgt in zwei
+      Schritten:<orderedlist>
+          <listitem>
+            <para>Suche des Datensatzes und erstellen einer entsprechenden
+            Instance.</para>
+          </listitem>
+
+          <listitem>
+            <para>Verändern der Werte.</para>
+          </listitem>
+
+          <listitem>
+            <para>Abspeichern des Datensatzes mit der Methode
+            <methodname>save</methodname>.</para>
+          </listitem>
+        </orderedlist></para>
+
+      <para>Beispiel:<screen>&gt;&gt; <command>hancock = Dvd.find_by_title('Hancock')</command>
+=&gt; #&lt;Dvd id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 06:11:13", updated_at: "2009-12-25 06:11:13"&gt;
+&gt;&gt; <command>hancock.rating = 3</command>
+=&gt; 3
+&gt;&gt; <command>hancock.save</command>
+=&gt; true
+&gt;&gt; <command>Dvd.find_by_title('Hancock')</command>
+=&gt; #&lt;Dvd id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 3, created_at: "2009-12-25 06:11:13", updated_at: "2009-12-25 06:11:51"&gt;
+&gt;&gt;</screen></para>
     </section>
   </section>
 </chapter>
