@@ -1874,4 +1874,85 @@ sw@debian:~/dvd-sammlung$</screen> </para>
       </section>
     </section>
   </section>
+
+  <section>
+    <title>Workflow innerhalb Rails</title>
+
+    <para>Jetzt können wir eine Tabelle anlegen und auf diese via HTTP und via
+    der Console zugreifen. Jetzt schauen wir uns mal an, was bei einer
+    HTTP-Anfrage passiert und welchen Weg diese Anfrage geht.</para>
+
+    <section>
+      <title>Das Szenario</title>
+
+      <para>Nehmen wir an, ein User ruft die URL
+      <uri>http://localhost:3000/dvds/show/1</uri> auf.</para>
+    </section>
+
+    <section>
+      <title>Routing</title>
+
+      <para>Kommt ein Aufruf per HTTP rein, so wird die URL durch eine
+      Routing-Engine verarbeitet. Diese wird durch die Datei
+      <filename>config/routes.rb</filename> konfiguriert. Schauen wir mal
+      rein:<screen>sw@debian:~/dvd-sammlung$ cat -n config/routes.rb 
+     1 ActionController::Routing::Routes.draw do |map|
+     2   map.resources :dvds
+     3 
+     4   # The priority is based upon order of creation: first created -&gt; highest priority.
+     5 
+     6   # Sample of regular route:
+     7   #   map.connect 'products/:id', :controller =&gt; 'catalog', :action =&gt; 'view'
+     8   # Keep in mind you can assign values other than :controller and :action
+     9 
+    10   # Sample of named route:
+    11   #   map.purchase 'products/:id/purchase', :controller =&gt; 'catalog', :action =&gt; 'purchase'
+    12   # This route can be invoked with purchase_url(:id =&gt; product.id)
+    13 
+    14   # Sample resource route (maps HTTP verbs to controller actions automatically):
+    15   #   map.resources :products
+    16 
+    17   # Sample resource route with options:
+    18   #   map.resources :products, :member =&gt; { :short =&gt; :get, :toggle =&gt; :post }, :collection =&gt; { :sold =&gt; :get }
+    19 
+    20   # Sample resource route with sub-resources:
+    21   #   map.resources :products, :has_many =&gt; [ :comments, :sales ], :has_one =&gt; :seller
+    22   
+    23   # Sample resource route with more complex sub-resources
+    24   #   map.resources :products do |products|
+    25   #     products.resources :comments
+    26   #     products.resources :sales, :collection =&gt; { :recent =&gt; :get }
+    27   #   end
+    28 
+    29   # Sample resource route within a namespace:
+    30   #   map.namespace :admin do |admin|
+    31   #     # Directs /admin/products/* to Admin::ProductsController (app/controllers/admin/products_controller.rb)
+    32   #     admin.resources :products
+    33   #   end
+    34 
+    35   # You can have the root of your site routed with map.root -- just remember to delete public/index.html.
+    36   # map.root :controller =&gt; "welcome"
+    37 
+    38   # See how all your routes lay out with "rake routes"
+    39 
+    40   # Install the default routes as the lowest priority.
+    41   # Note: These default routes make all actions in every controller accessible via GET requests. You should
+    42   # consider removing or commenting them out if you're using named routes and resources.
+    43   map.connect ':controller/:action/:id'
+    44   map.connect ':controller/:action/:id.:format'
+    45 end
+sw@debian:~/dvd-sammlung$</screen></para>
+
+      <para>Die Zeile 4 sagt aus, das die Priorität einer Route anhand hierer
+      Position in dieser Datei bestimmt wird. Es können also mehrere Regeln
+      auf die gleiche Route matchen. Die am weitesten oben stehende gewinnt
+      dann.</para>
+
+      <para>In der Zeile 2 steht eine für unsere Anfrage wichtige
+      Zeile:<programlisting>map.resources :dvds</programlisting></para>
+
+      <para>Dummerweise steht aber nicht viel mehr dazu da (mal abgesehen von
+      Zeile 14 und 15). </para>
+    </section>
+  </section>
 </chapter>
