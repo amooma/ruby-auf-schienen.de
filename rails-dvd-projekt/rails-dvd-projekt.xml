@@ -341,7 +341,7 @@ sw@debian:~/dvd-sammlung$ </programlisting></para>
         verwenden sehr viele Mechanismen automagisch Plural oder Singular von
         Englischen Wörtern. Wenn man sich damit anfreundet Datenbankfelder und
         Datenbanken an sich mit englischen Wörter zu benennen, dann kann man
-        die ganze Macht dieser Magie ausnutzen. </para>
+        die ganze Macht dieser Magie ausnutzen.</para>
       </section>
 
       <section>
@@ -504,14 +504,14 @@ sw@debian:~/dvd-sammlung$</screen>Und schon ist alles fertig. Alledings ist in
     <section>
       <title>rake db:migrate</title>
 
-      <para>./script/generate scaffold hat uns schon alles eingerichtet.
-      Allerdings müssen wir noch in der Datenbank die Tabelle für unsere Daten
-      anlegen. Rails nimmt uns aber die Arbeit ab. Im Verzeichnis db/migrate
-      liegen Migrationsdateien, die mit einem Timestamp im Namen versehen
-      sind. Im Laufe eines Projektes werden es immer mehr. Sie könne mit dem
-      Tool <application>rake</application> in die Datenbank eingespielt
-      werden. Aber schauen wir uns erst mal den Inhalt der Migrationsdatei zum
-      Modell dvd an:<screen>sw@debian:~/dvd-sammlung$ <command>cat -n db/migrate/20091224213402_create_dvds.rb</command>
+      <para><application>./script/generate scaffold</application> hat uns
+      schon alles eingerichtet. Allerdings müssen wir noch in der Datenbank
+      die Tabelle für unsere Daten anlegen. Rails nimmt uns aber die Arbeit
+      ab. Im Verzeichnis db/migrate liegen Migrationsdateien, die mit einem
+      Timestamp im Namen versehen sind. Im Laufe eines Projektes werden es
+      immer mehr. Sie können mit dem Tool <application>rake</application> in
+      die Datenbank eingespielt werden. Aber schauen wir uns erst mal den
+      Inhalt der Migrationsdatei zum Modell dvd an:<screen>sw@debian:~/dvd-sammlung$ <command>cat -n db/migrate/20091224213402_create_dvds.rb</command>
      1 class CreateDvds &lt; ActiveRecord::Migration
      2   def self.up
      3     create_table :dvds do |t|
@@ -645,7 +645,7 @@ sw@debian:~/dvd-sammlung$</screen></para>
 
         <para>Am Anfang fragt man sich: "Muss das sein? Macht das wirklich
         Sinn?". Aber mit der Zeit lernt man diese automatisch gehandelten
-        Felder lieben. </para>
+        Felder lieben.</para>
 
         <para>Falls Sie anderer Meinung sind: Sie können die Erstellung von
         <varname>created_at</varname> und <varname>updated_at</varname> mit
@@ -1386,7 +1386,7 @@ Terminator 2
 
       <para>Es gibt in ActiveRecord::Base eine Methode find die es uns
       ermöglicht ganz ohne SQL-Kenntnisse nach Daten in der Datenbank zu
-      suchen. </para>
+      suchen.</para>
 
       <section>
         <title>Nach ID suchen</title>
@@ -1731,7 +1731,7 @@ Dvd.create({ :title =&gt; 'The Dark Knight', :production_year =&gt; 2008, :ratin
       <title>Einen Datensatz löschen</title>
 
       <para>Es gibt die Methoden <methodname>delete</methodname> und
-      <methodname>destroy</methodname>, um Datensätze zu löschen. </para>
+      <methodname>destroy</methodname>, um Datensätze zu löschen.</para>
 
       <section>
         <title>delete</title>
@@ -1870,7 +1870,7 @@ Usage
      method. This method uses the same syntax as +set_table_name+
 
 ------------------------------------------------------------------------
-sw@debian:~/dvd-sammlung$</screen> </para>
+sw@debian:~/dvd-sammlung$</screen></para>
       </section>
     </section>
   </section>
@@ -1883,19 +1883,18 @@ sw@debian:~/dvd-sammlung$</screen> </para>
     HTTP-Anfrage passiert und welchen Weg diese Anfrage geht.</para>
 
     <section>
-      <title>Das Szenario</title>
+      <title>Beispiel dvds/show/1</title>
 
       <para>Nehmen wir an, ein User ruft die URL
       <uri>http://localhost:3000/dvds/show/1</uri> auf.</para>
-    </section>
 
-    <section>
-      <title>Routing</title>
+      <section>
+        <title>Routing</title>
 
-      <para>Kommt ein Aufruf per HTTP rein, so wird die URL durch eine
-      Routing-Engine verarbeitet. Diese wird durch die Datei
-      <filename>config/routes.rb</filename> konfiguriert. Schauen wir mal
-      rein:<screen>sw@debian:~/dvd-sammlung$ cat -n config/routes.rb 
+        <para>Kommt ein Aufruf per HTTP rein, so wird die URL durch eine
+        Routing-Engine verarbeitet. Diese wird durch die Datei
+        <filename>config/routes.rb</filename> konfiguriert. Schauen wir mal
+        rein:<screen>sw@debian:~/dvd-sammlung$ cat -n config/routes.rb 
      1 ActionController::Routing::Routes.draw do |map|
      2   map.resources :dvds
      3 
@@ -1943,16 +1942,278 @@ sw@debian:~/dvd-sammlung$</screen> </para>
     45 end
 sw@debian:~/dvd-sammlung$</screen></para>
 
-      <para>Die Zeile 4 sagt aus, das die Priorität einer Route anhand hierer
-      Position in dieser Datei bestimmt wird. Es können also mehrere Regeln
-      auf die gleiche Route matchen. Die am weitesten oben stehende gewinnt
-      dann.</para>
+        <para>Die Zeile 4 sagt aus, das die Priorität einer Route anhand ihrer
+        Position in dieser Datei bestimmt wird. Es können also mehrere Regeln
+        auf die gleiche Route matchen. Die am weitesten oben stehende gewinnt
+        dann.</para>
 
-      <para>In der Zeile 2 steht eine für unsere Anfrage wichtige
-      Zeile:<programlisting>map.resources :dvds</programlisting></para>
+        <para>In der Zeile 2 steht eine für unsere Anfrage wichtige
+        Zeile:<programlisting>map.resources :dvds</programlisting></para>
 
-      <para>Dummerweise steht aber nicht viel mehr dazu da (mal abgesehen von
-      Zeile 14 und 15). </para>
+        <para>Dummerweise steht aber nicht viel mehr dazu da (mal abgesehen
+        von Zeile 14 und 15). Bemühen wir mal <application>ri</application> um
+        Aufklärung:<screen>sw@debian:~/dvd-sammlung$ <command>ri ActionController::Resources.resource</command>
+----------------------------------- ActionController::Resources#resource
+     resource(*entities, &amp;block)
+
+     From gem actionpack-2.3.5
+------------------------------------------------------------------------
+     Creates named routes for implementing verb-oriented controllers for
+     a singleton \resource. A singleton \resource is global to its
+     current context. For unnested singleton \resources, the \resource
+     is global to the current user visiting the application, such as a
+     user's +/account+ profile. For nested singleton \resources, the
+     \resource is global to its parent \resource, such as a +projects+
+     \resource that +has_one :project_manager+. The +project_manager+
+     should be mapped as a singleton \resource under +projects+:
+
+       map.resources :projects do |project|
+         project.resource :project_manager
+       end
+
+     See +resources+ for general conventions. These are the main
+     differences:
+
+     *   A singular name is given to +map.resource+. The default
+         controller name is still taken from the plural name.
+
+     *   To specify a custom plural name, use the +:plural+ option.
+         There is no +:singular+ option.
+
+     *   No default index route is created for the singleton \resource
+         controller.
+
+     *   When nesting singleton \resources, only the singular name is
+         used as the path prefix (example: 'account/messages/1')
+
+     For example:
+
+       map.resource :account
+
+     maps these actions in the Accounts controller:
+
+       class AccountsController &lt; ActionController::Base
+         # GET new_account_url
+         def new
+           # return an HTML form for describing the new account
+         end
+     
+         # POST account_url
+         def create
+           # create an account
+         end
+     
+         # GET account_url
+         def show
+           # find and return the account
+         end
+     
+         # GET edit_account_url
+         def edit
+           # return an HTML form for editing the account
+         end
+     
+         # PUT account_url
+         def update
+           # find and update the account
+         end
+     
+         # DELETE account_url
+         def destroy
+           # delete the account
+         end
+       end
+
+     Along with the routes themselves, +resource+ generates named routes
+     for use in controllers and views. +map.resource :account+ produces
+     these named routes and helpers:
+
+       Named Route   Helpers
+       ============  =============================================
+       account       account_url, hash_for_account_url,
+                     account_path, hash_for_account_path
+     
+       new_account   new_account_url, hash_for_new_account_url,
+                     new_account_path, hash_for_new_account_path
+     
+       edit_account  edit_account_url, hash_for_edit_account_url,
+                     edit_account_path, hash_for_edit_account_path
+
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Die Zeile <programlisting>map.resources :dvds</programlisting>sorgt
+        dafür das automagisch die Anfragen mit der RESTful Logik an die
+        Methoden <methodname>index</methodname>,
+        <methodname>show</methodname>, <methodname>new</methodname>,
+        <methodname>edit</methodname>, <methodname>create</methodname>,
+        <methodname>update</methodname> und <methodname>destroy</methodname>
+        der Class <classname>DvdsController</classname> weitergeleitet werden.
+        Diese Class wird in der Datei
+        <filename>app/controllers/dvds_controller.rb</filename> definiert.
+        Schauen wir mal rein, was da bei der Methode show
+        steht:<programlisting>  # GET /dvds/1
+  # GET /dvds/1.xml
+  def show
+    @dvd = Dvd.find(params[:id])
+
+    respond_to do |format|      
+      format.html # show.html.erb
+      format.xml  { render :xml =&gt; @dvd }
+    end
+  end</programlisting></para>
+
+        <para>Direkt am Anfang wird die Instance-Variable
+        <varname>@dvd</varname> mit dem Ergebnis der Suche nach einer ID
+        gefüllt (<code>Dvd.find(params[:id])</code>).</para>
+
+        <para>hmmmm... was hat es mit diesem Hash <varname>params[]</varname>
+        auf sich? Machen wir mal testweise die Abfrage mit dem
+        Webbrowser:<screen>sw@debian:~$ <command>w3m -dump http://0.0.0.0:3000/dvds/show/1</command>
+Received cookie: _dvd-sammlung_session=BAh7BjoPc2Vzc2lvbl9pZCIlODgwZDU5ZjVmNzVkMzkzY2ExM2I3M2MxMGUwOWMxMDE%3D--5cf65da6c88441a14feed1d6d141bf4818eeceed
+Title: The Terminator
+
+Production year: 1984
+
+Duration: 120
+
+Plot:
+
+Rating: 5
+
+Edit | Back
+sw@debian:~$</screen></para>
+
+        <para>Und gleichzeitig schauen wir uns die Log-Ausgabe des Webservers
+        an:<screen>Processing DvdsController#show (for 127.0.0.1 at 2009-12-25 10:46:33) [GET]
+  Parameters: {"id"=&gt;"1"}
+  Dvd Load (0.3ms)   SELECT * FROM "dvds" WHERE ("dvds"."id" = 1) 
+Rendering template within layouts/dvds
+Rendering dvds/show
+Completed in 166ms (View: 159, DB: 0) | 200 OK [http://0.0.0.0/dvds/show/1]
+</screen></para>
+
+        <para>Da wird auf den Controller <classname>DvdsController</classname>
+        und dort auf die Methode <methodname>show</methodname> verwiesen.
+        Gleichzeitig wird ein Hash mit dem Namen <varname>params[]</varname>
+        generiert und dort <varname>params[:id]</varname> auf 1 gesetzt.
+        Schauen Sie sich bitte noch mal die Datei
+        <filename>config/routes.rb</filename> an. Dort wird es an dem Beispiel
+        in der Zeile 43 klar:<programlisting>map.connect ':controller/:action/:id'</programlisting></para>
+
+        <para>Die per regular Expression in der
+        <filename>config/routes.rb</filename> Datei gesetzten Routen füllen
+        automatisch das <varname>params[]</varname>-Hash. Und damit wiederum
+        können wir in der Methode show den entsprechenden Datensatz
+        finden:<programlisting>@dvd = Dvd.find(params[:id])</programlisting></para>
+
+        <para>Danach wird überprüft, ob es sich um eine
+        <filename>.html</filename> oder <filename>.xml</filename> Anfrage
+        gehandelt hat. Wurde vom Browser nur <filename>1</filename> und nicht
+        <filename>1.html</filename> abgefragt, setzt Rails den Default auf
+        <filename>.html</filename>.</para>
+
+        <para>Was passiert als nächstes? Denken wir noch mal über das
+        MCV-Model nach. Wir haben schon das Model
+        (<methodname>dvds</methodname>) und wir haben den Controller
+        (<classname>DvdsController</classname>). Was noch fehlt ist der View -
+        also die Darstellung der Webseite. Die Views für unser Model finden
+        sich alle im Unterverzeichnis
+        <filename>app/view/dvds</filename><screen>sw@debian:~/dvd-sammlung$ <command>ls app/views/dvds/</command>
+edit.html.erb  index.html.erb  new.html.erb  show.html.erb
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Schauen wir uns mal die Datei <filename>show.html.erb</filename>
+        an:<programlisting>&lt;p&gt;
+  &lt;b&gt;Title:&lt;/b&gt;
+  &lt;%=h @dvd.title %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;Production year:&lt;/b&gt;
+  &lt;%=h @dvd.production_year %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;Duration:&lt;/b&gt;
+  &lt;%=h @dvd.duration %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;Plot:&lt;/b&gt;
+  &lt;%=h @dvd.plot %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;Rating:&lt;/b&gt;
+  &lt;%=h @dvd.rating %&gt;
+&lt;/p&gt;
+
+
+&lt;%= link_to 'Edit', edit_dvd_path(@dvd) %&gt; |
+&lt;%= link_to 'Back', dvds_path %&gt;
+</programlisting></para>
+
+        <para>Die HTML-Elemente sind klar. Und die <code>&lt;%= ...
+        %&gt;</code> Elemente enthalten Ruby-Code. Wenn ein solches Element
+        mit <code>&lt;%=</code> anfängt, dann bedeutet das "Gib das Ergebnis
+        an dieser Stelle aus.". Wenn ein Element mit <code>&lt;%-</code>
+        anfängt, dann wird der Ruby-Code ausgeführt, aber es wird nichts
+        ausgegeben.</para>
+
+        <para>Die ganze erb-Datei ist also eine Mischung zwischen
+        HTML-Elementen und Ruby-Code. Damit hat sie Ähnlichkeiten zu
+        PHP-Seiten.</para>
+
+        <para>Das <code>h</code> hinter <code>&lt;%=</code> bedeuted, das die
+        Ausgabe escaped werden soll, um sicher zu stellen, das nicht
+        automatisch böse Java-Scripts oder ähnliches gestartet wird (wir
+        wissen an dieser Stelle ja nicht, was in der Datenbank steht).</para>
+
+        <para>Ist Ihnen aufgefallen, das bei dieser erb-Datei ja wichtige
+        HTML-Elemente fehlen? Die sind in der Datei
+        <filename>app/views/layouts/dvds.html.erb</filename><programlisting>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+
+&lt;html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"&gt;
+&lt;head&gt;
+  &lt;meta http-equiv="content-type" content="text/html;charset=UTF-8" /&gt;
+  &lt;title&gt;Dvds: &lt;%= controller.action_name %&gt;&lt;/title&gt;
+  &lt;%= stylesheet_link_tag 'scaffold' %&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;p style="color: green"&gt;&lt;%= flash[:notice] %&gt;&lt;/p&gt;
+
+&lt;%= yield %&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</programlisting></para>
+
+        <para>Das ist der Rahmen für alle Views des Models
+        <varname>dvds</varname>. Da es oft keinen Sinn macht für jedes Model
+        ein eigenes Grundlayout zu generieren, kann man diese Datei auch
+        löschen und stattdessen eine Datei
+        <filename>app/views/layouts/application.html.erb</filename> mit dem
+        Grundlayout erstellen. Die gilt dann für die gesamte
+        Rails-Application. Die Zeile <code>&lt;%= yield %&gt;</code> wird
+        dabei immer von der aufzurufenden View-Datei ersetzt.</para>
+
+        <para></para>
+      </section>
+    </section>
+
+    <section>
+      <title>Beispiel dvds/index.html</title>
+
+      <para>Da der Grundweg im letzten Segment erklärt wurde, gehe ich jetzt
+      auf die schnelle durch die Anfrage
+      http://localhost:3000/dvds/index.html. Erst mal das Ergebnis des
+      Webbrowser-Aufrufs:</para>
+
+      <para></para>
+
+      <para></para>
     </section>
   </section>
 </chapter>
