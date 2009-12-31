@@ -13,18 +13,56 @@
   Kapitel starten wir ein erstes Rails-Projekt und arbeiten uns damit Stück
   für Stück in die Materie ein.</para>
 
-  <para>Auch in diesem Kapitel wird es manchmal hoppla-hopp gehen. Wir stossen
-  auf typische Henne-Ei-Probleme wir zum Beispiel: "Wie erkläre ich MVC
-  (Model-View-Controller)?". Ich habe mich für den "Wir fangen mal an und
-  erklären später."-Ansatz entschieden.</para>
+  <para>Auch in diesem Kapitel wird es manchmal hoppla-hopp zu gehen. Wir
+  stossen auf typische Henne-Ei-Probleme wir zum Beispiel: "Wie erkläre ich
+  MVC (Model-View-Controller)?". Ich habe mich für den "Wir fangen mal an und
+  erklären bei der Arbeit."-Ansatz entschieden.</para>
+
+  <section>
+    <title>Development Umgebung</title>
+
+    <para>Rails kennt drei verschiedene Arbeits-Umgebungen:<itemizedlist>
+        <listitem>
+          <para>Development</para>
+        </listitem>
+
+        <listitem>
+          <para>Testing</para>
+        </listitem>
+
+        <listitem>
+          <para>Production</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>Wir arbeiten in diesem Kapitel nur mit der Development Umgebung. So
+    bald Sie ein besseres Gefühl für Rails bekommen haben, starten wir mit
+    Tests und benötigen dafür die entsprechende Umgebung (dort wird z.B. beim
+    Start eines Tests die Test-Datenbank neu gefühlt und beim Beenden wird
+    gelöscht). Später erkläre ich Ihnen dann die verschiedenen Szenarien, wie
+    Sie Ihre Rails-Applikation aus der Development-Umgebung in die
+    Production-Umgebung ausrollen können.</para>
+
+    <para>Die Development-Umgebung bringt bis auf einen Editor und einen
+    Webbrowser alles mit, was Sie zum Entwickeln benötigen. So müssen Sie
+    nicht extra einen Webserver installieren, sondern können den eingebauten
+    Rails-Webserver benutzen. Der besticht nicht durch extreme Performance,
+    aber das benötigen wir bei der Entwicklung ja auch nicht. Später kann man
+    dann auf grosse Systeme wie <application>Apache</application> umsteigen.
+    Das gleiche gilt für die Datenbank.</para>
+
+    <para>Um in der Development-Umgebung zu arbeiten, müssen Sie erst mal
+    nichts verändern. Alle Befehle gelten per Default auf die
+    Development-Umgebung.</para>
+  </section>
 
   <section>
     <title>Projektbeschreibung</title>
 
-    <para>Um endlich mal Ordnung in unsere DVD-Sammlung (ich höre schon die
-    Stimmen "Wie, die benutzen immer noch DVDs und keine Blue-Rays?") zu
-    bringen erstellen wir eine Datenbank die über ein Webinterface bedienbar
-    ist.</para>
+    <para>Um endlich mal Ordnung in unsere DVD-Sammlung - ich höre schon die
+    Stimmen "Wie, die benutzen immer noch DVDs und keine Blue-Rays?" - zu
+    bringen erstellen wir ein Rails-Projekt, das uns bei der Verwaltung
+    hilft.</para>
 
     <section>
       <title>Erst mal keine Authentifizierung</title>
@@ -131,7 +169,13 @@ sw@debian:~$ </screen></para>
 
     <para>Mit dieser Konfiguration können Sie einen Webbrowser auf dem
     entsprechenden System mit der URL http://0.0.0.0:3000 oder einfacher mit
-    http://localhost:3000 starten und sehen dann folgenden Output:<screen>sw@debian:~$ <command>w3m -dump http://localhost:3000</command>
+    http://localhost:3000 starten und sehen Sie den Output der Default-Seite.
+    Wenn Sie eine grafischen Browser benutzen sieht das natürlich etwas
+    schöner aus.<footnote>
+        <para>Im Sinne der Barrierefreiheit benutze ich in diesem Buch
+        grafische Browser nur, wenn es gar nicht mehr anders geht. Das wird
+        z.B. bei AJAX-Applikationen sein.</para>
+      </footnote><screen>sw@debian:~$ <command>w3m -dump http://localhost:3000</command>
   • [site:rubyonrails.org] [Search] the Rails site
   • Join the community
 
@@ -170,6 +214,22 @@ Here’s how to get rolling:
 
  
 sw@debian:~</screen></para>
+
+    <para>Wenn Sie jetzt auf den "About your application’s environment Link"
+    klicken, dann bekommen Sie Informationen zu der von Ihnen benutzten
+    Umgebung (ganz praktisch um zu überprüfen, ob auch alle richtig
+    ist):<screen>Ruby version            1.9.1 (i686-linux)
+RubyGems version        1.3.5
+Rack version            1.0
+Rails version           2.3.5
+Active Record version   2.3.5
+Active Resource version 2.3.5
+Action Mailer version   2.3.5
+Active Support version  2.3.5
+Application root        /home/sw/dvd-sammlung
+Environment             development
+Database adapter        sqlite3
+Database schema version 0</screen></para>
 
     <para>Den Webserver können Sie jederzeit mit <command>CTRL-C</command>
     wieder beenden:<screen>^C[2009-12-24 23:10:00] INFO  going to shutdown ...
@@ -256,39 +316,46 @@ sw@debian:~/dvd-sammlung$ </programlisting></para>
       starten. Aber das erhöht nicht gerade die Übersichtlichkeit beim
       Entwickeln. ;-)</para>
     </section>
-  </section>
 
-  <section>
-    <title>Development Umgebung</title>
+    <section>
+      <title>Logging</title>
 
-    <para>Rails kennt drei verschiedene Arbeits-Umgebungen:<itemizedlist>
-        <listitem>
-          <para>Development</para>
-        </listitem>
+      <para>In der Datei <filename>log/development.log</filename> finden Sie
+      das Log des Webservers. Bei der Entwicklung von Rails-Applikationen hat
+      es sich für mich als sehr praktisch erwiesen immer ein Terminal offen zu
+      haben, das mit einem <command>tail -f log/development.log</command> das
+      aktuelle Log anzeigt.<screen>sw@debian:~/dvd-sammlung$ <command>tail -f log/development.log</command> 
+# Logfile created on 2009-12-25 12:30:33 +0100
 
-        <listitem>
-          <para>Testing</para>
-        </listitem>
+Processing Rails::InfoController#properties (for 127.0.0.1 at 2009-12-25 12:30:59) [GET]
+  SQL (0.5ms)    SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
 
-        <listitem>
-          <para>Production</para>
-        </listitem>
-      </itemizedlist></para>
+Completed in 23ms (View: 4, DB: 1) | 200 OK [http://localhost/rails/info/properties]
+</screen></para>
+    </section>
 
-    <para>Wir arbeiten in diesem Kapitel nur mit der Development Umgebung. So
-    bald Sie ein besseres Gefühl für Rails bekommen haben, starten wir mit
-    Tests und benötigen dafür die entsprechende Umgebung (dort wird z.B. beim
-    Start eines Tests die Test-Datenbank neu gefühlt und beim Beenden wird
-    gelöscht). Ganz zum Schluss erkläre ich Ihnen dann die verschiedenen
-    Szenarien, wie Sie Ihre Rails-Applikation aus der Development-Umgebung in
-    die Production-Umgebung ausrollen können.</para>
+    <section>
+      <title>Statische und dynamisch generierte Seiten</title>
 
-    <para>Die Development-Umgebung bringt möglichst viel mit. So müssen Sie
-    nicht extra einen Webserver installieren, sondern können den eingebauten
-    Rails-Webserver benutzen. Der besticht nicht durch extreme Performance,
-    aber das benötien wir bei der Entwicklung ja auch nicht. Später kann man
-    dann auf grosse Systeme wie <application>Apache</application> umsteigen.
-    Das gleiche gilt für die Datenbank.</para>
+      <para>Statische Seite wie die default <filename>index.html</filename>
+      oder auch die 404.html Fehler-Seite liegen im Unterverzeichnis
+      public<screen>sw@debian:~/dvd-sammlung$ <command>ls public</command>
+404.html  500.html     images      javascripts  stylesheets
+422.html  favicon.ico  index.html  robots.txt
+sw@debian:~/dvd-sammlung$</screen></para>
+
+      <para>Die Auslieferung einer solchen Seite oder einer Datei aus diesem
+      Verzeichnis wird nicht im <filename>log/development.log</filename>
+      angezeigt. Übrigens haben die Dateien im public-Verzeichnis eine höhere
+      Prio, als die dynamisch gerenderten Seiten. Falls Sie also zwei Seiten
+      mit dem gleichen Namen haben, dann wird Rails die statische Variante
+      ausliefern. Deshalb werden Sie später die
+      <filename>index.html</filename> Seite entweder umbenennen oder ganz
+      löschen müssen (sonst würde Ihre Applikation immer nur mit dieser
+      statischen Webseite starten).</para>
+    </section>
   </section>
 
   <section>
@@ -297,17 +364,21 @@ sw@debian:~/dvd-sammlung$ </programlisting></para>
     <para>Die typischen "Ich zeige Euch mal Ruby on Rails in 15 Minuten"
     Videos arbeiten alle mit der Magie des Scaffolding. Leider ist das
     meistens kontraproduktiv, weil man zwar sehr schnell ein Grundgerüst
-    stehen hat, aber danach erst mal im Regen steht (das alte "ohne
-    Ruby-Grundkenntnisse kommt man nicht weiter"-Problem schlägt dann
-    zu).</para>
+    stehen hat, aber danach erst mal im Regen steht. Das alte "ohne
+    Ruby-Grundkenntnisse kommt man nicht weiter"-Problem schlägt dann zu. Aber
+    Sie haben sich ja schon das Ruby-Kapitel gekämpft und kommen deshalb
+    direkt zu den Vorzügen von Scaffolding.</para>
 
     <section>
       <title>Datenbankmodell</title>
 
-      <para>Auch wenn wir jederzeit neue Felder in der Datenbank hinzufügen
-      können, so sollte man sich am Anfang möglichst weitreichende Gedanken
-      über ein gutes Datenbankmodell machen. Das erspart später dadurch
-      notwendige Umstrukturierungen.</para>
+      <para>In früheren Rails-Versionen musste man die Datenbank von Hand
+      anlegen. ActiveRecord hat dann die Felder an bestimmten Namensmerkmalen
+      erkannt. Heute gibt es in Rails dazu eigene noch dazu äusserst
+      praktische Tools. Denn Sie wollen ja nicht nur jetzt eine Datebank für
+      Ihre Entwicklungs-Umgebung einrichten, sondern benötigen später auch ein
+      Tool, das Ihre Produktions-Datenbank Schritt für Schritt
+      mitzieht.</para>
 
       <para>Wir wollen DVDs katalogisieren. Dazu benötigen wir mindestens
       folgende Datenbankfelder:<itemizedlist>
@@ -355,16 +426,12 @@ sw@debian:~/dvd-sammlung$ </programlisting></para>
     <section>
       <title>Scaffolding benutzen</title>
 
-      <para>Für unsere (noch?) recht einfache DVD-Datenbank ist Scaffolding
-      gut geeignet. Es gibt uns auf die Schnelle ein gutes Grundgerüst, auf
-      das wir dann aufbauen können.</para>
-
       <section>
         <title>./script/generate</title>
 
         <para>Mit dem Rails-Skript <filename>./script/generate</filename> kann
-        man "Sachen" generieren (deshalb wohl der Name). Wer (wie ich) gerne
-        mal vergisst wie das Skript aufgerufen werden muss, der gibt einfach
+        man fertige Code generieren. Wer (wie ich) gerne mal vergisst wie das
+        Skript aufgerufen werden muss, der gibt einfach
         <filename>./script/generate</filename> ein und bekommt die folgende
         Hilfe angezeigt:<screen>sw@debian:~/dvd-sammlung$ <command>./script/generate</command> 
 Usage: ./script/generate generator [options] [args]
@@ -403,9 +470,8 @@ Generator gems are also available:
 sw@debian:~/dvd-sammlung$</screen></para>
 
         <para>Interessant ist für uns der Teil in dem die "Installed
-        Generators" aufgelistet werden. Das sind die "Sachen" die dieses
-        Skript generieren kann. Wenn wir scaffold benutzen wollen und dazu
-        weitere Hilfe brauchen, dann geht dies wiederrum einfach mit der
+        Generators" aufgelistet werden. Wenn wir scaffold benutzen wollen und
+        dazu weitere Hilfe brauchen, dann geht dies wiederrum einfach mit der
         eingebauten Hilfe:<screen>sw@debian:~/dvd-sammlung$ <command>./script/generate scaffold</command>
 Usage: ./script/generate scaffold ModelName [field:type, field:type]
 
@@ -507,11 +573,12 @@ sw@debian:~/dvd-sammlung$</screen>Und schon ist alles fertig. Alledings ist in
       <para><application>./script/generate scaffold</application> hat uns
       schon alles eingerichtet. Allerdings müssen wir noch in der Datenbank
       die Tabelle für unsere Daten anlegen. Rails nimmt uns aber die Arbeit
-      ab. Im Verzeichnis db/migrate liegen Migrationsdateien, die mit einem
-      Timestamp im Namen versehen sind. Im Laufe eines Projektes werden es
-      immer mehr. Sie können mit dem Tool <application>rake</application> in
-      die Datenbank eingespielt werden. Aber schauen wir uns erst mal den
-      Inhalt der Migrationsdatei zum Modell dvd an:<screen>sw@debian:~/dvd-sammlung$ <command>cat -n db/migrate/20091224213402_create_dvds.rb</command>
+      ab. Im Verzeichnis <filename>db/migrate</filename> liegen
+      Migrationsdateien, die mit einem Timestamp im Namen versehen sind. Im
+      Laufe eines Projektes werden es immer mehr. Sie können mit dem Tool
+      <application>rake</application> in die Datenbank eingespielt werden.
+      Aber schauen wir uns erst mal den Inhalt der Migrationsdatei zum Modell
+      <varname>dvd</varname> an:<screen>sw@debian:~/dvd-sammlung$ <command>cat -n db/migrate/20091224213402_create_dvds.rb</command>
      1 class CreateDvds &lt; ActiveRecord::Migration
      2   def self.up
      3     create_table :dvds do |t|
@@ -613,6 +680,31 @@ sqlite&gt; <command>.schema dvds</command>
 CREATE TABLE "dvds" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar(255), "production_year" integer, "duration" integer, "plot" text, "rating" integer, "created_at" datetime, "updated_at" datetime);
 sqlite&gt; .quit
 sw@debian:~/dvd-sammlung$</screen></para>
+
+      <para>Das Anlegen der Tabelle mit <application>rake
+      db:migrate</application> wurde natürlich auch im
+      <filename>log/development.log</filename> eingetragen:<programlisting>  SQL (0.1ms)   select sqlite_version(*)
+  SQL (409.9ms)   CREATE TABLE "schema_migrations" ("version" varchar(255) NOT NULL) 
+  SQL (58.5ms)   CREATE UNIQUE INDEX "unique_schema_migrations" ON "schema_migrations" ("version")
+  SQL (0.2ms)    SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+
+  SQL (0.1ms)   SELECT version FROM schema_migrations
+Migrating to CreateDvds (20091225115807)
+  SQL (0.3ms)   CREATE TABLE "dvds" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar(255), "production_year" integer, "duration" integer, "plot" text, "rating" integer, "created_at" datetime, "updated_at" datetime) 
+  SQL (0.1ms)   INSERT INTO schema_migrations (version) VALUES ('20091225115807')
+  SQL (0.2ms)    SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+
+  SQL (0.1ms)   SELECT version FROM schema_migrations
+  SQL (0.1ms)    SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+
+  SQL (0.5ms)   PRAGMA index_list("dvds")
+</programlisting></para>
 
       <section>
         <title>Automatisch zugefügte Felder (id, created_at und
