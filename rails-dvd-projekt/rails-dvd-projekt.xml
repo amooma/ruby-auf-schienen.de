@@ -6,7 +6,7 @@
          xmlns:m="http://www.w3.org/1998/Math/MathML"
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
-  <title>Rails - Ein erstes Projekt</title>
+  <title>Alles einsteigen!</title>
 
   <para>Nachdem Sie sich im letzten Kapitel mühsam in die Ruby-Grundlagen
   eingelesen haben, können wir jetzt spannender weitermachen. In diesem
@@ -1474,11 +1474,124 @@ Terminator 2
     </section>
 
     <section>
+      <title>Development Datenbank befüllen</title>
+
+      <para>Gerade bei der Entwicklung kommt es immer mal wieder vor, das man
+      den Inhalt der Datenbank löschen und mit neuen Werten befüllen will. In
+      Rails gibt es dafür den praktischen Mechanismus der Datei
+      <filename>db/seeds.rb</filename></para>
+
+      <para>Die <filename>db/seeds.rb</filename> ist ein normales
+      Ruby-Programm, das man mit <command>rake db:seed</command> ausführen
+      kann. Dies geht natürlich nicht nur mit der Entwicklungsdatenbank,
+      sondern kann später auch in der Produktion geschehen. Das ist z.B.
+      praktisch, wenn man initial eine Länderliste in eine Länderdatenbank
+      eintragen will.</para>
+
+      <para>Für unsere DVD-Datenbank habe ich folgende
+      <filename>db/seeds.rb</filename> vorbereitet:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
+# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
+#
+# Examples:
+#   
+#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
+#   Major.create(:name =&gt; 'Daley', :city =&gt; cities.first)
+
+Dvd.create({ :title =&gt; 'The Terminator', :production_year =&gt; 1984 })
+Dvd.create({ :title =&gt; 'Terminator 2', :production_year =&gt; 1992 })
+Dvd.create({ :title =&gt; 'Terminator Salvation', :production_year =&gt; 2009 })
+Dvd.create({ :title =&gt; 'Rain Man', :production_year =&gt; 1988, :rating =&gt; 5 })
+Dvd.create({ :title =&gt; 'War of the Worlds', :production_year =&gt; 2005, :rating =&gt; 4 })
+Dvd.create({ :title =&gt; 'Collateral', :production_year =&gt; 2004, :rating =&gt; 5})
+Dvd.create({ :title =&gt; 'Miami Vice', :production_year =&gt; 2006, :rating =&gt; 5})
+Dvd.create({ :title =&gt; 'Hancock', :production_year =&gt; 2008, :rating =&gt;  4})
+Dvd.create({ :title =&gt; 'The Aviator', :production_year =&gt; 2004, :rating =&gt;  4})
+Dvd.create({ :title =&gt; 'Some Like It Hot', :production_year =&gt; 1959, :rating =&gt;  5})
+Dvd.create({ :title =&gt; 'W.', :production_year =&gt; 2008, :rating =&gt;  4})
+Dvd.create({ :title =&gt; 'Iron Man', :production_year =&gt; 2008, :rating =&gt;  5})
+Dvd.create({ :title =&gt; 'The Dark Knight', :production_year =&gt; 2008, :rating =&gt;  5})
+</programlisting></para>
+
+      <section>
+        <title>Betankung</title>
+
+        <para>Wenn Sie vorher die Datenbank schon mit <command>rake
+        db:migrate</command> angelegt haben, können Sie wie folgt die
+        Betankung aus <filename>db/seeds.rb</filename> vornehmen:<screen>sw@debian:~/dvd-sammlung$ <command>rake db:seed</command>
+(in /home/sw/dvd-sammlung)
+sw@debian:~/dvd-sammlung$</screen></para>
+      </section>
+
+      <section>
+        <title>Reset</title>
+
+        <para>Wenn Sie im Entwicklungsprozess an der Stelle angekommen sind,
+        an der Sie die Datenbank wieder auf die in der
+        <filename>db/seeds.rb</filename> aufgeführten Werte setzen möchten, so
+        können Sie das wie folgt machen:<screen>sw@debian:~/dvd-sammlung$ <command>rake db:reset</command>
+(in /home/sw/dvd-sammlung)
+db/development.sqlite3 already exists
+-- create_table("dvds", {:force=&gt;true})
+   -&gt; 0.4381s
+-- initialize_schema_migrations_table()
+   -&gt; 0.0396s
+-- assume_migrated_upto_version(20091225115807)
+   -&gt; 0.0129s
+sw@debian:~/dvd-sammlung$ </screen><warning>
+            <para>Mit <command>rake db:reset</command> wird die Datenbank vor
+            dem Neubetanken gelöscht!</para>
+          </warning></para>
+      </section>
+
+      <section>
+        <title>Wie soll ich mir das alles merken?</title>
+
+        <para>Keine Panik, wenn Sie mal den genauen Rake-Befehl vergessen
+        haben. Der Schalter <parameter>"-T"</parameter> ist Ihr
+        Hilfe-Freund:<screen>sw@debian:~/dvd-sammlung$ <command>rake -T db</command>
+(in /home/sw/dvd-sammlung)
+rake db:abort_if_pending_migrations  # Raises an error if there are pending...
+rake db:charset                      # Retrieves the charset for the curren...
+rake db:collation                    # Retrieves the collation for the curr...
+rake db:create                       # Create the database defined in confi...
+rake db:create:all                   # Create all the local databases defin...
+rake db:drop                         # Drops the database for the current R...
+rake db:drop:all                     # Drops all the local databases define...
+rake db:fixtures:identify            # Search for a fixture given a LABEL o...
+rake db:fixtures:load                # Load fixtures into the current envir...
+rake db:migrate                      # Migrate the database through scripts...
+rake db:migrate:down                 # Runs the "down" for a given migratio...
+rake db:migrate:redo                 # Rollbacks the database one migration...
+rake db:migrate:reset                # Resets your database using your migr...
+rake db:migrate:up                   # Runs the "up" for a given migration ...
+rake db:reset                        # Drops and recreates the database fro...
+rake db:rollback                     # Rolls the schema back to the previou...
+rake db:schema:dump                  # Create a db/schema.rb file that can ...
+rake db:schema:load                  # Load a schema.rb file into the database
+rake db:seed                         # Load the seed data from db/seeds.rb
+rake db:sessions:clear               # Clear the sessions table
+rake db:sessions:create              # Creates a sessions migration for use...
+rake db:setup                        # Create the database, load the schema...
+rake db:structure:dump               # Dump the database structure to a SQL...
+rake db:test:clone                   # Recreate the test database from the ...
+rake db:test:clone_structure         # Recreate the test databases from the...
+rake db:test:load                    # Recreate the test database from the ...
+rake db:test:prepare                 # Check for pending migrations and loa...
+rake db:test:purge                   # Empty the test database
+rake db:version                      # Retrieves the current schema version...
+sw@debian:~/dvd-sammlung$ <command>rake -T db:reset</command>
+(in /home/sw/dvd-sammlung)
+rake db:reset  # Drops and recreates the database from db/schema.rb for the...
+sw@debian:~/dvd-sammlung$</screen></para>
+      </section>
+    </section>
+
+    <section>
       <title>Datensätze suchen</title>
 
-      <para>Es gibt in ActiveRecord::Base eine Methode find die es uns
-      ermöglicht ganz ohne SQL-Kenntnisse nach Daten in der Datenbank zu
-      suchen.</para>
+      <para>Es gibt in <classname>ActiveRecord::Base</classname> eine Methode
+      <methodname>find</methodname> die es uns ermöglicht ganz ohne
+      SQL-Kenntnisse nach Daten in der Datenbank zu suchen.</para>
 
       <section>
         <title>Nach ID suchen</title>
@@ -1668,22 +1781,7 @@ sw@debian:~/sandbox$ </screen></para>
           <title>Such-Beispiele</title>
 
           <para>Im folgenden werde ich per Fragen und Antwort ein
-          Beispielprobleme mit <methodname>find</methodname> lösen. Dazu werde
-          ich die Datenbank dvds reseten und wie folgt neu
-          befüllen:<programlisting>Dvd.create({ :title =&gt; 'The Terminator', :production_year =&gt; 1984 })
-Dvd.create({ :title =&gt; 'Terminator 2', :production_year =&gt; 1992 })
-Dvd.create({ :title =&gt; 'Terminator Salvation', :production_year =&gt; 2009 })
-Dvd.create({ :title =&gt; 'Rain Man', :production_year =&gt; 1988, :rating =&gt; 5 })
-Dvd.create({ :title =&gt; 'War of the Worlds', :production_year =&gt; 2005, :rating =&gt; 4 })
-Dvd.create({ :title =&gt; 'Collateral', :production_year =&gt; 2004, :rating =&gt; 5})
-Dvd.create({ :title =&gt; 'Miami Vice', :production_year =&gt; 2006, :rating =&gt; 5})
-Dvd.create({ :title =&gt; 'Hancock', :production_year =&gt; 2008, :rating =&gt;  4})
-Dvd.create({ :title =&gt; 'The Aviator', :production_year =&gt; 2004, :rating =&gt;  4})
-Dvd.create({ :title =&gt; 'Some Like It Hot', :production_year =&gt; 1959, :rating =&gt;  5})
-Dvd.create({ :title =&gt; 'W.', :production_year =&gt; 2008, :rating =&gt;  4})
-Dvd.create({ :title =&gt; 'Iron Man', :production_year =&gt; 2008, :rating =&gt;  5})
-Dvd.create({ :title =&gt; 'The Dark Knight', :production_year =&gt; 2008, :rating =&gt;  5})
-</programlisting></para>
+          Beispielprobleme mit <methodname>find</methodname> lösen. </para>
 
           <para><qandaset>
               <qandadiv>
@@ -1978,7 +2076,12 @@ sw@debian:~/dvd-sammlung$</screen></para>
       <title>Beispiel dvds/show/1</title>
 
       <para>Nehmen wir an, ein User ruft die URL
-      <uri>http://localhost:3000/dvds/show/1</uri> auf.</para>
+      <uri>http://localhost:3000/dvds/show/1</uri> auf.<note>
+          <para>Die beiden URLs <uri>http://localhost:3000/dvds/show/1</uri>
+          und <uri>http://localhost:3000/dvds/1</uri> zeigen das gleiche
+          Ergebnis an. Ich habe hier die längere Variante benutzt, um das
+          Beispiel logischer zu gestalten.</para>
+        </note></para>
 
       <section>
         <title>Routing</title>
@@ -2044,7 +2147,7 @@ sw@debian:~/dvd-sammlung$</screen></para>
 
         <para>Dummerweise steht aber nicht viel mehr dazu da (mal abgesehen
         von Zeile 14 und 15). Bemühen wir mal <application>ri</application> um
-        Aufklärung:<screen>sw@debian:~/dvd-sammlung$ <command>ri ActionController::Resources.resource</command>
+        Aufklärung:<screen xml:id="ri_ActionController_Resources.resource">sw@debian:~/dvd-sammlung$ <command>ri ActionController::Resources.resource</command>
 ----------------------------------- ActionController::Resources#resource
      resource(*entities, &amp;block)
 
@@ -2142,8 +2245,8 @@ sw@debian:~/dvd-sammlung$</screen></para>
         der Class <classname>DvdsController</classname> weitergeleitet werden.
         Diese Class wird in der Datei
         <filename>app/controllers/dvds_controller.rb</filename> definiert.
-        Schauen wir mal rein, was da bei der Methode show
-        steht:<programlisting>  # GET /dvds/1
+        Schauen wir mal rein, was da bei der Methode
+        <methodname>show</methodname> steht:<programlisting>  # GET /dvds/1
   # GET /dvds/1.xml
   def show
     @dvd = Dvd.find(params[:id])
@@ -2290,22 +2393,513 @@ sw@debian:~/dvd-sammlung$</screen></para>
         Grundlayout erstellen. Die gilt dann für die gesamte
         Rails-Application. Die Zeile <code>&lt;%= yield %&gt;</code> wird
         dabei immer von der aufzurufenden View-Datei ersetzt.</para>
-
-        <para></para>
       </section>
     </section>
 
     <section>
-      <title>Beispiel dvds/index.html</title>
+      <title>Beispiel /dvds (Index aller Datensätze)</title>
 
       <para>Da der Grundweg im letzten Segment erklärt wurde, gehe ich jetzt
       auf die schnelle durch die Anfrage
-      http://localhost:3000/dvds/index.html. Erst mal das Ergebnis des
-      Webbrowser-Aufrufs:</para>
+      <uri>http://localhost:3000/dvds</uri></para>
 
-      <para></para>
+      <para>Erst mal das Ergebnis des Webbrowser-Aufrufs:<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds</command>
+Received cookie: _dvd-sammlung_session=BAh7BzoPc2Vzc2lvbl9pZCIlYzViZWZkOWY4OWEzNTM0ZjdiNmZiYjJmODMzOTA1MmU6EF9jc3JmX3Rva2VuSSIxV1h4bUljZ0EyMnc3bld4WThyeExpekpCRjRQZDdvUVliSWVXUENmVU5Wcz0GOg1lbmNvZGluZyINVVMtQVNDSUk%3D--08b823e340bf0d62bf1725a23a9e5a041d914013
+Listing dvds
 
-      <para></para>
+       Title         Production year Duration Plot Rating
+The Terminator       1984                                 Show Edit Destroy
+Terminator 2         1992                                 Show Edit Destroy
+Terminator Salvation 2009                                 Show Edit Destroy
+Rain Man             1988                          5      Show Edit Destroy
+War of the Worlds    2005                          4      Show Edit Destroy
+Collateral           2004                          5      Show Edit Destroy
+Miami Vice           2006                          5      Show Edit Destroy
+Hancock              2008                          4      Show Edit Destroy
+The Aviator          2004                          4      Show Edit Destroy
+Some Like It Hot     1959                          5      Show Edit Destroy
+W.                   2008                          4      Show Edit Destroy
+Iron Man             2008                          5      Show Edit Destroy
+The Dark Knight      2008                          5      Show Edit Destroy
+
+
+New dvd
+sw@debian:~/dvd-sammlung$</screen></para>
+
+      <para>Die Anfrage wird in der <filename>config/routes.rb</filename> mit
+      der kleinen aber mächtigen Regel für diese Resource gehandelt:
+      <programlisting>map.resources :dvds</programlisting>Es geht also zu der
+      Methode <methodname>index</methodname> der Class
+      <classname>DvdsController</classname>. Diese Class wird in der Datei
+      <filename>app/controllers/dvds_controller.rb</filename> definiert.
+      Schauen wir mal rein, was da bei der Methode
+      <methodname>index</methodname> steht:<programlisting>  # GET /dvds
+  # GET /dvds.xml
+  def index
+    @dvds = Dvd.all
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render :xml =&gt; @dvds }
+    end
+  end
+</programlisting></para>
+
+      <para>In der Instance-Variable <varname>@dvds</varname> wird diesmal ein
+      Array aus allen Datensätze die mit Dvd.all angezeigt werden gespeichert.
+      Da es sich um eine html-Anfrage handelt wird als nächstes der View
+      <filename>app/views/dvds/index.html.erb</filename> gerendert. Ein Blick
+      in die erb-Datei:<screen>sw@debian:~/dvd-sammlung$ <command>cat -n app/views/dvds/index.html.erb</command>
+     1 &lt;h1&gt;Listing dvds&lt;/h1&gt;
+     2 
+     3 &lt;table&gt;
+     4   &lt;tr&gt;
+     5     &lt;th&gt;Title&lt;/th&gt;
+     6     &lt;th&gt;Production year&lt;/th&gt;
+     7     &lt;th&gt;Duration&lt;/th&gt;
+     8     &lt;th&gt;Plot&lt;/th&gt;
+     9     &lt;th&gt;Rating&lt;/th&gt;
+    10   &lt;/tr&gt;
+    11 
+    12 &lt;% @dvds.each do |dvd| %&gt;
+    13   &lt;tr&gt;
+    14     &lt;td&gt;&lt;%=h dvd.title %&gt;&lt;/td&gt;
+    15     &lt;td&gt;&lt;%=h dvd.production_year %&gt;&lt;/td&gt;
+    16     &lt;td&gt;&lt;%=h dvd.duration %&gt;&lt;/td&gt;
+    17     &lt;td&gt;&lt;%=h dvd.plot %&gt;&lt;/td&gt;
+    18     &lt;td&gt;&lt;%=h dvd.rating %&gt;&lt;/td&gt;
+    19     &lt;td&gt;&lt;%= link_to 'Show', dvd %&gt;&lt;/td&gt;
+    20     &lt;td&gt;&lt;%= link_to 'Edit', edit_dvd_path(dvd) %&gt;&lt;/td&gt;
+    21     &lt;td&gt;&lt;%= link_to 'Destroy', dvd, :confirm =&gt; 'Are you sure?', :method =&gt; :delete %&gt;&lt;/td&gt;
+    22   &lt;/tr&gt;
+    23 &lt;% end %&gt;
+    24 &lt;/table&gt;
+    25 
+    26 &lt;br /&gt;
+    27 
+    28 &lt;%= link_to 'New dvd', new_dvd_path %&gt;</screen></para>
+
+      <para>In der Zeile 12 wird mit der Iternator-Methode
+      <methodname>each</methodname> das Array <varname>@dvds</varname> Eintrag
+      für Eintrag angezeigt. Jeder Eintrag wird dann für den Block in der
+      lokalen Variable <varname>dvd</varname> gespeichert und die wird dann in
+      den Zeilen 14 bis 18 dazu benutzt den Inhalt des Eintrages
+      darzustellen.</para>
+
+      <section>
+        <title>link_to und UrlWriter</title>
+
+        <para>Was hat es mit <code>link_to</code> in den Zeilen 19 bis 21 auf
+        sich? Probieren wir es doch mal in der Console aus. Dazu müssen wir
+        als erstes die <classname>ActionController::UrlWriter</classname>
+        Class includieren (das passiert im View automatisch im Hintergrund)
+        und können dann mal den Block im kleinen nachstellen.<note>
+            <para>Mit <command>helper</command> können Sie in der Rails
+            Console Ausgaben von Helpern ausgeben. Mehr zum Thema Helper
+            gleich.</para>
+          </note><screen>&gt;&gt; <command>include ActionController::UrlWriter</command>
+=&gt; Object
+&gt;&gt; <command>@dvds = Dvd.all</command>
+=&gt; [#&lt;Dvd id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 12:15:21", updated_at: "2009-12-25 12:15:21"&gt;, #&lt;Dvd id: 2, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 12:15:21", updated_at: "2009-12-25 12:15:21"&gt;, #&lt;Dvd id: 3, title: "Terminator Salvation", production_year: 2009, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 12:15:21", updated_at: "2009-12-25 12:15:21"&gt;, #&lt;Dvd id: 4, title: "Rain Man", production_year: 1988, duration: nil, plot: nil, rating: 5, created_at: "2009-12-25 12:15:21", updated_at: "2009-12-25 12:15:21"&gt;, #&lt;Dvd id: 5, title: "War of the Worlds", production_year: 2005, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 12:15:21", updated_at: "2009-12-25 12:15:21"&gt;, #&lt;Dvd id: 6, title: "Collateral", production_year: 2004, duration: nil, plot: nil, rating: 5, created_at: "2009-12-25 12:15:21", updated_at: "2009-12-25 12:15:21"&gt;, #&lt;Dvd id: 7, title: "Miami Vice", production_year: 2006, duration: nil, plot: nil, rating: 5, created_at: "2009-12-25 12:15:21", updated_at: "2009-12-25 12:15:21"&gt;, #&lt;Dvd id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 12:15:21", updated_at: "2009-12-25 12:15:21"&gt;, #&lt;Dvd id: 9, title: "The Aviator", production_year: 2004, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 12:15:21", updated_at: "2009-12-25 12:15:21"&gt;, #&lt;Dvd id: 10, title: "Some Like It Hot", production_year: 1959, duration: nil, plot: nil, rating: 5, created_at: "2009-12-25 12:15:21", updated_at: "2009-12-25 12:15:21"&gt;, #&lt;Dvd id: 11, title: "W.", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2009-12-25 12:15:21", updated_at: "2009-12-25 12:15:21"&gt;, #&lt;Dvd id: 12, title: "Iron Man", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2009-12-25 12:15:21", updated_at: "2009-12-25 12:15:21"&gt;, #&lt;Dvd id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2009-12-25 12:15:21", updated_at: "2009-12-25 12:15:21"&gt;]
+&gt;&gt; <command>@dvds.each do |dvd|</command>
+?&gt; <command>puts helper.edit_dvd_path(dvd)</command>
+&gt;&gt; <command>end</command>
+/dvds/1/edit
+/dvds/2/edit
+/dvds/3/edit
+/dvds/4/edit
+/dvds/5/edit
+/dvds/6/edit
+/dvds/7/edit
+/dvds/8/edit
+/dvds/9/edit
+/dvds/10/edit
+/dvds/11/edit
+/dvds/12/edit
+/dvds/13/edit
+=&gt;</screen></para>
+
+        <para><code>edit_dvd_path(Dvd.first)</code> gibt also den URL-Pfad für
+        die Edit-Seite der ersten DVD an:<screen>sw@debian:~/dvd-sammlung$ <command>./script/console</command> 
+Loading development environment (Rails 2.3.5)
+&gt;&gt; <command>include ActionController::UrlWriter</command>
+=&gt; Object
+&gt;&gt; <command>edit_dvd_path(Dvd.first)</command>
+=&gt; "/dvds/1/edit"
+&gt;&gt; <command>exit</command>
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Schauen Sie sich bitte noch mal die letzten Zeilen aus der Hilfe
+        <classname>ActionController::Resources.recource</classname> an: <xref
+        linkend="ri_ActionController_Resources.resource" /></para>
+
+        <para>Dort steht in den letzten Zeilen:<screen>     Along with the routes themselves, +resource+ generates named routes
+     for use in controllers and views. +map.resource :account+ produces
+     these named routes and helpers:
+
+       Named Route   Helpers
+       ============  =============================================
+       account       account_url, hash_for_account_url,
+                     account_path, hash_for_account_path
+     
+       new_account   new_account_url, hash_for_new_account_url,
+                     new_account_path, hash_for_new_account_path
+     
+       edit_account  edit_account_url, hash_for_edit_account_url,
+                     edit_account_path, hash_for_edit_account_path
+</screen></para>
+
+        <para>Rails legt also für die wichtigen URLs automatisch diese Helper
+        an. Aber warum soll man sich damit rumschlagen? Ich weiß ja, wie die
+        URL heißt. Da könnte ich es ja auch direkt wie folgt
+        angeben:<programlisting>link_to 'Edit', '/dvds/'+dvd.id.to_s+'/edit'</programlisting></para>
+
+        <para>Abgesehen davon, das es nicht so sauber aussieht wie
+        <code>edit_dvd_path(dvd)</code> ist der Hauptgrund in der Möglichkeit
+        diesen Pfad in der <filename>config.routes.rb</filename> ändern zu
+        können, ohne den Rest der Application anzufassen.</para>
+
+        <section>
+          <title>Beispiel für geänderte Routen</title>
+
+          <para>Nehmen wir mal an, das wir in Zukunft nicht nur DVDs, sondern
+          auch CDs und BlueRays in jeweils eigenen Datenbanken und Controllern
+          halten wollen. Trotzdem sollte alles von aussen per logischer URL
+          erreichbar sein. Dann könnten wir die Route für die DVDs in der
+          <filename>config/routes.rb</filename> wie folgt
+          ändern:<programlisting>map.resources :dvds, :path_prefix =&gt; 'medien'
+</programlisting></para>
+
+          <para>Jetzt bekommen wir mit den obigen Helpern die neuen und
+          richtigen URLs angezeigt:<screen>sw@debian:~/dvd-sammlung$ <command>./script/console</command> 
+Loading development environment (Rails 2.3.5)
+&gt;&gt; <command>include ActionController::UrlWriter</command>
+=&gt; Object
+&gt;&gt; <command>dvd = Dvd.last</command>
+=&gt; #&lt;Dvd id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2009-12-25 12:15:21", updated_at: "2009-12-25 12:15:21"&gt;
+&gt;&gt; <command>helper.link_to 'Show', dvd</command>
+=&gt; "&lt;a href=\"/medien/dvds/13\"&gt;Show&lt;/a&gt;"
+&gt;&gt; <command>helper.link_to 'Edit', edit_dvd_path(dvd)</command>
+=&gt; "&lt;a href=\"/medien/dvds/13/edit\"&gt;Edit&lt;/a&gt;"
+&gt;&gt; <command>exit</command>
+sw@debian:~/dvd-sammlung$</screen></para>
+
+          <para>Obwohl Sie nichts an Ihren Views verändert haben, werden die
+          richtigen neuen URL benutzt.</para>
+        </section>
+      </section>
+    </section>
+  </section>
+
+  <section>
+    <title>Helper</title>
+
+    <para>Wer schon mal einen Blick in das <filename>app</filename>
+    Verzeichnis geworfen hat, wird dort folgendes gesehen haben:<screen>sw@debian:~/dvd-sammlung$ <command>ls app/</command>
+controllers  helpers  models  views
+sw@debian:~/dvd-sammlung$</screen></para>
+
+    <para>Was Controller, Models und Views sind, haben wir mittlerweile
+    besprochen. - Ja, ja, ... bis es wirklich in Fleisch und Blut übergeht
+    braucht es noch ein paar Übungen, aber wir sind ja auch erst am Anfang. -
+    Was aber hat es mit den Helpers auf sich?</para>
+
+    <para>Im Helper-Verzeichnis sind zwei Daten:<screen>sw@debian:~/dvd-sammlung$ <command>ls app/helpers/</command>
+application_helper.rb  dvds_helper.rb
+sw@debian:~/dvd-sammlung$ </screen></para>
+
+    <para>Der Default-Inhalt ist auch nicht gerade vielsagend:<screen>sw@debian:~/dvd-sammlung$ <command>cat app/helpers/application_helper.rb </command>
+# Methods added to this helper will be available to all templates in the application.
+module ApplicationHelper
+end
+sw@debian:~/dvd-sammlung$ <command>cat app/helpers/dvds_helper.rb</command> 
+module DvdsHelper
+end
+sw@debian:~/dvd-sammlung$</screen></para>
+
+    <para>Ich lös das Rätsel mal auf: Helper sind Methoden, die
+    Programmierlogik aus dem View raushalten sollen. Allgemein gilt ja die
+    Annahme, das das Layout einer Webseite auch von Nicht-Programmiern
+    erstellt werden kann. Helper sind da sehr praktisch. Zusätzlich
+    erleichtern Sie es uns den Code weiter aufzuräumen und besser zu
+    strukturieren.</para>
+
+    <section>
+      <title>Beispiel Film-Bewertung</title>
+
+      <para>Aktuell sieht unsere DVD-Index-Seite so aus:<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds</command>
+Received cookie: _dvd-sammlung_session=BAh7BzoPc2Vzc2lvbl9pZCIlYzViZWZkOWY4OWEzNTM0ZjdiNmZiYjJmODMzOTA1MmU6EF9jc3JmX3Rva2VuSSIxV1h4bUljZ0EyMnc3bld4WThyeExpekpCRjRQZDdvUVliSWVXUENmVU5Wcz0GOg1lbmNvZGluZyINVVMtQVNDSUk%3D--08b823e340bf0d62bf1725a23a9e5a041d914013
+Listing dvds
+
+       Title         Production year Duration Plot Rating
+The Terminator       1984                                 Show Edit Destroy
+Terminator 2         1992                                 Show Edit Destroy
+Terminator Salvation 2009                                 Show Edit Destroy
+Rain Man             1988                          5      Show Edit Destroy
+War of the Worlds    2005                          4      Show Edit Destroy
+Collateral           2004                          5      Show Edit Destroy
+Miami Vice           2006                          5      Show Edit Destroy
+Hancock              2008                          4      Show Edit Destroy
+The Aviator          2004                          4      Show Edit Destroy
+Some Like It Hot     1959                          5      Show Edit Destroy
+W.                   2008                          4      Show Edit Destroy
+Iron Man             2008                          5      Show Edit Destroy
+The Dark Knight      2008                          5      Show Edit Destroy
+
+
+New dvd
+sw@debian:~/dvd-sammlung$</screen></para>
+
+      <para>Anstatt der Zahlen für das Rating der Filme, möchten wir gerne
+      Sterne anzeigen. Das könnten wir in der Datei
+      <filename>app/views/dvds/index.html.erb</filename>
+      realisieren:<programlisting>&lt;h1&gt;Listing dvds&lt;/h1&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Title&lt;/th&gt;
+    &lt;th&gt;Production year&lt;/th&gt;
+    &lt;th&gt;Duration&lt;/th&gt;
+    &lt;th&gt;Plot&lt;/th&gt;
+    &lt;th&gt;Rating&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @dvds.each do |dvd| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%=h dvd.title %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%=h dvd.production_year %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%=h dvd.duration %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%=h dvd.plot %&gt;&lt;/td&gt;
+    &lt;td&gt;
+<emphasis>    &lt;%- stars = '' %&gt;
+    &lt;%- dvd.rating.to_i.times { stars = stars + '*' } %&gt;
+    &lt;%=h stars %&gt;</emphasis>
+    &lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Show', dvd %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Edit', edit_dvd_path(dvd) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', dvd, :confirm =&gt; 'Are you sure?', :method =&gt; :delete %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+
+&lt;br /&gt;
+
+&lt;%= link_to 'New dvd', new_dvd_path %&gt;
+</programlisting></para>
+
+      <para>Die fertige HTML-Seite sieht das so aus:<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds</command>
+Received cookie: _dvd-sammlung_session=BAh7BzoPc2Vzc2lvbl9pZCIlMWJjZDI4ZDVmYjUxNTBiZGE4NjZkZjkwNDAxNjU5Zjk6EF9jc3JmX3Rva2VuSSIxWnZNc2dsTFNGdmEzeTh4b3Bua1BTdUNwWTY0dnhZME51bmxUKyszOGkvVT0GOg1lbmNvZGluZyINVVMtQVNDSUk%3D--e432e5bdd136e5e38bc074fe0c6693dc2b818b0e
+Listing dvds
+
+       Title         Production year Duration Plot Rating
+The Terminator       1984                                 Show Edit Destroy
+Terminator 2         1992                                 Show Edit Destroy
+Terminator Salvation 2009                                 Show Edit Destroy
+Rain Man             1988                          *****  Show Edit Destroy
+War of the Worlds    2005                          ****   Show Edit Destroy
+Collateral           2004                          *****  Show Edit Destroy
+Miami Vice           2006                          *****  Show Edit Destroy
+Hancock              2008                          ****   Show Edit Destroy
+The Aviator          2004                          ****   Show Edit Destroy
+Some Like It Hot     1959                          *****  Show Edit Destroy
+W.                   2008                          ****   Show Edit Destroy
+Iron Man             2008                          *****  Show Edit Destroy
+The Dark Knight      2008                          *****  Show Edit Destroy
+
+
+New dvd
+sw@debian:~/dvd-sammlung$</screen></para>
+
+      <para>Dummerweise hat aber solche Art von Logik und Programmierung im
+      View nichts zu suchen. Deshalb erstellen wir einen Helper
+      <methodname>stars_for_rating</methodname> in der Datei
+      <filename>app/helpers/dvds_helper.rb</filename>:<programlisting>module DvdsHelper
+
+  # Zeigt das Rating nicht als Zahl sondern in Sternen an.
+  #
+  def stars_for_rating(rating)
+    stars = ''
+    rating.to_i.times { stars = stars + '*' }
+    stars
+  end
+
+end
+</programlisting></para>
+
+      <para>Jetzt ändern wir noch die Datei
+      <filename>app/views/dvds/index.html.erb</filename>:<programlisting>&lt;h1&gt;Listing dvds&lt;/h1&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Title&lt;/th&gt;
+    &lt;th&gt;Production year&lt;/th&gt;
+    &lt;th&gt;Duration&lt;/th&gt;
+    &lt;th&gt;Plot&lt;/th&gt;
+    &lt;th&gt;Rating&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @dvds.each do |dvd| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%=h dvd.title %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%=h dvd.production_year %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%=h dvd.duration %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%=h dvd.plot %&gt;&lt;/td&gt;
+    <emphasis>&lt;td&gt;&lt;%=h stars_for_rating(dvd.rating) %&gt;&lt;/td&gt;</emphasis>
+    &lt;td&gt;&lt;%= link_to 'Show', dvd %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Edit', edit_dvd_path(dvd) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', dvd, :confirm =&gt; 'Are you sure?', :method =&gt; :delete %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+
+&lt;br /&gt;
+
+&lt;%= link_to 'New dvd', new_dvd_path %&gt;
+</programlisting></para>
+
+      <para>Das Ergebnis ist das gleiche:<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds</command>
+Received cookie: _dvd-sammlung_session=BAh7BzoPc2Vzc2lvbl9pZCIlMWJjZDI4ZDVmYjUxNTBiZGE4NjZkZjkwNDAxNjU5Zjk6EF9jc3JmX3Rva2VuSSIxWnZNc2dsTFNGdmEzeTh4b3Bua1BTdUNwWTY0dnhZME51bmxUKyszOGkvVT0GOg1lbmNvZGluZyINVVMtQVNDSUk%3D--e432e5bdd136e5e38bc074fe0c6693dc2b818b0e
+Listing dvds
+
+       Title         Production year Duration Plot Rating
+The Terminator       1984                                 Show Edit Destroy
+Terminator 2         1992                                 Show Edit Destroy
+Terminator Salvation 2009                                 Show Edit Destroy
+Rain Man             1988                          *****  Show Edit Destroy
+War of the Worlds    2005                          ****   Show Edit Destroy
+Collateral           2004                          *****  Show Edit Destroy
+Miami Vice           2006                          *****  Show Edit Destroy
+Hancock              2008                          ****   Show Edit Destroy
+The Aviator          2004                          ****   Show Edit Destroy
+Some Like It Hot     1959                          *****  Show Edit Destroy
+W.                   2008                          ****   Show Edit Destroy
+Iron Man             2008                          *****  Show Edit Destroy
+The Dark Knight      2008                          *****  Show Edit Destroy
+
+
+New dvd
+sw@debian:~/dvd-sammlung$</screen></para>
+
+      <para>Durch die Benutzung einer Helper-Methode ist unsere ganze
+      Application aufgeräumter. Zusätzlich können wir die gleiche Methode auch
+      noch in der <filename>app/views/dvds/show.html.erb</filename> Datei zum
+      Anzeigen einer einzelnen DVD einbauen:<programlisting>&lt;p&gt;
+  &lt;b&gt;Title:&lt;/b&gt;
+  &lt;%=h @dvd.title %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;Production year:&lt;/b&gt;
+  &lt;%=h @dvd.production_year %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;Duration:&lt;/b&gt;
+  &lt;%=h @dvd.duration %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;Plot:&lt;/b&gt;
+  &lt;%=h @dvd.plot %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;Rating:&lt;/b&gt;
+  <emphasis>&lt;%=h stars_for_rating(@dvd.rating) %&gt;</emphasis>
+&lt;/p&gt;
+
+
+&lt;%= link_to 'Edit', edit_dvd_path(@dvd) %&gt; |
+&lt;%= link_to 'Back', dvds_path %&gt;
+</programlisting></para>
+
+      <para>Das Ergebnis sieht dann so aus:<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds/5</command>
+Received cookie: _dvd-sammlung_session=BAh7BjoPc2Vzc2lvbl9pZCIlNjhhYTI0ODIwMjBmZWRiMjU4YzI1NTA1MjZiNmRiODY%3D--6d466ee486dc4481e006a2ff317525f939b21926
+Title: War of the Worlds
+
+Production year: 2005
+
+Duration:
+
+Plot:
+
+Rating: ****
+
+Edit | Back
+sw@debian:~/dvd-sammlung$</screen></para>
+
+      <para>Wenn Sie einen Helper in der ganzen Application und nicht nur in
+      einem Controller benötigt, dann können Sie die Helper-Methode in der
+      Datei <filename>app/helpers/application_helper.rb</filename> definieren.
+      Vor dort aus ist Sie dann in jedem View abrufbar. </para>
+    </section>
+
+    <section>
+      <title>Eingebaute Helper</title>
+
+      <para>Es gibt einige schon fertig mitgelieferte Helper. Einige haben wir
+      schon benutzt:<itemizedlist>
+          <listitem>
+            <para><code>edit_dvd_path(dvd)</code></para>
+          </listitem>
+
+          <listitem>
+            <para><code>new_dvd_path</code></para>
+          </listitem>
+        </itemizedlist></para>
+
+      <para>Also nicht wundern, wenn von Helpern die Rede ist, aber die
+      entsprechende Helperdatei leer ist.</para>
+    </section>
+
+    <section>
+      <title>helper_method</title>
+
+      <para>Helper können nicht nur in
+      <filename>app/helpers/beispiel.rb</filename> definiert werden. Sie
+      können eine Methode aus Ihrem Controller zu einem Helper machen. In der
+      Hilfe zu helper_method finden sich ein sehr gutes Beispiel dafür.
+      Dummweise haben wir bis jetzt noch keine Sessions durchgenommen (Sie
+      haben sich vielleicht schon über die automatischen Cookies gewundert),
+      aber das Beispiel sollte trotzdem verständlich sein:<screen>sw@debian:~/dvd-sammlung$ <command>ri ActionController::Helpers::ClassMethods.helper_method</command>
+------------------ ActionController::Helpers::ClassMethods#helper_method
+     helper_method(*methods)
+
+     From gem actionpack-2.3.5
+------------------------------------------------------------------------
+     Declare a controller method as a helper. For example, the following
+     makes the +current_user+ controller method available to the view:
+
+       class ApplicationController &lt; ActionController::Base
+         helper_method :current_user, :logged_in?
+     
+         def current_user
+           @current_user ||= User.find_by_id(session[:user])
+         end
+     
+          def logged_in?
+            current_user != nil
+          end
+       end
+
+     In a view:
+
+      &lt;% if logged_in? -%&gt;Welcome, &lt;%= current_user.name %&gt;&lt;% end -%&gt;
+
+sw@debian:~/dvd-sammlung$</screen></para>
+    </section>
+
+    <section>
+      <title>Ist das nicht übertrieben?</title>
+
+      <para>Bei den ersten Rails-Projekten denkt man sich: "Das mache ich
+      gerade schnell und neu im View". Aber schon schnell merkt man die
+      Eleganz von Helpern und das saubere Abtrennen von Layout und
+      Programmierung zu schätzen. Gerade wer schon mal in der
+      PHP-Spagetti-Code Hölle war, wird die Arbeit mit Helpern bald
+      lieben.</para>
+
+      <para>Aber: Auto fahren, lernt man beim Auto fahren!</para>
     </section>
   </section>
 </chapter>
