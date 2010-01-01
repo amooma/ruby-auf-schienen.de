@@ -254,12 +254,54 @@ Completed in 29ms (View: 5, DB: 0) | 200 OK [http://localhost/dvds]
       <application>if</application> ausgewertet:<programlisting>if @dvd.save</programlisting></para>
 
       <para>Konnte das Objekt wegen Validierungsfehlern nicht abgespeichert
-      werden, ist das Ergebnis false und Rails rendert die new-Seite
-      neu:<programlisting>format.html { render :action =&gt; "new" }</programlisting></para>
+      werden, ist das Ergebnis <varname>false</varname> und Rails rendert die
+      new-Seite:<programlisting>format.html { render :action =&gt; "new" }</programlisting></para>
 
-      <para>Und im View <filename>app/views/dvds/new.html.erb</filename> steht
-      in der 4. Zeile der Eintrag mit dem die entsprechende Fehlermeldung
-      ausgegeben wird:<programlisting>&lt;%= f.error_messages %&gt;</programlisting></para>
+      <para>Hier noch mal der Code von
+      <filename>apps/views/dvds/new.html.erb</filename>:<programlisting>&lt;h1&gt;New dvd&lt;/h1&gt;
+
+&lt;% form_for(@dvd) do |f| %&gt;
+  &lt;%= f.error_messages %&gt;
+
+  &lt;p&gt;
+    &lt;%= f.label :title %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :title %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :production_year %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :production_year %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :duration %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :duration %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :plot %&gt;&lt;br /&gt;
+    &lt;%= f.text_area :plot %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :rating %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :rating %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.submit 'Create' %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+
+&lt;%= link_to 'Back', dvds_path %&gt;</programlisting></para>
+
+      <para>In der 4. Zeile steht der Eintrag mit dem die entsprechende
+      Fehlermeldung ausgegeben wird:<programlisting>&lt;%= f.error_messages %&gt;</programlisting></para>
+
+      <para><code>f.error_messages</code> für an dieser Stelle den folgenden
+      HTML-Code ein:<programlisting>&lt;div class="errorExplanation" id="errorExplanation"&gt;
+&lt;h2&gt;1 error prohibited this dvd from being saved&lt;/h2&gt;
+&lt;p&gt;There were problems with the following fields:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Title can't be blank&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</programlisting></para>
     </section>
   </section>
 
