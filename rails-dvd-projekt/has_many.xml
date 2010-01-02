@@ -401,60 +401,299 @@ end
 =&gt; "The Terminator"
 &gt;&gt;</screen></para>
       </section>
+    </section>
+  </section>
 
-      <section>
-        <title>Weitere Beispiele</title>
+  <section>
+    <title>n:n Verknüpfung (has_many :through)</title>
 
-        <para>Um das ganze ein wenig besser zu zeigen, benötigen wir eine
-        Beispiel-Datenbank. Dazu benutzen wir die folgende
-        <filename>db/seed.rb</filename> Datei:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#   
-#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
-#   Major.create(:name =&gt; 'Daley', :city =&gt; cities.first)
+    <para>Als nächstes wollen wir unsere Datenbank um die Schauspiele in den
+    Filmen erweitern. Das ginge zur Not auch mit 1:n (also has_many), aber
+    wäre unschön, weil ein Schauspieler ja in mehreren Filmen mitspielen kann
+    und dann mehrmals in der Datenbank wäre. Wir suchen also eine n:n
+    Verknüpfung.</para>
 
-Dvd.create({ :title =&gt; 'The Terminator', :production_year =&gt; 1984 }).showtimes.create([{:showtime =&gt; Time.now - 1.year},{:showtime =&gt; Time.now - 20.days}])
-Dvd.create({ :title =&gt; 'Terminator 2', :production_year =&gt; 1992 }).showtimes.create([{:showtime =&gt; Time.now - 1.year},{:showtime =&gt; Time.now - 2.months},{:showtime =&gt; Time.now - 20.days}])
-Dvd.create({ :title =&gt; 'Terminator Salvation', :production_year =&gt; 2009 })
-Dvd.create({ :title =&gt; 'Rain Man', :production_year =&gt; 1988, :rating =&gt; 5 }).showtimes.create([{:showtime =&gt; Time.now - 2.year},{:showtime =&gt; Time.now - 3.months},{:showtime =&gt; Time.now - 18.days - 2.hours}]
-)
-Dvd.create({ :title =&gt; 'War of the Worlds', :production_year =&gt; 2005, :rating =&gt; 4 })
-Dvd.create({ :title =&gt; 'Collateral', :production_year =&gt; 2004, :rating =&gt; 5}).showtimes.create({:showtime =&gt; Time.now - 1.year}) 
-Dvd.create({ :title =&gt; 'Miami Vice', :production_year =&gt; 2006, :rating =&gt; 5})
-Dvd.create({ :title =&gt; 'Hancock', :production_year =&gt; 2008, :rating =&gt;  4})
-Dvd.create({ :title =&gt; 'The Aviator', :production_year =&gt; 2004, :rating =&gt;  4})
-Dvd.create({ :title =&gt; 'Some Like It Hot', :production_year =&gt; 1959, :rating =&gt;  5})
-Dvd.create({ :title =&gt; 'W.', :production_year =&gt; 2008, :rating =&gt;  4})
-Dvd.create({ :title =&gt; 'Iron Man', :production_year =&gt; 2008, :rating =&gt;  5})
-Dvd.create({ :title =&gt; 'The Dark Knight', :production_year =&gt; 2008, :rating =&gt;  5})
-</programlisting></para>
+    <section>
+      <title>Schauspieler Datenbank</title>
 
-        <para>Bitte mit <command>rake db:reset</command> einspielen:<screen>sw@debian:~/dvd-sammlung$ <command>rake db:reset</command>
-(in /home/sw/dvd-sammlung)
-db/development.sqlite3 already exists
--- create_table("dvds", {:force=&gt;true})
-   -&gt; 0.0760s
--- create_table("showtimes", {:force=&gt;true})
-   -&gt; 0.0463s
--- initialize_schema_migrations_table()
-   -&gt; 0.0171s
--- assume_migrated_upto_version(20100102120720)
-   -&gt; 0.0054s
+      <para>Fangen wir mal mit der Actor-Datenbank an. Die soll folgende
+      Felder enthalten:<itemizedlist>
+          <listitem>
+            <para>firstname:string</para>
+          </listitem>
+
+          <listitem>
+            <para>lastname:string</para>
+          </listitem>
+
+          <listitem>
+            <para>gender:boolean</para>
+
+            <para>Das Geschlecht können wir ruhig in einem Boolean
+            abspeichern. Das ist performanter und benötigt weniger Platz als
+            ein String. true:männlich und false:weiblich<footnote>
+                <para>Ich sehe schon die Beschwerden der weiblichen Leser vor
+                mir. Wie rum man es macht ist logischerweise völlig
+                egal.</para>
+              </footnote></para>
+          </listitem>
+
+          <listitem>
+            <para>birthdate:date</para>
+          </listitem>
+
+          <listitem>
+            <para>homepage_url:string</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <para>Wieder ein Fall für Scaffolding:<screen>sw@debian:~/dvd-sammlung$ <command>./script/generate scaffold actor firstname:string lastname:string gender:boolean birthdate:date homepage_url:string</command>
+      exists  app/models/
+      exists  app/controllers/
+      exists  app/helpers/
+      create  app/views/people
+      exists  app/views/layouts/
+      exists  test/functional/
+      exists  test/unit/
+      exists  test/unit/helpers/
+      exists  public/stylesheets/
+      create  app/views/people/index.html.erb
+      create  app/views/people/show.html.erb
+      create  app/views/people/new.html.erb
+      create  app/views/people/edit.html.erb
+      create  app/views/layouts/people.html.erb
+   identical  public/stylesheets/scaffold.css
+      create  app/controllers/people_controller.rb
+      create  test/functional/people_controller_test.rb
+      create  app/helpers/people_helper.rb
+      create  test/unit/helpers/people_helper_test.rb
+       route  map.resources :people
+  dependency  model
+      exists    app/models/
+      exists    test/unit/
+      exists    test/fixtures/
+      create    app/models/person.rb
+      create    test/unit/person_test.rb
+      create    test/fixtures/people.yml
+      exists    db/migrate
+      create    db/migrate/20100102142248_create_people.rb
 sw@debian:~/dvd-sammlung$</screen></para>
 
-        <section>
-          <title></title>
+      <para>Und die Migration ausführen:<screen>sw@debian:~/dvd-sammlung$ <command>rake db:migrate</command>
+(in /home/sw/dvd-sammlung)
+==  CreatePeople: migrating ===================================================
+-- create_table(:people)
+   -&gt; 0.0012s
+==  CreatePeople: migrated (0.0022s) ==========================================
 
-          <para></para>
-        </section>
+sw@debian:~/dvd-sammlung$</screen></para>
 
-        <section>
-          <title></title>
+      <warning>
+        <para>Bitte beachten Sie, das eine Class immer Singular (also in
+        <classname>Person</classname>) und ein Model immer Plural (also
+        <varname>people</varname>) ist!</para>
+      </warning>
+    </section>
 
-          <para></para>
-        </section>
+    <section>
+      <title>Cast Datenbank</title>
+
+      <para>Wir haben eine Datenbank mit Schauspielern und wir haben eine
+      Datenbank mit DVDs. Da jeder Schauspieler in mehreren Filmen mitspielen
+      kann, benötigen wir jetzt noch eine Datenbank in der beide Tabellen mit
+      einander verknüpft werden. Die Class nennen wir
+      <classname>Cast</classname> (englisch für Besetzung).</para>
+
+      <para>Wir benötigen folgendes Datenbankmodel:<itemizedlist>
+          <listitem>
+            <para>person_id:integer</para>
+          </listitem>
+
+          <listitem>
+            <para>dvd_id:integer</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <section>
+        <title>./script/generate model</title>
+
+        <para>Diemal benötigen wir kein Scaffolding, da wir ja gar kein
+        Webinterface benötigen (wir werden diese Verküpfungen nie per Hand
+        eingeben). Deshalb reicht es aus, nur ein Model anzulegen. Ich kann
+        mir die Syntax nie merken und rufe deshalb erstmal das Programm ohne
+        weitere Parameter auf:<screen>sw@debian:~/dvd-sammlung$ <command>./script/generate model</command>
+Usage: ./script/generate model ModelName [field:type, field:type]
+
+Options:
+        --skip-timestamps            Don't add timestamps to the migration file for this model
+        --skip-migration             Don't generate a migration file for this model
+        --skip-fixture               Don't generation a fixture file for this model
+
+Rails Info:
+    -v, --version                    Show the Rails version number and quit.
+    -h, --help                       Show this help message and quit.
+
+General Options:
+    -p, --pretend                    Run but do not make any changes.
+    -f, --force                      Overwrite files that already exist.
+    -s, --skip                       Skip files that already exist.
+    -q, --quiet                      Suppress normal output.
+    -t, --backtrace                  Debugging: show backtrace on errors.
+    -c, --svn                        Modify files with subversion. (Note: svn must be in path)
+    -g, --git                        Modify files with git. (Note: git must be in path)
+
+Description:
+    Stubs out a new model. Pass the model name, either CamelCased or
+    under_scored, and an optional list of attribute pairs as arguments.
+
+    Attribute pairs are column_name:sql_type arguments specifying the
+    model's attributes. Timestamps are added by default, so you don't have to
+    specify them by hand as 'created_at:datetime updated_at:datetime'.
+
+    You don't have to think up every attribute up front, but it helps to
+    sketch out a few so you can start working with the model immediately.
+
+    This generates a model class in app/models, a unit test in test/unit,
+    a test fixture in test/fixtures/singular_name.yml, and a migration in
+    db/migrate.
+
+Examples:
+    `./script/generate model account`
+
+        creates an Account model, test, fixture, and migration:
+            Model:      app/models/account.rb
+            Test:       test/unit/account_test.rb
+            Fixtures:   test/fixtures/accounts.yml
+            Migration:  db/migrate/XXX_add_accounts.rb
+
+    `./script/generate model post title:string body:text published:boolean`
+
+        creates a Post model with a string title, text body, and published flag.
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Ähnelt alles stark dem Scaffolding.</para>
+
+        <para>Legen wir los:<screen>sw@debian:~/dvd-sammlung$ ./script/generate model cast actor_id:integer dvd_id:integer
+      exists  app/models/
+      exists  test/unit/
+      exists  test/fixtures/
+      create  app/models/cast.rb
+      create  test/unit/cast_test.rb
+      create  test/fixtures/casts.yml
+      exists  db/migrate
+      create  db/migrate/20100102152113_create_casts.rb
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Man sieht den Unterschied zu Scaffolding: Es wird viel weniger
+        Code erzeugt. Auch hier müssen wir jetzt noch die Migration
+        durchführen:<screen>sw@debian:~/dvd-sammlung$ <command>rake db:migrate</command>
+(in /home/sw/dvd-sammlung)
+==  CreateCasts: migrating ====================================================
+-- create_table(:casts)
+   -&gt; 0.0011s
+==  CreateCasts: migrated (0.0020s) ===========================================
+
+sw@debian:~/dvd-sammlung$</screen></para>
+      </section>
+    </section>
+
+    <section>
+      <title>has_many :through</title>
+
+      <para>Jetzt müssen wir in den Modelen die Verknüpfungen
+      eintragen:<itemizedlist>
+          <listitem>
+            <para><filename>app/models/cast.rb</filename></para>
+
+            <para><programlisting>class Cast &lt; ActiveRecord::Base
+  belongs_to :dvd
+  belongs_to :actor
+end
+</programlisting></para>
+
+            <para>Die Class <classname>Cast</classname> hat belongs_to
+            Verbindungen zur <classname>Dvd</classname>- und zur
+            <classname>Actor</classname>-Class.</para>
+          </listitem>
+
+          <listitem>
+            <para><filename>app/models/actor.rb</filename></para>
+
+            <para><programlisting>class Actor &lt; ActiveRecord::Base
+  has_many :casts, :dependent =&gt; :destroy
+  has_many :dvds, :through =&gt; :casts
+end
+</programlisting>Die Class <classname>Actor</classname> hat viele (has_many)
+            Casts zu denen eine <methodname>:destroy</methodname> Abhängigkeit
+            aufgebaut wird. Denn wenn ein Schauspieler aus der Datenbank
+            gelöscht wird, so macht es auch Sinn alle Einträge zu diesem
+            Schauspieler in der casts Datenbank zu löschen.</para>
+
+            <para>Weiterhin hat Actor viele (has_many) dvds durch eine
+            Verknüpfung mit casts.</para>
+          </listitem>
+
+          <listitem>
+            <para><filename>app/models/dvd.rb</filename></para>
+
+            <para><programlisting>class Dvd &lt; ActiveRecord::Base
+  has_many :showtimes, :dependent =&gt; :destroy
+  has_many :casts, :dependent =&gt; :destroy
+  has_many :actors, :through =&gt; :casts
+end
+</programlisting></para>
+
+            <para>Die Class <classname>Dvd</classname> hat viele (has_many)
+            Casts zu denen auch sie eine :destroy Abhängikeit aufbaut.
+            Zusätzlich baut Sie noch eine Verbindung durch (:through) casts zu
+            actors auf.</para>
+          </listitem>
+        </itemizedlist></para>
+    </section>
+
+    <section>
+      <title>In der Console</title>
+
+      <para>Starten wir die Console.<screen>sw@debian:~/dvd-sammlung$ <command>./script/console</command> 
+Loading development environment (Rails 2.3.5)
+&gt;&gt;</screen></para>
+
+      <section>
+        <title>Schauspieler hinzufügen</title>
+
+        <para>Fügen wir erst mal Arnold Schwarzenegger, Michael Biehn und
+        Linda Hamilton als Schauspieler im ersten Terminator Film
+        hinzu:<screen>&gt;&gt; <command>Dvd.find_by_title('The Terminator').actors.create({:firstname =&gt; 'Arnold', :lastname =&gt; 'Schwarzenegger'})</command>
+=&gt; #&lt;Actor id: 1, firstname: "Arnold", lastname: "Schwarzenegger", gender: nil, birthdate: nil, homepage_url: nil, created_at: "2010-01-02 15:27:20", updated_at: "2010-01-02 15:27:20"&gt;
+&gt;&gt; <command>Dvd.find_by_title('The Terminator').actors.create({:firstname =&gt; 'Michael', :lastname =&gt; 'Biehn'})</command>
+=&gt; #&lt;Actor id: 2, firstname: "Michael", lastname: "Biehn", gender: nil, birthdate: nil, homepage_url: nil, created_at: "2010-01-02 15:41:00", updated_at: "2010-01-02 15:41:00"&gt;
+&gt;&gt; <command>Dvd.find_by_title('The Terminator').actors.create({:firstname =&gt; 'Linda', :lastname =&gt; 'Hamilton'})</command>
+=&gt; #&lt;Actor id: 3, firstname: "Linda", lastname: "Hamilton", gender: nil, birthdate: nil, homepage_url: nil, created_at: "2010-01-02 15:41:33", updated_at: "2010-01-02 15:41:33"&gt;
+&gt;&gt;</screen></para>
+
+        <para>Überprüfen wir mal das Ergebnis:<screen>&gt;&gt; <command>Dvd.find_by_title('The Terminator').actors</command>
+=&gt; [#&lt;Actor id: 1, firstname: "Arnold", lastname: "Schwarzenegger", gender: nil, birthdate: nil, homepage_url: nil, created_at: "2010-01-02 15:27:20", updated_at: "2010-01-02 15:27:20"&gt;, #&lt;Actor id: 2, firstname: "Michael", lastname: "Biehn", gender: nil, birthdate: nil, homepage_url: nil, created_at: "2010-01-02 15:41:00", updated_at: "2010-01-02 15:41:00"&gt;, #&lt;Actor id: 3, firstname: "Linda", lastname: "Hamilton", gender: nil, birthdate: nil, homepage_url: nil, created_at: "2010-01-02 15:41:33", updated_at: "2010-01-02 15:41:33"&gt;]
+&gt;&gt; <command>Dvd.find_by_title('The Terminator').actors.count</command>
+=&gt; 3
+&gt;&gt;</screen></para>
+
+        <para>Dummerweise können wir nicht mit dem gleichen Verfahren die
+        beiden anderen Terminator Einträge in der DVD-Tabelle befüllen, denn
+        der Eintrag für z.B. Arnold Schwarzenegger ist ja schon in der
+        Actors-Tabelle und würde dann doppelt sein. </para>
+
+        <para>Eine Lösung für das Problem ist die
+        <methodname>find_or_create_by</methodname> Methode und der kleine
+        Umweg über casts:<screen>&gt;&gt; <command>Dvd.find_by_title('Terminator 2').casts.find_or_create_by_actor_id(Actor.find_or_create_by_firstname_and_lastname('Arnold','Schwarzenegger').id)</command>
+=&gt; #&lt;Cast id: 4, actor_id: 1, dvd_id: 2, created_at: "2010-01-02 16:37:20", updated_at: "2010-01-02 16:37:20"&gt;
+&gt;&gt;</screen></para>
+
+        <para>Mal schauen, ob wir jetzt auch sehen, welche DVDs bis jetzt mit
+        Arnold Schwarzenegger verknüpft sind:<screen>&gt;&gt; <command>Actor.find_by_lastname('Schwarzenegger').dvds</command>
+=&gt; [#&lt;Dvd id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-01-02 16:40:30", updated_at: "2010-01-02 16:40:30"&gt;, #&lt;Dvd id: 2, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2010-01-02 16:40:30", updated_at: "2010-01-02 16:40:30"&gt;]
+&gt;&gt; <command>Actor.find_by_lastname('Schwarzenegger').dvds.count</command>
+=&gt; 2
+&gt;&gt;</screen></para>
       </section>
     </section>
   </section>
