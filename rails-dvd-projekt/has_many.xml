@@ -296,6 +296,33 @@ sw@debian:~/dvd-sammlung$</screen></para>
         Datenbank:<screen>&gt;&gt; <command>Showtime.all</command>
 =&gt; [#&lt;Showtime id: 1, dvd_id: 1, showtime: "2010-01-02 08:59:20", created_at: "2010-01-02 12:59:20", updated_at: "2010-01-02 12:59:20"&gt;, #&lt;Showtime id: 2, dvd_id: 1, showtime: "2009-11-02 13:00:20", created_at: "2010-01-02 13:00:20", updated_at: "2010-01-02 13:00:20"&gt;]
 &gt;&gt;</screen></para>
+
+        <para>Sie können auch gleichzeit eine DVD und eine Showtime
+        hinzufügen:<screen>&gt;&gt; <command>Dvd.create({:title =&gt; 'Top Gun'}).showtimes.create({:showtime =&gt; Time.now - 10.years})</command>
+=&gt; #&lt;Showtime id: 6, dvd_id: 20, showtime: "2000-01-02 13:42:47", created_at: "2010-01-02 13:42:47", updated_at: "2010-01-02 13:42:47"&gt;
+&gt;&gt; <command>Dvd.last</command>
+=&gt; #&lt;Dvd id: 20, title: "Top Gun", production_year: nil, duration: nil, plot: nil, rating: nil, created_at: "2010-01-02 13:42:47", updated_at: "2010-01-02 13:42:47"&gt;
+&gt;&gt; <command>Dvd.last.showtimes</command>
+=&gt; [#&lt;Showtime id: 6, dvd_id: 20, showtime: "2000-01-02 13:42:47", created_at: "2010-01-02 13:42:47", updated_at: "2010-01-02 13:42:47"&gt;]
+&gt;&gt;</screen></para>
+
+        <para>Und Sie können natürlich auch mehrere Showtimes zu einer neuen
+        DVD hinzufügen. Bitte achten Sie auf die Klammern, denn mehrere
+        Showtimes werden in einem Array übergeben:<screen>&gt;&gt; <command>Dvd.create({:title =&gt; 'Some like it hot.'}).showtimes.create([{:showtime =&gt; Time.now - 20.years}, {:showtime =&gt; Time.now - 25.years}, {:showtime =&gt; Time.now - 30.years}])</command>
+=&gt; [#&lt;Showtime id: 7, dvd_id: 21, showtime: "1990-01-02 13:47:15", created_at: "2010-01-02 13:47:15", updated_at: "2010-01-02 13:47:15"&gt;, #&lt;Showtime id: 8, dvd_id: 21, showtime: "1985-01-02 13:47:15", created_at: "2010-01-02 13:47:15", updated_at: "2010-01-02 13:47:15"&gt;, #&lt;Showtime id: 9, dvd_id: 21, showtime: "1980-01-02 13:47:15", created_at: "2010-01-02 13:47:15", updated_at: "2010-01-02 13:47:15"&gt;]
+&gt;&gt; <command>Dvd.last</command>
+=&gt; #&lt;Dvd id: 21, title: "Some like it hot.", production_year: nil, duration: nil, plot: nil, rating: nil, created_at: "2010-01-02 13:47:15", updated_at: "2010-01-02 13:47:15"&gt;
+&gt;&gt; <command>Dvd.last.showtimes.count</command>
+=&gt; 3
+&gt;&gt;</screen>Für die letzten drei Befehle noch die Ausgabe von
+        <filename>log/development.log</filename>:<programlisting>  Dvd Create (0.7ms)   INSERT INTO "dvds" ("title", "production_year", "duration", "plot", "rating", "created_at", "updated_at") VALUES('Some like it hot.', NULL, NULL, NULL, NULL, '2010-01-02 13:47:15', '2010-01-02 13:47:15')
+  Showtime Create (0.2ms)   INSERT INTO "showtimes" ("dvd_id", "showtime", "created_at", "updated_at") VALUES(21, '1990-01-02 13:47:15', '2010-01-02 13:47:15', '2010-01-02 13:47:15')
+  Showtime Create (0.1ms)   INSERT INTO "showtimes" ("dvd_id", "showtime", "created_at", "updated_at") VALUES(21, '1985-01-02 13:47:15', '2010-01-02 13:47:15', '2010-01-02 13:47:15')
+  Showtime Create (0.1ms)   INSERT INTO "showtimes" ("dvd_id", "showtime", "created_at", "updated_at") VALUES(21, '1980-01-02 13:47:15', '2010-01-02 13:47:15', '2010-01-02 13:47:15')
+  Dvd Load (0.3ms)   SELECT * FROM "dvds" ORDER BY dvds.id DESC LIMIT 1
+  Dvd Load (0.3ms)   SELECT * FROM "dvds" ORDER BY dvds.id DESC LIMIT 1
+  SQL (0.2ms)   SELECT count(*) AS count_all FROM "showtimes" WHERE ("showtimes".dvd_id = 21) 
+</programlisting></para>
       </section>
 
       <section>
@@ -309,6 +336,50 @@ sw@debian:~/dvd-sammlung$</screen></para>
 &gt;&gt; <command>terminator.showtimes.count</command>
 =&gt; 1
 &gt;&gt;</screen></para>
+
+        <section>
+          <title>DVD mit damit verknüpften Showtimes löschen</title>
+
+          <para>Da wir in der <filename>app/models/dvd.rb</filename> das
+          has_many mit der Dependency destroy erweitert haben
+          ...<programlisting>class Dvd &lt; ActiveRecord::Base
+  has_many :showtimes, :dependent =&gt; :destroy
+end
+</programlisting>... brauchen wir uns bei einem destroy keine Gedanken zu
+          machen. Rails übernimmt das für uns.</para>
+
+          <para>Löschen wir den eben angelegten Film mit all seinen
+          Showtimes:<screen>&gt;&gt; <command>Dvd.last</command>
+=&gt; #&lt;Dvd id: 22, title: "Some like it hot.", production_year: nil, duration: nil, plot: nil, rating: nil, created_at: "2010-01-02 13:56:15", updated_at: "2010-01-02 13:56:15"&gt;
+&gt;&gt; <command>Dvd.last.showtimes.count</command>
+=&gt; 3
+&gt;&gt; <command>Dvd.last.destroy</command>
+=&gt; #&lt;Dvd id: 22, title: "Some like it hot.", production_year: nil, duration: nil, plot: nil, rating: nil, created_at: "2010-01-02 13:56:15", updated_at: "2010-01-02 13:56:15"&gt;
+&gt;&gt; <command>Showtime.find_all_by_dvd_id(22).count</command>
+=&gt; 0
+&gt;&gt;</screen></para>
+
+          <warning>
+            <para>Bitte beachten Sie hierbei den Unterschied zwischen den
+            Methoden <methodname>destroy</methodname> und
+            <methodname>delete</methodname>! Nur die Methode destroy löst alle
+            Abhängigkeiten auf.</para>
+
+            <para>Beispiel für <methodname>delete</methodname>. Hierbei wird
+            die DVD gelöscht, aber die Showtimes bleiben als Zombies in der
+            Datenbank.<screen>&gt;&gt; <command>Dvd.create({:title =&gt; 'Some like it hot.'}).showtimes.create([{:showtime =&gt; Time.now - 20.years}, {:showtime =&gt; Time.now - 25.years}, {:showtime =&gt; Time.now - 30.years}])</command>
+=&gt; [#&lt;Showtime id: 13, dvd_id: 23, showtime: "1990-01-02 13:59:50", created_at: "2010-01-02 13:59:50", updated_at: "2010-01-02 13:59:50"&gt;, #&lt;Showtime id: 14, dvd_id: 23, showtime: "1985-01-02 13:59:50", created_at: "2010-01-02 13:59:50", updated_at: "2010-01-02 13:59:50"&gt;, #&lt;Showtime id: 15, dvd_id: 23, showtime: "1980-01-02 13:59:50", created_at: "2010-01-02 13:59:50", updated_at: "2010-01-02 13:59:50"&gt;]
+&gt;&gt; <command>Dvd.last</command>
+=&gt; #&lt;Dvd id: 23, title: "Some like it hot.", production_year: nil, duration: nil, plot: nil, rating: nil, created_at: "2010-01-02 13:59:49", updated_at: "2010-01-02 13:59:49"&gt;
+&gt;&gt; <command>Dvd.last.showtimes.count</command>
+=&gt; 3
+&gt;&gt; <command>Dvd.last.delete</command>
+=&gt; #&lt;Dvd id: 23, title: "Some like it hot.", production_year: nil, duration: nil, plot: nil, rating: nil, created_at: "2010-01-02 13:59:49", updated_at: "2010-01-02 13:59:49"&gt;
+&gt;&gt; <command>Showtime.find_all_by_dvd_id(23).count</command>
+=&gt; 3
+&gt;&gt;</screen></para>
+          </warning>
+        </section>
       </section>
 
       <section>
@@ -332,11 +403,58 @@ sw@debian:~/dvd-sammlung$</screen></para>
       </section>
 
       <section>
-        <title>Beispiele</title>
+        <title>Weitere Beispiele</title>
 
         <para>Um das ganze ein wenig besser zu zeigen, benötigen wir eine
         Beispiel-Datenbank. Dazu benutzen wir die folgende
-        <filename>db/seed.rb</filename> Datei:</para>
+        <filename>db/seed.rb</filename> Datei:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
+# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
+#
+# Examples:
+#   
+#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
+#   Major.create(:name =&gt; 'Daley', :city =&gt; cities.first)
+
+Dvd.create({ :title =&gt; 'The Terminator', :production_year =&gt; 1984 }).showtimes.create([{:showtime =&gt; Time.now - 1.year},{:showtime =&gt; Time.now - 20.days}])
+Dvd.create({ :title =&gt; 'Terminator 2', :production_year =&gt; 1992 }).showtimes.create([{:showtime =&gt; Time.now - 1.year},{:showtime =&gt; Time.now - 2.months},{:showtime =&gt; Time.now - 20.days}])
+Dvd.create({ :title =&gt; 'Terminator Salvation', :production_year =&gt; 2009 })
+Dvd.create({ :title =&gt; 'Rain Man', :production_year =&gt; 1988, :rating =&gt; 5 }).showtimes.create([{:showtime =&gt; Time.now - 2.year},{:showtime =&gt; Time.now - 3.months},{:showtime =&gt; Time.now - 18.days - 2.hours}]
+)
+Dvd.create({ :title =&gt; 'War of the Worlds', :production_year =&gt; 2005, :rating =&gt; 4 })
+Dvd.create({ :title =&gt; 'Collateral', :production_year =&gt; 2004, :rating =&gt; 5}).showtimes.create({:showtime =&gt; Time.now - 1.year}) 
+Dvd.create({ :title =&gt; 'Miami Vice', :production_year =&gt; 2006, :rating =&gt; 5})
+Dvd.create({ :title =&gt; 'Hancock', :production_year =&gt; 2008, :rating =&gt;  4})
+Dvd.create({ :title =&gt; 'The Aviator', :production_year =&gt; 2004, :rating =&gt;  4})
+Dvd.create({ :title =&gt; 'Some Like It Hot', :production_year =&gt; 1959, :rating =&gt;  5})
+Dvd.create({ :title =&gt; 'W.', :production_year =&gt; 2008, :rating =&gt;  4})
+Dvd.create({ :title =&gt; 'Iron Man', :production_year =&gt; 2008, :rating =&gt;  5})
+Dvd.create({ :title =&gt; 'The Dark Knight', :production_year =&gt; 2008, :rating =&gt;  5})
+</programlisting></para>
+
+        <para>Bitte mit <command>rake db:reset</command> einspielen:<screen>sw@debian:~/dvd-sammlung$ <command>rake db:reset</command>
+(in /home/sw/dvd-sammlung)
+db/development.sqlite3 already exists
+-- create_table("dvds", {:force=&gt;true})
+   -&gt; 0.0760s
+-- create_table("showtimes", {:force=&gt;true})
+   -&gt; 0.0463s
+-- initialize_schema_migrations_table()
+   -&gt; 0.0171s
+-- assume_migrated_upto_version(20100102120720)
+   -&gt; 0.0054s
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <section>
+          <title></title>
+
+          <para></para>
+        </section>
+
+        <section>
+          <title></title>
+
+          <para></para>
+        </section>
       </section>
     </section>
   </section>
