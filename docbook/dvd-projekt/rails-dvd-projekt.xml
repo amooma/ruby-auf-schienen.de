@@ -153,8 +153,7 @@ sw@debian:~$ </screen></para>
       -v</command> und <command>rails -v</command>). An sonsten werden Sie
       irgendwann in Merkwürdigkeiten laufen. Falls Sie beides noch nicht
       installiert haben finden Sie weitere Infos im <xref
-      linkend="installation-und-versionsauswahl" />
-      .</para>
+      linkend="installation-und-versionsauswahl" /> .</para>
     </tip>
 
     <para>Als erstes (so sollte man sich das direkt angewöhnen) prüfen wir
@@ -371,7 +370,7 @@ sw@debian:~/dvd-sammlung$</screen></para>
     Sie haben sich ja schon das Ruby-Kapitel gekämpft und kommen deshalb
     direkt zu den Vorzügen von Scaffolding.</para>
 
-    <section>
+    <section xml:id="dvd-datenbankmodell">
       <title>Datenbankmodell</title>
 
       <para>In früheren Rails-Versionen musste man die Datenbank von Hand
@@ -385,29 +384,32 @@ sw@debian:~/dvd-sammlung$</screen></para>
       <para>Wir wollen DVDs katalogisieren. Dazu benötigen wir mindestens
       folgende Datenbankfelder:<itemizedlist>
           <listitem>
-            <para><varname>title</varname> - Titel oder Name der DVD</para>
+            <para><varname>title:string</varname> - Titel oder Name der
+            DVD</para>
           </listitem>
 
           <listitem>
-            <para><varname>production_year</varname> - Produktionsjahr</para>
+            <para><varname>production_year:integer</varname> -
+            Produktionsjahr</para>
           </listitem>
 
           <listitem>
-            <para><varname>duration</varname> - Abspieldauer</para>
+            <para><varname>duration:integer</varname> - Abspieldauer</para>
           </listitem>
 
           <listitem>
-            <para><varname>plot</varname> - Story des Films</para>
+            <para><varname>plot:text</varname> - Story des Films</para>
           </listitem>
 
           <listitem>
-            <para><varname>rating</varname> - Bewertung (ein 5 Sterne
+            <para><varname>rating:integer</varname> - Bewertung (ein 5 Sterne
             System)</para>
           </listitem>
         </itemizedlist></para>
 
       <section>
-        <title>Warum alles auf Englisch?</title>
+        <title>Warum alle Feldnamen, Methoden und Classes auf
+        Englisch?</title>
 
         <para>Ganz tief im Herzen liebt Rails die englische Sprache. Damit
         muss man sich abfinden und versuchen diese Liebe zu übernehmen. So
@@ -417,25 +419,22 @@ sw@debian:~/dvd-sammlung$</screen></para>
         die ganze Macht dieser Magie ausnutzen.</para>
       </section>
 
-      <section>
+      <section xml:id="dvd-ist-das-ein-model">
         <title>Ist das jetzt ein Model (laut der MVC-Idee)?</title>
 
         <para>Kurze Antwort: Ja. Wir müssen dem Model nur noch einen Namen
-        geben. Wie wäre es mit "dvd"?!</para>
+        geben. "<varname>dvd</varname>" macht wohl am meisten Sinn.</para>
       </section>
     </section>
 
-    <section>
-      <title>Scaffolding benutzen</title>
+    <section xml:id="script-generate">
+      <title>./script/generate</title>
 
-      <section>
-        <title>./script/generate</title>
-
-        <para>Mit dem Rails-Skript <filename>./script/generate</filename> kann
-        man fertige Code generieren. Wer (wie ich) gerne mal vergisst wie das
-        Skript aufgerufen werden muss, der gibt einfach
-        <filename>./script/generate</filename> ein und bekommt die folgende
-        Hilfe angezeigt:<screen>sw@debian:~/dvd-sammlung$ <command>./script/generate</command> 
+      <para>Mit dem Rails-Skript <filename>./script/generate</filename> kann
+      man fertige Code generieren. Wer (wie ich) gerne mal vergisst wie das
+      Skript aufgerufen werden muss, der gibt einfach
+      <filename>./script/generate</filename> ein und bekommt die folgende
+      Hilfe angezeigt:<screen>sw@debian:~/dvd-sammlung$ <command>./script/generate</command> 
 Usage: ./script/generate generator [options] [args]
 
 Rails Info:
@@ -471,10 +470,10 @@ Generator gems are also available:
 
 sw@debian:~/dvd-sammlung$</screen></para>
 
-        <para>Interessant ist für uns der Teil in dem die "Installed
-        Generators" aufgelistet werden. Wenn wir scaffold benutzen wollen und
-        dazu weitere Hilfe brauchen, dann geht dies wiederrum einfach mit der
-        eingebauten Hilfe:<screen>sw@debian:~/dvd-sammlung$ <command>./script/generate scaffold</command>
+      <para>Interessant ist für uns der Teil in dem die "Installed Generators"
+      aufgelistet werden. Wenn wir scaffold benutzen wollen und dazu weitere
+      Hilfe brauchen, dann geht dies wiederrum einfach mit der eingebauten
+      Hilfe:<screen>sw@debian:~/dvd-sammlung$ <command>./script/generate scaffold</command>
 Usage: ./script/generate scaffold ModelName [field:type, field:type]
 
 Options:
@@ -526,15 +525,15 @@ Examples:
     `./script/generate scaffold purchase order_id:integer amount:decimal`
 sw@debian:~/dvd-sammlung$</screen></para>
 
-        <para>Wir müssen also nach <application>./script/generate
-        scaffold</application> den Namen des Models (bei uns "dvd") und danach
-        die Datenbankfelder mit den entsprechenden Feldtypen angeben.</para>
-      </section>
+      <para>Wir müssen also nach <application>./script/generate
+      scaffold</application> den Namen des Models (bei uns "dvd") und danach
+      die Datenbankfelder mit den entsprechenden Feldtypen angeben.</para>
+    </section>
 
-      <section>
-        <title>Und los gehts</title>
+    <section xml:id="dvd-script-generate-anwenden">
+      <title>Und los gehts</title>
 
-        <para>Dann legen wir mal los:<screen>sw@debian:~/dvd-sammlung$ <command>./script/generate scaffold dvd title:string production_year:integer duration:integer plot:text rating:integer</command>
+      <para>Dann legen wir mal los:<screen>sw@debian:~/dvd-sammlung$ <command>./script/generate scaffold dvd title:string production_year:integer duration:integer plot:text rating:integer</command>
       exists  app/models/
       exists  app/controllers/
       exists  app/helpers/
@@ -564,13 +563,12 @@ sw@debian:~/dvd-sammlung$</screen></para>
       create    test/fixtures/dvds.yml
       create    db/migrate
       create    db/migrate/20091224213402_create_dvds.rb
-sw@debian:~/dvd-sammlung$</screen>Und schon ist alles fertig. Alledings ist in
-        der Datenbank noch keine entsprechende Tabelle angelegt.</para>
-      </section>
+sw@debian:~/dvd-sammlung$</screen>Und schon ist alles fertig. Allerdings ist
+      in der Datenbank noch keine entsprechende Tabelle angelegt.</para>
     </section>
 
-    <section>
-      <title>rake db:migrate</title>
+    <section xml:id="dvd-migration">
+      <title>Migrationen</title>
 
       <para><application>./script/generate scaffold</application> hat uns
       schon alles eingerichtet. Allerdings müssen wir noch in der Datenbank
@@ -708,14 +706,14 @@ Migrating to CreateDvds (20091225115807)
   SQL (0.5ms)   PRAGMA index_list("dvds")
 </programlisting></para>
 
-      <section>
+      <section xml:id="active-record-auto-felder">
         <title>Automatisch zugefügte Felder (id, created_at und
         updated_at)</title>
 
         <para>Rails ist so freundlich uns beim Scaffolding per Default immer
         noch folgende Felder hinzuzufügen:<itemizedlist>
             <listitem>
-              <para><varname>id</varname></para>
+              <para><varname>id:integer</varname></para>
 
               <para>Das ist die Unique-ID des Datensatzes. Das Feld wird von
               der Datenbank automatisch hochgezählt. Für alle SQL-Fans:
@@ -723,14 +721,14 @@ Migrating to CreateDvds (20091225115807)
             </listitem>
 
             <listitem>
-              <para><varname>created_at</varname></para>
+              <para><varname>created_at:datetime</varname></para>
 
               <para>Das Feld wird von ActiveRecord automatisch beim Erstellen
               eines Datensatzes gefüllt.</para>
             </listitem>
 
             <listitem>
-              <para><varname>updated_at</varname></para>
+              <para><varname>updated_at:datetime</varname></para>
 
               <para>Das Feld wird bei jeder Veränderung des Datensatzes
               automatisch an die aktuelle Zeit angepasst.</para>
@@ -747,8 +745,8 @@ Migrating to CreateDvds (20091225115807)
         deaktivieren.</para>
       </section>
 
-      <section>
-        <title>Rollback</title>
+      <section xml:id="migration-rollback">
+        <title>Migration Rollback</title>
 
         <para>Es soll schon vorgekommen sein, das übereilt eine Migration
         durchgeführt wurde. Natürlich passiert weder Ihnen noch mir so was.
@@ -812,8 +810,8 @@ sw@debian:~/dvd-sammlung$</screen></para>
     </section>
   </section>
 
-  <section>
-    <title>Start des Systems</title>
+  <section xml:id="dvd-start-application">
+    <title>Start der Rails-Applikation</title>
 
     <para>Bitte starten Sie Ihren Webserver:<screen>sw@debian:~/dvd-sammlung$ <command>./script/server</command> 
 =&gt; Booting WEBrick
@@ -830,7 +828,7 @@ sw@debian:~/dvd-sammlung$</screen></para>
     rudimentär, aber ist ein guter Start.</para>
   </section>
 
-  <section>
+  <section xml:id="zugriff-per-http">
     <title>Zugriff per HTTP-Protokoll</title>
 
     <para>Gemäss der CRUD Idee (siehe http://de.wikipedia.org/wiki/CRUD)
@@ -895,7 +893,7 @@ sw@debian:~/dvd-sammlung$</screen></para>
         </qandadiv>
       </qandaset></para>
 
-    <section>
+    <section xml:id="via-html-webbrowser">
       <title>HTML-Webbrowser</title>
 
       <para>Sie können mit einem normalen Webbrowser alle CRUD Aktionen
@@ -1173,7 +1171,7 @@ Completed in 386ms (DB: 0) | 302 Found [http://localhost/dvds/destroy/1]
       </section>
     </section>
 
-    <section>
+    <section xml:id="via-xml-browser">
       <title>Per XML</title>
 
       <para>Das XML-Interface erleichtert den Austausch von Daten zwischen
@@ -1350,8 +1348,8 @@ Completed in 128ms (View: 0, DB: 0) | 200 OK [http://localhost/dvds/1.xml]
     </section>
   </section>
 
-  <section>
-    <title>Zugriff per ./script/console</title>
+  <section xml:id="arbeiten-mit-der-console">
+    <title>Arbeiten mit ./script/console</title>
 
     <para>Sie haben im letzten Kapitel gelernt mit irb umzugehen. In Rails
     gibt es noch was cooleres: <filename>./script/console</filename></para>
@@ -1588,8 +1586,8 @@ sw@debian:~/dvd-sammlung$</screen></para>
       </section>
     </section>
 
-    <section>
-      <title>Datensätze suchen</title>
+    <section xml:id="arbeiten-mit-find">
+      <title>Arbeiten mit der Methode find</title>
 
       <para>Es gibt in <classname>ActiveRecord::Base</classname> eine Methode
       <methodname>find</methodname> die es uns ermöglicht ganz ohne
@@ -1919,7 +1917,7 @@ sw@debian:~/sandbox$ </screen></para>
       </section>
     </section>
 
-    <section>
+    <section xml:id="datensatz-loeschen">
       <title>Einen Datensatz löschen</title>
 
       <para>Es gibt die Methoden <methodname>delete</methodname> und
@@ -1976,8 +1974,8 @@ sw@debian:~/sandbox$ </screen></para>
       </section>
     </section>
 
-    <section>
-      <title>Einen Datensatz verändern</title>
+    <section xml:id="datensatz-editieren">
+      <title>Einen Datensatz editieren</title>
 
       <para>Das Verändern eines Datensatzes erfolgt in zwei
       Schritten:<orderedlist>
@@ -2067,14 +2065,14 @@ sw@debian:~/dvd-sammlung$</screen></para>
     </section>
   </section>
 
-  <section>
+  <section xml:id="workflow-in-rails">
     <title>Workflow innerhalb Rails</title>
 
     <para>Jetzt können wir eine Tabelle anlegen und auf diese via HTTP und via
     der Console zugreifen. Jetzt schauen wir uns mal an, was bei einer
     HTTP-Anfrage passiert und welchen Weg diese Anfrage geht.</para>
 
-    <section>
+    <section xml:id="dvd-show-html">
       <title>Beispiel dvds/show/1</title>
 
       <para>Nehmen wir an, ein User ruft die URL
@@ -2398,7 +2396,7 @@ sw@debian:~/dvd-sammlung$</screen></para>
       </section>
     </section>
 
-    <section>
+    <section xml:id="dvd-index-html">
       <title>Beispiel /dvds (Index aller Datensätze)</title>
 
       <para>Da der Grundweg im letzten Segment erklärt wurde, gehe ich jetzt
@@ -2593,7 +2591,7 @@ sw@debian:~/dvd-sammlung$</screen></para>
     </section>
   </section>
 
-  <section>
+  <section xml:id="helper">
     <title>Helper</title>
 
     <para>Wer schon mal einen Blick in das <filename>app</filename>
@@ -2626,7 +2624,7 @@ sw@debian:~/dvd-sammlung$</screen></para>
     erleichtern Sie es uns den Code weiter aufzuräumen und besser zu
     strukturieren.</para>
 
-    <section>
+    <section xml:id="dvd-sterne-helper">
       <title>Beispiel Film-Bewertung</title>
 
       <para>Aktuell sieht unsere DVD-Index-Seite so aus:<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://localhost:3000/dvds</command>
@@ -2836,7 +2834,7 @@ sw@debian:~/dvd-sammlung$</screen></para>
       Vor dort aus ist Sie dann in jedem View abrufbar.</para>
     </section>
 
-    <section>
+    <section xml:id="eingebaute-helper">
       <title>Eingebaute Helper</title>
 
       <para>Es gibt einige schon fertig mitgelieferte Helper. Einige haben wir
@@ -2854,7 +2852,7 @@ sw@debian:~/dvd-sammlung$</screen></para>
       entsprechende Helperdatei leer ist.</para>
     </section>
 
-    <section>
+    <section xml:id="helper-method">
       <title>helper_method</title>
 
       <para>Helper können nicht nur in
@@ -2891,8 +2889,8 @@ sw@debian:~/dvd-sammlung$</screen></para>
 sw@debian:~/dvd-sammlung$</screen></para>
     </section>
 
-    <section>
-      <title>Ist das nicht übertrieben?</title>
+    <section xml:id="mvc-ist-das-nicht-uebertrieben">
+      <title>MVC - Ist das nicht übertrieben?</title>
 
       <para>Bei den ersten Rails-Projekten denkt man sich: "Das mache ich
       gerade schnell und neu im View". Aber schon schnell merkt man die
