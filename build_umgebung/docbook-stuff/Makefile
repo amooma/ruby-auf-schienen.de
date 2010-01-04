@@ -4,7 +4,7 @@
 
 
 docbook_sources = $(wildcard docbook/*.xml)
-docbook_entry_file = docbook/rails-buch.xml
+docbook_entry_file = docbook/index.xml
 
 
 xmllint = $(shell which xmllint)
