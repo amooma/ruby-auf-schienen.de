@@ -58,7 +58,7 @@ xmlcatalog /etc/xml/catalog http://docbook.sourceforge.net/release/xsl-ns/curren
 
 <xsl:param name="img.src.path" select="'img/'" />
 
-<xsl:param name="admon.graphics" select="1" />
+<xsl:param name="admon.graphics" select="0" />
 <xsl:param name="admon.textlabel" select="1" />
 <xsl:param name="admon.graphics.extension" select="'.gif'" />
 <xsl:param name="admon.graphics.path" select="'dbkimg/'" />
@@ -78,15 +78,15 @@ xmlcatalog /etc/xml/catalog http://docbook.sourceforge.net/release/xsl-ns/curren
 <xsl:param name="use.role.for.mediaobject" select="1" />
 <xsl:param name="preferred.mediaobject.role" select="'html'" />
 
-<xsl:param name="chunk.first.sections" select="1" />
+<xsl:param name="chunk.first.sections" select="0" />
 <xsl:param name="chunk.section.depth" select="1" />
 
 <xsl:param name="toc.section.depth" select="2" />
-<xsl:param name="toc.max.depth" select="1" />
+<xsl:param name="toc.max.depth" select="3" />
 <xsl:param name="generate.section.toc.level" select="10" />
 <xsl:param name="toc.list.type" select="'dl'" />
 
-<xsl:param name="section.autolabel.max.depth" select="8" />
+<xsl:param name="section.autolabel.max.depth" select="2" />
 <xsl:param name="label.from.part" select="1" />
 <xsl:param name="section.label.includes.component.label" select="1" />
 <xsl:param name="component.label.includes.part.label" select="1" />
