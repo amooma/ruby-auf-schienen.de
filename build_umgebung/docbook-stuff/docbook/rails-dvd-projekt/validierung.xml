@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title>Validierung</title>
+
+  <section>
+    <title>Kein Film ohne Titel</title>
+
+    <para>Bis jetzt können wir eine DVD auch ohne Titel eintragen:<screen>sw@debian:~/dvd-sammlung$ <command>./script/console</command> 
+Loading development environment (Rails 2.3.5)
+&gt;&gt; <command>Dvd.last</command>
+=&gt; #&lt;Dvd id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2009-12-25 14:48:43", updated_at: "2009-12-25 14:48:43"&gt;
+&gt;&gt; <command>Dvd.create({:title =&gt; nil})</command>
+=&gt; #&lt;Dvd id: 14, title: nil, production_year: nil, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 15:08:48", updated_at: "2009-12-25 15:08:48"&gt;
+&gt;&gt; <command>Dvd.last</command>
+=&gt; #&lt;Dvd id: 14, title: nil, production_year: nil, duration: nil, plot: nil, rating: nil, created_at: "2009-12-25 15:08:48", updated_at: "2009-12-25 15:08:48"&gt;
+&gt;&gt; <command>exit</command>
+sw@debian:~/dvd-sammlung$</screen></para>
+
+    <para>Aber Sinn macht das nicht. Da ein Film auch immer einen Namen hat,
+    können wir dies auch ruhig als Pflicht-Feld ansehen. Rails hat dafür einen
+    fertigen Validierungsmechanismus.</para>
+
+    <para>Da es sich um Eigenschaften des Models <varname>dvds</varname>
+    handelt, müssen wir jede Validierung in der Datei
+    <filename>app/models/dvd.rb</filename> eintragen. Die Methode zum
+    Überprüfen, ob ein Feld ausgefüllt wurde oder nicht heisst
+    <methodname>validates_presence_of</methodname>. Tragen wir es wie folgt
+    ein:<programlisting>class Dvd &lt; ActiveRecord::Base
+  # Validierungen
+  #
+  validates_presence_of :title
+end</programlisting></para>
+
+    <para>Das war einfach.</para>
+
+    <section>
+      <title>Zugriff via Console</title>
+
+      <para>Versuchen wir das ganze doch mal in der Console:<screen>sw@debian:~/dvd-sammlung$ <command>./script/console</command> 
+Loading development environment (Rails 2.3.5)
+&gt;&gt;</screen></para>
+
+      <para>Jetzt eine neue Instance <classname>new_dvd</classname> erstellen
+      und mit der Methode <methodname>save</methodname> abspeichern:<screen>&gt;&gt; <command>new_dvd = Dvd.new</command>
+=&gt; #&lt;Dvd id: nil, title: nil, production_year: nil, duration: nil, plot: nil, rating: nil, created_at: nil, updated_at: nil&gt;
+&gt;&gt; <command>new_dvd.save</command>
+=&gt; false
+&gt;&gt;</screen></para>
+
+      <para>Wir bekommen als Antwort ein false. Der Datensatz wurde nicht in
+      der Datenbank abgespeichert. Die Methode <methodname>errors</methodname>
+      gibt uns mehr Informationen dazu:<screen>&gt;&gt; <command>new_dvd.errors</command>
+=&gt; #&lt;ActiveRecord::Errors:0xa66c9c8 @base=#&lt;Dvd id: nil, title: nil, production_year: nil, duration: nil, plot: nil, rating: nil, created_at: nil, updated_at: nil&gt;, @errors={"title"=&gt;[#&lt;ActiveRecord::Error:0xa66c530 @base=#&lt;Dvd id: nil, title: nil, production_year: nil, duration: nil, plot: nil, rating: nil, created_at: nil, updated_at: nil&gt;, @attribute=:title, @type=:blank, @options={}, @message=:blank&gt;]}&gt;
+&gt;&gt;</screen></para>
+
+      <para>Nicht richtig gut zu lesen. Da behelfen wir uns eines kleines
+      Tricks und geben mit <application>puts</application> und der Methode
+      <methodname>to_yaml</methodname>, das gleiche als YAML-Version
+      aus:<screen>&gt;&gt; <command>puts new_dvd.errors.to_yaml</command>
+--- &amp;id002 !ruby/object:ActiveRecord::Errors 
+base: &amp;id001 !ruby/object:Dvd 
+  attributes: 
+    title: 
+    production_year: 
+    duration: 
+    plot: 
+    rating: 
+    created_at: 
+    updated_at: 
+  attributes_cache: {}
+
+  errors: *id002
+  new_record: true
+errors: 
+  title: 
+  - !ruby/object:ActiveRecord::Error 
+    attribute: :title
+    base: *id001
+    message: :blank
+    options: {}
+
+    type: :blank
+=&gt; nil
+&gt;&gt;</screen></para>
+
+      <para>Die Fehlermeldung ist besser als nichts, aber noch nicht richtig
+      gut zu lesen. Versuchen wir es mal mit folgendem Umweg:<screen>&gt;&gt; <command>new_dvd.errors.each{|attr,msg| puts "#{attr} - #{msg}"}</command>
+title - can't be blank
+</screen></para>
+
+      <para>Tragen wir mal einen Wert in <methodname>title</methodname> ein
+      und versuchen es noch einmal:<screen>&gt;&gt; <command>new_dvd.title = 'Goldfinger'</command>
+=&gt; "Goldfinger"
+&gt;&gt; <command>new_dvd.save</command>
+=&gt; true
+&gt;&gt;</screen></para>
+
+      <para>Perfekt, das abspeichern hat funktioniert.</para>
+    </section>
+
+    <section>
+      <title>Webzugriff</title>
+
+      <para>Wir starten den Webserver.<screen>sw@debian:~/dvd-sammlung$ <command>./script/server </command>
+=&gt; Booting WEBrick
+=&gt; Rails 2.3.5 application starting on http://0.0.0.0:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2009-12-25 16:20:26] INFO  WEBrick 1.3.1
+[2009-12-25 16:20:26] INFO  ruby 1.9.1 (2009-12-07) [i686-linux]
+[2009-12-25 16:20:26] INFO  WEBrick::HTTPServer#start: pid=16670 port=3000
+</screen></para>
+
+      <para>Und rufen mit dem Browser die Seite
+      <uri>http://localhost:3000/dvds/new</uri> auf:<screen>New dvd
+
+Title
+[                              ]
+
+Production year
+[                              ]
+
+Duration
+[                              ]
+
+Plot
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+
+Rating
+[                              ]
+
+[Create]
+
+Back
+</screen></para>
+
+      <para>Jetzt klicken wir auf <code>[Create]</code> und bekommen die
+      gleiche Seite noch mal, aber diesmal mit einer Fehlermeldung "Title
+      can't be blank" angezeigt:<screen>New dvd
+
+1 error prohibited this dvd from being saved
+
+There were problems with the following fields:
+
+  • Title can't be blank
+
+Title
+
+[                              ]
+
+Production year
+[                              ]
+
+Duration
+[                              ]
+
+Plot
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+
+Rating
+[                              ]
+
+[Create]
+
+Back
+</screen></para>
+
+      <para>Geben wir einen Titel ein und drücken dann auf [Create]
+      funktioniert die Eingabe.</para>
+    </section>
+
+    <section>
+      <title>Woher kommt die Fehlermeldung?</title>
+
+      <para>Das Abspeichern eines neuen Datensatzes passiert durch die Methode
+      <methodname>create</methodname>. Ein Auszug aus
+      <filename>app/controllers/dvds_controller.rb</filename> <programlisting>  # POST /dvds
+  # POST /dvds.xml
+  def create
+    @dvd = Dvd.new(params[:dvd])
+
+    respond_to do |format|
+      if @dvd.save
+        flash[:notice] = 'Dvd was successfully created.'
+        format.html { redirect_to(@dvd) }
+        format.xml  { render :xml =&gt; @dvd, :status =&gt; :created, :location =&gt; @dvd }
+      else
+        format.html { render :action =&gt; "new" }
+        format.xml  { render :xml =&gt; @dvd.errors, :status =&gt; :unprocessable_entity }
+      end
+    end
+  end
+</programlisting></para>
+
+      <para>Wenn wir versuchen einen Datensatz ohne Titel abzuspeichern, dann
+      sehen wir im Log den folgenden Eintrag:<screen>Processing DvdsController#create (for 127.0.0.1 at 2009-12-25 18:04:31) [POST]
+  Parameters: {"authenticity_token"=&gt;"hiG204KAXr0eT4NtKX4kGCvibkQlaolcgtcykDE2Fiw=", "dvd"=&gt;{"title"=&gt;"", "production_year"=&gt;"", "duration"=&gt;"", "plot"=&gt;"", "rating"=&gt;""}, "commit"=&gt;"Create"}
+Rendering template within layouts/dvds
+Rendering dvds/new
+Completed in 29ms (View: 5, DB: 0) | 200 OK [http://localhost/dvds]
+</screen></para>
+
+      <para>Die Methode <methodname>create</methodname> legt als erstes eine
+      neue DVD-Instance mit dem Namen <varname>@dvd</varname> und den Werten
+      aus dem Parameter <varname>dvd</varname> an:<programlisting>@dvd = Dvd.new(params[:dvd])</programlisting></para>
+
+      <para>Drei Zeilen tiefer wird versucht mit der Methode
+      <methodname>save</methodname> dieses Objekt abzuspeichern. Das Ergebnis
+      ist <code>true</code> oder <code>false</code> und wird von einem
+      <application>if</application> ausgewertet:<programlisting>if @dvd.save</programlisting></para>
+
+      <para>Konnte das Objekt wegen Validierungsfehlern nicht abgespeichert
+      werden, ist das Ergebnis <varname>false</varname> und Rails rendert die
+      new-Seite:<programlisting>format.html { render :action =&gt; "new" }</programlisting></para>
+
+      <para>Hier noch mal der Code von
+      <filename>apps/views/dvds/new.html.erb</filename>:<programlisting>&lt;h1&gt;New dvd&lt;/h1&gt;
+
+&lt;% form_for(@dvd) do |f| %&gt;
+  &lt;%= f.error_messages %&gt;
+
+  &lt;p&gt;
+    &lt;%= f.label :title %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :title %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :production_year %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :production_year %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :duration %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :duration %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :plot %&gt;&lt;br /&gt;
+    &lt;%= f.text_area :plot %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :rating %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :rating %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.submit 'Create' %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+
+&lt;%= link_to 'Back', dvds_path %&gt;</programlisting></para>
+
+      <para>In der 4. Zeile steht der Eintrag mit dem die entsprechende
+      Fehlermeldung ausgegeben wird:<programlisting>&lt;%= f.error_messages %&gt;</programlisting></para>
+
+      <para><code>f.error_messages</code> für an dieser Stelle den folgenden
+      HTML-Code ein:<programlisting>&lt;div class="errorExplanation" id="errorExplanation"&gt;
+&lt;h2&gt;1 error prohibited this dvd from being saved&lt;/h2&gt;
+&lt;p&gt;There were problems with the following fields:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Title can't be blank&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</programlisting></para>
+    </section>
+  </section>
+
+  <section>
+    <title>Maximal 5 Sterne</title>
+
+    <para>Unser Bewertungssystem sieht für den Inhalt des Feldes rating
+    minimal 0 und maximal 5 Sterne vor. Das können wir mit
+    <code>"validates_numericality_of :rating, :only_integer =&gt; true,
+    :greater_than_or_equal_to =&gt; 0, :less_than_or_equal_to =&gt; 5"</code>
+    realisieren:<programlisting>class Dvd &lt; ActiveRecord::Base
+  # Validierungen
+  #
+  validates_presence_of :title
+  validates_numericality_of :rating, :only_integer =&gt; true, :greater_than_or_equal_to =&gt; 0, :less_than_or_equal_to =&gt; 5
+end
+</programlisting></para>
+
+    <para>Probieren wir es mal in der Console aus:<screen>sw@debian:~/dvd-sammlung$ <command>./script/console</command> 
+Loading development environment (Rails 2.3.5)
+&gt;&gt; <command>goldfinger = Dvd.new</command>
+=&gt; #&lt;Dvd id: nil, title: nil, production_year: nil, duration: nil, plot: nil, rating: nil, created_at: nil, updated_at: nil&gt;
+&gt;&gt; <command>goldfinger.title = 'Goldfinger'</command>
+=&gt; "Goldfinger"
+&gt;&gt; <command>goldfinger.save</command>
+=&gt; false
+&gt;&gt; <command>goldfinger.rating = 5</command>
+=&gt; 5
+&gt;&gt; <command>goldfinger.save</command>
+=&gt; true
+&gt;&gt; <command>exit</command>
+sw@debian:~/dvd-sammlung$</screen></para>
+
+    <section>
+      <title>nil soll möglich sein</title>
+
+      <para>Dummerweise können wir jetzt nur DVDs aufnehmen, zu denen wir auch
+      schon eine konkrete Bewertung haben. Was ist aber mit denen, die wir uns
+      noch gar nicht angeschaut haben? Da wäre rein logisch die Bewertung
+      <varname>nil</varname>. Also fügen wir eine entsprechende Erweitung in
+      die Validierung ein:<programlisting>class Dvd &lt; ActiveRecord::Base
+  # Validierungen
+  #
+  validates_presence_of :title
+  validates_numericality_of :rating, :only_integer =&gt; true, :greater_than_or_equal_to =&gt; 0, :less_than_or_equal_to =&gt; 5, :allow_nil =&gt; true
+end
+</programlisting></para>
+
+      <para>Auch hier wieder der Test in der Console:<screen>sw@debian:~/dvd-sammlung$ <command>./script/console</command> 
+Loading development environment (Rails 2.3.5)
+&gt;&gt; <command>new_bond = Dvd.new</command>
+=&gt; #&lt;Dvd id: nil, title: nil, production_year: nil, duration: nil, plot: nil, rating: nil, created_at: nil, updated_at: nil&gt;
+&gt;&gt; <command>new_bond.title = 'Quantum of Solace'</command>
+=&gt; "Quantum of Solace"
+&gt;&gt; <command>new_bond.save</command>
+=&gt; true
+&gt;&gt; <command>exit</command>
+sw@debian:~/dvd-sammlung$ </screen></para>
+    </section>
+
+    <section>
+      <title>Mehr Übersichtlichkeit</title>
+
+      <para>Sie können die Validierung auch in mehreren Zeilen auftrennen.
+      Ruby versteht, das nach einem Komma noch etwas kommt und parst dann die
+      nächste Zeile mit. So sieht die <filename>app/models/dvd.rb</filename>
+      Datei schöner formatiert so aus:<programlisting>class Dvd &lt; ActiveRecord::Base
+  # Validierungen
+  #
+  validates_presence_of :title
+  validates_numericality_of :rating, 
+                            :only_integer =&gt; true, 
+                            :greater_than_or_equal_to =&gt; 0, 
+                            :less_than_or_equal_to =&gt; 5, 
+                            :allow_nil =&gt; true
+end
+</programlisting></para>
+    </section>
+  </section>
+
+  <section>
+    <title>Produktionsjahr</title>
+
+    <para>Filme gibt es erst seit rund 1880 und wir können keinen Film aus der
+    Zukunft sehen. Allerdings kann es sein, das wir das Produktionsjahr nicht
+    kennen und deshalb soll <varname>nil</varname> erlaubt sein. </para>
+
+    <para>Da die Datei <filename>app/models/dvd.rb</filename> normaler
+    Ruby-Code ist, der bei der Abfrage der Seite ausgeführt wird, können wir
+    dort für das aktuelle Jahr den Wert <code>Time.now.year</code>
+    eintragen.<note>
+        <para><command>ri Time.now</command> und <command>ri
+        Time.year</command> </para>
+
+        <para>Da <methodname>now</methodname> und
+        <methodname>year</methodname> beides Methoden der Class
+        <classname>Time</classname> sind, kann man beide auch hintereinander
+        verknüpfen.</para>
+      </note></para>
+
+    <para>Die neue <filename>app/models/dvd.rb</filename> sieht dann so
+    aus:<programlisting>class Dvd &lt; ActiveRecord::Base
+  # Validierungen
+  #
+  validates_presence_of :title
+  validates_numericality_of :rating, 
+                            :only_integer =&gt; true, 
+                            :greater_than_or_equal_to =&gt; 0, 
+                            :less_than_or_equal_to =&gt; 5, 
+                            :allow_nil =&gt; true
+  validates_numericality_of :production_year, 
+                            :only_integer =&gt; true, 
+                            :greater_than_or_equal_to =&gt; 1880, 
+                            :less_than_or_equal_to =&gt; Time.now.year, 
+                            :allow_nil =&gt; true
+end
+</programlisting></para>
+  </section>
+
+  <section>
+    <title>Weitere Validierungsmöglichkeiten</title>
+
+    <para>Bezüglich der Validierung von Datensätzen sind der Phantasie kaum
+    Grenzen gesetzt. Im Laufe der nächsten Kapitel werden wir bei Bedarf
+    weitere Spezialfälle behandeln. </para>
+
+    <para>An sonsten finden Sie wie immer auch mit ri Hilfe und gute Beispiele
+    zu diesem Thema:<screen>sw@debian:~/dvd-sammlung$ <command>ri ActiveRecord::Validations::ClassMethods</command>
+------------------------- Class: ActiveRecord::Validations::ClassMethods
+     Active Record classes can implement validations in several ways.
+     The highest level, easiest to read, and recommended approach is to
+     use the declarative +validates_..._of+ class methods (and
+     +validates_associated+) documented below. These are sufficient for
+     most model validations.
+
+     Slightly lower level is +validates_each+. It provides some of the
+     same options as the purely declarative validation methods, but like
+     all the lower-level approaches it requires manually adding to the
+     errors collection when the record is invalid.
+
+     At a yet lower level, a model can use the class methods +validate+,
+     +validate_on_create+ and +validate_on_update+ to add validation
+     methods or blocks. These are ActiveSupport::Callbacks and follow
+     the same rules of inheritance and chaining.
+
+     The lowest level style is to define the instance methods
+     +validate+, +validate_on_create+ and +validate_on_update+ as
+     documented in ActiveRecord::Validations.
+
+
+validate, validate_on_create and validate_on_update Class Methods
+-----------------------------------------------------------------
+
+     Calls to these methods add a validation method or block to the
+     class. Again, this approach is recommended only when the
+     higher-level methods documented below (+validates_..._of+ and
+     +validates_associated+) are insufficient to handle the required
+     validation.
+
+     This can be done with a symbol pointing to a method:
+
+       class Comment &lt; ActiveRecord::Base
+         validate :must_be_friends
+     
+         def must_be_friends
+           errors.add_to_base("Must be friends to leave a comment") unless comme
+nter.friend_of?(commentee)
+         end
+       end
+
+     Or with a block which is passed the current record to be validated:
+
+       class Comment &lt; ActiveRecord::Base
+         validate do |comment|
+           comment.must_be_friends
+         end
+     
+         def must_be_friends
+           errors.add_to_base("Must be friends to leave a comment") unless comme
+nter.friend_of?(commentee)
+         end
+       end
+
+     This usage applies to +validate_on_create+ and +validate_on_update+
+     as well.
+
+------------------------------------------------------------------------
+
+
+Constants:
+----------
+
+     ALL_NUMERICALITY_CHECKS = { :greater_than =&gt; '&gt;',
+     :greater_than_or_equal_to =&gt; '&gt;=',                                 
+      :equal_to =&gt; '==', :less_than =&gt; '&lt;', :less_than_or_equal_to =&gt;
+     '&lt;=',                                   :odd =&gt; 'odd?', :even =&gt;
+     'even?' }.freeze
+     ALL_RANGE_OPTIONS = [ :is, :within, :in, :minimum, :maximum
+     ].freeze
+     DEFAULT_VALIDATION_OPTIONS = {         :on =&gt; :save,        
+     :allow_nil =&gt; false,         :allow_blank =&gt; false,        
+     :message =&gt; nil       }.freeze
+
+
+Instance methods:
+-----------------
+
+     create!, validates_acceptance_of, validates_associated,
+     validates_confirmation_of, validates_each, validates_exclusion_of,
+     validates_format_of, validates_inclusion_of, validates_length_of,
+     validates_numericality_of, validates_presence_of,
+     validates_size_of, validates_uniqueness_of
+sw@debian:~/dvd-sammlung$</screen></para>
+  </section>
+</chapter>
