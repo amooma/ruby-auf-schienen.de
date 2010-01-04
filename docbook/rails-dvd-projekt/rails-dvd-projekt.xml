@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="alles-einsteigen"
+<chapter version="5.0" xml:id="dvd-katalog"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -7,7 +7,7 @@
          xmlns:m="http://www.w3.org/1998/Math/MathML"
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
-  <title>Alles einsteigen!</title>
+  <title>1. Rails-Projekt =&gt; DVD-Katalog</title>
 
   <para>Nachdem Sie sich im letzten Kapitel mühsam in die Ruby-Grundlagen
   eingelesen haben, können wir jetzt spannender weitermachen. In diesem
@@ -19,8 +19,13 @@
   MVC (Model-View-Controller)?". Ich habe mich für den "Wir fangen mal an und
   erklären bei der Arbeit."-Ansatz entschieden.</para>
 
-  <section xml:id="drei-verschiedene-umgebungen">
-    <title>Development Umgebung</title>
+  <para>Um endlich mal Ordnung in unsere DVD-Sammlung - ich höre schon die
+  Stimmen "Wie, die benutzen immer noch DVDs und keine Blue-Rays?" - zu
+  bringen erstellen wir ein Rails-Projekt, das uns bei der Verwaltung
+  hilft.</para>
+
+  <section xml:id="arbeits-umgebung-development">
+    <title>Arbeits-Umgebung (Development)</title>
 
     <para>Rails kennt drei verschiedene Arbeits-Umgebungen:<itemizedlist>
         <listitem>
@@ -57,28 +62,14 @@
     Development-Umgebung.</para>
   </section>
 
-  <section xml:id="dvd-projektbeschreibung">
-    <title>Projektbeschreibung</title>
-
-    <para>Um endlich mal Ordnung in unsere DVD-Sammlung - ich höre schon die
-    Stimmen "Wie, die benutzen immer noch DVDs und keine Blue-Rays?" - zu
-    bringen erstellen wir ein Rails-Projekt, das uns bei der Verwaltung
-    hilft.</para>
-
-    <section>
-      <title>Erst mal keine Authentifizierung</title>
-
-      <para>Bei diesem ersten Projekt verzichten wir bewusst auf eine
-      Authentifizierung des Users. Dies folgt in späteren Kapiteln. Es geht
-      jetzt erst mal um das Grundverständnis für Rails.</para>
-    </section>
-  </section>
-
-  <section xml:id="dvd-neues-projekt-erstellen">
-    <title>Ein neues Rails-Projekt erstellen</title>
+  <section xml:id="dvd-neues-projekt-anfangen">
+    <title>Ein neues Rails-Projekt anfangen</title>
 
     <para>Als aller erstes müssen wir mal ein neues Rails-Projekt erstellen.
-    Das geht aber ratz-fatz:<screen>sw@debian:~$ <command>rails dvd-sammlung</command>
+    Da Ruby on Rails ein Framework ist, müssen wir erst mal die entsprechende
+    Verzeichnisstruktur und die Grundkonfiguration inkl. einiger Skripte
+    einrichten. Das geht aber mit dem <command>rails projektname</command>
+    ratz-fatz:<screen>sw@debian:~$ <command>rails dvd-sammlung</command>
       create  
       create  app/controllers
       create  app/helpers
@@ -155,6 +146,15 @@
       create  log/development.log
       create  log/test.log
 sw@debian:~$ </screen></para>
+
+    <tip>
+      <para>Bitte überprüfen Sie an dieser Stelle, ob Sie auch wirklich mit
+      der Ruby Version 1.9 und Rails 2.3.x arbeiten (<command>ruby
+      -v</command> und <command>rails -v</command>). An sonsten werden Sie
+      irgendwann in Merkwürdigkeiten laufen. Falls Sie beides noch nicht
+      installiert haben finden Sie im <link linkend='installation-und-versionsauswahl'>ersten Kapitel</link> weitere Infos
+      dazu.</para>
+    </tip>
 
     <para>Als erstes (so sollte man sich das direkt angewöhnen) prüfen wir
     mal, ob die Installation funktioniert. Dazu starten wir den mitgelieferten
@@ -238,7 +238,7 @@ Database schema version 0</screen></para>
 Exiting
 sw@debian:~/dvd-sammlung$</screen></para>
 
-    <section>
+    <section xml:id="andere-ip-oder-port">
       <title>Andere IP-Adresse oder Port gewünscht?</title>
 
       <para>Per default antwortet der eingebaute Rails-Webserver auf die
@@ -281,7 +281,7 @@ sw@debian:~/dvd-sammlung$</screen></para>
       http://192.168.248.134:3000 ansteuerbar.</para>
     </section>
 
-    <section>
+    <section xml:id="es-laeuft-schon-ein-webserver">
       <title>Es läuft schon ein Webserver</title>
 
       <para>Einer der Gründe für das initiale Starten des Webservers am Anfang
@@ -318,7 +318,7 @@ sw@debian:~/dvd-sammlung$ </programlisting></para>
       Entwickeln. ;-)</para>
     </section>
 
-    <section>
+    <section xml:id="logging">
       <title>Logging</title>
 
       <para>In der Datei <filename>log/development.log</filename> finden Sie
@@ -335,27 +335,27 @@ Processing Rails::InfoController#properties (for 127.0.0.1 at 2009-12-25 12:30:5
 
 Completed in 23ms (View: 4, DB: 1) | 200 OK [http://localhost/rails/info/properties]
 </screen></para>
-    </section>
 
-    <section>
-      <title>Statische und dynamisch generierte Seiten</title>
+      <section xml:id="logging-statische-oder-dynamische-seite">
+        <title>Statische und dynamisch generierte Seiten</title>
 
-      <para>Statische Seite wie die default <filename>index.html</filename>
-      oder auch die 404.html Fehler-Seite liegen im Unterverzeichnis
-      public<screen>sw@debian:~/dvd-sammlung$ <command>ls public</command>
+        <para>Statische Seite wie die default <filename>index.html</filename>
+        oder auch die 404.html Fehler-Seite liegen im Unterverzeichnis
+        public<screen>sw@debian:~/dvd-sammlung$ <command>ls public</command>
 404.html  500.html     images      javascripts  stylesheets
 422.html  favicon.ico  index.html  robots.txt
 sw@debian:~/dvd-sammlung$</screen></para>
 
-      <para>Die Auslieferung einer solchen Seite oder einer Datei aus diesem
-      Verzeichnis wird nicht im <filename>log/development.log</filename>
-      angezeigt. Übrigens haben die Dateien im public-Verzeichnis eine höhere
-      Prio, als die dynamisch gerenderten Seiten. Falls Sie also zwei Seiten
-      mit dem gleichen Namen haben, dann wird Rails die statische Variante
-      ausliefern. Deshalb werden Sie später die
-      <filename>index.html</filename> Seite entweder umbenennen oder ganz
-      löschen müssen (sonst würde Ihre Applikation immer nur mit dieser
-      statischen Webseite starten).</para>
+        <para>Die Auslieferung einer solchen Seite oder einer Datei aus diesem
+        Verzeichnis wird nicht im <filename>log/development.log</filename>
+        angezeigt. Übrigens haben die Dateien im public-Verzeichnis eine
+        höhere Prio, als die dynamisch gerenderten Seiten. Falls Sie also zwei
+        Seiten mit dem gleichen Namen haben, dann wird Rails die statische
+        Variante ausliefern. Deshalb werden Sie später die
+        <filename>index.html</filename> Seite entweder umbenennen oder ganz
+        löschen müssen (sonst würde Ihre Applikation immer nur mit dieser
+        statischen Webseite starten).</para>
+      </section>
     </section>
   </section>
 
