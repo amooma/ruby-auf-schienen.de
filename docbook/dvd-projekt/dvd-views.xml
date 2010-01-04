@@ -46,7 +46,7 @@ sw@debian:~/dvd-sammlung$</screen></para>
       Verzeichnis <filename>app/views/dvds/</filename> eingebaut werden. Die
       Datei <filename>app/views/layouts/dvds.html.erb</filename> wurde
       automatisch beim <link linkend="dvd-scaffolding">Scaffolding</link>
-      erstellt. Schauen wir mal rein:<programlisting linenumbering="numbered">&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+      erstellt. Schauen wir mal rein:<programlisting>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
 
 &lt;html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"&gt;
@@ -64,6 +64,314 @@ sw@debian:~/dvd-sammlung$</screen></para>
 &lt;/body&gt;
 &lt;/html&gt;
 </programlisting></para>
+
+      <para>Ich gehe davon aus, das Sie HTML lesen können und prinzipiell
+      verstehen, was in dieser Datei enthalten ist. Gehen wir also nur auf die
+      Rails-Spezialitäten ein.</para>
+
+      <section xml:id="controller-action-name">
+        <title>&lt;%= controller.action_name %&gt; (Zeile 7)</title>
+
+        <para>Leider ist das ein Wert, den wir nicht in der Console
+        nachstellen können (da er nur im Live-Betrieb sinnvolle Werte
+        enthält). Glücklicherweise ist er aber sehr selbstredend. An dieser
+        Stelle wir die aktuelle RESTful Aktion angezeigt. Also Edit, Index,
+        New oder Show.</para>
+      </section>
+
+      <section xml:id="stlyesheet-link-tag-scaffold">
+        <title>&lt;%= stylesheet_link_tag 'scaffold' %&gt; (Zeile 8)</title>
+
+        <para>Mit dem Helper stylesheet_link_tag wird ein CSS-Stylesheet
+        eingebunden. Das hier automatisch eingebundene Stylesheet können Sie
+        auf der Linux-Shell mit <application>find</application>
+        finden:<screen>sw@debian:~/dvd-sammlung$ <command>find . -name "scaffold.css"</command>
+./public/stylesheets/scaffold.css
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Dieses Default
+        <filename>public/stylesheets/scaffold.css</filename> ist recht
+        übersichtlich. Sie können es nach belieben verändern oder auch an
+        dieser Stelle auf ein anderes CSS-File verweisen.<programlisting>body { background-color: #fff; color: #333; }
+
+body, p, ol, ul, td {
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size:   13px;
+  line-height: 18px;
+}
+
+pre {
+  background-color: #eee;
+  padding: 10px;
+  font-size: 11px;
+}
+
+a { color: #000; }
+a:visited { color: #666; }
+a:hover { color: #fff; background-color:#000; }
+
+.fieldWithErrors {
+  padding: 2px;
+  background-color: red;
+  display: table;
+}
+
+#errorExplanation {
+  width: 400px;
+  border: 2px solid red;
+  padding: 7px;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  background-color: #f0f0f0;
+}
+
+#errorExplanation h2 {
+  text-align: left;
+  font-weight: bold;
+  padding: 5px 5px 5px 15px;
+  font-size: 12px;
+  margin: -7px;
+  background-color: #c00;
+  color: #fff;
+}
+
+#errorExplanation p {
+  color: #333;
+  margin-bottom: 0;
+  padding: 5px;
+}
+
+#errorExplanation ul li {
+  font-size: 12px;
+  list-style: square;
+}
+</programlisting></para>
+      </section>
+
+      <section xml:id="flash-notice">
+        <title>&lt;%= flash[:notice] %&gt; (Zeile 12)</title>
+
+        <para>Der Begriff flash ist meiner Meinung nach selten unglücklich
+        gewählt. Die meisten Nicht-Rails-User denken bei Flash direkt an
+        Adobe-Flash und nicht an Rails-Flash.</para>
+
+        <para>Rails-Flash ist die Nachricht, die Sie angezeigt bekommen, wenn
+        Sie zum Beispiel einen neuen Datensatz abgespeichert haben. Per
+        default ist Sie in einem Kasten mit leicht grünen Hintergrund. Dort
+        steht bei unserem DVD-Model nach dem Anlegen einer neuen DVD "Dvd was
+        successfully created.". Diese Nachricht wurde im DVD-Controller
+        (app/controller/dvds_controller.rb) in der create-Methode
+        gesetzt:<programlisting>  # POST /dvds
+  # POST /dvds.xml
+  def create
+    @dvd = Dvd.new(params[:dvd])
+
+    respond_to do |format|
+      if @dvd.save
+        <emphasis>flash[:notice] = 'Dvd was successfully created.'</emphasis>
+        format.html { redirect_to(@dvd) }
+        format.xml  { render :xml =&gt; @dvd, :status =&gt; :created, :location =&gt; @dvd }
+      else
+        format.html { render :action =&gt; "new" }
+        format.xml  { render :xml =&gt; @dvd.errors, :status =&gt; :unprocessable_entity }
+      end
+    end
+  end
+</programlisting></para>
+
+        <para>Dort sehen Sie in der Zeile 8 das der Hash
+        <varname>flash[:notice]</varname> mit genau diesem String gefüllt
+        wird. Das interessante an einem Flash ist die Eigenschaft, das der
+        Inhalt eines flash-Hashes erst beim View angezeigt und so lange
+        mitgeschleppt wird. Die <methodname>create</methodname>-Methode legt
+        den Datensatz an, aber rendert nicht selbstständig einen View. Anstatt
+        wird in Zeile 9 ein Redirect zur <methodname>show</methodname>-Methode
+        getriggert. Erst die show-Methode rendert den show-View und darin dann
+        auch <varname>flash[:notice]</varname>.</para>
+
+        <para>Probieren Sie es am besten mal durch den neuen Eintrag einer DVD
+        aus.</para>
+      </section>
+
+      <section xml:id="yield">
+        <title>&lt;%= yield %&gt; (Zeile 14)</title>
+
+        <para>Yield rendert die entsprechende View-Datei und fügt sie an
+        dieser Stelle ein.</para>
+      </section>
+    </section>
+
+    <section xml:id="ein-layout-fuer-die-gesamte-application">
+      <title>Ein Layout für die gesamte Application</title>
+
+      <para>Scafolding legt per default pro Model auch eine eigene
+      Layout-Datei an. In den meisten Fällen ist es praktisch diese Datei
+      direkt zu löschen und stattdessen eine
+      <filename>app/views/layouts/applications.html.erb</filename> Datei
+      anzugelegen. Diese Datei gilt dann für alle Views unabhängig vom
+      Controller. So können Sie leicht ein einheitliches Layout
+      realisieren.</para>
+    </section>
+  </section>
+
+  <section xml:id="views-anpassen">
+    <title>Views customizen</title>
+
+    <para>Es gibt bei allen Views prinzipiell zwei Dateien, die wir für
+    Layoutanpassungen benutzen können:<itemizedlist>
+        <listitem>
+          <para>Die View-Datei selber.</para>
+        </listitem>
+
+        <listitem>
+          <para>Die Layout-Datei.</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>Über Geschmack und Ergonomie lässt sich oft trefflich streiten. Es
+    geht in diesem Kapitel aber nicht um "bestes Webdesign", sondern um den
+    prinzipiellen Weg. Was Sie damit später in Ihrer Applikation machen,
+    bleibt Ihnen überlassen. Ich werde gezielt nur einfache Änderungen
+    machen.</para>
+
+    <para>Die angezeigten Datensätze wurden mit der
+    <filename>db/seeds.rb</filename> Datei aus <xref linkend="dvd-seeds" />
+    erstelle. </para>
+
+    <section xml:id="index-view-anpassen">
+      <title>Index-View anpassen</title>
+
+      <para>Per Default Scaffolding sieht unsere Index-Ansicht wie folgt
+      aus:<screen>sw@debian:~/dvd-sammlung$ w3m -dump http://0.0.0.0:3000/dvds
+Received cookie: _dvd-sammlung_session=BAh7BzoPc2Vzc2lvbl9pZCIlYWY3YjlmZGIxMmM4NTk2ZjI3MTZmZGFhZWQ2ZTUzMTE6EF9jc3JmX3Rva2VuSSIxNU5Cc1lFVkxraHRtbldRa2tiOFR4a0pKeEh6bnpPRzJhOTlzcjQwUTNsZz0GOg1lbmNvZGluZyINVVMtQVNDSUk%3D--747d803a3f9fff004a404dad1f88b66e294dca2a
+Listing dvds
+
+       Title         Production year Duration Plot Rating
+The Terminator       1984                                 Show Edit Destroy
+Terminator 2         1992                                 Show Edit Destroy
+Terminator Salvation 2009                                 Show Edit Destroy
+Rain Man             1988                          5      Show Edit Destroy
+War of the Worlds    2005                          4      Show Edit Destroy
+Collateral           2004                          5      Show Edit Destroy
+Miami Vice           2006                          5      Show Edit Destroy
+Hancock              2008                          4      Show Edit Destroy
+The Aviator          2004                          4      Show Edit Destroy
+Some Like It Hot     1959                          5      Show Edit Destroy
+W.                   2008                          4      Show Edit Destroy
+Iron Man             2008                          5      Show Edit Destroy
+The Dark Knight      2008                          5      Show Edit Destroy
+
+
+New dvd
+sw@debian:~/dvd-sammlung$</screen></para>
+
+      <para>Rechts neben der DVD-Tabelle werden immer Links auf die Methoden
+      Show, Edit und Destroy angezeigt. Das ist in der Index-Tabelle irgendwie
+      deplaziert. Wir werden folgendes machen:<itemizedlist>
+          <listitem>
+            <para>Der Titel eines Films wird mit der Show-Methode des Filmes
+            verlinkt.</para>
+          </listitem>
+
+          <listitem>
+            <para>Die Links zu Show, Edit und Destroy werden gelöscht.</para>
+          </listitem>
+
+          <listitem>
+            <para>Das Produktionsjahr wird in Klammern hinter den Filmtitel
+            geschrieben.</para>
+          </listitem>
+
+          <listitem>
+            <para>Die Überschriften der Tabelle werden optimiert.</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <section>
+        <title>Default app/views/dvds/index.html.erb</title>
+
+        <para>Die vom Scaffolding-Skript angelegte Default Datei für die
+        index-Methode sieht wie folgt aus:<programlisting>&lt;h1&gt;Listing dvds&lt;/h1&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Title&lt;/th&gt;
+    &lt;th&gt;Production year&lt;/th&gt;
+    &lt;th&gt;Duration&lt;/th&gt;
+    &lt;th&gt;Plot&lt;/th&gt;
+    &lt;th&gt;Rating&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @dvds.each do |dvd| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%=h dvd.title %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%=h dvd.production_year %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%=h dvd.duration %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%=h dvd.plot %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%=h dvd.rating %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Show', dvd %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Edit', edit_dvd_path(dvd) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', dvd, :confirm =&gt; 'Are you sure?', :method =&gt; :delete %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+
+&lt;br /&gt;
+
+&lt;%= link_to 'New dvd', new_dvd_path %&gt;</programlisting></para>
+      </section>
+
+      <section>
+        <title>Neue app/views/dvds/index.html.erb</title>
+
+        <para>Unsere neue index-View sieht wie folgt aus:<programlisting>&lt;h1&gt;Listing dvds&lt;/h1&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Title (Production Year)&lt;/th&gt;
+    &lt;th&gt;Duration&lt;/th&gt;
+    &lt;th&gt;Plot&lt;/th&gt;
+    &lt;th&gt;Rating&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @dvds.each do |dvd| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= link_to dvd.title, dvd %&gt; (&lt;%=h dvd.production_year %&gt;)&lt;/td&gt;
+    &lt;td&gt;&lt;%=h dvd.duration %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%=h dvd.plot %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%=h dvd.rating %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+
+&lt;br /&gt;
+
+&lt;%= link_to 'New dvd', new_dvd_path %&gt;
+</programlisting></para>
+
+        <para>Und sieht später im Browser wie folgt aus:<screen>sw@debian:~/dvd-sammlung$ <command>w3m -dump http://0.0.0.0:3000/dvds</command>
+Received cookie: _dvd-sammlung_session=BAh7BjoPc2Vzc2lvbl9pZCIlMWFjNGFjNjNkM2Y2MjBlYTExYWJmYzZjOTI3OTI3Zjg%3D--37d20b23033911a041510f873a2ae4a437abd4fb
+Listing dvds
+
+  Title (Production Year)   Duration Plot Rating
+The Terminator (1984)
+Terminator 2 (1992)
+Terminator Salvation (2009)
+Rain Man (1988)                           5
+War of the Worlds (2005)                  4
+Collateral (2004)                         5
+Miami Vice (2006)                         5
+Hancock (2008)                            4
+The Aviator (2004)                        4
+Some Like It Hot (1959)                   5
+W. (2008)                                 4
+Iron Man (2008)                           5
+The Dark Knight (2008)                    5
+
+
+New dvd
+sw@debian:~/dvd-sammlung$</screen></para>
+      </section>
     </section>
   </section>
 </chapter>
