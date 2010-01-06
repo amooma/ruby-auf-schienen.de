@@ -400,9 +400,9 @@ sw@debian:~/dvd-sammlung$</screen></para>
               <filename>app/models/dvd.rb</filename> Datei:<programlisting>class Dvd &lt; ActiveRecord::Base
   def hh_mm
     return 'NA' if duration.blank?
-    hours = duration / 60    
-    minutes = duration - (hours * 60)
-    hours.to_s + ':%.2d' % minutes
+    hh = duration / 60    
+    mm = duration - (hh * 60)
+    hh.to_s + ':%.2d' % mm
   end
 end
 </programlisting></para>
@@ -454,6 +454,86 @@ The Dark Knight (2008)      NA            *****
 
 
 New dvd
+sw@debian:~/dvd-sammlung$</screen></para>
+      </section>
+
+      <section>
+        <title>Helpers vs. Methoden</title>
+
+        <para>Sie werden sich vielleicht gefragt haben, warum wir für die
+        Anzeige der Bewertung (rating) einen Helper und für die Anzeige der
+        Zeit eine Methode genommen haben. Darüber habe ich selber auch lange
+        nachgedacht.<footnote>
+            <para>Ein Dank an David Vrensk, der mir den entscheidenen Tipp
+            gegeben hat.</para>
+          </footnote> Wie so oft kann man in Rails beides nehmen. Bei den
+        Sternen für das Rating ist die Sache klar. Aber bei der Methode für
+        die Zeit ist die Argumentation wie folgt.</para>
+
+        <para>Die Anzeige in Sternen ist eine Einwegstrasse. Wir werden nie
+        das Rating in Sternen eingeben. Bei der hh:mm Anzeige ist das aber
+        etwas anderes. Es macht durch aus Sinn zu der Getter-Methode
+        <methodname>hh_mm</methodname> auch noch eine Setter-Methode
+        <methodname>hh_mm =</methodname> zu setzen. Damit können wir dann auch
+        die <varname>duration</varname> in Stunden und Minuten setzten.</para>
+
+        <para>Die neue <filename>app/models/dvd.rb</filename> sieht das so
+        aus:<programlisting>class Dvd &lt; ActiveRecord::Base
+  # Getter method for the duration
+  #
+  # Example:
+  # self.duration = 108 =&gt; '1:48'
+  #
+  def hh_mm
+    return 'NA' if self.duration.blank?
+    minutes_to_hh_mm(self.duration)
+  end
+
+  # Setter method for the duration
+  #
+  # Example:
+  # hh_mm = '1:48' =&gt; self.duration = 108
+  #
+  def hh_mm=(input = nil)
+    if input.blank? or input.upcase == 'NA'
+      self.duration = nil
+    else 
+      duration_array = input.split(/:/)
+      self.duration = duration_array[0].to_i * 60 + duration_array[1].to_i
+      self.duration = nil if minutes_to_hh_mm(duration) != input
+    end
+  end
+
+private
+  def minutes_to_hh_mm(minutes = nil)
+    return nil if minutes.blank? or minutes.to_s.to_i != minutes
+    hh = minutes / 60    
+    mm = minutes - (hh * 60)
+    hh.to_s + ':%.2d' % mm
+  end
+end
+</programlisting>Kurze Erklärung: Wir verschieben die eigentliche
+        Konvertierung in die private Methode
+        <methodname>minutes_to_hh_mm</methodname>. Somit können wir diese
+        sowohl bei der Getter-Methode zum konvertieren, wie auch als
+        zusätzliche Überprüfung, ob die Setter-Methode funktioniert,
+        benutzen.</para>
+
+        <para>Probieren wir das mal in der Console aus. Als ersten suchen wir
+        einen Film und dann speichern wir die Länge nicht in Minuten, sondern
+        als String '1:48' für eine Stunde und 48 Minuten.<screen>sw@debian:~/dvd-sammlung$ <command>./script/console</command> 
+Loading development environment (Rails 2.3.5)
+&gt;&gt; <command>terminator = Dvd.find_by_title('The Terminator')</command>
+=&gt; #&lt;Dvd id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-01-03 06:17:32", updated_at: "2010-01-03 06:17:32"&gt;
+&gt;&gt; <command>terminator.hh_mm = '1:48'</command>
+=&gt; "1:48"
+&gt;&gt; <command>terminator</command>
+=&gt; #&lt;Dvd id: 1, title: "The Terminator", production_year: 1984, duration: 108, plot: nil, rating: nil, created_at: "2010-01-03 06:17:32", updated_at: "2010-01-03 06:17:32"&gt;
+&gt;&gt; <command>terminator.hh_mm</command>
+=&gt; "1:48"
+&gt;&gt; <command>terminator.save</command>
+=&gt; true
+&gt;&gt; <command>exit</command>
 sw@debian:~/dvd-sammlung$</screen></para>
       </section>
     </section>
