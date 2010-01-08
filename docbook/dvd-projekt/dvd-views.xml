@@ -477,7 +477,7 @@ sw@debian:~/dvd-sammlung$</screen></para>
         <methodname>hh_mm =</methodname> zu setzen. Damit können wir dann auch
         die <varname>duration</varname> in Stunden und Minuten setzten.</para>
 
-        <para>Die neue <filename>app/models/dvd.rb</filename> sieht das so
+        <para>Die neue <filename>app/models/dvd.rb</filename> sieht dann so
         aus:<programlisting>class Dvd &lt; ActiveRecord::Base
   # Getter method for the duration
   #
@@ -535,6 +535,143 @@ Loading development environment (Rails 2.3.5)
 =&gt; true
 &gt;&gt; <command>exit</command>
 sw@debian:~/dvd-sammlung$</screen></para>
+      </section>
+    </section>
+
+    <section>
+      <title>New View anpassen</title>
+
+      <para>Schauen wir uns als erstes mal den vom Scaffold-Skript erstellten
+      View an:<screen>sw@debian:~$ <command>w3m -dump http://localhost:3000/dvds/new</command>
+Received cookie: _dvd-sammlung_session=BAh7BzoPc2Vzc2lvbl9pZCIlMGM1ODVjMzgzN2UzOTM1YmJlMTYyOTAwMDBjNjNhOWU6EF9jc3JmX3Rva2VuSSIxM1ZadDhETmJ1VllkeWtTZExNZ3FlSUtVd0N0c1c4U3pzNERWaDZ1cU5OTT0GOg1lbmNvZGluZyINVVMtQVNDSUk%3D--85fa64d67ef738f70e08a44ddd6cb2c88cc319fa
+New dvd
+
+Title
+[                              ]
+
+Production year
+[                              ]
+
+Duration
+[                              ]
+
+Plot
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+[                                        ]
+
+Rating
+[                              ]
+
+[Create]
+
+Back
+</screen></para>
+
+      <para>Und jetzt den Code aus der Datei
+      <filename>app/views/dvds/new.html.erb</filename>:<programlisting>&lt;h1&gt;New dvd&lt;/h1&gt;
+
+&lt;% form_for(@dvd) do |f| %&gt;
+  &lt;%= f.error_messages %&gt;
+
+  &lt;p&gt;
+    &lt;%= f.label :title %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :title %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :production_year %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :production_year %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :duration %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :duration %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :plot %&gt;&lt;br /&gt;
+    &lt;%= f.text_area :plot %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :rating %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :rating %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.submit 'Create' %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+
+&lt;%= link_to 'Back', dvds_path %&gt;</programlisting></para>
+
+      <section>
+        <title>select Form-Helper</title>
+
+        <para>Die Eingabe des Produktionsjahres und der Bewertung (rating) des
+        Filmes lässt sich mit einem Select-Feld ein wenig komfortabler
+        machen.<footnote>
+            <para>Es lässt sich sicherlich darüber streiten, ob es schneller
+            ist mit der Maus eine Zahl aus einem Select-Feld auszuwählen oder
+            gerade über die Tastatur einzugeben. ;-)</para>
+          </footnote> </para>
+
+        <para>Wenn wir davon ausgehen, das ein Film frühestens aus dem Jahr
+        1880 und spätestens aus dem aktuellen Jahr ist, können wir dies schön
+        über einen Range <code>(1880..Date.today.year)</code> definieren.
+        Dummerweise benötigen wir für einen select Form-Helper ein Array und
+        kein Range. Aber kein echtes Problem: Mit der Methode
+        <methodname>collect</methodname> können wir ratz-fatz ein Array
+        generieren. Das Stück erb-Code sieht dann so aus:<programlisting>  &lt;p&gt;
+    &lt;%= f.label :production_year %&gt;&lt;br /&gt;
+    &lt;%= f.select :production_year, ((1880..Date.today.year).collect {|i| i }).reverse %&gt;
+  &lt;/p&gt;
+</programlisting></para>
+
+        <para>Den gleichen Weg gehen wir bei der Bewertung des Filmes. Da
+        geben wir allerdings zusätzlich noch die Möglichkeit keine Eingabe
+        (also nil) zu machen:<programlisting>  &lt;p&gt;
+    &lt;%= f.label :rating %&gt;&lt;br /&gt;
+    &lt;%= f.select :rating, (0..5).collect {|i| i }, {:include_blank =&gt; true} %&gt;
+   &lt;/p&gt;
+</programlisting></para>
+      </section>
+
+      <section>
+        <title>Label verändern</title>
+
+        <para>Bei der Länge des Feldes sollten wir noch ein Beispiel angeben.
+        Damit der User auch weiß, das er sowohl die Anzahl der Minuten, als
+        auch das Format hh:mm eingeben kann. Zusätzlich verkürzen wir das Feld
+        auf 10 Zeichen.<programlisting>  &lt;p&gt;
+    &lt;%= f.label :duration, 'Duration (e.g. 108 or 1:48)' %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :duration, :size =&gt; 10 %&gt;
+  &lt;/p&gt;
+</programlisting></para>
+      </section>
+
+      <section>
+        <title>text_area</title>
+
+        <para>Die Höhe und Breite des text_area Feldes passen wir auch ein
+        wenig an:<programlisting>  &lt;p&gt;
+    &lt;%= f.label :plot %&gt;&lt;br /&gt;
+    &lt;%= f.text_area :plot, :cols =&gt; 30, :rows =&gt; 5 %&gt;
+  &lt;/p&gt;
+</programlisting></para>
       </section>
     </section>
   </section>
