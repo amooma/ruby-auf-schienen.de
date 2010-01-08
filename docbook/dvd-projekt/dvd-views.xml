@@ -619,7 +619,16 @@ Back
 &lt;%= link_to 'Back', dvds_path %&gt;</programlisting></para>
 
       <section>
-        <title>select Form-Helper</title>
+        <title>Form-Helper</title>
+
+        <para>Rails hat eine Reihe von Helpern, die das erstellen von
+        Formularen (Forms) erleichtern. Eine Hilfe zu diesen Helpern können
+        Sie mit <command>ri ActionView::Helpers::FormHelper</command> abrufen.
+        </para>
+      </section>
+
+      <section>
+        <title>select Form-Options-Helper</title>
 
         <para>Die Eingabe des Produktionsjahres und der Bewertung (rating) des
         Filmes lässt sich mit einem Select-Feld ein wenig komfortabler
@@ -627,7 +636,13 @@ Back
             <para>Es lässt sich sicherlich darüber streiten, ob es schneller
             ist mit der Maus eine Zahl aus einem Select-Feld auszuwählen oder
             gerade über die Tastatur einzugeben. ;-)</para>
-          </footnote> </para>
+          </footnote></para>
+
+        <para>Die Online-Hilfe zum select-Form-Helper können Sie jederzeit mit
+        <command>ri ActionView::Helpers::FormOptionsHelper</command> abrufen.
+        Lassen Sie sich bitte nicht durch die vermeintliche Komplexität
+        abschrecken. Ich zeige Ihnen schon im nächsten Absatz wie einfach mal
+        damit arbeiten kann.</para>
 
         <para>Wenn wir davon ausgehen, das ein Film frühestens aus dem Jahr
         1880 und spätestens aus dem aktuellen Jahr ist, können wir dies schön
@@ -664,7 +679,7 @@ Back
       </section>
 
       <section>
-        <title>text_area</title>
+        <title>text_area anpassen</title>
 
         <para>Die Höhe und Breite des text_area Feldes passen wir auch ein
         wenig an:<programlisting>  &lt;p&gt;
@@ -673,6 +688,216 @@ Back
   &lt;/p&gt;
 </programlisting></para>
       </section>
+
+      <section>
+        <title>Ergebnis</title>
+
+        <para>Der Source-Code von
+        <filename>app/views/dvds/new.html.erb</filename> sieht jetzt so
+        aus:<programlisting>&lt;h1&gt;New dvd&lt;/h1&gt;
+
+&lt;% form_for(@dvd) do |f| %&gt;
+  &lt;%= f.error_messages %&gt;
+
+  &lt;p&gt;
+    &lt;%= f.label :title %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :title %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :production_year %&gt;&lt;br /&gt;
+    &lt;%= f.select :production_year, ((1880..Date.today.year).collect {|i| i }).reverse %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :duration, 'Duration (e.g. 108 or 1:48)' %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :duration, :size =&gt; 10 %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :plot %&gt;&lt;br /&gt;
+    &lt;%= f.text_area :plot, :cols =&gt; 30, :rows =&gt; 5 %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :rating %&gt;&lt;br /&gt;
+    &lt;%= f.select :rating, (0..5).collect {|i| i }, {:include_blank =&gt; true} %&gt;
+   &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.submit 'Create' %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+
+&lt;%= link_to 'Back', dvds_path %&gt;
+</programlisting></para>
+
+        <para>Und die Webseite ist ein gutes Stück ergonomischer:<screen>Title
+[                              ]
+
+Production year
+[2010]
+
+Duration (e.g. 108 or 1:48)
+[          ]
+
+Plot
+[                              ]
+[                              ]
+[                              ]
+[                              ]
+[                              ]
+
+Rating
+[ ]
+
+[Create]
+
+Back
+</screen></para>
+      </section>
+
+      <section>
+        <title>Controlleranpassung für das Eingabeformat der Filmlänge</title>
+
+        <para>Da wir den User im View die Möglichkeit geben zwei
+        unterschiedliche Formate für die Länge eines Filmes einzugeben, müssen
+        wir das jetzt im Controller auswerten. Aktuell sieht die
+        <methodname>create</methodname> Methode in der Datei
+        <filename>app/controllers/dvds_controller.rb</filename> so
+        aus:<programlisting>  # POST /dvds
+  # POST /dvds.xml
+  def create
+    @dvd = Dvd.new(params[:dvd])
+
+    respond_to do |format|
+      if @dvd.save
+        flash[:notice] = 'Dvd was successfully created.'
+        format.html { redirect_to(@dvd) }
+        format.xml  { render :xml =&gt; @dvd, :status =&gt; :created, :location =&gt; @dvd }
+      else
+        format.html { render :action =&gt; "new" }
+        format.xml  { render :xml =&gt; @dvd.errors, :status =&gt; :unprocessable_entity }
+      end
+    end
+  end
+</programlisting></para>
+
+        <para>Wie so oft gibt es jetzt mehrere Möglichkeiten das Problem zu
+        lösen. Schauen wir uns erst mal den Weg an, den die Daten in Rails
+        vollziehen. Dabei gehen wir von dieser Beispieleingabe aus:<screen>Title
+[Star Wars                     ]
+
+Production year
+[1977]
+
+Duration (e.g. 108 or 1:48)
+[2:01      ]
+
+Plot
+[                              ]
+[                              ]
+[                              ]
+[                              ]
+[                              ]
+
+Rating
+[5]
+
+[Create]
+
+Back
+</screen></para>
+
+        <para>Beim klicken auf Create sehen wir folgende Ausgabe im
+        Log-File:<programlisting>Processing DvdsController#create (for 127.0.0.1 at 2010-01-04 00:35:45) [POST]
+  Parameters: {"authenticity_token"=&gt;"07jynrwx85TSJL5GWKaN/cdFovFj6pUoOHh0js+MF7Y=", "dvd"=&gt;{"title"=&gt;"Star Wars", "production_year"=&gt;"1977", "duration"=&gt;"2:01", "plot"=&gt;"", "rating"=&gt;"5"}, "commit"=&gt;"Create"}
+  Dvd Create (0.6ms)   INSERT INTO "dvds" ("title", "production_year", "duration", "plot", "rating", "created_at", "updated_at") VALUES('Star Wars', 1977, 2, '', 5, '2010-01-03 23:35:45', '2010-01-03 23:35:45')
+Redirected to http://localhost:3000/dvds/14
+Completed in 45ms (DB: 1) | 302 Found [http://localhost/dvds]
+</programlisting></para>
+
+        <para>Die Formulardaten werden also über den Hash
+        <varname>params[:dvd]</varname> in den Controller übertragen. Dort
+        wird in der Methode <methodname>create</methodname> mit der
+        ActiveRecord Methode <methodname>new</methodname> ein neuer Datensatz
+        anhand dieser Daten angelegt. Die Eingabe im Formular für duration war
+        "2:01". Der neue Datensatz wurde mit dem Wert "2" angelegt. Rails hat
+        also versucht aus dem String ein Integer zu machen und einfach den
+        Rest weggeworfen. Das können wir uns jetzt zu Nutze machen, um zu
+        überprüfen, ob die Eingabe im Formular als Integer in Minuten oder im
+        hh:mm Format als String war. Im ersten Fall müsste nämlich der Wert im
+        Hash <varname>params[:dvd]</varname> identisch sein, mit dem im Objekt
+        <varname>@dvd</varname> gespeicherten Wert. Falls nicht, muss es sich
+        um eine ganz fehlerhafte oder eine Eingabe im Format hh:mm handeln.
+        Beides können wir durch unsere Methode <methodname>hh_mm=</methodname>
+        verarbeiten. Hier ist die entsprechend veränderte neue create
+        Methode:<programlisting>  # POST /dvds
+  # POST /dvds.xml
+  def create
+    @dvd = Dvd.new(params[:dvd])
+
+    # check if duration was entered as hh:mm or just minutes
+    #
+    @dvd.hh_mm = params[:dvd][:duration] if @dvd.duration != params[:dvd][:durat
+ion]
+
+    respond_to do |format|
+      if @dvd.save
+        flash[:notice] = 'Dvd was successfully created.'        format.html { redirect_to(@dvd) }
+        format.xml  { render :xml =&gt; @dvd, :status =&gt; :created, :location =&gt; @dv
+d }
+      else
+        format.html { render :action =&gt; "new" }
+        format.xml  { render :xml =&gt; @dvd.errors, :status =&gt; :unprocessable_entity }
+      end
+    end
+  end
+</programlisting></para>
+
+        <para>Und wenn wir im Formular noch einmal die gleichen Daten
+        eingeben, bekommen wir im Log die folgenden Daten
+        angezeigt:<programlisting>Processing DvdsController#create (for 127.0.0.1 at 2010-01-04 00:38:25) [POST]
+  Parameters: {"authenticity_token"=&gt;"07jynrwx85TSJL5GWKaN/cdFovFj6pUoOHh0js+MF7Y=", "dvd"=&gt;{"title"=&gt;"Star Wars", "production_year"=&gt;"1977", "duration"=&gt;"2:01", "plot"=&gt;"", "rating"=&gt;"5"}, "commit"=&gt;"Create"}
+  Dvd Create (0.3ms)   INSERT INTO "dvds" ("title", "production_year", "duration", "plot", "rating", "created_at", "updated_at") VALUES('Star Wars', 1977, 121, '', 5, '2010-01-03 23:38:25', '2010-01-03 23:38:25')
+Redirected to http://localhost:3000/dvds/15
+Completed in 58ms (DB: 0) | 302 Found [http://localhost/dvds]
+</programlisting></para>
+
+        <para>Im anschliessend angezeigten <methodname>show</methodname> View
+        sehen wir dann auch den korrekten Datensatz:<screen>Dvd was successfully created.
+
+Title: Star Wars
+
+Production year: 1977
+
+Duration: 121
+
+Plot:
+
+Rating: 5
+
+Edit | Back</screen></para>
+      </section>
+    </section>
+
+    <section>
+      <title>Edit View anpassen</title>
+
+      <para>Die Dateien für die vom Scaffolding angelegten edit- und new-Views
+      sehen fast identisch aus. Ein Diff der beiden ursprünglichen Dateien
+      bestätigt das:<screen>sw@debian:~/dvd-sammlung$ <command>cd app/views/dvds/</command>
+sw@debian:~/dvd-sammlung/app/views/dvds$ <command>diff edit.html.erb new.html.erb</command> 
+1c1
+&lt; &lt;h1&gt;Editing dvd&lt;/h1&gt;
+---
+&gt; &lt;h1&gt;New dvd&lt;/h1&gt;
+27c27
+&lt;     &lt;%= f.submit 'Update' %&gt;
+---
+&gt;     &lt;%= f.submit 'Create' %&gt;
+31d30
+&lt; &lt;%= link_to 'Show', @dvd %&gt; |
+sw@debian:~/test/app/views/dvds$</screen></para>
+
+      <para>Wir copy-and-paste-n jetzt erst mal die in erstellten Teile und
+      passen sie an edit an. Später machen wir uns dann Gedanken darüber wie
+      wir doppelte Programmteile vermeiden.</para>
     </section>
   </section>
 </chapter>
