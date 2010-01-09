@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="dryout-und-refactoring"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title>DRY-out und Refactoring</title>
+
+  <section xml:id="dryout-einleitung">
+    <title>Einleitung</title>
+
+    <para>Wenn Sie dieses Buch zum ersten mal lesen und unter starken
+    Zeitdruck stehen: Überspringen Sie ruhig dieses Kapitel und schauen Sie
+    später noch mal rein.</para>
+
+    <para>DRY ist die Abkürzung für DON'T REPEAT YOURSELF. In der
+    Rails-Community sagt man deshalb auch oft, das man einen bestimmten Code
+    DRY-out-en muss. Das ist ein Prozess, in dem der existierende Code
+    refactored wird. Noch so ein Buzzword! </para>
+
+    <para>Auf Wikipedia (http://de.wikipedia.org/wiki/Refactoring) finden wir
+    eine gute Defintion zum Wort Refactoring: <quote>Refactoring (deutsch auch
+    Refaktorisierung, Refaktorierung, Restrukturierung oder schlicht
+    Umgestaltung) bezeichnet in der Software-Entwicklung die manuelle oder
+    automatisierte Strukturverbesserung von Programm-Quelltexten unter
+    Beibehaltung des beobachtbaren Programm-Verhaltens. Dabei sollen die
+    Lesbarkeit, Verständlichkeit, Wartbarkeit und Erweiterbarkeit verbessert
+    werden, mit dem Ziel, den jeweiligen Aufwand für Fehleranalyse und
+    funktionale Erweiterungen deutlich zu senken.</quote></para>
+
+    <para>Zum jetzigen Wissenstand fehlt uns für das "korrekte" Refactoring
+    Rails-Testing. Also die Möglichkeit bestimmte Code-Abschnitte (z.B.
+    einzelne Methoden oder Views) automatisiert auf Ihre Funktion zu testen.
+    Das Problem beim Testing: Man muss vertehen, wozu es gut ist. An sonsten
+    wird man es nie freiwillig einsetzen. Da sind wir wieder bei so einem
+    Henne-Ei-Problem. Deshalb vertraue ich darauf, das Sie es keinem sagen:
+    Wir arbeiten jetzt mal ohne Testing. Dann werden Sie beim Testing-Kapitel
+    um so besser verstehen, wie praktisch Testing beim Refactoring ist.</para>
+
+    <section xml:id="was-ist-falsch-am-aktuellen-code">
+      <title>Was ist falsch am aktuellen Code?</title>
+
+      <para>Unsere DVD-Applikation läuft gut und stabil. Es besteht kein Grund
+      zur Sorge und trotzdem haben wir einige Code-Abschnitte oder ganze Views
+      die doppelt sind und die man optimieren sollte.</para>
+
+      <para>Es ist OK erst mal drauf los zu programmieren. Aber man sollte
+      sich von Zeit zu Zeit zurücklehnen und sich alles anschauen. Durch
+      DRY-out spart man schon mittelfristig viel Zeit bei der weiteren
+      Programmierung und man hat besseren Code, der weniger Fehler
+      aufweist.</para>
+    </section>
+  </section>
+
+  <section xml:id="dry-out-views">
+    <title>Partials in Views</title>
+
+    <para>Ein grosser Vorteil von Scaffolding ist die Schnelligkeit und die
+    Verlässlichkeit des produzierten Codes. Allerdings liefert Scaffolding
+    auch Code der für die meisten Applikationen stark optimiert werden kann.
+    Ein Beispiel dafür sind die Formular in den Views edit und new. Schauen
+    wir uns das mal auf der Kommandozeile mit dem Programm
+    <application>diff</application> an:<screen>sw@debian:~/dvd-sammlung$ <command>cd app/views/dvds/</command>
+sw@debian:~/dvd-sammlung/app/views/dvds$ <command>diff edit.html.erb new.html.erb</command> 
+1c1
+&lt; &lt;h1&gt;Editing dvd&lt;/h1&gt;
+---
+&gt; &lt;h1&gt;New dvd&lt;/h1&gt;
+27c27
+&lt;     &lt;%= f.submit 'Update' %&gt;
+---
+&gt;     &lt;%= f.submit 'Create' %&gt;
+31d30
+&lt; &lt;%= link_to 'Show', @dvd %&gt; |
+sw@debian:~/dvd-sammlung/app/views/dvds$</screen></para>
+
+    <para>Die beiden Dateien sind fast identisch.</para>
+
+    <para>Partials sind im gleichen Verzeichnis wie die normalen Views liegen,
+    aber mit einem Unterstrich (Underscore) anfangen. Partials können von
+    anderen Views zum Rendern der eigenen Seite benutzt werden. Dabei kann
+    Ihnen der Eltern-View lokale Variablen übergeben.</para>
+
+    <section xml:id="dvd-formular-partial">
+      <title>Das Formular-Partial</title>
+
+      <para>Das reine Formular des Edit-Views sieht als Template so
+      aus:<programlisting>&lt;% form_for(@dvd) do |f| %&gt;
+  &lt;%= f.error_messages %&gt;
+
+  &lt;p&gt;
+    &lt;%= f.label :title %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :title %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :production_year %&gt;&lt;br /&gt;
+    &lt;%= f.select :production_year, ((1880..Date.today.year).collect {|i| i }).reverse %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :duration, 'Duration (e.g. 108 or 1:48)' %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :duration, :size =&gt; 10 %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :plot %&gt;&lt;br /&gt;
+    &lt;%= f.text_area :plot, :cols =&gt; 30, :rows =&gt; 5 %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :rating %&gt;&lt;br /&gt;
+    &lt;%= f.select :rating, (0..5).collect {|i| i }, {:include_blank =&gt; true} %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.submit 'Update' %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+</programlisting></para>
+
+      <para>Der einzige Unterschied zum New-View ist der Name des
+      Submit-Buttons (einmal 'Update' und einmal 'Create'). Wenn wir daraus
+      also eine lokale Variable machen, könnten wir das ganze in ein eigenes
+      Partial abspeichern. Nennen wir diese Variable
+      <varname>submit_button_text</varname>. Allerdings müssen wir das gleiche
+      auch noch mit der Instance-Variable <varname>@dvd</varname> machen.
+      Lassen wir also einfach das @-Zeichen weg und schon haben wir eine
+      lokale Variable.</para>
+
+      <para>Das Partial speichern wir mit dem Dateinamen
+      <filename>app/views/dvds/_form.html.erb</filename> und folgendem Inhalt
+      ab:<programlisting>&lt;% form_for(<emphasis>dvd</emphasis>) do |f| %&gt;
+  &lt;%= f.error_messages %&gt;
+
+  &lt;p&gt;
+    &lt;%= f.label :title %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :title %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :production_year %&gt;&lt;br /&gt;
+    &lt;%= f.select :production_year, ((1880..Date.today.year).collect {|i| i }).reverse %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :duration, 'Duration (e.g. 108 or 1:48)' %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :duration, :size =&gt; 10 %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :plot %&gt;&lt;br /&gt;
+    &lt;%= f.text_area :plot, :cols =&gt; 30, :rows =&gt; 5 %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :rating %&gt;&lt;br /&gt;
+    &lt;%= f.select :rating, (0..5).collect {|i| i }, {:include_blank =&gt; true} %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.submit <emphasis>submit_button_text</emphasis> %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+</programlisting></para>
+    </section>
+
+    <section xml:id="dvd-partial-im-edit-view">
+      <title>Partial im Edit-View</title>
+
+      <para>Der Inhalt von <filename>app/views/dvds/edit.html.erb</filename>
+      ist mit unserem neuen Form-Partial stark geschrumpft und übersichtlicher
+      geworden:<programlisting>&lt;h1&gt;Editing dvd&lt;/h1&gt;
+
+<emphasis>&lt;%= render :partial =&gt; "form", :locals =&gt; { :dvd =&gt; @dvd, :submit_button_text =&gt; 'Update' } %&gt;</emphasis>
+
+&lt;%= link_to 'Show', @dvd %&gt; |
+&lt;%= link_to 'Back', dvds_path %&gt;
+</programlisting></para>
+    </section>
+
+    <section xml:id="dvd-partial-im-new-view">
+      <title>Partial im New-View</title>
+
+      <para>Der New-View <filename>app/views/dvds/new.html.erb</filename>
+      sieht jetzt auch viel sauberer aus:<programlisting>&lt;h1&gt;New dvd&lt;/h1&gt;
+
+<emphasis>&lt;%= render :partial =&gt; "form", :locals =&gt; { :dvd =&gt; @dvd, :submit_button_text =&gt; 'Create' } %&gt;</emphasis>
+
+&lt;%= link_to 'Back', dvds_path %&gt;
+</programlisting></para>
+    </section>
+
+    <section xml:id="partials-theorie">
+      <title>Noch ein wenig Theorie zu Partials</title>
+
+      <para>Wie immer finden Sie Online-Hilfe mit <command>ri
+      ActionView::Partials</command>. Hier lohnt es sicht wirklich. In diese
+      Dokumentation sind reichlich Beispiele zu Partials.</para>
+
+      <para>Wir kratzen mit den Beispielen in diesem Kapitel tatsächlich nur
+      an der Oberfläche der Möglichkeiten mit Partials. Erinnern Sie sich an
+      den <code>yield</code> Befehl in der Layout-Datei
+      <filename>app/views/layouts/dvds.html.erb</filename>? Auch das ist ein
+      Partial-Aufruf.</para>
+
+      <para>Die wichtigsten Punkte im Überblick:<itemizedlist>
+          <listitem>
+            <para>Ein Partial fängt immer mit einem Unterstrich (Underscore)
+            an und liegt im einem Views Unterverzeichnis.</para>
+
+            <para>Beispiel:</para>
+
+            <para><filename>_beispiel.html.erb</filename></para>
+          </listitem>
+
+          <listitem>
+            <para>Wird ein Partial mit <application>render()</application>
+            aufgerufen, so fehlt der Underscore im Namen.</para>
+
+            <para>Beispiel:</para>
+
+            <para><programlisting>&lt;%= render :partial =&gt; "beispiel" %&gt;</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para>Sie können auch Partials in anderen Unterverzeichnissen
+            aufrufen. Dann müssen Sie den Namen des entsprechenden
+            View-Verzeichnisse vorstellen. Aber auch hier wird das Underscore
+            weggelassen!</para>
+
+            <para>Beispiel:<programlisting>&lt;%= render :partial =&gt; "abc/beispiel" %&gt;</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para>Sie können einem Partial lokale Variablen übergeben.<warning>
+                <para>Innerhalb eines Partials haben Sie keinen Zugang zu den
+                Instance-Variablen, die im Eltern-View problemlos verfügbar
+                sind. Diese müssen Sie im Fall des Falles per
+                <code>:locals</code> Mechanismus als lokale Variablen
+                übergeben.</para>
+              </warning></para>
+
+            <para>Beispiel:<programlisting>&lt;%= render :partial =&gt; "beispiel", :locals =&gt; { :i =&gt; 42, abc =&gt; @abc } %&gt;</programlisting></para>
+          </listitem>
+        </itemizedlist></para>
+    </section>
+  </section>
+</chapter>
