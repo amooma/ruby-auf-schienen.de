@@ -7,7 +7,7 @@
          xmlns:m="http://www.w3.org/1998/Math/MathML"
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
-  <title>DRY-out und Refactoring</title>
+  <title xml:id="dryout-und-refactoring.title">DRY-out und Refactoring</title>
 
   <section xml:id="dryout-einleitung">
     <title>Einleitung</title>
@@ -19,7 +19,7 @@
     <para>DRY ist die Abkürzung für DON'T REPEAT YOURSELF. In der
     Rails-Community sagt man deshalb auch oft, das man einen bestimmten Code
     DRY-out-en muss. Das ist ein Prozess, in dem der existierende Code
-    refactored wird. Noch so ein Buzzword! </para>
+    refactored wird. Noch so ein Buzzword!</para>
 
     <para>Auf Wikipedia (http://de.wikipedia.org/wiki/Refactoring) finden wir
     eine gute Defintion zum Wort Refactoring: <quote>Refactoring (deutsch auch
@@ -237,6 +237,535 @@ sw@debian:~/dvd-sammlung/app/views/dvds$</screen></para>
             <para>Beispiel:<programlisting>&lt;%= render :partial =&gt; "beispiel", :locals =&gt; { :i =&gt; 42, abc =&gt; @abc } %&gt;</programlisting></para>
           </listitem>
         </itemizedlist></para>
+    </section>
+  </section>
+
+  <section xml:id="before_filter-im-controller">
+    <title>before_filter im Controller</title>
+
+    <para>Schauen wir uns mal die Datei
+    <filename>app/controllers/dvds_controller.rb</filename> bezüglich eines
+    Refactoring an:<programlisting>class DvdsController &lt; ApplicationController
+  # GET /dvds
+  # GET /dvds.xml
+  def index
+    @dvds = Dvd.all
+    @html_head_title = "Index of #{Dvd.count} DVDs"
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render :xml =&gt; @dvds }
+    end
+  end
+
+  # GET /dvds/1
+  # GET /dvds/1.xml
+  def show
+    @dvd = Dvd.find(params[:id])
+    if @dvd.title.blank?
+      @html_head_title = "Details for DVD #{@dvd.id}"
+    else
+      @html_head_title = @dvd.title
+      @html_head_title += " (#{@dvd.production_year})" if !@dvd.production_year.blank?
+    end
+
+    respond_to do |format|
+      format.html # show.html.erb
+      format.xml  { render :xml =&gt; @dvd }
+    end
+  end
+
+  # GET /dvds/new
+  # GET /dvds/new.xml
+  def new
+    @dvd = Dvd.new
+    @html_head_title = "Enter new DVD"
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml  { render :xml =&gt; @dvd }
+    end
+  end
+
+  # GET /dvds/1/edit
+  def edit
+    @dvd = Dvd.find(params[:id])
+    if @dvd.title.blank?
+      @html_head_title = "Edit the information for DVD #{@dvd.id}"
+    else
+      @html_head_title = "Edit the information for \"#{@dvd.title}\""
+      @html_head_title += " (#{@dvd.production_year})" if !@dvd.production_year.blank?
+    end
+  end
+
+  # POST /dvds
+  # POST /dvds.xml
+  def create
+    @dvd = Dvd.new(params[:dvd])
+
+    # check if duration was entered as hh:mm or just minutes
+    #
+    @dvd.hh_mm = params[:dvd][:duration] if @dvd.duration != params[:dvd][:duration]
+
+    respond_to do |format|
+      if @dvd.save
+        flash[:notice] = 'Dvd was successfully created.'
+        format.html { redirect_to(@dvd) }
+        format.xml  { render :xml =&gt; @dvd, :status =&gt; :created, :location =&gt; @dvd }
+      else
+        format.html { render :action =&gt; "new" }
+        format.xml  { render :xml =&gt; @dvd.errors, :status =&gt; :unprocessable_entity }
+      end
+    end
+  end
+
+  # PUT /dvds/1
+  # PUT /dvds/1.xml
+  def update
+    @dvd = Dvd.find(params[:id])
+
+    # check if duration was entered as hh:mm or just minutes
+    #
+    @dvd.hh_mm = params[:dvd][:duration] if @dvd.duration != params[:dvd][:duration]
+    params[:dvd][:duration] = @dvd.duration
+
+    respond_to do |format|
+      if @dvd.update_attributes(params[:dvd])
+        flash[:notice] = 'Dvd was successfully updated.'
+        format.html { redirect_to(@dvd) }
+        format.xml  { head :ok }
+      else
+        format.html { render :action =&gt; "edit" }
+        format.xml  { render :xml =&gt; @dvd.errors, :status =&gt; :unprocessable_entity }
+      end
+    end
+  end
+
+  # DELETE /dvds/1
+  # DELETE /dvds/1.xml
+  def destroy
+    @dvd = Dvd.find(params[:id])
+    @dvd.destroy
+
+    respond_to do |format|
+      format.html { redirect_to(dvds_url) }
+      format.xml  { head :ok }
+    end
+  end
+end
+</programlisting></para>
+
+    <para>Die Methoden <methodname>show</methodname>,
+    <methodname>view</methodname>, <methodname>edit</methodname> und
+    <methodname>update</methodname> suchen alle als erstes nach dem aktuellen
+    Datensatz:<programlisting>@dvd = Dvd.find(params[:id])</programlisting></para>
+
+    <para>Das könnten wir doch in eine eigene private Methode verschieben.
+    Natürlich es ist nur eine Zeile, aber vielleicht kommt ja noch was dazu.
+    Fangen wir also mal an diese private Methode mit dem Namen
+    <methodname>get_dvd</methodname> zu schreiben:<programlisting>private
+  def get_dvd
+    @dvd = Dvd.find(params[:id])
+  end
+</programlisting></para>
+
+    <para>Wie die Überschrift bereits vermuten lässt: Es gibt in Rails die
+    Möglichkeit vor oder nach einem Controller-Durchlauf einen oder mehrere
+    Filter auszuführen. Detail-Infos dazu bekommen Sie durch den Aufruf von
+    <command>ri ActionController::Filters::ClassMethods</command>. Der für uns
+    relevante Filter heisst <code>before_filter</code> wird wird direkt in der
+    zweiten Zeile der Datei eingebaut:<screen>sw@debian:~/dvd-sammlung/app/controllers$ <command>head -n 3 dvds_controller.rb</command> 
+class DvdsController &lt; ApplicationController
+  before_filter :get_dvd, :only =&gt; [:show, :edit, :create, :update, :destroy]
+
+sw@debian:~/dvd-sammlung/app/controllers$</screen>Wie Sie sehen, kann man den
+    Filter entweder auf alle Methoden des Controllers oder nur auf bestimmte
+    (wie in unserem Fall) Methoden anwenden. Das Gegenteil von
+    <code>:only</code> wäre hier <code>:except</code>.</para>
+
+    <para>Die entsprechenden Zeilen müssen wir natürlich noch aus den
+    einzelnen Methoden löschen. Hier ist der dazu gehörige Patch zur
+    Orginal-Datei:<programlisting>2,3d1
+&lt;   before_filter :get_dvd, :only =&gt; [:show, :edit, :create, :update, :destroy]
+&lt; 
+18a17
+&gt;     @dvd = Dvd.find(params[:id])
+45a45
+&gt;     @dvd = Dvd.find(params[:id])
+56a57,58
+&gt;     @dvd = Dvd.new(params[:dvd])
+&gt; 
+75a78,79
+&gt;     @dvd = Dvd.find(params[:id])
+&gt; 
+95a100
+&gt;     @dvd = Dvd.find(params[:id])
+103,107d107
+&lt; 
+&lt; private
+&lt;   def get_dvd
+&lt;     @dvd = Dvd.find(params[:id])
+&lt;   end
+</programlisting></para>
+
+    <para>Aber halt! Das war ja noch nicht alles. Wir können zusätzlich ja
+    noch eine private Methode schreiben, die die Informationen zum Film
+    zusammenfasst. Die nennen wir
+    <methodname>generate_dvd_name</methodname>:<programlisting>  def generate_dvd_name
+    if @dvd.title.blank?
+      @dvd_name = "DVD #{@dvd.id}"
+    else
+      @dvd_name = "\"#{@dvd.title}\""
+      @dvd_name += " (#{@dvd.production_year})" if !@dvd.production_year.blank?
+      @dvd_name
+    end
+  end
+</programlisting></para>
+
+    <para>Unser neue <filename>app/controllers/dvds_controller.rb</filename>
+    sieht dann inklusive dem neuen <code>before_filter</code> Aufruf so
+    aus:<programlisting>class DvdsController &lt; ApplicationController
+  before_filter :get_dvd, :only =&gt; [:show, :edit, :create, :update, :destroy]
+  before_filter :generate_dvd_name, :only =&gt; [:show, :edit]
+
+  # GET /dvds
+  # GET /dvds.xml
+  def index
+    @dvds = Dvd.all
+    @html_head_title = "Index of #{Dvd.count} DVDs"
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render :xml =&gt; @dvds }
+    end
+  end
+
+  # GET /dvds/1
+  # GET /dvds/1.xml
+  def show
+    @html_head_title = "Details of #{@dvd_name}"
+
+    respond_to do |format|
+      format.html # show.html.erb
+      format.xml  { render :xml =&gt; @dvd }
+    end
+  end
+
+  # GET /dvds/new
+  # GET /dvds/new.xml
+  def new
+    @dvd = Dvd.new
+    @html_head_title = "Enter new DVD"
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml  { render :xml =&gt; @dvd }
+    end
+  end
+
+  # GET /dvds/1/edit
+  def edit
+    @html_head_title = "Edit the information for DVD #{@dvd_name}"
+  end
+
+  # POST /dvds
+  # POST /dvds.xml
+  def create
+    # check if duration was entered as hh:mm or just minutes
+    #
+    @dvd.hh_mm = params[:dvd][:duration] if @dvd.duration != params[:dvd][:duration]
+
+    respond_to do |format|
+      if @dvd.save
+        flash[:notice] = 'Dvd was successfully created.'
+        format.html { redirect_to(@dvd) }
+        format.xml  { render :xml =&gt; @dvd, :status =&gt; :created, :location =&gt; @dvd }
+      else
+        format.html { render :action =&gt; "new" }
+        format.xml  { render :xml =&gt; @dvd.errors, :status =&gt; :unprocessable_entity }
+      end
+    end
+  end
+
+  # PUT /dvds/1
+  # PUT /dvds/1.xml
+  def update
+    # check if duration was entered as hh:mm or just minutes
+    #
+    @dvd.hh_mm = params[:dvd][:duration] if @dvd.duration != params[:dvd][:duration]
+    params[:dvd][:duration] = @dvd.duration
+
+    respond_to do |format|
+      if @dvd.update_attributes(params[:dvd])
+        flash[:notice] = 'Dvd was successfully updated.'
+        format.html { redirect_to(@dvd) }
+        format.xml  { head :ok }
+      else
+        format.html { render :action =&gt; "edit" }
+        format.xml  { render :xml =&gt; @dvd.errors, :status =&gt; :unprocessable_entity }
+      end
+    end
+  end
+
+  # DELETE /dvds/1
+  # DELETE /dvds/1.xml
+  def destroy
+    @dvd.destroy
+
+    respond_to do |format|
+      format.html { redirect_to(dvds_url) }
+      format.xml  { head :ok }
+    end
+  end
+
+private
+  def get_dvd
+    @dvd = Dvd.find(params[:id])
+  end
+
+  def generate_dvd_name
+    if @dvd.title.blank?
+      @dvd_name = "DVD #{@dvd.id}"
+    else
+      @dvd_name = "\"#{@dvd.title}\""
+      @dvd_name += " (#{@dvd.production_year})" if !@dvd.production_year.blank?
+      @dvd_name
+    end
+  end
+end
+</programlisting></para>
+  </section>
+
+  <section>
+    <title>app/models/dvd.rb</title>
+
+    <para>Schauen wir uns beim Thema Refactoring auch noch mal die Datei
+    <filename>app/models/dvd.rb</filename> an:<programlisting>class Dvd &lt; ActiveRecord::Base
+  # getter method for the duration
+  #
+  def hh_mm
+    return 'NA' if self.duration.blank?
+    minutes_to_hh_mm(self.duration)
+  end
+
+  # setter method for the duration
+  #
+  def hh_mm=(input = nil)
+    if input.blank? or input.upcase == 'NA'
+      self.duration = nil
+    else
+      duration_array = input.split(/:/)
+      self.duration = duration_array[0].to_i * 60 + duration_array[1].to_i
+      self.duration = nil if minutes_to_hh_mm(duration) != input
+    end
+  end
+
+private
+  def minutes_to_hh_mm(minutes = nil)
+    return nil if minutes.blank? or minutes.to_s.to_i != minutes
+    hh = minutes / 60
+    mm = minutes - (hh * 60)
+    hh.to_s + ':%.2d' % mm
+  end
+end
+</programlisting></para>
+
+    <section>
+      <title>def hh_mm=(input = nil)</title>
+
+      <para>Bei der in der Methode <methodname>hh_mm =</methodname>
+      durchgeführten Konvertierungen frage ich mich "Gibt es da nichts schon
+      in Ruby eingebautes?". Und tatsächlich: Die Suche nach Time und Ruby in
+      einer beliebigen Suchmaschine bringt uns zur Time Class. Und darin
+      (welch ein Zufall! ;-)) befindet sich die Methode parse. Schauen wir uns
+      mal die Hilfe zu Time.parse an:<screen>sw@debian:~/dvd-sammlung$ <command>ri -T Time.parse</command>
+------------------------------------------------------------ Time::parse
+     Time::parse(date, now=self.now) {|year| ...}
+
+     From Ruby 1.9.1
+------------------------------------------------------------------------
+     Parses +date+ using Date._parse and converts it to a Time object.
+
+     If a block is given, the year described in +date+ is converted by
+     the block. For example:
+
+         Time.parse(...) {|y| y &lt; 100 ? (y &gt;= 69 ? y + 1900 : y + 2000) : y}
+
+     If the upper components of the given time are broken or missing,
+     they are supplied with those of +now+. For the lower components,
+     the minimum values (1 or 0) are assumed if broken or missing. For
+     example:
+
+         # Suppose it is "Thu Nov 29 14:33:20 GMT 2001" now and
+         # your timezone is GMT:
+         Time.parse("16:30")     #=&gt; Thu Nov 29 16:30:00 GMT 2001
+         Time.parse("7/23")      #=&gt; Mon Jul 23 00:00:00 GMT 2001
+         Time.parse("Aug 31")    #=&gt; Fri Aug 31 00:00:00 GMT 2001
+
+     Since there are numerous conflicts among locally defined timezone
+     abbreviations all over the world, this method is not made to
+     understand all of them. For example, the abbreviation "CST" is used
+     variously as:
+
+         -06:00 in America/Chicago,
+         -05:00 in America/Havana,
+         +08:00 in Asia/Harbin,
+         +09:30 in Australia/Darwin,
+         +10:30 in Australia/Adelaide,
+         etc.
+
+     Based on the fact, this method only understands the timezone
+     abbreviations described in RFC 822 and the system timezone, in the
+     order named. (i.e. a definition in RFC 822 overrides the system
+     timezone definition.) The system timezone is taken from
+     +Time.local(year, 1, 1).zone+ and +Time.local(year, 7, 1).zone+. If
+     the extracted timezone abbreviation does not match any of them, it
+     is ignored and the given time is regarded as a local time.
+
+     ArgumentError is raised if Date._parse cannot extract information
+     from +date+ or Time class cannot represent specified date.
+
+     This method can be used as fail-safe for other parsing methods as:
+
+       Time.rfc2822(date) rescue Time.parse(date)
+       Time.httpdate(date) rescue Time.parse(date)
+       Time.xmlschema(date) rescue Time.parse(date)
+
+     A failure for Time.parse should be checked, though.
+
+sw@debian:~/dvd-sammlung$</screen></para>
+
+      <para>Das sieht doch vielversprechend aus. Gehen wir mal in die Console
+      und spielen ein wenig rum. Unser Ziel: Wir brauchen die Anzahl der
+      Minuten zu einer "1:48" Eingabe (1 Stunde plus 48 Minuten).<screen>sw@debian:~/dvd-sammlung$ <command>./script/console</command> 
+Loading development environment (Rails 2.3.5)
+&gt;&gt; <command>Time.parse("1:48")</command>
+=&gt; 2010-01-04 01:48:00 +0100
+&gt;&gt; <command>Time.now</command>
+=&gt; 2010-01-04 11:26:19 +0100
+&gt;&gt; <command>Time.now.beginning_of_day</command>
+=&gt; 2010-01-04 00:00:00 +0100
+&gt;&gt; <command>Time.parse("1:48") - Time.now.beginning_of_day</command>
+=&gt; 6480.0
+&gt;&gt; <command>(Time.parse("1:48") - Time.now.beginning_of_day) / 60</command>
+=&gt; 108.0
+&gt;&gt; <command>((Time.parse("1:48") - Time.now.beginning_of_day) / 60).class</command>
+=&gt; Float
+&gt;&gt; <command>((Time.parse("1:48") - Time.now.beginning_of_day) / 60).to_i</command>
+=&gt; 108
+&gt;&gt; <command>((Time.parse("1:48") - Time.now.beginning_of_day) / 60).to_i.class</command>
+=&gt; Fixnum
+&gt;&gt; <command>exit</command>
+sw@debian:~/dvd-sammlung$</screen></para>
+
+      <para>Wir können also die drei Zeilen <programlisting>duration_array = input.split(/:/)
+self.duration = duration_array[0].to_i * 60 + duration_array[1].to_i
+self.duration = nil if minutes_to_hh_mm(duration) != input
+</programlisting> gehen diese eine Zeile austauschen und müssen damit das Rad
+      nicht neu erfinden:<programlisting>self.duration = ((Time.parse(input) - Time.now.beginning_of_day) / 60).to_i</programlisting></para>
+    </section>
+
+    <section>
+      <title>def minutes_to_hh_mm(minutes = nil)</title>
+
+      <para>Wenn es eine Methode parse gibt, dann muss es auch den umgekehrten
+      Weg geben. Und der Ruby-Gott meint es gut mit uns. Es gibt nicht nur die
+      Methode <methodname>to_s</methodname>, sondern auch
+      <methodname>strftime</methodname>, mit der wir die Ausgabe formatieren
+      können:<screen>sw@debian:~/dvd-sammlung$ <command>ri -T Time.strftime</command>
+---------------------------------------------------------- Time#strftime
+     time.strftime( string ) =&gt; string
+
+     From Ruby 1.9.1
+------------------------------------------------------------------------
+     Formats _time_ according to the directives in the given format
+     string. Any text not listed as a directive will be passed through
+     to the output string.
+
+     Format meaning:
+
+       %a - The abbreviated weekday name (``Sun'')
+       %A - The  full  weekday  name (``Sunday'')
+       %b - The abbreviated month name (``Jan'')
+       %B - The  full  month  name (``January'')
+       %c - The preferred local date and time representation
+       %d - Day of the month (01..31)
+       %F - Equivalent to %Y-%m-%d (the ISO 8601 date format)
+       %H - Hour of the day, 24-hour clock (00..23)
+       %I - Hour of the day, 12-hour clock (01..12)
+       %j - Day of the year (001..366)
+       %L - Millisecond of the second (000..999)
+       %m - Month of the year (01..12)
+       %M - Minute of the hour (00..59)
+       %N - Fractional seconds digits, default is 9 digits (nanosecond)
+               %3N  millisecond (3 digits)
+               %6N  microsecond (6 digits)
+               %9N  nanosecond (9 digits)
+       %p - Meridian indicator (``AM''  or  ``PM'')
+       %P - Meridian indicator (``am''  or  ``pm'')
+       %s - Number of seconds since 1970-01-01 00:00:00 UTC.
+       %S - Second of the minute (00..60)
+       %U - Week  number  of the current year,
+               starting with the first Sunday as the first
+               day of the first week (00..53)
+       %W - Week  number  of the current year,
+               starting with the first Monday as the first
+               day of the first week (00..53)
+       %w - Day of the week (Sunday is 0, 0..6)
+       %x - Preferred representation for the date alone, no time
+       %X - Preferred representation for the time alone, no date
+       %y - Year without a century (00..99)
+       %Y - Year with century
+       %Z - Time zone name
+       %% - Literal ``%'' character
+     
+        t = Time.now                        #=&gt; 2007-11-19 08:37:48 -0600
+        t.strftime("Printed on %m/%d/%Y")   #=&gt; "Printed on 11/19/2007"
+        t.strftime("at %I:%M%p")            #=&gt; "at 08:37AM"
+
+sw@debian:~/dvd-sammlung$</screen></para>
+
+      <para>Spielen wir mal ein wenig in der Console, um aus dem Minuten-Wert
+      (ein Integer) einen passenden String (hh:mm) zu bekommen:<screen>sw@debian:~/dvd-sammlung$ <command>./script/console</command> 
+Loading development environment (Rails 2.3.5)
+&gt;&gt; <command>108.minutes</command>
+=&gt; 6480 seconds
+&gt;&gt; <command>nil.minutes</command>
+NoMethodError: undefined method `minutes' for nil:NilClass
+ from /usr/local/lib/ruby/gems/1.9.1/gems/activesupport-2.3.5/lib/active_support/whiny_nil.rb:52:in `method_missing'
+ from (irb):2
+ from /usr/local/bin/irb:12:in `&lt;main&gt;'</screen> hmmm... das sieht nicht
+      so gut aus. Probieren wir mal den Umweg über
+      <methodname>to_i</methodname> (daraus wird aus nil ein Integer gemacht)
+      ...<screen>&gt;&gt; <command>nil.to_i</command>
+=&gt; 0
+&gt;&gt; <command>nil.to_i.minutes</command>
+=&gt; 0 seconds
+&gt;&gt; <command>Time.now</command>
+=&gt; 2010-01-04 11:47:21 +0100
+&gt;&gt; <command>Time.now.beginning_of_day</command>
+=&gt; 2010-01-04 00:00:00 +0100
+&gt;&gt; <command>Time.now.beginning_of_day + 108.to_i.minutes</command>
+=&gt; 2010-01-04 01:48:00 +0100
+&gt;&gt; <command>(Time.now.beginning_of_day + 108.to_i.minutes).strftime("%H:%M")</command>
+=&gt; "01:48"
+&gt;&gt; <command>(Time.now.beginning_of_day + 108.to_i.minutes).strftime("%H:%M").class</command>
+=&gt; String
+&gt;&gt; <command>exit</command>
+sw@debian:~/dvd-sammlung$</screen></para>
+
+      <para>Sehr schön! Wir können aus aus <programlisting>  def minutes_to_hh_mm(minutes = nil)
+    return nil if minutes.blank? or minutes.to_s.to_i != minutes
+    hh = minutes / 60
+    mm = minutes - (hh * 60)
+    hh.to_s + ':%.2d' % mm
+  end
+</programlisting> folgendes machen:<programlisting>  def minutes_to_hh_mm(minutes = nil)
+    (Time.now.beginning_of_day + 108.to_i.minutes).strftime("%H:%M")
+  end
+</programlisting></para>
+
+      <para></para>
     </section>
   </section>
 </chapter>
