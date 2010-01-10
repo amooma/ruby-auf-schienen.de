@@ -570,7 +570,7 @@ private
 end
 </programlisting></para>
 
-    <section>
+    <section xml:id="refactoring_dd_mm" xml:lang="">
       <title>def hh_mm=(input = nil)</title>
 
       <para>Bei der in der Methode <methodname>hh_mm =</methodname>
@@ -665,7 +665,7 @@ self.duration = nil if minutes_to_hh_mm(duration) != input
       nicht neu erfinden:<programlisting>self.duration = ((Time.parse(input) - Time.now.beginning_of_day) / 60).to_i</programlisting></para>
     </section>
 
-    <section>
+    <section xml:id="refactoring-minutes-to-hh-mm">
       <title>def minutes_to_hh_mm(minutes = nil)</title>
 
       <para>Wenn es eine Methode parse gibt, dann muss es auch den umgekehrten
@@ -761,11 +761,45 @@ sw@debian:~/dvd-sammlung$</screen></para>
     hh.to_s + ':%.2d' % mm
   end
 </programlisting> folgendes machen:<programlisting>  def minutes_to_hh_mm(minutes = nil)
-    (Time.now.beginning_of_day + 108.to_i.minutes).strftime("%H:%M")
+    (Time.now.beginning_of_day + minutes.to_i.minutes).strftime("%H:%M")
   end
 </programlisting></para>
 
-      <para></para>
+      <para>Jetzt noch mal alles zusammen in der neuen
+      <filename>app/models/dvd.rb</filename>:<programlisting>class Dvd &lt; ActiveRecord::Base
+  # getter method for the duration
+  #
+  def hh_mm
+    return 'NA' if self.duration.blank?
+    minutes_to_hh_mm(self.duration)
+  end
+
+  # setter method for the duration
+  #
+  def hh_mm=(input = nil)
+    if input.blank? or input.upcase == 'NA'
+      self.duration = nil
+    else
+      self.duration = ((Time.parse(input) - Time.now.beginning_of_day) / 60).to_i
+    end
+  end
+
+private
+  def minutes_to_hh_mm(minutes = nil)
+    (Time.now.beginning_of_day + minutes.to_i.minutes).strftime("%H:%M")
+  end
+end
+</programlisting></para>
     </section>
+  </section>
+
+  <section>
+    <title>Wo anfangen und wo aufhören?</title>
+
+    <para>DRY und Refactoring haben einen grossen Nachteil: Man kann selten
+    aufhören. Irgendwo gibt es fast immer noch etwas, das man besser machen
+    kann. Wie am Anfang des Kapitels angedeutet geht Refactoring aber mit
+    Testen Hand-in-Hand. Denn wie kann man sonst sicher gehen, nichts
+    verschlimm-bessert zu haben?!</para>
   </section>
 </chapter>
