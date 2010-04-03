@@ -18,7 +18,8 @@
     Buch <quote><citetitle>The Ruby Programming
     Language</citetitle></quote><footnote>
         <para>Das Buch ist sehr empfehlenswert für jeden der Ruby verstehen
-        will.</para>
+        will. David Flanagan hat zusammen mit Yukihiro Matsumoto (aka Matz)
+        super Arbeit geleistet. </para>
       </footnote>:</para>
 
     <para><quote>It is easy to program in Ruby, but Ruby is not a simple
@@ -37,9 +38,12 @@
     habe ich mir keine Gedanken darüber gemacht. Da ich aber Ruby nicht
     verstand, konnte ich auch Rails nicht verstehen. Deshalb habe ich es immer
     wieder in die virtuelle Ecke gelegt und weiter mit PHP gearbeitet. Erst
-    nachdem ich mir Ruby intensiv angeschaut hatte fiel der Groschen. Heute
-    bin ich ein so großer Ruby- und Rails-Fan, dass ich mir sogar die Mühe
-    mache dazu ein Buch zu schreiben, um es Ihnen näherzubringen.</para>
+    nachdem ich mir Ruby intensiv angeschaut hatte fiel der Groschen.
+    <footnote>
+        <para>Heute bin ich ein so großer Ruby- und Rails-Fan, dass ich mir
+        sogar die Mühe mache dazu ein Buch zu schreiben, um es Ihnen
+        näherzubringen. ;-)</para>
+      </footnote></para>
   </section>
 
   <section xml:id="ruby-ist-eine-skriptsprache">
@@ -60,6 +64,16 @@
     <para>Und kann auf der Kommandozeile wie folgt aufgerufen werden:<screen>sw@debian:~/sandbox$ <command>ruby hello-world.rb</command> 
 Hello World!
 sw@debian:~/sandbox$ </screen></para>
+
+    <para>Eine Programmzeile in einem Ruby-Programm muss nicht durch ein
+    Semikolon beendet werden. Der Ruby Interpreter ist sogar so inteligent zu
+    erkennen, wenn eine Programmzeile wegen der besseren Lesbarkeit in zwei
+    oder noch mehr Zeilen aufgeteilt wird. Ich erspare Ihnen jetzt die
+    entsprechenden Beispiele und erwähne es nur, damit Sie später nicht
+    sagen/denken "Geht das den so?"</para>
+
+    <para>Einrücken von Code ist ebenfalls nicht notwendig. Allerdings
+    erleichtert das die Lesbarkeit für den Menschen doch ungemein.</para>
 
     <section xml:id="puts-und-print">
       <title>puts und print</title>
@@ -96,6 +110,147 @@ Hello World!
 Hello World!------------
 sw@debian:~/sandbox$ </screen></para>
     </section>
+
+    <section xml:id="kommentare-in-ruby">
+      <title>Kommentare</title>
+
+      <para>Ein Kommentar in einem Ruby-Programm wird mit einem
+      <code>#</code>-Zeichen eingeleitet und von einem Zeilenvorschub beendet.
+      Als Beispiel erweitere ich das obige <filename>hello-world.rb</filename>
+      um einen Kommentar:<programlisting><emphasis role="bold"># Programm zum Anzeigen von "Hello World!"</emphasis>
+<emphasis role="bold"># by Stefan Wintermeyer</emphasis>
+
+puts 'Hello World!'</programlisting></para>
+
+      <para>Ein Kommentar kann auch nach einer Programmzeile
+      stehen:<programlisting># Programm zum Anzeigen von "Hello World!"
+# by Stefan Wintermeyer
+
+puts 'Hello World!'  <emphasis role="bold"># Ausgabe</emphasis></programlisting></para>
+
+      <para>Ein <code>#</code>-Zeichen innerhalb von Strings in
+      Anführungszeichen wird nicht als Anfang eines Kommentars behandelt.
+      Beispielprogramm:<programlisting># Beispielprogramm
+# by Stefan Wintermeyer
+
+puts 'Hello World!'
+puts <emphasis role="bold">'############'</emphasis>
+puts
+puts <emphasis role="bold">'1#2#3#4#5#6#'</emphasis>  # Kommentar dazu
+</programlisting></para>
+
+      <para>Die Bildschirmausgabe dazu:<screen>sw@debian:~/sandbox$ <command>ruby hello-world.rb</command> 
+Hello World!
+############
+
+1#2#3#4#5#6#
+sw@debian:~/sandbox$ </screen></para>
+    </section>
+
+    <section>
+      <title>Hilfe per ri</title>
+
+      <para>Man hat ja beim Programmieren nicht immer auch ein Ruby Buch zur
+      Hand. Aber daran haben die Ruby Entwickler geacht und mit dem Programm
+      <application>ri</application> eine eigene Hilfe eingebaut.</para>
+
+      <para>Jetzt haben wir eine typische Henne-Ei-Situation. Wie kann ich
+      Ihnen einen Hilfe zu Ruby erklären, wenn wir gerade erst mit Ruby
+      anfangen? Ich greife also voraus und zeige Ihnen wie Sie Informationen
+      zur Klasse <classname>String</classname> suchen können:<screen>sw@debian:~/sandbox$ <command>ri String</command>
+------------------------------------------------- Class: String &lt; Object
+     A +String+ object holds and manipulates an arbitrary sequence of
+     bytes, typically representing characters. String objects may be
+     created using +String::new+ or as literals.
+
+     Because of aliasing issues, users of strings should be aware of the
+     methods that modify the contents of a +String+ object. Typically,
+     methods with names ending in ``!'' modify their receiver, while
+     those without a ``!'' return a new +String+. However, there are
+     exceptions, such as +String#[]=+.
+
+     Enhance the String class with a XML escaped character version of
+     to_s.
+
+     User defined methods to be added to String.
+
+------------------------------------------------------------------------
+
+
+Includes:
+---------
+
+     Comparable
+
+
+Class methods:
+--------------
+
+     new, try_convert, yaml_new
+
+
+Instance methods:
+-----------------
+
+     %, *, +, &lt;&lt;, &lt;=&gt;, ==, ===, =~, [], []=, ascii_only?, block_scanf,
+     bytes, bytesize, capitalize, capitalize!, casecmp, center, chars,
+     chomp, chomp!, chop, chop!, chr, clear, codepoints, concat, count,
+     crypt, delete, delete!, downcase, downcase!, dump, each_byte,
+     each_char, each_codepoint, each_line, empty?, encode, encode!,
+     encoding, end_with?, eql?, ext, force_encoding, getbyte, gsub,
+     gsub!, hash, hex, include?, index, initialize_copy, insert,
+     inspect, intern, is_binary_data?, is_complex_yaml?, iseuc, isjis,
+     issjis, isutf8, kconv, length, lines, ljust, lstrip, lstrip!,
+     match, next, next!, oct, ord, parse_csv, partition, pathmap,
+     pathmap_explode, pathmap_partial, pathmap_replace, replace,
+     reverse, reverse!, rindex, rjust, rpartition, rstrip, rstrip!,
+     scan, scanf, setbyte, shellescape, shellsplit, size, slice, slice!,
+     split, squeeze, squeeze!, start_with?, strip, strip!, sub, sub!,
+     succ, succ!, sum, swapcase, swapcase!, to_blob, to_d, to_f, to_i,
+     to_s, to_str, to_sym, to_yaml, toeuc, tojis, tolocale, tosjis,
+     toutf16, toutf32, toutf8, tr, tr!, tr_s, tr_s!, unpack, upcase,
+     upcase!, upto, valid_encoding?
+sw@debian:~/sandbox$ </screen></para>
+
+      <para>Suchen wir jetzt Informationen zu einer bestimmten Methode
+      (Henne-Ei!), dann geht das auch mit ri. Als Beispiel nehmen wir mal
+      <methodname>gsub</methodname>. Das ist eine Methode mit der man Elemente
+      in einem <classname>String</classname> austauschen kann (immer wieder
+      praktisch).<screen>sw@debian:~/sandbox$ <command>ri String.gsub</command>
+------------------------------------------------------------ String#gsub
+     str.gsub(pattern, replacement)       =&gt; new_str
+     str.gsub(pattern) {|match| block }   =&gt; new_str
+
+     From Ruby 1.9.1
+------------------------------------------------------------------------
+     Returns a copy of _str_ with _all_ occurrences of _pattern_
+     replaced with either _replacement_ or the value of the block. The
+     _pattern_ will typically be a +Regexp+; if it is a +String+ then no
+     regular expression metacharacters will be interpreted (that is
+     +/\d/+ will match a digit, but +'\d'+ will match a backslash
+     followed by a 'd').
+
+     If a string is used as the replacement, special variables from the
+     match (such as +$&amp;+ and +$1+) cannot be substituted into it, as
+     substitution into the string occurs before the pattern match
+     starts. However, the sequences +\1+, +\2+, +\k&lt;group_name&gt;+, and so
+     on may be used to interpolate successive groups in the match.
+
+     In the block form, the current match string is passed in as a
+     parameter, and variables such as +$1+, +$2+, +$`+, +$&amp;+, and +$'+
+     will be set appropriately. The value returned by the block will be
+     substituted for the match on each call.
+
+     The result inherits any tainting in the original string or any
+     supplied replacement string.
+
+        "hello".gsub(/[aeiou]/, '*')                  #=&gt; "h*ll*"
+        "hello".gsub(/([aeiou])/, '&lt;\1&gt;')             #=&gt; "h&lt;e&gt;ll&lt;o&gt;"
+        "hello".gsub(/./) {|s| s[0].ord.to_s + ' '}   #=&gt; "104 101 108 108 111 "
+        "hello".gsub(/(?&lt;foo&gt;[aeiou])/, '{\k&lt;foo&gt;}')  #=&gt; "h{e}ll{o}"
+
+sw@debian:~/sandbox$</screen></para>
+    </section>
   </section>
 
   <section xml:id="irb">
@@ -119,42 +274,6 @@ sw@debian:~/sandbox$ </screen></para>
     <application>irb</application> erarbeitet. Sie werden auch später bei der
     Arbeit oft innerhalb von irb neue Sachen ausprobieren, weil es so herrlich
     schnell und unkompliziert ist.</para>
-  </section>
-
-  <section xml:id="kommentare-in-ruby">
-    <title>Kommentare</title>
-
-    <para>Ein Kommentar in einem Ruby-Programm wird mit einem
-    <code>#</code>-Zeichen eingeleitet und von einem Zeilenvorschub beendet.
-    Als Beispiel erweitere ich das obige <filename>hello-world.rb</filename>
-    um einen Kommentar:<programlisting><emphasis role="bold"># Programm zum Anzeigen von "Hello World!"</emphasis>
-<emphasis role="bold"># by Stefan Wintermeyer</emphasis>
-
-puts 'Hello World!'</programlisting></para>
-
-    <para>Ein Kommentar kann auch nach einer Programmzeile
-    stehen:<programlisting># Programm zum Anzeigen von "Hello World!"
-# by Stefan Wintermeyer
-
-puts 'Hello World!'  <emphasis role="bold"># Ausgabe</emphasis></programlisting></para>
-
-    <para>Ein <code>#</code>-Zeichen innerhalb von Strings in
-    Anführungszeichen wird nicht als Anfang eines Kommentars behandelt.
-    Beispielprogramm:<programlisting># Beispielprogramm
-# by Stefan Wintermeyer
-
-puts 'Hello World!'
-puts <emphasis role="bold">'############'</emphasis>
-puts
-puts <emphasis role="bold">'1#2#3#4#5#6#'</emphasis>  # Kommentar dazu
-</programlisting></para>
-
-    <para>Die Bildschirmausgabe dazu:<screen>sw@debian:~/sandbox$ <command>ruby hello-world.rb</command> 
-Hello World!
-############
-
-1#2#3#4#5#6#
-sw@debian:~/sandbox$ </screen></para>
 
     <section xml:id="kommentare-im-irb">
       <title>Kommentare im irb</title>
@@ -163,7 +282,7 @@ sw@debian:~/sandbox$ </screen></para>
       Sinn, da in irb erarbeiteter Code quasi Wegwerf-Code ist. Innerhalb
       dieses Buches werden aber immer mal wieder Kommentare zur Erklärung auch
       im irb benutzt. Diese können Sie problemlos mit kopieren und im irb
-      einfügen.</para>
+      einfügen oder auch weglassen.</para>
     </section>
   </section>
 
@@ -185,9 +304,9 @@ sw@debian:~/sandbox$ </screen></para>
       <para>Sie haben keine Ahnung was eine Klasse und was ein Objekt ist?
       Keine Panik! Ich werde es keinem erzählen, und man kann auch ganz gut
       damit arbeiten, ohne sich große Gedanken darüber zu machen. Mit dem
-      Thema alleine könnte man ein ganzes Buch füllen. Ganz grob: Ein Objekt
-      ist ein Container für irgendwas und eine Methode verändert etwas in
-      diesem Container.</para>
+      Thema alleine könnte man ein eigenes und viel grösseres Buch füllen.
+      Ganz grob: Ein Objekt ist ein Container für irgendwas und eine Methode
+      verändert etwas in diesem Container.</para>
 
       <para>Lesen Sie bitte weiter und schauen Sie sich die Beispiele an.
       Stück für Stück wird das Puzzle dann klarer.</para>
@@ -271,10 +390,10 @@ irb(main):007:0&gt; <command>exit</command>
       definieren und diese innerhalb der Methode benutzen. Damit können wir
       eine Methode erstellen, der wir einen String als Parameter übergeben,
       und den dann dreimal ausgeben lassen.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>def drei_mal(mystr)</command>  # Parameter: mystr
-irb(main):002:1&gt; <command>  puts mystr</command>
-irb(main):003:1&gt; <command>  puts mystr</command>
-irb(main):004:1&gt; <command>  puts mystr</command>
+irb(main):001:0&gt; <command>def drei_mal(apfelmus)</command>  # Parameter: mystr
+irb(main):002:1&gt; <command>  puts apfelmus</command>
+irb(main):003:1&gt; <command>  puts apfelmus</command>
+irb(main):004:1&gt; <command>  puts apfelmus</command>
 irb(main):005:1&gt; <command>end</command>
 =&gt; nil
 irb(main):006:0&gt; <command>drei_mal('Hello World!')</command>
@@ -319,7 +438,7 @@ irb(main):009:0&gt; <command>exit</command>
       mal an, dass die Methode zur neuen Klasse
       <classname>Dies_und_das</classname> gehört. Dann würde sie in einem
       Ruby-Programm folgendermaßen definiert:<programlisting>class Dies_und_das      # Start der Klassendefinition
-  def drei_mail
+  def drei_mal
     puts 'Hello World!'
     puts 'Hello World!'
     puts 'Hello World!'
@@ -338,7 +457,7 @@ irb(main):007:1&gt; <command>end</command>
 </screen></para>
 
       <para>Jetzt probieren wir mal aus, die Methode
-      <methodname>drei_mail</methodname> aufzurufen:<screen>irb(main):008:0&gt; <command>Dies_und_das.drei_mal</command>
+      <methodname>drei_mal</methodname> aufzurufen:<screen>irb(main):008:0&gt; <command>Dies_und_das.drei_mal</command>
 NoMethodError: undefined method `drei_mal' for Dies_und_das:Class
  from (irb):8
 from /usr/local/bin/irb:12:in `&lt;main&gt;'
@@ -346,8 +465,8 @@ from /usr/local/bin/irb:12:in `&lt;main&gt;'
 
       <para>Das gibt eine Fehlermeldung, denn
       <classname>Dies_und_das</classname> ist eine Klasse und kein Objekt. Es
-      funktioniert nur, wenn wir vorher ein neues Objekt (eine neue Instanz)
-      der Klasse <classname>Dies_und_das</classname> mit der Methode
+      funktioniert nur, wenn wir vorher ein neues Objekt (also eine neue
+      Instanz) der Klasse <classname>Dies_und_das</classname> mit der Methode
       <methodname>new</methodname> erzeugt haben:<screen>irb(main):009:0&gt; <command>abc = Dies_und_das.new</command>
 =&gt; #&lt;Dies_und_das:0x9ebb3f0&gt;
 irb(main):010:0&gt; <command>abc.drei_mal</command>
@@ -365,7 +484,7 @@ irb(main):011:0&gt; <command>exit</command>
         <methodname>instance_methods</methodname> alle definierten Methoden
         auslesen.</para>
 
-        <important>
+        <note>
           <para>Lassen Sie sich hier nicht von dem Namen
           <methodname>instance_methods</methodname> verwirren. Es geht hier im
           Beispiel um statische Methoden einer Klasse selbst, nicht um
@@ -373,7 +492,7 @@ irb(main):011:0&gt; <command>exit</command>
           hat eine entsprechende Instanz auch keine Methode
           <methodname>instance_methods</methodname>, sondern nur die Methode
           <methodname>methods</methodname>.</para>
-        </important>
+        </note>
 
         <para>Probieren wir das mal mit der Klasse
         <classname>Dies_und_das</classname> aus (die legen wir dazu noch mal
@@ -391,9 +510,9 @@ irb(main):008:0&gt; <command>Dies_und_das.instance_methods</command>
 </screen></para>
 
         <para>Das ist ja viel mehr, als wir definiert haben! Das liegt daran,
-        dass jede neue Klasse von Ruby direkt mal ein Grundprogramm an
-        Methoden mitbekommt. Wenn wir nur die von uns definierten Methoden
-        auflisten wollen, so geht das wie folgt:<screen>irb(main):009:0&gt; <command>Dies_und_das.instance_methods(false)</command>
+        dass jede neue Klasse von Ruby direkt mal ein Grundgerüst an Methoden
+        mitbekommt. Wenn wir nur die von uns definierten Methoden auflisten
+        wollen, so geht das wie folgt:<screen>irb(main):009:0&gt; <command>Dies_und_das.instance_methods(false)</command>
 =&gt; [:drei_mal]
 irb(main):010:0&gt; </screen></para>
       </section>
@@ -446,9 +565,9 @@ irb(main):018:0&gt; <command>exit</command>
         <methodname>new</methodname> aufruft), dann gibt es einen Mechanismus
         eine Art Start-Skript ablaufen zu lassen. Dieser Mechanismus ist die
         Methode <methodname>initialize</methodname>.<footnote>
-            <para>In anderen Programmiersprachen sind quasi
+            <para>In anderen Programmiersprachen sind
             <methodname>.new</methodname> und
-            <methodname>.initialize</methodname> kombiniert und heißen
+            <methodname>.initialize</methodname> oft kombiniert und heißen
             Konstruktor.</para>
           </footnote> Die Methode ist automatisch eine private Methode, auch
         wenn Sie nicht explizit im Bereich <literal>private</literal>
@@ -505,7 +624,9 @@ irb(main):007:0&gt; <command>exit</command>
         <classname>Allgemeinwissen</classname> und vererben dorthin die Klasse
         <classname>Literatur</classname>. Die Instanz <code>egon</code> hat
         Zugriff auf alle Methoden und die Instanz <code>fritz</code> nur auf
-        die der Klasse <classname>Literatur</classname>.<screen>sw@debian:~/sandbox$ <command>irb</command>
+        die der Klasse <classname>Literatur</classname>.<footnote>
+            <para>Bei dem Satz wird einem ja schwindelig. ;-)</para>
+          </footnote><screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>class Literatur</command>
 irb(main):002:1&gt; <command>  def antwort_auf_alle_fragen_des_universums</command>
 irb(main):003:2&gt; <command>    42</command>
@@ -536,72 +657,74 @@ irb(main):017:0&gt; <command>exit</command>
 </screen></para>
       </section>
     </section>
+  </section>
+
+  <section>
+    <title>Variablen</title>
+
+    <para>Wir wissen ja jetzt, dass in Ruby alles ein Objekt ist. Also muss
+    auch eine Variable ein Objekt sein.</para>
 
     <section>
-      <title>Variablen</title>
+      <title>Namenskonventionen</title>
 
-      <para>Wir wissen ja jetzt, dass in Ruby alles ein Objekt ist. Also muss
-      auch eine Variable ein Objekt sein.</para>
+      <para>Normale Variablen werden kleingeschrieben. Konstanten fangen mit
+      einem Großbuchstaben an.<important>
+          <para>Eine Konstante kann in Ruby auch mit einem neuen Wert
+          überschrieben werden (allerdings wird dabei eine Warnung
+          ausgegeben). Man sollte sich also nicht auf Unveränderlichkeit einer
+          Konstanten verlassen.</para>
+        </important></para>
 
-      <section>
-        <title>Namenskonventionen</title>
+      <para>Auf der sicheren Seite ist man, wenn man nur ASCII-Zeichen
+      verwendet. Allerdings könnten Sie mit Ruby 1.9 und der richtigen
+      Kodierung auch problemlos Sonderzeichen und Umlaute in einem
+      Variablennamen verwenden. Die Höflichkeit gegenüber anderen (evtl.
+      ausländischen) Programmierern, die diese Zeichen vielleicht nicht fix
+      und fertig auf der Tastatur haben, ist aber Grund nur reines ASCII zu
+      benutzen.</para>
+    </section>
 
-        <para>Normale Variablen werden kleingeschrieben. Konstanten fangen mit
-        einem Großbuchstaben an.<important>
-            <para>Eine Konstante kann in Ruby auch mit einem neuen Wert
-            überschrieben werden (allerdings wird dabei eine Warnung
-            ausgegeben). Man sollte sich also nicht auf Unveränderlichkeit
-            einer Konstanten verlassen.</para>
-          </important></para>
+    <section>
+      <title>String</title>
 
-        <para>Auf der sicheren Seite ist man, wenn man nur ASCII-Zeichen
-        verwendet. Allerdings könnten Sie mit Ruby 1.9 und der richtigen
-        Kodierung auch problemlos Sonderzeichen und Umlaute in einem
-        Variablennamen verwenden. Die Höflichkeit gegenüber anderen (evtl.
-        ausländischen) Programmierern, die diese Zeichen vielleicht nicht fix
-        und fertig auf der Tastatur haben, ist aber Grund nur reines ASCII zu
-        benutzen.</para>
-      </section>
-
-      <section>
-        <title>String</title>
-
-        <para>Probieren wir mal ein wenig im irb aus.<screen>sw@debian:~/sandbox$ <command>irb</command>
+      <para>Probieren wir mal ein wenig im irb aus. Die Methode
+      <methodname>.class</methodname> gibt uns dabei an, um welche Klasse es
+      sich handelt.<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>a = 'Ein Test.'</command>
 =&gt; "Ein Test."
 irb(main):002:0&gt; <command>a.class</command>
 =&gt; String
 </screen></para>
 
-        <para>Das war einfach. Ruby erschafft also automagisch ein Objekt der
-        Klasse String. Das ginge auch mit der Methode
-        <methodname>new</methodname>:<screen>irb(main):003:0&gt; <command>b = String.new('Noch ein Test.')</command>
+      <para>Das war einfach. Ruby erschafft also automagisch ein Objekt der
+      Klasse String. Das ginge auch mit der Methode
+      <methodname>new</methodname>:<screen>irb(main):003:0&gt; <command>b = String.new('Noch ein Test.')</command>
 =&gt; "Noch ein Test."
 irb(main):004:0&gt; <command>b.class</command>
 =&gt; String
 </screen></para>
 
-        <para>Wenn wir <code>String.new</code> ohne einen Parameter aufrufen,
-        dann wird ebenfalls ein Objekt der Klasse
-        <classname>String</classname> erstellt. Nur ist das dann ein leerer
-        String:<screen>irb(main):005:0&gt; <command>c = String.new</command>
+      <para>Wenn wir <code>String.new</code> ohne einen Parameter aufrufen,
+      dann wird ebenfalls ein Objekt der Klasse <classname>String</classname>
+      erstellt. Nur ist das dann ein leerer String:<screen>irb(main):005:0&gt; <command>c = String.new</command>
 =&gt; ""
 irb(main):006:0&gt; <command>c.class</command>
 =&gt; String
 irb(main):007:0&gt; <command>exit</command>
 </screen></para>
 
-        <section>
-          <title>Einfache und doppelte Anführungszeichen</title>
+      <section>
+        <title>Einfache und doppelte Anführungszeichen</title>
 
-          <para>Strings können nicht nur in einfachen Anführungszeichen,
-          sondern auch in doppelten Anführungzeichen definiert werden. Bei den
-          doppelten Anführungszeichen gibt es dann aber eine Besonderheit: Man
-          kann Ausdrücke (Expressions) innerhalb eines Konstruktes
-          <code>#{}</code> einbinden. Das Ergebnis wird dann automatisch an
-          die entsprechende Stelle im String eingesetzt.</para>
+        <para>Strings können nicht nur in einfachen Anführungszeichen, sondern
+        auch in doppelten Anführungzeichen definiert werden. Bei den doppelten
+        Anführungszeichen gibt es dann aber eine Besonderheit: Man kann
+        Ausdrücke (Expressions) innerhalb eines Konstruktes <code>#{}</code>
+        einbinden. Das Ergebnis wird dann automatisch an die entsprechende
+        Stelle im String eingesetzt.</para>
 
-          <para>Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
+        <para>Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>a = 'blau'</command>
 =&gt; blau
 irb(main):002:0&gt; <command>b = "Farbe: #{a}"</command>
@@ -611,27 +734,26 @@ irb(main):003:0&gt; <command>b.class</command>
 irb(main):004:0&gt; <command>exit</command>
 </screen></para>
 
-          <para>Ist das Ergebnis des Ausdrucks kein String, versucht Ruby die
-          Methode <methodname>to_s</methodname> anzuwenden, um den Wert des
-          Objekts in einen String umzuwandeln.</para>
-        </section>
+        <para>Ist das Ergebnis des Ausdrucks kein String, versucht Ruby die
+        Methode <methodname>to_s</methodname> anzuwenden, um den Wert des
+        Objekts in einen String umzuwandeln.</para>
       </section>
+    </section>
+
+    <section>
+      <title>Zahlen</title>
 
       <section>
-        <title>Zahlen</title>
+        <title>Fixnum und Bignum</title>
 
-        <section>
-          <title>Fixnum und Bignum</title>
-
-          <para><classname>Fixnum</classname> und
-          <classname>Bignum</classname> sind
-          <classname>Integer</classname>-Klassen (sprich Ganzzahlen). Ein
-          <classname>Fixnum</classname> ist ein
-          <classname>Integer</classname>, der in einem <quote>Word</quote>
-          gespeichert werden kann. (Falls Sie nicht wissen, was ein
-          <quote>Word</quote> ist: egal). Wird ein
-          <classname>Fixnum</classname> größer, wandelt es sich automatisch in
-          ein <classname>Bignum</classname> um.<screen>sw@debian:~/sandbox$ <command>irb</command>
+        <para><classname>Fixnum</classname> und <classname>Bignum</classname>
+        sind <classname>Integer</classname>-Klassen (sprich Ganzzahlen). Ein
+        <classname>Fixnum</classname> ist ein <classname>Integer</classname>,
+        der in einem <quote>Word</quote> gespeichert werden kann.<footnote>
+            <para>Falls Sie nicht wissen, was ein <quote>Word</quote> ist:
+            egal.</para>
+          </footnote> Wird ein <classname>Fixnum</classname> größer, wandelt
+        es sich automatisch in ein <classname>Bignum</classname> um.<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>20.class</command>
 =&gt; Fixnum
 irb(main):002:0&gt; <command>a = 20</command>
@@ -644,14 +766,14 @@ irb(main):005:0&gt; <command>a.class</command>
 =&gt; Bignum
 irb(main):006:0&gt; <command>exit</command>
 </screen></para>
-        </section>
+      </section>
 
-        <section>
-          <title>Float</title>
+      <section>
+        <title>Float</title>
 
-          <para><classname>Float</classname> ist eine Klasse für reelle Zahlen
-          (<quote>Fließkomma-Zahlen</quote>). Dabei wird die englische
-          Schreibweise für das Komma (also ein Punkt) benutzt.<screen>sw@debian:~/sandbox$ <command>irb</command>
+        <para><classname>Float</classname> ist eine Klasse für reelle Zahlen
+        (<quote>Fließkomma-Zahlen</quote>). Dabei wird die englische
+        Schreibweise für das Komma (also ein Punkt) benutzt.<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>a = 20.424</command>
 =&gt; 20.424
 irb(main):002:0&gt; <command>a.class</command>
@@ -660,13 +782,13 @@ irb(main):003:0&gt; <command>42.2.class</command>
 =&gt; Float
 irb(main):004:0&gt; <command>exit</command>
 </screen></para>
-        </section>
+      </section>
 
-        <section>
-          <title>Einfache Berechnungen</title>
+      <section>
+        <title>Einfache Berechnungen</title>
 
-          <para>Rechnen mit Integers und Floats ist so einfach, dass man alles
-          anhand von ein paar Zeilen irb-Code beschreiben kann:<screen>sw@debian:~/sandbox$ <command>irb</command>
+        <para>Rechnen mit Integers und Floats ist so einfach, dass man alles
+        anhand von ein paar Zeilen irb-Code beschreiben kann:<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>a = 10</command>
 =&gt; 10
 irb(main):002:0&gt; <command>b = 23</command>
@@ -697,15 +819,15 @@ irb(main):014:0&gt; <command>a += 1</command>         # a = a + 1
 =&gt; 11
 irb(main):015:0&gt; <command>exit</command>
 </screen></para>
-        </section>
       </section>
+    </section>
 
-      <section>
-        <title>Booleans und nil</title>
+    <section>
+      <title>Booleans und nil</title>
 
-        <para>Für boolsche Werte (<code>true</code> und <code>false</code>)
-        und für <code>nil</code> (kein Wert) gibt es jeweils eine eigene
-        Klasse:<screen>sw@debian:~/sandbox$ <command>irb</command>
+      <para>Für boolsche Werte (<code>true</code> und <code>false</code>) und
+      für <code>nil</code> (kein Wert) gibt es jeweils eine eigene
+      Klasse:<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>true.class</command>
 =&gt; TrueClass
 irb(main):002:0&gt; <command>false.class</command>
@@ -714,44 +836,24 @@ irb(main):003:0&gt; <command>nil.class</command>
 =&gt; NilClass
 irb(main):004:0&gt; <command>exit</command>
 </screen></para>
-      </section>
+    </section>
+
+    <section>
+      <title>Gültigkeitsbereich (Scope) von Variablen</title>
+
+      <para>Variablen haben je nach Art eine unterschiedliche
+      <quote>Reichweite</quote> innerhalb der Ruby- und damit auch innerhalb
+      einer Ruby-on-Rails-Applikation. Man muss bei der Programmierung diese
+      Reichweite immer im Hinterkopf behalten, weil man sonst merkwürdige
+      "Effekte bemerkt".</para>
 
       <section>
-        <title>Gültigkeitsbereich (Scope) von Variablen</title>
+        <title>Lokale Variablen (aaa oder _aaa)</title>
 
-        <para>Variablen haben je nach Art eine unterschiedliche
-        <quote>Reichweite</quote> innerhalb der Ruby- oder
-        Ruby-on-Rails-Applikation. Am besten zeigt sich das mit diesem kleinen
-        Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = 10</command>
-=&gt; 10
-irb(main):002:0&gt; <command>def test</command>
-irb(main):003:1&gt; <command>  a = 20</command>
-irb(main):004:1&gt; <command>end</command>
-=&gt; nil
-irb(main):005:0&gt; <command>puts a</command>
-10
-=&gt; nil
-irb(main):006:0&gt; <command>test</command>
-=&gt; 20
-irb(main):007:0&gt; <command>puts a</command>
-10
-=&gt; nil
-irb(main):008:0&gt; <command>exit</command>
-</screen></para>
-
-        <para>Obwohl die Methode <methodname>test</methodname> den Wert der
-        Variable <varname>a</varname> auf 20 gesetzt hat, wurde dabei nur eine
-        lokale Variable verändert. Das vorher im Hauptprogramm gesetzte
-        <varname>a</varname> war davon nicht betroffen.</para>
-
-        <section>
-          <title>Lokale Variablen (aaa oder _aaa)</title>
-
-          <para>Lokale Variablen fangen entweder mit einem kleinen Buchstaben
-          oder mit einem Unterstrich (<literal>_</literal>) an. Ihr
-          Gültigkeitsbereich beschränkt sich auf die aktuelle Umgebung (z. B.
-          auf die aktuelle Methode). Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
+        <para>Lokale Variablen fangen entweder mit einem kleinen Buchstaben
+        oder mit einem Unterstrich (<literal>_</literal>) an. Ihr
+        Gültigkeitsbereich beschränkt sich auf die aktuelle Umgebung (z. B.
+        auf die aktuelle Methode). Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>aaa = 10</command>    # Lokale Variable aaa
 =&gt; 10
 irb(main):002:0&gt; <command>_bbb = 20</command>   # Lokale Variable _bbb
@@ -787,14 +889,14 @@ irb(main):015:0&gt; <command>puts _bbb</command>
 =&gt; nil
 irb(main):016:0&gt; <command>exit</command>
 </screen></para>
-        </section>
+      </section>
 
-        <section>
-          <title>Globale Variablen ($aaa)</title>
+      <section>
+        <title>Globale Variablen ($aaa)</title>
 
-          <para>Eine globale Variable fäng mit einem
-          <literal>$</literal>-Zeichen an und ist im gesamten Programm
-          erreichbar. Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
+        <para>Eine globale Variable fäng mit einem
+        <literal>$</literal>-Zeichen an und ist im gesamten Programm
+        erreichbar. Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>$aaa = 10</command>
 =&gt; 10
 irb(main):002:0&gt; <command>puts $aaa</command>
@@ -817,20 +919,20 @@ irb(main):009:0&gt; <command>$aaa.class</command>
 irb(main):010:0&gt; <command>exit</command>
 </screen></para>
 
-          <para>Globale Variablen werden recht selten benutzt.</para>
-        </section>
+        <para>Globale Variablen werden recht selten benutzt.</para>
+      </section>
 
-        <section>
-          <title>Instanz-Variablen (@aaa)</title>
+      <section>
+        <title>Instanz-Variablen (@aaa)</title>
 
-          <para>Instanz-Variablen (<quote><emphasis
-          role="bold">A</emphasis>ttribute</quote>, daher das
-          <literal>@</literal>) gelten nur innerhalb einer Klasse, dort aber
-          überall. Also quasi eine Mini-Version von globalen Variablen. Im
-          Gegensatz zu globalen Variablen findet man Instanz-Variablen in
-          einer Rails-Applikation an jeder Ecke. Wir gehen die Sache über ein
-          Beispielprogramm mit dem Namen <filename>farbe.rb</filename>
-          an:<programlisting>class Wand
+        <para>Instanz-Variablen (<quote><emphasis
+        role="bold">A</emphasis>ttribute</quote>, daher das
+        <literal>@</literal>) gelten nur innerhalb einer Klasse, dort aber
+        überall. Also quasi eine Mini-Version von globalen Variablen. Im
+        Gegensatz zu globalen Variablen findet man Instanz-Variablen in einer
+        Rails-Applikation an jeder Ecke. Wir gehen die Sache über ein
+        Beispielprogramm mit dem Namen <filename>farbe.rb</filename>
+        an:<programlisting>class Wand
   def initialize
     <emphasis role="bold">@farbe</emphasis> = 'weiß'
   end
@@ -848,7 +950,7 @@ irb(main):010:0&gt; <command>exit</command>
   end
   
   def streich_alles_rosa
-    farbe = 'rosa'
+    farbe = 'rosa'         # Achtung: Dies ist eine lokale Variable.
   end
 end
 
@@ -861,36 +963,38 @@ puts meine_wand.farbe
 meine_wand.streich_alles_rosa
 puts meine_wand.farbe
 </programlisting>Wenn wir dieses Programm starten erscheint folgende
-          Ausgabe:<screen>sw@debian:~/sandbox$ <command>ruby farbe.rb</command>
+        Ausgabe:<screen>sw@debian:~/sandbox$ <command>ruby farbe.rb</command>
 weiß
 rot
 rot
 sw@debian:~/sandbox$ </screen></para>
 
-          <para>In der Methode <methodname>initialize</methodname> setzen wir
-          die Instanz-Variable <varname>@farbe</varname> auf den Wert
-          <quote>weiß</quote>. Die Methoden
-          <methodname>streich_alles_rot</methodname> und
-          <methodname>streich_alles_gelb</methodname> verändern diese
-          Instanz-Variable. Die Methode
-          <methodname>streich_alles_rosa</methodname> hingegen setzt nur eine
-          lokale Variable mit dem Namen <varname>farbe</varname> (es fehlt das
-          <literal>@</literal>-Zeichen).</para>
+        <para>In der Methode <methodname>initialize</methodname> setzen wir
+        die Instanz-Variable <varname>@farbe</varname> auf den Wert
+        <quote>weiß</quote>. Die Methoden
+        <methodname>streich_alles_rot</methodname> und
+        <methodname>streich_alles_gelb</methodname> verändern diese
+        Instanz-Variable. Die Methode
+        <methodname>streich_alles_rosa</methodname> hingegen setzt nur eine
+        lokale Variable mit dem Namen <varname>farbe</varname> (es fehlt das
+        <literal>@</literal>-Zeichen).</para>
 
-          <para>Mit der Methode <methodname>farbe</methodname> können wir uns
-          außerhalb der Instanz den Wert von <varname>@farbe</varname>
-          ausgeben lassen.</para>
-        </section>
+        <para>Mit der Methode <methodname>farbe</methodname> können wir uns
+        außerhalb der Instanz den Wert von <varname>@farbe</varname> ausgeben
+        lassen.</para>
       </section>
     </section>
 
     <section xml:id="ruby-symbol">
       <title>Symbol</title>
 
-      <para>Ist es schlimm, wenn Symbole (Symbols) an dieser Stelle nicht
-      genau erklärt werden? Zur Benutzung von Symbolen braucht man nämlich nur
-      zu wissen wie ein Symbol aussieht, und das ist leicht
-      gezeigt:<programlisting>:symbolname</programlisting></para>
+      <para>Suchen Sie mit Google mal "Ruby Symbol" und Sie werden schnell
+      erahnen, welche Qual das Schreiben dieses kleinen Abschnittes war.
+      Zusätzlich kann man sich als Autor auch schlecht mit einem "ist nicht so
+      wichtig" rausreden. Aber ich werde genau dieses tun.</para>
+
+      <para>Zur Benutzung von Symbolen brauchen Sie erst mal nur zu wissen wie
+      ein Symbol aussieht, und das ist leicht gezeigt:<programlisting>:symbolname</programlisting></para>
 
       <para>Es fängt also mit einem Doppelpunkt an, gefolgt von einem kleinen
       Buchstaben. Symbole werden Sie in Rails einige Male sehen und im Lauf
@@ -898,26 +1002,28 @@ sw@debian:~/sandbox$ </screen></para>
       Sie mit <command>ri Symbol</command> die Hilfeseite zur Klasse
       <classname>Symbol</classname> aufrufen.</para>
     </section>
+  </section>
 
-    <section xml:id="mehr-zu-ruby-methoden">
-      <title>Noch ein paar Worte zu Methoden</title>
+  <section xml:id="noch_mal_methoden">
+    <title>Noch mal Methoden</title>
 
-      <para>Jetzt haben Sie ein wenig mehr Grundwissen, und da können wir bei
-      den Methoden ein kleine Stufe tiefer gehen.</para>
+    <para>Um die Menge der Henne-Ei-Probleme in diesem Kapitel erträglich zu
+    halten, müssen wir uns jetzt noch einmal mit Methoden beschäftigen und
+    dabei alles bis jetzt erlernte kombinieren.</para>
 
-      <section>
-        <title>Getter und Setter</title>
+    <section xml:id="getter_und_setter_methoden">
+      <title>Getter und Setter</title>
 
-        <para>Da Instanz-Variablen (<quote>Attribute</quote>) nur innerhalb
-        der jeweiligen Instanz existieren, muss man zum Exportieren einer
-        solchen Variable immer eine <quote>Getter</quote>-Methode schreiben.
-        Wenn wir eine Klasse <classname>Raum</classname> definieren, die als
-        Instanz-Variablen <varname>@tueren</varname> und
-        <varname>@fenster</varname> hat (für die Anzahl der Türen und Fenster
-        des Raumes), so können wir wie folgt Getter-Methoden
-        <methodname>tueren</methodname> und <methodname>fenster</methodname>
-        erstellen (Beispielprogramm
-        <filename>raum.rb</filename>):<programlisting>class Raum
+      <para>Da Instanz-Variablen (<quote>Attribute</quote>) nur innerhalb der
+      jeweiligen Instanz existieren, muss man zum Exportieren einer solchen
+      Variable immer eine <quote>Getter</quote>-Methode schreiben. Wenn wir
+      eine Klasse <classname>Raum</classname> definieren, die als
+      Instanz-Variablen <varname>@tueren</varname> und
+      <varname>@fenster</varname> hat (für die Anzahl der Türen und Fenster
+      des Raumes), so können wir wie folgt Getter-Methoden
+      <methodname>tueren</methodname> und <methodname>fenster</methodname>
+      erstellen (Beispielprogramm
+      <filename>raum.rb</filename>):<programlisting>class Raum
   def initialize
     @tueren  = 1   # ein neuer Raum hat eine Tür
     @fenster = 1   # ein neuer Raum hat ein Fenster
@@ -938,16 +1044,16 @@ puts wohnzimmer.tueren
 puts wohnzimmer.fenster
 </programlisting></para>
 
-        <para>Die Ausführung des Programmes:<screen>sw@debian:~/sandbox$ <command>ruby raum.rb</command> 
+      <para>Die Ausführung des Programmes:<screen>sw@debian:~/sandbox$ <command>ruby raum.rb</command> 
 1
 1
 sw@debian:~/sandbox$ </screen></para>
 
-        <para>Da dieses Szenario – dass man einfach nur einen Wert identisch
-        zurückgeben will – so häufig auftritt, gibt es dafür schon eine
-        vorgefertigte Getter-Methode mit dem Namen
-        <methodname>attr_reader</methodname>, die wie folgt im Programm
-        <filename>raum.rb</filename> angewendet werden würde:<programlisting>class Raum
+      <para>Da dieses Szenario – dass man einfach nur einen Wert identisch
+      zurückgeben will – so häufig auftritt, gibt es dafür schon eine
+      vorgefertigte Getter-Methode mit dem Namen
+      <methodname>attr_reader</methodname>, die wie folgt im Programm
+      <filename>raum.rb</filename> angewendet werden würde:<programlisting>class Raum
   def initialize
     @tueren  = 1
     @fenster = 1
@@ -962,16 +1068,16 @@ puts wohnzimmer.tueren
 puts wohnzimmer.fenster
 </programlisting></para>
 
-        <note>
-          <para><methodname>attr_reader</methodname> ist ein gutes Beispiel
-          für Meta-Programmierung in Ruby. Sie werden gerade bei der Arbeit
-          mit Rails immer wieder auf Meta-Programmierung stoßen und sich über
-          die Automagie freuen.</para>
-        </note>
+      <note>
+        <para><methodname>attr_reader</methodname> ist ein gutes Beispiel für
+        Meta-Programmierung in Ruby. Sie werden gerade bei der Arbeit mit
+        Rails immer wieder auf Meta-Programmierung stoßen und sich über die
+        Automagie freuen.</para>
+      </note>
 
-        <para>Wenn man von Außen die Anzahl der Türen oder Fenster verändern
-        will, so braucht man dafür eine <quote>Setter</quote>-Methode. Die
-        kann wie folgt realisiert werden:<programlisting>class Raum
+      <para>Wenn man von Außen die Anzahl der Türen oder Fenster verändern
+      will, so braucht man dafür eine <quote>Setter</quote>-Methode. Die kann
+      wie folgt realisiert werden:<programlisting>class Raum
   def initialize
     @tueren  = 1
     @fenster = 1
@@ -998,15 +1104,16 @@ wohnzimmer.fenster = 2     # fenster wird neu gesetzt
 puts wohnzimmer.fenster
 </programlisting></para>
 
-        <para>Die entsprechende Ausgabe dazu:<screen>sw@debian:~/sandbox$ <command>ruby raum.rb</command>
+      <para>Die entsprechende Ausgabe dazu:<screen>sw@debian:~/sandbox$ <command>ruby raum.rb</command>
 1
 1
 2
 sw@debian:~/sandbox$ </screen></para>
 
-        <para>Natürlich gibt es dazu auch einen vorgefertigten Weg. Mit der
-        Methode <methodname>attr_writer</methodname> können Sie den Code von
-        <filename>raum.rb</filename> weiter vereinfachen:<programlisting>class Raum
+      <para>Sie können es sich wahrscheinlich schon denken: Natürlich gibt es
+      dazu auch einen vorgefertigen und kürzeren Weg. Mit der Methode
+      <methodname>attr_writer</methodname> können Sie den Code von
+      <filename>raum.rb</filename> weiter vereinfachen:<programlisting>class Raum
   def initialize
     @tueren  = 1
     @fenster = 1
@@ -1027,10 +1134,10 @@ wohnzimmer.fenster = 2
 puts wohnzimmer.fenster
 </programlisting></para>
 
-        <para>Und (wer hätte das gedacht!) es gibt auch eine Methode
-        <methodname>attr_accessor</methodname>, die Getter und Setter
-        kombiniert. Der Code für <filename>raum.rb</filename> sähe dann so
-        aus:<screen>class Raum
+      <para>Und (wer hätte das gedacht!) es gibt auch eine Methode
+      <methodname>attr_accessor</methodname>, die Getter und Setter
+      kombiniert. Der Code für <filename>raum.rb</filename> sähe dann so
+      aus:<screen>class Raum
   def initialize
     @tueren  = 1
     @fenster = 1
@@ -1048,18 +1155,18 @@ wohnzimmer.fenster = 2
 
 puts wohnzimmer.fenster
 </screen></para>
-      </section>
+    </section>
 
-      <section>
-        <title>Mitgelieferte Methoden bei String</title>
+    <section>
+      <title>Mitgelieferte Methoden bei String</title>
 
-        <para>Die meisten Klassen kommen von Hause aus schon mit einem ganzen
-        Sack voll äußerst praktischer Methoden. Diese Methoden werden immer
-        mit einem Punkt abgetrennt hinter dem entsprechenden Objekt
-        geschrieben.</para>
+      <para>Die meisten Klassen kommen von Hause aus schon mit einem ganzen
+      Sack voll äußerst praktischer Methoden. Diese Methoden werden immer mit
+      einem Punkt abgetrennt hinter dem entsprechenden Objekt
+      geschrieben.</para>
 
-        <para>Hier ein paar Beispiele für Methoden der Klasse
-        <classname>String</classname>.<screen>sw@debian:~/sandbox$ <command>irb</command>
+      <para>Hier ein paar Beispiele für Methoden der Klasse
+      <classname>String</classname>.<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>a = 'Das Haus.'</command>
 =&gt; "Das Haus."
 irb(main):002:0&gt; <command>a.class</command>     # .class gibt die Klasse des Objektes aus
@@ -1074,14 +1181,14 @@ irb(main):006:0&gt; <command>a.reverse</command>   # Buchstabenreihenfolge umdre
 =&gt; ".suaH saD"
 irb(main):007:0&gt; <command>exit</command>
 </screen></para>
-      </section>
+    </section>
 
-      <section>
-        <title>Verketten von Methoden</title>
+    <section>
+      <title>Verketten von Methoden</title>
 
-        <para>Man kommt nicht direkt drauf, aber wenn man sich an das Arbeiten
-        mit Ruby gewöhnt hat, dann ist es auch völlig selbstverständlich (weil
-        logisch) verschiedene Methoden zu verketten.<screen>sw@debian:~/sandbox$ <command>irb</command>
+      <para>Man kommt nicht direkt drauf, aber wenn man sich an das Arbeiten
+      mit Ruby gewöhnt hat, dann ist es auch völlig selbstverständlich (weil
+      logisch) verschiedene Methoden zu verketten.<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>a = 'Das Haus.'</command>
 =&gt; "Das Haus."
 irb(main):002:0&gt; <command>a.class</command>
@@ -1090,17 +1197,16 @@ irb(main):003:0&gt; <command>a.upcase.reverse</command>  # Großbuchstaben umged
 =&gt; ".SUAH SAD"
 irb(main):004:0&gt; <command>exit</command>
 </screen></para>
-      </section>
+    </section>
 
-      <section>
-        <title>Von einem zum anderen (Konvertieren)</title>
+    <section>
+      <title>Von einem zum anderen (Konvertieren)</title>
 
-        <para>Logischerweise gibt es eine ganze Reihe von praktischen
-        Instanz-Methoden um Objekte von einer Klasse in eine andere zu wandeln
-        (zu <quote>cast</quote>en). Als erstes verwandeln wir mal mit der
-        Methode <methodname>.to_s</methodname> ein
-        <classname>Fixnum</classname> in einen
-        <classname>String</classname>.<screen>sw@debian:~/sandbox$ <command>irb</command>
+      <para>Logischerweise gibt es eine ganze Reihe von praktischen
+      Instanz-Methoden um Objekte von einer Klasse in eine andere zu wandeln
+      (zu <quote>cast</quote>en). Als erstes verwandeln wir mal mit der
+      Methode <methodname>.to_s</methodname> ein <classname>Fixnum</classname>
+      in einen <classname>String</classname>.<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>a = 10</command>
 =&gt; 10
 irb(main):002:0&gt; <command>a.class</command>
@@ -1110,15 +1216,15 @@ irb(main):003:0&gt; <command>b = a.to_s</command>
 irb(main):004:0&gt; <command>exit</command>
 </screen></para>
 
-        <para>Nichts anderes macht übrigens <code>puts</code>, wenn man mit
-        <code>puts</code> ein <classname>Fixnum</classname> oder ein
-        <classname>Float</classname> ausgibt (es fügt bei Nicht-Strings
-        einfach die Methode <methodname>.to_s</methodname> hinzu und gibt das
-        Ergebnis aus).</para>
+      <para>Nichts anderes macht übrigens <code>puts</code>, wenn man mit
+      <code>puts</code> ein <classname>Fixnum</classname> oder ein
+      <classname>Float</classname> ausgibt (es fügt bei Nicht-Strings einfach
+      die Methode <methodname>.to_s</methodname> hinzu und gibt das Ergebnis
+      aus).</para>
 
-        <para>Jetzt wandeln wir mal mit der Methode
-        <methodname>.to_i</methodname> ein <classname>Float</classname> in ein
-        <classname>Fixnum</classname> um.<screen>sw@debian:~/sandbox$ <command>irb</command>
+      <para>Jetzt wandeln wir mal mit der Methode
+      <methodname>.to_i</methodname> ein <classname>Float</classname> in ein
+      <classname>Fixnum</classname> um.<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>c = 10.0</command>
 =&gt; 10.0
 irb(main):002:0&gt; <command>c.class</command>
@@ -1129,19 +1235,19 @@ irb(main):004:0&gt; <command>d.class</command>
 =&gt; Fixnum
 irb(main):005:0&gt; <command>exit</command>
 </screen></para>
-      </section>
+    </section>
 
-      <section>
-        <title>Methode to_s bei eigenen Klassen</title>
+    <section>
+      <title>Methode to_s bei eigenen Klassen</title>
 
-        <para>Man sollte – und wenn es nur für das einfachere Debugging ist –
-        bei selbstdefinierten Klassen immer eine Methode
-        <methodname>to_s</methodname> einbauen. Dann kann man ein
-        entsprechendes Objekt einfach mit <code>puts</code> ausgeben
-        (<code>puts</code> gibt ein Objekt automatisch unter Verwendung der
-        Methode <methodname>to_s</methodname> aus).</para>
+      <para>Man sollte – und wenn es nur für das einfachere Debugging ist –
+      bei selbstdefinierten Klassen immer eine Methode
+      <methodname>to_s</methodname> einbauen. Dann kann man ein entsprechendes
+      Objekt einfach mit <code>puts</code> ausgeben (<code>puts</code> gibt
+      ein Objekt automatisch unter Verwendung der Methode
+      <methodname>to_s</methodname> aus).</para>
 
-        <para>Ein Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
+      <para>Ein Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>class Tier</command>
 irb(main):002:1&gt; <command>  def initialize(de_name,en_name)</command>
 irb(main):003:2&gt; <command>    @de_name = de_name</command>
@@ -1164,14 +1270,14 @@ Wellensittich(Budgerigar)
 =&gt; nil
 irb(main):014:0&gt; <command>exit</command>
 </screen></para>
-      </section>
+    </section>
 
-      <section>
-        <title>Ist <quote>+</quote> eine Methode?</title>
+    <section>
+      <title>Ist <quote>+</quote> eine Methode?</title>
 
-        <para>Wieso steht bei der Liste der Methoden beim
-        <classname>String</classname> auch das Pluszeichen? Schauen wir mal
-        mit <application>ri</application> nach:<screen>sw@debian:~/sandbox$ <command>ri String.+</command>
+      <para>Wieso steht bei der Liste der Methoden beim
+      <classname>String</classname> auch das Pluszeichen? Schauen wir mal mit
+      <application>ri</application> nach:<screen>sw@debian:~/sandbox$ <command>ri String.+</command>
 --------------------------------------------------------------- String#+
      str + other_str   =&gt; new_str
 
@@ -1184,8 +1290,8 @@ irb(main):014:0&gt; <command>exit</command>
 
 sw@debian:~/sandbox$</screen></para>
 
-        <para>hmmm… Mal schauen was da bei <classname>Fixnum</classname>
-        steht:<screen>sw@debian:~/sandbox$ <command>ri Fixnum.+</command>
+      <para>hmmm… Mal schauen was da bei <classname>Fixnum</classname>
+      steht:<screen>sw@debian:~/sandbox$ <command>ri Fixnum.+</command>
 --------------------------------------------------------------- Fixnum#+
      fix + numeric   =&gt;  numeric_result
 
@@ -1196,10 +1302,10 @@ sw@debian:~/sandbox$</screen></para>
 
 sw@debian:~/sandbox$</screen></para>
 
-        <para>Spielen wir damit mal im irb. Wir müssten ja dann das
-        <methodname>+</methodname> genauso wie jede andere Methode mit einem
-        Punkt an die Class hängen können und die zweite Zahl in einer Klammer
-        als Parameter anfügen.<screen>sw@debian:~/sandbox$ <command>irb</command>
+      <para>Spielen wir damit mal im irb. Wir müssten ja dann das
+      <methodname>+</methodname> genauso wie jede andere Methode mit einem
+      Punkt an die Class hängen können und die zweite Zahl in einer Klammer
+      als Parameter anfügen.<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>10 + 10</command>
 =&gt; 20
 irb(main):002:0&gt; <command>10+10</command>
@@ -1211,23 +1317,23 @@ irb(main):004:0&gt; <command>10.+(10)</command>
 irb(main):005:0&gt; <command>exit</command>
 </screen></para>
 
-        <para>Aha! Das Pluszeichen ist tatsächlich eine Methode, und diese
-        Methode nimmt den nächsten Wert als Parameter. Eigentlich müssten wir
-        diesen Wert in einer Klammer setzen, aber Ruby erspart uns das mit
-        durchdachter Syntax.</para>
+      <para>Aha! Das Pluszeichen ist tatsächlich eine Methode, und diese
+      Methode nimmt den nächsten Wert als Parameter. Eigentlich müssten wir
+      diesen Wert in einer Klammer setzen, aber Ruby erspart uns das mit
+      durchdachter Syntax.</para>
 
-        <section>
-          <title>Kann ich die Methode + überschreiben?</title>
+      <section>
+        <title>Kann ich die Methode + überschreiben?</title>
 
-          <para>Ja, man kann alle Methoden überschreiben. Logischerweise macht
-          das bei Methoden wie <methodname>+</methodname> wenig Sinn, außer
-          man will damit seine Programmierkollegen in den Wahnsinn treiben.
-          Damit Sie mir glauben führe ich jetzt im irb mal eine kleine Demo
-          aus.</para>
+        <para>Ja, man kann alle Methoden überschreiben. Logischerweise macht
+        das bei Methoden wie <methodname>+</methodname> wenig Sinn, außer man
+        will damit seine Programmierkollegen in den Wahnsinn treiben. Damit
+        Sie mir glauben führe ich jetzt im irb mal eine kleine Demo
+        aus.</para>
 
-          <para>Das Ziel ist es die Methode <methodname>+</methodname> für
-          <classname>Fixnum</classname> zu überschreiben. Als Ergebnis jeder
-          Addition soll die Zahl 42 rauskommen.<screen>sw@debian:~/sandbox$ <command>irb</command>
+        <para>Das Ziel ist es die Methode <methodname>+</methodname> für
+        <classname>Fixnum</classname> zu überschreiben. Als Ergebnis jeder
+        Addition soll die Zahl 42 rauskommen.<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>10 + 10</command>
 =&gt; 20
 irb(main):002:0&gt; <command>10 + 5555</command>
@@ -1245,13 +1351,11 @@ irb(main):042:0&gt; <command>10 + 5555</command>
 irb(main):042:0&gt; <command>exit</command>
 </screen></para>
 
-          <para>In den Zeilen 1 und 2 führen wir die normale Addition durch.
-          In den Zeilen 3 bis 7 definieren wir die Methode
-          <methodname>+</methodname> für die Class
-          <classname>Fixnum</classname> neu, und danach führen wir noch einmal
-          die Berechnung durch. Dann allerdings mit anderen
-          Ergebnissen.</para>
-        </section>
+        <para>In den Zeilen 1 und 2 führen wir die normale Addition durch. In
+        den Zeilen 3 bis 7 definieren wir die Methode
+        <methodname>+</methodname> für die Class <classname>Fixnum</classname>
+        neu, und danach führen wir noch einmal die Berechnung durch. Dann
+        allerdings mit anderen Ergebnissen.</para>
       </section>
 
       <section>
@@ -1273,133 +1377,6 @@ irb(main):002:0&gt; <command>a.methods</command>
 =&gt; [:&lt;=&gt;, :==, :===, :eql?, :hash, :casecmp, :+, :*, :%, :[], :[]=, :insert, :length, :size, :bytesize, :empty?, :=~, :match, :succ, :succ!, :next, :next!, :upto, :index, :rindex, :replace, :clear, :chr, :getbyte, :setbyte, :to_i, :to_f, :to_s, :to_str, :inspect, :dump, :upcase, :downcase, :capitalize, :swapcase, :upcase!, :downcase!, :capitalize!, :swapcase!, :hex, :oct, :split, :lines, :bytes, :chars, :codepoints, :reverse, :reverse!, :concat, :&lt;&lt;, :crypt, :intern, :to_sym, :ord, :include?, :start_with?, :end_with?, :scan, :ljust, :rjust, :center, :sub, :gsub, :chop, :chomp, :strip, :lstrip, :rstrip, :sub!, :gsub!, :chop!, :chomp!, :strip!, :lstrip!, :rstrip!, :tr, :tr_s, :delete, :squeeze, :count, :tr!, :tr_s!, :delete!, :squeeze!, :each_line, :each_byte, :each_char, :each_codepoint, :sum, :slice, :slice!, :partition, :rpartition, :encoding, :force_encoding, :valid_encoding?, :ascii_only?, :unpack, :encode, :encode!, :to_r, :to_c, :&gt;, :&gt;=, :&lt;, :&lt;=, :between?, :nil?, :!~, :class, :clone, :dup, :taint, :tainted?, :untaint, :untrust, :untrusted?, :trust, :freeze, :frozen?, :methods, :singleton_methods, :protected_methods, :private_methods, :public_methods, :instance_variables, :instance_variable_get, :instance_variable_set, :instance_variable_defined?, :instance_of?, :kind_of?, :is_a?, :tap, :send, :public_send, :respond_to?, :extend, :display, :method, :public_method, :define_singleton_method, :__id__, :object_id, :to_enum, :enum_for, :gem, :equal?, :!, :!=, :instance_eval, :instance_exec, :__send__]
 irb(main):003:0&gt; <command>exit</command>
 </screen></para>
-        </section>
-
-        <section>
-          <title>ruby-doc.org via Google und Co.</title>
-
-          <para>Unter <olink>http://ruby-doc.org</olink> finden Sie online
-          eine optisch aufbereitete und untereinander verlinkte
-          Ruby-Dokumentaion. Der einfachste Weg dort eine Liste der Methoden
-          zu bekommen ist sicherlich eine Suchmaschine. Einfach
-          <quote>Ruby</quote> und den Namen der Klasse als Suchbegriff
-          eingeben, und dann bekommt man meist als ersten Eintrag diese
-          offizielle Ruby-Dokumentation angezeigt.</para>
-
-          <para>Wenn ich alle Methoden für die Klasse
-          <classname>String</classname> suche, dann suche in in Google nach
-          <quote>ruby string</quote> und bekomme als ersten Treffer die URL
-          <olink>http://ruby-doc.org/core/classes/String.html</olink>.<footnote>
-              <para>Wer ganz sicher gehen will, kann auch folgenden
-              Google-Suchstring nehmen <quote>String
-              site:ruby-doc.org</quote>.</para>
-            </footnote> Auf dieser Seite bekomme ich dann Beispiele zu allen
-          Methoden.</para>
-        </section>
-
-        <section>
-          <title>Hilfe per ri</title>
-
-          <para>Es gibt noch eine eingebaute Hilfe (das Programm
-          <application>ri</application>), die wir anstatt Google auf der
-          Kommandozeile aufrufen können. Sehr praktisch, allerdings nicht so
-          schön bunt. <literal>;-)</literal></para>
-
-          <para>Wenn Sie Informationen zur Klasse
-          <classname>String</classname> suchen, dann können Sie diese auf der
-          Kommandozeile wie folgt ausgeben:<screen>sw@debian:~/sandbox$ <command>ri String</command>
-------------------------------------------------- Class: String &lt; Object
-     A +String+ object holds and manipulates an arbitrary sequence of
-     bytes, typically representing characters. String objects may be
-     created using +String::new+ or as literals.
-
-     Because of aliasing issues, users of strings should be aware of the
-     methods that modify the contents of a +String+ object. Typically,
-     methods with names ending in ``!'' modify their receiver, while
-     those without a ``!'' return a new +String+. However, there are
-     exceptions, such as +String#[]=+.
-
-     Enhance the String class with a XML escaped character version of
-     to_s.
-
-     User defined methods to be added to String.
-
-------------------------------------------------------------------------
-
-
-Includes:
----------
-
-     Comparable
-
-
-Class methods:
---------------
-
-     new, try_convert, yaml_new
-
-
-Instance methods:
------------------
-
-     %, *, +, &lt;&lt;, &lt;=&gt;, ==, ===, =~, [], []=, ascii_only?, block_scanf,
-     bytes, bytesize, capitalize, capitalize!, casecmp, center, chars,
-     chomp, chomp!, chop, chop!, chr, clear, codepoints, concat, count,
-     crypt, delete, delete!, downcase, downcase!, dump, each_byte,
-     each_char, each_codepoint, each_line, empty?, encode, encode!,
-     encoding, end_with?, eql?, ext, force_encoding, getbyte, gsub,
-     gsub!, hash, hex, include?, index, initialize_copy, insert,
-     inspect, intern, is_binary_data?, is_complex_yaml?, iseuc, isjis,
-     issjis, isutf8, kconv, length, lines, ljust, lstrip, lstrip!,
-     match, next, next!, oct, ord, parse_csv, partition, pathmap,
-     pathmap_explode, pathmap_partial, pathmap_replace, replace,
-     reverse, reverse!, rindex, rjust, rpartition, rstrip, rstrip!,
-     scan, scanf, setbyte, shellescape, shellsplit, size, slice, slice!,
-     split, squeeze, squeeze!, start_with?, strip, strip!, sub, sub!,
-     succ, succ!, sum, swapcase, swapcase!, to_blob, to_d, to_f, to_i,
-     to_s, to_str, to_sym, to_yaml, toeuc, tojis, tolocale, tosjis,
-     toutf16, toutf32, toutf8, tr, tr!, tr_s, tr_s!, unpack, upcase,
-     upcase!, upto, valid_encoding?
-sw@debian:~/sandbox$ </screen></para>
-
-          <para>Suchen wir jetzt Informationen zu einer bestimmten Methode,
-          dann geht das auch mit ri. Als Beispiel nehmen wir mal
-          <methodname>gsub</methodname>. Das ist eine Methode mit der man
-          Elemente in einem <classname>String</classname> austauschen kann
-          (immer wieder praktisch).<screen>sw@debian:~/sandbox$ <command>ri String.gsub</command>
------------------------------------------------------------- String#gsub
-     str.gsub(pattern, replacement)       =&gt; new_str
-     str.gsub(pattern) {|match| block }   =&gt; new_str
-
-     From Ruby 1.9.1
-------------------------------------------------------------------------
-     Returns a copy of _str_ with _all_ occurrences of _pattern_
-     replaced with either _replacement_ or the value of the block. The
-     _pattern_ will typically be a +Regexp+; if it is a +String+ then no
-     regular expression metacharacters will be interpreted (that is
-     +/\d/+ will match a digit, but +'\d'+ will match a backslash
-     followed by a 'd').
-
-     If a string is used as the replacement, special variables from the
-     match (such as +$&amp;+ and +$1+) cannot be substituted into it, as
-     substitution into the string occurs before the pattern match
-     starts. However, the sequences +\1+, +\2+, +\k&lt;group_name&gt;+, and so
-     on may be used to interpolate successive groups in the match.
-
-     In the block form, the current match string is passed in as a
-     parameter, and variables such as +$1+, +$2+, +$`+, +$&amp;+, and +$'+
-     will be set appropriately. The value returned by the block will be
-     substituted for the match on each call.
-
-     The result inherits any tainting in the original string or any
-     supplied replacement string.
-
-        "hello".gsub(/[aeiou]/, '*')                  #=&gt; "h*ll*"
-        "hello".gsub(/([aeiou])/, '&lt;\1&gt;')             #=&gt; "h&lt;e&gt;ll&lt;o&gt;"
-        "hello".gsub(/./) {|s| s[0].ord.to_s + ' '}   #=&gt; "104 101 108 108 111 "
-        "hello".gsub(/(?&lt;foo&gt;[aeiou])/, '{\k&lt;foo&gt;}')  #=&gt; "h{e}ll{o}"
-
-sw@debian:~/sandbox$</screen></para>
         </section>
       </section>
     </section>
@@ -1444,13 +1421,12 @@ irb(main):003:0&gt; <command>exit</command>
 # Langversion
 #
 if a == 10 then
-  puts 'a ist 10'
+  puts 'a ist 10'           # Die Programmzeile ist von if und end eingeschlossen.
 end
 
 # Kurzversion
 #
-<emphasis role="bold">puts 'a ist 10' if a == 10</emphasis>
-</programlisting></para>
+<emphasis role="bold">puts 'a ist 10' if a == 10</emphasis>  # das if folgt der Programmzeile</programlisting></para>
     </section>
 
     <section>
@@ -1536,9 +1512,10 @@ end</programlisting></para>
         <title>Iterator</title>
 
         <para>Iteratoren sind nichts weiter als eine bestimmte Art von
-        Methoden. (<quote>Iterate</quote> heißt <quote>wiederholen</quote>.)
-        Bei der Klasse <classname>Fixnum</classname> gibt es zum Beispiel den
-        Iterator <methodname>times</methodname>. Mal schauen was uns
+        Methoden. (das englische Wort <quote>Iterate</quote> heißt
+        <quote>wiederholen</quote>.) Bei der Klasse
+        <classname>Fixnum</classname> gibt es zum Beispiel den Iterator
+        <methodname>times</methodname>. Mal schauen was uns
         <application>ri</application> dazu als Hilfe anbietet:<screen>sw@debian:~/sandbox$ <command>ri Fixnum.times</command>
 ---------------------------------------------------------- Integer#times
      int.times {|i| block }     =&gt; int
