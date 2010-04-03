@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="erste_schritte_mit_rails" xml:lang="de"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="erste_schritte_mit_rails.title">Erste Schritte mit
+  Rails</title>
+
+  <para>Nachdem Sie sich im <xref linkend="ruby-grundlagen" /> Kapitel mühsam
+  in die Ruby-Grundlagen eingelesen haben, können wir jetzt spannender
+  weitermachen. In diesem Kapitel starten wir ein erstes Rails-Projekt und
+  arbeiten uns damit Stück für Stück in die Materie ein.</para>
+
+  <para>Auch in diesem Kapitel wird es manchmal hoppla-hopp zu gehen. Wir
+  stossen auf typische Henne-Ei-Probleme wir zum Beispiel: "Wie erkläre ich
+  MVC (Model-View-Controller)?". Ich habe mich für den "Wir fangen mal an und
+  erklären bei der Arbeit."-Ansatz entschieden.</para>
+
+  <para>Als erstes kleines Projekt erstellen wir eine kleine
+  Filmdatenbank.</para>
+
+  <section xml:id="arbeits-umgebung-development">
+    <title>Arbeits-Umgebung (Development)</title>
+
+    <para>Rails kennt drei verschiedene Arbeits-Umgebungen:<itemizedlist>
+        <listitem>
+          <para>Development</para>
+        </listitem>
+
+        <listitem>
+          <para>Testing</para>
+        </listitem>
+
+        <listitem>
+          <para>Production</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>Wir arbeiten in diesem Kapitel nur mit der Development Umgebung. So
+    bald Sie ein besseres Gefühl für Rails bekommen haben, starten wir mit
+    Tests und benötigen dafür die entsprechende Umgebung (dort wird z.B. beim
+    Start eines Tests die Test-Datenbank neu gefühlt und beim Beenden wird
+    gelöscht). Später erkläre ich Ihnen dann die verschiedenen Szenarien, wie
+    Sie Ihre Rails-Applikation aus der Development-Umgebung in die
+    Production-Umgebung ausrollen können.</para>
+
+    <para>Die Development-Umgebung bringt bis auf einen Editor und einen
+    Webbrowser alles mit, was Sie zum Entwickeln benötigen. So müssen Sie
+    nicht extra einen Webserver installieren, sondern können den eingebauten
+    Rails-Webserver benutzen. Der besticht nicht durch extreme Performance,
+    aber das benötigen wir bei der Entwicklung ja auch nicht. Später kann man
+    dann auf grosse Systeme wie <application>Apache</application> umsteigen.
+    Das gleiche gilt für die Datenbank.</para>
+
+    <para>Um in der Development-Umgebung zu arbeiten, müssen Sie erst mal
+    nichts verändern. Alle Befehle gelten per Default auf die
+    Development-Umgebung.</para>
+
+    <section xml:id="sqlite3_datenbank_default">
+      <title>sqlite3 Datenbank</title>
+
+      <para>Auch bei der Datenbank geht es in diesem Kapitel nicht um optimale
+      Performance, sondern um einen einfachen Einstieg. Deshalb benutzen wir
+      die sqlite3 Datenbank. Dafür haben Sie bereits alles fertig installiert
+      und müssen sich keinen Kopf machen. Später erkläre ich Ihnen dann wie
+      Sie andere Datenbank (z.B. MySQL) ansteuern können.</para>
+    </section>
+  </section>
+
+  <section xml:id="neues_rails_projekt_starten">
+    <title>Ein neues Railsprojekt starten</title>
+
+    <para>Als aller erstes müssen wir mal ein neues Rails-Projekt erstellen.
+    Da Ruby on Rails ein Framework ist, müssen wir erst mal die entsprechende
+    Verzeichnisstruktur und die Grundkonfiguration inkl. einiger Skripte
+    einrichten. Das geht aber mit dem <command>rails movie-app</command>
+    ratz-fatz.<tip>
+        <para>Bitte überprüfen Sie an dieser Stelle, ob Sie auch wirklich mit
+        der Ruby Version 1.9.1 und Rails 3.0.x arbeiten (<command>ruby
+        -v</command> und <command>rails -v</command>). An sonsten werden Sie
+        irgendwann in Merkwürdigkeiten laufen. Falls Sie beides noch nicht
+        installiert haben finden Sie weitere Infos im <xref
+        linkend="installation-und-versionsauswahl" /> .</para>
+      </tip><screen>Stefan-Wintermeyers-MacBook-Pro-2008-50:Development sw$ rails movie-app
+      create  
+      create  README
+      create  .gitignore
+      create  Rakefile
+      create  config.ru
+      create  Gemfile
+      create  app
+      create  app/controllers/application_controller.rb
+      create  app/helpers/application_helper.rb
+      create  app/models
+      create  app/views/layouts
+      create  config
+      create  config/routes.rb
+      create  config/application.rb
+      create  config/environment.rb
+      create  config/environments
+      create  config/environments/development.rb
+      create  config/environments/production.rb
+      create  config/environments/test.rb
+      create  config/initializers
+      create  config/initializers/backtrace_silencers.rb
+      create  config/initializers/cookie_verification_secret.rb
+      create  config/initializers/inflections.rb
+      create  config/initializers/mime_types.rb
+      create  config/initializers/session_store.rb
+      create  config/locales
+      create  config/locales/en.yml
+      create  config/boot.rb
+      create  config/database.yml
+      create  db
+      create  db/seeds.rb
+      create  doc
+      create  doc/README_FOR_APP
+      create  lib
+      create  lib/tasks
+      create  lib/tasks/.gitkeep
+      create  log
+      create  log/server.log
+      create  log/production.log
+      create  log/development.log
+      create  log/test.log
+      create  public
+      create  public/404.html
+      create  public/422.html
+      create  public/500.html
+      create  public/favicon.ico
+      create  public/index.html
+      create  public/robots.txt
+      create  public/images
+      create  public/images/rails.png
+      create  public/stylesheets
+      create  public/stylesheets/.gitkeep
+      create  public/javascripts
+      create  public/javascripts/application.js
+      create  public/javascripts/controls.js
+      create  public/javascripts/dragdrop.js
+      create  public/javascripts/effects.js
+      create  public/javascripts/prototype.js
+      create  public/javascripts/rails.js
+      create  script
+      create  script/rails
+      create  test
+      create  test/performance/browsing_test.rb
+      create  test/test_helper.rb
+      create  test/fixtures
+      create  test/functional
+      create  test/integration
+      create  test/unit
+      create  tmp
+      create  tmp/sessions
+      create  tmp/sockets
+      create  tmp/cache
+      create  tmp/pids
+      create  vendor/plugins
+      create  vendor/plugins/.gitkeep
+Stefan-Wintermeyers-MacBook-Pro-2008-50:Development sw$ </screen></para>
+
+    <para>Als erstes prüfen wir mal, ob die Installation funktioniert. Dazu
+    starten wir den mitgelieferten Server.<note>
+        <para>Bei Mac OS X kommt beim ersten Starten, je nach Firewall
+        Einstellung, ein Fenster, das Sie fragt, ob die Firewall die
+        entsprechende Verbindung erlauben soll. Da wir lokal arbeiten, können
+        Sie das mit ruhigen Gewissen bejahen.</para>
+      </note><screen>Stefan-Wintermeyers-MacBook-Pro-2008-50:movie-app sw$ <command>rails server</command>
+=&gt; Booting WEBrick
+=&gt; Rails 3.0.0.beta2 application starting in development on http://0.0.0.0:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2010-04-03 17:30:42] INFO  WEBrick 1.3.1
+[2010-04-03 17:30:42] INFO  ruby 1.9.1 (2010-01-10) [i386-darwin10.3.0]
+[2010-04-03 17:30:42] INFO  WEBrick::HTTPServer#start: pid=18770 port=3000
+</screen></para>
+
+    <para>Der Start der Rails Applikation sieht gut aus. Zum Testen rufen wir
+    jetzt mit dem Webbrowser die URL http://0.0.0.0:3000 auf.</para>
+
+    <para><mediaobject>
+        <imageobject>
+          <imagedata fileref="screenshots/virgin_rails_app" scalefit="1"
+                     width="" xml:id="virgin_rails_app"></imagedata>
+        </imageobject>
+      </mediaobject>Wenn wir jetzt auf den "About your application's
+    environment" link klicken erscheint eine Aufstellung der aktuellen
+    Umgebung.</para>
+
+    <para><mediaobject>
+        <imageobject>
+          <imagedata fileref="screenshots/virgin_rails_app_env_info" format=""
+                     scalefit="1"></imagedata>
+        </imageobject>
+      </mediaobject>Gleichzeitig wird im Log des Webservers folgendes
+    angezeigt:<screen>Started GET "/rails/info/properties" for 127.0.0.1 at 2010-04-03 17:38:38
+  Processing by Rails::InfoController#properties as */*
+  SQL (0.3ms)   SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+
+Rendered inline template (0.6ms)
+Completed 200 OK in 28ms (Views: 1.5ms | ActiveRecord: 0.3ms)
+</screen></para>
+
+    <para>Da beim Aufruf der ersten Startseite kein entsprechender Eintrag
+    erschien, muss es sich um zwei verschiedenartige Seiten handeln. Die erste
+    Seite ist tatsächlich eine statische HTML-Seite, die unter
+    <filename>public/index.html</filename> abgespeichert ist und der Link, auf
+    den wir geklickt haben führt ein Rails Programm aus.</para>
+
+    <para></para>
+  </section>
+</chapter>
