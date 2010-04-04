@@ -82,15 +82,15 @@
     <para>Als aller erstes müssen wir mal ein neues Rails-Projekt erstellen.
     Da Ruby on Rails ein Framework ist, müssen wir erst mal die entsprechende
     Verzeichnisstruktur und die Grundkonfiguration inkl. einiger Skripte
-    einrichten. Das geht aber mit dem <command>rails movie-app</command>
-    ratz-fatz.<tip>
+    einrichten. Das geht aber mit dem <command>rails
+    movie-application</command> ratz-fatz.<tip>
         <para>Bitte überprüfen Sie an dieser Stelle, ob Sie auch wirklich mit
         der Ruby Version 1.9.1 und Rails 3.0.x arbeiten (<command>ruby
         -v</command> und <command>rails -v</command>). An sonsten werden Sie
         irgendwann in Merkwürdigkeiten laufen. Falls Sie beides noch nicht
         installiert haben finden Sie weitere Infos im <xref
         linkend="installation-und-versionsauswahl" /> .</para>
-      </tip><screen>Stefan-Wintermeyers-MacBook-Pro-2008-50:Development sw$ rails movie-app
+      </tip><screen>MacBook:Development sw$ <command>rails movie-application</command>
       create  
       create  README
       create  .gitignore
@@ -166,15 +166,26 @@
       create  tmp/pids
       create  vendor/plugins
       create  vendor/plugins/.gitkeep
-Stefan-Wintermeyers-MacBook-Pro-2008-50:Development sw$ </screen></para>
+MacBook:Development sw$ </screen></para>
 
-    <para>Als erstes prüfen wir mal, ob die Installation funktioniert. Dazu
-    starten wir den mitgelieferten Server.<note>
-        <para>Bei Mac OS X kommt beim ersten Starten, je nach Firewall
-        Einstellung, ein Fenster, das Sie fragt, ob die Firewall die
-        entsprechende Verbindung erlauben soll. Da wir lokal arbeiten, können
-        Sie das mit ruhigen Gewissen bejahen.</para>
-      </note><screen>Stefan-Wintermeyers-MacBook-Pro-2008-50:movie-app sw$ <command>rails server</command>
+    <para>Rails hat das Verzeichnis <filename>movie-application</filename>
+    angelegt und in dieses Verzeichnis die Grundstruktur einer
+    Rails-Applikation gespeichert.</para>
+
+    <para>Als erstes prüfen wir mal, ob diese neue Applikation funktioniert.
+    Dazu welchen wir in das neue Verzeichnis und starten mitgelieferten
+    kleinen Web-Server.<footnote>
+        <para>Nein, keine Angst. Das ist nicht der Webserver, mit dem wir
+        später auch Produktiv gehen. Aber zum Entwickeln ist diese Variante
+        sehr praktisch.</para>
+      </footnote><note>
+        <para>Bei verschiednen Betriebssystemen (z.B. Mac OS X) kommt beim
+        ersten Starten einer Rails-Applikation, je nach Firewall Einstellung,
+        ein Fenster, das Sie fragt, ob die Firewall die entsprechende
+        Verbindung erlauben soll. Da wir lokal arbeiten, können Sie das mit
+        ruhigen Gewissen bejahen.</para>
+      </note><screen>MacBook:Development sw$ <command>cd movie-application</command> 
+MacBook:movie-application sw$ <command>rails server</command>
 =&gt; Booting WEBrick
 =&gt; Rails 3.0.0.beta2 application starting in development on http://0.0.0.0:3000
 =&gt; Call with -d to detach
@@ -187,7 +198,7 @@ Stefan-Wintermeyers-MacBook-Pro-2008-50:Development sw$ </screen></para>
     <para>Der Start der Rails Applikation sieht gut aus. Zum Testen rufen wir
     jetzt mit dem Webbrowser die URL http://0.0.0.0:3000 auf.<screenshot>
         <info>
-          <title>test</title>
+          <title>Default Seite in einem frischen Rails-Projekt.</title>
         </info>
 
         <mediaobject>
@@ -198,7 +209,17 @@ Stefan-Wintermeyers-MacBook-Pro-2008-50:Development sw$ </screen></para>
       </screenshot></para>
 
     <para>Wenn wir jetzt auf den "About your application's environment" link
-    klicken erscheint eine Aufstellung der aktuellen Umgebung.</para>
+    klicken erscheint eine Aufstellung der aktuellen Umgebung.<screenshot>
+        <info>
+          <title>Auflistung der Start-Umgebung der Rails-Applikation.</title>
+        </info>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screenshots/virgin_rails_app_env_info.jpg"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
 
     <para>Gleichzeitig wird im Log des Webservers folgendes angezeigt:<screen>Started GET "/rails/info/properties" for 127.0.0.1 at 2010-04-03 17:38:38
   Processing by Rails::InfoController#properties as */*
@@ -216,6 +237,523 @@ Completed 200 OK in 28ms (Views: 1.5ms | ActiveRecord: 0.3ms)
     <filename>public/index.html</filename> abgespeichert ist und der Link, auf
     den wir geklickt haben führt ein Rails Programm aus.</para>
 
-    <para></para>
+    <para>Mit <keycode>CTRL + C</keycode> können Sie den Webserver wieder
+    stoppen.</para>
+
+    <section xml:id="logging">
+      <title xml:id="logging.title">Logging</title>
+
+      <para>In der Datei <filename>log/development.log</filename> finden Sie
+      das Log des Webservers. Bei der Entwicklung von Rails-Applikationen ist
+      es oft sehr praktisch immer ein Terminal offen zu haben, das mit einem
+      <command>tail -f log/development.log</command> diese Datei
+      anzeigt.<screen>MacBook:movie-application sw$ <command>tail -f log/development.log</command> 
+
+Started GET "/rails/info/properties" for 127.0.0.1 at 2010-04-03 17:38:38
+  Processing by Rails::InfoController#properties as */*
+  SQL (0.3ms)   SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+
+Rendered inline template (0.6ms)
+Completed 200 OK in 28ms (Views: 1.5ms | ActiveRecord: 0.3ms)
+</screen></para>
+
+      <section xml:id="logging-statische-oder-dynamische-seite">
+        <title>Statische und dynamisch generierte Seiten</title>
+
+        <para>Statische Seite wie die default <filename>index.html</filename>
+        oder auch die 404.html Fehler-Seite liegen im Unterverzeichnis
+        public<screen>MacBook:movie-application sw$ <command>ls public</command>
+404.html  500.html     images      javascripts  stylesheets
+422.html  favicon.ico  index.html  robots.txt
+MacBook:movie-application sw$</screen></para>
+
+        <para>Die Auslieferung einer solchen Seite oder einer Datei aus diesem
+        Verzeichnis wird nicht im <filename>log/development.log</filename>
+        angezeigt. Übrigens haben die Dateien im public-Verzeichnis eine
+        höhere Prio, als die dynamisch gerenderten Seiten. Falls Sie also zwei
+        Seiten mit dem gleichen Namen haben, dann wird Rails die statische
+        Variante ausliefern. Deshalb werden Sie später die
+        <filename>index.html</filename> Seite entweder umbenennen oder ganz
+        löschen müssen (sonst würde Ihre Applikation immer nur mit dieser
+        statischen Webseite starten).</para>
+      </section>
+    </section>
+  </section>
+
+  <section xml:id="scaffolding">
+    <title xml:id="scaffolding.title">Scaffolding</title>
+
+    <para>Die typischen "Ich zeige Euch mal Ruby on Rails in 15 Minuten"
+    Videos im Internet arbeiten alle mit der Magie des Scaffolding.
+    Scaffolding steht dabei für ein auf den ersten Blick sehr mächtiges
+    Grundgerüst mit einer fertigen GUI zum Arbeiten mit einer
+    Datenbanktabelle. Leider ist dieses Vorgehen meistens kontraproduktiv,
+    weil man zwar sehr schnell dieses Grundgerüst stehen hat, aber danach erst
+    mal im Regen steht. Das alte "ohne Ruby-Grundkenntnisse kommt man nicht
+    weiter"-Problem schlägt zu. Aber Sie haben sich ja schon das <xref
+    linkend="ruby-grundlagen" /> Kapitel gekämpft. Falls nicht, sollten Sie es
+    jetzt nachholen.</para>
+
+    <section xml:id="activerecord">
+      <title xml:id="activerecord.title">ActiveRecord</title>
+
+      <para>Ein ganz wichtiges Element für Rails ist ActiveRecord. Es
+      übernimmt für den Programmierer transparent die Arbeit mit der
+      SQL-Datenbank und stellt Tabellen und einzelne Tabellen-Zeilen als
+      Objekte zur Verfügung. Um das zu ermöglichen hat man sich auf bestimmte
+      Namenskonventionen geeinigt. In früheren Rails-Versionen musste man die
+      Datenbank von Hand anhand dieser Konventionen anlegen. ActiveRecord hat
+      dann die Felder an bestimmten Namensmerkmalen erkannt. Heute gibt es in
+      Rails dazu eigene noch dazu äusserst praktische Tools. Denn Sie wollen
+      ja nicht nur jetzt eine Datebank für Ihre Entwicklungs-Umgebung
+      einrichten, sondern benötigen später auch ein Tool, das Ihre
+      Produktions-Datenbank Schritt für Schritt mitzieht.</para>
+
+      <para>Wir wollen Filme katalogisieren. Dazu benötigen wir mindestens
+      folgende Datenbankfelder:<itemizedlist>
+          <listitem>
+            <para><varname>title:string</varname> - Titel oder Name des Films
+            </para>
+          </listitem>
+
+          <listitem>
+            <para><varname>production_year:integer</varname> -
+            Produktionsjahr</para>
+          </listitem>
+
+          <listitem>
+            <para><varname>duration:integer</varname> - Dauer (in
+            Minuten)</para>
+          </listitem>
+
+          <listitem>
+            <para><varname>plot:text</varname> - Story des Films</para>
+          </listitem>
+
+          <listitem>
+            <para><varname>rating:integer</varname> - Bewertung (als Ganzahl
+            von 1 bis 5 Sterne)</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <section>
+        <title>Warum alle Feldnamen, Methoden und Klassen auf
+        Englisch?</title>
+
+        <para>Ganz tief im Herzen liebt Rails die englische Sprache. Damit
+        muss man sich abfinden und versuchen diese Liebe zu übernehmen. So
+        verwenden sehr viele Mechanismen automagisch Plural oder Singular von
+        Englischen Wörtern. Wenn man sich damit anfreundet Datenbankfelder und
+        Datenbanken an sich mit englischen Wörter zu benennen, dann kann man
+        die ganze Macht dieser Magie ausnutzen.</para>
+      </section>
+
+      <section xml:id="dvd-ist-das-ein-model">
+        <title>Ist das jetzt ein Model (laut der MVC-Idee)?</title>
+
+        <para>Kurze Antwort: Ja. Wir müssen dem Model nur noch einen Namen
+        geben. "<varname>movie</varname>" macht wohl im Englischen am meisten
+        Sinn.</para>
+      </section>
+    </section>
+
+    <section xml:id="rails_generate_scaffold">
+      <title xml:id="rails_generade_scaffold.title">rails generate
+      scaffold</title>
+
+      <para>Mit dem Rails-Skript-Aufruf <command>rails generate
+      scaffold</command> kann man fertige Code generieren. Wer (wie ich) gerne
+      mal vergisst wie das Skript aufgerufen werden muss, der gibt einfach
+      <filename>rails generate</filename> ein und bekommt die folgende Hilfe
+      angezeigt:<screen>MacBook:movie-application sw$ <command>rails generate</command>
+Usage: rails generate GENERATOR [args] [options]
+
+General options:
+  -h, [--help]     # Print generators options and usage
+  -p, [--pretend]  # Run but do not make any changes
+  -f, [--force]    # Overwrite files that already exist
+  -s, [--skip]     # Skip files that already exist
+  -q, [--quiet]    # Supress status output
+
+Please choose a generator below.
+
+Rails:
+  controller
+  generator
+  helper
+  integration_test
+  mailer
+  metal
+  migration
+  model
+  observer
+  performance_test
+  plugin
+  resource
+  scaffold
+  scaffold_controller
+  session_migration
+  stylesheets
+
+MacBook:movie-application sw$</screen></para>
+
+      <para>Interessant ist für uns der Teil "Please choose a generator
+      below.". Wenn wir <parameter>scaffold</parameter> benutzen wollen und
+      dazu weitere Hilfe brauchen, dann geht dies wiederrum einfach mit der
+      eingebauten Hilfe:<screen>MacBook:movie-application sw$ <command>rails generate scaffold</command>
+Usage:
+  rails generate scaffold NAME [field:type field:type] [options]
+
+Options:
+  -o, --orm=NAME                  # Orm to be invoked
+                                  # Default: active_record
+      [--force-plural]            # Forces the use of a plural ModelName
+      [--singleton]               # Supply to create a singleton controller
+  -c, --scaffold-controller=NAME  # Scaffold controller to be invoked
+                                  # Default: scaffold_controller
+  -y, [--stylesheets]             # Indicates when to generate stylesheets
+                                  # Default: true
+
+ActiveRecord options:
+      [--migration]            # Indicates when to generate migration
+                               # Default: true
+      [--timestamps]           # Indicates when to generate timestamps
+                               # Default: true
+      [--parent=PARENT]        # The parent class for the generated model
+  -t, [--test-framework=NAME]  # Test framework to be invoked
+                               # Default: test_unit
+
+TestUnit options:
+      [--fixture]                   # Indicates when to generate fixture
+                                    # Default: true
+  -r, [--fixture-replacement=NAME]  # Fixture replacement to be invoked
+
+ScaffoldController options:
+  -e, [--template-engine=NAME]  # Template engine to be invoked
+                                # Default: erb
+      [--helper]                # Indicates when to generate helper
+                                # Default: true
+
+Erb options:
+  [--layout]  # Indicates when to generate layout
+              # Default: true
+
+Runtime options:
+  -f, [--force]    # Overwrite files that already exist
+  -p, [--pretend]  # Run but do not make any changes
+  -q, [--quiet]    # Supress status output
+  -s, [--skip]     # Skip files that already exist
+
+Description:
+    Scaffolds an entire resource, from model and migration to controller and
+    views, along with a full test suite. The resource is ready to use as a
+    starting point for your RESTful, resource-oriented application.
+
+    Pass the name of the model (in singular form), either CamelCased or
+    under_scored, as the first argument, and an optional list of attribute
+    pairs.
+
+    Attribute pairs are field:type arguments specifying the
+    model's attributes. Timestamps are added by default, so you don't have to
+    specify them by hand as 'created_at:datetime updated_at:datetime'.
+
+    You don't have to think up every attribute up front, but it helps to
+    sketch out a few so you can start working with the resource immediately.
+
+    For example, 'scaffold post title:string body:text published:boolean'
+    gives you a model with those three attributes, a controller that handles
+    the create/show/update/destroy, forms to create and edit your posts, and
+    an index that lists them all, as well as a resources :posts
+    declaration in config/routes.rb.
+
+    If you want to remove all the generated files, run
+    'rails destroy scaffold ModelName'.
+
+Examples:
+    `rails generate scaffold post`
+    `rails generate scaffold post title:string body:text published:boolean`
+    `rails generate scaffold purchase order_id:integer amount:decimal`
+MacBook:movie-application sw$</screen></para>
+
+      <para>Wir müssen also nach <command>rails generate scaffold</command>
+      den Namen des Models (bei uns "movie") und danach die Datenbankfelder
+      mit den entsprechenden Feldtypen angeben.</para>
+
+      <para>Dann legen wir mal los:<screen>MacBook:movie-application sw$ <command>rails generate scaffold movie title:string production_year:integer duration:integer plot:text rating:integer</command>
+      invoke  active_record
+      create    db/migrate/20100404113234_create_movies.rb
+      create    app/models/movie.rb
+      invoke    test_unit
+      create      test/unit/movie_test.rb
+      create      test/fixtures/movies.yml
+       route  resources :movies
+      invoke  scaffold_controller
+      create    app/controllers/movies_controller.rb
+      invoke    erb
+      create      app/views/movies
+      create      app/views/movies/index.html.erb
+      create      app/views/movies/edit.html.erb
+      create      app/views/movies/show.html.erb
+      create      app/views/movies/new.html.erb
+      create      app/views/movies/_form.html.erb
+      create      app/views/layouts/movies.html.erb
+      invoke    test_unit
+      create      test/functional/movies_controller_test.rb
+      invoke    helper
+      create      app/helpers/movies_helper.rb
+      invoke      test_unit
+      create        test/unit/helpers/movies_helper_test.rb
+      invoke  stylesheets
+      create    public/stylesheets/scaffold.css
+MacBook:movie-application sw$</screen>Und schon ist alles fertig. Allerdings
+      ist in der Datenbank noch keine entsprechende Tabelle angelegt.</para>
+    </section>
+
+    <section xml:id="migration">
+      <title xml:id="migration.title">Migrationen</title>
+
+      <para><application>In der zweiten Ausgabezeile des Scaffoldings sehen
+      wir die Ausgabe:</application><screen>      create    db/migrate/20100404113234_create_movies.rb
+</screen></para>
+
+      <para>In der Datei
+      <filename>db/migrate/20100404113234_create_movies.rb</filename> finden
+      sich die Anweisung, mit der die Datenbank erstellt (<code>def
+      self.up</code>) und auch beim Roll-Back (<code>def self.down</code>)
+      wieder gelöscht werden kann.<programlisting>class CreateMovies &lt; ActiveRecord::Migration
+  def self.up
+    create_table :movies do |t|
+      t.string :title
+      t.integer :production_year
+      t.integer :duration
+      t.text :plot
+      t.integer :rating
+
+      t.timestamps
+    end
+  end
+
+  def self.down
+    drop_table :movies
+  end
+end
+</programlisting></para>
+
+      <para>Die in dieser Ruby-Datei angelegte Klasse
+      <classname>CreateMovies</classname> ist ein Kind der Klasse
+      <classname>ActiveRecord::Migration</classname> (siehe Zeile 1) und hat
+      zwei Methoden:<itemizedlist>
+          <listitem>
+            <para><methodname>self.up</methodname> (Zeile 2). Wird aufgerufen,
+            wenn die Migration durchgeführt wird.</para>
+          </listitem>
+
+          <listitem>
+            <para><methodname>self.down</methodname> (Zeile 14). Wird
+            aufgerufen, wenn für eine Migration ein Rollback durchgeführt
+            wird.</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <para>Die Migration (also das Anlegen der Datenbank) wird mit
+      <command>rake db:migrate</command> durchgeführt:<screen>MacBook:movie-application sw$ <command>rake db:migrate</command>
+(in /Users/sw/Development/movie-application)
+==  CreateMovies: migrating ===================================================
+-- create_table(:movies)
+   -&gt; 0.0015s
+==  CreateMovies: migrated (0.0017s) ==========================================
+
+MacBook:movie-application sw$</screen></para>
+
+      <para>Die Datenbank-Tabelle <varname>movies</varname> wird angelegt.
+      Dabei sehen wir, das Tabellen-Namen automatisch den Plural der Models
+      bekommen. Aber welche Datenbank wird überhaupt benutzt? Das wird in der
+      Konfigurationsdatei <filename>config/database.yml</filename>
+      definiert:<screen>MacBook:movie-application sw$ <command>cat -n config/database.yml</command> 
+     1 # SQLite version 3.x
+     2 #   gem install sqlite3-ruby (not necessary on OS X Leopard)
+     3 development:
+     4   adapter: sqlite3
+     5   database: db/development.sqlite3
+     6   pool: 5
+     7   timeout: 5000
+     8 
+     9 # Warning: The database defined as "test" will be erased and
+    10 # re-generated from your development database when you run "rake".
+    11 # Do not set this db to the same as development or production.
+    12 test:
+    13   adapter: sqlite3
+    14   database: db/test.sqlite3
+    15   pool: 5
+    16   timeout: 5000
+    17 
+    18 production:
+    19   adapter: sqlite3
+    20   database: db/production.sqlite3
+    21   pool: 5
+    22   timeout: 5000
+MacBook:movie-application sw$</screen></para>
+
+      <para>Dort werden drei verschiedene Datenbanken im YAML-Format (siehe
+      <uri xlink:href="http://www.yaml.org/">http://www.yaml.org/</uri> bzw.
+      <uri
+      xlink:href="http://de.wikipedia.org/wiki/YAML">http://de.wikipedia.org/wiki/YAML</uri>)
+      definiert. Für uns wichtig ist erst mal nur die development-Datenbank
+      (Zeile 3 bis 7). Per default benutzt Rails dort
+      <application>Sqlite3</application>. Sqlite3 mag nicht die richtige Wahl
+      für die Analyse der weltweit gesammelten Wetterdaten sein, aber für die
+      schnelle und unkompliziete Entwicklung von Rails-Anwendungen lernt man
+      sie schnell zu schätzen. In der Produktions-Umgebung kann man später
+      immer noch auf "grosse" Datenbanken wie MySQL umsteigen.<footnote>
+          <para>Es gibt unter einigen Entwicklern die Ansicht, das man auf
+          jeden Fall immer mit der gleichen Datenbank entwicklen soll, die man
+          später auch in der Produktion und im Testing benutzt. Das sollte
+          aber jeder für sich selbst entscheiden.</para>
+        </footnote></para>
+
+      <para>Um Ihre Neugierde zu befriedigen, schauen wir uns kurz noch die
+      Datenbank mit dem Command-Line-Tool <application>sqlite3</application>
+      an.<screen>MacBook:movie-application sw$ <command>sqlite3 db/development.sqlite3</command> 
+SQLite version 3.6.12
+Enter ".help" for instructions
+Enter SQL statements terminated with a ";"
+sqlite&gt; <command>.tables</command>
+movies             schema_migrations
+sqlite&gt; <command>.schema movies</command>
+CREATE TABLE "movies" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar(255), "production_year" integer, "duration" integer, "plot" text, "rating" integer, "created_at" datetime, "updated_at" datetime);
+sqlite&gt; <command>.quit</command>
+MacBook:movie-application sw$</screen></para>
+
+      <para>Das Anlegen der Tabelle mit <command>rake db:migrate</command>
+      wurde natürlich auch im <filename>log/development.log</filename>
+      eingetragen:<screen>  SQL (0.5ms)   SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+
+  SQL (0.1ms)   SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+  SQL (0.1ms)  SELECT "schema_migrations"."version" FROM "schema_migrations"
+Migrating to CreateMovies (20100404113234)
+  SQL (0.1ms)  select sqlite_version(*)
+  SQL (0.4ms)  CREATE TABLE "movies" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar(255), "production_year" integer, "duration" integer, "plot" text, "rating" integer, "created_at" datetime, "updated_at" datetime) 
+  SQL (0.1ms)  INSERT INTO "schema_migrations" ("version") VALUES ('20100404113234')
+  SQL (0.2ms)   SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+
+  SQL (0.1ms)  SELECT "schema_migrations"."version" FROM "schema_migrations"
+  SQL (0.1ms)   SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+
+  SQL (0.0ms)  PRAGMA index_list("movies")
+</screen></para>
+
+      <section xml:id="active-record-auto-felder">
+        <title>Automatisch zugefügte Felder (id, created_at und
+        updated_at)</title>
+
+        <para>Rails ist so freundlich uns beim Scaffolding per Default
+        folgende Felder hinzuzufügen:<itemizedlist>
+            <listitem>
+              <para><varname>id:integer</varname></para>
+
+              <para>Das ist die Unique-ID des Datensatzes. Das Feld wird von
+              der Datenbank automatisch hochgezählt. Für alle SQL-Fans:
+              AUTOINCREMENT NOT NULL</para>
+            </listitem>
+
+            <listitem>
+              <para><varname>created_at:datetime</varname></para>
+
+              <para>Das Feld wird von ActiveRecord automatisch beim Erstellen
+              eines Datensatzes gefüllt.</para>
+            </listitem>
+
+            <listitem>
+              <para><varname>updated_at:datetime</varname></para>
+
+              <para>Das Feld wird bei jeder Veränderung des Datensatzes
+              automatisch an die aktuelle Zeit angepasst.</para>
+            </listitem>
+          </itemizedlist></para>
+
+        <para>Am Anfang fragt man sich: "Muss das sein? Macht das wirklich
+        Sinn?". Aber mit der Zeit lernt man diese automatisch gehandelten
+        Felder schätzen.</para>
+      </section>
+
+      <section xml:id="migration-rollback">
+        <title>Migration Rollback</title>
+
+        <para>Es soll schon vorgekommen sein, das übereilt eine Migration
+        durchgeführt wurde. Natürlich passiert weder Ihnen noch mir so was.
+        ;-) Aber falls mal ein Freund von Ihnen in diese Predulie gerät: Keine
+        Panik! Dafür wurde in der Migrations-Class die Methode
+        <methodname>self.down</methodname> angelegt. Testweise können wir ja
+        mal unsere letzte Migration zurückrollen:<screen>MacBook:movie-application sw$ <command>rake db:rollback</command>
+(in /Users/sw/Development/movie-application)
+==  CreateMovies: reverting ===================================================
+-- drop_table(:movies)
+   -&gt; 0.1004s
+==  CreateMovies: reverted (0.1005s) ==========================================
+
+MacBook:movie-application sw$</screen></para>
+
+        <para>Sie können alles auf einmal zurück-rollen oder auch nur einzelne
+        Migrationen. Mit dem Schalter <parameter>-T</parameter> bekommen Sie
+        eine Hilfe zu allen möglichen Wegen aufgezeigt:<screen>MacBook:movie-application sw$ <command>rake -T db</command>
+(in /Users/sw/Development/movie-application)
+rake db:abort_if_pending_migrations  # Raises an error if there are pending...
+rake db:charset                      # Retrieves the charset for the curren...
+rake db:collation                    # Retrieves the collation for the curr...
+rake db:create                       # Create the database defined in confi...
+rake db:create:all                   # Create all the local databases defin...
+rake db:drop                         # Drops the database for the current R...
+rake db:drop:all                     # Drops all the local databases define...
+rake db:fixtures:identify            # Search for a fixture given a LABEL o...
+rake db:fixtures:load                # Load fixtures into the current envir...
+rake db:forward                      # Pushes the schema to the next version.
+rake db:migrate                      # Migrate the database through scripts...
+rake db:migrate:down                 # Runs the "down" for a given migratio...
+rake db:migrate:redo                 # Rollbacks the database one migration...
+rake db:migrate:reset                # Resets your database using your migr...
+rake db:migrate:up                   # Runs the "up" for a given migration ...
+rake db:reset                        # Drops and recreates the database fro...
+rake db:rollback                     # Rolls the schema back to the previou...
+rake db:schema:dump                  # Create a db/schema.rb file that can ...
+rake db:schema:load                  # Load a schema.rb file into the database
+rake db:seed                         # Load the seed data from db/seeds.rb
+rake db:sessions:clear               # Clear the sessions table
+rake db:sessions:create              # Creates a sessions migration for use...
+rake db:setup                        # Create the database, load the schema...
+rake db:structure:dump               # Dump the database structure to a SQL...
+rake db:test:clone                   # Recreate the test database from the ...
+rake db:test:clone_structure         # Recreate the test databases from the...
+rake db:test:load                    # Recreate the test database from the ...
+rake db:test:prepare                 # Check for pending migrations and loa...
+rake db:test:purge                   # Empty the test database
+rake db:version                      # Retrieves the current schema version...
+MacBook:movie-application sw$</screen></para>
+
+        <para>Und mit <command>rake -T db:rollback</command> die Hilfe zu
+        diesem bestimmten Befehl:<screen>MacBook:movie-application sw$ <command>rake -T db:rollback</command>
+(in /Users/sw/Development/movie-application)
+rake db:rollback  # Rolls the schema back to the previous version.
+MacBook:movie-application sw$</screen></para>
+
+        <para>Aber spielen wir lieber unsere Migration wieder ein:<screen>MacBook:movie-application sw$ rake db:migrate  
+(in /Users/sw/Development/movie-application)
+==  CreateMovies: migrating ===================================================
+-- create_table(:movies)
+   -&gt; 0.0014s
+==  CreateMovies: migrated (0.0015s) ==========================================
+
+MacBook:movie-application sw$</screen></para>
+      </section>
+    </section>
   </section>
 </chapter>
