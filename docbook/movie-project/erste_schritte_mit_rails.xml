@@ -745,7 +745,7 @@ MacBook:movie-application sw$</screen></para>
 rake db:rollback  # Rolls the schema back to the previous version.
 MacBook:movie-application sw$</screen></para>
 
-        <para>Aber spielen wir lieber unsere Migration wieder ein:<screen>MacBook:movie-application sw$ rake db:migrate  
+        <para>Aber spielen wir lieber unsere Migration wieder ein:<screen>MacBook:movie-application sw$ <command>rake db:migrate</command>  
 (in /Users/sw/Development/movie-application)
 ==  CreateMovies: migrating ===================================================
 -- create_table(:movies)
@@ -753,6 +753,538 @@ MacBook:movie-application sw$</screen></para>
 ==  CreateMovies: migrated (0.0015s) ==========================================
 
 MacBook:movie-application sw$</screen></para>
+      </section>
+    </section>
+
+    <section xml:id="restful_datenbankzugriff_per_webbrowser">
+      <title xml:id="restful_datenbankzugriff_per_webbrowser.title">RESTful
+      Datenbankzugriff per Webbrowser</title>
+
+      <para>Die Datenbank ist angelegt. Und der Vorteil von Scaffolding
+      besteht darin, das wir jetzt auch direkt per Webbrowser in einer
+      aktzeptablen Web-GUI darauf zugreifen können.</para>
+
+      <para>Gemäss der CRUD Idee (siehe <uri
+      xlink:href="http://de.wikipedia.org/wiki/CRUD">http://de.wikipedia.org/wiki/CRUD</uri>)
+      bietet Rails dafür ein RESTful Webinterface an. Was heisst das? Sie
+      können auf jede Resource innerhalb einer normalen Rails-Umgeben über
+      definierte URLs zugreifen und damit folgende Datenbank-Operationen
+      ausführen:<itemizedlist>
+          <listitem>
+            <para>C für CREATE</para>
+
+            <para>SQL: <code>INSERT INTO movies (title) VALUES ('Rain
+            Man')</code></para>
+          </listitem>
+
+          <listitem>
+            <para>R für READ</para>
+
+            <para>SQL: <code>SELECT * FROM movies</code></para>
+          </listitem>
+
+          <listitem>
+            <para>U für UPDATE</para>
+
+            <para>SQL: <code>UPDATE movies SET title = 'Rain Man' WHERE id =
+            1</code></para>
+          </listitem>
+
+          <listitem>
+            <para>D für DELETE</para>
+
+            <para>SQL: <code>DELETE FROM movies WHERE id = 1</code></para>
+          </listitem>
+        </itemizedlist>Für den Rails-Neuling ist nicht direkt ersichtlich, wo
+      den hier der grosse Vorteil liegt. Nachfolgend eine Mini-FAQ:<qandaset>
+          <qandadiv>
+            <qandaentry>
+              <question>
+                <para>Warum wird um das RESTful Interface in Ruby on Rails so
+                ein Bohei gemacht?</para>
+              </question>
+
+              <answer>
+                <para>Damit bekommt man ein sauberes und für alle
+                Programmierer leicht verständliches Interface zu Ihrem System.
+                Sie brauchen nur die URI
+                <uri>http://localhost:3000/movies</uri> und das Wissen, das es
+                sich um ein RESTful Webdienst handelt und Sie können direkt
+                loslegen.</para>
+              </answer>
+            </qandaentry>
+
+            <qandaentry>
+              <question>
+                <para>Ist RESTful nur für die automatische Abfrage zwischen
+                Computern gut?</para>
+              </question>
+
+              <answer>
+                <para>Nein. RESTful ist auch ein guter Denkansatz, um URLs und
+                damit ganze Webseiten strukturierter zu gestalten.</para>
+              </answer>
+            </qandaentry>
+
+            <qandaentry>
+              <question>
+                <para>Ist RESTful Teil der <emphasis>Convention over
+                Configuration</emphasis> Idee?</para>
+              </question>
+
+              <answer>
+                <para>Ja! Jeder Rails-Entwickler kann sich so in kurzer Zeit
+                in ein ihm neues Rails-Projekt einarbeiten.</para>
+              </answer>
+            </qandaentry>
+          </qandadiv>
+        </qandaset></para>
+
+      <section>
+        <title>Start des Webservers</title>
+
+        <para>Als erstes starten wir wie immer mit rails server unseren
+        Entwicklungswebserver:<screen>Stefan-Wintermeyers-MacBook-Pro-2008-50:movie-application sw$ <command>rails server</command>
+=&gt; Booting WEBrick
+=&gt; Rails 3.0.0.beta2 application starting in development on http://0.0.0.0:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2010-04-04 14:56:29] INFO  WEBrick 1.3.1
+[2010-04-04 14:56:29] INFO  ruby 1.9.1 (2010-01-10) [i386-darwin10.3.0]
+[2010-04-04 14:56:29] INFO  WEBrick::HTTPServer#start: pid=19993 port=3000
+</screen></para>
+      </section>
+
+      <section xml:id="restful_create">
+        <title xml:id="restful_create.title">Create (Erstellen)</title>
+
+        <para>Legen wir als erstes einmal einen neuen Datensatz an. Sie können
+        das entsprechende Interface über die URI <uri
+        xlink:href="http://0.0.0.0:3000/movies/new">http://0.0.0.0:3000/movies/new</uri>
+        abrufen. Bitte benutzen Sie dieses Interface um einen Beispiel-Film
+        einzutragen:<screenshot>
+            <info>
+              <title>Neuen Film in die Datenbank eintragen.</title>
+            </info>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/movies_new.jpg" format="jpg"></imagedata>
+              </imageobject>
+            </mediaobject>
+          </screenshot></para>
+
+        <para>Nachdem Sie auf "Create Movie" geklickt haben, können Sie im
+        Log-File folgenden Eintrag verfolgen:<screen>Started POST "/movies" for 127.0.0.1 at 2010-04-04 15:08:43
+  Processing by MoviesController#create as HTML
+  Parameters: {"authenticity_token"=&gt;"36ebldTKHnK4AXM9N2WFTCdzIzVtglqrsryicLEs1vE=", "movie"=&gt;{"title"=&gt;"Rain Man", "production_year"=&gt;"1988", "duration"=&gt;"133", "plot"=&gt;"Amerikanischer Roadmovie \xC3\xBCber zwei sehr ungleiche Br\xC3\xBCder, die sich erst nach dem Tod des Vaters kennen lernen.", "rating"=&gt;"5"}, "commit"=&gt;"Create Movie"}
+  SQL (0.2ms)   SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+
+  SQL (0.4ms)  INSERT INTO "movies" ("created_at", "duration", "plot", "production_year", "rating", "title", "updated_at") VALUES ('2010-04-04 13:08:43.139349', 133, 'Amerikanischer Roadmovie über zwei sehr ungleiche Brüder, die sich erst nach dem Tod des Vaters kennen lernen.', 1988, 5, 'Rain Man', '2010-04-04 13:08:43.139349')
+Redirected to http://0.0.0.0:3000/movies/1
+Completed 302 Found in 43ms
+
+
+Started GET "/movies/1" for 127.0.0.1 at 2010-04-04 15:08:43
+  Processing by MoviesController#show as HTML
+  Parameters: {"id"=&gt;"1"}
+  Movie Load (0.2ms)  SELECT "movies".* FROM "movies" WHERE ("movies"."id" = 1) LIMIT 1
+Rendered movies/show.html.erb within layouts/movies (11.7ms)
+Completed 200 OK in 55ms (Views: 33.2ms | ActiveRecord: 0.2ms)
+</screen></para>
+
+        <para>Als Ergebnis bekommen Sie im Browserfenster den entsprechenden
+        Eintrag angezeigt:<screenshot xml:id="screenshot_show_after_create">
+            <info>
+              <title>Nach dem Abspeichern wird der neue Eintrag
+              angezeigt.</title>
+            </info>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/movies_new_show.jpg"></imagedata>
+              </imageobject>
+            </mediaobject>
+          </screenshot></para>
+      </section>
+
+      <section xml:id="restful_show">
+        <title xml:id="restful_show.title">Show (Anzeigen eines einzelnen
+        Datensatzes)</title>
+
+        <para>Nach dem Erstellen (Create) eines neuen Datensatzes, können wir
+        uns diesen natürlich jetzt einzeln anschauen. Das geht über die URI
+        http://0.0.0.0:3000/movies/1<screenshot xml:id="screenshot_show">
+            <info>
+              <title>Anzeigen des ersten Datensatzes</title>
+            </info>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/movies_show.jpg" format="jpg"></imagedata>
+              </imageobject>
+            </mediaobject>
+          </screenshot></para>
+
+        <para>Im Log erscheint die folgende Ausgabe:<screen>Started GET "/movies/1" for 127.0.0.1 at 2010-04-04 16:19:38
+  Processing by MoviesController#show as HTML
+  Parameters: {"id"=&gt;"1"}
+  Movie Load (0.2ms)  SELECT "movies".* FROM "movies" WHERE ("movies"."id" = 1) LIMIT 1
+Rendered movies/show.html.erb within layouts/movies (8.7ms)
+Completed 200 OK in 29ms (Views: 11.5ms | ActiveRecord: 0.2ms)
+</screen></para>
+
+        <para>Ihnen wird bestimmt beim Vergleich der Screenshots <xref
+        linkend="screenshot_show" /> und <xref
+        linkend="screenshot_show_after_create" /> aufgefallens ein, das bei
+        <xref linkend="screenshot_show_after_create" /> am oben eine grüne
+        Nachricht angezeigt wurde. Das ist eine sogenannte Flash-Nachricht.
+        Dabei ist das Wording "Flash" meiner Meinung nach äusserst ungeschickt
+        gewählt, weil bei "Flash" jeder automatisch an das Adobe-Flash-Format
+        und nicht an eine Flash-artig (Flash = Blitz) erscheinende Nachricht
+        denkt. So ist es aber bei Rails. Flash-Nachrichten werden immer auf
+        der nächsten und nur auf der nächsten generierten Seite angezeigt. Wir
+        kommen später auf Flash detailierter zu sprechen.</para>
+      </section>
+
+      <section xml:id="restful_edit">
+        <title xml:id="restful_edit.title">Edit (Bearbeiten eines
+        Datensatzes)</title>
+
+        <para></para>
+      </section>
+
+      <section xml:id="restful_index">
+        <title xml:id="restful_index.title">Index (Anzeigen aller
+        Datensätze)</title>
+
+        <para>Über die URI http://0.0.0.0:3000/movies können Sie sich eine
+        Liste aller Filme in der Datenbank anzeigen lassen (logischerweise ist
+        das bis jetzt nur ein Film):<screenshot>
+            <info>
+              <title>Index-Ansicht aller Filme</title>
+            </info>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/movies_index.jpg" format="jpg"></imagedata>
+              </imageobject>
+            </mediaobject>
+          </screenshot></para>
+
+        <para>Im Log-File findet sich folgende Ausgabe:<screen>Started GET "/movies" for 127.0.0.1 at 2010-04-04 16:26:30
+  Processing by MoviesController#index as HTML
+  Movie Load (0.5ms)  SELECT "movies".* FROM "movies"
+Rendered movies/index.html.erb within layouts/movies (9.9ms)
+Completed 200 OK in 43ms (Views: 29.5ms | ActiveRecord: 0.4ms)
+</screen></para>
+      </section>
+
+      <section>
+        <title>Löschen eines Datensatzes</title>
+
+        <para>Wenn Sie auf der Index-Seite auf "Destroy" klicken, so bekommen
+        Sie folgende Meldung angezeigt:<screenshot>
+            <info>
+              <title>Sicherheitsabfrage beim Löschen eines Datensatzes</title>
+            </info>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/destroy_r_u_sure.jpg"
+                           format="jpg"></imagedata>
+              </imageobject>
+            </mediaobject>
+          </screenshot></para>
+
+        <para>Klicken wir jetzt mutig auf "OK", bekommen wir wieder die
+        Index-Seite, aber diesmal ganz ohne einen Film angezeigt:<screenshot>
+            <info>
+              <title>Index-Ansicht nach dem Löschen des einzigen
+              Datensatzes</title>
+            </info>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/index_after_destroy.jpg"
+                           format="jpg"></imagedata>
+              </imageobject>
+            </mediaobject>
+          </screenshot></para>
+
+        <para>Zum Schluss noch der obligatorische Blick in das
+        Log-File:<screen>Started POST "/movies/1" for 127.0.0.1 at 2010-04-04 16:34:46
+  Processing by MoviesController#destroy as HTML
+  Parameters: {"authenticity_token"=&gt;"xzdq0dePdnVUkBpqbDEXPhPdAo/NhTM3U/lVtjzPTds=", "id"=&gt;"1"}
+  Movie Load (0.2ms)  SELECT "movies".* FROM "movies" WHERE ("movies"."id" = 1) LIMIT 1
+  SQL (0.3ms)  DELETE FROM "movies" WHERE ("movies"."id" = 1)
+Redirected to http://0.0.0.0:3000/movies
+Completed 302 Found in 25ms
+</screen></para>
+      </section>
+    </section>
+
+    <section>
+      <title>Routen</title>
+
+      <para>Fassen wir mal kurz zusammen: Man kann also mit Scaffolding eine
+      Web-GUI erstellen und auf diese Web-GUI anscheinen über eine feste
+      CRUD-Stuktur zugreifen. Jetzt wäre ja mal interessant zu wissen, ob es
+      noch mehr URIs gibt. Rails steuert das über sogenannte Routen. Alle
+      Routen werden in der Datei <filename>config/routes.rb</filename>
+      definiert. Standardmässig sind in dieser Datei recht viele Beispiele als
+      Kommentare eingebaut. Schauen wir uns mal an, wie die aktuelle
+      Konfiguration ohne diese Kommentare aussieht:<screen>MacBook:movie-application sw$ <command>cat config/routes.rb | grep -v "#" | grep -v "^$"</command>
+MovieApp::Application.routes.draw do |map|
+  resources :movies
+end
+MacBook:movie-application sw$</screen></para>
+
+      <para>Interessant ist die Zeile:<programlisting>  resources :movies</programlisting></para>
+
+      <para>Diese Zeile sagt Rails, das es die Resource movies mit allen
+      Standard Routen ausstatten soll. Diese Routen können wir uns mit
+      <command>rake routes</command> anzeigen lassen.<screen>MacBook:movie-application sw$ <command>rake routes</command>
+(in /Users/sw/Development/movie-application)
+           GET    /movies(.:format)          {:action=&gt;"index", :controller=&gt;"movies"}
+    movies POST   /movies(.:format)          {:action=&gt;"create", :controller=&gt;"movies"}
+ new_movie GET    /movies/new(.:format)      {:action=&gt;"new", :controller=&gt;"movies"}
+           GET    /movies/:id(.:format)      {:action=&gt;"show", :controller=&gt;"movies"}
+           PUT    /movies/:id(.:format)      {:action=&gt;"update", :controller=&gt;"movies"}
+     movie DELETE /movies/:id(.:format)      {:action=&gt;"destroy", :controller=&gt;"movies"}
+edit_movie GET    /movies/:id/edit(.:format) {:action=&gt;"edit", :controller=&gt;"movies"}
+MacBook:movie-application sw$</screen></para>
+
+      <para>Puh... das sind ja viel mehr, als wir oben benutzt haben. Oder
+      doch nicht? Und jetzt muss ich das auch noch sinnvoll und strukturiert
+      erklären! ;-)</para>
+
+      <para>CRUD besteht zwar aus den vier Teilen Create, Read, Upate und
+      Delete, aber diese Einzelelemente müssen in der RESTful Umsetzung weiter
+      aufgeschlüsselt werden. Ziel bei REST ist es, das man eine
+      Abfrage-Methodik definiert, die von allen Entwicklern gleich verstanden
+      und auch benutzt werden kann. Dazu werden bei Webzugriffen die URIs und
+      die HTTP-Verben benutzt. Was HTTP-Verben sind? Ich habe die Frage
+      befürchtet. Bei der Entwicklung des HTTP-Protokolles wurden verschiedene
+      Abfrage-Methoden definiert. Sie haben bestimmt bei einem HTML-Formular
+      schon mal vom Unterschied zwischen GET und POST gelesen. GET und POST
+      sind genau solche Verben. Für uns weiterhin interessant sind PUT und
+      DELETE. Gerne verweise ich an dieser Stelle auf das RFC 2616 (<uri
+      xlink:href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html">http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html</uri>),
+      falls Sie sich mit dieser Materie näher beschäftigen wollen.</para>
+
+      <para>Für uns ist jetzt erst mal nur interessant, das gleiche URIs die
+      mit unterschiedlichen Verben angesprochen werden unterschiedliche
+      Aktionen in Ihrer Rails-Applikation auslösen. So können Sie in unserer
+      Filmdatenbank über die URI <uri
+      xlink:href="http://0.0.0.0:3000/movies">http://0.0.0.0:3000/movies</uri>
+      sowohl mit GET eine Liste (Index) aller Filme anfordern, als auch mit
+      POST einen neuen Filmeintrag abspeichern.</para>
+
+      <para>Die Kombination aus Verb und URI wird in Rails als Route
+      bezeichnet. Ist eine Route nicht definiert, passiert auch nichts. Ist
+      eine Route definiert, dann wird damit auf eine "Action" und einen
+      "Controller" verwiesen. Ich würde jetzt gerne erklären, was es mit
+      beidem auf sich hat, aber vorher will ich noch kurz <xref
+      linkend="restful_mit_xml" /> besprechen, damit wir das aktuelle Thema
+      RESTful Zugriff sauber abgeschlossen haben.</para>
+    </section>
+
+    <section xml:id="restful_mit_xml">
+      <title xml:id="restful_mit_xml.title">RESTful Datenbankzugriff per XML
+      und curl</title>
+
+      <para>Das XML-Interface erleichtert den Austausch von Daten zwischen
+      Maschinen. Dabei wird der ganze HTML-Balast abgeworfen und nur noch die
+      reinen Daten per XML ausgetauscht. Beispielhaft führen wir dies mit dem
+      Programm curl durch. Logischerweise geht es natürlich auch mit anderen
+      Programmen oder Programmiersprachen. Wer die Art und Weise verstanden
+      hat, kann von beliebigen Systemen eine Rails Applikation bedienen. Da
+      dies naturgemäss auch gewisse Gefahren in sich birgt (z.B. kann eine
+      Maschine per Brute-Force-Attacke schnell wie Unheil anrichten), kann man
+      per Default bestimmte Aktionen nicht durchführen. Dies wird in der Datei
+      <filename>app/controllers/application_controller.rb</filename> mit
+      <code>protect_from_forgery</code> konfiguriert. Bitte deaktiven Sie
+      diese Zeile für diese Beispiele wie folgt mit einem
+      #-Zeichen:<programlisting>class ApplicationController &lt; ActionController::Base
+  # protect_from_forgery
+end
+</programlisting></para>
+
+      <para>Dadurch entfällt eine per default aktivierte Sicherheitsschicht,
+      die einen Token austauscht, um die anonyme Interaktion von aussen zu
+      underbinden. Im Log-File werden Sie den Unterschied merken (es fehlt der
+      Eintrag <code>"authenticity_token"=&gt;"xyz"</code>). In späteren
+      Kapiteln besprechen wir Authentifizierungsmechanismen um diese Zugriffe
+      mit Passwörtern abzusichern.</para>
+
+      <section>
+        <title>new</title>
+
+        <para>Um einen neuen Film einzutragen, benötigen Sie als erstes die
+        Felder die ausgefüllt werden müssen. Dazu können Sie die URL <uri
+        xlink:href="http://0.0.0.0:3000/movies/new.xml">http://0.0.0.0:3000/movies/new.xml</uri>
+        abrufen:<screen>Stefan-Wintermeyers-MacBook-Pro-2008-50:~ sw$ curl -X GET http://0.0.0.0:3000/movies/new.xml
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;movie&gt;
+  &lt;created-at type="datetime" nil="true"&gt;&lt;/created-at&gt;
+  &lt;duration type="integer" nil="true"&gt;&lt;/duration&gt;
+  &lt;plot nil="true"&gt;&lt;/plot&gt;
+  &lt;production-year type="integer" nil="true"&gt;&lt;/production-year&gt;
+  &lt;rating type="integer" nil="true"&gt;&lt;/rating&gt;
+  &lt;title nil="true"&gt;&lt;/title&gt;
+  &lt;updated-at type="datetime" nil="true"&gt;&lt;/updated-at&gt;
+&lt;/movie&gt;
+Stefan-Wintermeyers-MacBook-Pro-2008-50:~ sw$</screen></para>
+
+        <para>Im Log des Webservers sehen Sie folgende Ausgabe:<screen>Started GET "/movies/new.xml" for 127.0.0.1 at 2010-04-04 19:28:19
+  Processing by MoviesController#new as XML
+Completed 200 OK in 124ms (Views: 111.1ms | ActiveRecord: 0.0ms)
+</screen></para>
+
+        <para>In der XML-Ausgabe können wir erkennen wie die einzelnen Felder
+        heissen und welche Typen (z.B. Integer) sie darstellen. Mit diesen
+        Informationen können wir jetzt einen create Aufruf mit dem neuen
+        Datensatz zusammenstellen:</para>
+
+        <para>Danach können Sie mit einem create Aufruf die Daten für einen
+        neuen Datensatz uploaden:<screen>sw@debian:~/dvd-sammlung$ <command>curl -X POST -d "&lt;dvd&gt;&lt;title&gt;Rain Man&lt;/title&gt;&lt;production-year&gt;1988&lt;/production-year&gt;&lt;/dvd&gt;" http://localhost:3000/dvds</command>
+&lt;html&gt;&lt;body&gt;You are being &lt;a href="http://localhost:3000/dvds/5"&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Ausgabe im Log:<screen>Processing DvdsController#create (for 127.0.0.1 at 2009-12-25 02:25:33) [POST]
+  Parameters: {"&lt;dvd&gt;&lt;title&gt;Rain Man&lt;/title&gt;&lt;production-year&gt;1988&lt;/production-year&gt;&lt;/dvd&gt;"=&gt;nil}
+  Dvd Create (0.3ms)   INSERT INTO "dvds" ("title", "production_year", "duration", "plot", "rating", "created_at", "updated_at") VALUES(NULL, NULL, NULL, NULL, NULL, '2009-12-25 01:25:33', '2009-12-25 01:25:33')
+Redirected to http://localhost:3000/dvds/5
+Completed in 52ms (DB: 0) | 302 Found [http://localhost/dvds]
+</screen></para>
+
+        <para>Danach werden Sie auf die show-Seite dieses Eintrages
+        umgeleitet.</para>
+      </section>
+
+      <section>
+        <title>index</title>
+
+        <para>Die Liste aller aktuell gespeicherten DVDs bekommen Sie unter
+        der URL <uri>http://localhost:3000/dvds.xml</uri><screen>sw@debian:~/dvd-sammlung$ <command>curl -X GET http://localhost:3000/dvds.xml</command>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;dvds type="array"&gt;
+  &lt;dvd&gt;
+    &lt;created-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/created-at&gt;
+    &lt;duration type="integer" nil="true"&gt;&lt;/duration&gt;
+    &lt;id type="integer"&gt;1&lt;/id&gt;
+    &lt;plot nil="true"&gt;&lt;/plot&gt;
+    &lt;production-year type="integer"&gt;1984&lt;/production-year&gt;
+    &lt;rating type="integer" nil="true"&gt;&lt;/rating&gt;
+    &lt;title&gt;The Terminator&lt;/title&gt;
+    &lt;updated-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/updated-at&gt;
+  &lt;/dvd&gt;
+  &lt;dvd&gt;
+    &lt;created-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/created-at&gt;
+    &lt;duration type="integer" nil="true"&gt;&lt;/duration&gt;
+    &lt;id type="integer"&gt;2&lt;/id&gt;
+    &lt;plot nil="true"&gt;&lt;/plot&gt;
+    &lt;production-year type="integer"&gt;1992&lt;/production-year&gt;
+    &lt;rating type="integer" nil="true"&gt;&lt;/rating&gt;
+    &lt;title&gt;Terminator 2&lt;/title&gt;
+    &lt;updated-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/updated-at&gt;
+  &lt;/dvd&gt;
+  &lt;dvd&gt;
+    &lt;created-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/created-at&gt;
+    &lt;duration type="integer" nil="true"&gt;&lt;/duration&gt;
+    &lt;id type="integer"&gt;3&lt;/id&gt;
+    &lt;plot nil="true"&gt;&lt;/plot&gt;
+    &lt;production-year type="integer"&gt;2009&lt;/production-year&gt;
+    &lt;rating type="integer" nil="true"&gt;&lt;/rating&gt;
+    &lt;title&gt;Terminator Salvation&lt;/title&gt;
+    &lt;updated-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/updated-at&gt;
+  &lt;/dvd&gt;
+&lt;/dvds&gt;
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Im Log des Webservers sehen Sie folgende Ausgabe:<screen>Processing DvdsController#index to xml (for 127.0.0.1 at 2009-12-25 02:11:09) [GET]
+  Dvd Load (0.9ms)   SELECT * FROM "dvds" 
+Completed in 494ms (View: 491, DB: 1) | 200 OK [http://0.0.0.0/dvds.xml]
+</screen></para>
+      </section>
+
+      <section>
+        <title>show</title>
+
+        <para>Eine einzelne DVD kann man sich mit der ID des Eintrages (hier
+        die 1) und der entsprechenden URL
+        <uri>http://localhost:3000/dvds/show/1.xml</uri> anschauen. Alternativ
+        geht auch die Kurzform
+        <uri>http://localhost:3000/dvds/1.xml</uri><screen>sw@debian:~/dvd-sammlung$ <command>curl -X GET http://localhost:3000/dvds/1.xml</command>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;dvd&gt;
+  &lt;created-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/created-at&gt;
+  &lt;duration type="integer" nil="true"&gt;&lt;/duration&gt;
+  &lt;id type="integer"&gt;1&lt;/id&gt;
+  &lt;plot nil="true"&gt;&lt;/plot&gt;
+  &lt;production-year type="integer"&gt;1984&lt;/production-year&gt;
+  &lt;rating type="integer" nil="true"&gt;&lt;/rating&gt;
+  &lt;title&gt;The Terminator&lt;/title&gt;
+  &lt;updated-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/updated-at&gt;
+&lt;/dvd&gt;
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Im Log des Webservers sehen Sie folgende Ausgabe:<screen>Processing DvdsController#show to xml (for 127.0.0.1 at 2009-12-25 02:31:28) [GET]
+  Parameters: {"id"=&gt;"1"}
+  Dvd Load (0.2ms)   SELECT * FROM "dvds" WHERE ("dvds"."id" = 1) 
+Completed in 7ms (View: 3, DB: 0) | 200 OK [http://localhost/dvds/1.xml]
+</screen></para>
+      </section>
+
+      <section>
+        <title>edit - update</title>
+
+        <para>Zum Editieren eines Eintrages downloaden wir diesen Eintrag erst
+        wieder von der entsprechenden URL
+        <uri>http://localhost:3000/dvds/1.xml</uri><screen>sw@debian:~/dvd-sammlung$ <command>curl -X GET http://localhost:3000/dvds/1.xml</command>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;dvd&gt;
+  &lt;created-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/created-at&gt;
+  &lt;duration type="integer" nil="true"&gt;&lt;/duration&gt;
+  &lt;id type="integer"&gt;1&lt;/id&gt;
+  &lt;plot nil="true"&gt;&lt;/plot&gt;
+  &lt;production-year type="integer"&gt;1984&lt;/production-year&gt;
+  &lt;rating type="integer" nil="true"&gt;&lt;/rating&gt;
+  &lt;title&gt;The Terminator&lt;/title&gt;
+  &lt;updated-at type="datetime"&gt;2009-12-25T01:10:54Z&lt;/updated-at&gt;
+&lt;/dvd&gt;
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Danach posten wir den entsprechenden Eintrag neu (in diesem
+        Beispiel setzen wir das Rating auf 5 Sterne). Wichtig dabei ist, das
+        wir die <parameter>id</parameter> des Eintrages mit
+        übertragen:<screen>sw@debian:~/dvd-sammlung$ <command>curl -X PUT -d "&lt;dvd&gt;&lt;id&gt;1&lt;/id&gt;&lt;rating&gt;5&lt;/rating&gt;&lt;/dvd&gt;" http://localhost:3000/dvds/update/1.xml</command>
+sw@debian:~/dvd-sammlung$ </screen></para>
+
+        <para>Im Log des Webservers sehen Sie folgende Ausgabe:<screen>Processing DvdsController#update to xml (for 127.0.0.1 at 2009-12-25 02:46:31) [PUT]
+  Parameters: {"&lt;dvd&gt;&lt;id&gt;1&lt;/id&gt;&lt;rating&gt;5&lt;/rating&gt;&lt;/dvd&gt;"=&gt;nil, "id"=&gt;"1"}
+  Dvd Load (0.2ms)   SELECT * FROM "dvds" WHERE ("dvds"."id" = 1) 
+Completed in 5ms (View: 0, DB: 0) | 200 OK [http://localhost/dvds/update/1.xml]
+</screen></para>
+      </section>
+
+      <section>
+        <title>destroy</title>
+
+        <para>Sie können den eben angelegten Datensatz mit der URL
+        <uri>http://localhost:3000/dvds/destroy/1</uri> wieder aus der
+        Datenbank löschen.<screen>sw@debian:~/dvd-sammlung$ <command>curl -X DELETE http://localhost:3000/dvds/1.xml</command>
+sw@debian:~/dvd-sammlung$</screen></para>
+
+        <para>Im Log des Webservers sehen Sie folgende Ausgabe:<screen>Processing DvdsController#destroy to xml (for 127.0.0.1 at 2009-12-25 02:49:40) [DELETE]
+  Parameters: {"id"=&gt;"1"}
+  Dvd Load (0.2ms)   SELECT * FROM "dvds" WHERE ("dvds"."id" = 1) 
+  Dvd Destroy (0.2ms)   DELETE FROM "dvds" WHERE "id" = 1
+Completed in 128ms (View: 0, DB: 0) | 200 OK [http://localhost/dvds/1.xml]
+</screen></para>
       </section>
     </section>
   </section>
