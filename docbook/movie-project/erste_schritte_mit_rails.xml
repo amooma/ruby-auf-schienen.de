@@ -80,14 +80,14 @@
 
     <para>Bevor wir hier überhaupt mit dem aller einfachsten starten,
     überprüfen Sie bitte, ob Sie eine Ruby Version 1.9.1 oder höher
-    einsetzen:<screen>stefan@swmbp 0 head- test$ <command>ruby -v</command>
+    einsetzen:<screen>MacBook$ <command>ruby -v</command>
 ruby 1.9.2dev (2010-04-11 trunk 27304) [x86_64-darwin10.3.0]
-stefan@swmbp 0 head- test$</screen></para>
+MacBook$</screen></para>
 
     <para>Und als nächstes überprüfen wir, ob auch Rails 3.0 oder höher
-    installiert ist:<screen>stefan@swmbp 0 head- test$ <command>rails -v</command>
+    installiert ist:<screen>MacBook$ <command>rails -v</command>
 Rails 3.0.0.beta2
-stefan@swmbp 0 head- test$</screen></para>
+MacBook$</screen></para>
 
     <para>Das sieht gut aus. Falls Sie eine ältere Ruby- oder Rails-Version
     installiert haben, dann installieren Sie bitte vor dem Weiterlesen die
@@ -1464,9 +1464,10 @@ Completed 200 OK in 51ms (Views: 35.8ms | ActiveRecord: 0.2ms)
         <title xml:id="restful_index.title">Index (Anzeigen aller
         Datensätze)</title>
 
-        <para>Über die URI http://0.0.0.0:3000/movies können Sie sich eine
-        Liste aller Filme in der Datenbank anzeigen lassen (logischerweise ist
-        das bis jetzt nur ein Film):<screenshot
+        <para>Über die URI <uri
+        xlink:href="http://0.0.0.0:3000/movies">http://0.0.0.0:3000/movies</uri>
+        können Sie sich eine Liste aller Filme in der Datenbank anzeigen
+        lassen (logischerweise ist das bis jetzt nur ein Film):<screenshot
             xml:id="screenshot_movies_index">
             <info>
               <title xml:id="screenshot_movies_index.title">Index-Ansicht
@@ -1545,6 +1546,7 @@ Completed 302 Found in 25ms
       Konfiguration ohne diese Kommentare aussieht:<screen>MacBook:movie-app sw$ <command>cat config/routes.rb | grep -v "#" | grep -v "^$"</command>
 MovieApp::Application.routes.draw do |map|
   resources :movies
+  get "example/test"
 end
 MacBook:movie-app sw$</screen></para>
 
@@ -1554,18 +1556,22 @@ MacBook:movie-app sw$</screen></para>
       Standard Routen ausstatten soll. Diese Routen können wir uns mit
       <command>rake routes</command> anzeigen lassen.<screen>MacBook:movie-app sw$ <command>rake routes</command>
 (in /Users/sw/Development/movie-app)
-           GET    /movies(.:format)          {:action=&gt;"index", :controller=&gt;"movies"}
-    movies POST   /movies(.:format)          {:action=&gt;"create", :controller=&gt;"movies"}
- new_movie GET    /movies/new(.:format)      {:action=&gt;"new", :controller=&gt;"movies"}
-           GET    /movies/:id(.:format)      {:action=&gt;"show", :controller=&gt;"movies"}
-           PUT    /movies/:id(.:format)      {:action=&gt;"update", :controller=&gt;"movies"}
-     movie DELETE /movies/:id(.:format)      {:action=&gt;"destroy", :controller=&gt;"movies"}
-edit_movie GET    /movies/:id/edit(.:format) {:action=&gt;"edit", :controller=&gt;"movies"}
+             GET    /movies(.:format)          {:action=&gt;"index", :controller=&gt;"movies"}
+      movies POST   /movies(.:format)          {:action=&gt;"create", :controller=&gt;"movies"}
+   new_movie GET    /movies/new(.:format)      {:action=&gt;"new", :controller=&gt;"movies"}
+             GET    /movies/:id(.:format)      {:action=&gt;"show", :controller=&gt;"movies"}
+             PUT    /movies/:id(.:format)      {:action=&gt;"update", :controller=&gt;"movies"}
+       movie DELETE /movies/:id(.:format)      {:action=&gt;"destroy", :controller=&gt;"movies"}
+  edit_movie GET    /movies/:id/edit(.:format) {:action=&gt;"edit", :controller=&gt;"movies"}
+example_test GET    /example/test              {:controller=&gt;"example", :action=&gt;"test"}
 MacBook:movie-app sw$</screen></para>
 
       <para>Puh... das sind ja viel mehr, als wir oben benutzt haben. Oder
       doch nicht? Und jetzt muss ich das auch noch sinnvoll und strukturiert
-      erklären! ;-)</para>
+      erklären! Die letzte Zeile ist dabei am einfachsten. Die kommt aus
+      unserem ersten Beispiel in <xref
+      linkend="die_einfachst_anzunehmende_webseite" />. Kümmern wir uns also
+      um die restlichen vom Scaffolding erzeugten Einträge.</para>
 
       <para>CRUD besteht zwar aus den vier Teilen Create, Read, Upate und
       Delete, aber diese Einzelelemente müssen in der RESTful Umsetzung weiter
@@ -1602,7 +1608,11 @@ MacBook:movie-app sw$</screen></para>
       <title xml:id="restful_mit_xml.title">RESTful Datenbankzugriff per XML
       und curl</title>
 
-      <para>Das XML-Interface erleichtert den Austausch von Daten zwischen
+      <para><tip>
+          <para>Wenn Sie sich nicht für den Austausch von Daten per XML
+          interessieren, dann können Sie diesen Abschnitt ruhig
+          überspringen.</para>
+        </tip>Das XML-Interface erleichtert den Austausch von Daten zwischen
       Maschinen. Dabei wird der ganze HTML-Balast abgeworfen und nur noch die
       reinen Daten per XML ausgetauscht. Beispielhaft führen wir dies mit dem
       Programm curl durch. Logischerweise geht es natürlich auch mit anderen
@@ -1883,7 +1893,7 @@ ruby-1.9.1-p378 &gt;</screen></para>
         <classname>ActiveRecord::Base</classname>. Die online Hilfe dazu kann
         mit <application>ri</application> abgerufen werden. Wenn Sie das jetzt
         ausprobieren wollen, müssen Sie natürlich erst mit
-        <command>exit</command> aus der Console raus.<screen>Stefan-Wintermeyers-MacBook-Pro-2008-50:movie-app sw$ <command>ri ActiveRecord::Base.create</command>
+        <command>exit</command> aus der Console raus.<screen>MacBook:movie-app sw$ <command>ri ActiveRecord::Base.create</command>
 --------------------------------------------- ActiveRecord::Base::create
      ActiveRecord::Base::create(attributes = nil, &amp;block) {|object| ...}
 
@@ -1917,7 +1927,7 @@ ruby-1.9.1-p378 &gt;</screen></para>
          u.is_admin = false
        end
 
-Stefan-Wintermeyers-MacBook-Pro-2008-50:movie-app sw$ 
+MacBook:movie-app sw$ 
 </screen></para>
       </section>
     </section>
@@ -2521,6 +2531,8 @@ sw@debian:~/dvd-sammlung$</screen></para>
         mal rein. Diesmal mit allen Kommentaren.<programlisting>MovieApp::Application.routes.draw do |map|
   resources :movies
 
+  get "example/test"
+
   # The priority is based upon order of creation:
   # first created -&gt; highest priority.
 
@@ -2577,8 +2589,7 @@ sw@debian:~/dvd-sammlung$</screen></para>
   # This is a legacy wild controller route that's not recommended for RESTful applications.
   # Note: This route will make all actions in every controller accessible via GET requests.
   # match ':controller(/:action(/:id(.:format)))'
-end
-</programlisting></para>
+end</programlisting></para>
 
         <para>Die Priorität einer Route wird anhand ihrer Position in dieser
         Datei bestimmt. Es können also mehrere Regeln auf die gleiche Route
@@ -2598,13 +2609,14 @@ end
         <para>Diese Routen können wir uns mit <command>rake routes</command>
         anzeigen lassen.<screen>MacBook:movie-app sw$ <command>rake routes</command>
 (in /Users/sw/Development/movie-app)
-           GET    /movies(.:format)          {:action=&gt;"index", :controller=&gt;"movies"}
-    movies POST   /movies(.:format)          {:action=&gt;"create", :controller=&gt;"movies"}
- new_movie GET    /movies/new(.:format)      {:action=&gt;"new", :controller=&gt;"movies"}
-           GET    /movies/:id(.:format)      {:action=&gt;"show", :controller=&gt;"movies"}
-           PUT    /movies/:id(.:format)      {:action=&gt;"update", :controller=&gt;"movies"}
-     movie DELETE /movies/:id(.:format)      {:action=&gt;"destroy", :controller=&gt;"movies"}
-edit_movie GET    /movies/:id/edit(.:format) {:action=&gt;"edit", :controller=&gt;"movies"}
+             GET    /movies(.:format)          {:action=&gt;"index", :controller=&gt;"movies"}
+      movies POST   /movies(.:format)          {:action=&gt;"create", :controller=&gt;"movies"}
+   new_movie GET    /movies/new(.:format)      {:action=&gt;"new", :controller=&gt;"movies"}
+             GET    /movies/:id(.:format)      {:action=&gt;"show", :controller=&gt;"movies"}
+             PUT    /movies/:id(.:format)      {:action=&gt;"update", :controller=&gt;"movies"}
+       movie DELETE /movies/:id(.:format)      {:action=&gt;"destroy", :controller=&gt;"movies"}
+  edit_movie GET    /movies/:id/edit(.:format) {:action=&gt;"edit", :controller=&gt;"movies"}
+example_test GET    /example/test              {:controller=&gt;"example", :action=&gt;"test"}
 MacBook:movie-app sw$</screen></para>
 
         <para>Diese Klasse wird in der Datei
@@ -2668,9 +2680,9 @@ Completed 200 OK in 30ms (Views: 12.5ms | ActiveRecord: 0.7ms)
         (<classname>MoviesController</classname>). Was noch fehlt ist der View
         - also die Darstellung der Webseite. Die Views für unser Model finden
         sich alle im Unterverzeichnis
-        <filename>app/view/movies</filename><screen>Stefan-Wintermeyers-MacBook-Pro-2008-50:movie-app sw$ <command>ls app/views/movies</command>
+        <filename>app/view/movies</filename><screen>MacBook:movie-app sw$ <command>ls app/views/movies</command>
 _form.html.erb edit.html.erb index.html.erb new.html.erb show.html.erb
-Stefan-Wintermeyers-MacBook-Pro-2008-50:movie-app</screen></para>
+MacBook:movie-app</screen></para>
 
         <para>Schauen wir uns mal die Datei <filename>show.html.erb</filename>
         an:<programlisting>&lt;p&gt;
@@ -2702,15 +2714,6 @@ Stefan-Wintermeyers-MacBook-Pro-2008-50:movie-app</screen></para>
 &lt;%= link_to 'Edit', edit_movie_path(@movie) %&gt; |
 &lt;%= link_to 'Back', movies_path %&gt;
 </programlisting></para>
-
-        <para>Die HTML-Elemente sind klar. Und die <code>&lt;%= ...
-        %&gt;</code> Elemente enthalten Ruby-Code. Wenn ein solches Element
-        mit <code>&lt;%=</code> anfängt, dann bedeutet das "Gib das Ergebnis
-        des Ruby-Codes an dieser Stelle aus.". Wenn ein Element mit
-        <code>&lt;%-</code> anfängt, dann wird der Ruby-Code ausgeführt, aber
-        es wird nichts ausgegeben. Das ganze nennt sich "erb" und ist eine
-        Mischung zwischen HTML-Elementen und Ruby-Code. Damit hat es starke
-        Ähnlichkeiten zu PHP.</para>
 
         <para>Ist Ihnen aufgefallen, das bei dieser erb-Datei ja wichtige
         HTML-Elemente fehlen? Die sind in der Datei
@@ -2749,9 +2752,20 @@ Stefan-Wintermeyers-MacBook-Pro-2008-50:movie-app</screen></para>
 
       <para>Da der Grundweg im letzten Segment erklärt wurde, gehe ich jetzt
       auf die schnelle durch die Anfrage <uri
-      xlink:href="http://localhost:3000/movies">http://localhost:3000/movies</uri>.
-      Den Screenshot haben Sie noch im Kopf? Falls nicht: <xref
-      linkend="screenshot_movies_index" /></para>
+      xlink:href="http://localhost:3000/movies">http://0.0.0.0:3000/movies</uri>.
+      Hier noch mal den Screenshot dazu:<screenshot
+          xml:id="screenshot_movies_index">
+          <info>
+            <title xml:id="screenshot_movies_index.title">Index-Ansicht aller
+            Filme</title>
+          </info>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/movies_index.jpg" format="jpg"></imagedata>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <para>Im Log erscheint:<screen>Started GET "/movies" for 127.0.0.1 at 2010-04-05 11:02:42
   Processing by MoviesController#index as HTML
@@ -2826,50 +2840,5 @@ Completed 200 OK in 47ms (Views: 31.2ms | ActiveRecord: 1.1ms)
       %&gt;</code>" endet dazu benutzt den Inhalt des Eintrages
       darzustellen.</para>
     </section>
-  </section>
-
-  <section xml:id="erb_basics">
-    <title xml:id="erb_basics.title">erb Basics</title>
-
-    <para>In <xref linkend="mvc-workflow-in-rails" /> haben Sie sich ja schon
-    mit erb beschäftigen können. Ich will hier nur noch einmal die absoluten
-    Basics zusammenfassen. Die Abkürzung erb steht übrigens für Embedded
-    Ruby.</para>
-
-    <para>Wer schon mal eine PHP-Datei gesehen hat, der wird sich bei einer
-    erb Datei denken "Ja, kenn' ich.". In einer erb-Datei finden Sie in erster
-    Linie einmal normales HTML. Allerdings kann eine erb Datei auch nicht
-    HTML-Texte ausgeben. Das Zielformat ist im Dateinamen eingebaut. Schauen
-    wir uns noch mal die Datei
-    <filename>app/views/movies/index.html.erb</filename> an, mit der die
-    Übersicht über alle gespeicherten Filme dargestellt wird. Der Dateiname
-    <filename>index.html.erb</filename> teilt sich in die Elemente
-    <filename>index</filename> (für die Methode), <filename>html</filename>
-    (für das Ausgabeformat) und <filename>erb</filename> (für erb).</para>
-
-    <para>In einer html.erb Datei gibt zusätzlich zu den HTML-Elementen zwei
-    Arten von Ruby-Code Elementen:<itemizedlist>
-        <listitem>
-          <para><code>&lt;% ... %&gt;</code></para>
-
-          <para>Führt den enthaltenen Ruby-Code aus, aber gibt nichts
-          aus.</para>
-        </listitem>
-
-        <listitem>
-          <para><code>&lt;%= ... %&gt;</code></para>
-
-          <para>Führt den enthaltenen Ruby-Code aus und gibt das Ergebnis als
-          Text aus. Dabei werden seit Ruby 3.0 automatisch problematische
-          Zeichen escaped (das musste man früher mit <code>h</code> manuel
-          machen). Falls Sie einmal nicht escapeten Text ausgeben möchten, so
-          müssen Sie das mit <code>raw(string)</code> realisieren.</para>
-        </listitem>
-      </itemizedlist></para>
-
-    <para>Eigentlich ist erb recht selbsterklärend. Schauen Sie sich einfach
-    die fertigen Scaffold Dateien in <filename>app/views/movies/</filename> an
-    und Sie werden wissen was ich meine. Es ist kein Zauberwerk, sondern
-    wirklich logisch.</para>
   </section>
 </chapter>
