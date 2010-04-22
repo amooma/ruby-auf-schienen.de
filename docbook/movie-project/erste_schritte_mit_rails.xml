@@ -580,7 +580,146 @@ Completed 200 OK in 5ms (Views: 4.1ms | ActiveRecord: 0.0ms)
             </listitem>
           </itemizedlist></para>
 
-        <para></para>
+        <para>Das mit dem Ruby-Code schauen wir uns mal genauer an. In einer
+        <filename>html.erb</filename> Datei gibt zusätzlich zu den
+        HTML-Elementen zwei Arten von Ruby-Code Elementen:<itemizedlist>
+            <listitem>
+              <para><code>&lt;% ... %&gt;</code></para>
+
+              <para>Führt den enthaltenen Ruby-Code aus, aber gibt nichts
+              aus.</para>
+            </listitem>
+
+            <listitem>
+              <para><code>&lt;%= ... %&gt;</code></para>
+
+              <para>Führt den enthaltenen Ruby-Code aus und gibt das Ergebnis
+              als Text aus. Dabei werden seit Ruby 3.0 automatisch
+              problematische Zeichen escaped (das musste man früher mit
+              <code>h</code> manuel machen). Falls Sie einmal nicht escapeten
+              Text ausgeben möchten, so müssen Sie das mit
+              <code>raw(string)</code> realisieren.</para>
+            </listitem>
+          </itemizedlist></para>
+
+        <para>Ich erkläre das am besten mal mit einem Beispiel. Bitte
+        verändern Sie die <filename>app/views/example/test.html.erb</filename>
+        Datei wie folgt:<programlisting>&lt;h1&gt;Example#test&lt;/h1&gt;
+&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt;
+
+&lt;p&gt;
+Die aktuelle Uhrzeit ist 
+&lt;%= Time.now %&gt;
+&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;% (1..5).each do |i| %&gt;
+&lt;li&gt;&lt;%= i %&gt;&lt;/li&gt;
+&lt;% end %&gt;
+&lt;/ul&gt;
+</programlisting></para>
+
+        <para>Danach schauen wir uns das Ergebnis im Browser an:<screenshot>
+            <info>
+              <title>Beispiel erb</title>
+            </info>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/test_erb_html_example_2.jpg"></imagedata>
+              </imageobject>
+            </mediaobject>
+          </screenshot></para>
+
+        <para>Schauen wir uns den generierten HTML-Code an:<programlisting>&lt;h1&gt;Example#test&lt;/h1&gt; 
+&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt; 
+ 
+&lt;p&gt; 
+Die aktuelle Uhrzeit ist 
+2010-04-22 14:08:47 +0200
+&lt;/p&gt; 
+ 
+&lt;ul&gt; 
+&lt;li&gt;1&lt;/li&gt; 
+&lt;li&gt;2&lt;/li&gt; 
+&lt;li&gt;3&lt;/li&gt; 
+&lt;li&gt;4&lt;/li&gt; 
+&lt;li&gt;5&lt;/li&gt; 
+&lt;/ul&gt; </programlisting></para>
+
+        <para>Folgende Sachen fallen auf:<itemizedlist>
+            <listitem>
+              <para>Zwischen dem ersten und zweiten Screenshot ist einiges an
+              Zeit vergangen. ;-)</para>
+            </listitem>
+
+            <listitem>
+              <para>Der HTML-Code ist so nicht valide. Es fehlen noch ein paar
+              "Kleinigkeiten" wie ein <code>&lt;HTML&gt;</code> oder ein
+              <code>&lt;BODY&gt;</code> Tag.</para>
+            </listitem>
+
+            <listitem>
+              <para>Bei der Ausgabe der Variable <varname>i</varname> fügt
+              Rails wieder automatisch die <methodname>.to_s</methodname>
+              Methode hinzu. Denn <varname>i</varname> gehört zur Klasse
+              Integer.</para>
+            </listitem>
+          </itemizedlist></para>
+
+        <para>Ich glaube das Grundprinzip von erb ist jetzt klar. Der Rest
+        kommt mit der Übung. Einen Punkt möchte ich aber noch kurz anreissen:
+        Das Zusammenspiel vom Controller und vom View. Die erb-Datei ist im
+        View und soll damit so wenig wie möglich Eigenintelligenz besitzen. In
+        der idealen Welt kann eine erb-Datei jeder HTML-Designer ohne
+        Programmierkenntnisse verändern und alle Programmierer arbeiten nur im
+        Controller oder im Model (wozu wir später kommen). Leider gibt es
+        dabei immer eine grosse Grauzone, aber ich werde im Buch versuchen die
+        Vorteile einer sauberen Abtrennung aufzuzeigen.</para>
+
+        <para>Wir brechen jetzt einfach mal ein Beispiel vom Zaun und fügen im
+        Controller eine Instance-Variable für die aktuelle Uhrzeit ein und
+        fügen diese dann im View ein. Wir nehmen also Programmierintelligenz
+        aus dem View in den Controller.</para>
+
+        <para>Die Controller Datei
+        <filename>app/controllers/example_controller.rb</filename> sieht dann
+        so aus:<programlisting>class ExampleController &lt; ApplicationController
+  def test
+    <emphasis>@current_time</emphasis> = Time.now
+  end
+
+end
+</programlisting></para>
+
+        <para>In der View Datei
+        <filename>app/views/example/test.html.erb</filename> können wir dann
+        auf diese Instance-Variable zurückgreifen:<programlisting>&lt;h1&gt;Example#test&lt;/h1&gt;
+&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt;
+
+&lt;p&gt;
+Die aktuelle Uhrzeit ist 
+&lt;%= <emphasis>@current_time</emphasis> %&gt;
+&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;% (1..5).each do |i| %&gt;
+&lt;li&gt;&lt;%= i %&gt;&lt;/li&gt;
+&lt;% end %&gt;
+&lt;/ul&gt;
+</programlisting></para>
+
+        <para>Die angezeigte HTML-Seite verändert sich nicht. OK, die Uhrzeit
+        ist natürlich immer die aktuelle. Aber wir haben eine Trennung von
+        Programmierlogik und Darstellungslogik mit dem Controller und dem
+        View.</para>
+
+        <para>Mir ist klar, das jetzt keiner aufspringen und schreien wird
+        "Danke für die Erleuchtung! Ich werde nur noch sauber nach MVC
+        programmieren". Das obige Beispiel ist der erste kleine Schritt in die
+        Richtung und zeigt wie wir einfach mit Instance Variablen (das sind
+        die mit dem @-Zeichen davor) Werte aus dem Controller in den View
+        bringenen können.</para>
       </section>
     </section>
   </section>
@@ -609,8 +748,8 @@ Completed 200 OK in 5ms (Views: 4.1ms | ActiveRecord: 0.0ms)
       Namenskonventionen geeinigt. In früheren Rails-Versionen musste man die
       Datenbank von Hand anhand dieser Konventionen anlegen. ActiveRecord hat
       dann die Felder an bestimmten Namensmerkmalen erkannt. Heute gibt es in
-      Rails dazu eigene noch dazu äusserst praktische Tools. Denn Sie wollen
-      ja nicht nur jetzt eine Datebank für Ihre Entwicklungs-Umgebung
+      Rails dazu eigene, noch dazu äusserst praktische Tools. Denn Sie wollen
+      ja nicht nur jetzt eine Datenbank für Ihre Entwicklungs-Umgebung
       einrichten, sondern benötigen später auch ein Tool, das Ihre
       Produktions-Datenbank Schritt für Schritt mitzieht.</para>
 
