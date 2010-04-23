@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="model" xml:lang="de"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title>Model - Das M in MVC.</title>
+
+  <section xml:id="model_was_bisher_geschah">
+    <title xml:id="model_was_bisher_geschah.title">Was bisher geschah</title>
+
+    <para>Um sicher zu stellen, das wir alle vom gleichen reden (für den Fall
+    das Sie gezielt dieses Kapitel aufschlagen), erstellen wir gerade mal im
+    Schnelldurchgang eine frische Applikation. Für alle die gerade erst <xref
+    linkend="erste_schritte_mit_rails" /> durchgearbeitet haben: Das haben Sie
+    schon alles. Für alle anderen: Einfach das Kochrezept abtippen.</para>
+
+    <section>
+      <title>Unser Beispielprojekt: Eine Filmdatenbank</title>
+
+      <para>Wir legen das Rails-Projekt <code>movie-app</code> an:<screen>stefan@swmbp 0 head- test$ <command>rails movie-app</command>
+      create  
+      create  README
+      create  .gitignore
+      create  Rakefile
+      create  config.ru
+      create  Gemfile
+      create  app
+      create  app/controllers/application_controller.rb
+      create  app/helpers/application_helper.rb
+      create  app/models
+      create  app/views/layouts
+      create  config
+      create  config/routes.rb
+      create  config/application.rb
+
+      [...]
+
+      create  test/functional
+      create  test/integration
+      create  test/unit
+      create  tmp
+      create  tmp/sessions
+      create  tmp/sockets
+      create  tmp/cache
+      create  tmp/pids
+      create  vendor/plugins
+      create  vendor/plugins/.gitkeep
+stefan@swmbp 0 head- test$</screen></para>
+
+      <para>Jetzt noch mit Scaffold das Grundgerüst für dieses Kapitel
+      erstellen:<screen>stefan@swmbp 0 head- test$ <command>cd movie-app</command>
+stefan@swmbp 0 head- movie-app$ <command>rails generate scaffold movie title:string production_year:integer duration:integer plot:text rating:integer</command>
+      invoke  active_record
+      create    db/migrate/20100423081205_create_movies.rb
+      create    app/models/movie.rb
+      invoke    test_unit
+      create      test/unit/movie_test.rb
+      create      test/fixtures/movies.yml
+       route  resources :movies
+      invoke  scaffold_controller
+      create    app/controllers/movies_controller.rb
+      invoke    erb
+      create      app/views/movies
+      create      app/views/movies/index.html.erb
+      create      app/views/movies/edit.html.erb
+      create      app/views/movies/show.html.erb
+      create      app/views/movies/new.html.erb
+      create      app/views/movies/_form.html.erb
+      create      app/views/layouts/movies.html.erb
+      invoke    test_unit
+      create      test/functional/movies_controller_test.rb
+      invoke    helper
+      create      app/helpers/movies_helper.rb
+      invoke      test_unit
+      create        test/unit/helpers/movies_helper_test.rb
+      invoke  stylesheets
+      create    public/stylesheets/scaffold.css
+stefan@swmbp 0 head- movie-app$</screen></para>
+
+      <para>Zum Schluss legen wir die Datenbank im Entwicklungssystem
+      an:<screen>stefan@swmbp 0 head- movie-app$ <command>rake db:migrate</command>
+(in /Users/stefan/Development/test/movie-app)
+==  CreateMovies: migrating ===================================================
+-- create_table(:movies)
+   -&gt; 0.0013s
+==  CreateMovies: migrated (0.0014s) ==========================================
+
+stefan@swmbp 0 head- movie-app$</screen></para>
+    </section>
+
+    <section xml:id="model_seed_rb">
+      <title xml:id="model_seed_rb.title">Beispieldaten mit seed.rb
+      einspielen</title>
+
+      <para>Um gleich mit der Arbeit anfangen zu können, betanken wir unsere
+      Filmdatenbank mit ein paar Beispielfilmen.</para>
+
+      <para>Bitte schreiben Sie mit dem Editor Ihrer Wahl den folgenden Inhalt
+      in die <filename>db/seeds.rb</filename> Datei:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
+# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
+#
+# Examples:
+#   
+#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
+#   Major.create(:name =&gt; 'Daley', :city =&gt; cities.first)
+
+Movie.create({ :title =&gt; 'The Terminator', :production_year =&gt; 1984 })
+Movie.create({ :title =&gt; 'Terminator 2', :production_year =&gt; 1992 })
+Movie.create({ :title =&gt; 'Terminator Salvation', :production_year =&gt; 2009 })
+Movie.create({ :title =&gt; 'Rain Man', :production_year =&gt; 1988, :rating =&gt; 5 })
+Movie.create({ :title =&gt; 'War of the Worlds', :production_year =&gt; 2005, :rating =&gt; 4 })
+Movie.create({ :title =&gt; 'Collateral', :production_year =&gt; 2004, :rating =&gt; 5})
+Movie.create({ :title =&gt; 'Miami Vice', :production_year =&gt; 2006, :rating =&gt; 5})
+Movie.create({ :title =&gt; 'Hancock', :production_year =&gt; 2008, :rating =&gt; 4})
+Movie.create({ :title =&gt; 'The Aviator', :production_year =&gt; 2004, :rating =&gt; 4})
+Movie.create({ :title =&gt; 'Some Like It Hot', :production_year =&gt; 1959, :rating =&gt; 5})
+Movie.create({ :title =&gt; 'W.', :production_year =&gt; 2008, :rating =&gt; 4})
+Movie.create({ :title =&gt; 'Iron Man', :production_year =&gt; 2008, :rating =&gt; 5})
+Movie.create({ :title =&gt; 'The Dark Knight', :production_year =&gt; 2008, :rating =&gt; 5})
+</programlisting></para>
+
+      <para>Danach befühlen wir unser Entwicklungssystem mit diesen
+      Daten:<screen>stefan@swmbp 0 head- movie-app$ <command>rake db:seed</command>
+(in /Users/stefan/Development/test/movie-app)
+stefan@swmbp 0 head- movie-app$</screen></para>
+
+      <para>Fertig. Jetzt haben wir ein gutes Grundgerüst für dieses
+      Kapitel.</para>
+    </section>
+  </section>
+
+  <section xml:id="model_orientierung">
+    <title xml:id="model_orientierung.title">Orientierung</title>
+
+    <para>Ein Hauptvorteil von Rails ist die klare Struktur des
+    Rails-Projektes. Wenn Sie neu in ein Team eintretten oder von einem
+    befreundeten Rails-Entwickler ein Projekt übernehmen, dann können Sie sich
+    sehr schnell einen Überblick verschaffen. Die Definition der Models finden
+    Sie immer im Verzeichnis <filename>app/models</filename><screen>stefan@swmbp 0 head- movie-app$ <command>ls app/models</command>
+movie.rb
+stefan@swmbp 0 head- movie-app$</screen></para>
+
+    <para>Aktuell haben wir nur ein Model (movie). Bei grösseren
+    Rails-Projekten sind entsprechend mehr Modelle enthalten. Die die
+    <filename>app/models/movie.rb</filename> Datei sieht nach dem Scaffolding
+    so aus:<programlisting>class Movie &lt; ActiveRecord::Base
+end</programlisting></para>
+
+    <para>An Movie &lt; ActiveRecord::Base erkennen wir, das es sich bei
+    diesem Model um eine Klasse handelt, die auf die Klasse ActiveRecord
+    aufbaut. Wir bekommen also alles was ActiveRecord von Haus enthält erst
+    mal kostenlos mitgeliefert. Alle von uns gewünschten Erweiterungen werden
+    On-Top auf diese Klasse gesetzt. Falls Ihnen dieses Prinzip nicht mehr
+    ganz geläufig ist, sollten Sie noch mal in <xref linkend="ruby-class" />
+    nachschlagen. Das Verständnis für diesen Mechanismus ist ziemlich
+    essentiell für den erfolgreichen Einsatz von Rails.</para>
+  </section>
+
+  <section xml:id="model_validierungen">
+    <title xml:id="model_validierungen.title">Validierungen</title>
+
+    <para>Unser aller Albtraum sind User die Daten eingeben, mit denen wir als
+    Programmierer nicht gerechnet haben. Und wem ist das noch nicht passiert!?
+    In Rails haben wir ein ausgeklügeltes und einfach zu programmierendes
+    Validierungssystem, mit dem wir solche Eingabefehler abfangen
+    können.</para>
+
+    <para>In unserer Filmdatenbank haben wir ein Feld, das auf jeden Fall
+    ausgefüllt werden soll: Der Titel (<code>title</code>) des Films. Die
+    Validierungsregel dafür gehört in die
+    <filename>app/models/movie.rb</filename> Datei:<programlisting>class Movie &lt; ActiveRecord::Base
+  validates_presence_of :title
+end</programlisting></para>
+
+    <para>Probieren wir das mal aus und starten dafür den
+    Rails-Server:<screen>stefan@swmbp 0 head- movie-app$ <command>rails server</command>
+=&gt; Booting WEBrick
+=&gt; Rails 3.0.0.beta2 application starting in development on http://0.0.0.0:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2010-04-23 10:56:16] INFO  WEBrick 1.3.1
+[2010-04-23 10:56:16] INFO  ruby 1.9.2 (2010-04-11) [x86_64-darwin10.3.0]
+[2010-04-23 10:56:16] INFO  WEBrick::HTTPServer#start: pid=20907 port=3000
+</screen></para>
+
+    <para>Jetzt gehen wir mit dem Browser auf die URI <uri
+    xlink:href="http://0.0.0.0:3000/movies/new">http://0.0.0.0:3000/movies/new</uri>
+    und tragen die Daten zu einem Film ohne Titel ein:<screenshot>
+        <info>
+          <title>Neuen Film ohne Titel eingeben.</title>
+        </info>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screenshots/movies_new_validation_1.jpg"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
+
+    <para>Nach dem klicken auf "Create Movie" gekommen wir folgende
+    Fehlermeldung angezeigt:<screenshot>
+        <info>
+          <title>Validierungsfehlermeldung bei fehlendem Titel</title>
+        </info>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screenshots/movies_new_validation_2.jpg"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
+
+    <para>Was ist hier passiert? Schauen wir uns im Controller
+    <filename>app/controllers/movies_controller.rb</filename> die
+    <methodname>create</methodname> Methode an:<programlisting>  # POST /movies
+  # POST /movies.xml
+  def create
+    @movie = Movie.new(params[:movie])
+
+    respond_to do |format|
+      if @movie.save
+        format.html { redirect_to(@movie, :notice =&gt; 'Movie was successfully created.') }
+        format.xml  { render :xml =&gt; @movie, :status =&gt; :created, :location =&gt; @movie }
+      else
+        format.html { render :action =&gt; "new" }
+        format.xml  { render :xml =&gt; @movie.errors, :status =&gt; :unprocessable_entity }
+      end
+    end
+  end
+</programlisting></para>
+
+    <para>Es wurde ein neues Movie Objekt erstellt (<code>@movie</code>). Beim
+    Abspeichern (<methodname>@movie.save</methodname>) kam es dann zu einem
+    Fehler und deshalb kam als Ergebnis <code>false</code> und die
+    if-else-Kondition sprang auf <code>else</code>. Deshalb wurde wieder die
+    <methodname>new</methodname> Methode aufgerufen.</para>
+  </section>
+</chapter>

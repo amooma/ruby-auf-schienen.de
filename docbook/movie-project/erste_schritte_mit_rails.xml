@@ -405,7 +405,7 @@ stefan@swmbp 0 head- movie-app$</screen></para>
 
       <para>A-ha! Unten ist freundlicherweise direkt ein Beispiel angegeben
       "<code>rails generate controller CreditCard open debit credit
-      close</code>". Passt aber nicht direkt für unseren Fall. </para>
+      close</code>". Passt aber nicht direkt für unseren Fall.</para>
 
       <para>Ich bin mutig und schlage vor, das wir einfach mal was
       ausprobieren:<screen>stefan@swmbp 0 head- movie-app$ <command>rails generate controller example test</command>
@@ -721,6 +721,273 @@ Die aktuelle Uhrzeit ist
         die mit dem @-Zeichen davor) Werte aus dem Controller in den View
         bringenen können.</para>
       </section>
+    </section>
+  </section>
+
+  <section xml:base="basics_generisches_html_framework">
+    <title xml:id="basics_generisches_html_framework.title">Generisches
+    HTML-Framework (Layout)</title>
+
+    <para>Bei allen bisherigen mit erb gerenderten HTML-Seiten fehlten
+    wichtige HTML-Elemente, die die Seite syntakisch erst korrekt machen.
+    Heute Webbrowser stellen die Seiten trotzdem dar, aber auch nur deshalb
+    weil sie so fehlertollerant programmiert wurden. Bis jetzt wurde von erb
+    immer nur der Inhalts-Kern der Seite gerendert und an den Browser
+    ausgeliefert. Hier der Code der <uri
+    xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
+    Seite:<programlisting>&lt;h1&gt;Example#test&lt;/h1&gt; 
+&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt; 
+ 
+&lt;p&gt; 
+Die aktuelle Uhrzeit ist 
+ 
+&lt;/p&gt; 
+ 
+&lt;ul&gt; 
+&lt;li&gt;1&lt;/li&gt; 
+&lt;li&gt;2&lt;/li&gt; 
+&lt;li&gt;3&lt;/li&gt; 
+&lt;li&gt;4&lt;/li&gt; 
+&lt;li&gt;5&lt;/li&gt; 
+&lt;/ul&gt;</programlisting></para>
+
+    <para>Für das Gerüst drum rum müssen wir die Datei
+    <filename>app/views/layouts/application.html.erb</filename> mit einem
+    Editor erstellen und beispielhaft wie folgt befüllen:<programlisting>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Unsere Filmdatenbank&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;%= yield %&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</programlisting></para>
+
+    <para>Wenn wir danach die <uri
+    xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
+    Seite noch einmal aufrufen, bekommen wir folgenden HTML-Code
+    ausgeliefert:<programlisting>&lt;!DOCTYPE html&gt; 
+&lt;html&gt; 
+&lt;head&gt; 
+  &lt;title&gt;Unsere Filmdatenbank&lt;/title&gt; 
+&lt;/head&gt; 
+&lt;body&gt; 
+ 
+&lt;h1&gt;Example#test&lt;/h1&gt; 
+&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt; 
+ 
+&lt;p&gt; 
+Die aktuelle Uhrzeit ist 
+ 
+&lt;/p&gt; 
+ 
+&lt;ul&gt; 
+&lt;li&gt;1&lt;/li&gt; 
+&lt;li&gt;2&lt;/li&gt; 
+&lt;li&gt;3&lt;/li&gt; 
+&lt;li&gt;4&lt;/li&gt; 
+&lt;li&gt;5&lt;/li&gt; 
+&lt;/ul&gt; 
+ 
+&lt;/body&gt; 
+&lt;/html&gt; </programlisting></para>
+
+    <para>Das sieht doch schon direkt viel besser aus. Mit dem Befehl
+    <code>yield</code> bzw. mit der erb-Zeite <code>&lt;%= yield %&gt;</code>
+    wird der Kern der Seite in das Aussengerüst eingebettet. Ich überlasse es
+    Ihrer Fantasie und Ihren HTML-Künsten mit der Möglichkeit zu zaubern.
+    Natürlich müssen Sie diese Konstrukt nicht benutzen und können jede Seite
+    im View direkt vollständig programmieren.</para>
+  </section>
+
+  <section xml:id="redirects">
+    <title xml:id="redirects.title">Redirects</title>
+
+    <para>Redirects sind Befehle, mit denen Sie innerhalb des Controllers auf
+    andere Methoden oder auch auf ganz andere Webseiten "springen" also
+    redirecten können. Um diese Funktion zeigen zu können, benötigen wir eine
+    zweite Webseite. Das machen wir diesmal nicht mit einem Generator-Skript,
+    sondern von Hand.</para>
+
+    <para>Bitte erweitern Sie die Datei
+    <filename>app/controllers/example_controller.rb</filename> wie
+    folgt:<programlisting>class ExampleController &lt; ApplicationController
+  def test
+  end
+  
+  def shopping_list
+  end
+
+end</programlisting></para>
+
+    <para>Die <filename>app/views/example/shopping_list.html.erb</filename>
+    Seite erstellen Sie bitte neu mit folgendem Inhalt:<programlisting>&lt;h1&gt;Einkaufsliste&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;12 Eier&lt;/li&gt;
+&lt;li&gt;250 gr Butter&lt;/li&gt;
+&lt;li&gt;500 gr Mehl&lt;/li&gt;
+&lt;/ul&gt;</programlisting></para>
+
+    <para>Zum Schluss müssen wir in der Datei
+    <filename>config/routes.rb</filename> noch die Route für diese Seite
+    einfügen:<programlisting>MovieApp::Application.routes.draw do |map|
+  get "example/test"
+  get "example/shopping_list"
+end
+</programlisting></para>
+
+    <para>Dies daraus resultierende Seite lässt sich unter der URI
+    <uri>http://0.0.0.0:3000/example/shopping_list</uri> abrufen:<screenshot>
+        <info>
+          <title>shopping_list Seite</title>
+        </info>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screenshots/example_shopping_list.jpg"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
+
+    <para>Im Log finden wir folgenden Eintrag:<screen>Started GET "/example/shopping_list" for 127.0.0.1 at 2010-04-23 15:25:17
+  Processing by ExampleController#shopping_list as HTML
+Rendered example/shopping_list.html.erb within layouts/application (0.4ms)
+Completed 200 OK in 4ms (Views: 3.4ms | ActiveRecord: 0.0ms)
+</screen></para>
+
+    <para>Ohne das mir jetzt dazu ein wirklich brauchbares Beispiel einfällt,
+    zeige ich Ihnen jetzt wie ein Redirect funktioniert. Ändern Sie dazu bitte
+    die Datei <filename>app/controllers/example_controller.rb</filename> wie
+    folgt:<programlisting>class ExampleController &lt; ApplicationController
+  def test
+    <emphasis>redirect_to :action =&gt; "shopping_list"</emphasis>
+  end
+  
+  def shopping_list
+  end
+
+end</programlisting>Wenn Sie jetzt im Browser die URI <uri
+    xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
+    aufrufen, so bekommen Sie die shopping_list Seite angezeigt. Im Log finden
+    Sie den folgenden Eintrag:<screen>Started GET "/example/test" for 127.0.0.1 at 2010-04-23 23:16:13
+  Processing by ExampleController#test as HTML
+Redirected to http://0.0.0.0:3000/example/shopping_list
+Completed 302 Found in 1ms
+</screen></para>
+
+    <para>Wie Sie sehen, wurde zwar im ersten Schritt mit "<code>Processing by
+    ExampleController#test as HTML</code>" die Methode
+    <methodname>test</methodname> im Controller <code>ExampleController</code>
+    aufgerufen, aber danach fand ein Redirect zur Methode
+    <methodname>shopping_list</methodname> statt. In diesem Fall könnte man
+    das gleiche Ergebnis auch mit einer anderen Route lösen, aber schon bei
+    <xref linkend="scaffolding" /> werden Sie sehen, wie praktisch und
+    notwendig Redirects in Rails sind.</para>
+
+    <para>Auf die Details und einzelnen Möglichkeiten des Redirects gehen wir
+    später im jeweils konkreten Fall ein. Nur schon so viel vorweg: Man kann
+    nicht nur auf eine andere Methode, sondern auch auf einen anderen
+    Controller oder eine ganze andere Seite redirecten.</para>
+  </section>
+
+  <section xml:id="flash">
+    <title xml:id="flash.title">Flash Nachrichten</title>
+
+    <para>Der Name "Flash Message" oder "Flash Nachricht" ist meiner Meinung
+    nach denkbar ungeeignet gewählt worden. Mit dem Wort "Flash" assoziiert
+    fast jeder mehr oder weniger bunte Webseiten, die mit dem
+    Adobe-Flash-Plug-in realisiert wurden. Aber in Rails sind Flash
+    Nachrichten etwas ganz anderes. Sie sind Nachrichten, die über ein
+    Redirect auf eine andere Seite weiter geleitet werden können.</para>
+
+    <para>Als Beispiel erweitern wir die in <xref linkend="redirects" />
+    erstellten <filename>app/controllers/example_controller.rb</filename> wie
+    folgt:<programlisting>class ExampleController &lt; ApplicationController
+  def test
+    <emphasis>flash[:notice] = "Ein sinnfreies Beispiel."</emphasis>
+    redirect_to :action =&gt; "shopping_list"
+  end
+  
+  def shopping_list
+  end
+
+end
+</programlisting></para>
+
+    <para>Mit "<code>flash[:notice] = "Ein sinnfreies Beispiel."</code>"
+    übergeben wir eine Flash Message mit dem Status "<code>notice</code>" an
+    den nächsten View (in diesem Fall an
+    <methodname>shopping_list</methodname>).</para>
+
+    <para>Merkwürdigerweise verändert sich aber nichts beim erneuten Aufruf
+    von <uri
+    xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>.
+    Der Grund dafür ist einfach: Wir haben zwar eine Flash Message generiert,
+    aber im View wird nirgends überprüft, ob es Flash Messages gibt. Der
+    einfachste Weg evt. existierende Flash Nachrichten immer anzuzeigen ist
+    die folgende Erweiterung der
+    <filename>app/views/layouts/application.html.erb</filename>
+    Datei:<programlisting>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Unsere Filmdatenbank&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+<emphasis>&lt;p class="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
+&lt;p class="alert"&gt;&lt;%= alert %&gt;&lt;/p&gt;</emphasis>
+
+&lt;%= yield %&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</programlisting></para>
+
+    <para>Wenn wir jetzt noch einmal die Seite <uri
+    xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
+    aufrufen, werden wir richtig an <methodname>shopping_list</methodname>
+    redirected und bekommen am Kopf der Seite die Flash Nachricht
+    angezeigt:<screenshot>
+        <info>
+          <title>Beispiel für eine Flash Nachricht</title>
+        </info>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screenshots/flash_example_shopping_list.jpg"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
+
+    <section xml:id="verschiedene_arten_von_flash_nachrichten">
+      <title
+      xml:id="verschiedene_arten_von_flash_nachrichten.title">Verschiedene
+      Arten von Flash Nachrichten</title>
+
+      <para>Per default werden die Arten "error", "notice" und "warning"
+      unterschieden. Allerdings kann man auch selber eine Kategorie erfinden
+      und diese später im View abfragen.</para>
+    </section>
+
+    <section xml:id="neue_flash_redirect_schreibweise">
+      <title xml:id="neue_flash_redirect_schreibweise.title">Kürzere
+      Schreibweise innerhalb eines Redirects</title>
+
+      <para>Bis Rails 2.3.5 konnte man Flash Nachrichten nicht innerhalb eines
+      Redirect einbauen. Mit Rails 3.0 ist dies möglich. So können Sie unser
+      Beispiel von vorhin auch wie folgt schreiben: <programlisting>class ExampleController &lt; ApplicationController
+  def test
+    redirect_to :action =&gt; "shopping_list"<emphasis>, :flash =&gt; { :notice =&gt; "Ein sinnfreies Beispiel." }</emphasis>
+  end
+  
+  def shopping_list
+  end
+
+end
+</programlisting></para>
     </section>
   </section>
 
