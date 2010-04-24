@@ -722,6 +722,87 @@ Die aktuelle Uhrzeit ist
         bringenen können.</para>
       </section>
     </section>
+
+    <section xml:id="partials">
+      <title xml:id="partials.title">Partials</title>
+
+      <para>Mit Partials lassen sich innerhalb von erb-Seiten andere Views die
+      mit einem Unterstrich (Underscore = _) anfangen einbetten. Nehmen wir
+      einmal an, das wir aus logischen (hier rein hypotetisch) Gründen den
+      folgenden Teil aus unserer
+      <filename>app/views/movies/test.html.erb</filename> auslagern
+      wollen:<programlisting>&lt;ul&gt;
+&lt;% (1..5).each do |i| %&gt;
+&lt;li&gt;&lt;%= i %&gt;&lt;/li&gt;
+&lt;% end %&gt;
+&lt;/ul&gt;
+</programlisting></para>
+
+      <para>Dann können wir eine Datei
+      <filename>app/views/movies/_simple_example.html.erb</filename> mit genau
+      diesem Inhalt erstellen und die
+      <filename>app/views/example/test.html.erb</filename> wie folgt
+      verändern:<programlisting>&lt;h1&gt;Example#test&lt;/h1&gt;
+&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt;
+
+&lt;p&gt;
+Die aktuelle Uhrzeit ist 
+&lt;%= @current_time %&gt;
+&lt;/p&gt;
+
+<emphasis>&lt;%= render :partial =&gt; "simple_example" %&gt;</emphasis></programlisting></para>
+
+      <para>Die gerenderte Webseite <uri
+      xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
+      sieht genauso aus wie vorher, aber wir haben die Teile logisch von
+      einander getrennt. Partials bieten damit die Möglichkeit gleiche Inhalte
+      in verschiedenen Views zu benutzen und nur einmal zu erstellen. Da DRY
+      (Don't Repeat Yourself) in der Rails Community sehr ausgeprägt gelebt
+      wird, ist dies eine gute Methode, um DRY innerhalb von Views zu
+      realisieren. <important>
+          <para>Der Name eines Partials wird immer ohne den Unterstrich am
+          Anfang und ohne die erb und HTML Endung angegeben. Aber die
+          wirkliche Datei muss im Dateinamen mit einem Unterstrich anfangen
+          und auch am Ende mir der erb und HTML Endung aufhören.</para>
+        </important></para>
+
+      <para>Partials können auch aus anderen Bereichen des Unterverzeichnisses
+      <filename>app/views</filename> eingebunden werden. So können Sie für
+      wiederkehrende und übergreifende Inhalte beispielsweise ein Verzeichnis
+      <filename>app/views/shared</filename> anlegen und dort eine Datei
+      <filename>_one_more_example.html.erb</filename> anlegen. Das Einbetten
+      im erb Code würde dann mit folgender Zeile erfolgen:<programlisting>&lt;%= render :partial =&gt; "shared/one_more_example" %&gt;</programlisting></para>
+
+      <section xml:id="partials_locale_variables">
+        <title xml:id="partials_locale_variables.title">Lokale Variablen an
+        ein Partial übergeben</title>
+
+        <para>Partials sind im DRY Gedanken sehr gut. Aber was sie erst
+        richtig praktisch macht, ist die Möglichkeit lokale Variablen zu
+        übergeben. Diese können dann im Partial selbst benutzt werden.
+        Beispielhaft zerpflücke ich unsere arme Beispielseite noch mehr und
+        erstelle eine
+        <filename>app/views/movies/_current_time.html.erb</filename> mit
+        folgendem Inhalt:<programlisting>&lt;p&gt;
+Die aktuelle Uhrzeit ist 
+&lt;%= current_time %&gt;
+&lt;/p&gt;</programlisting></para>
+
+        <para>Danach binde ich das Partial in der
+        <filename>app/views/example/test.html.erb</filename> wie folgt
+        ein:<programlisting>&lt;h1&gt;Example#test&lt;/h1&gt;
+&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt;
+
+<emphasis>&lt;%= render :partial =&gt; "current_time", :locals =&gt; { :current_time =&gt; @current_time } %&gt;</emphasis>
+
+&lt;%= render :partial =&gt; "simple_example" %&gt;</programlisting></para>
+
+        <para>Wichtig dabei ist der Unterschied zwischen der Instance-Variable
+        <varname>@current_time</varname> und der lokalen Variable
+        <varname>current_time</varname>. Da hat man sich schnell mal
+        verhaspelt.</para>
+      </section>
+    </section>
   </section>
 
   <section xml:base="basics_generisches_html_framework">
