@@ -882,29 +882,49 @@ Completed 302 Found in 1ms
     ExampleController#test as HTML</code>" die Methode
     <methodname>test</methodname> im Controller <code>ExampleController</code>
     aufgerufen, aber danach fand ein Redirect zur Methode
-    <methodname>shopping_list</methodname> statt. In diesem Fall könnte man
-    das gleiche Ergebnis auch mit einer anderen Route lösen, aber schon bei
-    <xref linkend="scaffolding" /> werden Sie sehen, wie praktisch und
-    notwendig Redirects in Rails sind.</para>
+    <methodname>shopping_list</methodname> statt.</para>
 
     <para>Auf die Details und einzelnen Möglichkeiten des Redirects gehen wir
     später im jeweils konkreten Fall ein. Nur schon so viel vorweg: Man kann
     nicht nur auf eine andere Methode, sondern auch auf einen anderen
     Controller oder eine ganze andere Seite redirecten.</para>
+
+    <section>
+      <title>Warum Redirects?</title>
+
+      <para>Beim obigen Beispiel fragt man sich natürlich, warum man denn im
+      Controller einen Redirect einbaut und nicht direkt die Routen ändert.
+      Das ist der Nachteil von der "wir benutzen nur bisheriges
+      Wissen"-Methode. Schon im <xref linkend="scaffolding" /> werden Sie
+      verstehen warum Redirects so praktisch sind. Sie können z.B. in einem
+      Controller überprüfen, ob bestimmte Eingabedaten valide sind oder nicht
+      und wenn etwas fehlt zur ursprünglichen Eingabeseite redirecten. Das
+      wäre mit einer statischen Route nicht lösbar. </para>
+
+      <para>Allerdings muss man beim Programmieren auch darauf achten, nicht
+      beliebig viele Redirects einzubauen. Wenn man tatsächlich mal in der
+      Versuchung kommen zwei oder mehr Redirects hinter einander zu schachteln
+      (also in verschiedene Methoden), dann sollte man einen Schritt zurück
+      gehen und sich Gedanken über die Gesamtidee machen. Meist geht es dann
+      anders einfacher und sauberer.</para>
+    </section>
   </section>
 
   <section xml:id="flash">
     <title xml:id="flash.title">Flash Nachrichten</title>
 
-    <para>Der Name "Flash Message" oder "Flash Nachricht" ist meiner Meinung
+    <para>"Der Name "Flash Message" oder "Flash Nachricht" ist meiner Meinung
     nach denkbar ungeeignet gewählt worden. Mit dem Wort "Flash" assoziiert
     fast jeder mehr oder weniger bunte Webseiten, die mit dem
     Adobe-Flash-Plug-in realisiert wurden. Aber in Rails sind Flash
     Nachrichten etwas ganz anderes. Sie sind Nachrichten, die über ein
     Redirect auf eine andere Seite weiter geleitet werden können.</para>
 
-    <para>Als Beispiel erweitern wir die in <xref linkend="redirects" />
-    erstellten <filename>app/controllers/example_controller.rb</filename> wie
+    <para>Flash Nachrichten sind quasi gute Freunde von Redirects. Nicht
+    selten arbeiten beide ihm Team, um dem User ein Feedback über eine gerade
+    vollzogene Aktion zu geben. Als Beispiel erweitern wir die in <xref
+    linkend="redirects" /> erstellten
+    <filename>app/controllers/example_controller.rb</filename> wie
     folgt:<programlisting>class ExampleController &lt; ApplicationController
   def test
     <emphasis>flash[:notice] = "Ein sinnfreies Beispiel."</emphasis>
@@ -969,7 +989,9 @@ end
 
       <para>Per default werden die Arten "error", "notice" und "warning"
       unterschieden. Allerdings kann man auch selber eine Kategorie erfinden
-      und diese später im View abfragen.</para>
+      und diese später im View abfragen. Beim Arbeiten mit <xref
+      linkend="scaffolding" /> werden Sie Beispiele für die verschiedenen
+      Arten finden.</para>
     </section>
 
     <section xml:id="neue_flash_redirect_schreibweise">
@@ -1798,6 +1820,48 @@ Redirected to http://0.0.0.0:3000/movies
 Completed 302 Found in 25ms
 </screen></para>
       </section>
+    </section>
+
+    <section xml:id="default_css_im_scaffolding">
+      <title xml:id="default_css_im_scaffolding.title">Default CSS- und
+      HTML-Layout im Scaffolding</title>
+
+      <para>Wer sich bei den vorherigen Beispiel mal den HTML-Code der
+      Webseiten angeschaut hat, der wird bemerkt haben, das die vom Framework
+      wenig mit denen von uns in <xref
+      linkend="basics_generisches_html_framework" /> erstellten Seiten gemein
+      haben. Die Lösung liegt in der Datei
+      <filename>app/views/layouts/movies.html.erb</filename>:<programlisting>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Movies: &lt;%= controller.action_name %&gt;&lt;/title&gt;
+  &lt;%= stylesheet_link_tag 'scaffold' %&gt;
+  &lt;%= javascript_include_tag :defaults %&gt;
+  &lt;%= csrf_meta_tag %&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;p class="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
+&lt;p class="alert"&gt;&lt;%= alert %&gt;&lt;/p&gt;
+
+&lt;%= yield %&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</programlisting></para>
+
+      <para>Im Verzeichnis <filename>app/views/layouts</filename> liegen jetzt
+      zwei verschiedene HTML-Frames:<screen>stefan@swmbp 0 head- movie-app$ <command>ls app/views/layouts/</command>
+application.html.erb  movies.html.erb
+stefan@swmbp 0 head- movie-app$</screen></para>
+
+      <para>Die Datei <filename>movies.html.erb</filename> wurde beim
+      Scaffolding automatisch erstellt und wird von Rails per default
+      genommen. Wenn man nur mit der <filename>application.html.erb</filename>
+      arbeiten möchte, dann muss man die <filename>movies.html.erb</filename>
+      löschen. Sie können das auch Mischen. Wenn Sie möchten können Sie für
+      jedes Model einen eigenen View erstellen oder mit mehren Views ein
+      Framework teilen.</para>
     </section>
 
     <section xml:id="routen">
