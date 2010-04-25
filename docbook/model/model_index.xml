@@ -238,6 +238,261 @@ end</programlisting></para>
     Fehler und deshalb kam als Ergebnis <code>false</code> und die
     if-else-Kondition sprang auf <code>else</code>. Deshalb wurde mittels
     <code>redirect_to</code> die <methodname>new</methodname> Methode
-    aufgerufen (siehe <xref linkend="redirects" />).</para>
+    aufgerufen (siehe <xref linkend="redirects" />). So weit klar, aber es
+    stellt sich die Frage, wo die Fehlermeldung "Title can't be blank"
+    herkommt.</para>
+
+    <para>Rein View-technisch ist die Antwort einfach. Im von
+    <filename>app/views/movies/edit.html.erb</filename> und
+    <filename>app/views/movies/new.html.erb</filename> benutzen Partial (siehe
+    <xref linkend="partials" />)
+    <filename>app/views/movies/_form.html.erb</filename> steht in der zweiten
+    Zeile<programlisting>&lt;%= f.error_messages %&gt;
+</programlisting></para>
+
+    <para>Das sind die Fehler die bei der Erzeugung eines neuen ActiveRecord
+    Objektes entstanden sind. </para>
+
+    <para>Wir machen am besten mal auf der Console (siehe <xref
+    linkend="die_console" />) weiter:<screen>stefan@swmbp 0 head- movie-app$ <command>rails console</command>
+Loading development environment (Rails 3.0.0.beta2)
+ruby-head &gt;</screen></para>
+
+    <para>Jetzt gernerien wir ein eines Movie-Objekt und befüllen es mit
+    einigen Werten:<screen>ruby-head &gt; <command>pulp_fiction = Movie.new</command>
+ =&gt; #&lt;Movie id: nil, title: nil, production_year: nil, duration: nil, plot: nil, rating: nil, created_at: nil, updated_at: nil&gt; 
+ruby-head &gt; <command>pulp_fiction.production_year = 1994</command>
+ =&gt; 1994 
+ruby-head &gt; <command>pulp_fiction.duration = 154</command>
+ =&gt; 154 
+ruby-head &gt; </screen></para>
+
+    <para>Wenn wir das Movie-Objekt mit der Methode
+    <methodname>save</methodname> abspeichern wollen, dann bekommen wir eine
+    Fehlermeldung:<screen>ruby-head &gt; <command>pulp_fiction.save</command>
+ =&gt; false 
+ruby-head &gt;</screen></para>
+
+    <para>Die Fehlermeldungen werden mit der Methode
+    <methodname>errors</methodname> ausgegeben:<screen>ruby-1.9.2-p-1 &gt; <command>pulp_fiction.errors</command>
+ =&gt; {:title=&gt;["can't be blank"]} 
+ruby-1.9.2-p-1 &gt;</screen>Aus purer Neugierde schauen wir uns noch die
+    Klasse dieser Ausgabe an:<screen>ruby-1.9.2-p-1 &gt; <command>pulp_fiction.errors.class</command>
+ =&gt; ActiveModel::Errors 
+ruby-1.9.2-p-1 &gt;</screen></para>
+
+    <para>Ist also kein Array oder Hash. Aber wir können mit den normalen
+    Iterator-Methoden drauf zugreifen:<screen>ruby-1.9.2-p-1 &gt; <command>pulp_fiction.errors.first</command>
+ =&gt; [:title, "can't be blank"] 
+ruby-1.9.2-p-1 &gt; <command>pulp_fiction.errors.first.class</command>
+ =&gt; Array 
+ruby-1.9.2-p-1 &gt;</screen></para>
+
+    <para>Aber zurück zum eigentlichen Thema. Da wir in
+    <filename>app/models/movie.rb</filename> die folgende Validierungsregel
+    eingebaut haben, bekommen wir die obige Fehlermeldung und können das
+    Objekt nicht abspeichern.<programlisting>class Movie &lt; ActiveRecord::Base
+  validates_presence_of :title
+end</programlisting></para>
+
+    <para>Das coole daran ist, das wir uns in der gesamten Rails-Applikation
+    darauf verlassen können. Es gibt keinen Weg die Validierung zu umgehen.
+    hmmm... OK, das war jetzt eine kleine Lüge. Wir können die Validierung mit
+    der Methode <methodname>save_without_validation</methodname>
+    umgehen:<screen>ruby-1.9.2-p-1 &gt; <command>pulp_fiction.save_without_validation</command>
+ =&gt; true 
+ruby-1.9.2-p-1 &gt;</screen></para>
+
+    <para>Aber bitte vergessen Sie das mit dem
+    <methodname>save_without_validation</methodname> ganz schnell wieder!
+    Validierung ist nicht nur zum Schutz vor Falscheingaben durch den User
+    praktisch, sondern auch zum Schutz vor Fehler in der
+    Programmierung.</para>
+
+    <para>Führen wir unser Beispiel noch zu Ende und fügen den Titel
+    hinzu:<screen>ruby-1.9.2-p-1 &gt; <command>pulp_fiction.save</command>
+ =&gt; false 
+ruby-1.9.2-p-1 &gt; <command>pulp_fiction.title = 'Pulp Fiction'</command>
+ =&gt; "Pulp Fiction" 
+ruby-1.9.2-p-1 &gt; <command>pulp_fiction.save</command>
+ =&gt; true 
+ruby-1.9.2-p-1 &gt;</screen></para>
+
+    <para>Schauen wir uns noch gerade die Ausgabe der
+    <methodname>errors</methodname> Methode an:<screen>ruby-1.9.2-p-1 &gt; <command>pulp_fiction.errors</command>
+ =&gt; {} 
+ruby-1.9.2-p-1 &gt;</screen></para>
+
+    <section xml:id="eingebaute_validierungs_methoden">
+      <title xml:id="eingebaute_validierungs_methoden.title">Eingebaute
+      Validierungs-Methoden</title>
+
+      <para>ActiveRecord kommt mit einem Satz von fertigen
+      Validierungs-Methoden, die man immer wieder braucht. Die wichtigsten
+      gehen wir hier Methode für Methode durch. Diesen Abschnitt können Sie
+      auch schnell überfliegen und im Fall des Falles noch mal hier
+      nachschlagen.</para>
+
+      <section>
+        <title
+        xml:id="validates_presence_of.title">validates_presence_of</title>
+
+        <para>Mit <methodname>validates_presence_of</methodname> können Sie
+        festlegen, das ein bestimmtes Feld präsent also ausgefüllt sein muss.
+        Das Filmdatenbank-Beispiel dazu:<programlisting>class Movie &lt; ActiveRecord::Base
+  <emphasis>validates_presence_of :title</emphasis>
+end</programlisting></para>
+
+        <para>Denn ohne einen Titel macht ein Filmeintrag keinen Sinn.</para>
+
+        <para>Wichtige Optionen:<itemizedlist>
+            <listitem>
+              <para><code>:message</code></para>
+
+              <para>Gibt eine eigene Fehlermeldung aus. Default ist "can't be
+              blank".</para>
+
+              <para><example>
+                  <title>Beispiel für die Anwendung der :message
+                  Option</title>
+
+                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+  validates_presence_of :title, <emphasis>:message =&gt; "must not be blank"</emphasis>
+end
+</programlisting></para>
+                </example></para>
+            </listitem>
+
+            <listitem>
+              <para><code>:on</code></para>
+
+              <para>Spezifiziert, wann die Validierung ausgeführt werden soll.
+              Default ist <code>:save</code> (das heißt bei jedem
+              Abspeichern). Andere Optionen sind <code>:update</code> (dann
+              wird nur bei einem Update des Datensatzes validiert) und
+              <code>:create</code> (dann wird nur beim ersten Abspeichern
+              eines Datensatzes validiert).</para>
+
+              <para><example>
+                  <title>Beispiel für die Anwendung der :on Option</title>
+
+                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+  validates_presence_of :title, <emphasis>:on =&gt; :create</emphasis>
+end
+</programlisting></para>
+                </example></para>
+            </listitem>
+          </itemizedlist></para>
+      </section>
+
+      <section xml:id="validates_uniqueness_of">
+        <title
+        xml:id="validates_uniqueness_of.title">validates_uniqueness_of</title>
+
+        <para>Mit <methodname>validates_uniqueness_of</methodname> können Sie
+        festlegen, das ein bestimmtes Feld in der gesamten Datenbank nur
+        einmal einen einzelnen Wert enthalten darf. Er muss also immer unique
+        (einzigartig) sein. Wenn wir in unserer Filmdatenbank jeden Filmtitel
+        nur einmal aufnehmen wollen, dann wäre die entsprechende
+        Validierung:<programlisting>class Movie &lt; ActiveRecord::Base
+  validates_presence_of :title
+  <emphasis>validates_uniqueness_of :title</emphasis>
+end
+</programlisting></para>
+
+        <para>Ich würde aber auf Nummer sicher gehen und die
+        <code>:case_sensitive =&gt; false</code> Option
+        benutzen:<programlisting>class Movie &lt; ActiveRecord::Base
+  validates_presence_of :title
+  validates_uniqueness_of :title<emphasis>, :case_sensitive =&gt; false</emphasis>
+end
+</programlisting></para>
+
+        <para>Per default ist <code>:case_sensitive</code> immer auf
+        <code>true</code> gesetzt, deshalb müssen wir es hier auf
+        <code>false</code> setzen, um sicher zu stellen, das auch Filmtitel,
+        die nur unterschiedlich Gross und Klein geschrieben wurden trotzdem
+        unique sind.</para>
+
+        <para>Wichtige Optionen:<itemizedlist>
+            <listitem>
+              <para><code>:message</code></para>
+
+              <para>Gibt eine eigene Fehlermeldung aus. Default ist "has
+              already been taken".<example>
+                  <title>Beispiel für die Anwendung der :message
+                  Option</title>
+
+                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+  validates_uniqueness_of :title, <emphasis>:message =&gt; "has to be unique"</emphasis>
+end
+</programlisting></para>
+                </example></para>
+            </listitem>
+
+            <listitem>
+              <para><code>:case_sensitive</code></para>
+
+              <para>Definiert, ob die Einzigartigkeit (uniqueness) des Feldes
+              inklusive Gross- und Kleinschreibung definiert ist. Default ist
+              <code>true</code>.<example>
+                  <title>Beispiel für die Anwendung der :case_sensitive
+                  Option</title>
+
+                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+  validates_uniqueness_of :title, <emphasis>:case_sensitive =&gt; false</emphasis>
+end
+</programlisting></para>
+                </example></para>
+            </listitem>
+
+            <listitem>
+              <para><code>:allow_nil</code></para>
+
+              <para>Definiert, ob ein Eintrag auch nil sein darf. Ein solcher
+              Eintrag wäre dann genau einmal möglich. Default ist
+              <code>false</code>.<example>
+                  <title>Beispiel für die Anwendung der :allow_nil
+                  Option</title>
+
+                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+  validates_uniqueness_of :title, <emphasis>:allow_nil =&gt; true</emphasis>
+end
+</programlisting></para>
+                </example></para>
+            </listitem>
+
+            <listitem>
+              <para><code>:allow_blank</code></para>
+
+              <para>Definiert, ob ein Eintrag auch leer sein darf. Ein solcher
+              Eintrag wäre dann genau einmal möglich. Default ist
+              <code>false</code>.<example>
+                  <title>Beispiel für die Anwendung der :allow_blank
+                  Option</title>
+
+                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+  validates_uniqueness_of :title, <emphasis>:allow_blank =&gt; true</emphasis>
+end
+</programlisting></para>
+                </example></para>
+            </listitem>
+          </itemizedlist></para>
+      </section>
+    </section>
+  </section>
+
+  <section>
+    <title>Das Kapitel ist noch nicht fertig gestellt</title>
+
+    <para>Ich veröffentlich nicht jeden frisch geschriebenen Satz, aber jeden
+    in sich selbst schon logischen Teil. Das heißt aber nicht, das dieser Teil
+    auch schon abgeschlossen oder gar final ist. Oft schaue ich mir ein
+    Kapitel ein paar Tage später an und sage mir "das geht besser" oder "das
+    ist so nicht richtig rund". Entweder werfe ich den Text dann ganz raus
+    oder ändere ihn ab.</para>
+
+    <para><emphasis>Deshalb: Bitte regelmässig auf der Webseite nach Updates
+    schauen. Zu diesem Kapitel wird es noch einiges geben.</emphasis></para>
   </section>
 </chapter>
