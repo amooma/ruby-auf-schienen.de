@@ -474,6 +474,61 @@ end
             </listitem>
           </itemizedlist></para>
       </section>
+
+      <section xml:id="validates_numericality_of">
+        <title
+        xml:id="validates_numericality_of.title">validates_numericality_of</title>
+
+        <para>Mit <code>validates_numericality_of</code> wird überprüft, ob
+        der Eintrag eine Zahl ist. In unserer Filmdatenbank würde das auf das
+        Feld <code>production_year</code> passen:<programlisting>class Movie &lt; ActiveRecord::Base
+  <emphasis>validates_numericality_of :production_year</emphasis>
+end
+</programlisting></para>
+
+        <para>Allerdings wäre das nur die halbe Miete. Denn
+        <code>validates_numericality_of</code> überprüft per Default nur, ob
+        es sich um eine Zahl handelt. Wir möchten aber eine ganze Zahl (also
+        Integer). Entsprechend müssten wir folgende Validierung
+        benutzen:<programlisting>class Movie &lt; ActiveRecord::Base
+  validates_numericality_of :production_year, <emphasis>:only_integer =&gt; true</emphasis>
+end
+</programlisting></para>
+
+        <para>Aber es geht noch weiter, denn eigentlich sind nur die Jahre
+        1895 (erster Stummfilm) bis heute interessant. Das können wir
+        ebenfalls in die Validierung mit aufnehmen:<programlisting>class Movie &lt; ActiveRecord::Base
+  validates_numericality_of :production_year, 
+                            :only_integer =&gt; true,<co
+              xml:id="validates_numericality_of_production_year_co_1" /> 
+                            :greater_than =&gt; 1894,<co
+              xml:id="validates_numericality_of_production_year_co_2" /> 
+                            :less_than =&gt; Date.today.year + 1<co
+              xml:id="validates_numericality_of_production_year_co_3" />
+end
+</programlisting></para>
+
+        <para>Erklärung:<calloutlist>
+            <callout arearefs="validates_numericality_of_production_year_co_1">
+              <para>Nur ganze Zahlen werden aktzeptiert (Integer).</para>
+            </callout>
+
+            <callout arearefs="validates_numericality_of_production_year_co_2">
+              <para>Die Zahl muss grösser als 1894 sein, weil der erste
+              Stummfilm im Jahr 1895 veröffentlicht wurde.</para>
+            </callout>
+
+            <callout arearefs="???">
+              <para>Jetzt wird es wirklich cool! ;-) Da ein Film in unserer
+              Datenbank schlecht aus der Zukunft sein kann, nehmen wir das
+              aktuelle Jahr mit Date.today.year und addieren 1. Damit
+              definieren wir dann, das das production_year niedriger sein
+              muss.</para>
+            </callout>
+          </calloutlist></para>
+
+        <para></para>
+      </section>
     </section>
   </section>
 
