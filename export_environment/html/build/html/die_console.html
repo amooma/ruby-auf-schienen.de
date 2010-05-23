@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>3.9. Die Console</title><link rel="stylesheet" href="./default.css" type="text/css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta name="package" content="" /><link rel="home" href="index.html" title="Ruby on Rails 3.0" /><link rel="up" href="erste_schritte_mit_rails.html" title="Kapitel 3. Erste Schritte mit Rails" /><link rel="prev" href="scaffolding.html" title="3.8. Scaffolding" /><link rel="next" href="workflow-in-rails.html" title="3.10. MVC-Workflow innerhalb Rails" /></head><body id="your-body"><div id="content"><div id="content-inner"><div id="leftcol" class="sidebar"><ul class="breadcrumbs"><li class="breadcrumb-link" style="margin-left: 0em"><a href="index.html">Ruby on Rails 3.0</a></li><li class="breadcrumb-link breadcrumb-bullet" style="margin-left: 0.8em"><a href="erste_schritte_mit_rails.html">Erste Schritte mit
+  Rails</a></li><li class="breadcrumb-node breadcrumb-last breadcrumb-bullet" style="margin-left: 1.6em"><a href="die_console.html">Die Console</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="die_console.html#id3314021">Neuen Datensatz anlegen</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="die_console.html#id3314192">Alle Datensätze anzeigen</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="die_console.html#seed_rb">Mit seed.rb die Entwicklungsdatenbank
+      betanken</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="die_console.html#arbeiten-mit-find">Arbeiten mit der Methode find</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="die_console.html#datensatz-loeschen">Einen Datensatz löschen</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="die_console.html#datensatz-editieren">Einen Datensatz editieren</a></li></ul><div id="textsize"><span class="textts"> Change Text Size</span><br /><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='13px'"><span class="plusts" style="font-size: small;">+</span></a><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='15px'"><span class="plusts" style="font-size: large;">+</span></a><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='17px'"><span class="plusts" style="font-size: x-large;">+</span></a></div></div><div id="rightcol" class="sidebar"></div><div id="maincol"><ul class="docnav top"><li class="previous"><a accesskey="p" href="scaffolding.html"><strong>Zurück</strong></a></li><li class="next"><a accesskey="n" href="workflow-in-rails.html"><strong>Weiter</strong></a></li></ul><div class="section" title="3.9. Die Console" id="die_console"><div class="titlepage"><div><div><h2 class="title">3.9. Die Console</h2></div></div></div><div class="para">Sie haben im <a class="xref" href="ruby-grundlagen.html" title="Kapitel 2. Ruby Grundlagen">Kapitel 2, <i>Ruby Grundlagen</i></a> gelernt mit irb
+    umzugehen. In Rails gibt es dazu ein Pondon: <span class="command"><strong>rails
+    console</strong></span></div><div class="para">Mit der Rails Console haben Sie nicht nur die normalen irb
+    Mechanismen, sondern auch direkt alle Klassen und Methoden aus Ihrer
+    Rails-Applikation. Und können somit auf die Datenbank zugreifen. Diese
+    werden automagisch per ActiveRecord als Objekte zur Verfügung
+    gestellt.</div><div class="para">Die Rails-Console kann parallel zum Webserver oder anstatt des
+    Webservers gestartet werden. Wir führen als erstes ein <span class="command"><strong>rake
+    db:reset</strong></span> aus, damit wir eine frische und leere Datenbank zum
+    Üben vorfinden. <pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>rake db:reset</strong></span>
+(in /Users/sw/Development/movie-app)
+db/test.sqlite3 already exists
+db/development.sqlite3 already exists
+-- create_table("movies", {:force=&gt;true})
+   -&gt; 0.0155s
+-- initialize_schema_migrations_table()
+   -&gt; 0.0049s
+-- assume_migrated_upto_version(20100404113234, "db/migrate")
+   -&gt; 0.0026s
+MacBook:movie-app sw$ </pre></div><div class="para">Danach starten wir die Console:<pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>rails console</strong></span>
+Loading development environment (Rails 3.0.0.beta2)
+ruby-1.9.1-p378 &gt;</pre></div><div class="section" title="3.9.1. Neuen Datensatz anlegen"><div class="titlepage"><div><div><h3 class="title">3.9.1. Neuen Datensatz anlegen</h3></div></div></div><div class="para">ActiveRecord stellt uns automagisch eine Klasse aus der Datenbank
+      <em class="parameter"><code>movies</code></em> mit dem Namen <code class="classname">Movie</code>
+      zur Verfügung. Diese KLasse hat eine Methode
+      <code class="methodname">new</code> und mit der können wir ein neues Objekt
+      erstellen.<pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>terminator = Movie.new</strong></span>
+ =&gt; #&lt;Movie id: nil, title: nil, production_year: nil, duration: nil, plot: nil, rating: nil, created_at: nil, updated_at: nil&gt; 
+ruby-1.9.1-p378 &gt; </pre></div><div class="para">Wir können uns sicherheitshalber noch mal die KLasse der Instance
+      terminator ausgeben lassen.<pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>terminator.class</strong></span>
+ =&gt; Movie(id: integer, title: string, production_year: integer, duration: integer, plot: text, rating: integer, created_at: datetime, updated_at: datetime) 
+ruby-1.9.1-p378 &gt; </pre></div><div class="para">Das neue Objekt terminator hat automatsch Accessors (siehe <a class="xref" href="noch_mal_methoden.html#getter_und_setter_methoden" title="2.7.1. Getter und Setter">Abschnitt 2.7.1, „Getter und Setter“</a>) zu den einzelnen Datenfeldern.
+      Diese benutzen wir zum Füllen mit einem Beispieldatensatz.<pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>terminator.title = 'The Terminator'</strong></span>
+ =&gt; "The Terminator" 
+ruby-1.9.1-p378 &gt; <span class="command"><strong>terminator.production_year = 1984</strong></span>
+ =&gt; 1984 
+ruby-1.9.1-p378 &gt; <span class="command"><strong>terminator</strong></span>
+ =&gt; #&lt;Movie id: nil, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: nil, updated_at: nil&gt; 
+ruby-1.9.1-p378 &gt;</pre></div><div class="para">Das Objekt ist allerdings noch nicht in der Datenbank gespeichert.
+      Das erfolgt erst durch Aufruf der Methode
+      <code class="methodname">save</code>.<pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>terminator.save</strong></span>
+ =&gt; true 
+ruby-1.9.1-p378 &gt;</pre></div><div class="para">Alternative können wir einen zweiten Datensatz auch direkt mit der
+      Methode <code class="methodname">create</code> anlegen.<pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.create({ :title =&gt; 'Terminator 2', :production_year =&gt; 1992 })</strong></span>
+ =&gt; #&lt;Movie id: 2, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:39:22", updated_at: "2010-04-04 19:39:22"&gt; 
+ruby-1.9.1-p378 &gt;</pre></div><div class="section" title="3.9.1.1. Hilfe zu create"><div class="titlepage"><div><div><h4 class="title">3.9.1.1. Hilfe zu create</h4></div></div></div><div class="para">Die Methode <code class="methodname">create</code> gehört zu
+        <code class="classname">ActiveRecord::Base</code>. Die online Hilfe dazu kann
+        mit <span class="application">ri</span> abgerufen werden. Wenn Sie das jetzt
+        ausprobieren wollen, müssen Sie natürlich erst mit
+        <span class="command"><strong>exit</strong></span> aus der Console raus.<pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>ri ActiveRecord::Base.create</strong></span>
+--------------------------------------------- ActiveRecord::Base::create
+     ActiveRecord::Base::create(attributes = nil, &amp;block) {|object| ...}
+
+     From
+     /Users/sw/.rvm/gems/ruby-1.9.1-p378/doc/activerecord-3.0.0.beta2/ri
+     /ActiveRecord/Base/cdesc-Base.yaml
+------------------------------------------------------------------------
+     Creates an object (or multiple objects) and saves it to the
+     database, if validations pass. The resulting object is returned
+     whether the object was saved successfully to the database or not.
+
+     The +attributes+ parameter can be either be a Hash or an Array of
+     Hashes. These Hashes describe the attributes on the objects that
+     are to be created.
+
+     Examples
+
+       # Create a single new object
+       User.create(:first_name =&gt; 'Jamie')
+     
+       # Create an Array of new objects
+       User.create([{ :first_name =&gt; 'Jamie' }, { :first_name =&gt; 'Jeremy' }])
+     
+       # Create a single object and pass it into a block to set other attributes.
+       User.create(:first_name =&gt; 'Jamie') do |u|
+         u.is_admin = false
+       end
+     
+       # Creating an Array of new objects using a block, where the block is executed for each object:
+       User.create([{ :first_name =&gt; 'Jamie' }, { :first_name =&gt; 'Jeremy' }]) do |u|
+         u.is_admin = false
+       end
+
+MacBook:movie-app sw$ 
+</pre></div></div></div><div class="section" title="3.9.2. Alle Datensätze anzeigen"><div class="titlepage"><div><div><h3 class="title">3.9.2. Alle Datensätze anzeigen</h3></div></div></div><div class="para">Der einfachste Weg alle Datensätze aus der Datenbank movies
+      anzuzeigen ist die Methode <code class="methodname">all</code>:<pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.all</strong></span>
+ =&gt; [#&lt;Movie id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:38:36", updated_at: "2010-04-04 19:38:36"&gt;, #&lt;Movie id: 2, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:39:22", updated_at: "2010-04-04 19:39:22"&gt;] 
+ruby-1.9.1-p378 &gt;</pre></div><div class="para">Was für eine Klasse ist das Ergebnis von
+      <code class="classname">Movie.all</code>? Schauen wir mal nach.<pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.all.class</strong></span>
+ =&gt; Array 
+ruby-1.9.1-p378 &gt;</pre></div><div class="para">Dann können wir ja die Iterator-Methode
+      <code class="methodname">each</code> anwenden (siehe <a class="xref" href="ruby-array-und-hash.html#array_iterator" title="2.10.1.1. Iterator (each)">Abschnitt 2.10.1.1, „Iterator (each)“</a>), um durch die einzelnen Elemente des Arrays
+      zu gehen. Damit können Sie sich als Beispiel alle Titel ausgeben
+      lassen.<pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.all.each { |movie| puts movie.title }</strong></span>
+The Terminator
+Terminator 2
+ =&gt; [#&lt;Movie id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:38:36", updated_at: "2010-04-04 19:38:36"&gt;, #&lt;Movie id: 2, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:39:22", updated_at: "2010-04-04 19:39:22"&gt;] 
+ruby-1.9.1-p378 &gt;</pre></div></div><div class="section" title="3.9.3. Mit seed.rb die Entwicklungsdatenbank betanken" id="seed_rb"><div class="titlepage"><div><div><h3 class="title">3.9.3. Mit seed.rb die Entwicklungsdatenbank
+      betanken</h3></div></div></div><div class="para">Gehört nicht so richtig in dieses Kapitel, aber gerade bei der
+      Entwicklung kommt es immer mal wieder vor, das man den Inhalt der
+      Datenbank löschen und mit neuen Werten befüllen will. In Rails gibt es
+      dafür den praktischen Mechanismus der Datei
+      <code class="filename">db/seeds.rb</code></div><div class="para">Die <code class="filename">db/seeds.rb</code> ist ein normales
+      Ruby-Programm, das man mit <span class="command"><strong>rake db:seed</strong></span> ausführen
+      kann. Dies geht natürlich nicht nur mit der Entwicklungsdatenbank,
+      sondern kann später auch in der Produktion geschehen. Das ist z.B.
+      praktisch, wenn man initial eine Länderliste in eine Länderdatenbank
+      eintragen will.</div><div class="para">Für unsere Film-Datenbank habe ich folgende
+      <code class="filename">db/seeds.rb</code> vorbereitet:<pre class="programlisting"># This file should contain all the record creation needed to seed the database with its default values.
+# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
+#
+# Examples:
+#   
+#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
+#   Major.create(:name =&gt; 'Daley', :city =&gt; cities.first)
+
+Movie.create({ :title =&gt; 'The Terminator', :production_year =&gt; 1984 })
+Movie.create({ :title =&gt; 'Terminator 2', :production_year =&gt; 1992 })
+Movie.create({ :title =&gt; 'Terminator Salvation', :production_year =&gt; 2009 })
+Movie.create({ :title =&gt; 'Rain Man', :production_year =&gt; 1988, :rating =&gt; 5 })
+Movie.create({ :title =&gt; 'War of the Worlds', :production_year =&gt; 2005, :rating =&gt; 4 })
+Movie.create({ :title =&gt; 'Collateral', :production_year =&gt; 2004, :rating =&gt; 5})
+Movie.create({ :title =&gt; 'Miami Vice', :production_year =&gt; 2006, :rating =&gt; 5})
+Movie.create({ :title =&gt; 'Hancock', :production_year =&gt; 2008, :rating =&gt;  4})
+Movie.create({ :title =&gt; 'The Aviator', :production_year =&gt; 2004, :rating =&gt;  4})
+Movie.create({ :title =&gt; 'Some Like It Hot', :production_year =&gt; 1959, :rating =&gt;  5})
+Movie.create({ :title =&gt; 'W.', :production_year =&gt; 2008, :rating =&gt;  4})
+Movie.create({ :title =&gt; 'Iron Man', :production_year =&gt; 2008, :rating =&gt;  5})
+Movie.create({ :title =&gt; 'The Dark Knight', :production_year =&gt; 2008, :rating =&gt;  5})
+</pre></div><div class="section" title="3.9.3.1. Betankung"><div class="titlepage"><div><div><h4 class="title">3.9.3.1. Betankung</h4></div></div></div><div class="para">Um keine Filme doppelt zu haben, reseten wir erst mit
+        <span class="command"><strong>rake db:reset</strong></span> die Datenbank.<pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>rake db:reset</strong></span>
+(in /Users/sw/Development/movie-app)
+db/test.sqlite3 already exists
+db/test.sqlite3 already exists
+db/development.sqlite3 already exists
+-- create_table("movies", {:force=&gt;true})
+   -&gt; 0.0168s
+-- initialize_schema_migrations_table()
+   -&gt; 0.0046s
+-- assume_migrated_upto_version(20100404113234, "db/migrate")
+   -&gt; 0.0022s
+MacBook:movie-app sw$</pre></div><div class="para">Um sie dann mit <span class="command"><strong>rake db:seed</strong></span> zu
+        betanken.<pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>rake db:seed</strong></span>
+(in /Users/sw/Development/movie-app)
+MacBook:movie-app sw$</pre></div></div></div><div class="section" title="3.9.4. Arbeiten mit der Methode find" id="arbeiten-mit-find"><div class="titlepage"><div><div><h3 class="title">3.9.4. Arbeiten mit der Methode find</h3></div></div></div><div class="para">Es gibt in <code class="classname">ActiveRecord::Base</code> eine Methode
+      <code class="methodname">find</code> die es uns ermöglicht ganz ohne
+      SQL-Kenntnisse nach Daten in der Datenbank zu suchen.</div><div class="section" title="3.9.4.1. Nach ID suchen"><div class="titlepage"><div><div><h4 class="title">3.9.4.1. Nach ID suchen</h4></div></div></div><div class="para">Einen Film nach der ID zu suchen ist der einfachste aller
+        Fälle.<pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.find(1)</strong></span>
+ =&gt; #&lt;Movie id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt; 
+ruby-1.9.1-p378 &gt;</pre></div></div><div class="section" title="3.9.4.2. Nach einem Feldinhalt suchen"><div class="titlepage"><div><div><h4 class="title">3.9.4.2. Nach einem Feldinhalt suchen</h4></div></div></div><div class="para">Jetzt kommt ein wenig Ruby-Magie ins Spiel. Die Methode
+        <code class="methodname">find</code> kann dynamisch mit
+        <code class="methodname">_by_</code> und dem Feldnamen erweitert werden. Am
+        einfachsten zeigt sich das mit ein paar Beispielen:<pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.find_by_title('The Terminator')</strong></span>
+ =&gt; #&lt;Movie id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt; 
+ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.find_by_production_year(1984)</strong></span>
+ =&gt; #&lt;Movie id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt; 
+ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.find_by_rating(nil)</strong></span>
+ =&gt; #&lt;Movie id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt; 
+ruby-1.9.1-p378 &gt;</pre></div><div class="para">Bei der letzten Suche zeigt sich dabei allerdings schon ein
+        Problem, denn <code class="methodname">find_by_x</code> gibt immer nur den
+        ersten Treffer aus. Wenn man mehrere Treffer ausgeben will, muss man
+        <span class="command"><strong>find_all_by_x</strong></span> benutzen:<pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.find_all_by_rating(nil)</strong></span>
+ =&gt; [#&lt;Movie id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 2, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 3, title: "Terminator Salvation", production_year: 2009, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 14, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 15, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 16, title: "Terminator Salvation", production_year: 2009, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;] 
+ruby-1.9.1-p378 &gt;</pre></div><div class="para">Mit der Methode count kann man sich dann übrigens auch leicht
+        die Anzahl der gefundenen Filme ausrechnen lassen:<pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.find_all_by_rating(nil).count</strong></span>
+ =&gt; 6 
+ruby-1.9.1-p378 &gt;</pre></div><div class="para">Jetzt mal eine kleine Quizfrage: "Zählt Rails die Anzahl der
+        Objekte im Array, das von
+        <span class="command"><strong>Movie.find_all_by_rating(nil)</strong></span> ausgegeben wird oder
+        geht es intelligenter vor?". Die Antwort liegt im Logfile:<pre class="screen">  SQL (0.2ms)   SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+
+  Movie Load (0.5ms)  SELECT "movies".* FROM "movies" WHERE ("movies"."rating" IS NULL)
+</pre></div><div class="para">Rails bekommt also wirklich alle entsprechenden Tabelleneinträge
+        zurück und zählt dann die Anzahl der Objekte im Array. Bei einer solch
+        kleinen Tabelle ist das kein Problem. Aber bei einer grösseren will
+        man so was eher vom SQL-Server machen lassen, weil dieser einfach viel
+        schneller ist. Dafür gibt es die Methode count die wir wie folgt
+        aufrufen können:<pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.count(:all, :conditions =&gt; { :rating =&gt; nil } )</strong></span>
+ =&gt; 6 
+ruby-1.9.1-p378 &gt; </pre></div><div class="para">Im Logfile zeigt sich dann der folgende, von uns genau so
+        gewünschte Eintrag:<pre class="screen">  SQL (0.3ms)  SELECT COUNT(*) AS count_id FROM "movies" WHERE ("movies"."rating" IS NULL)
+</pre></div><div class="para">Man kann die <code class="methodname">find_all_by_x</code> oder
+        <code class="methodname">find_by_x</code> Methoden übrigens beliebig mit dem
+        String <code class="methodname">_and_</code> und weiteren Feldnamen
+        verlängern:<pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.find_all_by_duration_and_rating(nil,nil)</strong></span>
+ =&gt; [#&lt;Movie id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 2, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 3, title: "Terminator Salvation", production_year: 2009, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 14, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 15, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 16, title: "Terminator Salvation", production_year: 2009, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;] 
+ruby-1.9.1-p378 &gt;</pre></div></div><div class="section" title="3.9.4.3. Komplexere Suchen"><div class="titlepage"><div><div><h4 class="title">3.9.4.3. Komplexere Suchen</h4></div></div></div><div class="para">Die Methode find ist sehr mächtig. Bevor ich einzelne Beispiele
+        gebe, möchte ich Sie schon mal auf die eingebaute Hilfe
+        verweisen:<pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>ri ActiveRecord::Base.find</strong></span>
+----------------------------------------------- ActiveRecord::Base::find
+     ActiveRecord::Base::find(*args)
+
+     From gem activerecord-2.3.5
+------------------------------------------------------------------------
+     Find operates with four different retrieval approaches:
+
+     *   Find by id - This can either be a specific id (1), a list of
+         ids (1, 5, 6), or an array of ids ([5, 6, 10]). If no record
+         can be found for all of the listed ids, then RecordNotFound
+         will be raised.
+
+     *   Find first - This will return the first record matched by the
+         options used. These options can either be specific conditions
+         or merely an order. If no record can be matched, +nil+ is
+         returned. Use +Model.find(:first, *args)+ or its shortcut
+         +Model.first(*args)+.
+
+     *   Find last - This will return the last record matched by the
+         options used. These options can either be specific conditions
+         or merely an order. If no record can be matched, +nil+ is
+         returned. Use +Model.find(:last, *args)+ or its shortcut
+         +Model.last(*args)+.
+
+     *   Find all - This will return all the records matched by the
+         options used. If no records are found, an empty array is
+         returned. Use +Model.find(:all, *args)+ or its shortcut
+         +Model.all(*args)+.
+
+     All approaches accept an options hash as their last parameter.
+
+     Parameters
+
+     *   +:conditions+ - An SQL fragment like "administrator = 1", +[
+         "user_name = ?", username ]+, or +["user_name = :user_name", {
+         :user_name =&gt; user_name }]+. See conditions in the intro.
+
+     *   +:order+ - An SQL fragment like "created_at DESC, name".
+
+     *   +:group+ - An attribute name by which the result should be
+         grouped. Uses the +GROUP BY+ SQL-clause.
+
+     *   +:having+ - Combined with +:group+ this can be used to filter
+         the records that a +GROUP BY+ returns. Uses the +HAVING+
+         SQL-clause.
+
+     *   +:limit+ - An integer determining the limit on the number of
+         rows that should be returned.
+
+     *   +:offset+ - An integer determining the offset from where the
+         rows should be fetched. So at 5, it would skip rows 0 through
+         4.
+
+     *   +:joins+ - Either an SQL fragment for additional joins like
+         "LEFT JOIN comments ON comments.post_id = id" (rarely needed),
+         named associations in the same form used for the +:include+
+         option, which will perform an +INNER JOIN+ on the associated
+         table(s), or an array containing a mixture of both strings and
+         named associations. If the value is a string, then the records
+         will be returned read-only since they will have attributes that
+         do not correspond to the table's columns. Pass +:readonly =&gt;
+         false+ to override.
+
+     *   +:include+ - Names associations that should be loaded
+         alongside. The symbols named refer to already defined
+         associations. See eager loading under Associations.
+
+     *   +:select+ - By default, this is "*" as in "SELECT * FROM", but
+         can be changed if you, for example, want to do a join but not
+         include the joined columns. Takes a string with the SELECT SQL
+         fragment (e.g. "id, name").
+
+     *   +:from+ - By default, this is the table name of the class, but
+         can be changed to an alternate table name (or even the name of
+         a database view).
+
+     *   +:readonly+ - Mark the returned records read-only so they
+         cannot be saved or updated.
+
+     *   +:lock+ - An SQL fragment like "FOR UPDATE" or "LOCK IN SHARE
+         MODE". +:lock =&gt; true+ gives connection's default exclusive
+         lock, usually "FOR UPDATE".
+
+     Examples
+
+       # find by id
+       Person.find(1)       # returns the object for ID = 1
+       Person.find(1, 2, 6) # returns an array for objects with IDs in (1, 2, 6)
+       Person.find([7, 17]) # returns an array for objects with IDs in (7, 17)
+       Person.find([1])     # returns an array for the object with ID = 1
+       Person.find(1, :conditions =&gt; "administrator = 1", :order =&gt; "created_on DE
+SC")
+
+     Note that returned records may not be in the same order as the ids
+     you provide since database rows are unordered. Give an explicit
+     +:order+ to ensure the results are sorted.
+
+     Examples
+
+       # find first
+       Person.find(:first) # returns the first object fetched by SELECT * FROM peo
+ple
+       Person.find(:first, :conditions =&gt; [ "user_name = ?", user_name])
+       Person.find(:first, :conditions =&gt; [ "user_name = :u", { :u =&gt; user_name }]
+)
+       Person.find(:first, :order =&gt; "created_on DESC", :offset =&gt; 5)
+     
+       # find last
+       Person.find(:last) # returns the last object fetched by SELECT * FROM peopl
+e
+       Person.find(:last, :conditions =&gt; [ "user_name = ?", user_name])
+       Person.find(:last, :order =&gt; "created_on DESC", :offset =&gt; 5)
+     
+       # find all
+       Person.find(:all) # returns an array of objects for all the rows fetched by
+ SELECT * FROM people
+       Person.find(:all, :conditions =&gt; [ "category IN (?)", categories], :limit =
+&gt; 50)
+       Person.find(:all, :conditions =&gt; { :friends =&gt; ["Bob", "Steve", "Fred"] }
+       Person.find(:all, :offset =&gt; 10, :limit =&gt; 10)
+       Person.find(:all, :include =&gt; [ :account, :friends ])
+       Person.find(:all, :group =&gt; "category")
+
+     Example for find with a lock: Imagine two concurrent transactions:
+     each will read +person.visits == 2+, add 1 to it, and save,
+     resulting in two saves of +person.visits = 3+. By locking the row,
+     the second transaction has to wait until the first is finished; we
+     get the expected +person.visits == 4+.
+
+       Person.transaction do
+         person = Person.find(1, :lock =&gt; true)
+         person.visits += 1
+         person.save!
+       end
+
+MacBook:movie-app sw$ </pre></div><div class="section" title="3.9.4.3.1. Such-Beispiele"><div class="titlepage"><div><div><h5 class="title">3.9.4.3.1. Such-Beispiele</h5></div></div></div><div class="para">Im folgenden werde ich per Fragen und Antwort ein
+          Beispielprobleme mit <code class="methodname">find</code> lösen.</div><div class="para"><div class="qandaset" title="Frequently Asked Questions"><div class="qandaset"><tr class="question" title="F:"><td align="left" valign="top"><p><b>F:</b></p></td><td align="left" valign="top"><div class="para">Wie kann ich alle in der Datenbank enthaltenen Filme
+                    in das Objekt mit dem Namen <code class="varname">alle_filme</code>
+                    speichern?</div></td></tr><tr class="answer"><td align="left" valign="top"><p><b>A:</b></p></td><td align="left" valign="top"><div class="para"><pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>alle_filme = Movie.all</strong></span>
+ =&gt; [#&lt;Movie id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 2, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 3, title: "Terminator Salvation", production_year: 2009, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 4, title: "Rain Man", production_year: 1988, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 5, title: "War of the Worlds", production_year: 2005, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 6, title: "Collateral", production_year: 2004, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 7, title: "Miami Vice", production_year: 2006, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 9, title: "The Aviator", production_year: 2004, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 10, title: "Some Like It Hot", production_year: 1959, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 11, title: "W.", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 12, title: "Iron Man", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 14, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 15, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 16, title: "Terminator Salvation", production_year: 2009, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 17, title: "Rain Man", production_year: 1988, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 18, title: "War of the Worlds", production_year: 2005, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 19, title: "Collateral", production_year: 2004, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 20, title: "Miami Vice", production_year: 2006, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 21, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 22, title: "The Aviator", production_year: 2004, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 23, title: "Some Like It Hot", production_year: 1959, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 24, title: "W.", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 25, title: "Iron Man", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 26, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;] 
+ruby-1.9.1-p378 &gt;</pre></div></td></tr><tr class="question" title="F:"><td align="left" valign="top"><p><b>F:</b></p></td><td align="left" valign="top"><div class="para">Wie finde ich den ersten Film in der
+                    Datenbank?</div></td></tr><tr class="answer"><td align="left" valign="top"><p><b>A:</b></p></td><td align="left" valign="top"><div class="para"><pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.find(:first)</strong></span>
+ =&gt; #&lt;Movie id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt; 
+ruby-1.9.1-p378 &gt;</pre>Oder noch kürzer mit der Methode
+                    <code class="methodname">first</code>.<pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.first</strong></span>
+ =&gt; #&lt;Movie id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt; 
+ruby-1.9.1-p378 &gt; </pre></div></td></tr><tr class="question" title="F:"><td align="left" valign="top"><p><b>F:</b></p></td><td align="left" valign="top"><div class="para">Wie kann ich alle Filme die im Jahr 1984 produziert
+                    wurden suchen?</div></td></tr><tr class="answer"><td align="left" valign="top"><p><b>A:</b></p></td><td align="left" valign="top"><div class="para"><pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.find_all_by_production_year(1984)</strong></span>
+ =&gt; [#&lt;Movie id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 14, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;] 
+ruby-1.9.1-p378 &gt;</pre></div></td></tr><tr class="question" title="F:"><td align="left" valign="top"><p><b>F:</b></p></td><td align="left" valign="top"><div class="para">Wie finde ich die Anzahl der im Jahr 1984
+                    produzierten Filme raus?</div></td></tr><tr class="answer"><td align="left" valign="top"><p><b>A:</b></p></td><td align="left" valign="top"><div class="para"><pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.find_all_by_production_year(1984).count</strong></span>
+ =&gt; 2 
+ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.count(:all, :conditions =&gt; { :production_year =&gt; 1984 })</strong></span>
+ =&gt; 2 
+ruby-1.9.1-p378 &gt; </pre></div></td></tr><tr class="question" title="F:"><td align="left" valign="top"><p><b>F:</b></p></td><td align="left" valign="top"><div class="para">Einer Liste aller 5 Sterne Filme aus dem Jahr 2008
+                    im YAML Format.</div></td></tr><tr class="answer"><td align="left" valign="top"><p><b>A:</b></p></td><td align="left" valign="top"><div class="para"><pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.find_all_by_production_year_and_rating(2008,5).to_yaml</strong></span>
+ =&gt; "--- \n- !ruby/object:Movie \n  attributes: \n    id: \"12\"\n    title: Iron Man\n    production_year: \"2008\"\n    duration: \n    plot: \n    rating: \"5\"\n    created_at: 2010-04-04 19:50:41.922898\n    updated_at: 2010-04-04 19:50:41.922898\n  attributes_cache: {}\n\n  changed_attributes: {}\n\n  destroyed: false\n  marked_for_destruction: false\n  new_record: false\n  previously_changed: {}\n\n  readonly: false\n- !ruby/object:Movie \n  attributes: \n    id: \"13\"\n    title: The Dark Knight\n    production_year: \"2008\"\n    duration: \n    plot: \n    rating: \"5\"\n    created_at: 2010-04-04 19:50:41.925878\n    updated_at: 2010-04-04 19:50:41.925878\n  attributes_cache: {}\n\n  changed_attributes: {}\n\n  destroyed: false\n  marked_for_destruction: false\n  new_record: false\n  previously_changed: {}\n\n  readonly: false\n- !ruby/object:Movie \n  attributes: \n    id: \"25\"\n    title: Iron Man\n    production_year: \"2008\"\n    duration: \n    plot: \n    rating: \"5\"\n    created_at: 2010-04-04 19:50:50.084528\n    updated_at: 2010-04-04 19:50:50.084528\n  attributes_cache: {}\n\n  changed_attributes: {}\n\n  destroyed: false\n  marked_for_destruction: false\n  new_record: false\n  previously_changed: {}\n\n  readonly: false\n- !ruby/object:Movie \n  attributes: \n    id: \"26\"\n    title: The Dark Knight\n    production_year: \"2008\"\n    duration: \n    plot: \n    rating: \"5\"\n    created_at: 2010-04-04 19:50:50.087386\n    updated_at: 2010-04-04 19:50:50.087386\n  attributes_cache: {}\n\n  changed_attributes: {}\n\n  destroyed: false\n  marked_for_destruction: false\n  new_record: false\n  previously_changed: {}\n\n  readonly: false\n" 
+ruby-1.9.1-p378 &gt; </pre></div></td></tr><tr class="question" title="F:"><td align="left" valign="top"><p><b>F:</b></p></td><td align="left" valign="top"><div class="para">Alle 2008er Filme, alphabetisch nach Titeln
+                    sortiert.</div></td></tr><tr class="answer"><td align="left" valign="top"><p><b>A:</b></p></td><td align="left" valign="top"><div class="para"><pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.find_all_by_production_year(2008, :order =&gt; :title)</strong></span>
+ =&gt; [#&lt;Movie id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 21, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 12, title: "Iron Man", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 25, title: "Iron Man", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 26, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 11, title: "W.", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 24, title: "W.", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;] 
+ruby-1.9.1-p378 &gt;</pre></div></td></tr><tr class="question" title="F:"><td align="left" valign="top"><p><b>F:</b></p></td><td align="left" valign="top"><div class="para">Ich möchte selbst SQL einbauen. Wie kann ich nach
+                    allen Filmen suchen, die im Titel das Wort 'Terminator'
+                    enthalten?</div></td></tr><tr class="answer"><td align="left" valign="top"><p><b>A:</b></p></td><td align="left" valign="top"><div class="para"><pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.find(:all, :conditions =&gt; [ "title LIKE ?", '%Terminator%' ])</strong></span>
+ =&gt; [#&lt;Movie id: 1, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 2, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 3, title: "Terminator Salvation", production_year: 2009, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:41", updated_at: "2010-04-04 19:50:41"&gt;, #&lt;Movie id: 14, title: "The Terminator", production_year: 1984, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 15, title: "Terminator 2", production_year: 1992, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;, #&lt;Movie id: 16, title: "Terminator Salvation", production_year: 2009, duration: nil, plot: nil, rating: nil, created_at: "2010-04-04 19:50:50", updated_at: "2010-04-04 19:50:50"&gt;] 
+ruby-1.9.1-p378 &gt;</pre></div></td></tr></div></div></div></div></div></div><div class="section" title="3.9.5. Einen Datensatz löschen" id="datensatz-loeschen"><div class="titlepage"><div><div><h3 class="title">3.9.5. Einen Datensatz löschen</h3></div></div></div><div class="para">Es gibt die Methoden <code class="methodname">delete</code> und
+      <code class="methodname">destroy</code>, um Datensätze zu löschen.</div><div class="section" title="3.9.5.1. delete"><div class="titlepage"><div><div><h4 class="title">3.9.5.1. delete</h4></div></div></div><div class="para">Mit delete können Sie einen Datensatz löschen. Dabei werden
+        allerdings keine Abhängigkeiten zu anderen Datensätzen beachtet.
+        Delete löscht also nur die eine Zeile in der Datenbank und sonst
+        nichts.<div class="note"><h2>Anmerkung</h2><div class="para">Für unseren jetzigen Kenntnisstand sind solche Abhänigkeiten
+            noch egal, aber in späteren Kapiteln werden wir verschiedene
+            Tabellen mit einander verknüpfen und dann wird es entsprechende
+            Abhängigkeiten geben.</div></div><div class="important"><h2>Wichtig</h2><div class="para">Die Instanz wird nach dem Löschen des Datenbankfeldes frozen
+            (eingefroren). Sie ist also noch da, kann aber nicht verändert
+            werden.</div></div></div><div class="para">Beispiel:<pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.find_by_title('Hancock')</strong></span>
+ =&gt; #&lt;Movie id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
+ruby-1.9.1-p378 &gt; <span class="command"><strong>hancock = Movie.find_by_title('Hancock')</strong></span>
+ =&gt; #&lt;Movie id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
+ruby-1.9.1-p378 &gt; <span class="command"><strong>hancock.delete</strong></span>      # Die Zeile in der DB wird geloescht. Siehe Log.
+ =&gt; #&lt;Movie id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
+ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.find_by_title('Hancock')</strong></span>
+ =&gt; nil                               # Eine Suche bringt kein Ergebnis mehr.
+ruby-1.9.1-p378 &gt; <span class="command"><strong>hancock</strong></span>             
+ =&gt; #&lt;Movie id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
+ruby-1.9.1-p378 &gt; <span class="command"><strong>hancock.frozen?</strong></span>     # Die Instanz ist frozen.
+ =&gt; true 
+ruby-1.9.1-p378 &gt;</pre></div></div><div class="section" title="3.9.5.2. destroy"><div class="titlepage"><div><div><h4 class="title">3.9.5.2. destroy</h4></div></div></div><div class="para">Mit <code class="methodname">destroy</code> können Sie einen Datensatz
+        löschen und dabei werden auch evt. vorhandene Abhängigkeiten beachtet
+        (solche Abhängikeiten betrachten wir später). Vereinfacht kann man
+        sagen: "Lieber destroy nehmen, das ist sicherer, weil das Rails-System
+        dann mehr mitdenkt."<div class="important"><h2>Wichtig</h2><div class="para">Die Instanz wird nach dem Löschen des Datenbankfeldes frozen
+            (eingefroren). Sie ist also noch da, kann aber nicht verändert
+            werden.</div></div></div><div class="para">Beispiel:<pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.find_by_title('The Dark Knight')</strong></span>
+ =&gt; #&lt;Movie id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
+ruby-1.9.1-p378 &gt; <span class="command"><strong>dark_night = Movie.find_by_title('The Dark Knight')</strong></span>
+ =&gt; #&lt;Movie id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
+ruby-1.9.1-p378 &gt; <span class="command"><strong>dark_night.destroy</strong></span>
+ =&gt; #&lt;Movie id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
+ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.find_by_title('The Dark Knight')</strong></span>
+ =&gt; nil 
+ruby-1.9.1-p378 &gt; <span class="command"><strong>dark_night</strong></span>
+ =&gt; #&lt;Movie id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
+ruby-1.9.1-p378 &gt; <span class="command"><strong>dark_night.frozen?</strong></span>
+ =&gt; true 
+ruby-1.9.1-p378 &gt; </pre></div></div></div><div class="section" title="3.9.6. Einen Datensatz editieren" id="datensatz-editieren"><div class="titlepage"><div><div><h3 class="title">3.9.6. Einen Datensatz editieren</h3></div></div></div><div class="para">Das Verändern eines Datensatzes erfolgt in zwei
+      Schritten:<div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><div class="para">Suche des Datensatzes und erstellen einer entsprechenden
+            Instanz.</div></li><li class="listitem"><div class="para">Verändern der Werte.</div></li><li class="listitem"><div class="para">Abspeichern des Datensatzes mit der Methode
+            <code class="methodname">save</code>.</div></li></ol></div></div><div class="para">Beispiel:<pre class="screen">ruby-1.9.1-p378 &gt; <span class="command"><strong>iron_man = Movie.find_by_title('Iron Man')</strong></span>
+ =&gt; #&lt;Movie id: 12, title: "Iron Man", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
+ruby-1.9.1-p378 &gt; <span class="command"><strong>iron_man.duration = 126</strong></span>
+ =&gt; 126 
+ruby-1.9.1-p378 &gt; <span class="command"><strong>iron_man.save</strong></span>
+ =&gt; true 
+ruby-1.9.1-p378 &gt; <span class="command"><strong>Movie.find_by_title('Iron Man')</strong></span>
+ =&gt; #&lt;Movie id: 12, title: "Iron Man", production_year: 2008, duration: 126, plot: nil, rating: 5, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:52:27"&gt; 
+ruby-1.9.1-p378 &gt;</pre></div><div class="section" title="3.9.6.1. Locking"><div class="titlepage"><div><div><h4 class="title">3.9.6.1. Locking</h4></div></div></div><div class="para">Per Default benutzt Rails Optimistisches Locking der Datensätze.
+        Dies kann aber umgeschaltet werden. Da für die meisten User
+        Optimistisches Locking optimal ist und viele vor diesem Absatz nicht
+        mal über das Problem nachgedacht haben, werde ich nicht weiter drauf
+        eingehen, sondern auf die ri Hilfe verweisen. Wer pessimistisches
+        Locking benötigt, der findet dort die notwendigen Schalter.</div><div class="para"><pre class="screen">sw@debian:~/dvd-sammlung$ <span class="command"><strong>ri ActiveRecord::Locking::Optimistic</strong></span>
+------------------------------- Class: ActiveRecord::Locking::Optimistic
+
+What is Optimistic Locking
+--------------------------
+
+     Optimistic locking allows multiple users to access the same record
+     for edits, and assumes a minimum of conflicts with the data. It
+     does this by checking whether another process has made changes to a
+     record since it was opened, an ActiveRecord::StaleObjectError is
+     thrown if that has occurred and the update is ignored.
+
+     Check out ActiveRecord::Locking::Pessimistic for an alternative.
+
+
+Usage
+-----
+
+     Active Records support optimistic locking if the field
+     +lock_version+ is present. Each update to the record increments the
+     lock_version column and the locking facilities ensure that records
+     instantiated twice will let the last one saved raise a
+     StaleObjectError if the first was also updated. Example:
+
+       p1 = Person.find(1)
+       p2 = Person.find(1)
+     
+       p1.first_name = "Michael"
+       p1.save
+     
+       p2.first_name = "should fail"
+       p2.save # Raises a ActiveRecord::StaleObjectError
+
+     You're then responsible for dealing with the conflict by rescuing
+     the exception and either rolling back, merging, or otherwise apply
+     the business logic needed to resolve the conflict.
+
+     You must ensure that your database schema defaults the lock_version
+     column to 0.
+
+     This behavior can be turned off by setting
+     +ActiveRecord::Base.lock_optimistically = false+. To override the
+     name of the lock_version column, invoke the +set_locking_column+
+     method. This method uses the same syntax as +set_table_name+
+
+------------------------------------------------------------------------
+sw@debian:~/dvd-sammlung$</pre></div></div></div></div><ul class="docnav bottom"><li class="previous"><a accesskey="p" href="scaffolding.html"><strong>Zurück</strong>3.8. Scaffolding</a></li><li class="up"><a accesskey="u" href="#"><strong>Nach oben</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Zum Anfang</strong></a></li><li class="next"><a accesskey="n" href="workflow-in-rails.html"><strong>Weiter</strong>3.10. MVC-Workflow innerhalb
+    Rails</a></li></ul></div><div class="clear"></div></div></div></body></html>

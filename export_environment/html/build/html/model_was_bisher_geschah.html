@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>4.1. Was bisher geschah</title><link rel="stylesheet" href="./default.css" type="text/css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta name="package" content="" /><link rel="home" href="index.html" title="Ruby on Rails 3.0" /><link rel="up" href="model.html" title="Kapitel 4. Model - Das M in MVC." /><link rel="prev" href="model.html" title="Kapitel 4. Model - Das M in MVC." /><link rel="next" href="model_orientierung.html" title="4.2. Orientierung" /></head><body id="your-body"><div id="content"><div id="content-inner"><div id="leftcol" class="sidebar"><ul class="breadcrumbs"><li class="breadcrumb-link" style="margin-left: 0em"><a href="index.html">Ruby on Rails 3.0</a></li><li class="breadcrumb-link breadcrumb-bullet" style="margin-left: 0.8em"><a href="model.html">Model - Das M in MVC.</a></li><li class="breadcrumb-node breadcrumb-last breadcrumb-bullet" style="margin-left: 1.6em"><a href="model_was_bisher_geschah.html">Was bisher geschah</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="model_was_bisher_geschah.html#id3301820">Unser Beispielprojekt: Eine Filmdatenbank</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="model_was_bisher_geschah.html#model_seed_rb">Beispieldaten mit seed.rb
+      einspielen</a></li></ul><div id="textsize"><span class="textts"> Change Text Size</span><br /><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='13px'"><span class="plusts" style="font-size: small;">+</span></a><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='15px'"><span class="plusts" style="font-size: large;">+</span></a><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='17px'"><span class="plusts" style="font-size: x-large;">+</span></a></div></div><div id="rightcol" class="sidebar"></div><div id="maincol"><ul class="docnav top"><li class="previous"><a accesskey="p" href="model.html"><strong>Zurück</strong></a></li><li class="next"><a accesskey="n" href="model_orientierung.html"><strong>Weiter</strong></a></li></ul><div class="section" title="4.1. Was bisher geschah" id="model_was_bisher_geschah"><div class="titlepage"><div><div><h2 class="title">4.1. Was bisher geschah</h2></div></div></div><div class="para">Um sicher zu stellen, das wir alle vom gleichen reden (für den Fall
+    das Sie gezielt dieses Kapitel aufschlagen), erstellen wir gerade mal im
+    Schnelldurchgang eine frische Applikation. Für alle die gerade erst <a class="xref" href="erste_schritte_mit_rails.html" title="Kapitel 3. Erste Schritte mit Rails">Kapitel 3, <i>Erste Schritte mit
+  Rails</i></a> durchgearbeitet haben: Das haben Sie
+    schon alles. Für alle anderen: Einfach das Kochrezept abtippen.</div><div class="section" title="4.1.1. Unser Beispielprojekt: Eine Filmdatenbank"><div class="titlepage"><div><div><h3 class="title">4.1.1. Unser Beispielprojekt: Eine Filmdatenbank</h3></div></div></div><div class="para">Wir legen das Rails-Projekt <code class="code">movie-app</code> an:<pre class="screen">stefan@swmbp 0 head- test$ <span class="command"><strong>rails movie-app</strong></span>
+      create  
+      create  README
+      create  .gitignore
+      create  Rakefile
+      create  config.ru
+      create  Gemfile
+      create  app
+      create  app/controllers/application_controller.rb
+      create  app/helpers/application_helper.rb
+      create  app/models
+      create  app/views/layouts
+      create  config
+      create  config/routes.rb
+      create  config/application.rb
+
+      [...]
+
+      create  test/functional
+      create  test/integration
+      create  test/unit
+      create  tmp
+      create  tmp/sessions
+      create  tmp/sockets
+      create  tmp/cache
+      create  tmp/pids
+      create  vendor/plugins
+      create  vendor/plugins/.gitkeep
+stefan@swmbp 0 head- test$</pre></div><div class="para">Jetzt noch mit Scaffold das Grundgerüst für dieses Kapitel
+      erstellen:<pre class="screen">stefan@swmbp 0 head- test$ <span class="command"><strong>cd movie-app</strong></span>
+stefan@swmbp 0 head- movie-app$ <span class="command"><strong>rails generate scaffold movie title:string production_year:integer duration:integer plot:text rating:integer</strong></span>
+      invoke  active_record
+      create    db/migrate/20100423081205_create_movies.rb
+      create    app/models/movie.rb
+      invoke    test_unit
+      create      test/unit/movie_test.rb
+      create      test/fixtures/movies.yml
+       route  resources :movies
+      invoke  scaffold_controller
+      create    app/controllers/movies_controller.rb
+      invoke    erb
+      create      app/views/movies
+      create      app/views/movies/index.html.erb
+      create      app/views/movies/edit.html.erb
+      create      app/views/movies/show.html.erb
+      create      app/views/movies/new.html.erb
+      create      app/views/movies/_form.html.erb
+      create      app/views/layouts/movies.html.erb
+      invoke    test_unit
+      create      test/functional/movies_controller_test.rb
+      invoke    helper
+      create      app/helpers/movies_helper.rb
+      invoke      test_unit
+      create        test/unit/helpers/movies_helper_test.rb
+      invoke  stylesheets
+      create    public/stylesheets/scaffold.css
+stefan@swmbp 0 head- movie-app$</pre></div><div class="para">Zum Schluss legen wir die Datenbank im Entwicklungssystem
+      an:<pre class="screen">stefan@swmbp 0 head- movie-app$ <span class="command"><strong>rake db:migrate</strong></span>
+(in /Users/stefan/Development/test/movie-app)
+==  CreateMovies: migrating ===================================================
+-- create_table(:movies)
+   -&gt; 0.0013s
+==  CreateMovies: migrated (0.0014s) ==========================================
+
+stefan@swmbp 0 head- movie-app$</pre></div></div><div class="section" title="4.1.2. Beispieldaten mit seed.rb einspielen" id="model_seed_rb"><div class="titlepage"><div><div><h3 class="title">4.1.2. Beispieldaten mit seed.rb
+      einspielen</h3></div></div></div><div class="para">Um gleich mit der Arbeit anfangen zu können, betanken wir unsere
+      Filmdatenbank mit ein paar Beispielfilmen.</div><div class="para">Bitte schreiben Sie mit dem Editor Ihrer Wahl den folgenden Inhalt
+      in die <code class="filename">db/seeds.rb</code> Datei:<pre class="programlisting"># This file should contain all the record creation needed to seed the database with its default values.
+# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
+#
+# Examples:
+#   
+#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
+#   Major.create(:name =&gt; 'Daley', :city =&gt; cities.first)
+
+Movie.create({ :title =&gt; 'The Terminator', :production_year =&gt; 1984 })
+Movie.create({ :title =&gt; 'Terminator 2', :production_year =&gt; 1992 })
+Movie.create({ :title =&gt; 'Terminator Salvation', :production_year =&gt; 2009 })
+Movie.create({ :title =&gt; 'Rain Man', :production_year =&gt; 1988, :rating =&gt; 5 })
+Movie.create({ :title =&gt; 'War of the Worlds', :production_year =&gt; 2005, :rating =&gt; 4 })
+Movie.create({ :title =&gt; 'Collateral', :production_year =&gt; 2004, :rating =&gt; 5})
+Movie.create({ :title =&gt; 'Miami Vice', :production_year =&gt; 2006, :rating =&gt; 5})
+Movie.create({ :title =&gt; 'Hancock', :production_year =&gt; 2008, :rating =&gt; 4})
+Movie.create({ :title =&gt; 'The Aviator', :production_year =&gt; 2004, :rating =&gt; 4})
+Movie.create({ :title =&gt; 'Some Like It Hot', :production_year =&gt; 1959, :rating =&gt; 5})
+Movie.create({ :title =&gt; 'W.', :production_year =&gt; 2008, :rating =&gt; 4})
+Movie.create({ :title =&gt; 'Iron Man', :production_year =&gt; 2008, :rating =&gt; 5})
+Movie.create({ :title =&gt; 'The Dark Knight', :production_year =&gt; 2008, :rating =&gt; 5})
+</pre></div><div class="para">Danach befühlen wir unser Entwicklungssystem mit diesen
+      Daten:<pre class="screen">stefan@swmbp 0 head- movie-app$ <span class="command"><strong>rake db:seed</strong></span>
+(in /Users/stefan/Development/test/movie-app)
+stefan@swmbp 0 head- movie-app$</pre></div><div class="para">Fertig. Jetzt haben wir ein gutes Grundgerüst für dieses
+      Kapitel.</div></div></div><ul class="docnav bottom"><li class="previous"><a accesskey="p" href="model.html"><strong>Zurück</strong>Kapitel 4. Model - Das M in MVC.</a></li><li class="up"><a accesskey="u" href="#"><strong>Nach oben</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Zum Anfang</strong></a></li><li class="next"><a accesskey="n" href="model_orientierung.html"><strong>Weiter</strong>4.2. Orientierung</a></li></ul></div><div class="clear"></div></div></div></body></html>

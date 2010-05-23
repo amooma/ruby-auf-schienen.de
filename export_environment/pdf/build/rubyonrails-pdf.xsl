@@ -2,17 +2,20 @@
 <xsl:stylesheet  
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
     xmlns:fo="http://www.w3.org/1999/XSL/Format"
-	xmlns:d="http://docbook.org/ns/docbook" 
-     exclude-result-prefixes="d"
+	xmlns:d="http://docbook.org/ns/docbook"
+	xmlns:exsl="http://exslt.org/common"
+    extension-element-prefixes="exsl"
+    exclude-result-prefixes="exsl d"
     version="1.0"> 
 
-<xsl:import href="docbook-xsl-ns-1.75.2/fo/docbook.xsl"/> 
-<xsl:import href="docbook-xsl-ns-1.75.2/fo/graphics.xsl"/> 
+
+<xsl:import href="deps.xsl"/>
+<xsl:output method="xml" indent="no"/>
 <xsl:param name="use.extensions" select="1"/>
 <xsl:param name="fop1.extensions" select="1"/>
 <xsl:param name="draft.mode">no</xsl:param>
 <xsl:param name="hyphenate">true</xsl:param>
-<xsl:param name="l10n.gentext.default.language">de</xsl:param>
+<xsl:param name="l10n.gentext.default.language">DE</xsl:param>
 <xsl:param name="ulink.footnotes" select="1"/>
 <xsl:param name="ulink.show" select="1"/>
 <xsl:param name="table.footnote.number.format" select="'1'"/>
@@ -20,6 +23,7 @@
 <xsl:param name="highlight.source" select="1"/>
 <xsl:param name="line-height" select="1.3"/>
 <xsl:param name="qandadiv.autolabel" select="0"/>
+<xsl:param name="keep.relative.image.uris" select="1"/>
 
 <!-- Format Variable Lists as Blocks (prevents horizontal overflow). -->
 <xsl:param name="variablelist.as.blocks">1</xsl:param>
@@ -77,7 +81,7 @@
 <!-- Admonitions -->
 <xsl:param name="admon.graphics" select="1"/>
 <xsl:param name="admon.graphics.extension">.svg</xsl:param>
-<xsl:param  name="admon.graphics.path">docbook-xsl-ns-1.75.2/images/</xsl:param>
+<!--<xsl:param  name="admon.graphics.path">docbook-xsl-ns-1.75.2/images/</xsl:param>-->
 <xsl:attribute-set name="admonition.title.properties">
 	<xsl:attribute name="font-size">13pt</xsl:attribute>
 	<xsl:attribute name="color"><xsl:text>#000033</xsl:text></xsl:attribute>
@@ -159,7 +163,7 @@
                    use-attribute-sets="verbatim.properties monospace.properties">
   <xsl:attribute name="text-align">start</xsl:attribute>
   <xsl:attribute name="wrap-option">wrap</xsl:attribute>
-  <xsl:attribute name="hyphenation-character">\</xsl:attribute>
+  <xsl:attribute name="hyphenation-character">-</xsl:attribute>
 </xsl:attribute-set>
 
 
@@ -167,7 +171,7 @@
 <xsl:param name="shade.verbatim" select="1"/>
 <xsl:attribute-set name="shade.verbatim.style">
   <xsl:attribute name="wrap-option">wrap</xsl:attribute>
-  <xsl:attribute name="hyphenation-character">\</xsl:attribute>
+  <!--<xsl:attribute name="hyphenation-character">\</xsl:attribute>-->
   <xsl:attribute name="background-color">
 	<xsl:choose>
 		<xsl:when test="ancestor::note or ancestor::caution or ancestor::important or ancestor::warning or ancestor::tip">
@@ -494,6 +498,131 @@ Version:1.72
       <xsl:apply-templates select="*[local-name(.)!='label']"/>
     </fo:list-item-body>
   </fo:list-item>
+</xsl:template>
+
+<xsl:template match="d:programlisting|d:screen|d:synopsis">
+  <xsl:param name="suppress-numbers" select="'0'"/>
+  <xsl:variable name="id"><xsl:call-template name="object.id"/></xsl:variable>
+
+  <xsl:variable name="content">
+    <xsl:choose>
+      <xsl:when test="$suppress-numbers = '0'
+                      and @linenumbering = 'numbered'
+                      and $use.extensions != '0'
+                      and $linenumbering.extension != '0'">
+        <xsl:call-template name="number.rtf.lines">
+          <xsl:with-param name="rtf">
+            <xsl:choose>
+              <xsl:when test="$highlight.source != 0">
+                <xsl:call-template name="apply-highlighting"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:apply-templates/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$highlight.source != 0">
+            <xsl:call-template name="apply-highlighting"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <xsl:variable name="block.content">
+    <xsl:choose>
+      <xsl:when test="$shade.verbatim != 0">
+        <fo:block id="{$id}"
+             xsl:use-attribute-sets="monospace.verbatim.properties shade.verbatim.style">
+          <xsl:choose>
+            <xsl:when test="$hyphenate.verbatim != 0 and 
+                            $exsl.node.set.available != 0">
+              <xsl:apply-templates select="exsl:node-set($content)" 
+                                   mode="hyphenate.verbatim"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:apply-templates select="exsl:node-set($content)" 
+mode="hyphenate"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </fo:block>
+      </xsl:when>
+      <xsl:otherwise>
+        <fo:block id="{$id}"
+                  xsl:use-attribute-sets="monospace.verbatim.properties">
+          <xsl:choose>
+            <xsl:when test="$hyphenate.verbatim != 0 and 
+                            $exsl.node.set.available != 0">
+              <xsl:apply-templates select="exsl:node-set($content)" 
+                                   mode="hyphenate.verbatim"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:copy-of select="$content"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </fo:block>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <xsl:choose>
+    <!-- Need a block-container for these features -->
+    <xsl:when test="@width != '' or
+                    (self::d:programlisting and
+                    starts-with($writing.mode, 'rl'))">
+      <fo:block-container start-indent="0pt" end-indent="0pt">
+        <xsl:if test="@width != ''">
+          <xsl:attribute name="width">
+            <xsl:value-of select="concat(@width, '*', $monospace.verbatim.font.width)"/>
+          </xsl:attribute>
+        </xsl:if>
+        <!-- All known program code is left-to-right -->
+        <xsl:if test="self::d:programlisting and
+                      starts-with($writing.mode, 'rl')">
+          <xsl:attribute name="writing-mode">lr-tb</xsl:attribute>
+        </xsl:if>
+        <xsl:copy-of select="$block.content"/>
+      </fo:block-container>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:copy-of select="$block.content"/>
+    </xsl:otherwise>
+  </xsl:choose>
+
+</xsl:template>
+
+
+<xsl:template match="text()" mode="hyphenate" priority="2">
+   <xsl:call-template name="string.subst">
+     <xsl:with-param name="string">
+       <xsl:call-template name="string.subst">
+         <xsl:with-param name="string">
+           <xsl:call-template name="string.subst">
+             <xsl:with-param name="string" select="."/>
+             <xsl:with-param name="target" select="'****'"/>
+             <xsl:with-param name="replacement" select="'****&#x200B;'"/>
+           </xsl:call-template>
+         </xsl:with-param>
+         <xsl:with-param name="target" select="'mmmm'"/>
+         <xsl:with-param name="replacement" select="'mmmm&#x200B;'"/>
+       </xsl:call-template>
+     </xsl:with-param>
+     <xsl:with-param name="target" select="':'"/>
+     <xsl:with-param name="replacement" select="'&#x200B;:'"/>
+   </xsl:call-template>
+</xsl:template>
+
+<xsl:template match="node()|@*" mode="hyphenate">
+   <xsl:copy>
+     <xsl:apply-templates select="node()|@*" mode="hyphenate"/>
+   </xsl:copy>
 </xsl:template>
 
 

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>3.7. Flash Nachrichten</title><link rel="stylesheet" href="./default.css" type="text/css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta name="package" content="" /><link rel="home" href="index.html" title="Ruby on Rails 3.0" /><link rel="up" href="erste_schritte_mit_rails.html" title="Kapitel 3. Erste Schritte mit Rails" /><link rel="prev" href="redirects.html" title="3.6. Redirects" /><link rel="next" href="scaffolding.html" title="3.8. Scaffolding" /></head><body id="your-body"><div id="content"><div id="content-inner"><div id="leftcol" class="sidebar"><ul class="breadcrumbs"><li class="breadcrumb-link" style="margin-left: 0em"><a href="index.html">Ruby on Rails 3.0</a></li><li class="breadcrumb-link breadcrumb-bullet" style="margin-left: 0.8em"><a href="erste_schritte_mit_rails.html">Erste Schritte mit
+  Rails</a></li><li class="breadcrumb-node breadcrumb-last breadcrumb-bullet" style="margin-left: 1.6em"><a href="flash.html">Flash Nachrichten</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="flash.html#verschiedene_arten_von_flash_nachrichten">Verschiedene
+      Arten von Flash Nachrichten</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="flash.html#neue_flash_redirect_schreibweise">Kürzere
+      Schreibweise innerhalb eines Redirects</a></li></ul><div id="textsize"><span class="textts"> Change Text Size</span><br /><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='13px'"><span class="plusts" style="font-size: small;">+</span></a><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='15px'"><span class="plusts" style="font-size: large;">+</span></a><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='17px'"><span class="plusts" style="font-size: x-large;">+</span></a></div></div><div id="rightcol" class="sidebar"></div><div id="maincol"><ul class="docnav top"><li class="previous"><a accesskey="p" href="redirects.html"><strong>Zurück</strong></a></li><li class="next"><a accesskey="n" href="scaffolding.html"><strong>Weiter</strong></a></li></ul><div class="section" title="3.7. Flash Nachrichten" id="flash"><div class="titlepage"><div><div><h2 class="title">3.7. Flash Nachrichten</h2></div></div></div><div class="para">"Der Name "Flash Message" oder "Flash Nachricht" ist meiner Meinung
+    nach denkbar ungeeignet gewählt worden. Mit dem Wort "Flash" assoziiert
+    fast jeder mehr oder weniger bunte Webseiten, die mit dem
+    Adobe-Flash-Plug-in realisiert wurden. Aber in Rails sind Flash
+    Nachrichten etwas ganz anderes. Sie sind Nachrichten, die über ein
+    Redirect auf eine andere Seite weiter geleitet werden können.</div><div class="para">Flash Nachrichten sind quasi gute Freunde von Redirects. Nicht
+    selten arbeiten beide ihm Team, um dem User ein Feedback über eine gerade
+    vollzogene Aktion zu geben. Als Beispiel erweitern wir die in <a class="xref" href="redirects.html" title="3.6. Redirects">Abschnitt 3.6, „Redirects“</a> erstellten
+    <code class="filename">app/controllers/example_controller.rb</code> wie
+    folgt:<pre class="programlisting">class ExampleController &lt; ApplicationController
+  def test
+    <span class="emphasis"><em>flash[:notice] = "Ein sinnfreies Beispiel."</em></span>
+    redirect_to :action =&gt; "shopping_list"
+  end
+  
+  def shopping_list
+  end
+
+end
+</pre></div><div class="para">Mit "<code class="code">flash[:notice] = "Ein sinnfreies Beispiel."</code>"
+    übergeben wir eine Flash Message mit dem Status "<code class="code">notice</code>" an
+    den nächsten View (in diesem Fall an
+    <code class="methodname">shopping_list</code>).</div><div class="para">Merkwürdigerweise verändert sich aber nichts beim erneuten Aufruf
+    von <code class="uri"><a class="uri" href="http://0.0.0.0:3000/example/test" target="">http://0.0.0.0:3000/example/test</a></code>.
+    Der Grund dafür ist einfach: Wir haben zwar eine Flash Message generiert,
+    aber im View wird nirgends überprüft, ob es Flash Messages gibt. Der
+    einfachste Weg evt. existierende Flash Nachrichten immer anzuzeigen ist
+    die folgende Erweiterung der
+    <code class="filename">app/views/layouts/application.html.erb</code>
+    Datei:<pre class="programlisting">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Unsere Filmdatenbank&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+<span class="emphasis"><em>&lt;p class="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
+&lt;p class="alert"&gt;&lt;%= alert %&gt;&lt;/p&gt;</em></span>
+
+&lt;%= yield %&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</pre></div><div class="para">Wenn wir jetzt noch einmal die Seite <code class="uri"><a class="uri" href="http://0.0.0.0:3000/example/test" target="">http://0.0.0.0:3000/example/test</a></code>
+    aufrufen, werden wir richtig an <code class="methodname">shopping_list</code>
+    redirected und bekommen am Kopf der Seite die Flash Nachricht
+    angezeigt:<div class="screenshot"><div class="mediaobject"><img src="screenshots/flash_example_shopping_list.jpg" width="500" /></div></div></div><div class="section" title="3.7.1. Verschiedene Arten von Flash Nachrichten" id="verschiedene_arten_von_flash_nachrichten"><div class="titlepage"><div><div><h3 class="title">3.7.1. Verschiedene
+      Arten von Flash Nachrichten</h3></div></div></div><div class="para">Per default werden die Arten "error", "notice" und "warning"
+      unterschieden. Allerdings kann man auch selber eine Kategorie erfinden
+      und diese später im View abfragen. Beim Arbeiten mit <a class="xref" href="scaffolding.html" title="3.8. Scaffolding">Abschnitt 3.8, „Scaffolding“</a> werden Sie Beispiele für die verschiedenen
+      Arten finden.</div></div><div class="section" title="3.7.2. Kürzere Schreibweise innerhalb eines Redirects" id="neue_flash_redirect_schreibweise"><div class="titlepage"><div><div><h3 class="title">3.7.2. Kürzere
+      Schreibweise innerhalb eines Redirects</h3></div></div></div><div class="para">Bis Rails 2.3.5 konnte man Flash Nachrichten nicht innerhalb eines
+      Redirect einbauen. Mit Rails 3.0 ist dies möglich. So können Sie unser
+      Beispiel von vorhin auch wie folgt schreiben: <pre class="programlisting">class ExampleController &lt; ApplicationController
+  def test
+    redirect_to :action =&gt; "shopping_list"<span class="emphasis"><em>, :flash =&gt; { :notice =&gt; "Ein sinnfreies Beispiel." }</em></span>
+  end
+  
+  def shopping_list
+  end
+
+end
+</pre></div></div></div><ul class="docnav bottom"><li class="previous"><a accesskey="p" href="redirects.html"><strong>Zurück</strong>3.6. Redirects</a></li><li class="up"><a accesskey="u" href="#"><strong>Nach oben</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Zum Anfang</strong></a></li><li class="next"><a accesskey="n" href="scaffolding.html"><strong>Weiter</strong>3.8. Scaffolding</a></li></ul></div><div class="clear"></div></div></div></body></html>

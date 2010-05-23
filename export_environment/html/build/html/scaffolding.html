@@ -1,0 +1,714 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>3.8. Scaffolding</title><link rel="stylesheet" href="./default.css" type="text/css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta name="package" content="" /><link rel="home" href="index.html" title="Ruby on Rails 3.0" /><link rel="up" href="erste_schritte_mit_rails.html" title="Kapitel 3. Erste Schritte mit Rails" /><link rel="prev" href="flash.html" title="3.7. Flash Nachrichten" /><link rel="next" href="die_console.html" title="3.9. Die Console" /></head><body id="your-body"><div id="content"><div id="content-inner"><div id="leftcol" class="sidebar"><ul class="breadcrumbs"><li class="breadcrumb-link" style="margin-left: 0em"><a href="index.html">Ruby on Rails 3.0</a></li><li class="breadcrumb-link breadcrumb-bullet" style="margin-left: 0.8em"><a href="erste_schritte_mit_rails.html">Erste Schritte mit
+  Rails</a></li><li class="breadcrumb-node breadcrumb-last breadcrumb-bullet" style="margin-left: 1.6em"><a href="scaffolding.html">Scaffolding</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="scaffolding.html#activerecord">ActiveRecord</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="scaffolding.html#rails_generate_scaffold">rails generate
+      scaffold</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="scaffolding.html#migration">Migrationen</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="scaffolding.html#restful_datenbankzugriff_per_webbrowser">RESTful
+      Datenbankzugriff per Webbrowser</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="scaffolding.html#default_css_im_scaffolding">Default CSS- und
+      HTML-Layout im Scaffolding</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="scaffolding.html#routen">Routen</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="scaffolding.html#restful_mit_xml">RESTful Datenbankzugriff per XML
+      und curl</a></li></ul><div id="textsize"><span class="textts"> Change Text Size</span><br /><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='13px'"><span class="plusts" style="font-size: small;">+</span></a><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='15px'"><span class="plusts" style="font-size: large;">+</span></a><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='17px'"><span class="plusts" style="font-size: x-large;">+</span></a></div></div><div id="rightcol" class="sidebar"></div><div id="maincol"><ul class="docnav top"><li class="previous"><a accesskey="p" href="flash.html"><strong>Zurück</strong></a></li><li class="next"><a accesskey="n" href="die_console.html"><strong>Weiter</strong></a></li></ul><div class="section" title="3.8. Scaffolding" id="scaffolding"><div class="titlepage"><div><div><h2 class="title">3.8. Scaffolding</h2></div></div></div><div class="para">Die typischen "Ich zeige Euch mal Ruby on Rails in 15 Minuten"
+    Videos im Internet arbeiten alle mit der Magie des Scaffolding.
+    Scaffolding steht dabei für ein auf den ersten Blick sehr mächtiges
+    Grundgerüst mit einer fertigen GUI zum Arbeiten mit einer
+    Datenbanktabelle. Leider ist dieses Vorgehen meistens kontraproduktiv,
+    weil man zwar sehr schnell dieses Grundgerüst stehen hat, aber danach erst
+    mal im Regen steht. Das alte "ohne Ruby-Grundkenntnisse kommt man nicht
+    weiter"-Problem schlägt zu. Aber Sie haben sich ja schon das <a class="xref" href="ruby-grundlagen.html" title="Kapitel 2. Ruby Grundlagen">Kapitel 2, <i>Ruby Grundlagen</i></a> gekämpft. Falls nicht, sollten Sie es jetzt
+    nachholen.</div><div class="section" title="3.8.1. ActiveRecord" id="activerecord"><div class="titlepage"><div><div><h3 class="title">3.8.1. ActiveRecord</h3></div></div></div><div class="para">Ein ganz wichtiges Element für Rails ist ActiveRecord. Es
+      übernimmt für den Programmierer transparent die Arbeit mit der
+      SQL-Datenbank und stellt Tabellen und einzelne Tabellen-Zeilen als
+      Objekte zur Verfügung. Um das zu ermöglichen hat man sich auf bestimmte
+      Namenskonventionen geeinigt. In früheren Rails-Versionen musste man die
+      Datenbank von Hand anhand dieser Konventionen anlegen. ActiveRecord hat
+      dann die Felder an bestimmten Namensmerkmalen erkannt. Heute gibt es in
+      Rails dazu eigene, noch dazu äusserst praktische Tools. Denn Sie wollen
+      ja nicht nur jetzt eine Datenbank für Ihre Entwicklungs-Umgebung
+      einrichten, sondern benötigen später auch ein Tool, das Ihre
+      Produktions-Datenbank Schritt für Schritt mitzieht.</div><div class="para">Wir wollen Filme katalogisieren. Dazu benötigen wir mindestens
+      folgende Datenbankfelder:<div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><div class="para"><code class="varname">title:string</code> - Titel oder Name des
+            Films</div></li><li class="listitem"><div class="para"><code class="varname">production_year:integer</code> -
+            Produktionsjahr</div></li><li class="listitem"><div class="para"><code class="varname">duration:integer</code> - Dauer (in
+            Minuten)</div></li><li class="listitem"><div class="para"><code class="varname">plot:text</code> - Story des Films</div></li><li class="listitem"><div class="para"><code class="varname">rating:integer</code> - Bewertung (als Ganzahl
+            von 1 bis 5 Sterne)</div></li></ul></div></div><div class="section" title="3.8.1.1. Warum alle Feldnamen, Methoden und Klassen auf Englisch?"><div class="titlepage"><div><div><h4 class="title">3.8.1.1. Warum alle Feldnamen, Methoden und Klassen auf
+        Englisch?</h4></div></div></div><div class="para">Ganz tief im Herzen liebt Rails die englische Sprache. Damit
+        muss man sich abfinden und versuchen diese Liebe zu übernehmen. So
+        verwenden sehr viele Mechanismen automagisch Plural oder Singular von
+        Englischen Wörtern. Wenn man sich damit anfreundet Datenbankfelder und
+        Datenbanken an sich mit englischen Wörter zu benennen, dann kann man
+        die ganze Macht dieser Magie ausnutzen.</div></div><div class="section" title="3.8.1.2. Ist das jetzt ein Model (laut der MVC-Idee)?" id="dvd-ist-das-ein-model"><div class="titlepage"><div><div><h4 class="title">3.8.1.2. Ist das jetzt ein Model (laut der MVC-Idee)?</h4></div></div></div><div class="para">Kurze Antwort: Ja. Wir müssen dem Model nur noch einen Namen
+        geben. "<code class="varname">movie</code>" macht wohl im Englischen am meisten
+        Sinn.</div></div></div><div class="section" title="3.8.2. rails generate scaffold" id="rails_generate_scaffold"><div class="titlepage"><div><div><h3 class="title">3.8.2. rails generate
+      scaffold</h3></div></div></div><div class="para">Mit dem Rails-Skript-Aufruf <span class="command"><strong>rails generate
+      scaffold</strong></span> kann man fertige Code generieren. Wer (wie ich) gerne
+      mal vergisst wie das Skript aufgerufen werden muss, der gibt einfach
+      <code class="filename">rails generate</code> ein und bekommt die folgende Hilfe
+      angezeigt:<pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>rails generate</strong></span>
+Usage: rails generate GENERATOR [args] [options]
+
+General options:
+  -h, [--help]     # Print generators options and usage
+  -p, [--pretend]  # Run but do not make any changes
+  -f, [--force]    # Overwrite files that already exist
+  -s, [--skip]     # Skip files that already exist
+  -q, [--quiet]    # Supress status output
+
+Please choose a generator below.
+
+Rails:
+  controller
+  generator
+  helper
+  integration_test
+  mailer
+  metal
+  migration
+  model
+  observer
+  performance_test
+  plugin
+  resource
+  scaffold
+  scaffold_controller
+  session_migration
+  stylesheets
+
+MacBook:movie-app sw$</pre></div><div class="para">Interessant ist für uns der Teil "Please choose a generator
+      below.". Wenn wir <em class="parameter"><code>scaffold</code></em> benutzen wollen und
+      dazu weitere Hilfe brauchen, dann geht dies wiederrum einfach mit der
+      eingebauten Hilfe:<pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>rails generate scaffold</strong></span>
+Usage:
+  rails generate scaffold NAME [field:type field:type] [options]
+
+Options:
+  -o, --orm=NAME                  # Orm to be invoked
+                                  # Default: active_record
+      [--force-plural]            # Forces the use of a plural ModelName
+      [--singleton]               # Supply to create a singleton controller
+  -c, --scaffold-controller=NAME  # Scaffold controller to be invoked
+                                  # Default: scaffold_controller
+  -y, [--stylesheets]             # Indicates when to generate stylesheets
+                                  # Default: true
+
+ActiveRecord options:
+      [--migration]            # Indicates when to generate migration
+                               # Default: true
+      [--timestamps]           # Indicates when to generate timestamps
+                               # Default: true
+      [--parent=PARENT]        # The parent class for the generated model
+  -t, [--test-framework=NAME]  # Test framework to be invoked
+                               # Default: test_unit
+
+TestUnit options:
+      [--fixture]                   # Indicates when to generate fixture
+                                    # Default: true
+  -r, [--fixture-replacement=NAME]  # Fixture replacement to be invoked
+
+ScaffoldController options:
+  -e, [--template-engine=NAME]  # Template engine to be invoked
+                                # Default: erb
+      [--helper]                # Indicates when to generate helper
+                                # Default: true
+
+Erb options:
+  [--layout]  # Indicates when to generate layout
+              # Default: true
+
+Runtime options:
+  -f, [--force]    # Overwrite files that already exist
+  -p, [--pretend]  # Run but do not make any changes
+  -q, [--quiet]    # Supress status output
+  -s, [--skip]     # Skip files that already exist
+
+Description:
+    Scaffolds an entire resource, from model and migration to controller and
+    views, along with a full test suite. The resource is ready to use as a
+    starting point for your RESTful, resource-oriented application.
+
+    Pass the name of the model (in singular form), either CamelCased or
+    under_scored, as the first argument, and an optional list of attribute
+    pairs.
+
+    Attribute pairs are field:type arguments specifying the
+    model's attributes. Timestamps are added by default, so you don't have to
+    specify them by hand as 'created_at:datetime updated_at:datetime'.
+
+    You don't have to think up every attribute up front, but it helps to
+    sketch out a few so you can start working with the resource immediately.
+
+    For example, 'scaffold post title:string body:text published:boolean'
+    gives you a model with those three attributes, a controller that handles
+    the create/show/update/destroy, forms to create and edit your posts, and
+    an index that lists them all, as well as a resources :posts
+    declaration in config/routes.rb.
+
+    If you want to remove all the generated files, run
+    'rails destroy scaffold ModelName'.
+
+Examples:
+    `rails generate scaffold post`
+    `rails generate scaffold post title:string body:text published:boolean`
+    `rails generate scaffold purchase order_id:integer amount:decimal`
+MacBook:movie-app sw$</pre></div><div class="para">Wir müssen also nach <span class="command"><strong>rails generate scaffold</strong></span>
+      den Namen des Models (bei uns "movie") und danach die Datenbankfelder
+      mit den entsprechenden Feldtypen angeben.</div><div class="para">Dann legen wir mal los:<pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>rails generate scaffold movie title:string production_year:integer duration:integer plot:text rating:integer</strong></span>
+      invoke  active_record
+      create    db/migrate/20100404113234_create_movies.rb
+      create    app/models/movie.rb
+      invoke    test_unit
+      create      test/unit/movie_test.rb
+      create      test/fixtures/movies.yml
+       route  resources :movies
+      invoke  scaffold_controller
+      create    app/controllers/movies_controller.rb
+      invoke    erb
+      create      app/views/movies
+      create      app/views/movies/index.html.erb
+      create      app/views/movies/edit.html.erb
+      create      app/views/movies/show.html.erb
+      create      app/views/movies/new.html.erb
+      create      app/views/movies/_form.html.erb
+      create      app/views/layouts/movies.html.erb
+      invoke    test_unit
+      create      test/functional/movies_controller_test.rb
+      invoke    helper
+      create      app/helpers/movies_helper.rb
+      invoke      test_unit
+      create        test/unit/helpers/movies_helper_test.rb
+      invoke  stylesheets
+      create    public/stylesheets/scaffold.css
+MacBook:movie-app sw$</pre>Und schon ist alles fertig. Allerdings ist in
+      der Datenbank noch keine entsprechende Tabelle angelegt.</div></div><div class="section" title="3.8.3. Migrationen" id="migration"><div class="titlepage"><div><div><h3 class="title">3.8.3. Migrationen</h3></div></div></div><div class="para"><span class="application">In der zweiten Ausgabezeile des Scaffoldings sehen
+      wir die Ausgabe:</span><pre class="screen">      create    db/migrate/20100404113234_create_movies.rb
+</pre></div><div class="para">In der Datei
+      <code class="filename">db/migrate/20100404113234_create_movies.rb</code> finden
+      sich die Anweisung, mit der die Datenbank erstellt (<code class="code">def
+      self.up</code>) und auch beim Roll-Back (<code class="code">def self.down</code>)
+      wieder gelöscht werden kann.<pre class="programlisting">class CreateMovies &lt; ActiveRecord::Migration
+  def self.up
+    create_table :movies do |t|
+      t.string :title
+      t.integer :production_year
+      t.integer :duration
+      t.text :plot
+      t.integer :rating
+
+      t.timestamps
+    end
+  end
+
+  def self.down
+    drop_table :movies
+  end
+end
+</pre></div><div class="para">Die in dieser Ruby-Datei angelegte Klasse
+      <code class="classname">CreateMovies</code> ist ein Kind der Klasse
+      <code class="classname">ActiveRecord::Migration</code> (siehe Zeile 1) und hat
+      zwei Methoden:<div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><div class="para"><code class="methodname">self.up</code> (Zeile 2). Wird aufgerufen,
+            wenn die Migration durchgeführt wird.</div></li><li class="listitem"><div class="para"><code class="methodname">self.down</code> (Zeile 14). Wird
+            aufgerufen, wenn für eine Migration ein Rollback durchgeführt
+            wird.</div></li></ul></div></div><div class="para">Die Migration (also das Anlegen der Datenbank) wird mit
+      <span class="command"><strong>rake db:migrate</strong></span> durchgeführt:<pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>rake db:migrate</strong></span>
+(in /Users/sw/Development/movie-app)
+==  CreateMovies: migrating ===================================================
+-- create_table(:movies)
+   -&gt; 0.0015s
+==  CreateMovies: migrated (0.0017s) ==========================================
+
+MacBook:movie-app sw$</pre></div><div class="para">Die Datenbank-Tabelle <code class="varname">movies</code> wird angelegt.
+      Dabei sehen wir, das Tabellen-Namen automatisch den Plural der Models
+      bekommen. Aber welche Datenbank wird überhaupt benutzt? Das wird in der
+      Konfigurationsdatei <code class="filename">config/database.yml</code>
+      definiert:<pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>cat -n config/database.yml</strong></span> 
+     1 # SQLite version 3.x
+     2 #   gem install sqlite3-ruby (not necessary on OS X Leopard)
+     3 development:
+     4   adapter: sqlite3
+     5   database: db/development.sqlite3
+     6   pool: 5
+     7   timeout: 5000
+     8 
+     9 # Warning: The database defined as "test" will be erased and
+    10 # re-generated from your development database when you run "rake".
+    11 # Do not set this db to the same as development or production.
+    12 test:
+    13   adapter: sqlite3
+    14   database: db/test.sqlite3
+    15   pool: 5
+    16   timeout: 5000
+    17 
+    18 production:
+    19   adapter: sqlite3
+    20   database: db/production.sqlite3
+    21   pool: 5
+    22   timeout: 5000
+MacBook:movie-app sw$</pre></div><div class="para">Dort werden drei verschiedene Datenbanken im YAML-Format (siehe
+      <code class="uri"><a class="uri" href="http://www.yaml.org/" target="">http://www.yaml.org/</a></code> bzw.
+      <code class="uri"><a class="uri" href="http://de.wikipedia.org/wiki/YAML" target="">http://de.wikipedia.org/wiki/YAML</a></code>)
+      definiert. Für uns wichtig ist erst mal nur die development-Datenbank
+      (Zeile 3 bis 7). Per default benutzt Rails dort
+      <span class="application">Sqlite3</span>. Sqlite3 mag nicht die richtige Wahl
+      für die Analyse der weltweit gesammelten Wetterdaten sein, aber für die
+      schnelle und unkompliziete Entwicklung von Rails-Anwendungen lernt man
+      sie schnell zu schätzen. In der Produktions-Umgebung kann man später
+      immer noch auf "grosse" Datenbanken wie MySQL umsteigen.<sup>[<a id="id3312264" href="#ftn.id3312264" class="footnote">8</a>]</sup></div><div class="para">Um Ihre Neugierde zu befriedigen, schauen wir uns kurz noch die
+      Datenbank mit dem Command-Line-Tool <span class="application">sqlite3</span>
+      an.<pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>sqlite3 db/development.sqlite3</strong></span> 
+SQLite version 3.6.12
+Enter ".help" for instructions
+Enter SQL statements terminated with a ";"
+sqlite&gt; <span class="command"><strong>.tables</strong></span>
+movies             schema_migrations
+sqlite&gt; <span class="command"><strong>.schema movies</strong></span>
+CREATE TABLE "movies" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar(255), "production_year" integer, "duration" integer, "plot" text, "rating" integer, "created_at" datetime, "updated_at" datetime);
+sqlite&gt; <span class="command"><strong>.quit</strong></span>
+MacBook:movie-app sw$</pre></div><div class="para">Das Anlegen der Tabelle mit <span class="command"><strong>rake db:migrate</strong></span>
+      wurde natürlich auch im <code class="filename">log/development.log</code>
+      eingetragen:<pre class="screen">  SQL (0.5ms)   SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+
+  SQL (0.1ms)   SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+  SQL (0.1ms)  SELECT "schema_migrations"."version" FROM "schema_migrations"
+Migrating to CreateMovies (20100404113234)
+  SQL (0.1ms)  select sqlite_version(*)
+  SQL (0.4ms)  CREATE TABLE "movies" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar(255), "production_year" integer, "duration" integer, "plot" text, "rating" integer, "created_at" datetime, "updated_at" datetime) 
+  SQL (0.1ms)  INSERT INTO "schema_migrations" ("version") VALUES ('20100404113234')
+  SQL (0.2ms)   SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+
+  SQL (0.1ms)  SELECT "schema_migrations"."version" FROM "schema_migrations"
+  SQL (0.1ms)   SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+
+  SQL (0.0ms)  PRAGMA index_list("movies")
+</pre></div><div class="section" title="3.8.3.1. Automatisch zugefügte Felder (id, created_at und updated_at)" id="active-record-auto-felder"><div class="titlepage"><div><div><h4 class="title">3.8.3.1. Automatisch zugefügte Felder (id, created_at und
+        updated_at)</h4></div></div></div><div class="para">Rails ist so freundlich uns beim Scaffolding per Default
+        folgende Felder hinzuzufügen:<div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><div class="para"><code class="varname">id:integer</code></div><div class="para">Das ist die Unique-ID des Datensatzes. Das Feld wird von
+              der Datenbank automatisch hochgezählt. Für alle SQL-Fans:
+              AUTOINCREMENT NOT NULL</div></li><li class="listitem"><div class="para"><code class="varname">created_at:datetime</code></div><div class="para">Das Feld wird von ActiveRecord automatisch beim Erstellen
+              eines Datensatzes gefüllt.</div></li><li class="listitem"><div class="para"><code class="varname">updated_at:datetime</code></div><div class="para">Das Feld wird bei jeder Veränderung des Datensatzes
+              automatisch an die aktuelle Zeit angepasst.</div></li></ul></div></div><div class="para">Am Anfang fragt man sich: "Muss das sein? Macht das wirklich
+        Sinn?". Aber mit der Zeit lernt man diese automatisch gehandelten
+        Felder schätzen.</div></div><div class="section" title="3.8.3.2. Migration Rollback" id="migration-rollback"><div class="titlepage"><div><div><h4 class="title">3.8.3.2. Migration Rollback</h4></div></div></div><div class="para">Es soll schon vorgekommen sein, das übereilt eine Migration
+        durchgeführt wurde. Natürlich passiert weder Ihnen noch mir so was.
+        ;-) Aber falls mal ein Freund von Ihnen in diese Predulie gerät: Keine
+        Panik! Dafür wurde in der Migrations-Class die Methode
+        <code class="methodname">self.down</code> angelegt. Testweise können wir ja
+        mal unsere letzte Migration zurückrollen:<pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>rake db:rollback</strong></span>
+(in /Users/sw/Development/movie-app)
+==  CreateMovies: reverting ===================================================
+-- drop_table(:movies)
+   -&gt; 0.1004s
+==  CreateMovies: reverted (0.1005s) ==========================================
+
+MacBook:movie-app sw$</pre></div><div class="para">Sie können alles auf einmal zurück-rollen oder auch nur einzelne
+        Migrationen. Mit dem Schalter <em class="parameter"><code>-T</code></em> bekommen Sie
+        eine Hilfe zu allen möglichen Wegen aufgezeigt:<pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>rake -T db</strong></span>
+(in /Users/sw/Development/movie-app)
+rake db:abort_if_pending_migrations  # Raises an error if there are pending...
+rake db:charset                      # Retrieves the charset for the curren...
+rake db:collation                    # Retrieves the collation for the curr...
+rake db:create                       # Create the database defined in confi...
+rake db:create:all                   # Create all the local databases defin...
+rake db:drop                         # Drops the database for the current R...
+rake db:drop:all                     # Drops all the local databases define...
+rake db:fixtures:identify            # Search for a fixture given a LABEL o...
+rake db:fixtures:load                # Load fixtures into the current envir...
+rake db:forward                      # Pushes the schema to the next version.
+rake db:migrate                      # Migrate the database through scripts...
+rake db:migrate:down                 # Runs the "down" for a given migratio...
+rake db:migrate:redo                 # Rollbacks the database one migration...
+rake db:migrate:reset                # Resets your database using your migr...
+rake db:migrate:up                   # Runs the "up" for a given migration ...
+rake db:reset                        # Drops and recreates the database fro...
+rake db:rollback                     # Rolls the schema back to the previou...
+rake db:schema:dump                  # Create a db/schema.rb file that can ...
+rake db:schema:load                  # Load a schema.rb file into the database
+rake db:seed                         # Load the seed data from db/seeds.rb
+rake db:sessions:clear               # Clear the sessions table
+rake db:sessions:create              # Creates a sessions migration for use...
+rake db:setup                        # Create the database, load the schema...
+rake db:structure:dump               # Dump the database structure to a SQL...
+rake db:test:clone                   # Recreate the test database from the ...
+rake db:test:clone_structure         # Recreate the test databases from the...
+rake db:test:load                    # Recreate the test database from the ...
+rake db:test:prepare                 # Check for pending migrations and loa...
+rake db:test:purge                   # Empty the test database
+rake db:version                      # Retrieves the current schema version...
+MacBook:movie-app sw$</pre></div><div class="para">Und mit <span class="command"><strong>rake -T db:rollback</strong></span> die Hilfe zu
+        diesem bestimmten Befehl:<pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>rake -T db:rollback</strong></span>
+(in /Users/sw/Development/movie-app)
+rake db:rollback  # Rolls the schema back to the previous version.
+MacBook:movie-app sw$</pre></div><div class="para">Aber spielen wir lieber unsere Migration wieder ein:<pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>rake db:migrate</strong></span>  
+(in /Users/sw/Development/movie-app)
+==  CreateMovies: migrating ===================================================
+-- create_table(:movies)
+   -&gt; 0.0014s
+==  CreateMovies: migrated (0.0015s) ==========================================
+
+MacBook:movie-app sw$</pre></div></div></div><div class="section" title="3.8.4. RESTful Datenbankzugriff per Webbrowser" id="restful_datenbankzugriff_per_webbrowser"><div class="titlepage"><div><div><h3 class="title">3.8.4. RESTful
+      Datenbankzugriff per Webbrowser</h3></div></div></div><div class="para">Die Datenbank ist angelegt. Und der Vorteil von Scaffolding
+      besteht darin, das wir jetzt auch direkt per Webbrowser in einer
+      aktzeptablen Web-GUI darauf zugreifen können.</div><div class="para">Gemäss der CRUD Idee (siehe <code class="uri"><a class="uri" href="http://de.wikipedia.org/wiki/CRUD" target="">http://de.wikipedia.org/wiki/CRUD</a></code>)
+      bietet Rails dafür ein RESTful Webinterface an. Was heisst das? Sie
+      können auf jede Resource innerhalb einer normalen Rails-Umgeben über
+      definierte URLs zugreifen und damit folgende Datenbank-Operationen
+      ausführen:<div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><div class="para">C für CREATE</div><div class="para">SQL: <code class="code">INSERT INTO movies (title) VALUES ('Rain
+            Man')</code></div></li><li class="listitem"><div class="para">R für READ</div><div class="para">SQL: <code class="code">SELECT * FROM movies</code></div></li><li class="listitem"><div class="para">U für UPDATE</div><div class="para">SQL: <code class="code">UPDATE movies SET title = 'Rain Man' WHERE id =
+            1</code></div></li><li class="listitem"><div class="para">D für DELETE</div><div class="para">SQL: <code class="code">DELETE FROM movies WHERE id = 1</code></div></li></ul></div>Für den Rails-Neuling ist nicht direkt ersichtlich, wo
+      den hier der grosse Vorteil liegt. Nachfolgend eine Mini-FAQ:<div class="qandaset" title="Frequently Asked Questions"><div class="qandaset"><tr class="question" title="F:"><td align="left" valign="top"><p><b>F:</b></p></td><td align="left" valign="top"><div class="para">Warum wird um das RESTful Interface in Ruby on Rails so
+                ein Bohei gemacht?</div></td></tr><tr class="answer"><td align="left" valign="top"><p><b>A:</b></p></td><td align="left" valign="top"><div class="para">Damit bekommt man ein sauberes und für alle
+                Programmierer leicht verständliches Interface zu Ihrem System.
+                Sie brauchen nur die URI
+                <code class="uri">http://localhost:3000/movies</code> und das Wissen, das es
+                sich um ein RESTful Webdienst handelt und Sie können direkt
+                loslegen.</div></td></tr><tr class="question" title="F:"><td align="left" valign="top"><p><b>F:</b></p></td><td align="left" valign="top"><div class="para">Ist RESTful nur für die automatische Abfrage zwischen
+                Computern gut?</div></td></tr><tr class="answer"><td align="left" valign="top"><p><b>A:</b></p></td><td align="left" valign="top"><div class="para">Nein. RESTful ist auch ein guter Denkansatz, um URLs und
+                damit ganze Webseiten strukturierter zu gestalten.</div></td></tr><tr class="question" title="F:"><td align="left" valign="top"><p><b>F:</b></p></td><td align="left" valign="top"><div class="para">Ist RESTful Teil der <span class="emphasis"><em>Convention over
+                Configuration</em></span> Idee?</div></td></tr><tr class="answer"><td align="left" valign="top"><p><b>A:</b></p></td><td align="left" valign="top"><div class="para">Ja! Jeder Rails-Entwickler kann sich so in kurzer Zeit
+                in ein ihm neues Rails-Projekt einarbeiten.</div></td></tr></div></div></div><div class="section" title="3.8.4.1. Start des Webservers"><div class="titlepage"><div><div><h4 class="title">3.8.4.1. Start des Webservers</h4></div></div></div><div class="para">Als erstes starten wir wie immer mit rails server unseren
+        Entwicklungswebserver:<pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>rails server</strong></span>
+=&gt; Booting WEBrick
+=&gt; Rails 3.0.0.beta2 application starting in development on http://0.0.0.0:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2010-04-04 14:56:29] INFO  WEBrick 1.3.1
+[2010-04-04 14:56:29] INFO  ruby 1.9.1 (2010-01-10) [i386-darwin10.3.0]
+[2010-04-04 14:56:29] INFO  WEBrick::HTTPServer#start: pid=19993 port=3000
+</pre></div></div><div class="section" title="3.8.4.2. Create (Erstellen)" id="restful_create"><div class="titlepage"><div><div><h4 class="title">3.8.4.2. Create (Erstellen)</h4></div></div></div><div class="para">Legen wir als erstes einmal einen neuen Datensatz an. Sie können
+        das entsprechende Interface über die URI <code class="uri"><a class="uri" href="http://0.0.0.0:3000/movies/new" target="">http://0.0.0.0:3000/movies/new</a></code>
+        abrufen. Bitte benutzen Sie dieses Interface um einen Beispiel-Film
+        einzutragen:<div class="screenshot"><div class="mediaobject"><img src="screenshots/movies_new.jpg" width="500" /></div></div></div><div class="para">Nachdem Sie auf "Create Movie" geklickt haben, können Sie im
+        Log-File folgenden Eintrag verfolgen:<pre class="screen">Started POST "/movies" for 127.0.0.1 at 2010-04-04 15:08:43
+  Processing by MoviesController#create as HTML
+  Parameters: {"authenticity_token"=&gt;"36ebldTKHnK4AXM9N2WFTCdzIzVtglqrsryicLEs1vE=", "movie"=&gt;{"title"=&gt;"Rain Man", "production_year"=&gt;"1988", "duration"=&gt;"133", "plot"=&gt;"Amerikanischer Roadmovie \xC3\xBCber zwei sehr ungleiche Br\xC3\xBCder, die sich erst nach dem Tod des Vaters kennen lernen.", "rating"=&gt;"5"}, "commit"=&gt;"Create Movie"}
+  SQL (0.2ms)   SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+
+  SQL (0.4ms)  INSERT INTO "movies" ("created_at", "duration", "plot", "production_year", "rating", "title", "updated_at") VALUES ('2010-04-04 13:08:43.139349', 133, 'Amerikanischer Roadmovie über zwei sehr ungleiche Brüder, die sich erst nach dem Tod des Vaters kennen lernen.', 1988, 5, 'Rain Man', '2010-04-04 13:08:43.139349')
+Redirected to http://0.0.0.0:3000/movies/1
+Completed 302 Found in 43ms
+
+
+Started GET "/movies/1" for 127.0.0.1 at 2010-04-04 15:08:43
+  Processing by MoviesController#show as HTML
+  Parameters: {"id"=&gt;"1"}
+  Movie Load (0.2ms)  SELECT "movies".* FROM "movies" WHERE ("movies"."id" = 1) LIMIT 1
+Rendered movies/show.html.erb within layouts/movies (11.7ms)
+Completed 200 OK in 55ms (Views: 33.2ms | ActiveRecord: 0.2ms)
+</pre></div><div class="para">Als Ergebnis bekommen Sie im Browserfenster den entsprechenden
+        Eintrag angezeigt:<div class="screenshot"><div class="mediaobject"><img src="screenshots/movies_new_show.jpg" width="500" /></div></div></div></div><div class="section" title="3.8.4.3. Show (Anzeigen eines einzelnen Datensatzes)" id="restful_show"><div class="titlepage"><div><div><h4 class="title">3.8.4.3. Show (Anzeigen eines einzelnen
+        Datensatzes)</h4></div></div></div><div class="para">Nach dem Erstellen (Create) eines neuen Datensatzes, können wir
+        uns diesen natürlich jetzt einzeln anschauen. Da unter ActiveRecord
+        automatisch eine unique ID für jeden Datensatz erstellt wird, können
+        wir diese zum Aufruf benutzen. In diesem Fall ist es die 1 für den
+        ersten Datensatz. Das geht über die URI
+        http://0.0.0.0:3000/movies/1<div class="screenshot"><div class="mediaobject"><img src="screenshots/movies_show.jpg" width="500" /></div></div></div><div class="para">Im Log erscheint die folgende Ausgabe:<pre class="screen">Started GET "/movies/1" for 127.0.0.1 at 2010-04-04 16:19:38
+  Processing by MoviesController#show as HTML
+  Parameters: {"id"=&gt;"1"}
+  Movie Load (0.2ms)  SELECT "movies".* FROM "movies" WHERE ("movies"."id" = 1) LIMIT 1
+Rendered movies/show.html.erb within layouts/movies (8.7ms)
+Completed 200 OK in 29ms (Views: 11.5ms | ActiveRecord: 0.2ms)
+</pre></div><div class="para">Ihnen wird bestimmt beim Vergleich der Screenshots <a class="xref" href="scaffolding.html#screenshot_show">???</a> und <a class="xref" href="scaffolding.html#screenshot_show_after_create">???</a> aufgefallens ein, das bei
+        <a class="xref" href="scaffolding.html#screenshot_show_after_create">???</a> am oben eine grüne
+        Nachricht angezeigt wurde. Das ist eine sogenannte Flash-Nachricht.
+        Dabei ist das Wording "Flash" meiner Meinung nach äusserst ungeschickt
+        gewählt, weil bei "Flash" jeder automatisch an das Adobe-Flash-Format
+        und nicht an eine Flash-artig (Flash = Blitz) erscheinende Nachricht
+        denkt. So ist es aber bei Rails. Flash-Nachrichten werden immer auf
+        der nächsten und nur auf der nächsten generierten Seite angezeigt. Wir
+        kommen später auf Flash detailierter zu sprechen.</div></div><div class="section" title="3.8.4.4. Edit (Bearbeiten eines Datensatzes)" id="restful_edit"><div class="titlepage"><div><div><h4 class="title">3.8.4.4. Edit (Bearbeiten eines
+        Datensatzes)</h4></div></div></div><div class="para">Zum Editieren eines Datensatzes müssen wir wiederum die ID des
+        Datensatzes kennen und können dann mit dieser (hier wieder die 1 als
+        Beispiel) das Formular zum Bearbeiten des Filmes mit der URI <code class="uri"><a class="uri" href="http://0.0.0.0:3000/movies/1/edit" target="">http://0.0.0.0:3000/movies/1/edit</a></code>
+        aufrufen:<div class="screenshot"><div class="mediaobject"><img src="screenshots/movies_edit.jpg" width="500" /></div></div></div><div class="para">Im Log-File gibt es folgende Ausgabe:<pre class="screen">Started GET "/movies/1/edit" for 127.0.0.1 at 2010-04-04 21:04:44
+  Processing by MoviesController#edit as HTML
+  Parameters: {"id"=&gt;"1"}
+  Movie Load (0.2ms)  SELECT "movies".* FROM "movies" WHERE ("movies"."id" = 1) LIMIT 1
+Rendered movies/_form.html.erb (72.8ms)
+Rendered movies/edit.html.erb within layouts/movies (77.1ms)
+Completed 200 OK in 120ms (Views: 106.3ms | ActiveRecord: 0.2ms)
+</pre></div><div class="para">Durch klicken auf "Update Movie" können wir dann den Datensatz
+        updaten und bekommen ihn dann wieder im Show-View
+        angezeigt:<div class="screenshot"><div class="mediaobject"><img src="screenshots/movies_show_after_update.jpg" width="500" /></div></div></div><div class="para">Auch hier wird wieder mit einer Flash-Message ein Feedback vom
+        System zum User gegeben.</div><div class="para">Im Log-File sieht man das Update wie folgt:<pre class="screen">Started POST "/movies/1" for 127.0.0.1 at 2010-04-04 21:05:23
+  Processing by MoviesController#update as HTML
+  Parameters: {"authenticity_token"=&gt;"Udc8Uy1kiOW0Gj2hMW72ws5HEPrLNL9ewCLiPyhR+YM=", "movie"=&gt;{"title"=&gt;"Rain Man", "production_year"=&gt;"1988", "duration"=&gt;"133", "plot"=&gt;"", "rating"=&gt;"5"}, "commit"=&gt;"Update Movie", "id"=&gt;"1"}
+  Movie Load (0.2ms)  SELECT "movies".* FROM "movies" WHERE ("movies"."id" = 1) LIMIT 1
+  SQL (0.4ms)  UPDATE "movies" SET "plot" = '', "updated_at" = '2010-04-04 19:05:23.696771' WHERE ("movies"."id" = 1)
+Redirected to http://0.0.0.0:3000/movies/1
+Completed 302 Found in 342ms
+
+
+Started GET "/movies/1" for 127.0.0.1 at 2010-04-04 21:05:23
+  Processing by MoviesController#show as HTML
+  Parameters: {"id"=&gt;"1"}
+  Movie Load (0.2ms)  SELECT "movies".* FROM "movies" WHERE ("movies"."id" = 1) LIMIT 1
+Rendered movies/show.html.erb within layouts/movies (9.0ms)
+Completed 200 OK in 51ms (Views: 35.8ms | ActiveRecord: 0.2ms)
+</pre></div></div><div class="section" title="3.8.4.5. Index (Anzeigen aller Datensätze)" id="restful_index"><div class="titlepage"><div><div><h4 class="title">3.8.4.5. Index (Anzeigen aller
+        Datensätze)</h4></div></div></div><div class="para">Über die URI <code class="uri"><a class="uri" href="http://0.0.0.0:3000/movies" target="">http://0.0.0.0:3000/movies</a></code>
+        können Sie sich eine Liste aller Filme in der Datenbank anzeigen
+        lassen (logischerweise ist das bis jetzt nur ein Film):<div class="screenshot"><div class="mediaobject"><img src="screenshots/movies_index.jpg" width="500" /></div></div></div><div class="para">Im Log-File findet sich folgende Ausgabe:<pre class="screen">Started GET "/movies" for 127.0.0.1 at 2010-04-04 16:26:30
+  Processing by MoviesController#index as HTML
+  Movie Load (0.5ms)  SELECT "movies".* FROM "movies"
+Rendered movies/index.html.erb within layouts/movies (9.9ms)
+Completed 200 OK in 43ms (Views: 29.5ms | ActiveRecord: 0.4ms)
+</pre></div></div><div class="section" title="3.8.4.6. Löschen eines Datensatzes"><div class="titlepage"><div><div><h4 class="title">3.8.4.6. Löschen eines Datensatzes</h4></div></div></div><div class="para">Wenn Sie auf der Index-Seite auf "Destroy" klicken, so bekommen
+        Sie folgende Meldung angezeigt:<div class="screenshot"><div class="mediaobject"><img src="screenshots/destroy_r_u_sure.jpg" width="500" /></div></div></div><div class="para">Klicken wir jetzt mutig auf "OK", bekommen wir wieder die
+        Index-Seite, aber diesmal ganz ohne einen Film angezeigt:<div class="screenshot"><div class="mediaobject"><img src="screenshots/index_after_destroy.jpg" width="500" /></div></div></div><div class="para">Zum Schluss noch der obligatorische Blick in das
+        Log-File:<pre class="screen">Started POST "/movies/1" for 127.0.0.1 at 2010-04-04 16:34:46
+  Processing by MoviesController#destroy as HTML
+  Parameters: {"authenticity_token"=&gt;"xzdq0dePdnVUkBpqbDEXPhPdAo/NhTM3U/lVtjzPTds=", "id"=&gt;"1"}
+  Movie Load (0.2ms)  SELECT "movies".* FROM "movies" WHERE ("movies"."id" = 1) LIMIT 1
+  SQL (0.3ms)  DELETE FROM "movies" WHERE ("movies"."id" = 1)
+Redirected to http://0.0.0.0:3000/movies
+Completed 302 Found in 25ms
+</pre></div></div></div><div class="section" title="3.8.5. Default CSS- und HTML-Layout im Scaffolding" id="default_css_im_scaffolding"><div class="titlepage"><div><div><h3 class="title">3.8.5. Default CSS- und
+      HTML-Layout im Scaffolding</h3></div></div></div><div class="para">Wer sich bei den vorherigen Beispiel mal den HTML-Code der
+      Webseiten angeschaut hat, der wird bemerkt haben, das die vom Framework
+      wenig mit denen von uns in <a class="xref" href="basics_generisches_html_framework.html" title="3.5. Generisches HTML-Framework (Layout)">Abschnitt 3.5, „Generisches
+    HTML-Framework (Layout)“</a> erstellten Seiten gemein
+      haben. Die Lösung liegt in der Datei
+      <code class="filename">app/views/layouts/movies.html.erb</code>:<pre class="programlisting">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Movies: &lt;%= controller.action_name %&gt;&lt;/title&gt;
+  &lt;%= stylesheet_link_tag 'scaffold' %&gt;
+  &lt;%= javascript_include_tag :defaults %&gt;
+  &lt;%= csrf_meta_tag %&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;p class="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
+&lt;p class="alert"&gt;&lt;%= alert %&gt;&lt;/p&gt;
+
+&lt;%= yield %&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</pre></div><div class="para">Auch wenn es aktuell keine grosse Bedeutung hat, möchte ich kurz
+      auf ein paar uns bis jetzt unbekannten Programmteilen eingehen. Alle
+      werden später noch einmal detailierter behandelt.<div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><div class="para"><code class="code">&lt;%= controller.action_name %&gt;</code></div><div class="para">Gibt den Namen der aktuellen Aktion bzw. Methode aus. Für
+            den Fall das Sie mal den Controllernamen benötigen: Das geht mit
+            <code class="code">controller.controller_name</code>.</div></li><li class="listitem"><div class="para"><code class="code">&lt;%= stylesheet_link_tag 'scaffold'
+            %&gt;</code></div><div class="para"><code class="code">stylesheet_link_tag</code> ist ein eingebautes Helper
+            Skript, das das HTML-Tag für die Einbindung eines Default
+            Stylesheets für Scaffolding übernimmt. Natürlich kämen wir auch
+            ohne diese CSS Stylesheets aus, aber die Seiten sehen schon einen
+            Tick schöner aus und ausserdem geht es ja darum Scaffolding zu
+            verstehen. Schauen Sie einmal in den HTML-Source-Code oder lesen
+            Sie die Hilfeseite mit <span class="command"><strong>ri
+            ActionView::Helpers::AssetTagHelper</strong></span></div></li><li class="listitem"><div class="para"><code class="code">&lt;%= javascript_include_tag :defaults
+            %&gt;</code></div><div class="para">Auch <code class="code">javascript_include_tag</code> ist ein eingebautes
+            Helper Skript, mit dem einige Default JavaScript Bibliotheken
+            geladen werden. Das brauchen wir aktuell nicht und könnten es auch
+            löschen.</div></li><li class="listitem"><div class="para"><code class="code">&lt;%= csrf_meta_tag %&gt;</code></div><div class="para">Ein Helper Skript, das sich um Unobtrusive Javascript (UJS)
+            kümmert. Puhh... das jetzt zu erklären, würde den Rahmen völlig
+            sprengen. Kommen wir später noch mal drauf zu sprechen.</div></li></ul></div></div><div class="para">Im Verzeichnis <code class="filename">app/views/layouts</code> liegen jetzt
+      zwei verschiedene HTML-Frames:<pre class="screen">stefan@swmbp 0 head- movie-app$ <span class="command"><strong>ls app/views/layouts/</strong></span>
+application.html.erb  movies.html.erb
+stefan@swmbp 0 head- movie-app$</pre></div><div class="para">Die Datei <code class="filename">movies.html.erb</code> wurde beim
+      Scaffolding automatisch erstellt und wird von Rails per default
+      genommen. Wenn man nur mit der <code class="filename">application.html.erb</code>
+      arbeiten möchte, dann muss man die <code class="filename">movies.html.erb</code>
+      löschen. Sie können das auch Mischen. Wenn Sie möchten können Sie für
+      jedes Model einen eigenen View erstellen oder mit mehren Views ein
+      Framework teilen.</div></div><div class="section" title="3.8.6. Routen" id="routen"><div class="titlepage"><div><div><h3 class="title">3.8.6. Routen</h3></div></div></div><div class="para">Fassen wir mal kurz zusammen: Man kann also mit Scaffolding eine
+      Web-GUI erstellen und auf diese Web-GUI anscheinen über eine feste
+      CRUD-Stuktur zugreifen. Jetzt wäre ja mal interessant zu wissen, ob es
+      noch mehr URIs gibt. Rails steuert das über sogenannte Routen. Alle
+      Routen werden in der Datei <code class="filename">config/routes.rb</code>
+      definiert. Standardmässig sind in dieser Datei recht viele Beispiele als
+      Kommentare eingebaut. Schauen wir uns mal an, wie die aktuelle
+      Konfiguration ohne diese Kommentare aussieht:<pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>cat config/routes.rb | grep -v "#" | grep -v "^$"</strong></span>
+MovieApp::Application.routes.draw do |map|
+  resources :movies
+  get "example/test"
+end
+MacBook:movie-app sw$</pre></div><div class="para">Interessant ist die Zeile:<pre class="programlisting">  resources :movies</pre></div><div class="para">Diese Zeile sagt Rails, das es die Resource movies mit allen
+      Standard Routen ausstatten soll. Diese Routen können wir uns mit
+      <span class="command"><strong>rake routes</strong></span> anzeigen lassen.<pre class="screen">MacBook:movie-app sw$ <span class="command"><strong>rake routes</strong></span>
+(in /Users/sw/Development/movie-app)
+             GET    /movies(.:format)          {:action=&gt;"index", :controller=&gt;"movies"}
+      movies POST   /movies(.:format)          {:action=&gt;"create", :controller=&gt;"movies"}
+   new_movie GET    /movies/new(.:format)      {:action=&gt;"new", :controller=&gt;"movies"}
+             GET    /movies/:id(.:format)      {:action=&gt;"show", :controller=&gt;"movies"}
+             PUT    /movies/:id(.:format)      {:action=&gt;"update", :controller=&gt;"movies"}
+       movie DELETE /movies/:id(.:format)      {:action=&gt;"destroy", :controller=&gt;"movies"}
+  edit_movie GET    /movies/:id/edit(.:format) {:action=&gt;"edit", :controller=&gt;"movies"}
+example_test GET    /example/test              {:controller=&gt;"example", :action=&gt;"test"}
+MacBook:movie-app sw$</pre></div><div class="para">Puh... das sind ja viel mehr, als wir oben benutzt haben. Oder
+      doch nicht? Und jetzt muss ich das auch noch sinnvoll und strukturiert
+      erklären! Die letzte Zeile ist dabei am einfachsten. Die kommt aus
+      unserem ersten Beispiel in <a class="xref" href="die_einfachst_anzunehmende_webseite.html" title="3.4. Die einfachst anzunehmende Webseite">Abschnitt 3.4, „Die einfachst
+    anzunehmende Webseite“</a>. Kümmern wir uns also
+      um die restlichen vom Scaffolding erzeugten Einträge.</div><div class="para">CRUD besteht zwar aus den vier Teilen Create, Read, Upate und
+      Delete, aber diese Einzelelemente müssen in der RESTful Umsetzung weiter
+      aufgeschlüsselt werden. Ziel bei REST ist es, das man eine
+      Abfrage-Methodik definiert, die von allen Entwicklern gleich verstanden
+      und auch benutzt werden kann. Dazu werden bei Webzugriffen die URIs und
+      die HTTP-Verben benutzt. Was HTTP-Verben sind? Ich habe die Frage
+      befürchtet. Bei der Entwicklung des HTTP-Protokolles wurden verschiedene
+      Abfrage-Methoden definiert. Sie haben bestimmt bei einem HTML-Formular
+      schon mal vom Unterschied zwischen GET und POST gelesen. GET und POST
+      sind genau solche Verben. Für uns weiterhin interessant sind PUT und
+      DELETE. Gerne verweise ich an dieser Stelle auf das RFC 2616 (<code class="uri"><a class="uri" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html" target="">http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html</a></code>),
+      falls Sie sich mit dieser Materie näher beschäftigen wollen.</div><div class="para">Für uns ist jetzt erst mal nur interessant, das gleiche URIs die
+      mit unterschiedlichen Verben angesprochen werden unterschiedliche
+      Aktionen in Ihrer Rails-Applikation auslösen. So können Sie in unserer
+      Filmdatenbank über die URI <code class="uri"><a class="uri" href="http://0.0.0.0:3000/movies" target="">http://0.0.0.0:3000/movies</a></code>
+      sowohl mit GET eine Liste (Index) aller Filme anfordern, als auch mit
+      POST einen neuen Filmeintrag abspeichern.</div><div class="para">Die Kombination aus Verb und URI wird in Rails als Route
+      bezeichnet. Ist eine Route nicht definiert, passiert auch nichts. Ist
+      eine Route definiert, dann wird damit auf eine "Action" und einen
+      "Controller" verwiesen. Ich würde jetzt gerne erklären, was es mit
+      beidem auf sich hat, aber vorher will ich noch kurz <a class="xref" href="scaffolding.html#restful_mit_xml" title="3.8.7. RESTful Datenbankzugriff per XML und curl">Abschnitt 3.8.7, „RESTful Datenbankzugriff per XML
+      und curl“</a> besprechen, damit wir das aktuelle Thema
+      RESTful Zugriff sauber abgeschlossen haben.</div></div><div class="section" title="3.8.7. RESTful Datenbankzugriff per XML und curl" id="restful_mit_xml"><div class="titlepage"><div><div><h3 class="title">3.8.7. RESTful Datenbankzugriff per XML
+      und curl</h3></div></div></div><div class="para"><div class="tip"><h2>Tipp</h2><div class="para">Wenn Sie sich nicht für den Austausch von Daten per XML
+          interessieren, dann können Sie diesen Abschnitt ruhig
+          überspringen.</div></div>Das XML-Interface erleichtert den Austausch von Daten zwischen
+      Maschinen. Dabei wird der ganze HTML-Balast abgeworfen und nur noch die
+      reinen Daten per XML ausgetauscht. Beispielhaft führen wir dies mit dem
+      Programm curl durch. Logischerweise geht es natürlich auch mit anderen
+      Programmen oder Programmiersprachen. Wer die Art und Weise verstanden
+      hat, kann von beliebigen Systemen eine Rails Applikation bedienen. Da
+      dies naturgemäss auch gewisse Gefahren in sich birgt (z.B. kann eine
+      Maschine per Brute-Force-Attacke schnell wie Unheil anrichten), kann man
+      per Default bestimmte Aktionen nicht durchführen. Dies wird in der Datei
+      <code class="filename">app/controllers/application_controller.rb</code> mit
+      <code class="code">protect_from_forgery</code> konfiguriert. Bitte deaktiven Sie
+      diese Zeile für diese Beispiele wie folgt mit einem
+      #-Zeichen:<pre class="programlisting">class ApplicationController &lt; ActionController::Base
+  # protect_from_forgery
+end
+</pre></div><div class="para">Dadurch entfällt eine per default aktivierte Sicherheitsschicht,
+      die einen Token austauscht, um die anonyme Interaktion von aussen zu
+      underbinden. Im Log-File werden Sie den Unterschied merken (es fehlt der
+      Eintrag <code class="code">"authenticity_token"=&gt;"xyz"</code>). In späteren
+      Kapiteln besprechen wir Authentifizierungsmechanismen um diese Zugriffe
+      mit Passwörtern abzusichern.</div><div class="section" title="3.8.7.1. new"><div class="titlepage"><div><div><h4 class="title">3.8.7.1. new</h4></div></div></div><div class="para">Um einen neuen Film einzutragen, benötigen Sie als erstes die
+        Felder die ausgefüllt werden müssen. Dazu können Sie die URL <code class="uri"><a class="uri" href="http://0.0.0.0:3000/movies/new.xml" target="">http://0.0.0.0:3000/movies/new.xml</a></code>
+        abrufen:<pre class="screen">MacBook:~ sw$ <span class="command"><strong>curl -X GET -H 'Content-Type: application/xml' http://0.0.0.0:3000/movies/new.xml</strong></span>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;movie&gt;
+  &lt;created-at type="datetime" nil="true"&gt;&lt;/created-at&gt;
+  &lt;duration type="integer" nil="true"&gt;&lt;/duration&gt;
+  &lt;plot nil="true"&gt;&lt;/plot&gt;
+  &lt;production-year type="integer" nil="true"&gt;&lt;/production-year&gt;
+  &lt;rating type="integer" nil="true"&gt;&lt;/rating&gt;
+  &lt;title nil="true"&gt;&lt;/title&gt;
+  &lt;updated-at type="datetime" nil="true"&gt;&lt;/updated-at&gt;
+&lt;/movie&gt;
+MacBook:~ sw$</pre></div><div class="para">Im Log des Webservers sehen Sie folgende Ausgabe:<pre class="screen">Started GET "/movies/new.xml" for 127.0.0.1 at 2010-04-04 19:28:19
+  Processing by MoviesController#new as XML
+Completed 200 OK in 124ms (Views: 111.1ms | ActiveRecord: 0.0ms)
+</pre></div><div class="para">In der XML-Ausgabe können wir erkennen wie die einzelnen Felder
+        heissen und welche Typen (z.B. Integer) sie darstellen. Mit diesen
+        Informationen können wir jetzt einen create Aufruf mit dem neuen
+        Datensatz zusammenstellen:</div><div class="para">Danach können Sie mit einem create Aufruf die Daten für einen
+        neuen Datensatz uploaden:<pre class="screen">MacBook:~ sw$ <span class="command"><strong>curl -X POST -H 'Content-Type: application/xml' -d '&lt;movie&gt;&lt;title&gt;Rain Man&lt;/title&gt;&lt;duration&gt;133&lt;/duration&gt;&lt;rating&gt;5&lt;/rating&gt;&lt;production-year&gt;1988&lt;/production-year&gt;&lt;/movie&gt;' http://0.0.0.0:3000/movies</strong></span>
+&lt;html&gt;&lt;body&gt;You are being &lt;a href="http://0.0.0.0:3000/movies/2"&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;
+MacBook:~ sw$</pre></div><div class="para">Ausgabe im Log:<pre class="screen">Started POST "/movies" for 127.0.0.1 at 2010-04-04 20:30:10
+  Processing by MoviesController#create as */*
+  Parameters: {"movie"=&gt;{"title"=&gt;"Rain Man", "duration"=&gt;"133", "rating"=&gt;"5", "production_year"=&gt;"1988"}}
+  SQL (0.3ms)  INSERT INTO "movies" ("created_at", "duration", "plot", "production_year", "rating", "title", "updated_at") VALUES ('2010-04-04 18:30:10.440028', 133, NULL, 1988, 5, 'Rain Man', '2010-04-04 18:30:10.440028')
+Redirected to http://0.0.0.0:3000/movies/6
+Completed 302 Found in 27ms
+</pre></div><div class="para">Als Ergebnis des curl Aufrufes bekommen Sie die den folgenden
+        Code zurück:<pre class="screen">&lt;html&gt;&lt;body&gt;You are being &lt;a href="http://0.0.0.0:3000/movies/2"&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;
+</pre></div><div class="para">Das ist also quasi wie beim Aufruf mit dem Webbrowser, nur das
+        ein Show des neuen Datensatzes so beim XML-Aufruf wenig Sinn
+        macht.</div></div><div class="section" title="3.8.7.2. index"><div class="titlepage"><div><div><h4 class="title">3.8.7.2. index</h4></div></div></div><div class="para">Um das Ergebnis des Index-Aufrufes sinnvoller zu gestalten, habe
+        ich vorher zwei mal den Film Rain Man eingetragen. Jetzt müssen wir
+        mit curl die URI <code class="uri"><a class="uri" href="http://0.0.0.0:3000/movies.xml" target="">http://0.0.0.0:3000/movies.xml</a></code>
+        abrufen.<pre class="screen">MacBook:~ sw$ <span class="command"><strong>curl -X GET -H 'Content-Type: application/xml' http://0.0.0.0:3000/movies.xml</strong></span>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;movies type="array"&gt;
+  &lt;movie&gt;
+    &lt;created-at type="datetime"&gt;2010-04-04T18:35:28Z&lt;/created-at&gt;
+    &lt;duration type="integer"&gt;133&lt;/duration&gt;
+    &lt;id type="integer"&gt;1&lt;/id&gt;
+    &lt;plot nil="true"&gt;&lt;/plot&gt;
+    &lt;production-year type="integer"&gt;1988&lt;/production-year&gt;
+    &lt;rating type="integer"&gt;5&lt;/rating&gt;
+    &lt;title&gt;Rain Man&lt;/title&gt;
+    &lt;updated-at type="datetime"&gt;2010-04-04T18:35:28Z&lt;/updated-at&gt;
+  &lt;/movie&gt;
+  &lt;movie&gt;
+    &lt;created-at type="datetime"&gt;2010-04-04T18:35:30Z&lt;/created-at&gt;
+    &lt;duration type="integer"&gt;133&lt;/duration&gt;
+    &lt;id type="integer"&gt;2&lt;/id&gt;
+    &lt;plot nil="true"&gt;&lt;/plot&gt;
+    &lt;production-year type="integer"&gt;1988&lt;/production-year&gt;
+    &lt;rating type="integer"&gt;5&lt;/rating&gt;
+    &lt;title&gt;Rain Man&lt;/title&gt;
+    &lt;updated-at type="datetime"&gt;2010-04-04T18:35:30Z&lt;/updated-at&gt;
+  &lt;/movie&gt;
+&lt;/movies&gt;
+MacBook:~ sw$</pre></div><div class="para">Im Log des Webservers sehen Sie folgende Ausgabe:<pre class="screen">Started GET "/movies.xml" for 127.0.0.1 at 2010-04-04 20:39:09
+  Processing by MoviesController#index as XML
+  Movie Load (0.3ms)  SELECT "movies".* FROM "movies"
+Completed 200 OK in 23ms (Views: 9.6ms | ActiveRecord: 0.3ms)
+</pre></div></div><div class="section" title="3.8.7.3. show"><div class="titlepage"><div><div><h4 class="title">3.8.7.3. show</h4></div></div></div><div class="para">Einen einzelnen Film kann man sich mit der ID des Eintrages
+        (hier die 1) und der entsprechenden URL <code class="uri"><a class="uri" href="http://0.0.0.0:3000/movies/1.xml" target="">http://0.0.0.0:3000/movies/1.xml</a></code>
+        anschauen. <pre class="screen">MacBook:~ sw$ <span class="command"><strong>curl -X GET -H 'Content-Type: application/xml' http://0.0.0.0:3000/movies/1.xml</strong></span>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;movie&gt;
+  &lt;created-at type="datetime"&gt;2010-04-04T18:35:28Z&lt;/created-at&gt;
+  &lt;duration type="integer"&gt;133&lt;/duration&gt;
+  &lt;id type="integer"&gt;1&lt;/id&gt;
+  &lt;plot nil="true"&gt;&lt;/plot&gt;
+  &lt;production-year type="integer"&gt;1988&lt;/production-year&gt;
+  &lt;rating type="integer"&gt;5&lt;/rating&gt;
+  &lt;title&gt;Rain Man&lt;/title&gt;
+  &lt;updated-at type="datetime"&gt;2010-04-04T18:35:28Z&lt;/updated-at&gt;
+&lt;/movie&gt;
+MacBook:~ sw$</pre></div><div class="para">Im Log des Webservers sehen Sie folgende Ausgabe:<pre class="screen">Started GET "/movies/1.xml" for 127.0.0.1 at 2010-04-04 20:40:06
+  Processing by MoviesController#show as XML
+  Parameters: {"id"=&gt;"1"}
+  Movie Load (0.3ms)  SELECT "movies".* FROM "movies" WHERE ("movies"."id" = 1) LIMIT 1
+Completed 200 OK in 37ms (Views: 8.8ms | ActiveRecord: 0.3ms)
+</pre></div></div><div class="section" title="3.8.7.4. edit - update"><div class="titlepage"><div><div><h4 class="title">3.8.7.4. edit - update</h4></div></div></div><div class="para">Zum Editieren eines Eintrages downloaden wir diesen Eintrag erst
+        wieder von der entsprechenden URL <code class="uri"><a class="uri" href="http://0.0.0.0:3000/movies/1.xml" target="">http://0.0.0.0:3000/movies/1.xml</a></code><pre class="screen">MacBook:~ sw$ <span class="command"><strong>curl -X GET -H 'Content-Type: application/xml' http://0.0.0.0:3000/movies/1.xml</strong></span>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;movie&gt;
+  &lt;created-at type="datetime"&gt;2010-04-04T18:35:28Z&lt;/created-at&gt;
+  &lt;duration type="integer"&gt;133&lt;/duration&gt;
+  &lt;id type="integer"&gt;1&lt;/id&gt;
+  &lt;plot&gt;&lt;/plot&gt;
+  &lt;production-year type="integer"&gt;1988&lt;/production-year&gt;
+  &lt;rating type="integer"&gt;5&lt;/rating&gt;
+  &lt;title&gt;Rain Man&lt;/title&gt;
+  &lt;updated-at type="datetime"&gt;2010-04-04T19:05:23Z&lt;/updated-at&gt;
+&lt;/movie&gt;
+MacBook:~ sw$</pre></div><div class="para">Danach übermitteln wir den entsprechenden Eintrag mit PUT neu
+        auf die URI <code class="uri"><a class="uri" href="http://0.0.0.0:3000/movies/1" target="">http://0.0.0.0:3000/movies/1</a></code>.
+        Dabei ist es egal, ob wir wirklich neue oder wieder die gleichen Daten
+        übermitteln. Wichtig dabei ist, das wir die <em class="parameter"><code>id</code></em>
+        des Eintrages mit übertragen:<pre class="screen">MacBook:~ sw$ <span class="command"><strong>curl -X PUT -H 'Content-Type: application/xml' -d '&lt;movie&gt;&lt;title&gt;Rain Man&lt;/title&gt;&lt;duration&gt;133&lt;/duration&gt;&lt;rating&gt;5&lt;/rating&gt;&lt;production-year&gt;1989&lt;/production-year&gt;&lt;/movie&gt;' http://0.0.0.0:3000/movies/1</strong></span>    
+&lt;html&gt;&lt;body&gt;You are being &lt;a href="http://0.0.0.0:3000/movies/1"&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;
+MacBook:~ sw$</pre></div><div class="para">Im Log des Webservers sehen Sie folgende Ausgabe:<pre class="screen">Started PUT "/movies/1" for 127.0.0.1 at 2010-04-04 21:12:32
+  Processing by MoviesController#update as */*
+  Parameters: {"movie"=&gt;{"title"=&gt;"Rain Man", "duration"=&gt;"133", "rating"=&gt;"5", "production_year"=&gt;"1989"}, "id"=&gt;"1"}
+  Movie Load (0.2ms)  SELECT "movies".* FROM "movies" WHERE ("movies"."id" = 1) LIMIT 1
+  SQL (0.4ms)  UPDATE "movies" SET "production_year" = 1989, "updated_at" = '2010-04-04 19:12:32.237009' WHERE ("movies"."id" = 1)
+Redirected to http://0.0.0.0:3000/movies/1
+Completed 302 Found in 70ms
+</pre></div><div class="para">ActiveRecord ist dabei intelligent genug nur wirkliche
+        Veränderungen einzutragen.</div></div><div class="section" title="3.8.7.5. destroy"><div class="titlepage"><div><div><h4 class="title">3.8.7.5. destroy</h4></div></div></div><div class="para">Sie können den eben angelegten Datensatz mit der URI <code class="uri"><a class="uri" href="http://0.0.0.0:3000/movies/1" target="">http://0.0.0.0:3000/movies/1</a></code>
+        und einem DELETE Aufruf wieder aus der Datenbank löschen.<pre class="screen">MacBook:~ sw$ <span class="command"><strong>curl -X DELETE -H 'Content-Type: application/xml' http://0.0.0.0:3000/movies/1</strong></span>
+&lt;html&gt;&lt;body&gt;You are being &lt;a href="http://0.0.0.0:3000/movies"&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;
+MacBook:~ sw$</pre></div><div class="para">Im Log des Webservers sehen Sie folgende Ausgabe:<pre class="screen">Started DELETE "/movies/1" for 127.0.0.1 at 2010-04-04 21:14:44
+  Processing by MoviesController#destroy as */*
+  Parameters: {"id"=&gt;"1"}
+  Movie Load (0.2ms)  SELECT "movies".* FROM "movies" WHERE ("movies"."id" = 1) LIMIT 1
+  SQL (0.2ms)  DELETE FROM "movies" WHERE ("movies"."id" = 1)
+Redirected to http://0.0.0.0:3000/movies
+Completed 302 Found in 22ms
+</pre></div></div></div></div><ul class="docnav bottom"><li class="previous"><a accesskey="p" href="flash.html"><strong>Zurück</strong>3.7. Flash Nachrichten</a></li><li class="up"><a accesskey="u" href="#"><strong>Nach oben</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Zum Anfang</strong></a></li><li class="next"><a accesskey="n" href="die_console.html"><strong>Weiter</strong>3.9. Die Console</a></li></ul></div><div class="clear"></div></div></div></body></html>

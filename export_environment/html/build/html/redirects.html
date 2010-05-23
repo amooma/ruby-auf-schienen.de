@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>3.6. Redirects</title><link rel="stylesheet" href="./default.css" type="text/css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta name="package" content="" /><link rel="home" href="index.html" title="Ruby on Rails 3.0" /><link rel="up" href="erste_schritte_mit_rails.html" title="Kapitel 3. Erste Schritte mit Rails" /><link rel="prev" href="basics_generisches_html_framework.html" title="3.5. Generisches HTML-Framework (Layout)" /><link rel="next" href="flash.html" title="3.7. Flash Nachrichten" /></head><body id="your-body"><div id="content"><div id="content-inner"><div id="leftcol" class="sidebar"><ul class="breadcrumbs"><li class="breadcrumb-link" style="margin-left: 0em"><a href="index.html">Ruby on Rails 3.0</a></li><li class="breadcrumb-link breadcrumb-bullet" style="margin-left: 0.8em"><a href="erste_schritte_mit_rails.html">Erste Schritte mit
+  Rails</a></li><li class="breadcrumb-node breadcrumb-last breadcrumb-bullet" style="margin-left: 1.6em"><a href="redirects.html">Redirects</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="redirects.html#id3311538">Warum Redirects?</a></li></ul><div id="textsize"><span class="textts"> Change Text Size</span><br /><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='13px'"><span class="plusts" style="font-size: small;">+</span></a><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='15px'"><span class="plusts" style="font-size: large;">+</span></a><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='17px'"><span class="plusts" style="font-size: x-large;">+</span></a></div></div><div id="rightcol" class="sidebar"></div><div id="maincol"><ul class="docnav top"><li class="previous"><a accesskey="p" href="basics_generisches_html_framework.html"><strong>Zurück</strong></a></li><li class="next"><a accesskey="n" href="flash.html"><strong>Weiter</strong></a></li></ul><div class="section" title="3.6. Redirects" id="redirects"><div class="titlepage"><div><div><h2 class="title">3.6. Redirects</h2></div></div></div><div class="para">Redirects sind Befehle, mit denen Sie innerhalb des Controllers auf
+    andere Methoden oder auch auf ganz andere Webseiten "springen" also
+    redirecten können. Um diese Funktion zeigen zu können, benötigen wir eine
+    zweite Webseite. Das machen wir diesmal nicht mit einem Generator-Skript,
+    sondern von Hand.</div><div class="para">Bitte erweitern Sie die Datei
+    <code class="filename">app/controllers/example_controller.rb</code> wie
+    folgt:<pre class="programlisting">class ExampleController &lt; ApplicationController
+  def test
+  end
+  
+  def shopping_list
+  end
+
+end</pre></div><div class="para">Die <code class="filename">app/views/example/shopping_list.html.erb</code>
+    Seite erstellen Sie bitte neu mit folgendem Inhalt:<pre class="programlisting">&lt;h1&gt;Einkaufsliste&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;12 Eier&lt;/li&gt;
+&lt;li&gt;250 gr Butter&lt;/li&gt;
+&lt;li&gt;500 gr Mehl&lt;/li&gt;
+&lt;/ul&gt;</pre></div><div class="para">Zum Schluss müssen wir in der Datei
+    <code class="filename">config/routes.rb</code> noch die Route für diese Seite
+    einfügen:<pre class="programlisting">MovieApp::Application.routes.draw do |map|
+  get "example/test"
+  get "example/shopping_list"
+end
+</pre></div><div class="para">Dies daraus resultierende Seite lässt sich unter der URI
+    <code class="uri">http://0.0.0.0:3000/example/shopping_list</code> abrufen:<div class="screenshot"><div class="mediaobject"><img src="screenshots/example_shopping_list.jpg" width="500" /></div></div></div><div class="para">Im Log finden wir folgenden Eintrag:<pre class="screen">Started GET "/example/shopping_list" for 127.0.0.1 at 2010-04-23 15:25:17
+  Processing by ExampleController#shopping_list as HTML
+Rendered example/shopping_list.html.erb within layouts/application (0.4ms)
+Completed 200 OK in 4ms (Views: 3.4ms | ActiveRecord: 0.0ms)
+</pre></div><div class="para">Ohne das mir jetzt dazu ein wirklich brauchbares Beispiel einfällt,
+    zeige ich Ihnen jetzt wie ein Redirect funktioniert. Ändern Sie dazu bitte
+    die Datei <code class="filename">app/controllers/example_controller.rb</code> wie
+    folgt:<pre class="programlisting">class ExampleController &lt; ApplicationController
+  def test
+    <span class="emphasis"><em>redirect_to :action =&gt; "shopping_list"</em></span>
+  end
+  
+  def shopping_list
+  end
+
+end</pre>Wenn Sie jetzt im Browser die URI <code class="uri"><a class="uri" href="http://0.0.0.0:3000/example/test" target="">http://0.0.0.0:3000/example/test</a></code>
+    aufrufen, so bekommen Sie die shopping_list Seite angezeigt. Im Log finden
+    Sie den folgenden Eintrag:<pre class="screen">Started GET "/example/test" for 127.0.0.1 at 2010-04-23 23:16:13
+  Processing by ExampleController#test as HTML
+Redirected to http://0.0.0.0:3000/example/shopping_list
+Completed 302 Found in 1ms
+</pre></div><div class="para">Wie Sie sehen, wurde zwar im ersten Schritt mit "<code class="code">Processing by
+    ExampleController#test as HTML</code>" die Methode
+    <code class="methodname">test</code> im Controller <code class="code">ExampleController</code>
+    aufgerufen, aber danach fand ein Redirect zur Methode
+    <code class="methodname">shopping_list</code> statt.</div><div class="para">Auf die Details und einzelnen Möglichkeiten des Redirects gehen wir
+    später im jeweils konkreten Fall ein. Nur schon so viel vorweg: Man kann
+    nicht nur auf eine andere Methode, sondern auch auf einen anderen
+    Controller oder eine ganze andere Seite redirecten.</div><div class="section" title="3.6.1. Warum Redirects?"><div class="titlepage"><div><div><h3 class="title">3.6.1. Warum Redirects?</h3></div></div></div><div class="para">Beim obigen Beispiel fragt man sich natürlich, warum man denn im
+      Controller einen Redirect einbaut und nicht direkt die Routen ändert.
+      Das ist der Nachteil von der "wir benutzen nur bisheriges
+      Wissen"-Methode. Schon im <a class="xref" href="scaffolding.html" title="3.8. Scaffolding">Abschnitt 3.8, „Scaffolding“</a> werden Sie
+      verstehen warum Redirects so praktisch sind. Sie können z.B. in einem
+      Controller überprüfen, ob bestimmte Eingabedaten valide sind oder nicht
+      und wenn etwas fehlt zur ursprünglichen Eingabeseite redirecten. Das
+      wäre mit einer statischen Route nicht lösbar. </div><div class="para">Allerdings muss man beim Programmieren auch darauf achten, nicht
+      beliebig viele Redirects einzubauen. Wenn man tatsächlich mal in der
+      Versuchung kommen zwei oder mehr Redirects hinter einander zu schachteln
+      (also in verschiedene Methoden), dann sollte man einen Schritt zurück
+      gehen und sich Gedanken über die Gesamtidee machen. Meist geht es dann
+      anders einfacher und sauberer.</div></div></div><ul class="docnav bottom"><li class="previous"><a accesskey="p" href="basics_generisches_html_framework.html"><strong>Zurück</strong>3.5. Generisches
+    HTML-Framework (Layout)</a></li><li class="up"><a accesskey="u" href="#"><strong>Nach oben</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Zum Anfang</strong></a></li><li class="next"><a accesskey="n" href="flash.html"><strong>Weiter</strong>3.7. Flash Nachrichten</a></li></ul></div><div class="clear"></div></div></div></body></html>

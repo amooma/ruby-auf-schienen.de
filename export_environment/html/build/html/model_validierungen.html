@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>4.3. Validierungen</title><link rel="stylesheet" href="./default.css" type="text/css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta name="package" content="" /><link rel="home" href="index.html" title="Ruby on Rails 3.0" /><link rel="up" href="model.html" title="Kapitel 4. Model - Das M in MVC." /><link rel="prev" href="model_orientierung.html" title="4.2. Orientierung" /><link rel="next" href="ch04s04.html" title="4.4. Dieses Kapitel ist noch nicht fertig gestellt" /></head><body id="your-body"><div id="content"><div id="content-inner"><div id="leftcol" class="sidebar"><ul class="breadcrumbs"><li class="breadcrumb-link" style="margin-left: 0em"><a href="index.html">Ruby on Rails 3.0</a></li><li class="breadcrumb-link breadcrumb-bullet" style="margin-left: 0.8em"><a href="model.html">Model - Das M in MVC.</a></li><li class="breadcrumb-node breadcrumb-last breadcrumb-bullet" style="margin-left: 1.6em"><a href="model_validierungen.html">Validierungen</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="model_validierungen.html#eingebaute_validierungs_methoden">Eingebaute
+      Validierungs-Methoden</a></li></ul><div id="textsize"><span class="textts"> Change Text Size</span><br /><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='13px'"><span class="plusts" style="font-size: small;">+</span></a><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='15px'"><span class="plusts" style="font-size: large;">+</span></a><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='17px'"><span class="plusts" style="font-size: x-large;">+</span></a></div></div><div id="rightcol" class="sidebar"></div><div id="maincol"><ul class="docnav top"><li class="previous"><a accesskey="p" href="model_orientierung.html"><strong>Zurück</strong></a></li><li class="next"><a accesskey="n" href="ch04s04.html"><strong>Weiter</strong></a></li></ul><div class="section" title="4.3. Validierungen" id="model_validierungen"><div class="titlepage"><div><div><h2 class="title">4.3. Validierungen</h2></div></div></div><div class="para">Unser aller Albtraum sind User die Daten eingeben, mit denen wir als
+    Programmierer nicht gerechnet haben. Und wem ist das noch nicht passiert!?
+    In Rails haben wir ein ausgeklügeltes und einfach zu programmierendes
+    Validierungssystem, mit dem wir solche Eingabefehler abfangen
+    können.</div><div class="para">In unserer Filmdatenbank haben wir ein Feld, das auf jeden Fall
+    ausgefüllt werden soll: Der Titel (<code class="code">title</code>) des Films. Die
+    Validierungsregel dafür gehört in die
+    <code class="filename">app/models/movie.rb</code> Datei:<pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_presence_of :title
+end</pre></div><div class="para">Probieren wir das mal aus und starten dafür den
+    Rails-Server:<pre class="screen">stefan@swmbp 0 head- movie-app$ <span class="command"><strong>rails server</strong></span>
+=&gt; Booting WEBrick
+=&gt; Rails 3.0.0.beta2 application starting in development on http://0.0.0.0:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2010-04-23 10:56:16] INFO  WEBrick 1.3.1
+[2010-04-23 10:56:16] INFO  ruby 1.9.2 (2010-04-11) [x86_64-darwin10.3.0]
+[2010-04-23 10:56:16] INFO  WEBrick::HTTPServer#start: pid=20907 port=3000
+</pre></div><div class="para">Jetzt gehen wir mit dem Browser auf die URI <code class="uri"><a class="uri" href="http://0.0.0.0:3000/movies/new" target="">http://0.0.0.0:3000/movies/new</a></code>
+    und tragen die Daten zu einem Film ohne Titel ein:<div class="screenshot"><div class="mediaobject"><img src="screenshots/movies_new_validation_1.jpg" width="500" /></div></div></div><div class="para">Nach dem klicken auf "Create Movie" gekommen wir folgende
+    Fehlermeldung angezeigt:<div class="screenshot"><div class="mediaobject"><img src="screenshots/movies_new_validation_2.jpg" width="500" /></div></div></div><div class="para">Was ist hier passiert? Schauen wir uns im Controller
+    <code class="filename">app/controllers/movies_controller.rb</code> die
+    <code class="methodname">create</code> Methode an:<pre class="programlisting">  # POST /movies
+  # POST /movies.xml
+  def create
+    @movie = Movie.new(params[:movie])
+
+    respond_to do |format|
+      if @movie.save
+        format.html { redirect_to(@movie, :notice =&gt; 'Movie was successfully created.') }
+        format.xml  { render :xml =&gt; @movie, :status =&gt; :created, :location =&gt; @movie }
+      else
+        format.html { render :action =&gt; "new" }
+        format.xml  { render :xml =&gt; @movie.errors, :status =&gt; :unprocessable_entity }
+      end
+    end
+  end
+</pre></div><div class="para">Es wurde ein neues Movie Objekt erstellt (<code class="code">@movie</code>). Beim
+    Abspeichern (<code class="methodname">@movie.save</code>) kam es dann zu einem
+    Fehler und deshalb kam als Ergebnis <code class="code">false</code> und die
+    if-else-Kondition sprang auf <code class="code">else</code>. Deshalb wurde mittels
+    <code class="code">redirect_to</code> die <code class="methodname">new</code> Methode
+    aufgerufen (siehe <a class="xref" href="redirects.html" title="3.6. Redirects">Abschnitt 3.6, „Redirects“</a>). So weit klar, aber es
+    stellt sich die Frage, wo die Fehlermeldung "Title can't be blank"
+    herkommt.</div><div class="para">Rein View-technisch ist die Antwort einfach. Im von
+    <code class="filename">app/views/movies/edit.html.erb</code> und
+    <code class="filename">app/views/movies/new.html.erb</code> benutzen Partial (siehe
+    <a class="xref" href="die_einfachst_anzunehmende_webseite.html#partials" title="3.4.3. Partials">Abschnitt 3.4.3, „Partials“</a>)
+    <code class="filename">app/views/movies/_form.html.erb</code> steht in der zweiten
+    Zeile<pre class="programlisting">&lt;%= f.error_messages %&gt;
+</pre></div><div class="para">Das sind die Fehler die bei der Erzeugung eines neuen ActiveRecord
+    Objektes entstanden sind. </div><div class="para">Wir machen am besten mal auf der Console (siehe <a class="xref" href="die_console.html" title="3.9. Die Console">Abschnitt 3.9, „Die Console“</a>) weiter:<pre class="screen">stefan@swmbp 0 head- movie-app$ <span class="command"><strong>rails console</strong></span>
+Loading development environment (Rails 3.0.0.beta2)
+ruby-head &gt;</pre></div><div class="para">Jetzt gernerien wir ein eines Movie-Objekt und befüllen es mit
+    einigen Werten:<pre class="screen">ruby-head &gt; <span class="command"><strong>pulp_fiction = Movie.new</strong></span>
+ =&gt; #&lt;Movie id: nil, title: nil, production_year: nil, duration: nil, plot: nil, rating: nil, created_at: nil, updated_at: nil&gt; 
+ruby-head &gt; <span class="command"><strong>pulp_fiction.production_year = 1994</strong></span>
+ =&gt; 1994 
+ruby-head &gt; <span class="command"><strong>pulp_fiction.duration = 154</strong></span>
+ =&gt; 154 
+ruby-head &gt; </pre></div><div class="para">Wenn wir das Movie-Objekt mit der Methode
+    <code class="methodname">save</code> abspeichern wollen, dann bekommen wir eine
+    Fehlermeldung:<pre class="screen">ruby-head &gt; <span class="command"><strong>pulp_fiction.save</strong></span>
+ =&gt; false 
+ruby-head &gt;</pre></div><div class="para">Die Fehlermeldungen werden mit der Methode
+    <code class="methodname">errors</code> ausgegeben:<pre class="screen">ruby-1.9.2-p-1 &gt; <span class="command"><strong>pulp_fiction.errors</strong></span>
+ =&gt; {:title=&gt;["can't be blank"]} 
+ruby-1.9.2-p-1 &gt;</pre>Aus purer Neugierde schauen wir uns noch die
+    Klasse dieser Ausgabe an:<pre class="screen">ruby-1.9.2-p-1 &gt; <span class="command"><strong>pulp_fiction.errors.class</strong></span>
+ =&gt; ActiveModel::Errors 
+ruby-1.9.2-p-1 &gt;</pre></div><div class="para">Ist also kein Array oder Hash. Aber wir können mit den normalen
+    Iterator-Methoden drauf zugreifen:<pre class="screen">ruby-1.9.2-p-1 &gt; <span class="command"><strong>pulp_fiction.errors.first</strong></span>
+ =&gt; [:title, "can't be blank"] 
+ruby-1.9.2-p-1 &gt; <span class="command"><strong>pulp_fiction.errors.first.class</strong></span>
+ =&gt; Array 
+ruby-1.9.2-p-1 &gt;</pre></div><div class="para">Aber zurück zum eigentlichen Thema. Da wir in
+    <code class="filename">app/models/movie.rb</code> die folgende Validierungsregel
+    eingebaut haben, bekommen wir die obige Fehlermeldung und können das
+    Objekt nicht abspeichern.<pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_presence_of :title
+end</pre></div><div class="para">Das coole daran ist, das wir uns in der gesamten Rails-Applikation
+    darauf verlassen können. Es gibt keinen Weg die Validierung zu umgehen.
+    hmmm... OK, das war jetzt eine kleine Lüge. Wir können die Validierung mit
+    der Methode <code class="methodname">save_without_validation</code>
+    umgehen:<pre class="screen">ruby-1.9.2-p-1 &gt; <span class="command"><strong>pulp_fiction.save_without_validation</strong></span>
+ =&gt; true 
+ruby-1.9.2-p-1 &gt;</pre></div><div class="para">Aber bitte vergessen Sie das mit dem
+    <code class="methodname">save_without_validation</code> ganz schnell wieder!
+    Validierung ist nicht nur zum Schutz vor Falscheingaben durch den User
+    praktisch, sondern auch zum Schutz vor Fehler in der
+    Programmierung.</div><div class="para">Führen wir unser Beispiel noch zu Ende und fügen den Titel
+    hinzu:<pre class="screen">ruby-1.9.2-p-1 &gt; <span class="command"><strong>pulp_fiction.save</strong></span>
+ =&gt; false 
+ruby-1.9.2-p-1 &gt; <span class="command"><strong>pulp_fiction.title = 'Pulp Fiction'</strong></span>
+ =&gt; "Pulp Fiction" 
+ruby-1.9.2-p-1 &gt; <span class="command"><strong>pulp_fiction.save</strong></span>
+ =&gt; true 
+ruby-1.9.2-p-1 &gt;</pre></div><div class="para">Schauen wir uns noch gerade die Ausgabe der
+    <code class="methodname">errors</code> Methode an:<pre class="screen">ruby-1.9.2-p-1 &gt; <span class="command"><strong>pulp_fiction.errors</strong></span>
+ =&gt; {} 
+ruby-1.9.2-p-1 &gt;</pre></div><div class="section" title="4.3.1. Eingebaute Validierungs-Methoden" id="eingebaute_validierungs_methoden"><div class="titlepage"><div><div><h3 class="title">4.3.1. Eingebaute
+      Validierungs-Methoden</h3></div></div></div><div class="para">ActiveRecord kommt mit einem Satz von fertigen
+      Validierungs-Methoden, die man immer wieder braucht. Die wichtigsten
+      gehen wir hier Methode für Methode durch. Diesen Abschnitt können Sie
+      auch schnell überfliegen und im Fall des Falles noch mal hier
+      nachschlagen.</div><div class="section" title="4.3.1.1. validates_presence_of"><div class="titlepage"><div><div><h4 class="title">4.3.1.1. validates_presence_of</h4></div></div></div><div class="para">Mit <code class="methodname">validates_presence_of</code> können Sie
+        festlegen, das ein bestimmtes Feld präsent also ausgefüllt sein muss.
+        Das Filmdatenbank-Beispiel dazu:<pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  <span class="emphasis"><em>validates_presence_of :title</em></span>
+end</pre></div><div class="para">Denn ohne einen Titel macht ein Filmeintrag keinen Sinn.</div><div class="para">Wichtige Optionen:<div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><div class="para"><code class="code">:message</code></div><div class="para">Gibt eine eigene Fehlermeldung aus. Default ist "can't be
+              blank".</div><div class="para"><div class="example"><div class="example-contents"><div class="para"><pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_presence_of :title, <span class="emphasis"><em>:message =&gt; "darf nicht leer sein"</em></span>
+end
+</pre></div></div><h6>Beispiel 4.1. Anwendung der :message Option</h6></div><br class="example-break" /></div></li><li class="listitem"><div class="para"><code class="code">:on</code></div><div class="para">Spezifiziert, wann die Validierung ausgeführt werden soll.
+              Default ist <code class="code">:save</code>.</div><div class="para">Mögliche Optionen:<div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><div class="para"><code class="code">:update</code></div><div class="para">Nur bei einem Update des Datensatzes wird
+                    validiert.</div></li><li class="listitem"><div class="para"><code class="code">:create</code></div><div class="para">Nur beim ersten Abspeichern, also beim initialen
+                    Erstellen des Datensatzes, wird validiert.</div></li><li class="listitem"><div class="para"><code class="code">:save</code></div><div class="para"><code class="code">:save</code> ist die Kombination zwischen
+                    <code class="code">:update</code> und <code class="code">:create</code>. Es wird
+                    also immer validiert.</div></li></ul></div></div><div class="para"><div class="example"><div class="example-contents"><div class="para"><pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_presence_of :title, <span class="emphasis"><em>:on =&gt; :create</em></span>
+end
+</pre></div></div><h6>Beispiel 4.2. Anwendung der :on Option</h6></div><br class="example-break" /></div></li></ul></div></div></div><div class="section" title="4.3.1.2. validates_uniqueness_of" id="validates_uniqueness_of"><div class="titlepage"><div><div><h4 class="title">4.3.1.2. validates_uniqueness_of</h4></div></div></div><div class="para">Mit <code class="methodname">validates_uniqueness_of</code> können Sie
+        festlegen, das ein bestimmtes Feld in der gesamten Datenbank nur
+        einmal einen einzelnen Wert enthalten darf. Er muss also immer unique
+        (einzigartig) sein. Wenn wir in unserer Filmdatenbank jeden Filmtitel
+        nur einmal aufnehmen wollen, dann wäre die entsprechende
+        Validierung:<pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_presence_of :title
+  <span class="emphasis"><em>validates_uniqueness_of :title</em></span>
+end
+</pre></div><div class="para">Ich würde aber auf Nummer sicher gehen und die
+        <code class="code">:case_sensitive =&gt; false</code> Option
+        benutzen:<pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_presence_of :title
+  validates_uniqueness_of :title<span class="emphasis"><em>, :case_sensitive =&gt; false</em></span>
+end
+</pre></div><div class="para">Per default ist <code class="code">:case_sensitive</code> immer auf
+        <code class="code">true</code> gesetzt, deshalb müssen wir es hier auf
+        <code class="code">false</code> setzen, um sicher zu stellen, das auch Filmtitel,
+        die nur unterschiedlich Gross und Klein geschrieben wurden trotzdem
+        unique sind.</div><div class="para">Wichtige Optionen:<div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><div class="para"><code class="code">:message</code></div><div class="para">Gibt eine eigene Fehlermeldung aus. Default ist "has
+              already been taken".<div class="example"><div class="example-contents"><div class="para"><pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_uniqueness_of :title, <span class="emphasis"><em>:message =&gt; "muss in der Datenbank einmalig sein"</em></span>
+end
+</pre></div></div><h6>Beispiel 4.3. Anwendung der :message Option</h6></div><br class="example-break" /></div></li><li class="listitem"><div class="para"><code class="code">:case_sensitive</code></div><div class="para">Definiert, ob die Einzigartigkeit (uniqueness) des Feldes
+              inklusive Gross- und Kleinschreibung definiert ist. Default ist
+              <code class="code">true</code>.<div class="example"><div class="example-contents"><div class="para"><pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_uniqueness_of :title, <span class="emphasis"><em>:case_sensitive =&gt; false</em></span>
+end
+</pre></div></div><h6>Beispiel 4.4. Anwendung der :case_sensitive Option</h6></div><br class="example-break" /></div></li><li class="listitem"><div class="para"><code class="code">:allow_nil</code></div><div class="para">Definiert, ob ein Eintrag auch nil sein darf. Ein solcher
+              Eintrag wäre dann genau einmal möglich. Default ist
+              <code class="code">false</code>.<div class="example"><div class="example-contents"><div class="para"><pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_uniqueness_of :title, <span class="emphasis"><em>:allow_nil =&gt; true</em></span>
+end
+</pre></div></div><h6>Beispiel 4.5. Anwendung der :allow_nil Option</h6></div><br class="example-break" /></div></li><li class="listitem"><div class="para"><code class="code">:allow_blank</code></div><div class="para">Definiert, ob ein Eintrag auch leer sein darf. Ein solcher
+              Eintrag wäre dann genau einmal möglich. Default ist
+              <code class="code">false</code>.<div class="example"><div class="example-contents"><div class="para"><pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_uniqueness_of :title, <span class="emphasis"><em>:allow_blank =&gt; true</em></span>
+end
+</pre></div></div><h6>Beispiel 4.6. Anwendung der :allow_blank Option</h6></div><br class="example-break" /></div></li></ul></div></div></div><div class="section" title="4.3.1.3. validates_numericality_of" id="validates_numericality_of"><div class="titlepage"><div><div><h4 class="title">4.3.1.3. validates_numericality_of</h4></div></div></div><div class="para">Mit <code class="code">validates_numericality_of</code> wird überprüft, ob
+        der Eintrag eine Zahl ist. In unserer Filmdatenbank würde das auf das
+        Feld <code class="code">production_year</code> passen:<pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  <span class="emphasis"><em>validates_numericality_of :production_year</em></span>
+end
+</pre></div><div class="para">Allerdings wäre das nur die halbe Miete. Denn
+        <code class="code">validates_numericality_of</code> überprüft per Default nur, ob
+        es sich um eine Zahl handelt. Wir möchten aber eine ganze Zahl (also
+        Integer). Entsprechend müssten wir folgende Validierung
+        benutzen:<pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_numericality_of :production_year, <span class="emphasis"><em>:only_integer =&gt; true</em></span>
+end
+</pre></div><div class="para">Aber es geht noch weiter, denn eigentlich sind nur die Jahre
+        1895 (erster Stummfilm) bis heute interessant. Das können wir
+        ebenfalls in die Validierung mit aufnehmen:<pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_numericality_of :production_year, 
+                            :only_integer =&gt; true,<img class="callout" src="/home/pratik/work/stefanwintermeyer/rails-buch/export_environment/html/build/../..//dependencies/custom-admons-callouts/1.png" alt="1" border="0" id="validates_numericality_of_production_year_co_1" /> 
+                            :greater_than =&gt; 1894,<img class="callout" src="/home/pratik/work/stefanwintermeyer/rails-buch/export_environment/html/build/../..//dependencies/custom-admons-callouts/2.png" alt="2" border="0" id="validates_numericality_of_production_year_co_2" /> 
+                            :less_than =&gt; Date.today.year + 1<img class="callout" src="/home/pratik/work/stefanwintermeyer/rails-buch/export_environment/html/build/../..//dependencies/custom-admons-callouts/3.png" alt="3" border="0" id="validates_numericality_of_production_year_co_3" />
+end
+</pre></div><div class="para">Erklärung:<div class="calloutlist"><table border="0" summary="Callout list"><tr><td width="5%" valign="top" align="left"><p><a href="#validates_numericality_of_production_year_co_1"><img class="callout" src="/home/pratik/work/stefanwintermeyer/rails-buch/export_environment/html/build/../..//dependencies/custom-admons-callouts/1.png" alt="1" border="0" id="validates_numericality_of_production_year_co_1" /></a> </p></td><td valign="top" align="left"><div class="para">Nur ganze Zahlen werden aktzeptiert (Integer).</div></td></tr><tr><td width="5%" valign="top" align="left"><p><a href="#validates_numericality_of_production_year_co_2"><img class="callout" src="/home/pratik/work/stefanwintermeyer/rails-buch/export_environment/html/build/../..//dependencies/custom-admons-callouts/2.png" alt="2" border="0" id="validates_numericality_of_production_year_co_2" /></a> </p></td><td valign="top" align="left"><div class="para">Die Zahl muss grösser als 1894 sein, weil der erste
+              Stummfilm im Jahr 1895 veröffentlicht wurde.</div></td></tr><tr><td width="5%" valign="top" align="left"><p><a href="#validates_numericality_of_production_year_co_3"><img class="callout" src="/home/pratik/work/stefanwintermeyer/rails-buch/export_environment/html/build/../..//dependencies/custom-admons-callouts/3.png" alt="3" border="0" id="validates_numericality_of_production_year_co_3" /></a> </p></td><td valign="top" align="left"><div class="para">Jetzt wird es wirklich cool! ;-) Da ein Film in unserer
+              Datenbank schlecht aus der Zukunft sein kann, nehmen wir das
+              aktuelle Jahr mit <code class="code">Date.today.year</code> und addieren 1.
+              Damit definieren wir dann, das das <code class="code">production_year</code>
+              niedriger sein muss.</div></td></tr></table></div></div><div class="para">Wichtige Optionen:<div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><div class="para"><code class="code">:message</code></div><div class="para">Gibt eine eigene Fehlermeldung aus. Default ist "is not a
+              number".<div class="example"><div class="example-contents"><div class="para"><pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_numericality_of :title, <span class="emphasis"><em>:message =&gt; "muss eine Zahl sein"</em></span>
+end
+</pre></div></div><h6>Beispiel 4.7. Anwendung der :message Option</h6></div><br class="example-break" /></div></li><li class="listitem"><div class="para"><code class="code">:on</code></div><div class="para">Spezifiziert, wann die Validierung ausgeführt werden soll.
+              Default ist <code class="code">:save.</code></div><div class="para">Mögliche Optionen:<div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><div class="para"><code class="code">:update</code></div><div class="para">Nur bei einem Update des Datensatzes wird
+                    validiert.</div></li><li class="listitem"><div class="para"><code class="code">:create</code></div><div class="para">Nur beim ersten Abspeichern, also beim initialen
+                    Erstellen des Datensatzes, wird validiert.</div></li><li class="listitem"><div class="para"><code class="code">:save</code></div><div class="para"><code class="code">:save</code> ist die Kombination zwischen
+                    <code class="code">:update</code> und <code class="code">:create</code>. Es wird
+                    also immer validiert.</div></li></ul></div></div><div class="para"><div class="example"><div class="example-contents"><div class="para"><pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_numericality_of :title, <span class="emphasis"><em>:on =&gt; :create</em></span>
+end
+</pre></div></div><h6>Beispiel 4.8. Anwendung der :on Option</h6></div><br class="example-break" /></div></li><li class="listitem"><div class="para"><code class="code">:only_integer</code></div><div class="para">Lässt nur ganze Zahlen zu. Default ist <code class="code">false</code>
+              (das heißt es dürfen auch Real abgespeichert werden).</div></li><li class="listitem"><div class="para"><code class="code">:greater_than</code></div><div class="para">Stellt sicher, das die Zahl grösser als der hier
+              angegebene Wert ist.<div class="example"><div class="example-contents"><div class="para"><pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_numericality_of :production_year, <span class="emphasis"><em>:greater_than =&gt; 1894</em></span>
+end
+</pre></div></div><h6>Beispiel 4.9. Anwendung der :greater_than Option</h6></div><br class="example-break" /></div></li><li class="listitem"><div class="para"><code class="code">:greater_than_or_equal_to</code></div><div class="para">Stellt sicher, das die Zahl grösser oder gleich des
+              angegebene Wertes ist.<div class="example"><div class="example-contents"><div class="para"><pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_numericality_of :production_year, <span class="emphasis"><em>:greater_than_or_equal_to =&gt; 1895</em></span>
+end
+</pre></div></div><h6>Beispiel 4.10. Anwendung der :greater_than_or_equal_to
+                  Option</h6></div><br class="example-break" /></div></li><li class="listitem"><div class="para"><code class="code">:less_than</code></div><div class="para">Stellt sicher, das die Zahl kleiner als der hier
+              angegebene Wert ist.<div class="example"><div class="example-contents"><div class="para"><pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_numericality_of :production_year, <span class="emphasis"><em>:less_than =&gt; 2011</em></span>
+end
+</pre></div></div><h6>Beispiel 4.11. Anwendung der :less_than Option</h6></div><br class="example-break" /></div></li><li class="listitem"><div class="para"><code class="code">:less_than_or_equal_to</code></div><div class="para">Stellt sicher, das die Zahl kleiner oder gleich des
+              angegebenen Wertes ist.<div class="example"><div class="example-contents"><div class="para"><pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_numericality_of :production_year, <span class="emphasis"><em>:less_than_or_equal_to =&gt; 2010</em></span>
+end
+</pre></div></div><h6>Beispiel 4.12. Anwendung der :less_than_or_equal_to Option</h6></div><br class="example-break" /></div></li><li class="listitem"><div class="para"><code class="code">:equal_to</code></div><div class="para">Stellt sicher, das die Zahl gleich der angegebenen Zahl
+              ist.<div class="example"><div class="example-contents"><div class="para"><pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_numericality_of :production_year, <span class="emphasis"><em>:equal_to =&gt; 2000</em></span>
+end
+</pre></div></div><h6>Beispiel 4.13. Anwendung der :equal_to Option</h6></div><br class="example-break" /></div></li><li class="listitem"><div class="para"><code class="code">:odd</code></div><div class="para">Stellt sicher, das die Zahl immer ungerade ist. Default
+              ist <code class="code">false</code>.<div class="example"><div class="example-contents"><div class="para"><pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_numericality_of :production_year, <span class="emphasis"><em>:odd =&gt; true</em></span>
+end
+</pre></div></div><h6>Beispiel 4.14. Anwendung der :odd Option</h6></div><br class="example-break" /></div></li><li class="listitem"><div class="para"><code class="code">:even</code></div><div class="para">Stellt sicher, das die Zahl immer gerade ist. Default ist
+              <code class="code">false</code>.<div class="example"><div class="example-contents"><div class="para"><pre class="programlisting">class Movie &lt; ActiveRecord::Base
+  validates_numericality_of :production_year, <span class="emphasis"><em>:even =&gt; true</em></span>
+end
+</pre></div></div><h6>Beispiel 4.15. Anwendung der :even Option</h6></div><br class="example-break" /></div></li></ul></div></div></div></div></div><ul class="docnav bottom"><li class="previous"><a accesskey="p" href="model_orientierung.html"><strong>Zurück</strong>4.2. Orientierung</a></li><li class="up"><a accesskey="u" href="#"><strong>Nach oben</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Zum Anfang</strong></a></li><li class="next"><a accesskey="n" href="ch04s04.html"><strong>Weiter</strong>4.4. Dieses Kapitel ist noch nicht fertig gestellt</a></li></ul></div><div class="clear"></div></div></div></body></html>

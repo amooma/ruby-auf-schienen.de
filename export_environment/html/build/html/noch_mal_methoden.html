@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>2.7. Noch mal Methoden</title><link rel="stylesheet" href="./default.css" type="text/css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta name="package" content="" /><link rel="home" href="index.html" title="Ruby on Rails 3.0" /><link rel="up" href="ruby-grundlagen.html" title="Kapitel 2. Ruby Grundlagen" /><link rel="prev" href="ch02s06.html" title="2.6. Variablen" /><link rel="next" href="ruby-if-condition.html" title="2.8. if-Bedingung (if-Condition)" /></head><body id="your-body"><div id="content"><div id="content-inner"><div id="leftcol" class="sidebar"><ul class="breadcrumbs"><li class="breadcrumb-link" style="margin-left: 0em"><a href="index.html">Ruby on Rails 3.0</a></li><li class="breadcrumb-link breadcrumb-bullet" style="margin-left: 0.8em"><a href="ruby-grundlagen.html">Ruby Grundlagen</a></li><li class="breadcrumb-node breadcrumb-last breadcrumb-bullet" style="margin-left: 1.6em"><a href="noch_mal_methoden.html">Noch mal Methoden</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="noch_mal_methoden.html#getter_und_setter_methoden">Getter und Setter</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="noch_mal_methoden.html#id3305863">Mitgelieferte Methoden bei String</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="noch_mal_methoden.html#id3305919">Verketten von Methoden</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="noch_mal_methoden.html#id3305954">Von einem zum anderen (Konvertieren)</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="noch_mal_methoden.html#id3306061">Methode to_s bei eigenen Klassen</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="noch_mal_methoden.html#id3306153">Ist <span class="quote">„<span class="quote">+</span>“</span> eine Methode?</a></li></ul><div id="textsize"><span class="textts"> Change Text Size</span><br /><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='13px'"><span class="plusts" style="font-size: small;">+</span></a><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='15px'"><span class="plusts" style="font-size: large;">+</span></a><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='17px'"><span class="plusts" style="font-size: x-large;">+</span></a></div></div><div id="rightcol" class="sidebar"></div><div id="maincol"><ul class="docnav top"><li class="previous"><a accesskey="p" href="ch02s06.html"><strong>Zurück</strong></a></li><li class="next"><a accesskey="n" href="ruby-if-condition.html"><strong>Weiter</strong></a></li></ul><div class="section" title="2.7. Noch mal Methoden" id="noch_mal_methoden"><div class="titlepage"><div><div><h2 class="title">2.7. Noch mal Methoden</h2></div></div></div><div class="para">Um die Menge der Henne-Ei-Probleme in diesem Kapitel erträglich zu
+    halten, müssen wir uns jetzt noch einmal mit Methoden beschäftigen und
+    dabei alles bis jetzt erlernte kombinieren.</div><div class="section" title="2.7.1. Getter und Setter" id="getter_und_setter_methoden"><div class="titlepage"><div><div><h3 class="title">2.7.1. Getter und Setter</h3></div></div></div><div class="para">Da Instanz-Variablen (<span class="quote">„<span class="quote">Attribute</span>“</span>) nur innerhalb der
+      jeweiligen Instanz existieren, muss man zum Exportieren einer solchen
+      Variable immer eine <span class="quote">„<span class="quote">Getter</span>“</span>-Methode schreiben. Wenn wir
+      eine Klasse <code class="classname">Raum</code> definieren, die als
+      Instanz-Variablen <code class="varname">@tueren</code> und
+      <code class="varname">@fenster</code> hat (für die Anzahl der Türen und Fenster
+      des Raumes), so können wir wie folgt Getter-Methoden
+      <code class="methodname">tueren</code> und <code class="methodname">fenster</code>
+      erstellen (Beispielprogramm
+      <code class="filename">raum.rb</code>):<pre class="programlisting">class Raum
+  def initialize
+    @tueren  = 1   # ein neuer Raum hat eine Tür
+    @fenster = 1   # ein neuer Raum hat ein Fenster
+  end
+  
+  <span class="bold bold"><strong>def tueren</strong></span>
+    <span class="bold bold"><strong>@tueren</strong></span>        # der Wert von @tueren wird zurückgeben
+  <span class="bold bold"><strong>end</strong></span>
+  
+  <span class="bold bold"><strong>def fenster</strong></span>
+    <span class="bold bold"><strong>@fenster</strong></span>       # der Wert von @fenster wird zurückgeben
+  <span class="bold bold"><strong>end</strong></span>
+end
+
+wohnzimmer = Raum.new
+
+puts wohnzimmer.tueren
+puts wohnzimmer.fenster
+</pre></div><div class="para">Die Ausführung des Programmes:<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>ruby raum.rb</strong></span> 
+1
+1
+sw@debian:~/sandbox$ </pre></div><div class="para">Da dieses Szenario – dass man einfach nur einen Wert identisch
+      zurückgeben will – so häufig auftritt, gibt es dafür schon eine
+      vorgefertigte Getter-Methode mit dem Namen
+      <code class="methodname">attr_reader</code>, die wie folgt im Programm
+      <code class="filename">raum.rb</code> angewendet werden würde:<pre class="programlisting">class Raum
+  def initialize
+    @tueren  = 1
+    @fenster = 1
+  end
+  
+  <span class="bold bold"><strong>attr_reader :tueren, :fenster</strong></span>   # die Namen werden als Symbol angegeben
+end
+
+wohnzimmer = Raum.new
+
+puts wohnzimmer.tueren
+puts wohnzimmer.fenster
+</pre></div><div class="note"><h2>Anmerkung</h2><div class="para"><code class="methodname">attr_reader</code> ist ein gutes Beispiel für
+        Meta-Programmierung in Ruby. Sie werden gerade bei der Arbeit mit
+        Rails immer wieder auf Meta-Programmierung stoßen und sich über die
+        Automagie freuen.</div></div><div class="para">Wenn man von Außen die Anzahl der Türen oder Fenster verändern
+      will, so braucht man dafür eine <span class="quote">„<span class="quote">Setter</span>“</span>-Methode. Die kann
+      wie folgt realisiert werden:<pre class="programlisting">class Raum
+  def initialize
+    @tueren  = 1
+    @fenster = 1
+  end
+  
+  attr_reader :tueren, :fenster
+  
+  <span class="bold bold"><strong>def tueren=(value)</strong></span>       # Setter fuer tueren
+    <span class="bold bold"><strong>@tueren = value</strong></span>
+  <span class="bold bold"><strong>end</strong></span>
+  
+  <span class="bold bold"><strong>def fenster=(value)</strong></span>      # Setter fuer fenster
+    <span class="bold bold"><strong>@fenster = value</strong></span>
+  <span class="bold bold"><strong>end</strong></span>
+end
+
+wohnzimmer = Raum.new
+
+puts wohnzimmer.tueren
+puts wohnzimmer.fenster
+
+wohnzimmer.fenster = 2     # fenster wird neu gesetzt
+
+puts wohnzimmer.fenster
+</pre></div><div class="para">Die entsprechende Ausgabe dazu:<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>ruby raum.rb</strong></span>
+1
+1
+2
+sw@debian:~/sandbox$ </pre></div><div class="para">Sie können es sich wahrscheinlich schon denken: Natürlich gibt es
+      dazu auch einen vorgefertigen und kürzeren Weg. Mit der Methode
+      <code class="methodname">attr_writer</code> können Sie den Code von
+      <code class="filename">raum.rb</code> weiter vereinfachen:<pre class="programlisting">class Raum
+  def initialize
+    @tueren  = 1
+    @fenster = 1
+  end
+  
+  attr_reader :tueren, :fenster
+  
+  <span class="bold bold"><strong>attr_writer :tueren, :fenster</strong></span>
+end
+
+wohnzimmer = Raum.new
+
+puts wohnzimmer.tueren
+puts wohnzimmer.fenster
+
+wohnzimmer.fenster = 2
+
+puts wohnzimmer.fenster
+</pre></div><div class="para">Und (wer hätte das gedacht!) es gibt auch eine Methode
+      <code class="methodname">attr_accessor</code>, die Getter und Setter
+      kombiniert. Der Code für <code class="filename">raum.rb</code> sähe dann so
+      aus:<pre class="screen">class Raum
+  def initialize
+    @tueren  = 1
+    @fenster = 1
+  end
+  
+  <span class="bold bold"><strong>attr_accessor :tueren, :fenster</strong></span>
+end
+
+wohnzimmer = Raum.new
+
+puts wohnzimmer.tueren
+puts wohnzimmer.fenster
+
+wohnzimmer.fenster = 2
+
+puts wohnzimmer.fenster
+</pre></div></div><div class="section" title="2.7.2. Mitgelieferte Methoden bei String"><div class="titlepage"><div><div><h3 class="title">2.7.2. Mitgelieferte Methoden bei String</h3></div></div></div><div class="para">Die meisten Klassen kommen von Hause aus schon mit einem ganzen
+      Sack voll äußerst praktischer Methoden. Diese Methoden werden immer mit
+      einem Punkt abgetrennt hinter dem entsprechenden Objekt
+      geschrieben.</div><div class="para">Hier ein paar Beispiele für Methoden der Klasse
+      <code class="classname">String</code>.<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>irb</strong></span>
+irb(main):001:0&gt; <span class="command"><strong>a = 'Das Haus.'</strong></span>
+=&gt; "Das Haus."
+irb(main):002:0&gt; <span class="command"><strong>a.class</strong></span>     # .class gibt die Klasse des Objektes aus
+=&gt; String
+irb(main):003:0&gt; <span class="command"><strong>a.size</strong></span>      # Länge des Strings
+=&gt; 9
+irb(main):004:0&gt; <span class="command"><strong>a.downcase</strong></span>  # Umwandlung in Kleinbuchstaben
+=&gt; "das haus."
+irb(main):005:0&gt; <span class="command"><strong>a.upcase</strong></span>    # Umwandlung in Großbuchstaben
+=&gt; "DAS HAUS."
+irb(main):006:0&gt; <span class="command"><strong>a.reverse</strong></span>   # Buchstabenreihenfolge umdrehen
+=&gt; ".suaH saD"
+irb(main):007:0&gt; <span class="command"><strong>exit</strong></span>
+</pre></div></div><div class="section" title="2.7.3. Verketten von Methoden"><div class="titlepage"><div><div><h3 class="title">2.7.3. Verketten von Methoden</h3></div></div></div><div class="para">Man kommt nicht direkt drauf, aber wenn man sich an das Arbeiten
+      mit Ruby gewöhnt hat, dann ist es auch völlig selbstverständlich (weil
+      logisch) verschiedene Methoden zu verketten.<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>irb</strong></span>
+irb(main):001:0&gt; <span class="command"><strong>a = 'Das Haus.'</strong></span>
+=&gt; "Das Haus."
+irb(main):002:0&gt; <span class="command"><strong>a.class</strong></span>
+=&gt; String
+irb(main):003:0&gt; <span class="command"><strong>a.upcase.reverse</strong></span>  # Großbuchstaben umgedreht
+=&gt; ".SUAH SAD"
+irb(main):004:0&gt; <span class="command"><strong>exit</strong></span>
+</pre></div></div><div class="section" title="2.7.4. Von einem zum anderen (Konvertieren)"><div class="titlepage"><div><div><h3 class="title">2.7.4. Von einem zum anderen (Konvertieren)</h3></div></div></div><div class="para">Logischerweise gibt es eine ganze Reihe von praktischen
+      Instanz-Methoden um Objekte von einer Klasse in eine andere zu wandeln
+      (zu <span class="quote">„<span class="quote">cast</span>“</span>en). Als erstes verwandeln wir mal mit der
+      Methode <code class="methodname">.to_s</code> ein <code class="classname">Fixnum</code>
+      in einen <code class="classname">String</code>.<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>irb</strong></span>
+irb(main):001:0&gt; <span class="command"><strong>a = 10</strong></span>
+=&gt; 10
+irb(main):002:0&gt; <span class="command"><strong>a.class</strong></span>
+=&gt; Fixnum
+irb(main):003:0&gt; <span class="command"><strong>b = a.to_s</strong></span>
+=&gt; "10"
+irb(main):004:0&gt; <span class="command"><strong>exit</strong></span>
+</pre></div><div class="para">Nichts anderes macht übrigens <code class="code">puts</code>, wenn man mit
+      <code class="code">puts</code> ein <code class="classname">Fixnum</code> oder ein
+      <code class="classname">Float</code> ausgibt (es fügt bei Nicht-Strings einfach
+      die Methode <code class="methodname">.to_s</code> hinzu und gibt das Ergebnis
+      aus).</div><div class="para">Jetzt wandeln wir mal mit der Methode
+      <code class="methodname">.to_i</code> ein <code class="classname">Float</code> in ein
+      <code class="classname">Fixnum</code> um.<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>irb</strong></span>
+irb(main):001:0&gt; <span class="command"><strong>c = 10.0</strong></span>
+=&gt; 10.0
+irb(main):002:0&gt; <span class="command"><strong>c.class</strong></span>
+=&gt; Float
+irb(main):003:0&gt; <span class="command"><strong>d = c.to_i</strong></span>
+=&gt; 10
+irb(main):004:0&gt; <span class="command"><strong>d.class</strong></span>
+=&gt; Fixnum
+irb(main):005:0&gt; <span class="command"><strong>exit</strong></span>
+</pre></div></div><div class="section" title="2.7.5. Methode to_s bei eigenen Klassen"><div class="titlepage"><div><div><h3 class="title">2.7.5. Methode to_s bei eigenen Klassen</h3></div></div></div><div class="para">Man sollte – und wenn es nur für das einfachere Debugging ist –
+      bei selbstdefinierten Klassen immer eine Methode
+      <code class="methodname">to_s</code> einbauen. Dann kann man ein entsprechendes
+      Objekt einfach mit <code class="code">puts</code> ausgeben (<code class="code">puts</code> gibt
+      ein Objekt automatisch unter Verwendung der Methode
+      <code class="methodname">to_s</code> aus).</div><div class="para">Ein Beispiel:<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>irb</strong></span>
+irb(main):001:0&gt; <span class="command"><strong>class Tier</strong></span>
+irb(main):002:1&gt; <span class="command"><strong>  def initialize(de_name,en_name)</strong></span>
+irb(main):003:2&gt; <span class="command"><strong>    @de_name = de_name</strong></span>
+irb(main):004:2&gt; <span class="command"><strong>    @en_name = en_name</strong></span>
+irb(main):005:2&gt; <span class="command"><strong>  end</strong></span>
+irb(main):006:1&gt; <span class="command"><strong>  def to_s</strong></span>
+irb(main):007:2&gt; <span class="command"><strong>    @de_name + ' (' + @en_name + ')'</strong></span>
+irb(main):008:2&gt; <span class="command"><strong>  end</strong></span>
+irb(main):009:1&gt; <span class="command"><strong>end</strong></span>
+=&gt; nil
+irb(main):010:0&gt; <span class="command"><strong>lumpi = Tier.new('Hund', 'Dog')</strong></span>
+=&gt; #&lt;Tier:0x873b5c8 @de_name="Hund", @en_name="Dog"&gt;
+irb(main):011:0&gt; <span class="command"><strong>hansi = Tier.new('Wellensittich', 'Budgerigar')</strong></span>           
+=&gt; #&lt;Tier:0x86b60f8 @de_name="Wellensittich", @en_name="Budgerigar"&gt;
+irb(main):012:0&gt; <span class="command"><strong>puts lumpi</strong></span>
+Hund(Dog)
+=&gt; nil
+irb(main):013:0&gt; <span class="command"><strong>puts hansi</strong></span>
+Wellensittich(Budgerigar)
+=&gt; nil
+irb(main):014:0&gt; <span class="command"><strong>exit</strong></span>
+</pre></div></div><div class="section" title="2.7.6. Ist „+“ eine Methode?"><div class="titlepage"><div><div><h3 class="title">2.7.6. Ist <span class="quote">„<span class="quote">+</span>“</span> eine Methode?</h3></div></div></div><div class="para">Wieso steht bei der Liste der Methoden beim
+      <code class="classname">String</code> auch das Pluszeichen? Schauen wir mal mit
+      <span class="application">ri</span> nach:<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>ri String.+</strong></span>
+--------------------------------------------------------------- String#+
+     str + other_str   =&gt; new_str
+
+     From Ruby 1.9.1
+------------------------------------------------------------------------
+     Concatenation---Returns a new +String+ containing _other_str_
+     concatenated to _str_.
+
+        "Hello from " + self.to_s   #=&gt; "Hello from main"
+
+sw@debian:~/sandbox$</pre></div><div class="para">hmmm… Mal schauen was da bei <code class="classname">Fixnum</code>
+      steht:<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>ri Fixnum.+</strong></span>
+--------------------------------------------------------------- Fixnum#+
+     fix + numeric   =&gt;  numeric_result
+
+     From Ruby 1.9.1
+------------------------------------------------------------------------
+     Performs addition: the class of the resulting object depends on the
+     class of +numeric+ and on the magnitude of the result.
+
+sw@debian:~/sandbox$</pre></div><div class="para">Spielen wir damit mal im irb. Wir müssten ja dann das
+      <code class="methodname">+</code> genauso wie jede andere Methode mit einem
+      Punkt an die Class hängen können und die zweite Zahl in einer Klammer
+      als Parameter anfügen.<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>irb</strong></span>
+irb(main):001:0&gt; <span class="command"><strong>10 + 10</strong></span>
+=&gt; 20
+irb(main):002:0&gt; <span class="command"><strong>10+10</strong></span>
+=&gt; 20
+irb(main):003:0&gt; <span class="command"><strong>10.+10</strong></span>
+=&gt; 20
+irb(main):004:0&gt; <span class="command"><strong>10.+(10)</strong></span>
+=&gt; 20
+irb(main):005:0&gt; <span class="command"><strong>exit</strong></span>
+</pre></div><div class="para">Aha! Das Pluszeichen ist tatsächlich eine Methode, und diese
+      Methode nimmt den nächsten Wert als Parameter. Eigentlich müssten wir
+      diesen Wert in einer Klammer setzen, aber Ruby erspart uns das mit
+      durchdachter Syntax.</div><div class="section" title="2.7.6.1. Kann ich die Methode + überschreiben?"><div class="titlepage"><div><div><h4 class="title">2.7.6.1. Kann ich die Methode + überschreiben?</h4></div></div></div><div class="para">Ja, man kann alle Methoden überschreiben. Logischerweise macht
+        das bei Methoden wie <code class="methodname">+</code> wenig Sinn, außer man
+        will damit seine Programmierkollegen in den Wahnsinn treiben. Damit
+        Sie mir glauben führe ich jetzt im irb mal eine kleine Demo
+        aus.</div><div class="para">Das Ziel ist es die Methode <code class="methodname">+</code> für
+        <code class="classname">Fixnum</code> zu überschreiben. Als Ergebnis jeder
+        Addition soll die Zahl 42 rauskommen.<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>irb</strong></span>
+irb(main):001:0&gt; <span class="command"><strong>10 + 10</strong></span>
+=&gt; 20
+irb(main):002:0&gt; <span class="command"><strong>10 + 5555</strong></span>
+=&gt; 5565
+irb(main):003:0&gt; <span class="command"><strong>class Fixnum</strong></span> 
+irb(main):004:1&gt; <span class="command"><strong>  def +(name, *args, &amp;blk)</strong></span>
+irb(main):005:2&gt; <span class="command"><strong>    42</strong></span>
+irb(main):006:2&gt; <span class="command"><strong>  end</strong></span>
+irb(main):007:1&gt; <span class="command"><strong>end</strong></span>
+=&gt; nil
+irb(main):008:0&gt; <span class="command"><strong>10 + 10</strong></span>
+=&gt; 42
+irb(main):042:0&gt; <span class="command"><strong>10 + 5555</strong></span>
+=&gt; 42
+irb(main):042:0&gt; <span class="command"><strong>exit</strong></span>
+</pre></div><div class="para">In den Zeilen 1 und 2 führen wir die normale Addition durch. In
+        den Zeilen 3 bis 7 definieren wir die Methode
+        <code class="methodname">+</code> für die Class <code class="classname">Fixnum</code>
+        neu, und danach führen wir noch einmal die Berechnung durch. Dann
+        allerdings mit anderen Ergebnissen.</div></div><div class="section" title="2.7.6.2. Liste aller Methoden für eine bestimmte Class"><div class="titlepage"><div><div><h4 class="title">2.7.6.2. Liste aller Methoden für eine bestimmte Class</h4></div></div></div><div class="para">Nun hat man nicht immer alle Methoden-Namen im Kopf, weiß aber
+        dass es für das spezielle Problem eine perfekte Methode gibt (passiert
+        mir ständig).</div><div class="section" title="2.7.6.2.1. Im irb"><div class="titlepage"><div><div><h5 class="title">2.7.6.2.1. Im irb</h5></div></div></div><div class="para">Mit der Methode <code class="methodname">methods</code> kann man die
+          zur Verfügung stehenden Methoden anzeigen. Allerdings weiß man dann
+          nicht unbedingt was diese genau machen.<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>irb</strong></span>
+irb(main):001:0&gt; <span class="command"><strong>a = 'Das blaue Haus.'</strong></span>
+=&gt; "Das blaue Haus."
+irb(main):002:0&gt; <span class="command"><strong>a.methods</strong></span>
+=&gt; [:&lt;=&gt;, :==, :===, :eql?, :hash, :casecmp, :+, :*, :%, :[], :[]=, :insert, :length, :size, :bytesize, :empty?, :=~, :match, :succ, :succ!, :next, :next!, :upto, :index, :rindex, :replace, :clear, :chr, :getbyte, :setbyte, :to_i, :to_f, :to_s, :to_str, :inspect, :dump, :upcase, :downcase, :capitalize, :swapcase, :upcase!, :downcase!, :capitalize!, :swapcase!, :hex, :oct, :split, :lines, :bytes, :chars, :codepoints, :reverse, :reverse!, :concat, :&lt;&lt;, :crypt, :intern, :to_sym, :ord, :include?, :start_with?, :end_with?, :scan, :ljust, :rjust, :center, :sub, :gsub, :chop, :chomp, :strip, :lstrip, :rstrip, :sub!, :gsub!, :chop!, :chomp!, :strip!, :lstrip!, :rstrip!, :tr, :tr_s, :delete, :squeeze, :count, :tr!, :tr_s!, :delete!, :squeeze!, :each_line, :each_byte, :each_char, :each_codepoint, :sum, :slice, :slice!, :partition, :rpartition, :encoding, :force_encoding, :valid_encoding?, :ascii_only?, :unpack, :encode, :encode!, :to_r, :to_c, :&gt;, :&gt;=, :&lt;, :&lt;=, :between?, :nil?, :!~, :class, :clone, :dup, :taint, :tainted?, :untaint, :untrust, :untrusted?, :trust, :freeze, :frozen?, :methods, :singleton_methods, :protected_methods, :private_methods, :public_methods, :instance_variables, :instance_variable_get, :instance_variable_set, :instance_variable_defined?, :instance_of?, :kind_of?, :is_a?, :tap, :send, :public_send, :respond_to?, :extend, :display, :method, :public_method, :define_singleton_method, :__id__, :object_id, :to_enum, :enum_for, :gem, :equal?, :!, :!=, :instance_eval, :instance_exec, :__send__]
+irb(main):003:0&gt; <span class="command"><strong>exit</strong></span>
+</pre></div></div></div></div></div><ul class="docnav bottom"><li class="previous"><a accesskey="p" href="ch02s06.html"><strong>Zurück</strong>2.6. Variablen</a></li><li class="up"><a accesskey="u" href="#"><strong>Nach oben</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Zum Anfang</strong></a></li><li class="next"><a accesskey="n" href="ruby-if-condition.html"><strong>Weiter</strong>2.8. if-Bedingung (if-Condition)</a></li></ul></div><div class="clear"></div></div></div></body></html>

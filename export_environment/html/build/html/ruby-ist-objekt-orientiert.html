@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>2.5. Ruby ist objektorientiert</title><link rel="stylesheet" href="./default.css" type="text/css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta name="package" content="" /><link rel="home" href="index.html" title="Ruby on Rails 3.0" /><link rel="up" href="ruby-grundlagen.html" title="Kapitel 2. Ruby Grundlagen" /><link rel="prev" href="irb.html" title="2.4. irb" /><link rel="next" href="ch02s06.html" title="2.6. Variablen" /></head><body id="your-body"><div id="content"><div id="content-inner"><div id="leftcol" class="sidebar"><ul class="breadcrumbs"><li class="breadcrumb-link" style="margin-left: 0em"><a href="index.html">Ruby on Rails 3.0</a></li><li class="breadcrumb-link breadcrumb-bullet" style="margin-left: 0.8em"><a href="ruby-grundlagen.html">Ruby Grundlagen</a></li><li class="breadcrumb-node breadcrumb-last breadcrumb-bullet" style="margin-left: 1.6em"><a href="ruby-ist-objekt-orientiert.html">Ruby ist objektorientiert</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="ruby-ist-objekt-orientiert.html#id3298716">Anmerkung</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="ruby-ist-objekt-orientiert.html#ruby-methoden">Methoden (Methods)</a></li><li class="breadcrumb-link breadcrumb-bullet-another" style="margin-left: 2.4em"><a href="ruby-ist-objekt-orientiert.html#ruby-class">Klassen (Classes)</a></li></ul><div id="textsize"><span class="textts"> Change Text Size</span><br /><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='13px'"><span class="plusts" style="font-size: small;">+</span></a><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='15px'"><span class="plusts" style="font-size: large;">+</span></a><a href="javascript:void(0);" onclick="javascript:body.style.fontSize='17px'"><span class="plusts" style="font-size: x-large;">+</span></a></div></div><div id="rightcol" class="sidebar"></div><div id="maincol"><ul class="docnav top"><li class="previous"><a accesskey="p" href="irb.html"><strong>Zurück</strong></a></li><li class="next"><a accesskey="n" href="ch02s06.html"><strong>Weiter</strong></a></li></ul><div class="section" title="2.5. Ruby ist objektorientiert" id="ruby-ist-objekt-orientiert"><div class="titlepage"><div><div><h2 class="title">2.5. Ruby ist objektorientiert</h2></div></div></div><div class="para">Ruby kennt nur Objekte. Alles ist ein Objekt (was ja fast schon
+    zen-artig ist). Jedes Objekt ist eine Instanz (Instance) einer Klasse
+    (Class). Die Klasse eines Objektes lässt sich mit der Methode
+    <code class="methodname">.class</code> rausfinden.</div><div class="para">Ein Objekt in Ruby ist eingekapselt und kann von Außen nur mit den
+    Methoden des entsprechenden Objektes erreicht werden. Was das heißt? Ich
+    kann von Außen keine Variable in einem Objekt direkt verändern. Das
+    entsprechende Objekt muss mir dafür eine Methode zur Verfügung
+    stellen.</div><div class="note"><h2>Anmerkung</h2><div class="para">Sie haben keine Ahnung was eine Klasse und was ein Objekt ist?
+      Keine Panik! Ich werde es keinem erzählen, und man kann auch ganz gut
+      damit arbeiten, ohne sich große Gedanken darüber zu machen. Mit dem
+      Thema alleine könnte man ein eigenes und viel grösseres Buch füllen.
+      Ganz grob: Ein Objekt ist ein Container für irgendwas und eine Methode
+      verändert etwas in diesem Container.</div><div class="para">Lesen Sie bitte weiter und schauen Sie sich die Beispiele an.
+      Stück für Stück wird das Puzzle dann klarer.</div></div><div class="section" title="2.5.1. Methoden (Methods)" id="ruby-methoden"><div class="titlepage"><div><div><h3 class="title">2.5.1. Methoden (Methods)</h3></div></div></div><div class="para">In anderen Programmiersprachen würde man für Ruby-Methoden
+      Begriffe wie die folgenden verwenden:<div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><div class="para">Funktionen</div></li><li class="listitem"><div class="para">Prozeduren</div></li><li class="listitem"><div class="para">Subroutinen</div></li><li class="listitem"><div class="para">Makros</div></li><li class="listitem"><div class="para">Methoden</div></li></ul></div></div><div class="para">Da Ruby objektorientiert angelegt ist, sind es in Ruby halt
+      Methoden. Man darf sich da an dem Namen nicht stören.<div class="note"><h2>Anmerkung</h2><div class="para">Es gibt zwei Arten von Methoden (Class Method und Instance
+          Method). Ich will es an dieser Stelle nicht zu kompliziert machen
+          und übergehe diesen <span class="quote">„<span class="quote">feinen</span>“</span> Unterschied einfach
+          mal.</div></div></div><div class="para">An so einer Stelle sucht man immer nach einem guten Beispiel, aber
+      es fallen einem nur eigentlich unsinnige Beispiele ein. Das Problem ist
+      dabei die Prämisse, dass man nur Wissen benutzen kann/darf, das bis zu
+      dieser Stelle schon im Buch beschrieben wurde.</div><div class="para">Nehmen wir also an, dass wir folgenden Code-Ablauf - aus welchem
+      Grund auch immer - häufig verwenden:<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>irb</strong></span>
+irb(main):001:0&gt; <span class="command"><strong>puts 'Hello World!'</strong></span>
+Hello World!
+=&gt; nil
+irb(main):002:0&gt; <span class="command"><strong>puts 'Hello World!'</strong></span>
+Hello World!
+=&gt; nil
+irb(main):003:0&gt; <span class="command"><strong>puts 'Hello World!'</strong></span>
+Hello World!
+=&gt; nil
+irb(main):004:0&gt; <span class="command"><strong>exit</strong></span>
+</pre></div><div class="para">Wir möchten also dreimal hintereinander den String <span class="quote">„<span class="quote">Hello
+      World!</span>“</span> ausgeben. Da dies unseren täglichen Arbeitsablauf stark
+      in die Länge zieht, definieren wir jetzt eine Methode (mit dem
+      sinnfreien Namen <code class="methodname">drei_mal</code>), mit der man das
+      alles auf einmal machen kann.<div class="important"><h2>Wichtig</h2><div class="para">Namen von Methoden werden immer kleingeschrieben.</div></div><pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>irb</strong></span>
+irb(main):001:0&gt; <span class="command"><strong>def drei_mal</strong></span>  # Start der Definition
+irb(main):002:1&gt; <span class="command"><strong>  puts 'Hello World!'</strong></span>
+irb(main):003:1&gt; <span class="command"><strong>  puts 'Hello World!'</strong></span>
+irb(main):004:1&gt; <span class="command"><strong>  puts 'Hello World!'</strong></span>
+irb(main):005:1&gt; <span class="command"><strong>end</strong></span>           # Ende der Definition
+=&gt; nil
+irb(main):006:0&gt; <span class="command"><strong>drei_mal</strong></span>      # Aufruf der Methode
+Hello World!
+Hello World!
+Hello World!
+=&gt; nil
+irb(main):007:0&gt; <span class="command"><strong>exit</strong></span>
+</pre></div><div class="para">Bei der Definition einer Methode kann man benötigte Parameter
+      definieren und diese innerhalb der Methode benutzen. Damit können wir
+      eine Methode erstellen, der wir einen String als Parameter übergeben,
+      und den dann dreimal ausgeben lassen.<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>irb</strong></span>
+irb(main):001:0&gt; <span class="command"><strong>def drei_mal(apfelmus)</strong></span>  # Parameter: mystr
+irb(main):002:1&gt; <span class="command"><strong>  puts apfelmus</strong></span>
+irb(main):003:1&gt; <span class="command"><strong>  puts apfelmus</strong></span>
+irb(main):004:1&gt; <span class="command"><strong>  puts apfelmus</strong></span>
+irb(main):005:1&gt; <span class="command"><strong>end</strong></span>
+=&gt; nil
+irb(main):006:0&gt; <span class="command"><strong>drei_mal('Hello World!')</strong></span>
+Hello World!
+Hello World!
+Hello World!
+=&gt; nil
+</pre></div><div class="para">Die Klammern beim Aufruf kann man sich übrigens sparen.<pre class="screen">irb(main):007:0&gt; <span class="command"><strong>drei_mal 'Hello World!'</strong></span>
+Hello World!
+Hello World!
+Hello World!
+=&gt; nil
+</pre></div><div class="tip"><h2>Tipp</h2><div class="para">Ruby-Gurus und Möchtegern-Ruby-Gurus werden über
+        <span class="quote">„<span class="quote">unnötige</span>“</span> Klammern in Ihren Programmen die Nase rüpfen
+        und wahrscheinlich mehr oder weniger blöde Kommentare mit Vergleichen
+        zu Java und anderen Programmiersprachen machen.</div><div class="para">Es gilt in der Ruby-Community eine einfache Regel: Je weniger
+        Klammern, desto cooler! <code class="literal">;-)</code></div></div><div class="para">Wenn man bei der obigen Methode keinen Parameter angibt, kommt die
+      Fehlermeldung: <span class="quote">„<span class="quote"><code class="literal">wrong number of
+      arguments</code></span>“</span>:<pre class="screen">irb(main):008:0&gt; <span class="command"><strong>drei_mal</strong></span>
+ArgumentError: wrong number of arguments (0 for 1)
+ from (irb):8
+ from /usr/local/bin/irb:12:in `&lt;main&gt;'
+irb(main):009:0&gt; <span class="command"><strong>exit</strong></span>
+</pre></div></div><div class="section" title="2.5.2. Klassen (Classes)" id="ruby-class"><div class="titlepage"><div><div><h3 class="title">2.5.2. Klassen (Classes)</h3></div></div></div><div class="para">Eine Klasse ist nichts anderes als eine Ansammlung von Methoden.
+      Der Name einer Klasse beginnt immer mit einem Großbuchstaben. Nehmen wir
+      mal an, dass die Methode zur neuen Klasse
+      <code class="classname">Dies_und_das</code> gehört. Dann würde sie in einem
+      Ruby-Programm folgendermaßen definiert:<pre class="programlisting">class Dies_und_das      # Start der Klassendefinition
+  def drei_mal
+    puts 'Hello World!'
+    puts 'Hello World!'
+    puts 'Hello World!'
+  end
+end                     # Ende der Klassendefinition</pre></div><div class="para">Spielen wir das mal im irb durch:<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>irb</strong></span>
+irb(main):001:0&gt; <span class="command"><strong>class Dies_und_das</strong></span>
+irb(main):002:1&gt; <span class="command"><strong>  def drei_mal</strong></span>
+irb(main):003:2&gt; <span class="command"><strong>    puts 'Hello World!'</strong></span>
+irb(main):004:2&gt; <span class="command"><strong>    puts 'Hello World!'</strong></span>
+irb(main):005:2&gt; <span class="command"><strong>    puts 'Hello World!'</strong></span>
+irb(main):006:2&gt; <span class="command"><strong>  end</strong></span>
+irb(main):007:1&gt; <span class="command"><strong>end</strong></span>
+=&gt; nil
+</pre></div><div class="para">Jetzt probieren wir mal aus, die Methode
+      <code class="methodname">drei_mal</code> aufzurufen:<pre class="screen">irb(main):008:0&gt; <span class="command"><strong>Dies_und_das.drei_mal</strong></span>
+NoMethodError: undefined method `drei_mal' for Dies_und_das:Class
+ from (irb):8
+from /usr/local/bin/irb:12:in `&lt;main&gt;'
+</pre></div><div class="para">Das gibt eine Fehlermeldung, denn
+      <code class="classname">Dies_und_das</code> ist eine Klasse und kein Objekt. Es
+      funktioniert nur, wenn wir vorher ein neues Objekt (also eine neue
+      Instanz) der Klasse <code class="classname">Dies_und_das</code> mit der Methode
+      <code class="methodname">new</code> erzeugt haben:<pre class="screen">irb(main):009:0&gt; <span class="command"><strong>abc = Dies_und_das.new</strong></span>
+=&gt; #&lt;Dies_und_das:0x9ebb3f0&gt;
+irb(main):010:0&gt; <span class="command"><strong>abc.drei_mal</strong></span>
+Hello World!
+Hello World!
+Hello World!
+=&gt; nil
+irb(main):011:0&gt; <span class="command"><strong>exit</strong></span>
+</pre></div><div class="section" title="2.5.2.1. Liste aller Instanz-Methoden"><div class="titlepage"><div><div><h4 class="title">2.5.2.1. Liste aller Instanz-Methoden</h4></div></div></div><div class="para">Für eine Klasse kann man mit der Methode
+        <code class="methodname">instance_methods</code> alle definierten Methoden
+        auslesen.</div><div class="note"><h2>Anmerkung</h2><div class="para">Lassen Sie sich hier nicht von dem Namen
+          <code class="methodname">instance_methods</code> verwirren. Es geht hier im
+          Beispiel um statische Methoden einer Klasse selbst, nicht um
+          Methoden einer Instanz einer Klasse (das wäre ein Objekt). Deshalb
+          hat eine entsprechende Instanz auch keine Methode
+          <code class="methodname">instance_methods</code>, sondern nur die Methode
+          <code class="methodname">methods</code>.</div></div><div class="para">Probieren wir das mal mit der Klasse
+        <code class="classname">Dies_und_das</code> aus (die legen wir dazu noch mal
+        neu im <span class="application">irb</span> an):<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>irb</strong></span>
+irb(main):001:0&gt; <span class="command"><strong>class Dies_und_das</strong></span>
+irb(main):002:1&gt; <span class="command"><strong>  def drei_mal</strong></span>
+irb(main):003:2&gt; <span class="command"><strong>    puts 'Hello World!'</strong></span>
+irb(main):004:2&gt; <span class="command"><strong>    puts 'Hello World!'</strong></span>
+irb(main):005:2&gt; <span class="command"><strong>    puts 'Hello World!'</strong></span>
+irb(main):006:2&gt; <span class="command"><strong>  end</strong></span>
+irb(main):007:1&gt; <span class="command"><strong>end</strong></span>
+=&gt; nil
+irb(main):008:0&gt; <span class="command"><strong>Dies_und_das.instance_methods</strong></span>
+=&gt; [:drei_mal, :nil?, :===, :=~, :!~, :eql?, :class, :clone, :dup, :taint, :tainted?, :untaint, :untrust, :untrusted?, :trust, :freeze, :frozen?, :to_s, :inspect, :methods, :singleton_methods, :protected_methods, :private_methods, :public_methods, :instance_variables, :instance_variable_get, :instance_variable_set, :instance_variable_defined?, :instance_of?, :kind_of?, :is_a?, :tap, :send, :public_send, :respond_to?, :extend, :display, :method, :public_method, :define_singleton_method, :hash, :__id__, :object_id, :to_enum, :enum_for, :gem, :==, :equal?, :!, :!=, :instance_eval, :instance_exec, :__send__]
+</pre></div><div class="para">Das ist ja viel mehr, als wir definiert haben! Das liegt daran,
+        dass jede neue Klasse von Ruby direkt mal ein Grundgerüst an Methoden
+        mitbekommt. Wenn wir nur die von uns definierten Methoden auflisten
+        wollen, so geht das wie folgt:<pre class="screen">irb(main):009:0&gt; <span class="command"><strong>Dies_und_das.instance_methods(false)</strong></span>
+=&gt; [:drei_mal]
+irb(main):010:0&gt; </pre></div></div><div class="section" title="2.5.2.2. Private Methoden"><div class="titlepage"><div><div><h4 class="title">2.5.2.2. Private Methoden</h4></div></div></div><div class="para">Es ist häufig sinnvoll eine Methode nur innerhalb der eigenen
+        Klasse bzw. der eigenen Instanz aufzurufen. Solche Methoden nennt man
+        private Methoden (im Gegensatz zu den öffentlichen Methoden), und sie
+        werden innerhalb einer Klasse unterhalb des Schlüsselwortes
+        <code class="literal">private</code> aufgeführt.</div><div class="para">irb-Beispiel:<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>irb</strong></span>
+irb(main):001:0&gt; <span class="command"><strong>class Beispiel</strong></span>         # Klasse Beispiel
+irb(main):002:1&gt; <span class="command"><strong>  def mach_was</strong></span>         # Methode mach_was
+irb(main):003:2&gt; <span class="command"><strong>    puts 'Was.'</strong></span>           
+irb(main):004:2&gt; <span class="command"><strong>  end</strong></span>
+irb(main):005:1&gt; <span class="command"><strong>  def mach_noch_was</strong></span>    # Methode mach_noch_was
+irb(main):006:2&gt; <span class="command"><strong>    puts 'Noch was.'</strong></span>
+irb(main):007:2&gt; <span class="command"><strong>  end</strong></span>
+irb(main):008:1&gt;   
+irb(main):009:1* <span class="command"><strong>  private</strong></span>              # Beginn der privaten Methoden
+irb(main):010:1&gt; <span class="command"><strong>  def noch_mehr</strong></span>        # Methode noch_mehr
+irb(main):011:2&gt; <span class="command"><strong>    puts 'Noch was.'</strong></span>
+irb(main):012:2&gt; <span class="command"><strong>  end</strong></span>
+irb(main):013:1&gt; <span class="command"><strong>end</strong></span>
+=&gt; nil
+irb(main):014:0&gt; <span class="command"><strong>test = Beispiel.new</strong></span>    # Neue Instanz von Beispiel
+=&gt; #&lt;Beispiel:0x8bb6ffc&gt;
+irb(main):015:0&gt; <span class="command"><strong>test.mach_was</strong></span>          # Methode .mach_was aufrufen
+Was.
+=&gt; nil
+irb(main):016:0&gt; <span class="command"><strong>test.mach_noch_was</strong></span>     # Methode .mach_noch_was aufrufen
+Noch was.
+
+=&gt; nil
+irb(main):017:0&gt; <span class="command"><strong>test.noch_mehr</strong></span>   # Kann nicht von außen aufgerufen werden.
+NoMethodError: private method `noch_mehr' called for #&lt;Beispiel:0x8bb6ffc&gt;
+ from (irb):17
+ from /usr/local/bin/irb:12:in `&lt;main&gt;'
+irb(main):018:0&gt; <span class="command"><strong>exit</strong></span>
+</pre></div></div><div class="section" title="2.5.2.3. Methode initialize"><div class="titlepage"><div><div><h4 class="title">2.5.2.3. Methode initialize</h4></div></div></div><div class="para">Wenn man eine neue Instanz erstellt (also die Methode
+        <code class="methodname">new</code> aufruft), dann gibt es einen Mechanismus
+        eine Art Start-Skript ablaufen zu lassen. Dieser Mechanismus ist die
+        Methode <code class="methodname">initialize</code>.<sup>[<a id="id3304620" href="#ftn.id3304620" class="footnote">4</a>]</sup> Die Methode ist automatisch eine private Methode, auch
+        wenn Sie nicht explizit im Bereich <code class="literal">private</code>
+        aufgeführt wird.</div><div class="para">irb-Beispiel:<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>irb</strong></span>
+irb(main):001:0&gt; <span class="command"><strong>class Beispiel</strong></span>
+irb(main):002:1&gt; <span class="command"><strong>  def initialize</strong></span>
+irb(main):003:2&gt; <span class="command"><strong>    puts 'Hello World!'</strong></span>
+irb(main):004:2&gt; <span class="command"><strong>  end</strong></span>
+irb(main):005:1&gt; <span class="command"><strong>end</strong></span>
+=&gt; nil
+irb(main):006:0&gt; <span class="command"><strong>test = Beispiel.new</strong></span>
+Hello World!
+=&gt; #&lt;Beispiel:0x99f1e24&gt;
+irb(main):007:0&gt; <span class="command"><strong>exit</strong></span>
+</pre></div><div class="para">Die Instanz <code class="code">test</code> wird mit <code class="code">Beispiel.new</code>
+        erstellt, und als erstes wird dabei die Methode
+        <code class="methodname">initialize</code> abgearbeitet. Deshalb sieht man im
+        irb die <code class="code">puts</code>-Ausgabe aus der irb-Zeile 3.</div><div class="para">Die Methode <code class="methodname">new</code> akzeptiert die bei der
+        <code class="methodname">initialize</code> Methode angegebenen
+        Parameter:<pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>irb</strong></span>
+irb(main):001:0&gt; <span class="command"><strong>class Beispiel</strong></span>
+irb(main):002:1&gt; <span class="command"><strong>  def initialize(aaa)</strong></span>   # Definition Parameter aaa
+irb(main):003:2&gt; <span class="command"><strong>    puts aaa</strong></span>            # Ausgabe von aaa
+irb(main):004:2&gt; <span class="command"><strong>  end</strong></span>
+irb(main):005:1&gt; <span class="command"><strong>end</strong></span>
+=&gt; nil
+irb(main):006:0&gt; <span class="command"><strong>test = Beispiel.new('Hello World!')</strong></span>
+Hello World!
+=&gt; #&lt;Beispiel:0x86bed84&gt;
+irb(main):007:0&gt; <span class="command"><strong>exit</strong></span>
+</pre></div></div><div class="section" title="2.5.2.4. Vererben"><div class="titlepage"><div><div><h4 class="title">2.5.2.4. Vererben</h4></div></div></div><div class="para">Eine Klasse kann von einer anderen Klasse erben. Bei der
+        Definition der Klasse muss dabei die Eltern-Klasse mit einem
+        <code class="literal">&lt;</code> (Kleiner-als-Zeichen) angefügt
+        werden:<pre class="programlisting">class Beispiel &lt; Elternklasse</pre>Von
+        dieser Möglichkeit wird in Rails sehr oft Gebrauch gemacht (ansonsten
+        würde ich Sie damit hier nicht behelligen).</div><div class="para">Im folgenden Beispiel definieren wir die Klasse
+        <code class="classname">Literatur</code> und fügen die Methode
+        <code class="methodname">antwort_auf_alle_fragen_des_universums</code> hinzu.
+        Danach definieren wir eine Klasse
+        <code class="classname">Allgemeinwissen</code> und vererben dorthin die Klasse
+        <code class="classname">Literatur</code>. Die Instanz <code class="code">egon</code> hat
+        Zugriff auf alle Methoden und die Instanz <code class="code">fritz</code> nur auf
+        die der Klasse <code class="classname">Literatur</code>.<sup>[<a id="id3304791" href="#ftn.id3304791" class="footnote">5</a>]</sup><pre class="screen">sw@debian:~/sandbox$ <span class="command"><strong>irb</strong></span>
+irb(main):001:0&gt; <span class="command"><strong>class Literatur</strong></span>
+irb(main):002:1&gt; <span class="command"><strong>  def antwort_auf_alle_fragen_des_universums</strong></span>
+irb(main):003:2&gt; <span class="command"><strong>    42</strong></span>
+irb(main):004:2&gt; <span class="command"><strong>  end</strong></span>
+irb(main):005:1&gt; <span class="command"><strong>end</strong></span>
+=&gt; nil
+irb(main):006:0&gt; <span class="command"><strong>class Allgemeinwissen &lt; Literatur</strong></span>     
+irb(main):007:1&gt; <span class="command"><strong>  def pi</strong></span>
+irb(main):008:2&gt; <span class="command"><strong>    3.14</strong></span>
+irb(main):009:2&gt; <span class="command"><strong>  end</strong></span>
+irb(main):010:1&gt; <span class="command"><strong>end</strong></span>
+=&gt; nil
+irb(main):011:0&gt; <span class="command"><strong>fritz = Literatur.new</strong></span>
+=&gt; #&lt;Literatur:0x90e7098&gt;
+irb(main):012:0&gt; <span class="command"><strong>egon = Allgemeinwissen.new</strong></span>
+=&gt; #&lt;Allgemeinwissen:0x90da0ac&gt;
+irb(main):013:0&gt; <span class="command"><strong>egon.antwort_auf_alle_fragen_des_universums</strong></span>
+=&gt; 42
+irb(main):014:0&gt; <span class="command"><strong>egon.pi</strong></span>
+=&gt; 3.14
+irb(main):015:0&gt; <span class="command"><strong>fritz.antwort_auf_alle_fragen_des_universums</strong></span>
+=&gt; 42
+irb(main):016:0&gt; <span class="command"><strong>fritz.pi</strong></span>
+NoMethodError: undefined method `pi' for #&lt;Literatur:0x90e7098&gt;
+ from (irb):21
+ from /usr/local/bin/irb:12:in `&lt;main&gt;'
+irb(main):017:0&gt; <span class="command"><strong>exit</strong></span>
+</pre></div></div></div></div><ul class="docnav bottom"><li class="previous"><a accesskey="p" href="irb.html"><strong>Zurück</strong>2.4. irb</a></li><li class="up"><a accesskey="u" href="#"><strong>Nach oben</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Zum Anfang</strong></a></li><li class="next"><a accesskey="n" href="ch02s06.html"><strong>Weiter</strong>2.6. Variablen</a></li></ul></div><div class="clear"></div></div></div></body></html>
