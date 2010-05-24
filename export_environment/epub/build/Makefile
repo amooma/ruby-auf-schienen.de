@@ -5,9 +5,7 @@ DOCBOOKNSDIR_CLEANED = $(shell cd ${DOCBOOKNSDIR}; pwd | awk -F"$$" {'print $1'}
 
 DOCBOOKXSLPATH :=  ${DOCBOOKNSDIR_CLEANED}/epub/docbook.xsl 
 
-all: document.epub
-       
-document.epub: $(DOCBOOKSRCDIR)/index.xml
+all: 
 	rm -f deps.xsl
 
 	echo "<?xml version='1.0'?>" >> deps.xsl

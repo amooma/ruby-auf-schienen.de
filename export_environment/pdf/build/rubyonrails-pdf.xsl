@@ -24,6 +24,7 @@
 <xsl:param name="line-height" select="1.3"/>
 <xsl:param name="qandadiv.autolabel" select="0"/>
 <xsl:param name="keep.relative.image.uris" select="1"/>
+<xsl:param name="paper.type" select="'A4'"/>
 
 <!-- Format Variable Lists as Blocks (prevents horizontal overflow). -->
 <xsl:param name="variablelist.as.blocks">1</xsl:param>

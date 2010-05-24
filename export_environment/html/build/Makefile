@@ -6,9 +6,7 @@ DOCBOOKNSDIR_CLEANED = $(shell cd ${DOCBOOKNSDIR}; pwd | awk -F"$$" {'print $1'}
 DOCBOOKXSLPATH :=  ${DOCBOOKNSDIR_CLEANED}/xhtml/docbook.xsl
 CHUNKXSLPATH := ${DOCBOOKNSDIR_CLEANED}/xhtml/chunk.xsl
  
-all: $(EXPORTDIR)/html/index.html
-       
-$(EXPORTDIR)/html/index.html: $(DOCBOOKSRCDIR)/index.xml
+all:        
 	rm -f deps.xsl
 
 	echo "<?xml version='1.0'?>" >> deps.xsl
