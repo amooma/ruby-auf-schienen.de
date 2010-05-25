@@ -29,9 +29,9 @@ all:
 	cp -R ${DEPENDDIR}/custom-admons-callouts/ $(EXPORTDIR)/html
 	cp -R ${DOCBOOKSRCDIR}/screenshots $(EXPORTDIR)/html
 	@if test -f $(HTMLDIR)/ad.xml; then \
-		xsltproc --stringparam base.dir $(EXPORTDIR)/html/ --stringparam admon.graphics.path ${DEPENDDIR}/custom-admons-callouts/ --stringparam callout.graphics.path ${DEPENDDIR}/custom-admons-callouts/ --stringparam adincluded 1 --xinclude $(HTMLDIR)/rubyonrails-html.xsl $(DOCBOOKSRCDIR)/index.xml; \
+		xsltproc --stringparam base.dir $(EXPORTDIR)/html/ --stringparam admon.graphics.path ./custom-admons-callouts/ --stringparam callout.graphics.path ./custom-admons-callouts/callouts/ --stringparam adincluded 1 --xinclude $(HTMLDIR)/rubyonrails-html.xsl $(DOCBOOKSRCDIR)/index.xml; \
 	else \
-		xsltproc --stringparam base.dir $(EXPORTDIR)/html/ --stringparam admon.graphics.path ${DEPENDDIR}/custom-admons-callouts/ --stringparam callout.graphics.path ${DEPENDDIR}/custom-admons-callouts/ --stringparam adincluded 0 --xinclude $(HTMLDIR)/rubyonrails-html.xsl $(DOCBOOKSRCDIR)/index.xml; \
+		xsltproc --stringparam base.dir $(EXPORTDIR)/html/ --stringparam admon.graphics.path ./custom-admons-callouts/ --stringparam callout.graphics.path ./custom-admons-callouts/ --stringparam adincluded 0 --xinclude $(HTMLDIR)/rubyonrails-html.xsl $(DOCBOOKSRCDIR)/index.xml; \
 	fi
 	
 clean:

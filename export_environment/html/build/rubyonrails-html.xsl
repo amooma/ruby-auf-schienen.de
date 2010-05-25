@@ -49,6 +49,15 @@ qandaset nop
 </xsl:param>
 
 
+<xsl:param name="admon.graphics" select="1"/>
+<xsl:param name="admon.graphics.extension">.png</xsl:param>
+<xsl:param name="admon.graphics.path">custom-admons-callouts/</xsl:param>
+
+<xsl:param name="callout.graphics" select="1"/>
+<xsl:param name="callout.graphics.extension">.png</xsl:param>
+<xsl:param name="callout.graphics.path">custom-admons-callouts/callouts/</xsl:param>
+
+
 <!--<xsl:param name="embedtoc" select="1"/>-->
 
 <!--
