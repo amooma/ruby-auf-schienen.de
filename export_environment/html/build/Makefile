@@ -20,6 +20,7 @@ all:
 	version=\"1.0\">" >> deps.xsl
 	echo "<xsl:import href=\"${DOCBOOKXSLPATH}\"/>" >> deps.xsl
 	echo "<xsl:import href=\"${CHUNKXSLPATH}\"/>" >> deps.xsl
+	echo "<xsl:variable name=\"adfile\" select=\"document('${HTMLDIR}/ad.xml',/)\"/>" >> deps.xsl
 	echo "</xsl:stylesheet>" >> deps.xsl
 
 	sed 's/.xsl \"/.xsl\"/' deps.xsl  > tmp.xsl; mv tmp.xsl deps.xsl
@@ -35,4 +36,4 @@ all:
 	fi
 	
 clean:
-	rm -rf $(EXPORTDIR)/html
+	rm -rf $(EXPORTDIR)/html deps.xsl

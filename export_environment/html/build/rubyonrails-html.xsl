@@ -30,7 +30,7 @@
 <xsl:param name="use.id.as.filename" select="1"/>
 <xsl:param name="prod.url">http://www.wintermeyer.de/</xsl:param>
 <xsl:param name="doc.url">http://www.wintermeyer.de/</xsl:param>
-<xsl:param name="default.image.width" select="'500px'"/>
+<xsl:param name="default.image.width" select="'700px'"/>
 <xsl:param name="generate.toc">
 set toc
 book toc
@@ -329,23 +329,23 @@ Version:
       </xsl:if>
       <div id="content">
       <div id="content-inner">
-      	<div id="leftcol" class="sidebar">
+      	<div id="rightcol" class="sidebar">
 	      <xsl:call-template name="breadcrumbs"/>
       	
       	<div id="textsize">
       	<span class="textts"> Change Text Size</span><br/>
 	<!--<a href="javascript:void(0);" onclick="javascript:body.style.fontSize='9px'"><span class="plusts" style="font-size: xx-small;">+</span></a> <a href="javascript:void(0);" onclick="javascript:body.style.fontSize='11px'"><span class="plusts" style="font-size: x-small;">+</span></a>-->
 	<a href="javascript:void(0);" onclick="javascript:body.style.fontSize='13px'"><span class="plusts" style="font-size: small;">+</span></a> <a href="javascript:void(0);" onclick="javascript:body.style.fontSize='15px'"><span class="plusts" style="font-size: large;">+</span></a> <a href="javascript:void(0);" onclick="javascript:body.style.fontSize='17px'"><span class="plusts" style="font-size: x-large;">+</span></a>
-	</div>
-      	</div>
-      	<div id="rightcol" class="sidebar">
+		</div>
+		<div id="adsense" align="center">
+
       		<xsl:if test="$adincluded = 1">
      		<script type="text/javascript">
       			<xsl:text disable-output-escaping="yes">
       				<!--ADD YOUR AD INSIDE THE CDATA SECTION-->
 					<![CDATA[<!--]]>
 				</xsl:text>
-				<xsl:variable name="adfile" select="document('ad.xml',/)"/>
+				<!--<xsl:variable name="adfile" select="document('ad.xml',/)"/>-->
 				<xsl:copy-of select="$adfile/ad/node()"/>
       			<xsl:text disable-output-escaping="yes">
 					<![CDATA[//-->]]>
@@ -355,6 +355,7 @@ Version:
 			src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 			</script>
 			</xsl:if>
+		</div>	
       	</div>
       <div id="maincol">
       <xsl:call-template name="user.header.navigation"/>

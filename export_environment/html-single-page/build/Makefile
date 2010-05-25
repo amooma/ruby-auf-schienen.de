@@ -31,4 +31,4 @@ all:
 	xsltproc -o $(EXPORTDIR)/html-single-page/index.html --stringparam admon.graphics.path ${DEPENDDIR}/custom-admons-callouts/ --stringparam callout.graphics.path ${DEPENDDIR}/custom-admons-callouts/ --stringparam adincluded 0 --xinclude $(HTMLSPDIR)/html-single.xsl $(DOCBOOKSRCDIR)/index.xml; \
 	
 clean:
-	rm -rf $(EXPORTDIR)/html-single-page
+	rm -rf $(EXPORTDIR)/html-single-page deps.xsl

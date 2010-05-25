@@ -32,4 +32,4 @@ $(EXPORTDIR)/document.fo: $(DOCBOOKSRCDIR)/index.xml
 	xsltproc --stringparam img.src.path $(DOCBOOKSRCDIR)/ --stringparam admon.graphics.path ${DEPENDDIR}/custom-admons-callouts/ --stringparam callout.graphics.path ${DEPENDDIR}/custom-admons-callouts/ -o $(EXPORTDIR)/document.fo --xinclude ${PDFDIR}/rubyonrails-pdf.xsl $(DOCBOOKSRCDIR)/index.xml
 
 clean:
-	rm -f $(EXPORTDIR)/document.fo $(EXPORTDIR)/document.pdf
+	rm -f $(EXPORTDIR)/document.fo $(EXPORTDIR)/document.pdf deps.xsl

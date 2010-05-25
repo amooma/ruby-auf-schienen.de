@@ -28,4 +28,4 @@ validate:
 	java -jar $(EPUBDIR)/epubcheck/epubcheck-1.0.5.jar $(EXPORTDIR)/document.epub
 
 clean:
-	rm -f $(EXPORTDIR)/document.epub
+	rm -f $(EXPORTDIR)/document.epub deps.xsl
