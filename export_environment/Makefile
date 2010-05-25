@@ -9,6 +9,9 @@ pdf: $(PDFDIR)/Makefile
 html: $(HTMLDIR)/Makefile
 	cd ${HTMLDIR} && $(MAKE) 
 
+htmlsp: $(HTMLSPDIR)/Makefile
+	cd ${HTMLSPDIR} && $(MAKE) 
+
 epub: $(EPUBDIR)/Makefile
 	cd ${EPUBDIR} && $(MAKE) 
 
@@ -18,7 +21,10 @@ pdfclean: $(PDFDIR)/Makefile
 htmlclean: $(HTMLDIR)/Makefile
 	cd ${HTMLDIR} && $(MAKE) clean
 
+htmlspclean: $(HTMLSPDIR)/Makefile
+	cd ${HTMLDIR} && $(MAKE) clean
+
 epubclean: $(EPUBDIR)/Makefile
 	cd ${EPUBDIR} && $(MAKE) clean
 
-clean: pdfclean htmlclean epubclean
+clean: pdfclean htmlclean epubclean htmlspclean
