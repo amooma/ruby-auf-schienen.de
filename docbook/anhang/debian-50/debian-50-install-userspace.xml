@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0"
+         xml:id="ruby-on-rails-30-install-howto-debian-5-userspace"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="ruby-on-rails-30-install-howto-debian-5-userspace.title">Ruby
+  on Rails 3.0 Installation im Userspace auf Debian 5.0</title>
+
+  <para>Nicht immer hat man Root-Rechte auf einem System oder kann aus anderen
+  Gründen nicht die Anleitung <xref
+  linkend="ruby-on-rails-install-howto-debian" /> benutzen. Kein Problem, denn
+  wenn bereits eine Ruby Version auf dem System installiert ist, kann man mit
+  dem Programm rvm (Ruby Version Manager) im Userspace eine eigene
+  Ruby-Version installieren. Infos zu rvm finden Sie auf der rvm-Homepage
+  unter <uri>http://rvm.beginrescueend.com/</uri></para>
+
+  <section>
+    <title>Test der bestehenden Version</title>
+
+    <para>Sie brauchen für diese Installationsanleitung ein installiertes Ruby
+    und die Application gem. Loggen Sie sich bitte ein und geben Sie zum
+    Testen die folgenden Befehle ein:<screen>sw@debian:~$ <command>ruby -v</command>
+ruby 1.8.7 (2008-08-11 patchlevel 72) [i486-linux]
+</screen></para>
+
+    <para>Wenn Sie keine Root-Rechte auf dem System haben, dann müssen Sie die
+    folgende Anleitung ausprobieren und hoffen, das die folgenden
+    Debian-Pakete von Ihrem Admin bereits installiert wurden: curl, git-core,
+    rake und build-essential</para>
+  </section>
+
+  <section>
+    <title>rvm installieren</title>
+
+    <para>Gehen Sie zum Installieren von rvm nach folgender Anleitung
+    vor:<screen>sw@debian:~$ <command>wget http://rvm.beginrescueend.com/releases/rvm-install-head</command>
+ --2010-05-26 00:47:04--  http://rvm.beginrescueend.com/releases/rvm-install-head
+Auflösen des Hostnamen »rvm.beginrescueend.com«.... 67.214.211.190
+Verbindungsaufbau zu rvm.beginrescueend.com|67.214.211.190|:80... verbunden.
+HTTP Anforderung gesendet, warte auf Antwort... 200 OK
+Länge: 349 [application/octet-stream]
+In »rvm-install-head« speichern.
+
+100%[======================================&gt;] 349         --.-K/s   in 0,002s  
+
+2010-05-26 00:47:15 (161 KB/s) - »rvm-install-head« gespeichert [349/349]
+
+sw@debian:~$ <command>bash ./rvm-install-head </command>
+Initialized empty Git repository in /home/sw/.rvm/src/rvm/.git/
+remote: Counting objects: 2214, done.
+remote: Compressing objects: 100% (1037/1037), done.
+Receiving objects: 100% (2214/2214), 526.90 KiB | 438 KiB/s, done.
+remote: Total 2214 (delta 1309), reused 1582 (delta 743)
+Resolving deltas: 100% (1309/1309), done.
+grep: /home/sw/.zsh*: Datei oder Verzeichnis nicht gefunden
+
+RVM:   shell scripts which allow management of multiple ruby interpreters and environments.
+RTFM:  http://rvm.beginrescueend.com/
+HELP:  http://webchat.freenode.net/?channels=rvm (#rvm on irc.freenode.net)
+
+*cat: /etc/*-release: Datei oder Verzeichnis nicht gefunden
+
+
+Notes for Linux (  )
+
+    *  curl is required.
+
+    *  patch is required (for ree, some ruby head's).
+
+    *  For JRuby (if you wish to use it) you will need:
+       $ aptitude install curl sun-java6-bin sun-java6-jre sun-java6-jdk
+    *  For MRI &amp; ree (if you wish to use it) you will need:
+       $ aptitude install curl bison build-essential zlib1g zlib1g-dev libssl-dev libreadline5-dev libreadline6-dev libxml2-dev git-core subversion autoconf
+    *  For IronRuby (if you wish to use it) you will need:
+       $ aptitude install curl mono-2.0-devel
+
+
+sw,
+
+Thank you for using rvm. I hope that it makes your work easier and more enjoyable.
+If you have any questions, issues and/or ideas for improvement please hop in #rvm on irc.freenode.net and let me know.
+My irc nickname is 'wayneeseguin' and I hang out from ~09:00-17:00EST and again from ~21:00EST-~00:00EST.
+If I do not respond right away, please hang around after asking your question, I will respond as soon as I am back.
+Be sure to get head often as rvm development happens fast, you can do this by typing 'rvm update --head'.
+  w⦿‿⦿t!
+    ~ Wayne
+
+You must now finish the install manually:
+1) Place the folowing line at the end of your shell's loading files(.bashrc or .bash_profile for bash and .zshrc for zsh), after all path/variable settings:
+     if [[ -s /home/sw/.rvm/scripts/rvm ]] ; then source /home/sw/.rvm/scripts/rvm ; fi
+2) Ensure that there is no 'return' from inside the .bashrc file. (otherwise rvm will be prevented from working properly).
+   This means that if you see '[ -z  ] &amp;&amp; return' then you must change this line to:
+   if [[ ! -z  ]] ; then
+     ... original content that was below the &amp;&amp; return line ...
+   fi # &lt;= be sure to close the if.
+   #EOF .bashrc
+   Be absolutely *sure* to REMOVE the '&amp;&amp; return'.
+   If you wish to DRY up your config you can 'source ~/.bashrc' at the top of your .bash_profile.
+   placing all non-interactive items in the .bashrc
+3) Then CLOSE THIS SHELL and open a new one in order to use rvm.
+[ -z "$PS1" ] &amp;&amp; return
+
+
+WARNING:  you have a 'return' statement in your .bashrc, likely this will cause untold havoc.
+   This means that if you see '[ -z $PS1 ] &amp;&amp; return' then you must change this line to:
+   if [[ -n $PS1 ]] ; then
+     ... original content that was below the &amp;&amp; return line ...
+   fi # &lt;= be sure to close the if.
+   #EOF .bashrc
+Even if you use zsh you should still adjust the .bashrc as above.
+If you have any questions about this please visit #rvm on irc.freenode.net.
+
+Installation of RVM to /home/sw/.rvm/ is complete.
+
+sw@debian:~$</screen></para>
+
+    <para>rvm ist fertig installiert, aber Sie müssen zum täglichen Gebrauch
+    noch die entsprechende Zeile in Ihre <filename>.bashrc</filename>
+    einfügen. </para>
+
+    <para>Die folgende Zeile können Sie nicht per Cut-and-Paste aus diesem
+    Dokument übernehmen, sondern müssen Sie selbst aus der Ausgabe der rvm
+    Installation zusammenfügen. Ob Sie die Zeile dann mit einem Editor per
+    Cut-and-Paste oder mit diesem echo Befehl in die Datei
+    <filename>.bashrc</filename> einfügen ist egal.<screen>sw@debian:~$ <command>echo "if [[ -s ~/.rvm/scripts/rvm ]] ; then source ~/.rvm/scripts/rvm ; fi" &gt;&gt; .bashrc</command> 
+sw@debian:~$</screen></para>
+
+    <important>
+      <para>Jetzt müssen Sie das Terminal schliessen und ein neues Terminal
+      aufmachen (an sonsten wirkt die Veränderung von eben nicht).</para>
+    </important>
+
+    <para>Zum Testen, ob <application>rvm</application> richtig installiert
+    ist, rufen wir es einmal mit <parameter>-v</parameter> auf.<screen>sw@debian:~$ <command>rvm -v</command>
+
+rvm 0.1.33 by Wayne E. Seguin (wayneeseguin@gmail.com) [http://rvm.beginrescueend.com/]
+
+sw@debian:~$</screen></para>
+
+    <para>Sollte hierbei als Antwort der Bash ein "command not found"
+    ausgegeben worden sein, müssen Sie die obigen Schritte noch einmal
+    überprüfen. Wahrscheinlich haben Sie einen Schritt ausgelassen.</para>
+
+    <para>Mit <application>rvm</application> können Sie im neuen Terminal Ruby
+    1.9.1 installieren:<screen>MacBook$ <command>rvm install ruby-1.9.1</command>
+Installing Ruby from source to: /Users/sw/.rvm/rubies/ruby-1.9.1-p378
+/Users/sw/.rvm/src/ruby-1.9.1-p378 has already been extracted.
+Configuring ruby-1.9.1-p378, this may take a while depending on your cpu(s)...
+Compiling ruby-1.9.1-p378, this may take a while, depending on your cpu(s)...
+Installing ruby-1.9.1-p378
+Installation of ruby-1.9.1-p378 is complete.
+Updating rubygems for /Users/sw/.rvm/gems/ruby-1.9.1-p378@global
+Updating rubygems for /Users/sw/.rvm/gems/ruby-1.9.1-p378
+Installing gems for ruby-1.9.1-p378.
+Installing rdoc to /Users/sw/.rvm/gems/ruby-1.9.1-p378@global
+Installing rdoc to /Users/sw/.rvm/gems/ruby-1.9.1-p378
+Installing rake to /Users/sw/.rvm/gems/ruby-1.9.1-p378@global
+Installing rake to /Users/sw/.rvm/gems/ruby-1.9.1-p378
+Installation of gems for ruby-1.9.1-p378 is complete.
+MacBook:~ sw$</screen></para>
+
+    <para>Noch werden Sie per Default ein 1.8er Ruby aufrufen. Das lässt sich
+    leicht mit <application>ruby -v</application> rausfinden.<screen>MacBook:~ sw$ <command>ruby -v</command>
+ruby 1.8.7 (2009-06-08 patchlevel 173) [universal-darwin10.0]
+MacBook:~ sw$</screen></para>
+
+    <para>Mit dem Befehl <command>rvm 1.9.1</command> können Sie aber auf ein
+    1.9.1er Ruby wechseln.<screen>MacBook:~ sw$ <command>rvm 1.9.1</command>
+MacBook:~ sw$ <command>ruby -v</command>
+ruby 1.9.1p378 (2010-01-10 revision 26273) [i386-darwin10.3.0]
+MacBook:~ sw$</screen></para>
+
+    <para>Dummerweise müssten Sie jetzt in jeder neuen Shell <command>rvm
+    1.9.1</command> eingeben. Sie können für diesen User aber auch die
+    Ruby-Version 1.9.1 als Default einstellen:<screen>MacBook:~ sw$ <command>rvm --default 1.9.1</command>
+MacBook:~ sw$</screen></para>
+
+    <para>Als nächstes installieren wir jetzt die aktuelle Version der
+    Paketmanagers gem:<screen>MacBook:~ sw$ <command>gem update --system</command>
+Updating RubyGems
+Updating rubygems-update
+Successfully installed rubygems-update-1.3.6
+
+[...]
+
+* Bulk index update is no longer supported.
+* Gem::manage_gems was removed in 1.3.3.
+* Time::today was removed in 1.3.3.
+
+
+------------------------------------------------------------------------------
+
+RubyGems installed the following executables:
+ /Users/sw/.rvm/rubies/ruby-head/bin/gem
+
+MacBook:~ sw$</screen></para>
+
+    <para>Dann müssen Sie nur noch Rails 3.0 installieren.<important>
+        <para>Solange Rails 3.0 nur als Beta-Version zur Verfügung steht,
+        müssen Sie diese Version hier mit "--pre" installieren.</para>
+      </important><screen>MacBook:~ sw$ <command>gem install rails --pre</command>
+gem install rails --pre
+Successfully installed i18n-0.3.7
+Successfully installed tzinfo-0.3.20
+Successfully installed builder-2.1.2
+Successfully installed memcache-client-1.8.3
+Successfully installed activesupport-3.0.0.beta3
+Successfully installed activemodel-3.0.0.beta3
+Successfully installed rack-1.1.0
+Successfully installed rack-test-0.5.3
+
+[...]
+
+Installing RDoc documentation for text-format-1.0.0...
+Installing RDoc documentation for actionmailer-3.0.0.beta3...
+Installing RDoc documentation for thor-0.13.6...
+Installing RDoc documentation for railties-3.0.0.beta3...
+Installing RDoc documentation for bundler-0.9.25...
+Installing RDoc documentation for rails-3.0.0.beta3...
+MacBook:~ sw$</screen></para>
+
+    <para>Perfekt. Jetzt haben Sie Ruby 1.9.1 und Rails 3.0
+    installiert.<screen>MacBook:~ sw$ <command>ruby -v</command>
+ruby 1.9.1p378 (2010-01-10 revision 26273) [i386-darwin10.3.0]
+MacBook:~ sw$ <command>rails -v</command>
+Rails 3.0.0.beta3
+MacBook:~ sw$</screen></para>
+
+    <para>Mit <command>rvm system</command> können Sie auch jederzeit wieder
+    auf die Ruby Version 1.8 zurückgehen oder zwischen beiden Versionen
+    wechseln. Geben Sie einfach <command>rvm</command> ein, um eine
+    entsprechende Hilfe-Seite angezeigt zu bekommen.</para>
+  </section>
+
+  <section>
+    <title>Und jetzt?</title>
+
+    <para>Wenn Sie noch nie mit Ruby gearbeitet haben, sollten Sie als
+    nächstes <xref linkend="ruby-grundlagen" /> lesen. Wenn Sie schon
+    Ruby-Meister sind und sich neu mit Rails beschäftigen wollen, dann
+    empfehle ich Ihnen die Lektüre von <xref
+    linkend="erste_schritte_mit_rails" />.</para>
+  </section>
+</section>
