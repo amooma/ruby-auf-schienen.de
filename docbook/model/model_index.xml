@@ -345,63 +345,67 @@ end</programlisting></para>
 
         <para>Denn ohne einen Titel macht ein Filmeintrag keinen Sinn.</para>
 
-        <para>Wichtige Optionen:<itemizedlist>
-            <listitem>
-              <para><code>:message</code></para>
+        <section>
+          <title>Wichtige Optionen</title>
 
-              <para>Gibt eine eigene Fehlermeldung aus. Default ist "can't be
-              blank".</para>
+          <para><itemizedlist>
+              <listitem>
+                <para><code>:message</code></para>
 
-              <para><example>
-                  <title>Anwendung der :message Option</title>
+                <para>Gibt eine eigene Fehlermeldung aus. Default ist "can't
+                be blank".</para>
 
-                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+                <para><example>
+                    <title>Anwendung der :message Option</title>
+
+                    <para><programlisting>class Movie &lt; ActiveRecord::Base
   validates_presence_of :title, <emphasis>:message =&gt; "darf nicht leer sein"</emphasis>
 end
 </programlisting></para>
-                </example></para>
-            </listitem>
+                  </example></para>
+              </listitem>
 
-            <listitem>
-              <para><code>:on</code></para>
+              <listitem>
+                <para><code>:on</code></para>
 
-              <para>Spezifiziert, wann die Validierung ausgeführt werden soll.
-              Default ist <code>:save</code>.</para>
+                <para>Spezifiziert, wann die Validierung ausgeführt werden
+                soll. Default ist <code>:save</code>.</para>
 
-              <para>Mögliche Optionen:<itemizedlist>
-                  <listitem>
-                    <para><code>:update</code></para>
+                <para>Mögliche Optionen:<itemizedlist>
+                    <listitem>
+                      <para><code>:update</code></para>
 
-                    <para>Nur bei einem Update des Datensatzes wird
-                    validiert.</para>
-                  </listitem>
+                      <para>Nur bei einem Update des Datensatzes wird
+                      validiert.</para>
+                    </listitem>
 
-                  <listitem>
-                    <para><code>:create</code></para>
+                    <listitem>
+                      <para><code>:create</code></para>
 
-                    <para>Nur beim ersten Abspeichern, also beim initialen
-                    Erstellen des Datensatzes, wird validiert.</para>
-                  </listitem>
+                      <para>Nur beim ersten Abspeichern, also beim initialen
+                      Erstellen des Datensatzes, wird validiert.</para>
+                    </listitem>
 
-                  <listitem>
-                    <para><code>:save</code></para>
+                    <listitem>
+                      <para><code>:save</code></para>
 
-                    <para><code>:save</code> ist die Kombination zwischen
-                    <code>:update</code> und <code>:create</code>. Es wird
-                    also immer validiert.</para>
-                  </listitem>
-                </itemizedlist></para>
+                      <para><code>:save</code> ist die Kombination zwischen
+                      <code>:update</code> und <code>:create</code>. Es wird
+                      also immer validiert.</para>
+                    </listitem>
+                  </itemizedlist></para>
 
-              <para><example>
-                  <title>Anwendung der :on Option</title>
+                <para><example>
+                    <title>Anwendung der :on Option</title>
 
-                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+                    <para><programlisting>class Movie &lt; ActiveRecord::Base
   validates_presence_of :title, <emphasis>:on =&gt; :create</emphasis>
 end
 </programlisting></para>
-                </example></para>
-            </listitem>
-          </itemizedlist></para>
+                  </example></para>
+              </listitem>
+            </itemizedlist></para>
+        </section>
       </section>
 
       <section xml:id="validates_uniqueness_of">
@@ -433,66 +437,70 @@ end
         die nur unterschiedlich Gross und Klein geschrieben wurden trotzdem
         unique sind.</para>
 
-        <para>Wichtige Optionen:<itemizedlist>
-            <listitem>
-              <para><code>:message</code></para>
+        <section>
+          <title>Wichtige Optionen</title>
 
-              <para>Gibt eine eigene Fehlermeldung aus. Default ist "has
-              already been taken".<example>
-                  <title>Anwendung der :message Option</title>
+          <para><itemizedlist>
+              <listitem>
+                <para><code>:message</code></para>
 
-                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+                <para>Gibt eine eigene Fehlermeldung aus. Default ist "has
+                already been taken".<example>
+                    <title>Anwendung der :message Option</title>
+
+                    <para><programlisting>class Movie &lt; ActiveRecord::Base
   validates_uniqueness_of :title, <emphasis>:message =&gt; "muss in der Datenbank einmalig sein"</emphasis>
 end
 </programlisting></para>
-                </example></para>
-            </listitem>
+                  </example></para>
+              </listitem>
 
-            <listitem>
-              <para><code>:case_sensitive</code></para>
+              <listitem>
+                <para><code>:case_sensitive</code></para>
 
-              <para>Definiert, ob die Einzigartigkeit (uniqueness) des Feldes
-              inklusive Gross- und Kleinschreibung definiert ist. Default ist
-              <code>true</code>.<example>
-                  <title>Anwendung der :case_sensitive Option</title>
+                <para>Definiert, ob die Einzigartigkeit (uniqueness) des
+                Feldes inklusive Gross- und Kleinschreibung definiert ist.
+                Default ist <code>true</code>.<example>
+                    <title>Anwendung der :case_sensitive Option</title>
 
-                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+                    <para><programlisting>class Movie &lt; ActiveRecord::Base
   validates_uniqueness_of :title, <emphasis>:case_sensitive =&gt; false</emphasis>
 end
 </programlisting></para>
-                </example></para>
-            </listitem>
+                  </example></para>
+              </listitem>
 
-            <listitem>
-              <para><code>:allow_nil</code></para>
+              <listitem>
+                <para><code>:allow_nil</code></para>
 
-              <para>Definiert, ob ein Eintrag auch nil sein darf. Ein solcher
-              Eintrag wäre dann genau einmal möglich. Default ist
-              <code>false</code>.<example>
-                  <title>Anwendung der :allow_nil Option</title>
+                <para>Definiert, ob ein Eintrag auch nil sein darf. Ein
+                solcher Eintrag wäre dann genau einmal möglich. Default ist
+                <code>false</code>.<example>
+                    <title>Anwendung der :allow_nil Option</title>
 
-                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+                    <para><programlisting>class Movie &lt; ActiveRecord::Base
   validates_uniqueness_of :title, <emphasis>:allow_nil =&gt; true</emphasis>
 end
 </programlisting></para>
-                </example></para>
-            </listitem>
+                  </example></para>
+              </listitem>
 
-            <listitem>
-              <para><code>:allow_blank</code></para>
+              <listitem>
+                <para><code>:allow_blank</code></para>
 
-              <para>Definiert, ob ein Eintrag auch leer sein darf. Ein solcher
-              Eintrag wäre dann genau einmal möglich. Default ist
-              <code>false</code>.<example>
-                  <title>Anwendung der :allow_blank Option</title>
+                <para>Definiert, ob ein Eintrag auch leer sein darf. Ein
+                solcher Eintrag wäre dann genau einmal möglich. Default ist
+                <code>false</code>.<example>
+                    <title>Anwendung der :allow_blank Option</title>
 
-                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+                    <para><programlisting>class Movie &lt; ActiveRecord::Base
   validates_uniqueness_of :title, <emphasis>:allow_blank =&gt; true</emphasis>
 end
 </programlisting></para>
-                </example></para>
-            </listitem>
-          </itemizedlist></para>
+                  </example></para>
+              </listitem>
+            </itemizedlist></para>
+        </section>
       </section>
 
       <section xml:id="validates_numericality_of">
@@ -550,167 +558,172 @@ end
             </listitem>
           </itemizedlist></para>
 
-        <para>Wichtige Optionen:<itemizedlist>
-            <listitem>
-              <para><code>:message</code></para>
+        <section>
+          <title>Wichtige Optionen</title>
 
-              <para>Gibt eine eigene Fehlermeldung aus. Default ist "is not a
-              number".<example>
-                  <title>Anwendung der :message Option</title>
+          <para><itemizedlist>
+              <listitem>
+                <para><code>:message</code></para>
 
-                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+                <para>Gibt eine eigene Fehlermeldung aus. Default ist "is not
+                a number".<example>
+                    <title>Anwendung der :message Option</title>
+
+                    <para><programlisting>class Movie &lt; ActiveRecord::Base
   validates_numericality_of :title, <emphasis>:message =&gt; "muss eine Zahl sein"</emphasis>
 end
 </programlisting></para>
-                </example></para>
-            </listitem>
+                  </example></para>
+              </listitem>
 
-            <listitem>
-              <para><code>:on</code></para>
+              <listitem>
+                <para><code>:on</code></para>
 
-              <para>Spezifiziert, wann die Validierung ausgeführt werden soll.
-              Default ist <code>:save.</code></para>
+                <para>Spezifiziert, wann die Validierung ausgeführt werden
+                soll. Default ist <code>:save.</code></para>
 
-              <para>Mögliche Optionen:<itemizedlist>
-                  <listitem>
-                    <para><code>:update</code></para>
+                <para>Mögliche Optionen:<itemizedlist>
+                    <listitem>
+                      <para><code>:update</code></para>
 
-                    <para>Nur bei einem Update des Datensatzes wird
-                    validiert.</para>
-                  </listitem>
+                      <para>Nur bei einem Update des Datensatzes wird
+                      validiert.</para>
+                    </listitem>
 
-                  <listitem>
-                    <para><code>:create</code></para>
+                    <listitem>
+                      <para><code>:create</code></para>
 
-                    <para>Nur beim ersten Abspeichern, also beim initialen
-                    Erstellen des Datensatzes, wird validiert.</para>
-                  </listitem>
+                      <para>Nur beim ersten Abspeichern, also beim initialen
+                      Erstellen des Datensatzes, wird validiert.</para>
+                    </listitem>
 
-                  <listitem>
-                    <para><code>:save</code></para>
+                    <listitem>
+                      <para><code>:save</code></para>
 
-                    <para><code>:save</code> ist die Kombination zwischen
-                    <code>:update</code> und <code>:create</code>. Es wird
-                    also immer validiert.</para>
-                  </listitem>
-                </itemizedlist></para>
+                      <para><code>:save</code> ist die Kombination zwischen
+                      <code>:update</code> und <code>:create</code>. Es wird
+                      also immer validiert.</para>
+                    </listitem>
+                  </itemizedlist></para>
 
-              <para><example>
-                  <title>Anwendung der :on Option</title>
+                <para><example>
+                    <title>Anwendung der :on Option</title>
 
-                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+                    <para><programlisting>class Movie &lt; ActiveRecord::Base
   validates_numericality_of :title, <emphasis>:on =&gt; :create</emphasis>
 end
 </programlisting></para>
-                </example></para>
-            </listitem>
+                  </example></para>
+              </listitem>
 
-            <listitem>
-              <para><code>:only_integer</code></para>
+              <listitem>
+                <para><code>:only_integer</code></para>
 
-              <para>Lässt nur ganze Zahlen zu. Default ist <code>false</code>
-              (das heißt es dürfen auch Real abgespeichert werden).</para>
-            </listitem>
+                <para>Lässt nur ganze Zahlen zu. Default ist
+                <code>false</code> (das heißt es dürfen auch Real
+                abgespeichert werden).</para>
+              </listitem>
 
-            <listitem>
-              <para><code>:greater_than</code></para>
+              <listitem>
+                <para><code>:greater_than</code></para>
 
-              <para>Stellt sicher, das die Zahl grösser als der hier
-              angegebene Wert ist.<example>
-                  <title>Anwendung der :greater_than Option</title>
+                <para>Stellt sicher, das die Zahl grösser als der hier
+                angegebene Wert ist.<example>
+                    <title>Anwendung der :greater_than Option</title>
 
-                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+                    <para><programlisting>class Movie &lt; ActiveRecord::Base
   validates_numericality_of :production_year, <emphasis>:greater_than =&gt; 1894</emphasis>
 end
 </programlisting></para>
-                </example></para>
-            </listitem>
+                  </example></para>
+              </listitem>
 
-            <listitem>
-              <para><code>:greater_than_or_equal_to</code></para>
+              <listitem>
+                <para><code>:greater_than_or_equal_to</code></para>
 
-              <para>Stellt sicher, das die Zahl grösser oder gleich des
-              angegebene Wertes ist.<example>
-                  <title>Anwendung der :greater_than_or_equal_to
-                  Option</title>
+                <para>Stellt sicher, das die Zahl grösser oder gleich des
+                angegebene Wertes ist.<example>
+                    <title>Anwendung der :greater_than_or_equal_to
+                    Option</title>
 
-                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+                    <para><programlisting>class Movie &lt; ActiveRecord::Base
   validates_numericality_of :production_year, <emphasis>:greater_than_or_equal_to =&gt; 1895</emphasis>
 end
 </programlisting></para>
-                </example></para>
-            </listitem>
+                  </example></para>
+              </listitem>
 
-            <listitem>
-              <para><code>:less_than</code></para>
+              <listitem>
+                <para><code>:less_than</code></para>
 
-              <para>Stellt sicher, das die Zahl kleiner als der hier
-              angegebene Wert ist.<example>
-                  <title>Anwendung der :less_than Option</title>
+                <para>Stellt sicher, das die Zahl kleiner als der hier
+                angegebene Wert ist.<example>
+                    <title>Anwendung der :less_than Option</title>
 
-                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+                    <para><programlisting>class Movie &lt; ActiveRecord::Base
   validates_numericality_of :production_year, <emphasis>:less_than =&gt; 2011</emphasis>
 end
 </programlisting></para>
-                </example></para>
-            </listitem>
+                  </example></para>
+              </listitem>
 
-            <listitem>
-              <para><code>:less_than_or_equal_to</code></para>
+              <listitem>
+                <para><code>:less_than_or_equal_to</code></para>
 
-              <para>Stellt sicher, das die Zahl kleiner oder gleich des
-              angegebenen Wertes ist.<example>
-                  <title>Anwendung der :less_than_or_equal_to Option</title>
+                <para>Stellt sicher, das die Zahl kleiner oder gleich des
+                angegebenen Wertes ist.<example>
+                    <title>Anwendung der :less_than_or_equal_to Option</title>
 
-                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+                    <para><programlisting>class Movie &lt; ActiveRecord::Base
   validates_numericality_of :production_year, <emphasis>:less_than_or_equal_to =&gt; 2010</emphasis>
 end
 </programlisting></para>
-                </example></para>
-            </listitem>
+                  </example></para>
+              </listitem>
 
-            <listitem>
-              <para><code>:equal_to</code></para>
+              <listitem>
+                <para><code>:equal_to</code></para>
 
-              <para>Stellt sicher, das die Zahl gleich der angegebenen Zahl
-              ist.<example>
-                  <title>Anwendung der :equal_to Option</title>
+                <para>Stellt sicher, das die Zahl gleich der angegebenen Zahl
+                ist.<example>
+                    <title>Anwendung der :equal_to Option</title>
 
-                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+                    <para><programlisting>class Movie &lt; ActiveRecord::Base
   validates_numericality_of :production_year, <emphasis>:equal_to =&gt; 2000</emphasis>
 end
 </programlisting></para>
-                </example></para>
-            </listitem>
+                  </example></para>
+              </listitem>
 
-            <listitem>
-              <para><code>:odd</code></para>
+              <listitem>
+                <para><code>:odd</code></para>
 
-              <para>Stellt sicher, das die Zahl immer ungerade ist. Default
-              ist <code>false</code>.<example>
-                  <title>Anwendung der :odd Option</title>
+                <para>Stellt sicher, das die Zahl immer ungerade ist. Default
+                ist <code>false</code>.<example>
+                    <title>Anwendung der :odd Option</title>
 
-                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+                    <para><programlisting>class Movie &lt; ActiveRecord::Base
   validates_numericality_of :production_year, <emphasis>:odd =&gt; true</emphasis>
 end
 </programlisting></para>
-                </example></para>
-            </listitem>
+                  </example></para>
+              </listitem>
 
-            <listitem>
-              <para><code>:even</code></para>
+              <listitem>
+                <para><code>:even</code></para>
 
-              <para>Stellt sicher, das die Zahl immer gerade ist. Default ist
-              <code>false</code>.<example>
-                  <title>Anwendung der :even Option</title>
+                <para>Stellt sicher, das die Zahl immer gerade ist. Default
+                ist <code>false</code>.<example>
+                    <title>Anwendung der :even Option</title>
 
-                  <para><programlisting>class Movie &lt; ActiveRecord::Base
+                    <para><programlisting>class Movie &lt; ActiveRecord::Base
   validates_numericality_of :production_year, <emphasis>:even =&gt; true</emphasis>
 end
 </programlisting></para>
-                </example></para>
-            </listitem>
-          </itemizedlist></para>
+                  </example></para>
+              </listitem>
+            </itemizedlist></para>
+        </section>
       </section>
     </section>
   </section>
