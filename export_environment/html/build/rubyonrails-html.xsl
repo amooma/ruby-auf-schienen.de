@@ -23,6 +23,7 @@
 
 <xsl:param name="chunk.section.depth" select="1"/>
 <xsl:param name="chunk.first.sections" select="1"/>
+<xsl:param name="section.autolabel.max.depth" select="2"/>
 <xsl:param name="chunk.toc" select="''"/>
 <xsl:param name="chunk.append"/>
 <xsl:param name="chunker.output.quiet" select="0"/>
@@ -345,7 +346,6 @@ Version:
       				<!--ADD YOUR AD INSIDE THE CDATA SECTION-->
 					<![CDATA[<!--]]>
 				</xsl:text>
-				<!--<xsl:variable name="adfile" select="document('ad.xml',/)"/>-->
 				<xsl:copy-of select="$adfile/ad/node()"/>
       			<xsl:text disable-output-escaping="yes">
 					<![CDATA[//-->]]>
@@ -383,6 +383,14 @@ Version:
       	<div class="clear"></div>
       </div>
       </div>
+	<script type="text/javascript">
+		var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+		document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+	</script>
+	<script type="text/javascript">
+		var pageTracker = _gat._getTracker("UA-774512-3");
+		pageTracker._trackPageview();
+	</script>
     </body>
   </html>
   <xsl:value-of select="$chunk.append"/>
