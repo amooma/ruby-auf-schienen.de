@@ -21,6 +21,7 @@ all:
 	echo "<xsl:import href=\"${DOCBOOKXSLPATH}\"/>" >> deps.xsl
 	echo "<xsl:import href=\"${CHUNKXSLPATH}\"/>" >> deps.xsl
 	echo "<xsl:variable name=\"adfile\" select=\"document('${HTMLDIR}/ad.xml',/)\"/>" >> deps.xsl
+	echo "<xsl:variable name=\"analyticsfile\" select=\"document('${HTMLDIR}/analytics.xml',/)\"/>" >> deps.xsl
 	echo "</xsl:stylesheet>" >> deps.xsl
 
 	sed 's/.xsl \"/.xsl\"/' deps.xsl  > tmp.xsl; mv tmp.xsl deps.xsl
@@ -29,10 +30,14 @@ all:
 	cp $(HTMLDIR)/default.css $(HTMLDIR)/common.css $(EXPORTDIR)/html
 	cp -R ${DEPENDDIR}/custom-admons-callouts/ $(EXPORTDIR)/html
 	cp -R ${DOCBOOKSRCDIR}/screenshots $(EXPORTDIR)/html
-	@if test -f $(HTMLDIR)/ad.xml; then \
-		xsltproc --stringparam base.dir $(EXPORTDIR)/html/ --stringparam admon.graphics.path ./custom-admons-callouts/ --stringparam callout.graphics.path ./custom-admons-callouts/callouts/ --stringparam adincluded 1 --xinclude $(HTMLDIR)/rubyonrails-html.xsl $(DOCBOOKSRCDIR)/index.xml; \
+	@if test -f $(HTMLDIR)/ad.xml -a -f $(HTMLDIR)/analytics.xml; then \
+		xsltproc --stringparam base.dir $(EXPORTDIR)/html/ --stringparam admon.graphics.path ./custom-admons-callouts/ --stringparam callout.graphics.path ./custom-admons-callouts/callouts/ --stringparam adincluded 1 --stringparam analyticsincluded 1 --xinclude $(HTMLDIR)/rubyonrails-html.xsl $(DOCBOOKSRCDIR)/index.xml; \
+	elif test -f $(HTMLDIR)/ad.xml; then \
+		xsltproc --stringparam base.dir $(EXPORTDIR)/html/ --stringparam admon.graphics.path ./custom-admons-callouts/ --stringparam callout.graphics.path ./custom-admons-callouts/callouts/ --stringparam adincluded 1 --stringparam analyticsincluded 0 --xinclude $(HTMLDIR)/rubyonrails-html.xsl $(DOCBOOKSRCDIR)/index.xml; \
+	elif test -f $(HTMLDIR)/analytics.xml; then \
+		xsltproc --stringparam base.dir $(EXPORTDIR)/html/ --stringparam admon.graphics.path ./custom-admons-callouts/ --stringparam callout.graphics.path ./custom-admons-callouts/callouts/ --stringparam adincluded 0 --stringparam analyticsincluded 1 --xinclude $(HTMLDIR)/rubyonrails-html.xsl $(DOCBOOKSRCDIR)/index.xml; \
 	else \
-		xsltproc --stringparam base.dir $(EXPORTDIR)/html/ --stringparam admon.graphics.path ./custom-admons-callouts/ --stringparam callout.graphics.path ./custom-admons-callouts/ --stringparam adincluded 0 --xinclude $(HTMLDIR)/rubyonrails-html.xsl $(DOCBOOKSRCDIR)/index.xml; \
+		xsltproc --stringparam base.dir $(EXPORTDIR)/html/ --stringparam admon.graphics.path ./custom-admons-callouts/ --stringparam callout.graphics.path ./custom-admons-callouts/callouts/ --stringparam adincluded 0 --stringparam analyticsincluded 0 --xinclude $(HTMLDIR)/rubyonrails-html.xsl $(DOCBOOKSRCDIR)/index.xml; \
 	fi
 	
 clean:
