@@ -284,10 +284,10 @@ Version:
 				</ul>
 				<ul class="footer">
 					<li class="copyright">
-						Copyright © 2010 <a target="_blank" class="twitter-link" rel="me" href="http://www.twitter.com/wintermeyer" title="Stefan Wintermeyer"><span>Stefan Wintermeyer</span></a>.
+						Copyright © 2010 <a class="twitter-link" rel="me" href="http://www.twitter.com/wintermeyer" title="Stefan Wintermeyer"><span>Stefan Wintermeyer</span></a>.
 					</li>
 					<li class="designer">
-						<a target="_blank" rel="colleague" class="designer-link" href="http://www.humbug.in." title="Docbook Conversion and Design by Pratik Sinha"><span>Docbook Conversion and Design by Pratik Sinha</span></a>
+						<a rel="colleague" class="designer-link" href="http://www.humbug.in." title="Docbook Conversion and Design by Pratik Sinha"><span>Docbook Conversion and Design by Pratik Sinha</span></a>
 					</li>
 				</ul>
 			</xsl:if>
@@ -347,7 +347,7 @@ Version:
 									<span class="plusts" style="font-size: x-large;">+</span>
 								</a>
 							</div>
-							<div id="adsense" align="center">
+							<div id="adsense">
 																																
 								<xsl:if test="$adincluded = 1">
 									<script type="text/javascript">
