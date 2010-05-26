@@ -36,7 +36,51 @@ ruby 1.8.7 (2008-08-11 patchlevel 72) [i486-linux]
     <para>Wenn Sie keine Root-Rechte auf dem System haben, dann müssen Sie die
     folgende Anleitung ausprobieren und hoffen, das die folgenden
     Debian-Pakete von Ihrem Admin bereits installiert wurden: curl, git-core,
-    rake und build-essential</para>
+    rake und build-essential make zlib1g-dev libssl-dev libreadline5-dev
+    libxml2-dev libsqlite3-dev</para>
+
+    <para>Falls Sie root Rechte auf dem System haben:<screen>debian:~# <command>aptitude -y install curl git-core rake build-essential make zlib1g-dev libssl-dev libreadline5-dev libxml2-dev libsqlite3-dev</command>
+Paketlisten werden gelesen... Fertig
+Abhängigkeitsbaum wird aufgebaut       
+Lese Status-Informationen ein... Fertig
+Lese erweiterte Statusinformationen      
+Initialisiere Paketstatus... Fertig
+Lese Task-Beschreibungen... Fertig 
+Die folgenden NEUEN Pakete werden zusätzlich installiert:
+  binutils{a} build-essential bzip2{a} ca-certificates{a} cpp{a} cpp-4.3{a} 
+  curl dpkg-dev{a} g++{a} g++-4.3{a} gcc{a} gcc-4.3{a} git-core less{a} 
+  libc6-dev{a} libcurl3{a} libcurl3-gnutls{a} libdigest-sha1-perl{a} 
+  liberror-perl{a} libexpat1{a} libgmp3c2{a} libgomp1{a} libidn11{a} 
+  libldap-2.4-2{a} libmpfr1ldbl{a} libncurses5-dev{a} libreadline5-dev 
+  libruby1.8{a} libsqlite3-0{a} libsqlite3-dev libssh2-1{a} libssl-dev 
+  libstdc++6-4.3-dev{a} libtimedate-perl{a} libxml2{a} libxml2-dev 
+  linux-libc-dev{a} make openssl{a} patch{a} rake rsync{a} ruby{a} 
+  ruby1.8{a} sgml-base{a} unzip{a} xml-core{a} zip{a} zlib1g-dev 
+0 Pakete aktualisiert, 49 zusätzlich installiert, 0 werden entfernt und 0 nicht aktualisiert.
+Muss 33,9MB an Archiven herunterladen. Nach dem Entpacken werden 101MB zusätzlich belegt sein.
+Schreibe erweiterte Statusinformationen... Fertig
+Hole:1 http://ftp.de.debian.org lenny/main less 418-1 [115kB]         
+Hole:2 http://ftp.de.debian.org lenny/main libidn11 1.8+20080606-1 [141kB]
+Hole:3 http://ftp.de.debian.org lenny/main libsqlite3-0 3.5.9-6 [245kB]
+
+[...]
+
+Richte rake ein (0.8.1-3) ...
+Richte rsync ein (3.0.3-2) ...
+Richte sgml-base ein (1.26) ...
+Richte unzip ein (5.52-12) ...
+Richte xml-core ein (0.12) ...
+Richte zip ein (2.32-1) ...
+E: Konnte http://security.debian.org/pool/updates/main/o/openldap/libldap-2.4-2_2.4.11-1+lenny1_i386.deb nicht herunterladen: Kann keine Verbindung mit security.debian.org:80 aufbauen (2001:4f8:8:36::6). - connect (101 Das Netzwerk ist nicht erreichbar)
+Paketlisten werden gelesen... Fertig             
+Abhängigkeitsbaum wird aufgebaut       
+Lese Status-Informationen ein... Fertig
+Lese erweiterte Statusinformationen      
+Initialisiere Paketstatus... Fertig
+Schreibe erweiterte Statusinformationen... Fertig
+Lese Task-Beschreibungen... Fertig               
+
+debian:~# </screen></para>
   </section>
 
   <section>
@@ -151,23 +195,49 @@ sw@debian:~$</screen></para>
     ausgegeben worden sein, müssen Sie die obigen Schritte noch einmal
     überprüfen. Wahrscheinlich haben Sie einen Schritt ausgelassen.</para>
 
-    <para>Mit <application>rvm</application> können Sie im neuen Terminal Ruby
-    1.9.1 installieren:<screen>MacBook$ <command>rvm install ruby-1.9.1</command>
-Installing Ruby from source to: /Users/sw/.rvm/rubies/ruby-1.9.1-p378
-/Users/sw/.rvm/src/ruby-1.9.1-p378 has already been extracted.
+    <para>Mit rvm müssen wir jetzt erst mal das Package zlib
+    installieren:<screen>sw@debian:~$ <command>rvm package install zlib</command>
+
+Fetching zlib-1.2.5.tar.gz to /home/sw/.rvm/archives
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  531k  100  531k    0     0   130k      0  0:00:04  0:00:04 --:--:--  172k
+
+Extracting zlib-1.2.5.tar.gz to /home/sw/.rvm/src
+
+Configuring zlib in /home/sw/.rvm/src/zlib-1.2.5.
+
+Compiling zlib in /home/sw/.rvm/src/zlib-1.2.5.
+
+Installing zlib to /home/sw/.rvm/usr
+sw@debian:~$</screen></para>
+
+    <para>Danach Ruby 1.9.1 installieren:<screen>sw@debian:~$ <command>rvm install 1.9.1 -C --with-zlib-dir=$rvm_path/usr</command>
+
+Installing Ruby from source to: /home/sw/.rvm/rubies/ruby-1.9.1-p378
+
+/home/sw/.rvm/src/ruby-1.9.1-p378 has already been extracted.
+
 Configuring ruby-1.9.1-p378, this may take a while depending on your cpu(s)...
+
 Compiling ruby-1.9.1-p378, this may take a while, depending on your cpu(s)...
+
 Installing ruby-1.9.1-p378
+
 Installation of ruby-1.9.1-p378 is complete.
-Updating rubygems for /Users/sw/.rvm/gems/ruby-1.9.1-p378@global
-Updating rubygems for /Users/sw/.rvm/gems/ruby-1.9.1-p378
-Installing gems for ruby-1.9.1-p378.
-Installing rdoc to /Users/sw/.rvm/gems/ruby-1.9.1-p378@global
-Installing rdoc to /Users/sw/.rvm/gems/ruby-1.9.1-p378
-Installing rake to /Users/sw/.rvm/gems/ruby-1.9.1-p378@global
-Installing rake to /Users/sw/.rvm/gems/ruby-1.9.1-p378
+
+Updating rubygems for /home/sw/.rvm/gems/ruby-1.9.1-p378
+
+adjusting shebangs for ruby-1.9.1-p378 (gem irb erb ri rdoc testrb rake).
+
+Installing gems for ruby-1.9.1-p378 (rdoc rake).
+
+Installing rdoc to /home/sw/.rvm/gems/ruby-1.9.1-p378
+
+Installing rake to /home/sw/.rvm/gems/ruby-1.9.1-p378
+
 Installation of gems for ruby-1.9.1-p378 is complete.
-MacBook:~ sw$</screen></para>
+sw@debian:~$ </screen></para>
 
     <para>Noch werden Sie per Default ein 1.8er Ruby aufrufen. Das lässt sich
     leicht mit <application>ruby -v</application> rausfinden.<screen>MacBook:~ sw$ <command>ruby -v</command>
