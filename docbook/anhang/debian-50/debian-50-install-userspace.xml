@@ -9,37 +9,38 @@
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
   <title xml:id="ruby-on-rails-30-install-howto-debian-5-userspace.title">Ruby
-  on Rails 3.0 Installation im Userspace auf Debian 5.0</title>
+  on Rails 3.0 Installation mit rvm im Userspace auf Debian 5.0</title>
 
-  <para>Nicht immer hat man Root-Rechte auf einem System oder kann aus anderen
-  Gründen nicht die Anleitung <xref
-  linkend="ruby-on-rails-install-howto-debian" /> benutzen. Kein Problem, denn
-  wenn bereits eine Ruby Version auf dem System installiert ist, kann man mit
-  dem Programm rvm (Ruby Version Manager) im Userspace eine eigene
-  Ruby-Version installieren. Infos zu rvm finden Sie auf der rvm-Homepage
-  unter <uri>http://rvm.beginrescueend.com/</uri></para>
+  <para>Es gibt zwei Hauptgründe mit rvm (Ruby Version Manager) im Userspace
+  ein Ruby on Rails System zu installieren:<itemizedlist>
+      <listitem>
+        <para>Man hat schlicht und ergreifend keine Root-Rechte auf dem
+        System. Dann geht es nicht anders.</para>
+      </listitem>
 
-  <para><warning>
-      <para>Dieses Howto ist noch nicht fertig und wird so noch nicht
-      funktionieren! Bitte die Tage noch mal reinschauen.</para>
-    </warning></para>
+      <listitem>
+        <para>Man möchte mehrere und sauber von einander abgetrennte Rails
+        Systeme und damit vielleicht Rails-Versionen betreiben. Das lässt sich
+        mit rvm und verschiedenen Accounts auf dem Linux System sehr gut
+        realisieren. So können Sie auf einem Rechner ein Ruby 1.8.7 mit einem
+        Rails 2.3.7 und parallel ein Ruby 1.9.1 mit einem Rails 3.0
+        betreiben.</para>
+      </listitem>
+    </itemizedlist></para>
+
+  <para>Infos zu rvm finden Sie übrigens auf der rvm-Homepage unter
+  <uri>http://rvm.beginrescueend.com/</uri></para>
 
   <section>
-    <title>Test der bestehenden Version</title>
+    <title>Vorbereitungen</title>
 
-    <para>Sie brauchen für diese Installationsanleitung ein installiertes Ruby
-    und die Application gem. Loggen Sie sich bitte ein und geben Sie zum
-    Testen die folgenden Befehle ein:<screen>sw@debian:~$ <command>ruby -v</command>
-ruby 1.8.7 (2008-08-11 patchlevel 72) [i486-linux]
-</screen></para>
+    <para>Wenn Sie auf dem Zielsystem Root-Rechte besitzen, dann können Sie
+    mit folgendem Befehl sicher gehen, das alle notwendigen Programme für eine
+    erfolgreiche rvm Installation bereit stehen. Falls Sie keine Root-Rechte
+    besitzen müssen Sie entweder hoffen, das Ihr Admin bereits alle so
+    installiert hat oder ihm die entsprechende Zeile kurz mailen. </para>
 
-    <para>Wenn Sie keine Root-Rechte auf dem System haben, dann müssen Sie die
-    folgende Anleitung ausprobieren und hoffen, das die folgenden
-    Debian-Pakete von Ihrem Admin bereits installiert wurden: curl, git-core,
-    rake und build-essential make zlib1g-dev libssl-dev libreadline5-dev
-    libxml2-dev libsqlite3-dev</para>
-
-    <para>Falls Sie root Rechte auf dem System haben:<screen>debian:~# <command>aptitude -y install curl git-core rake build-essential make zlib1g-dev libssl-dev libreadline5-dev libxml2-dev libsqlite3-dev</command>
+    <para><screen>debian:~# <command>aptitude -y install curl ruby git-core rake build-essential make zlib1g-dev libssl-dev libreadline5-dev libxml2-dev libsqlite3-dev</command>
 Paketlisten werden gelesen... Fertig
 Abhängigkeitsbaum wird aufgebaut       
 Lese Status-Informationen ein... Fertig
@@ -169,15 +170,21 @@ Installation of RVM to /home/sw/.rvm/ is complete.
 sw@debian:~$</screen></para>
 
     <para>rvm ist fertig installiert, aber Sie müssen zum täglichen Gebrauch
-    noch die entsprechende Zeile in Ihre <filename>.bashrc</filename>
-    einfügen. </para>
+    noch die beim Starten Ihrer Bash eingelesene <filename>.bashrc</filename>
+    so verändern, das rvm immer automatisch konfiguriert wird. Das ist jetzt
+    etwas hackelig, weil Sie dafür Elemente aus der Ausgabe von eben wieder
+    verwenden müssen und diese bei jeder Installation angepasst werden.</para>
 
-    <para>Die folgende Zeile können Sie nicht per Cut-and-Paste aus diesem
-    Dokument übernehmen, sondern müssen Sie selbst aus der Ausgabe der rvm
-    Installation zusammenfügen. Ob Sie die Zeile dann mit einem Editor per
-    Cut-and-Paste oder mit diesem echo Befehl in die Datei
-    <filename>.bashrc</filename> einfügen ist egal.<screen>sw@debian:~$ <command>echo "if [[ -s ~/.rvm/scripts/rvm ]] ; then source ~/.rvm/scripts/rvm ; fi" &gt;&gt; .bashrc</command> 
-sw@debian:~$</screen></para>
+    <para>Bitte öffnen sie mit einem Editor die Datei
+    <filename>.bashrc</filename> in Ihrem Homedirectory. Tauschen Sie die
+    Zeile <programlisting>[ -z "$PS1" ] &amp;&amp; return
+</programlisting>gegen die folgende Zeile aus:<programlisting>if [[ -n $PS1 ]] ; then
+</programlisting></para>
+
+    <para>Und fügen Sie am Ende der Datei noch die folgende Zeilen
+    hinzu:<programlisting>if [[ -s ~/.rvm/scripts/rvm ]] ; then source ~/.rvm/scripts/rvm ; fi
+
+fi</programlisting></para>
 
     <important>
       <para>Jetzt müssen Sie das Terminal schliessen und ein neues Terminal
@@ -193,7 +200,11 @@ sw@debian:~$</screen></para>
 
     <para>Sollte hierbei als Antwort der Bash ein "command not found"
     ausgegeben worden sein, müssen Sie die obigen Schritte noch einmal
-    überprüfen. Wahrscheinlich haben Sie einen Schritt ausgelassen.</para>
+    überprüfen. Wahrscheinlich haben Sie einen Schritt ausgelassen oder haben
+    bei der Arbeit in der <filename>.bashrc</filename> einen Fehler gemacht.
+    Bitte lesen Sie noch einmal die Ausgabe vom
+    <filename>rvm-install-head</filename> Skript und führen Sie die
+    entsprechenden Schritte durch.</para>
 
     <para>Mit rvm müssen wir jetzt erst mal das Package zlib
     installieren:<screen>sw@debian:~$ <command>rvm package install zlib</command>
@@ -240,46 +251,31 @@ Installation of gems for ruby-1.9.1-p378 is complete.
 sw@debian:~$ </screen></para>
 
     <para>Noch werden Sie per Default ein 1.8er Ruby aufrufen. Das lässt sich
-    leicht mit <application>ruby -v</application> rausfinden.<screen>MacBook:~ sw$ <command>ruby -v</command>
-ruby 1.8.7 (2009-06-08 patchlevel 173) [universal-darwin10.0]
-MacBook:~ sw$</screen></para>
+    leicht mit <application>ruby -v</application> rausfinden.<screen>sw@debian:~$ <command>ruby -v</command>
+ruby 1.8.7 (2008-08-11 patchlevel 72) [i486-linux]
+sw@debian:~$</screen></para>
 
     <para>Mit dem Befehl <command>rvm 1.9.1</command> können Sie aber auf ein
-    1.9.1er Ruby wechseln.<screen>MacBook:~ sw$ <command>rvm 1.9.1</command>
-MacBook:~ sw$ <command>ruby -v</command>
-ruby 1.9.1p378 (2010-01-10 revision 26273) [i386-darwin10.3.0]
-MacBook:~ sw$</screen></para>
+    1.9.1er Ruby wechseln.<screen>sw@debian:~$ <command>rvm 1.9.1</command>
+sw@debian:~$ <command>ruby -v</command>
+ruby 1.9.1p378 (2010-01-10 revision 26273) [i686-linux]
+sw@debian:~$</screen></para>
 
     <para>Dummerweise müssten Sie jetzt in jeder neuen Shell <command>rvm
     1.9.1</command> eingeben. Sie können für diesen User aber auch die
-    Ruby-Version 1.9.1 als Default einstellen:<screen>MacBook:~ sw$ <command>rvm --default 1.9.1</command>
-MacBook:~ sw$</screen></para>
+    Ruby-Version 1.9.1 als Default einstellen:<screen>sw@debian:~$ <command>rvm --default 1.9.1</command>
+sw@debian:~$</screen></para>
 
     <para>Als nächstes installieren wir jetzt die aktuelle Version der
-    Paketmanagers gem:<screen>MacBook:~ sw$ <command>gem update --system</command>
+    Paketmanagers gem:<screen>sw@debian:~$ <command>gem update --system</command>
 Updating RubyGems
-Updating rubygems-update
-Successfully installed rubygems-update-1.3.6
-
-[...]
-
-* Bulk index update is no longer supported.
-* Gem::manage_gems was removed in 1.3.3.
-* Time::today was removed in 1.3.3.
-
-
-------------------------------------------------------------------------------
-
-RubyGems installed the following executables:
- /Users/sw/.rvm/rubies/ruby-head/bin/gem
-
-MacBook:~ sw$</screen></para>
+Nothing to update
+sw@debian:~$</screen></para>
 
     <para>Dann müssen Sie nur noch Rails 3.0 installieren.<important>
         <para>Solange Rails 3.0 nur als Beta-Version zur Verfügung steht,
         müssen Sie diese Version hier mit "--pre" installieren.</para>
-      </important><screen>MacBook:~ sw$ <command>gem install rails --pre</command>
-gem install rails --pre
+      </important><screen>sw@debian:~$ <command>gem install rails --pre</command>
 Successfully installed i18n-0.3.7
 Successfully installed tzinfo-0.3.20
 Successfully installed builder-2.1.2
@@ -287,24 +283,25 @@ Successfully installed memcache-client-1.8.3
 Successfully installed activesupport-3.0.0.beta3
 Successfully installed activemodel-3.0.0.beta3
 Successfully installed rack-1.1.0
-Successfully installed rack-test-0.5.3
 
 [...]
 
+Installing RDoc documentation for mail-2.2.1...
+Installing RDoc documentation for text-hyphen-1.0.0...
 Installing RDoc documentation for text-format-1.0.0...
 Installing RDoc documentation for actionmailer-3.0.0.beta3...
 Installing RDoc documentation for thor-0.13.6...
 Installing RDoc documentation for railties-3.0.0.beta3...
 Installing RDoc documentation for bundler-0.9.25...
 Installing RDoc documentation for rails-3.0.0.beta3...
-MacBook:~ sw$</screen></para>
+sw@debian:~$ </screen></para>
 
     <para>Perfekt. Jetzt haben Sie Ruby 1.9.1 und Rails 3.0
-    installiert.<screen>MacBook:~ sw$ <command>ruby -v</command>
-ruby 1.9.1p378 (2010-01-10 revision 26273) [i386-darwin10.3.0]
-MacBook:~ sw$ <command>rails -v</command>
+    installiert.<screen>sw@debian:~$ <command>ruby -v</command>
+ruby 1.9.1p378 (2010-01-10 revision 26273) [i686-linux]
+sw@debian:~$ <command>rails -v</command>
 Rails 3.0.0.beta3
-MacBook:~ sw$</screen></para>
+sw@debian:~$</screen></para>
 
     <para>Mit <command>rvm system</command> können Sie auch jederzeit wieder
     auf die Ruby Version 1.8 zurückgehen oder zwischen beiden Versionen
