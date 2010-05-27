@@ -347,9 +347,15 @@ Version:
 									<span class="plusts" style="font-size: x-large;">+</span>
 								</a>
 							</div>
-							<div id="adsense">
-																																
-								<xsl:if test="$adincluded = 1">
+							<xsl:if test="$extrahtml = 1">
+								<xsl:if test="count($extrahtmlfile//extrahtml/*) &gt; 0">
+									<div id="extrahtml">
+										<xsl:copy-of select="$extrahtmlfile/extrahtml/node()"/>
+									</div>
+								</xsl:if>
+							</xsl:if>
+							<xsl:if test="$adincluded = 1">
+								<div id="adsense">
 									<script type="text/javascript">
 										<xsl:text disable-output-escaping="yes">
       				<!--ADD YOUR AD INSIDE THE CDATA SECTION-->
@@ -361,7 +367,14 @@ Version:
 				</xsl:text>
 									</script>
 									<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-								</xsl:if>
+								</div>
+							</xsl:if>
+							<div id="validator">
+							<p>
+   								<a href="http://validator.w3.org/check?uri=referer"><img
+							       src="http://www.w3.org/Icons/valid-xhtml10"
+							       alt="Valid XHTML 1.0 Strict" height="31" width="88" /></a>
+							</p>
 							</div>
 						</div>
 						<div id="maincol">
@@ -391,16 +404,16 @@ Version:
 					</div>
 				</div>
 				<xsl:if test="$analyticsincluded = 1">
-				<script type="text/javascript">
-				<xsl:text disable-output-escaping="yes">
-		var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-		document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-				</xsl:text>
-				</script>
-				<script type="text/javascript">
-				<xsl:text disable-output-escaping="yes">var pageTracker = _gat._getTracker("</xsl:text>	<xsl:copy-of select="$analyticsfile/analytics/node()"/><xsl:text disable-output-escaping="yes">");</xsl:text>
-				<xsl:text>pageTracker._trackPageview();</xsl:text>
-				</script>
+					<script type="text/javascript">
+					<xsl:text disable-output-escaping="yes">
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+					</xsl:text>
+					</script>
+					<script type="text/javascript">
+					<xsl:text disable-output-escaping="yes">var pageTracker = _gat._getTracker("</xsl:text>	<xsl:copy-of select="$analyticsfile/analytics/node()"/><xsl:text disable-output-escaping="yes">");</xsl:text>
+					<xsl:text>pageTracker._trackPageview();</xsl:text>
+					</script>
 				</xsl:if>
 			</body>
 		</html>
