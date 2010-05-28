@@ -3,8 +3,8 @@ TOPDIR = $(CURDIR)/../..
 include $(TOPDIR)/Makefile.inc
 DOCBOOKNSDIR_CLEANED = $(shell cd ${DOCBOOKNSDIR}; pwd | awk -F"$$" {'print $1'})
 
-DOCBOOKXSLPATH :=  ${DOCBOOKNSDIR_CLEANED}/xhtml/docbook.xsl
-CHUNKXSLPATH := ${DOCBOOKNSDIR_CLEANED}/xhtml/chunk.xsl
+DOCBOOKXSLPATH :=  ${DOCBOOKNSDIR_CLEANED}/xhtml-1_1/docbook.xsl
+CHUNKXSLPATH := ${DOCBOOKNSDIR_CLEANED}/xhtml-1_1/chunk.xsl
 EXTRAPARAMS +=  --stringparam base.dir $(EXPORTDIR)/html/ --stringparam admon.graphics.path ./custom-admons-callouts/ --stringparam callout.graphics.path ./custom-admons-callouts/callouts/ 
 
 ifneq ("$(wildcard $(HTMLDIR)/ad.xml)","")

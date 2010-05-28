@@ -49,7 +49,7 @@
 <xsl:param name="othercredit.like.author.enabled" select="0"/>
 <xsl:param name="email.delimiters.enabled">0</xsl:param>
 
-<xsl:param name="generate.id.attributes" select="0"/>
+<xsl:param name="generate.id.attributes" select="1"/>
 <xsl:param name="make.graphic.viewport" select="0"/>
 <xsl:param name="use.embed.for.svg" select="0"/>
 
@@ -80,7 +80,6 @@ part toc
 <xsl:param name="header.rule" select="0"/>
 <xsl:param name="footer.rule" select="0"/>
 <xsl:param name="css.decoration" select="0"/>
-<xsl:param name="ulink.target"/>
 <xsl:param name="table.cell.border.style"/>
 
 <!-- BUGBUG 
@@ -595,7 +594,7 @@ Reason: No stinking tables
 Version: 1.72.0
 -->
 
-<xsl:template name="qandaset">
+<!--<xsl:template name="qandaset">
   <div class="qandaset">
     <xsl:apply-templates select="." mode="class.attribute"/>
     <xsl:apply-templates />
@@ -651,9 +650,9 @@ Version: 1.72.0
     <xsl:apply-templates select="." mode="class.attribute"/>
     <xsl:apply-templates/>
   </div>
-</xsl:template>
+</xsl:template>-->
 
-<xsl:template match="question">
+<!--<xsl:template match="question">
   <xsl:variable name="deflabel">
     <xsl:choose>
       <xsl:when test="ancestor-or-self::*[@defaultlabel]">
@@ -676,9 +675,9 @@ Version: 1.72.0
         <xsl:with-param name="node" select=".."/>
         <xsl:with-param name="conditional" select="0"/>
       </xsl:call-template>
-      <!--xsl:call-template name="anchor">
+      <xsl:call-template name="anchor">
         <xsl:with-param name="conditional" select="0"/>
-      </xsl:call-template-->
+      </xsl:call-template>
       <xsl:if test="string-length($label.content) &gt; 0">
         <label>
           <xsl:copy-of select="$label.content"/>
@@ -688,9 +687,9 @@ Version: 1.72.0
       <xsl:apply-templates/>
     </div>
   </div>
-</xsl:template>
+</xsl:template>-->
 
-<xsl:template match="answer">
+<!--<xsl:template match="answer">
   <xsl:variable name="deflabel">
     <xsl:choose>
       <xsl:when test="ancestor-or-self::*[@defaultlabel]">
@@ -716,7 +715,7 @@ Version: 1.72.0
        <xsl:apply-templates />
      </div>
    </div>
-</xsl:template>
+</xsl:template>-->
 
 <xsl:template match="productnumber" mode="book.titlepage.recto.auto.mode">
 <xsl:apply-templates select="." mode="book.titlepage.recto.mode"/>
@@ -1147,7 +1146,7 @@ Version: 1.72.0
   <!-- those elements have the same set of attributes, so we can -->
   <!-- handle them all in one place.                             -->
   <xsl:param name="tag" select="'img'"/>
-  <xsl:param name="alt"/>
+  <xsl:param name="alt" select="'image'"/>
   <xsl:param name="longdesc"/>
 
   <!-- The HTML img element only supports the notion of content-area
