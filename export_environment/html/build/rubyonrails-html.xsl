@@ -406,18 +406,7 @@ Version:
 					</div>
 				</div>
 				<xsl:if test="$analyticsincluded = 1">
-					<script type="text/javascript">
-						<xsl:text disable-output-escaping="yes">
-			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-					</xsl:text>
-					</script>
-					<script type="text/javascript">
-						<xsl:text disable-output-escaping="yes">var pageTracker = _gat._getTracker("</xsl:text>
-						<xsl:copy-of select="$analyticsfile/analytics/node()"/>
-						<xsl:text disable-output-escaping="yes">");</xsl:text>
-						<xsl:text>pageTracker._trackPageview();</xsl:text>
-					</script>
+					<xsl:copy-of select="$analyticsfile/analytics/node()"/>
 				</xsl:if>
 			</body>
 		</html>
@@ -443,7 +432,14 @@ Version:
 					</xsl:attribute>
 					<xsl:attribute name="style">
 						<xsl:text>margin-left: </xsl:text>
-						<xsl:value-of select="(position() - 1) * 0.8"/>
+						<xsl:choose>
+							<xsl:when test="local-name(.) = 'book'">
+								<xsl:value-of select="0"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="(position() - 1) * 0.8"/>
+							</xsl:otherwise>
+						</xsl:choose>
 						<xsl:text>em</xsl:text>
 					</xsl:attribute>
 					<a>
@@ -457,15 +453,26 @@ Version:
 					</a>
 				</li>
 				<xsl:if test="position() = last()">
+					<xsl:if test="local-name($this.node) = 'chapter'">
+						<xsl:call-template name="special-print-previous-chapters">
+							<xsl:with-param name="node" select="$this.node"/>
+							<xsl:with-param name="padding" select="(position() - 1) * 0.8"/>
+						</xsl:call-template>
+					</xsl:if>
 					<xsl:call-template name="last-li-breadcrumb">
 						<xsl:with-param name="padding" select="(position() - 1) * 0.8"/>
 						<xsl:with-param name="last-li-node" select="$this.node"/>
 					</xsl:call-template>
+					<xsl:if test="local-name($this.node) = 'chapter'">
+						<xsl:call-template name="special-print-following-chapters">
+							<xsl:with-param name="node" select="$this.node"/>
+						</xsl:call-template>
+					</xsl:if>
 					<xsl:call-template name="print-following-chapters">
 						<xsl:with-param name="last-li-node" select="$this.node"/>
 					</xsl:call-template>
 				</xsl:if>
-				
+			
 			</xsl:for-each>
 			<xsl:if test="count($this.node/ancestor::*) = 0">
 				<li class="breadcrumb-node breadcrumb-last">
@@ -501,9 +508,63 @@ Version:
 		</xsl:for-each>
 	</xsl:template>
 	
+	<xsl:template name="special-print-following-chapters">
+		<xsl:param name="node"/>
+		<xsl:for-each select="$node/following-sibling::*[name() = 'chapter']">
+			<xsl:if test="local-name(.) = 'chapter'">
+				<li>
+					<xsl:attribute name="class">
+						<xsl:text>breadcrumb-link breadcrumb-bullet </xsl:text>
+						<xsl:value-of select="local-name(.)"/>
+					</xsl:attribute>
+					<xsl:attribute name="style">
+						<xsl:text>margin-left: 0.8em</xsl:text>
+					</xsl:attribute>
+					<a>
+						<xsl:attribute name="href">
+							<xsl:call-template name="href.target">
+								<xsl:with-param name="object" select="."/>
+							</xsl:call-template>
+						</xsl:attribute>
+						<xsl:apply-templates select="." mode="title.markup"/>
+					</a>
+				</li>
+			</xsl:if>
+		</xsl:for-each>
+	</xsl:template>
+	
 	<xsl:template name="print-previous-chapters">
 		<xsl:param name="padding"/>
 		<xsl:for-each select="preceding-sibling::*">
+			<xsl:if test="local-name(.) = 'chapter'">
+				<li>
+					<xsl:attribute name="class">
+						<xsl:text>breadcrumb-link breadcrumb-bullet </xsl:text>
+						<xsl:value-of select="local-name(.)"/>
+					</xsl:attribute>
+					<xsl:attribute name="style">
+						<xsl:text>margin-left: </xsl:text>
+						<xsl:value-of select="$padding"/>
+						<xsl:text>em</xsl:text>
+					</xsl:attribute>
+					<a>
+						<xsl:attribute name="href">
+							<xsl:call-template name="href.target">
+								<xsl:with-param name="object" select="."/>
+							</xsl:call-template>
+						</xsl:attribute>
+						<xsl:apply-templates select="." mode="title.markup"/>
+					</a>
+				</li>
+			</xsl:if>
+		</xsl:for-each>
+	</xsl:template>
+	
+	
+	<xsl:template name="special-print-previous-chapters">
+		<xsl:param name="node"/>
+		<xsl:param name="padding"/>
+		<xsl:for-each select="$node/preceding-sibling::*">
 			<xsl:if test="local-name(.) = 'chapter'">
 				<li>
 					<xsl:attribute name="class">
