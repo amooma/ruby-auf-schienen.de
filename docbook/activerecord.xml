@@ -1,0 +1,945 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="activerecord"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="activerecord.title">ActiveRecord</title>
+
+  <para>ActiveRecord ist eine Abstaktionsschicht, die es uns leichten Zugang
+  zu einer SQL-Datenbank gibt. Einer der Erfolgsrezepte von Rails ist
+  sicherlich die Benutzung von ActiveRecord. Die Programmierung "fühlt sich
+  gut an" und es ist viel weniger fehleranfällig als pures SQL. Bei der Arbeit
+  mit diesem Kapitel hilft SQL-Wissen, aber es wird nicht vorrausgesetzt und
+  es ist auch für die Arbeit mit ActiveRecord nicht notwendig.</para>
+
+  <para>In diesem Kapitel werden wir hauptsächlich in der Rails Console
+  arbeiten. </para>
+
+  <section xml:id="railsair">
+    <title xml:id="railsair.title">Die Fluggesellschaft RailsAir</title>
+
+    <para>Damit das Kapitel in sich selbst abschlossen ist, erstellen wir ein
+    neues Rails-Projekt, in dem wir dann alle Beispiele einbauen. Dabei habe
+    ich etwas aus dem "täglichen Leben" genommen und schlage vor, das wir
+    gemeinsam eine neue regionale Fluggesellschaft gründen. Die RailsAir!
+    Fangen wir mal an:<screen>stefan@swmbp 0 1.9.1-p378 test$ <command>rails new railsair</command>
+      create  
+      create  README
+      create  Rakefile
+      create  config.ru
+      create  .gitignore
+      create  Gemfile
+      create  app
+      create  app/controllers/application_controller.rb
+      create  app/helpers/application_helper.rb
+      create  app/views/layouts/application.html.erb
+      create  app/models
+      create  config
+      create  config/routes.rb
+      create  config/application.rb
+      create  config/environment.rb
+      create  config/environments
+      create  config/environments/development.rb
+      create  config/environments/production.rb
+      create  config/environments/test.rb
+      create  config/initializers
+      create  config/initializers/backtrace_silencers.rb
+      create  config/initializers/inflections.rb
+      create  config/initializers/mime_types.rb
+      create  config/initializers/secret_token.rb
+      create  config/initializers/session_store.rb
+      create  config/locales
+      create  config/locales/en.yml
+      create  config/boot.rb
+      create  config/database.yml
+      create  db
+      create  db/seeds.rb
+      create  doc
+      create  doc/README_FOR_APP
+      create  lib
+      create  lib/tasks
+      create  lib/tasks/.gitkeep
+      create  log
+      create  log/server.log
+      create  log/production.log
+      create  log/development.log
+      create  log/test.log
+      create  public
+      create  public/404.html
+      create  public/422.html
+      create  public/500.html
+      create  public/favicon.ico
+      create  public/index.html
+      create  public/robots.txt
+      create  public/images
+      create  public/images/rails.png
+      create  public/stylesheets
+      create  public/stylesheets/.gitkeep
+      create  public/javascripts
+      create  public/javascripts/application.js
+      create  public/javascripts/controls.js
+      create  public/javascripts/dragdrop.js
+      create  public/javascripts/effects.js
+      create  public/javascripts/prototype.js
+      create  public/javascripts/rails.js
+      create  script
+      create  script/rails
+      create  test
+      create  test/performance/browsing_test.rb
+      create  test/test_helper.rb
+      create  test/fixtures
+      create  test/functional
+      create  test/integration
+      create  test/unit
+      create  tmp
+      create  tmp/sessions
+      create  tmp/sockets
+      create  tmp/cache
+      create  tmp/pids
+      create  vendor/plugins
+      create  vendor/plugins/.gitkeep
+stefan@swmbp 0 1.9.1-p378 test$</screen></para>
+
+    <para>So jetzt noch in das neue Verzeichnis wechseln und <command>bundle
+    install</command> ausführen:<screen>stefan@swmbp 0 1.9.1-p378 test$ <command>cd railsair</command>
+stefan@swmbp 0 1.9.1-p378 railsair$ <command>bundle install</command>
+Fetching source index from http://rubygems.org/
+Using rake (0.8.7) from bundler gems 
+Using abstract (1.0.0) from bundler gems 
+Using activesupport (3.0.0.beta4) from bundler gems 
+Using builder (2.1.2) from bundler gems 
+Using i18n (0.4.1) from bundler gems 
+Using activemodel (3.0.0.beta4) from bundler gems 
+Using erubis (2.6.5) from bundler gems 
+Using rack (1.1.0) from bundler gems 
+Using rack-mount (0.6.4) from bundler gems 
+Using rack-test (0.5.4) from bundler gems 
+Using tzinfo (0.3.22) from bundler gems 
+Using actionpack (3.0.0.beta4) from bundler gems 
+Using mime-types (1.16) from bundler gems 
+Using polyglot (0.3.1) from bundler gems 
+Using treetop (1.4.8) from bundler gems 
+Using mail (2.2.4) from bundler gems 
+Using actionmailer (3.0.0.beta4) from bundler gems 
+Using arel (0.4.0) from bundler gems 
+Using activerecord (3.0.0.beta4) from bundler gems 
+Using activeresource (3.0.0.beta4) from bundler gems 
+Using bundler (0.9.26) from bundler gems 
+Using thor (0.13.6) from bundler gems 
+Using railties (3.0.0.beta4) from bundler gems 
+Using rails (3.0.0.beta4) from bundler gems 
+Using sqlite3-ruby (1.3.0) from bundler gems 
+Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
+stefan@swmbp 0 1.9.1-p378 railsair$</screen></para>
+  </section>
+
+  <section>
+    <title>Unsere Flugzeuge</title>
+
+    <para>Als erstes brauchen wir ein Model für unsere Flugzeuge. Der
+    Einfachheit halber benutzen wir Scaffolding:<screen>stefan@swmbp 0 1.9.1-p378 railsair$ <command>rails generate scaffold airplane name:string model:string production_year:integer seats:integer</command>
+      invoke  active_record
+      create    db/migrate/20100613142008_create_airplanes.rb
+      create    app/models/airplane.rb
+      invoke    test_unit
+      create      test/unit/airplane_test.rb
+      create      test/fixtures/airplanes.yml
+       route  resources :airplanes
+      invoke  scaffold_controller
+      create    app/controllers/airplanes_controller.rb
+      invoke    erb
+      create      app/views/airplanes
+      create      app/views/airplanes/index.html.erb
+      create      app/views/airplanes/edit.html.erb
+      create      app/views/airplanes/show.html.erb
+      create      app/views/airplanes/new.html.erb
+      create      app/views/airplanes/_form.html.erb
+      invoke    test_unit
+      create      test/functional/airplanes_controller_test.rb
+      invoke    helper
+      create      app/helpers/airplanes_helper.rb
+      invoke      test_unit
+      create        test/unit/helpers/airplanes_helper_test.rb
+      invoke  stylesheets
+   identical    public/stylesheets/scaffold.css
+stefan@swmbp 0 1.9.1-p378 railsair$</screen></para>
+
+    <para>Sie sehen schon, die RailsAir ist einer dieser neumodischen billig
+    Flieger mit nur einer Art von Bestuhlung (Economy). Sie haben sich ja
+    bereits in <xref linkend="model_validierungen" /> intensiv mit der
+    Validierung beschäftigt und können deshalb die
+    <filename>app/models/airplane.rb</filename> ohne weitere Erklärung
+    lesen:<programlisting>class Airplane &lt; ActiveRecord::Base
+  # Ein Flugzeugname wird immer nur einmal vergeben
+  validates_presence_of :name
+  validates_uniqueness_of :name
+  
+  validates_presence_of :model
+  
+  # Unsere Flugzeuge sind nicht aelter als 20 Jahre
+  validates_presence_of :production_year
+  validates_numericality_of :production_year,
+                            :only_integer =&gt; true,
+                            :greater_than =&gt; Date.today.year - 21,
+                            :less_than =&gt; Date.today.year + 1
+
+  # Die maximale Bestuhlung eines A380 liegt bei 852
+  validates_presence_of :seats
+  validates_numericality_of :seats,
+                            :only_integer =&gt; true,
+                            :greater_than =&gt; 0,
+                            :less_than =&gt; 853
+end
+</programlisting>Die Datenbank anlegen:<screen>stefan@swmbp 0 1.9.1-p378 railsair$ <command>rake db:migrate</command>
+(in /Users/stefan/Desktop/test/railsair)
+==  CreateAirplanes: migrating ================================================
+-- create_table(:airplanes)
+   -&gt; 0.0015s
+==  CreateAirplanes: migrated (0.0016s) =======================================
+
+stefan@swmbp 0 1.9.1-p378 railsair$</screen></para>
+  </section>
+
+  <section xml:id="anlegen_und_anzeigen_von_datensaetzen">
+    <title xml:id="anlegen_und_anzeigen_von_datensaetzen.title">Anlegen und
+    Anzeigen von Datensätzen</title>
+
+    <para>Als erstes starten wir die Rails Console:<screen>stefan@swmbp 0 1.9.1-p378 railsair$ <command>rails console</command>
+Loading development environment (Rails 3.0.0.beta4)
+ruby-1.9.1-p378 &gt; </screen></para>
+
+    <section>
+      <title>Neuen Datensatz anlegen</title>
+
+      <para>ActiveRecord stellt uns automagisch eine Klasse aus der Datenbank
+      <parameter>airplanes</parameter> mit dem Namen
+      <classname>Airplane</classname> zur Verfügung. Diese Klasse hat eine
+      Methode <methodname>new</methodname> und mit der können wir ein neues
+      Objekt erstellen. <screen>ruby-1.9.1-p378 &gt; <command>new_airplane = Airplane.new</command>
+ =&gt; #&lt;Airplane id: nil, name: nil, model: nil, production_year: nil, seats: nil, created_at: nil, updated_at: nil&gt; 
+ruby-1.9.1-p378 &gt; </screen></para>
+
+      <para>Wir können uns sicherheitshalber noch mal die KLasse der Instance
+      new_airplane ausgeben lassen.<screen>ruby-1.9.1-p378 &gt; <command>new_airplane.class</command>
+ =&gt; Airplane(id: integer, name: string, model: string, production_year: integer, seats: integer, created_at: datetime, updated_at: datetime) 
+ruby-1.9.1-p378 &gt;</screen></para>
+
+      <para>Das neue Objekt new_airplane hat automatsch Accessors (siehe <xref
+      linkend="getter_und_setter_methoden" />) zu den einzelnen Datenfeldern.
+      Diese benutzen wir zum Füllen mit einem Beispieldatensatz.<screen>ruby-1.9.1-p378 &gt; <command>new_airplane.name = 'New York'</command>
+ =&gt; "New York" 
+ruby-1.9.1-p378 &gt; <command>new_airplane.production_year = 2010</command>
+ =&gt; 2010 
+ruby-1.9.1-p378 &gt; <command>new_airplane.model = 'A380'</command>
+ =&gt; "A380" 
+ruby-1.9.1-p378 &gt; <command>new_airplane.seats = 852</command>
+ =&gt; 852 
+ruby-1.9.1-p378 &gt; <command>new_airplane</command>
+ =&gt; #&lt;Airplane id: nil, name: "New York", model: "A380", production_year: 2010, seats: 852, created_at: nil, updated_at: nil&gt; 
+ruby-1.9.1-p378 &gt; </screen></para>
+
+      <para>Das Objekt ist allerdings noch nicht in der Datenbank gespeichert.
+      Das erfolgt erst durch Aufruf der Methode
+      <methodname>save</methodname>.<screen>ruby-1.9.1-p378 &gt; <command>new_airplane.save</command>
+ =&gt; true 
+ruby-1.9.1-p378 &gt;</screen></para>
+
+      <para>Alternative können wir einen zweiten Datensatz auch direkt mit der
+      Methode <methodname>create</methodname> anlegen.<screen>ruby-1.9.1-p378 &gt; <command>Airplane.create(:name =&gt; 'Las Vegas', :production_year =&gt; 2005, :seats =&gt; 467, :model =&gt; 'Boing 747')</command>
+ =&gt; #&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:38:20", updated_at: "2010-06-13 15:38:20"&gt; 
+ruby-1.9.1-p378 &gt;</screen></para>
+
+      <para>Die Methode create nimmt übrigens auch ein Array von neuen
+      Objekten an. Die nächsten zwei Flugzeuge wir so an:<screen>ruby-1.9.1-p378 &gt; <command>Airplane.create([{:name =&gt; 'Miami', :production_year =&gt; 2002, :model =&gt; 'Boing 777', :seats =&gt; 300},{:name =&gt; 'Los Angeles', :model =&gt; 'A330', :production_year =&gt; 1995, :seats =&gt; 412}])</command>
+ =&gt; [#&lt;Airplane id: 3, name: "Miami", model: "Boing 777", production_year: 2002, seats: 300, created_at: "2010-06-13 15:46:47", updated_at: "2010-06-13 15:46:47"&gt;, #&lt;Airplane id: 4, name: "Los Angeles", model: nil, production_year: 1995, seats: 412, created_at: "2010-06-13 15:46:47", updated_at: "2010-06-13 15:46:47"&gt;] 
+ruby-1.9.1-p378 &gt;</screen></para>
+
+      <para>Ganz zum Schluss legen wir noch zwei weitere Boing 747 an, damit
+      wir später bessere Suchbeispiele haben:<screen>ruby-head &gt; <command>Airplane.create(:name =&gt; 'Orlando', :model =&gt; 'Boing 747', :production_year =&gt; 2007, :seats =&gt; 467)</command>
+ =&gt; #&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt; 
+ruby-head &gt; <command>Airplane.create(:name =&gt; 'San Diego', :model =&gt; 'Boing 747', :production_year =&gt; 2005, :seats =&gt; 467)</command>
+ =&gt; #&lt;Airplane id: 6, name: "San Diego", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-14 11:52:49", updated_at: "2010-06-14 11:52:49"&gt; 
+ruby-head &gt;</screen></para>
+
+      <section>
+        <title>Hilfe zu create</title>
+
+        <para>Die Methode <methodname>create</methodname> gehört zu
+        <classname>ActiveRecord::Base</classname>. Die online Hilfe dazu kann
+        mit <application>ri</application> abgerufen werden. Wenn Sie das jetzt
+        ausprobieren wollen, müssen Sie natürlich erst mit
+        <command>exit</command> aus der Console raus.<screen>stefan@swmbp 0 1.9.1-p378 railsair$ <command>ri ActiveRecord::Base.create</command>
+ActiveRecord::Base.create
+
+(from gem activerecord-3.0.0.beta4)
+------------------------------------------------------------------------------
+  create(attributes = nil) { |object| ... }
+
+------------------------------------------------------------------------------
+
+Creates an object (or multiple objects) and saves it to the database, if
+validations pass. The resulting object is returned whether the object was
+saved successfully to the database or not.
+
+The attributes parameter can be either be a Hash or an Array of Hashes.
+ These Hashes describe the attributes on the objects that are to be created.
+
+Examples
+  # Create a single new object
+  User.create(:first_name =&gt; 'Jamie')
+
+  # Create an Array of new objects
+  User.create([{ :first_name =&gt; 'Jamie' }, { :first_name =&gt; 'Jeremy' }])
+
+  # Create a single object and pass it into a block to set other attributes.
+  User.create(:first_name =&gt; 'Jamie') do |u|
+    u.is_admin = false
+  end
+
+  # Creating an Array of new objects using a block, where the block is executed for each object:
+  User.create([{ :first_name =&gt; 'Jamie' }, { :first_name =&gt; 'Jeremy' }]) do |u|
+    u.is_admin = false
+  end
+
+
+stefan@swmbp 0 1.9.1-p378 railsair$
+</screen></para>
+      </section>
+
+      <section xml:id="seed_rb">
+        <title xml:id="seed_rb.title">Mit seed.rb die Entwicklungsdatenbank
+        betanken</title>
+
+        <para>In der Entwicklung von neuen Rails Projekten kommt es immer mal
+        wieder vor, das man den Inhalt der Datenbank löschen und mit neuen
+        Werten befüllen will. In Rails gibt es dafür den praktischen
+        Mechanismus der Datei <filename>db/seeds.rb</filename></para>
+
+        <para>Die <filename>db/seeds.rb</filename> ist ein normales
+        Ruby-Programm, das man mit <command>rake db:seed</command> ausführen
+        kann. Dies geht natürlich nicht nur mit der Entwicklungsdatenbank,
+        sondern kann später auch in der Produktion geschehen. Das ist z.B.
+        praktisch, wenn man initial eine Länderliste in eine Länderdatenbank
+        eintragen will.</para>
+
+        <para>Für unsere Flugzeug-Datenbank habe ich folgende
+        <filename>db/seeds.rb</filename> vorbereitet:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
+# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
+#
+# Examples:
+#   
+#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
+#   Major.create(:name =&gt; 'Daley', :city =&gt; cities.first)
+
+Airplane.create(:name =&gt; 'New York', :model =&gt; 'A380', :production_year =&gt; 2010, :seats =&gt; 852)
+Airplane.create(:name =&gt; 'Las Vegas', :model =&gt; 'Boing 747', :production_year =&gt; 2005, :seats =&gt; 467)
+Airplane.create(:name =&gt; 'Miami', :model =&gt; 'Boing 777', :production_year =&gt; 2002, :seats =&gt; 300)
+Airplane.create(:name =&gt; 'Los Angeles', :model =&gt; 'A330', :production_year =&gt; 1995, :seats =&gt; 412)
+Airplane.create(:name =&gt; 'Orlando', :model =&gt; 'Boing 747', :production_year =&gt; 2007, :seats =&gt; 467)
+Airplane.create(:name =&gt; 'San Diego', :model =&gt; 'Boing 747', :production_year =&gt; 2005, :seats =&gt; 467)
+</programlisting></para>
+
+        <section>
+          <title>Betankung</title>
+
+          <para>Die Datenbank können wir <command>rake db:reset</command>
+          resetten.<screen>stefan@swmbp 0 1.9.1-p378 railsair$ <command>rake db:reset</command>
+(in /Users/stefan/Desktop/test/railsair)
+db/test.sqlite3 already exists
+-- create_table("airplanes", {:force=&gt;true})
+   -&gt; 0.1848s
+-- initialize_schema_migrations_table()
+   -&gt; 0.3762s
+-- assume_migrated_upto_version(20100613142008, "db/migrate")
+   -&gt; 0.0018s
+stefan@swmbp 0 1.9.1-p378 railsair$</screen></para>
+
+          <para>Um sie dann mit <command>rake db:seed</command> zu
+          betanken.<screen>stefan@swmbp 0 1.9.1-p378 railsair$ <command>rake db:seed</command>
+(in /Users/stefan/Desktop/test/railsair)
+stefan@swmbp 0 1.9.1-p378 railsair$</screen></para>
+        </section>
+      </section>
+    </section>
+  </section>
+
+  <section>
+    <title>Datensätze anzeigen</title>
+
+    <para>Mit den Methoden <methodname>first</methodname> und
+    <methodname>last</methodname> können wir uns den ersten und den letzten
+    Datensatz in einer Tabelle ausgeben lassen:<screen>ruby-1.9.1-p378 &gt; <command>Airplane.first</command>
+ =&gt; #&lt;Airplane id: 1, name: "New York", model: "A380", production_year: 2010, seats: 852, created_at: "2010-06-13 15:57:25", updated_at: "2010-06-13 15:57:25"&gt; 
+ruby-1.9.1-p378 &gt; <command>Airplane.last</command>
+ =&gt; #&lt;Airplane id: 4, name: "Los Angeles", model: "A330", production_year: 1995, seats: 412, created_at: "2010-06-13 15:57:42", updated_at: "2010-06-13 15:57:42"&gt; 
+ruby-1.9.1-p378 &gt; </screen></para>
+
+    <para>Der einfachste Weg alle Datensätze aus der Datenbank
+    <varname>airplanes</varname> anzuzeigen ist die Methode
+    <methodname>all</methodname>:<screen>ruby-1.9.1-p378 &gt; <command>Airplane.all</command>
+ =&gt; [#&lt;Airplane id: 1, name: "New York", model: "A380", production_year: 2010, seats: 852, created_at: "2010-06-13 15:57:25", updated_at: "2010-06-13 15:57:25"&gt;, #&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-13 15:57:32"&gt;, #&lt;Airplane id: 3, name: "Miami", model: "Boing 777", production_year: 2002, seats: 300, created_at: "2010-06-13 15:57:41", updated_at: "2010-06-13 15:57:41"&gt;, #&lt;Airplane id: 4, name: "Los Angeles", model: "A330", production_year: 1995, seats: 412, created_at: "2010-06-13 15:57:42", updated_at: "2010-06-13 15:57:42"&gt;] 
+ruby-1.9.1-p378 &gt;</screen></para>
+
+    <para>Was für eine Klasse ist das Ergebnis von
+    <classname>Movie.all</classname>? Schauen wir mal nach.<screen>ruby-1.9.1-p378 &gt; <command>Airplane.all.class</command>
+ =&gt; Array 
+ruby-1.9.1-p378 &gt; </screen></para>
+
+    <para>Dann können wir ja die Iterator-Methode
+    <methodname>each</methodname> anwenden (siehe <xref
+    linkend="array_iterator" />), um durch die einzelnen Elemente des Arrays
+    zu gehen. Damit können Sie sich als Beispiel alle Flugzeugmodelle ausgeben
+    lassen.<screen>ruby-1.9.1-p378 &gt; <command>Airplane.all.each { |airplane| puts airplane.model }</command>
+A380
+Boing 747
+Boing 777
+A330
+ =&gt; [#&lt;Airplane id: 1, name: "New York", model: "A380", production_year: 2010, seats: 852, created_at: "2010-06-13 15:57:25", updated_at: "2010-06-13 15:57:25"&gt;, #&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-13 15:57:32"&gt;, #&lt;Airplane id: 3, name: "Miami", model: "Boing 777", production_year: 2002, seats: 300, created_at: "2010-06-13 15:57:41", updated_at: "2010-06-13 15:57:41"&gt;, #&lt;Airplane id: 4, name: "Los Angeles", model: "A330", production_year: 1995, seats: 412, created_at: "2010-06-13 15:57:42", updated_at: "2010-06-13 15:57:42"&gt;] 
+ruby-1.9.1-p378 &gt; </screen></para>
+  </section>
+
+  <section xml:id="einfache_queries">
+    <title xml:id="einfache_queries.title">Query</title>
+
+    <para>So, das wird jetzt ein wenig komplexer. Muss man sich nicht beim
+    ersten mal ganz durchlesen, aber schaden kann es auch nicht.</para>
+
+    <note>
+      <para>In diesem Kapitel werden gezielt keine Methoden benutzt, die
+      bereits zu Rails 3.0 deprecated sind oder sehr wahrscheinlich in Rails
+      3.1 deprecated werden.</para>
+    </note>
+
+    <section>
+      <title>first und last</title>
+
+      <para>Mit den Methoden <methodname>first</methodname> und
+      <methodname>last</methodname> können wir uns den ersten und den letzten
+      Datensatz in einer Tabelle ausgeben lassen:<screen>ruby-1.9.1-p378 &gt; <command>Airplane.first</command>
+ =&gt; #&lt;Airplane id: 1, name: "New York", model: "A380", production_year: 2010, seats: 852, created_at: "2010-06-13 15:57:25", updated_at: "2010-06-13 15:57:25"&gt; 
+ruby-1.9.1-p378 &gt; <command>Airplane.last</command>
+ =&gt; #&lt;Airplane id: 4, name: "Los Angeles", model: "A330", production_year: 1995, seats: 412, created_at: "2010-06-13 15:57:42", updated_at: "2010-06-13 15:57:42"&gt; 
+ruby-1.9.1-p378 &gt; </screen></para>
+
+      <para>Das Ergebnis von <methodname>Airplane.first</methodname> ist
+      natürlich eine <classname>Airplane</classname> Klasse:<screen>ruby-1.9.1-p378 &gt; <command>Airplane.first.class</command>
+ =&gt; Airplane(id: integer, name: string, model: string, production_year: integer, seats: integer, created_at: datetime, updated_at: datetime) 
+ruby-1.9.1-p378 &gt;</screen></para>
+    </section>
+
+    <section>
+      <title>all</title>
+
+      <para>Der einfachste Weg alle Datensätze aus der Datenbank
+      <varname>airplanes</varname> anzuzeigen ist die Methode
+      <methodname>all</methodname>:<screen>ruby-1.9.1-p378 &gt; <command>Airplane.all</command>
+ =&gt; [#&lt;Airplane id: 1, name: "New York", model: "A380", production_year: 2010, seats: 852, created_at: "2010-06-13 15:57:25", updated_at: "2010-06-13 15:57:25"&gt;, #&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-13 15:57:32"&gt;, #&lt;Airplane id: 3, name: "Miami", model: "Boing 777", production_year: 2002, seats: 300, created_at: "2010-06-13 15:57:41", updated_at: "2010-06-13 15:57:41"&gt;, #&lt;Airplane id: 4, name: "Los Angeles", model: "A330", production_year: 1995, seats: 412, created_at: "2010-06-13 15:57:42", updated_at: "2010-06-13 15:57:42"&gt;, #&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;, #&lt;Airplane id: 6, name: "San Diego", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-14 11:52:49", updated_at: "2010-06-14 11:52:49"&gt;] 
+ruby-head &gt;</screen></para>
+
+      <para>Was für eine Klasse ist das Ergebnis von
+      <classname>Movie.all</classname>? Schauen wir mal nach.<screen>ruby-1.9.1-p378 &gt; <command>Airplane.all.class</command>
+ =&gt; Array 
+ruby-1.9.1-p378 &gt; </screen></para>
+
+      <para>Dann können wir ja die Iterator-Methode
+      <methodname>each</methodname> anwenden (siehe <xref
+      linkend="array_iterator" />), um durch die einzelnen Elemente des Arrays
+      zu gehen. Damit können Sie sich als Beispiel alle Flugzeugmodelle
+      ausgeben lassen.<screen>ruby-head &gt; <command>Airplane.all.each { |airplane| puts airplane.model }</command>
+A380
+Boing 747
+Boing 777
+A330
+Boing 747
+Boing 747
+ =&gt; [#&lt;Airplane id: 1, name: "New York", model: "A380", production_year: 2010, seats: 852, created_at: "2010-06-13 15:57:25", updated_at: "2010-06-13 15:57:25"&gt;, #&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-13 15:57:32"&gt;, #&lt;Airplane id: 3, name: "Miami", model: "Boing 777", production_year: 2002, seats: 300, created_at: "2010-06-13 15:57:41", updated_at: "2010-06-13 15:57:41"&gt;, #&lt;Airplane id: 4, name: "Los Angeles", model: "A330", production_year: 1995, seats: 412, created_at: "2010-06-13 15:57:42", updated_at: "2010-06-13 15:57:42"&gt;, #&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;, #&lt;Airplane id: 6, name: "San Diego", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-14 11:52:49", updated_at: "2010-06-14 11:52:49"&gt;] 
+ruby-head &gt;</screen></para>
+    </section>
+
+    <section>
+      <title>Nach ID suchen</title>
+
+      <para>Einen Film nach der Datenbank-ID zu suchen geht mit der Methode
+      <methodname>find</methodname>:<screen>ruby-head &gt; <command>Airplane.find(1)</command>
+ =&gt; #&lt;Airplane id: 1, name: "New York", model: "A380", production_year: 2010, seats: 852, created_at: "2010-06-13 15:57:25", updated_at: "2010-06-13 15:57:25"&gt; 
+ruby-head &gt; </screen></para>
+
+      <para>Das Ergebnis von <methodname>Airplane.find(1)</methodname> ist
+      eine <classname>Airplane</classname> Klasse:<screen>ruby-head &gt; <command>Airplane.find(1).class</command>
+ =&gt; Airplane(id: integer, name: string, model: string, production_year: integer, seats: integer, created_at: datetime, updated_at: datetime) 
+ruby-head &gt; </screen></para>
+
+      <para>Wir können aber auch mehrere IDs auf einmal suchen:<screen>ruby-head &gt; <command>Airplane.find(2,3,4)</command>
+ =&gt; [#&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-13 15:57:32"&gt;, #&lt;Airplane id: 3, name: "Miami", model: "Boing 777", production_year: 2002, seats: 300, created_at: "2010-06-13 15:57:41", updated_at: "2010-06-13 15:57:41"&gt;, #&lt;Airplane id: 4, name: "Los Angeles", model: "A330", production_year: 1995, seats: 412, created_at: "2010-06-13 15:57:42", updated_at: "2010-06-13 15:57:42"&gt;] 
+ruby-head &gt;</screen></para>
+
+      <para>Das Ergebnis ist dann logischerweise wieder ein Array:<screen>ruby-head &gt; <command>Airplane.find(2,3,4).class</command>
+ =&gt; Array 
+ruby-head &gt; </screen></para>
+
+      <para>Mit dem Array können Sie dann wieder die Iterator-Methoden
+      benutzen (siehe <xref linkend="array_iterator" />).</para>
+
+      <section>
+        <title>Verhalten bei "nicht gefunden"</title>
+
+        <para>Wer mit <methodname>find(ID)</methodname> einen bestimmten
+        Datensatz abrufen will, sollte sicher sein, das es diesen Datensatz
+        auch gibt. Sonst kommt es zu einem Fehler, den man extra abfangen
+        müsste:<screen>ruby-head &gt; <command>Airplane.find(100)</command>
+ActiveRecord::RecordNotFound: Couldn't find Airplane with ID=100
+ from /Users/stefan/.rvm/gems/ruby-head/gems/activerecord-3.0.0.beta4/lib/active_record/relation/finder_methods.rb:287:in `find_one'
+ from /Users/stefan/.rvm/gems/ruby-head/gems/activerecord-3.0.0.beta4/lib/active_record/relation/finder_methods.rb:274:in `find_with_ids'
+ from /Users/stefan/.rvm/gems/ruby-head/gems/activerecord-3.0.0.beta4/lib/active_record/relation/finder_methods.rb:102:in `find'
+ from /Users/stefan/.rvm/gems/ruby-head/gems/activerecord-3.0.0.beta4/lib/active_record/base.rb:403:in `find'
+ from (irb):43
+ from /Users/stefan/.rvm/gems/ruby-head/gems/railties-3.0.0.beta4/lib/rails/commands/console.rb:47:in `start'
+ from /Users/stefan/.rvm/gems/ruby-head/gems/railties-3.0.0.beta4/lib/rails/commands/console.rb:8:in `start'
+ from /Users/stefan/.rvm/gems/ruby-head/gems/railties-3.0.0.beta4/lib/rails/commands.rb:23:in `&lt;top (required)&gt;'
+ from script/rails:6:in `require'
+ from script/rails:6:in `&lt;main&gt;'
+ruby-head &gt;</screen></para>
+
+        <para>Man kann übrigens mit der Methode exists?(ID) vor einem find(ID)
+        überprüfen, ob der entsprechende Datensatz in der Datenbank
+        existiert:<screen>ruby-head &gt; <command>Airplane.exists?(100)</command>
+ =&gt; false 
+ruby-head &gt; <command>Airplane.exists?(2)</command>
+ =&gt; true 
+ruby-head &gt;</screen></para>
+
+        <para><warning>
+            <para>Mehr der Form halber möchte ich hier erwähnen, das es bei
+            einem <methodname>exists(ID)</methodname> gefolgt von einem
+            <methodname>find(ID)</methodname> durchaus zu einer Race-Condition
+            kommen kann. Unwahrscheinlich, aber nicht unmöglich. Es kann ja
+            sein, das in der minimalen Zeit zwischen den beiden Befehlen ein
+            anderes Programm genau diese Tabellen-ID löscht.</para>
+          </warning></para>
+      </section>
+    </section>
+
+    <section>
+      <title>find_by</title>
+
+      <para>Bei der Benutzung von find_by kommt ein wenig Ruby-Magie ins
+      Spiel. Die Methode <methodname>find</methodname> kann dynamisch mit
+      <methodname>_by_</methodname> und dem Feldnamen erweitert werden und
+      gibt dann den ersten Treffer der Suche aus. Am einfachsten zeigt sich
+      das mit ein paar Beispielen:<screen>ruby-head &gt; <command>Airplane.find_by_model('Boing 747')</command>
+ =&gt; #&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-13 15:57:32"&gt; 
+ruby-head &gt; <command>Airplane.find_by_production_year(2010)</command>
+ =&gt; #&lt;Airplane id: 1, name: "New York", model: "A380", production_year: 2010, seats: 852, created_at: "2010-06-13 15:57:25", updated_at: "2010-06-13 15:57:25"&gt; 
+ruby-head &gt;</screen></para>
+
+      <para>Man kann <methodname>find_by_x</methodname> Methoden weiterhin
+      beliebig mit <methodname>_and_</methodname> um weitere Feldnamen
+      verlängern:<screen>ruby-head &gt; <command>Airplane.find_by_model_and_production_year('Boing 747',2007)</command>
+ =&gt; #&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt; 
+ruby-head &gt;</screen></para>
+
+      <section>
+        <title>Verhalten bei "nicht gefunden"</title>
+
+        <para>Wenn ein <methodname>find_by</methodname> keinen Treffer findet,
+        dann ist das Ergebenis nil:<screen>ruby-head &gt; <command>Airplane.find_by_production_year(1977)</command>
+ =&gt; nil 
+ruby-head &gt;</screen></para>
+
+        <para>Kein Treffer bei einem find_all_by Aufruf ist ein leeres
+        Array:<screen>ruby-head &gt; <command>Airplane.find_all_by_production_year(1977)</command>
+ =&gt; [] 
+ruby-head &gt;</screen></para>
+      </section>
+    </section>
+
+    <section>
+      <title>where</title>
+
+      <para>Wenn man alle Treffer ausgeben will, muss man die Methode
+      <methodname>where</methodname> benutzen:<screen>ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747')</command>
+ =&gt; [#&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-13 15:57:32"&gt;, #&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;, #&lt;Airplane id: 6, name: "San Diego", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-14 11:52:49", updated_at: "2010-06-14 11:52:49"&gt;] 
+ruby-head &gt;</screen></para>
+
+      <para><warning>
+          <para>In vielen Dokumentationen finden Sie auch die Methode
+          <methodname>find_all_by</methodname>. Diese wird aber zu Rails 3.1
+          deprecated und später ganz raus genommen. Deshalb empfehle ich an
+          dieser Stelle darauf ganz zu verzichten.</para>
+        </warning></para>
+
+      <para>Mit der Methode <methodname>count</methodname> kann man sich dann
+      übrigens auch leicht die Anzahl der gefundenen Flugzeuge ausrechnen
+      lassen:<screen>ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').count</command>
+ =&gt; 3 
+ruby-head &gt; </screen></para>
+
+      <para>Jetzt mal eine kleine Quizfrage: "Zählt Rails die Anzahl der
+      Objekte im Array, das von <command>Airplane.where(:model =&gt; 'Boing
+      747').count</command> ausgegeben wird oder geht es intelligenter vor?".
+      Die Antwort liegt im Logfile
+      <filename>log/development.log</filename><screen>  SQL (0.5ms)  SELECT COUNT(*) AS count_id FROM `airplanes` WHERE (`airplanes`.`model` = 'Boing 747')
+</screen></para>
+
+      <para>ActiveRecord überlässt also nicht Rails das Zählen des
+      Ergebnis-Arrays von <command>Airplane.where(:model =&gt; 'Boing
+      747')</command> sondern fügt das COUNT der SQL Anweisung hinzu und lässt
+      die Datenbank diese Berechnung vollziehen (was viel schneller und
+      Resourcen-schonender ist).</para>
+
+      <para>Natürlich kann man auch mehrere <methodname>where</methodname>
+      Methoden hintereinander schalten:<screen>ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').where(:production_year =&gt; 2007)</command>
+ =&gt; [#&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;] 
+ruby-head &gt;</screen></para>
+
+      <section>
+        <title>Lazy Loading</title>
+
+        <para>Seit Rails 3.0 wird bei ActiveRecords <emphasis>Lazy
+        Loading</emphasis> verwendet. Das heißt, das eine Datenbankabfrage
+        erst dann gestellt wird, wenn es gar nicht mehr anders geht. Vorher
+        wird die Anfrage als <classname>ActiveRecord::Relation</classname>
+        gespeichert. Schauen wir uns das mal an einem Code-Beispiel
+        an:<screen>ruby-head &gt; <command>jumbos = Airplane.where(:model =&gt; 'Boing 747')</command>
+ =&gt; [#&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-13 15:57:32"&gt;, #&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;, #&lt;Airplane id: 6, name: "San Diego", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-14 11:52:49", updated_at: "2010-06-14 11:52:49"&gt;] 
+ruby-head &gt; <command>jumbos.class</command>
+ =&gt; ActiveRecord::Relation 
+ruby-head &gt; <command>jumbos = jumbos.where(:production_year =&gt; 2007)</command>
+ =&gt; [#&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;] 
+ruby-head &gt; <command>jumbos.class</command>
+ =&gt; ActiveRecord::Relation 
+ruby-head &gt; <command>jumbos = jumbos.all</command>
+ =&gt; [#&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;] 
+ruby-head &gt; <command>jumbos.class</command>
+ =&gt; Array 
+ruby-head &gt;</screen></para>
+
+        <para>Dummerweise will die Console dem Entwickler hier "helfen" und
+        macht immer die Abfrage. Deshalb kommt man nur mit der Methode
+        <methodname>class</methodname> an den Kern. Im Produktiv-System wäre
+        erst ganz zum Schluss, bei der Methode all eine Datenbankanfrage
+        gemacht worden. Die Methode <methodname>to_sql</methodname> gibt hier
+        einen Hinweis für das Wieso und Warum:<screen>ruby-head &gt; <command>jumbos = Airplane.where(:model =&gt; 'Boing 747')</command>
+ =&gt; [#&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-13 15:57:32"&gt;, #&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;, #&lt;Airplane id: 6, name: "San Diego", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-14 11:52:49", updated_at: "2010-06-14 11:52:49"&gt;] 
+ruby-head &gt; <command>jumbos.to_sql</command>
+ =&gt; "SELECT     `airplanes`.* FROM       `airplanes` WHERE     (`airplanes`.`model` = 'Boing 747')" 
+ruby-head &gt; <command>jumbos = jumbos.where(:production_year =&gt; 2007)</command>
+ =&gt; [#&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;] 
+ruby-head &gt; <command>jumbos.to_sql</command>
+ =&gt; "SELECT     `airplanes`.* FROM       `airplanes` WHERE     (`airplanes`.`model` = 'Boing 747') AND (`airplanes`.`production_year` = 2007)" 
+ruby-head &gt;</screen></para>
+
+        <para>ActiveRecord versucht also die Anzahl der Datenbankanfragen zu
+        minimieren und gleichzeitig zu optimieren. Damit wird der Datenbank
+        Last erspart und der ganze Programmablauf wird deutlich schneller. Das
+        schöne an Lazy Loading ist, das man sich eigentlich gar keinen Kopf
+        darum machen muss. Es passiert alles im Hintergrund.</para>
+
+        <note>
+          <para>Wurde eine Abfrage bei der Datenbank durchgeführt, dann können
+          wir natürlich nicht mehr die Methode <methodname>to_sql</methodname>
+          anwenden, da diese nur bei
+          <classname>ActiveRecord::Relation</classname> greift:<screen>ruby-head &gt; <command>jumbos = Airplane.where(:model =&gt; 'Boing 747')</command>
+ =&gt; [#&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-13 15:57:32"&gt;, #&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;, #&lt;Airplane id: 6, name: "San Diego", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-14 11:52:49", updated_at: "2010-06-14 11:52:49"&gt;] 
+ruby-head &gt; <command>jumbos.to_sql</command>
+ =&gt; "SELECT     `airplanes`.* FROM       `airplanes` WHERE     (`airplanes`.`model` = 'Boing 747')" 
+ruby-head &gt; <command>jumbos = jumbos.all</command>
+ =&gt; [#&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-13 15:57:32"&gt;, #&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;, #&lt;Airplane id: 6, name: "San Diego", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-14 11:52:49", updated_at: "2010-06-14 11:52:49"&gt;] 
+ruby-head &gt; <command>jumbos.to_sql</command>
+NoMethodError: undefined method `scalar' for nil:NilClass
+ from /Users/stefan/.rvm/gems/ruby-head/gems/activesupport-3.0.0.beta4/lib/active_support/whiny_nil.rb:48:in `method_missing'
+ from /Users/stefan/.rvm/gems/ruby-head/gems/arel-0.4.0/lib/arel/engines/sql/core_extensions/object.rb:5:in `to_sql'
+ from /Users/stefan/.rvm/gems/ruby-head/gems/arel-0.4.0/lib/arel/engines/sql/core_extensions/array.rb:6:in `block in to_sql'
+ from /Users/stefan/.rvm/gems/ruby-head/gems/arel-0.4.0/lib/arel/engines/sql/core_extensions/array.rb:6:in `collect'
+ from /Users/stefan/.rvm/gems/ruby-head/gems/arel-0.4.0/lib/arel/engines/sql/core_extensions/array.rb:6:in `to_sql'
+ from (irb):42
+ from /Users/stefan/.rvm/gems/ruby-head/gems/railties-3.0.0.beta4/lib/rails/commands/console.rb:47:in `start'
+ from /Users/stefan/.rvm/gems/ruby-head/gems/railties-3.0.0.beta4/lib/rails/commands/console.rb:8:in `start'
+ from /Users/stefan/.rvm/gems/ruby-head/gems/railties-3.0.0.beta4/lib/rails/commands.rb:23:in `&lt;top (required)&gt;'
+ from script/rails:6:in `require'
+ from script/rails:6:in `&lt;main&gt;'
+ruby-head &gt;</screen></para>
+        </note>
+      </section>
+
+      <section>
+        <title>Verhalten bei "nicht gefunden"</title>
+
+        <para>Die Methode <methodname>where</methodname> gibt als Ergebnis
+        einer nicht erfolgreichen Suche ein leeres Array aus:<screen>ruby-head &gt; <command>Airplane.where(:model =&gt; 'Raumschiff Enterprise')</command>
+ =&gt; [] 
+ruby-head &gt;</screen></para>
+
+        <note>
+          <para>Man kann natürlich argumentieren, das das Ergebnis einer
+          erfolglosen Suche ein ist, das erst bei einem weiteren Vergleich
+          wirklich aufgelöst wird. Aber in der Praxis kann man diese
+          Genauigkeit getrost vernachlässigen.<screen>ruby-head &gt; <command>Airplane.where(:model =&gt; 'Raumschiff Enterprise')</command>
+ =&gt; [] 
+ruby-head &gt; <command>Airplane.where(:model =&gt; 'Raumschiff Enterprise').class</command>
+ =&gt; ActiveRecord::Relation 
+ruby-head &gt; <command>Airplane.where(:model =&gt; 'Raumschiff Enterprise') == []</command>
+ =&gt; true 
+ruby-head &gt;</screen></para>
+        </note>
+      </section>
+    </section>
+
+    <section>
+      <title>Sortieren</title>
+
+      <para>Mit der Methode <methodname>order</methodname> können Sie die
+      Ergebnisse einer Abfrage sortieren:<screen>ruby-head &gt; <command>Airplane.order(:name)</command>
+ =&gt; [#&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-13 15:57:32"&gt;, #&lt;Airplane id: 4, name: "Los Angeles", model: "A330", production_year: 1995, seats: 412, created_at: "2010-06-13 15:57:42", updated_at: "2010-06-13 15:57:42"&gt;, #&lt;Airplane id: 3, name: "Miami", model: "Boing 777", production_year: 2002, seats: 300, created_at: "2010-06-13 15:57:41", updated_at: "2010-06-13 15:57:41"&gt;, #&lt;Airplane id: 1, name: "New York", model: "A380", production_year: 2010, seats: 852, created_at: "2010-06-13 15:57:25", updated_at: "2010-06-13 15:57:25"&gt;, #&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;, #&lt;Airplane id: 6, name: "San Diego", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-14 11:52:49", updated_at: "2010-06-14 11:52:49"&gt;] 
+ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').order('name desc')</command>
+ =&gt; [#&lt;Airplane id: 6, name: "San Diego", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-14 11:52:49", updated_at: "2010-06-14 11:52:49"&gt;, #&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;, #&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-13 15:57:32"&gt;] 
+ruby-head &gt;</screen></para>
+
+      <para>Auch hier sort Lazy Loading im Hintergrund für performantere
+      Programme:<screen>ruby-head &gt; <command>jumbos = Airplane.where(:model =&gt; 'Boing 747')</command>
+ =&gt; [#&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-13 15:57:32"&gt;, #&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;, #&lt;Airplane id: 6, name: "San Diego", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-14 11:52:49", updated_at: "2010-06-14 11:52:49"&gt;] 
+ruby-head &gt; <command>jumbos.to_sql</command>
+ =&gt; "SELECT     `airplanes`.* FROM       `airplanes` WHERE     (`airplanes`.`model` = 'Boing 747')" 
+ruby-head &gt; <command>jumbos = jumbos.order('name desc')</command>
+ =&gt; [#&lt;Airplane id: 6, name: "San Diego", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-14 11:52:49", updated_at: "2010-06-14 11:52:49"&gt;, #&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;, #&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-13 15:57:32"&gt;] 
+ruby-head &gt; <command>jumbos.to_sql</command>
+ =&gt; "SELECT     `airplanes`.* FROM       `airplanes` WHERE     (`airplanes`.`model` = 'Boing 747') ORDER BY  name desc" 
+ruby-head &gt;</screen></para>
+    </section>
+
+    <section>
+      <title>Limit</title>
+
+      <para>Zum Schluss zeige ich Ihnen noch kurz die
+      <methodname>limit</methodname> Methode, mit der Sie die Anzahl der
+      Ergebnisse limitieren können:<screen>ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').limit(2)</command>
+ =&gt; [#&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-13 15:57:32"&gt;, #&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;] 
+ruby-head &gt;</screen></para>
+
+      <para>Ja, auch dies ist wieder ein Fall für Lazy Loading:<screen>ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').limit(2).to_sql</command>
+ =&gt; "SELECT     `airplanes`.* FROM       `airplanes` WHERE     (`airplanes`.`model` = 'Boing 747') LIMIT 2" 
+ruby-head &gt;</screen></para>
+    </section>
+
+    <section>
+      <title>Berechnungen</title>
+
+      <para>ActiveRecord gibt uns direkten Zugriff auf eine Hand voll
+      Berechnungsmethoden die von einer SQL-Datenbank durchgeführt werden
+      können. Auch hier gilt der Grundsatz: Im Zweifel kann die Datenbank das
+      schneller.</para>
+
+      <section>
+        <title>count</title>
+
+        <para>Mit <methodname>count</methodname> kann man die Anzahl der
+        Datensätze berechnen:<screen>ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').count</command>
+ =&gt; 3 
+ruby-head &gt; </screen></para>
+      </section>
+
+      <section>
+        <title>average</title>
+
+        <para>Mit <methodname>average</methodname> kann man den
+        Durchschnittswert eines Tabellenfeldes berechnen:<screen>ruby-head &gt; <command>Airplane.average(:seats)</command>
+ =&gt; #&lt;BigDecimal:101377858,'0.4941667E3',18(18)&gt; 
+ruby-head &gt; <command>Airplane.average(:seats).to_i</command>
+ =&gt; 494 
+ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').average(:production_year)</command>
+ =&gt; #&lt;BigDecimal:1013321e0,'0.20056667E4',18(18)&gt; 
+ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').average(:production_year).to_i</command> 
+ =&gt; 2005 
+ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').average(:production_year).to_f</command> 
+ =&gt; 2005.6667 
+ruby-head &gt;</screen></para>
+      </section>
+
+      <section>
+        <title>minimum und maximum</title>
+
+        <para>Mit den Methoden <methodname>minimum</methodname> und
+        <methodname>maximum</methodname> kann man das jeweilige Minimum oder
+        Maximum eines Feldes berechnen:<screen>ruby-head &gt; <command>Airplane.minimum(:seats)</command>
+ =&gt; 300 
+ruby-head &gt; <command>Airplane.maximum(:seats)</command>
+ =&gt; 852 
+ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').minimum(:production_year)</command>
+ =&gt; 2005 
+ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').maximum(:production_year)</command>
+ =&gt; 2007 
+ruby-head &gt; </screen></para>
+      </section>
+
+      <section>
+        <title>sum</title>
+
+        <para>Mit der Methode <methodname>sum</methodname> kann man die Summe
+        eines bestimmten Feldes in Einträgen berechnen: <screen>ruby-head &gt; <command>Airplane.sum(:seats)</command>
+ =&gt; 2965 
+ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').sum(:seats)</command>
+ =&gt; 1401 
+ruby-head &gt; </screen></para>
+      </section>
+    </section>
+  </section>
+
+  <section xml:id="datensatz-editieren">
+    <title>Einen Datensatz editieren</title>
+
+    <para>Das Verändern eines Datensatzes erfolgt in zwei
+    Schritten:<orderedlist>
+        <listitem>
+          <para>Suche des Datensatzes und erstellen einer entsprechenden
+          Instanz.</para>
+        </listitem>
+
+        <listitem>
+          <para>Verändern der Werte.</para>
+        </listitem>
+
+        <listitem>
+          <para>Abspeichern des Datensatzes mit der Methode
+          <methodname>save</methodname>.</para>
+        </listitem>
+      </orderedlist></para>
+
+    <para>Beispiel:<screen>ruby-head &gt; <command>jumbo = Airplane.find_by_model('Boing 747')</command>
+ =&gt; #&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-13 15:57:32"&gt; 
+ruby-head &gt; <command>jumbo.seats = 450</command>
+ =&gt; 450 
+ruby-head &gt; <command>jumbo.save</command>
+ =&gt; true 
+ruby-head &gt; <command>Airplane.find_by_model('Boing 747')</command>
+ =&gt; #&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 450, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-14 14:53:09"&gt; 
+ruby-head &gt;</screen></para>
+
+    <section>
+      <title>Locking</title>
+
+      <para>Per Default benutzt Rails Optimistisches Locking der Datensätze.
+      Dies kann aber umgeschaltet werden. Da für die meisten User
+      Optimistisches Locking optimal ist und viele vor diesem Absatz nicht mal
+      über das Problem nachgedacht haben, werde ich nicht weiter drauf
+      eingehen, sondern auf die ri Hilfe verweisen. Wer pessimistisches
+      Locking benötigt, der findet dort die notwendigen Schalter.</para>
+
+      <para><screen>sw@debian:~/dvd-sammlung$ <command>ri ActiveRecord::Locking::Optimistic</command>
+------------------------------- Class: ActiveRecord::Locking::Optimistic
+
+What is Optimistic Locking
+--------------------------
+
+     Optimistic locking allows multiple users to access the same record
+     for edits, and assumes a minimum of conflicts with the data. It
+     does this by checking whether another process has made changes to a
+     record since it was opened, an ActiveRecord::StaleObjectError is
+     thrown if that has occurred and the update is ignored.
+
+     Check out ActiveRecord::Locking::Pessimistic for an alternative.
+
+
+Usage
+-----
+
+     Active Records support optimistic locking if the field
+     +lock_version+ is present. Each update to the record increments the
+     lock_version column and the locking facilities ensure that records
+     instantiated twice will let the last one saved raise a
+     StaleObjectError if the first was also updated. Example:
+
+       p1 = Person.find(1)
+       p2 = Person.find(1)
+     
+       p1.first_name = "Michael"
+       p1.save
+     
+       p2.first_name = "should fail"
+       p2.save # Raises a ActiveRecord::StaleObjectError
+
+     You're then responsible for dealing with the conflict by rescuing
+     the exception and either rolling back, merging, or otherwise apply
+     the business logic needed to resolve the conflict.
+
+     You must ensure that your database schema defaults the lock_version
+     column to 0.
+
+     This behavior can be turned off by setting
+     +ActiveRecord::Base.lock_optimistically = false+. To override the
+     name of the lock_version column, invoke the +set_locking_column+
+     method. This method uses the same syntax as +set_table_name+
+
+------------------------------------------------------------------------
+sw@debian:~/dvd-sammlung$</screen></para>
+    </section>
+  </section>
+
+  <section xml:id="datensatz-loeschen">
+    <title>Einen Datensatz löschen</title>
+
+    <para>Es gibt die Methoden <methodname>destroy</methodname> und
+    <methodname>delete</methodname>, um Datensätze zu löschen.</para>
+
+    <section>
+      <title>destroy</title>
+
+      <para>Mit <methodname>destroy</methodname> können Sie einen Datensatz
+      löschen und dabei werden auch vorhandene Abhängigkeiten beachtet.
+      Vereinfacht kann man sagen: "Lieber destroy nehmen, das ist sicherer,
+      weil das Rails-System dann mehr mitdenkt."<important>
+          <para>Die Instanz wird nach dem Löschen des Datenbankfeldes frozen
+          (eingefroren). Sie ist also noch da, kann aber nicht verändert
+          werden.</para>
+        </important></para>
+
+      <para>Beispiel:<screen>ruby-1.9.1-p378 &gt; <command>Movie.find_by_title('The Dark Knight')</command>
+ =&gt; #&lt;Movie id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
+ruby-1.9.1-p378 &gt; <command>dark_night = Movie.find_by_title('The Dark Knight')</command>
+ =&gt; #&lt;Movie id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
+ruby-1.9.1-p378 &gt; <command>dark_night.destroy</command>
+ =&gt; #&lt;Movie id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
+ruby-1.9.1-p378 &gt; <command>Movie.find_by_title('The Dark Knight')</command>
+ =&gt; nil 
+ruby-1.9.1-p378 &gt; <command>dark_night</command>
+ =&gt; #&lt;Movie id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
+ruby-1.9.1-p378 &gt; <command>dark_night.frozen?</command>
+ =&gt; true 
+ruby-1.9.1-p378 &gt; </screen></para>
+    </section>
+
+    <section>
+      <title>delete</title>
+
+      <para>Mit delete können Sie einen Datensatz löschen. Dabei werden
+      allerdings keine Abhängigkeiten zu anderen Datensätzen beachtet. Delete
+      löscht also nur die eine Zeile in der Datenbank und sonst nichts.<note>
+          <para>Für unseren jetzigen Kenntnisstand sind solche Abhänigkeiten
+          noch egal, aber in späteren Kapiteln werden wir verschiedene
+          Tabellen mit einander verknüpfen und dann wird es entsprechende
+          Abhängigkeiten geben.</para>
+        </note><important>
+          <para>Die Instanz wird nach dem Löschen des Datenbankfeldes frozen
+          (eingefroren). Sie ist also noch da, kann aber nicht verändert
+          werden.</para>
+        </important></para>
+
+      <para>Beispiel:<screen>ruby-1.9.1-p378 &gt; <command>Movie.find_by_title('Hancock')</command>
+ =&gt; #&lt;Movie id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
+ruby-1.9.1-p378 &gt; <command>hancock = Movie.find_by_title('Hancock')</command>
+ =&gt; #&lt;Movie id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
+ruby-1.9.1-p378 &gt; <command>hancock.delete</command>      # Die Zeile in der DB wird geloescht. Siehe Log.
+ =&gt; #&lt;Movie id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
+ruby-1.9.1-p378 &gt; <command>Movie.find_by_title('Hancock')</command>
+ =&gt; nil                               # Eine Suche bringt kein Ergebnis mehr.
+ruby-1.9.1-p378 &gt; <command>hancock</command>             
+ =&gt; #&lt;Movie id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
+ruby-1.9.1-p378 &gt; <command>hancock.frozen?</command>     # Die Instanz ist frozen.
+ =&gt; true 
+ruby-1.9.1-p378 &gt;</screen></para>
+    </section>
+  </section>
+</chapter>
