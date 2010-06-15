@@ -177,7 +177,8 @@ stefan@swmbp 0 1.9.1-p378 railsair$</screen></para>
   # Ein Flugzeugname wird immer nur einmal vergeben
   validates_presence_of :name
   validates_uniqueness_of :name
-  
+
+  # Ein Flugzeug benötigt eine Model-Bezeichnung  
   validates_presence_of :model
   
   # Unsere Flugzeuge sind nicht aelter als 20 Jahre
@@ -186,7 +187,7 @@ stefan@swmbp 0 1.9.1-p378 railsair$</screen></para>
                             :only_integer =&gt; true,
                             :greater_than =&gt; Date.today.year - 21,
                             :less_than =&gt; Date.today.year + 1
-
+  
   # Die maximale Bestuhlung eines A380 liegt bei 852
   validates_presence_of :seats
   validates_numericality_of :seats,
@@ -524,7 +525,7 @@ ruby-head &gt;</screen></para>
     </section>
 
     <section>
-      <title>find_by</title>
+      <title>find_by_x und find_all_by_x</title>
 
       <para>Bei der Benutzung von find_by kommt ein wenig Ruby-Magie ins
       Spiel. Die Methode <methodname>find</methodname> kann dynamisch mit
@@ -540,6 +541,14 @@ ruby-head &gt;</screen></para>
       beliebig mit <methodname>_and_</methodname> um weitere Feldnamen
       verlängern:<screen>ruby-head &gt; <command>Airplane.find_by_model_and_production_year('Boing 747',2007)</command>
  =&gt; #&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt; 
+ruby-head &gt;</screen></para>
+
+      <para>Während find_by_x immer nur den ersten gefundenen Datensatz
+      ausgibt, kann man mit find_all_by_x alle Treffer für diese Anfrage als
+      Array bekommen:<screen>ruby-head &gt; <command>Airplane.find_all_by_model('Boing 747')</command>
+ =&gt; [#&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;, #&lt;Airplane id: 6, name: "San Diego", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-14 11:52:49", updated_at: "2010-06-14 11:52:49"&gt;] 
+ruby-head &gt; <command>Airplane.find_all_by_model('Boing 747').class</command>
+ =&gt; Array 
 ruby-head &gt;</screen></para>
 
       <section>
@@ -564,13 +573,6 @@ ruby-head &gt;</screen></para>
       <methodname>where</methodname> benutzen:<screen>ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747')</command>
  =&gt; [#&lt;Airplane id: 2, name: "Las Vegas", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-13 15:57:32", updated_at: "2010-06-13 15:57:32"&gt;, #&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;, #&lt;Airplane id: 6, name: "San Diego", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-14 11:52:49", updated_at: "2010-06-14 11:52:49"&gt;] 
 ruby-head &gt;</screen></para>
-
-      <para><warning>
-          <para>In vielen Dokumentationen finden Sie auch die Methode
-          <methodname>find_all_by</methodname>. Diese wird aber zu Rails 3.1
-          deprecated und später ganz raus genommen. Deshalb empfehle ich an
-          dieser Stelle darauf ganz zu verzichten.</para>
-        </warning></para>
 
       <para>Mit der Methode <methodname>count</methodname> kann man sich dann
       übrigens auch leicht die Anzahl der gefundenen Flugzeuge ausrechnen
@@ -884,8 +886,8 @@ sw@debian:~/dvd-sammlung$</screen></para>
     <para>Es gibt die Methoden <methodname>destroy</methodname> und
     <methodname>delete</methodname>, um Datensätze zu löschen.</para>
 
-    <section>
-      <title>destroy</title>
+    <section xml:id="destroy">
+      <title xml:id="destroy.title">destroy</title>
 
       <para>Mit <methodname>destroy</methodname> können Sie einen Datensatz
       löschen und dabei werden auch vorhandene Abhängigkeiten beachtet.
@@ -896,23 +898,43 @@ sw@debian:~/dvd-sammlung$</screen></para>
           werden.</para>
         </important></para>
 
-      <para>Beispiel:<screen>ruby-1.9.1-p378 &gt; <command>Movie.find_by_title('The Dark Knight')</command>
- =&gt; #&lt;Movie id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
-ruby-1.9.1-p378 &gt; <command>dark_night = Movie.find_by_title('The Dark Knight')</command>
- =&gt; #&lt;Movie id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
-ruby-1.9.1-p378 &gt; <command>dark_night.destroy</command>
- =&gt; #&lt;Movie id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
-ruby-1.9.1-p378 &gt; <command>Movie.find_by_title('The Dark Knight')</command>
+      <para>Beispiel:<screen>ruby-head &gt; <command>Airplane.find_by_model('Boing 777')</command>
+ =&gt; #&lt;Airplane id: 3, name: "Miami", model: "Boing 777", production_year: 2002, seats: 300, created_at: "2010-06-13 15:57:41", updated_at: "2010-06-13 15:57:41"&gt; 
+ruby-head &gt; <command>triple_seven = Airplane.find_by_model('Boing 777')</command>
+ =&gt; #&lt;Airplane id: 3, name: "Miami", model: "Boing 777", production_year: 2002, seats: 300, created_at: "2010-06-13 15:57:41", updated_at: "2010-06-13 15:57:41"&gt; 
+ruby-head &gt; <command>triple_seven.destroy</command>
+ =&gt; #&lt;Airplane id: 3, name: "Miami", model: "Boing 777", production_year: 2002, seats: 300, created_at: "2010-06-13 15:57:41", updated_at: "2010-06-13 15:57:41"&gt; 
+ruby-head &gt; <command>Airplane.find_by_model('Boing 777')</command>
  =&gt; nil 
-ruby-1.9.1-p378 &gt; <command>dark_night</command>
- =&gt; #&lt;Movie id: 13, title: "The Dark Knight", production_year: 2008, duration: nil, plot: nil, rating: 5, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
-ruby-1.9.1-p378 &gt; <command>dark_night.frozen?</command>
+</screen></para>
+
+      <para>Der Datensatz ist also in der Datenbank gelöscht worden.
+      Allerdings enthält das Object <varname>triple_seven</varname> noch die
+      Daten und ist im frozen-State:<screen>ruby-head &gt; <command>triple_seven</command>
+ =&gt; #&lt;Airplane id: 3, name: "Miami", model: "Boing 777", production_year: 2002, seats: 300, created_at: "2010-06-13 15:57:41", updated_at: "2010-06-13 15:57:41"&gt; 
+ruby-head &gt; <command>triple_seven.frozen?</command>
  =&gt; true 
-ruby-1.9.1-p378 &gt; </screen></para>
+ruby-head &gt; </screen></para>
+
+      <para>Wozu das gut ist? Erst mal ist es wichtig für das Verständnis von
+      der Arbeit mit ActiveRecords. Man muss immer im Hinterkopf behalten, was
+      im eigenen Objekt und was in der Datenbank ist. </para>
+
+      <para>Aber ganz praktisch gesprochen kann man ein frozen-Objekt dazu
+      benutzen einen versehentlich gelöschten Datensatz in einen neuen
+      Datensatz zu speichern:<screen>ruby-head &gt; <command>triple_seven</command>
+ =&gt; #&lt;Airplane id: 3, name: "Miami", model: "Boing 777", production_year: 2002, seats: 300, created_at: "2010-06-13 15:57:41", updated_at: "2010-06-13 15:57:41"&gt; 
+ruby-head &gt; <command>triple_seven.attributes</command>
+ =&gt; {"created_at"=&gt;2010-06-13 15:57:41 UTC, "id"=&gt;3, "model"=&gt;"Boing 777", "name"=&gt;"Miami", "production_year"=&gt;2002, "seats"=&gt;300, "updated_at"=&gt;2010-06-13 15:57:41 UTC} 
+ruby-head &gt; <command>Airplane.create(triple_seven.attributes)</command>
+ =&gt; #&lt;Airplane id: 7, name: "Miami", model: "Boing 777", production_year: 2002, seats: 300, created_at: "2010-06-13 15:57:41", updated_at: "2010-06-13 15:57:41"&gt; 
+ruby-head &gt; <command>Airplane.last</command>
+ =&gt; #&lt;Airplane id: 7, name: "Miami", model: "Boing 777", production_year: 2002, seats: 300, created_at: "2010-06-13 15:57:41", updated_at: "2010-06-13 15:57:41"&gt; 
+ruby-head &gt;</screen></para>
     </section>
 
-    <section>
-      <title>delete</title>
+    <section xml:id="delete">
+      <title xml:id="delete.title">delete</title>
 
       <para>Mit delete können Sie einen Datensatz löschen. Dabei werden
       allerdings keine Abhängigkeiten zu anderen Datensätzen beachtet. Delete
@@ -927,19 +949,472 @@ ruby-1.9.1-p378 &gt; </screen></para>
           werden.</para>
         </important></para>
 
-      <para>Beispiel:<screen>ruby-1.9.1-p378 &gt; <command>Movie.find_by_title('Hancock')</command>
- =&gt; #&lt;Movie id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
-ruby-1.9.1-p378 &gt; <command>hancock = Movie.find_by_title('Hancock')</command>
- =&gt; #&lt;Movie id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
-ruby-1.9.1-p378 &gt; <command>hancock.delete</command>      # Die Zeile in der DB wird geloescht. Siehe Log.
- =&gt; #&lt;Movie id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
-ruby-1.9.1-p378 &gt; <command>Movie.find_by_title('Hancock')</command>
- =&gt; nil                               # Eine Suche bringt kein Ergebnis mehr.
-ruby-1.9.1-p378 &gt; <command>hancock</command>             
- =&gt; #&lt;Movie id: 8, title: "Hancock", production_year: 2008, duration: nil, plot: nil, rating: 4, created_at: "2010-04-04 20:35:48", updated_at: "2010-04-04 20:35:48"&gt; 
-ruby-1.9.1-p378 &gt; <command>hancock.frozen?</command>     # Die Instanz ist frozen.
+      <para>Beispiel:<screen>ruby-head &gt; <command>triple_seven = Airplane.find_by_model('Boing 777')</command>
+ =&gt; #&lt;Airplane id: 7, name: "Miami", model: "Boing 777", production_year: 2002, seats: 300, created_at: "2010-06-13 15:57:41", updated_at: "2010-06-13 15:57:41"&gt; 
+ruby-head &gt; <command>triple_seven.delete</command>
+ =&gt; #&lt;Airplane id: 7, name: "Miami", model: "Boing 777", production_year: 2002, seats: 300, created_at: "2010-06-13 15:57:41", updated_at: "2010-06-13 15:57:41"&gt; 
+ruby-head &gt; <command>triple_seven = Airplane.find_by_model('Boing 777')</command>
+ =&gt; nil 
+ruby-head &gt;</screen></para>
+    </section>
+  </section>
+
+  <section xml:id="has_many">
+    <title xml:id="has_many.title">has_many - 1:n Verknüpfung</title>
+
+    <para>Die RailsAir braucht jetzt noch einen Flugplan. Das machen wir in
+    der Tabelle <varname>flights</varname>. Ich gehe davon aus, das Sie schon
+    einmal mit 1:n Datenbankverknüpfungen gearbeitet haben und werde jetzt
+    nicht bei Adam und Eva anfangen. Falls es für Sie Neuland ist: Einfach ins
+    kalte Wasser springen. Wer es bis hier hin geschaft hat, der hat genug
+    Grips das so zu verstehen.</para>
+
+    <para>Ich benutze auch hier Scaffolding:<screen>stefan@swmbp 0 head railsair$ <command>rails generate scaffold flight airplane_id:integer flight_number:string departure_airport:string destination_airport:string departure_time:time arrival_time:time list_price:decimal</command>
+      invoke  active_record
+      create    db/migrate/20100614185254_create_flights.rb
+      create    app/models/flight.rb
+      invoke    test_unit
+      create      test/unit/flight_test.rb
+      create      test/fixtures/flights.yml
+       route  resources :flights
+      invoke  scaffold_controller
+      create    app/controllers/flights_controller.rb
+      invoke    erb
+      create      app/views/flights
+      create      app/views/flights/index.html.erb
+      create      app/views/flights/edit.html.erb
+      create      app/views/flights/show.html.erb
+      create      app/views/flights/new.html.erb
+      create      app/views/flights/_form.html.erb
+      invoke    test_unit
+      create      test/functional/flights_controller_test.rb
+      invoke    helper
+      create      app/helpers/flights_helper.rb
+      invoke      test_unit
+      create        test/unit/helpers/flights_helper_test.rb
+      invoke  stylesheets
+   identical    public/stylesheets/scaffold.css
+stefan@swmbp 0 head railsair$</screen></para>
+
+    <para>Jetzt dürfen wir auf keinen Fall vergessen in der Migrations-Datei
+    für die Tabelle flights die Decimal-Angabe für den Flugpreis zu definieren
+    (Decimalzahl mit zwei Nachkommastellen). - Bitte fragen Sie mich nicht,
+    warum man das nicht schon beim Generieren angeben kann. Ich weiß es auch
+    nicht. - Suchen Sie dazu bitte im Unterverzeichnis
+    <filename>db/migrate/</filename> nach einer Datei die mit
+    <filename>_create_flights.rb</filename> endet. Diese bitte wie folgt
+    ergänzen:<programlisting>class CreateFlights &lt; ActiveRecord::Migration
+  def self.up
+    create_table :flights do |t|
+      t.integer :airplane_id
+      t.string :flight_number
+      t.string :departure_airport
+      t.string :destination_airport
+      t.time :departure_time
+      t.time :arrival_time
+      t.decimal :list_price<emphasis>, :precision =&gt; 10, :scale =&gt; 2</emphasis>
+
+      t.timestamps
+    end
+  end
+
+  def self.down
+    drop_table :flights
+  end
+end</programlisting></para>
+
+    <para>Jetzt mit <command>rake db:migrate</command> die Datenbank
+    anlegen:<screen>stefan@swmbp 0 head railsair$ <command>rake db:migrate</command>
+(in /Users/stefan/Desktop/test/railsair)
+==  CreateFlights: migrating ==================================================
+-- create_table(:flights)
+   -&gt; 0.0917s
+==  CreateFlights: migrated (0.0918s) =========================================
+
+stefan@swmbp 0 head railsair$ </screen></para>
+
+    <para>Jetzt haben wir zwei Tabellen in der Datenbank und können dank
+    ActiveRecord auch direkt drauf zugreifen:<screen>stefan@swmbp 0 head railsair$ <command>rails console</command>
+Loading development environment (Rails 3.0.0.beta4)
+ruby-head &gt; <command>Airplane</command>
+ =&gt; Airplane(id: integer, name: string, model: string, production_year: integer, seats: integer, created_at: datetime, updated_at: datetime) 
+ruby-head &gt; <command>Flight</command>
+ =&gt; Flight(id: integer, airplane_id: integer, flight_number: string, departure_airport: string, destination_airport: string, departure_time: time, arrival_time: time, list_price: decimal, created_at: datetime, updated_at: datetime) 
+ruby-head &gt; exit
+stefan@swmbp 0 head railsair$ </screen></para>
+
+    <para>Bei der angestrebten Verknüpfung ist es wichtig, das wir in der
+    Flight Datei </para>
+
+    <para>Als erstes definieren wir jetzt mal eine sinnvolle Validierung für
+    flights in der Datei <filename>app/models/flights.rb</filename>. Sollte
+    etwas nicht klar sein, dann bitte noch mal einen Blick in <xref
+    linkend="model_validierungen" /> werfen.<programlisting>class Flight &lt; ActiveRecord::Base
+  # Jeder Flug braucht eine Flugnummer
+  validates_presence_of :flight_number
+  
+  # Die Flugnummer hat immer das Format RA1234 (zwei Buchstaben und 1 bis 4 Ziffern)
+  validates_length_of :flight_number, :within =&gt; 3..6
+  validates_format_of :flight_number, :with =&gt; /^RA[0-9]+$/
+
+  # Jeder Flug braucht einen Abflug- und Zielflughafen
+  validates_presence_of :departure_airport
+  validates_presence_of :destination_airport
+    
+  # Abflug- und Zielflughafen muss im 3-Letter-Code angegeben werden (Grossbuchstaben)
+  validates_length_of :departure_airport, :is =&gt; 3
+  validates_length_of :destination_airport, :is =&gt; 3
+  validates_format_of :departure_airport, :with =&gt; /^[A-Z][A-Z][A-Z]$/
+  validates_format_of :destination_airport, :with =&gt; /^[A-Z][A-Z][A-Z]$/
+  
+  def before_validation
+    # Eine kleine Hilfe fuer die Eingabe: Der 3-Letter-Code kann auch in Kleinbuchstaben
+    # eingegeben werden und wird automatisch ge-upcase-ed.
+    self.departure_airport = self.departure_airport.upcase if !self.departure_airport.blank?
+    self.destination_airport = self.destination_airport.upcase if !self.destination_airport.blank?
+
+    # Das gleiche fuer das Kuerzel RA bei der Flugnummer
+    self.flight_number = self.flight_number.upcase if !self.flight_number.blank?
+  end
+end
+</programlisting></para>
+
+    <para>Allerdings sind diese Tabellen noch nicht miteinander verknüpft.
+    Dies geschieht im Model. Das sieht dann bei
+    <filename>app/models/airplane.rb</filename> so aus:<programlisting>class Airplane &lt; ActiveRecord::Base
+  # Ein Flugzeugname wird immer nur einmal vergeben
+  validates_presence_of :name
+  validates_uniqueness_of :name
+
+  # Ein Flugzeug benötigt eine Model-Bezeichnung  
+  validates_presence_of :model
+  
+  # Unsere Flugzeuge sind nicht aelter als 20 Jahre
+  validates_presence_of :production_year
+  validates_numericality_of :production_year,
+                            :only_integer =&gt; true,
+                            :greater_than =&gt; Date.today.year - 21,
+                            :less_than =&gt; Date.today.year + 1
+  
+  # Die maximale Bestuhlung eines A380 liegt bei 852
+  validates_presence_of :seats
+  validates_numericality_of :seats,
+                            :only_integer =&gt; true,
+                            :greater_than =&gt; 0,
+                            :less_than =&gt; 853
+
+<emphasis>  # 1:n has_many Verknuepfung mit dem Flugplan
+  has_many :flights
+</emphasis>end
+</programlisting></para>
+
+    <para>In der vorletzten Zeile steht <code>has_many :flights</code> und
+    damit weiß Rails automatisch, das jedes Flugzeug mehrere Flüge in der
+    Datei <code>flights</code> hat. Jetzt müssen wir noch ein Gegenstück dazu
+    in der <filename>app/models/flights.rb</filename>
+    eintragen:<programlisting>class Flight &lt; ActiveRecord::Base
+  # Jeder Flug braucht eine Flugnummer
+  validates_presence_of :flight_number
+  
+  # Die Flugnummer hat immer das Format RA1234 (zwei Buchstaben und 1 bis 4 Ziffern)
+  validates_length_of :flight_number, :within =&gt; 3..6
+  validates_format_of :flight_number, :with =&gt; /^RA[0-9]+$/
+
+  # Jeder Flug braucht einen Abflug- und Zielflughafen
+  validates_presence_of :departure_airport
+  validates_presence_of :destination_airport
+    
+  # Abflug- und Zielflughafen muss im 3-Letter-Code angegeben werden (Grossbuchstaben)
+  validates_length_of :departure_airport, :is =&gt; 3
+  validates_length_of :destination_airport, :is =&gt; 3
+  validates_format_of :departure_airport, :with =&gt; /^[A-Z][A-Z][A-Z]$/
+  validates_format_of :destination_airport, :with =&gt; /^[A-Z][A-Z][A-Z]$/
+  
+<emphasis>  # Fluege werden immer zu einem Flugzeug zugeordnet
+  belongs_to :airplane
+  
+  validates_presence_of :airplane_id
+</emphasis>  
+  def before_validation
+    # Eine kleine Hilfe fuer die Eingabe: Der 3-Letter-Code kann auch in Kleinbuchstaben
+    # eingegeben werden und wird automatisch ge-upcase-ed.
+    self.departure_airport = self.departure_airport.upcase if !self.departure_airport.blank?
+    self.destination_airport = self.destination_airport.upcase if !self.destination_airport.blank?
+
+    # Das gleiche fuer das Kuerzel RA bei der Flugnummer
+    self.flight_number = self.flight_number.upcase if !self.flight_number.blank?
+  end
+end
+</programlisting></para>
+
+    <para>Jetzt haben wir die zwei Models miteinander verknüpft. Schauen wir
+    uns doch mal in der Console an, was für Auswirkungen das hat:<screen>stefan@swmbp 0 head railsair$ <command>rails console</command>
+Loading development environment (Rails 3.0.0.beta4)
+ruby-head &gt; <command>my_airplane = Airplane.last</command>
+ =&gt; #&lt;Airplane id: 6, name: "San Diego", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-14 11:52:49", updated_at: "2010-06-14 11:52:49"&gt; 
+ruby-head &gt; <command>next_flight = Flight.new</command>
+ =&gt; #&lt;Flight id: nil, airplane_id: nil, flight_number: nil, departure_airport: nil, destination_airport: nil, departure_time: nil, arrival_time: nil, list_price: nil, created_at: nil, updated_at: nil&gt; 
+ruby-head &gt; <command>next_flight.flight_number = 'RA1000'</command>
+ =&gt; "RA1000" 
+ruby-head &gt; <command>next_flight.departure_airport = 'FRA'</command>
+ =&gt; "FRA" 
+ruby-head &gt; <command>next_flight.destination_airport = 'HAM'</command>
+ =&gt; "HAM" 
+ruby-head &gt; <command>next_flight.departure_time = Time.parse('14:00 01.01.2011')</command>
+ =&gt; 2011-01-01 14:00:00 +0100 
+ruby-head &gt; <command>next_flight.arrival_time = Time.parse('15:20 01.01.2011')</command>
+ =&gt; 2011-01-01 15:20:00 +0100 
+ruby-head &gt; <command>next_flight.list_price = '300'</command>
+ =&gt; "300" 
+ruby-head &gt; <command>next_flight</command>
+ =&gt; #&lt;Flight id: nil, airplane_id: nil, flight_number: "RA1000", departure_airport: "FRA", destination_airport: "HAM", departure_time: "2011-01-01 14:00:00", arrival_time: "2011-01-01 15:20:00", list_price: #&lt;BigDecimal:101dc3758,'0.3E3',9(18)&gt;, created_at: nil, updated_at: nil&gt; 
+</screen></para>
+
+    <para>Jetzt versuchen wir den Flug abzuspeichern:<screen>ruby-head &gt; <command>next_flight.save</command>
+ =&gt; false 
+ruby-head &gt; <command>next_flight.errors.first</command>
+ =&gt; [:airplane_id, "can't be blank"] 
+</screen></para>
+
+    <para>Geht nicht, weil wir keine airplane_id eingegeben haben. Es kann
+    keinen Flight ohne Airplane geben:<screen>ruby-head &gt; <command>next_flight.airplane_id = my_airplane.id</command>
+ =&gt; 6 
+ruby-head &gt; <command>next_flight.save</command>
  =&gt; true 
-ruby-1.9.1-p378 &gt;</screen></para>
+ruby-head &gt;</screen></para>
+
+    <para>Jetzt können wir mit <methodname>my_airplane.flights</methodname>
+    die Flüge dieses Flugzeuge auflisten:<screen>ruby-head &gt; <command>my_airplane.flights</command>
+ =&gt; [#&lt;Flight id: 1, airplane_id: 6, flight_number: "RA1000", departure_airport: "FRA", destination_airport: "HAM", departure_time: "2000-01-01 13:00:00", arrival_time: "2000-01-01 14:20:00", list_price: #&lt;BigDecimal:101d31f88,'0.3E3',9(18)&gt;, created_at: "2010-06-15 14:30:31", updated_at: "2010-06-15 14:30:31"&gt;] 
+ruby-head &gt; </screen></para>
+
+    <para>Und umgekehrt können wir mit
+    <methodname>Flight.first.airplane</methodname> das Flugzeug für unseren
+    ersten Flug ausgeben:<screen>ruby-head &gt; <command>Flight.first.airplane</command>
+ =&gt; #&lt;Airplane id: 6, name: "San Diego", model: "Boing 747", production_year: 2005, seats: 467, created_at: "2010-06-14 11:52:49", updated_at: "2010-06-14 11:52:49"&gt; 
+ruby-head &gt; </screen></para>
+
+    <important>
+      <para>Bei einer has_many - belongs_to Verknüpfung wird automatisch eine
+      Methode mit dem Namen des jeweils anderen Models zur Verfügung gestellt.
+      Über diese Methode hat man dann Zugriff auf die zugeordneten anderen
+      Models:<itemizedlist>
+          <listitem>
+            <para><methodname>Airplane.first.flights</methodname></para>
+
+            <para>Gibt ein Array der Flights des ersten Airplanes aus.
+            Achtung: Plural</para>
+          </listitem>
+
+          <listitem>
+            <para><methodname>Flight.first.airplane</methodname></para>
+
+            <para>Gibt das Flugzeug des ersten Flights aus. Achtung:
+            Singular</para>
+          </listitem>
+        </itemizedlist></para>
+    </important>
+
+    <para>Allerdings haben wir jetzt noch ein Problem. Es ist bei der
+    aktuellen Validierung möglich einen Flight mit einer nicht existierenden
+    <varname>airplane_id</varname> abzuspeichern. Versuchen wir es mal mit der
+    nicht existierenden <varname>airplane_id</varname> 1500:<screen>ruby-head &gt; <command>new_flight = Flight.create(:flight_number =&gt; 'RA1001', :departure_airport =&gt; 'FRA', :destination_airport =&gt; 'JFK', :list_price =&gt; '900')</command>
+ =&gt; #&lt;Flight id: nil, airplane_id: nil, flight_number: "RA1001", departure_airport: "FRA", destination_airport: "JFK", departure_time: nil, arrival_time: nil, list_price: #&lt;BigDecimal:10165a868,'0.9E3',9(18)&gt;, created_at: nil, updated_at: nil&gt; 
+ruby-head &gt; <command>new_flight.airplane_id = 1500</command>
+ =&gt; 1500 
+ruby-head &gt; <command>new_flight.save</command>
+ =&gt; true 
+ruby-head &gt; <command>new_flight.airplane</command>
+ =&gt; nil 
+ruby-head &gt; <command>Airplane.find(1500)</command>
+ActiveRecord::RecordNotFound: Couldn't find Airplane with ID=1500
+ from /Users/stefan/.rvm/gems/ruby-head/gems/activerecord-3.0.0.beta4/lib/active_record/relation/finder_methods.rb:287:in `find_one'
+ from /Users/stefan/.rvm/gems/ruby-head/gems/activerecord-3.0.0.beta4/lib/active_record/relation/finder_methods.rb:274:in `find_with_ids'
+ from /Users/stefan/.rvm/gems/ruby-head/gems/activerecord-3.0.0.beta4/lib/active_record/relation/finder_methods.rb:102:in `find'
+ from /Users/stefan/.rvm/gems/ruby-head/gems/activerecord-3.0.0.beta4/lib/active_record/base.rb:403:in `find'
+ from (irb):5
+ from /Users/stefan/.rvm/gems/ruby-head/gems/railties-3.0.0.beta4/lib/rails/commands/console.rb:47:in `start'
+ from /Users/stefan/.rvm/gems/ruby-head/gems/railties-3.0.0.beta4/lib/rails/commands/console.rb:8:in `start'
+ from /Users/stefan/.rvm/gems/ruby-head/gems/railties-3.0.0.beta4/lib/rails/commands.rb:23:in `&lt;top (required)&gt;'
+ from script/rails:6:in `require'
+ from script/rails:6:in `&lt;main&gt;'
+ruby-head &gt; </screen></para>
+
+    <para>Wir konnten zwar einen flight mit der <varname>airplane_id</varname>
+    1500 anlegen, aber das macht in unserer Applikation keinen Sinn. Es wäre
+    ein Geisterflug. Deshalb müssen wir die Validierung in der Datei
+    <filename>app/models/flights.rb</filename> noch erweitern:<programlisting>class Flight &lt; ActiveRecord::Base
+  # Jeder Flug braucht eine Flugnummer
+  validates_presence_of :flight_number
+  
+  # Die Flugnummer hat immer das Format RA1234 (zwei Buchstaben und 1 bis 4 Ziffern)
+  validates_length_of :flight_number, :within =&gt; 3..6
+  validates_format_of :flight_number, :with =&gt; /^RA[0-9]+$/
+
+  # Jeder Flug braucht einen Abflug- und Zielflughafen
+  validates_presence_of :departure_airport
+  validates_presence_of :destination_airport
+    
+  # Abflug- und Zielflughafen muss im 3-Letter-Code angegeben werden (Grossbuchstaben)
+  validates_length_of :departure_airport, :is =&gt; 3
+  validates_length_of :destination_airport, :is =&gt; 3
+  validates_format_of :departure_airport, :with =&gt; /^[A-Z][A-Z][A-Z]$/
+  validates_format_of :destination_airport, :with =&gt; /^[A-Z][A-Z][A-Z]$/
+  
+  # Fluege werden immer zu einem Flugzeug zugeordnet
+  belongs_to :airplane
+  
+  validates_presence_of :airplane_id
+<emphasis>  validate :airplane_must_exist
+
+  def airplane_must_exist
+    errors.add(:airplane_id, "each flight needs an existing airplane") if self.airplane.nil?
+  end
+</emphasis>  
+  def before_validation
+    # Eine kleine Hilfe fuer die Eingabe: Der 3-Letter-Code kann auch in Kleinbuchstaben
+    # eingegeben werden und wird automatisch ge-upcase-ed.
+    self.departure_airport = self.departure_airport.upcase if !self.departure_airport.blank?
+    self.destination_airport = self.destination_airport.upcase if !self.destination_airport.blank?
+
+    # Das gleiche fuer das Kuerzel RA bei der Flugnummer
+    self.flight_number = self.flight_number.upcase if !self.flight_number.blank?
+  end
+end
+</programlisting></para>
+
+    <para>Durch das Hinzufügen der Methode
+    <methodname>airplane_must_exist</methodname> die überprüft, ob ein
+    Airplane mit der von uns angegebenen <varname>airplane_id</varname>
+    überhaupt existiert (sonst gibt es beim nil als Ergebnis der
+    <methodname>airplane</methodname> Methode) können wir sicherstellen das
+    kein <classname>Flight</classname> ohne passendes
+    <classname>Airplane</classname> eingefügt wird:<screen>stefan@swmbp 0 head railsair$ <command>rails console</command>
+Loading development environment (Rails 3.0.0.beta4)
+ruby-head &gt; <command>new_flight = Flight.create(:flight_number =&gt; 'RA1001', :departure_airport =&gt; 'FRA', :destination_airport =&gt; 'JFK', :list_price =&gt; '900')</command>
+ =&gt; #&lt;Flight id: nil, airplane_id: nil, flight_number: "RA1001", departure_airport: "FRA", destination_airport: "JFK", departure_time: nil, arrival_time: nil, list_price: #&lt;BigDecimal:10481b9b0,'0.9E3',9(18)&gt;, created_at: nil, updated_at: nil&gt; 
+ruby-head &gt; <command>new_flight.airplane_id = 1500</command>
+ =&gt; 1500 
+ruby-head &gt; <command>new_flight.save</command>
+ =&gt; false 
+ruby-head &gt; <command>new_flight.errors.first</command>
+ =&gt; [:airplane_id, "each flight needs an existing airplane"] 
+ruby-head &gt; </screen></para>
+
+    <para>Fehlt sonst noch was? Ja, wir haben noch keine Validierung, ob eine
+    Abflug- und Ankunftsuhrzeit angegeben wurde. Weiterhin sollten wir dann
+    auch direkt überprüfen, ob beide Angaben in der Zukunft und die
+    Ankunftszeit mindestens 15 Minuten nach der Abflugzeit ist. Aber das ist
+    ja schnell in der <filename>app/models/flights.rb</filename>
+    hinzugefügt:</para>
+
+    <para>Jetzt probieren wir das ganze noch mal aus:<screen>stefan@swmbp 0 head railsair$ <command>rails console</command>
+Loading development environment (Rails 3.0.0.beta4)
+ruby-head &gt; <command>new_flight = Flight.create(:flight_number =&gt; 'RA1001', :departure_airport =&gt; 'FRA', :destination_airport =&gt; 'JFK', :list_price =&gt; '900', :airplane_id =&gt; Airplane.first.id)</command>
+ =&gt; #&lt;Flight id: nil, airplane_id: 1, flight_number: "RA1001", departure_airport: "FRA", destination_airport: "JFK", departure_time: nil, arrival_time: nil, list_price: #&lt;BigDecimal:1008e84a0,'0.9E3',9(18)&gt;, created_at: nil, updated_at: nil&gt; 
+ruby-head &gt; <command>new_flight.save</command>
+ =&gt; false 
+ruby-head &gt; <command>new_flight.errors.first</command>
+ =&gt; [:departure_time, "can't be blank"] 
+ruby-head &gt; <command>new_flight.departure_time = Time.now + 30.days</command>
+ =&gt; 2010-07-15 20:11:22 +0200 
+ruby-head &gt; <command>new_flight.arrival_time = Time.now</command>
+ =&gt; 2010-06-15 20:11:34 +0200 
+ruby-head &gt; <command>new_flight.save</command>
+ =&gt; false 
+ruby-head &gt; <command>new_flight.errors.first</command>
+ =&gt; [:arrival_time, "arrival must be in the future"] 
+ruby-head &gt; <command>new_flight.arrival_time = Time.now + 2.hours</command>
+ =&gt; 2010-06-15 22:12:04 +0200 
+ruby-head &gt; <command>new_flight.save</command>
+ =&gt; false 
+ruby-head &gt; <command>new_flight.errors.first</command>
+ =&gt; [:arrival_time, "arrival must be at least 15 minutes after departure"] 
+ruby-head &gt; <command>new_flight.arrival_time = new_flight.departure_time + 7.hours</command>
+ =&gt; 2010-07-16 03:11:22 +0200 
+ruby-head &gt; <command>new_flight.save</command>
+ =&gt; true 
+ruby-head &gt; </screen></para>
+
+    <para>Ist jetzt alles idiotensicher? Nein, aber den Rest heben wir uns für
+    <xref linkend="tests" /> auf. ;-)</para>
+
+    <section xml:id="has_many_build">
+      <title xml:id="has_many_build.title">build</title>
+
+      <para>Mit der Methode <methodname>build</methodname> lassen sich in
+      unserem Beispiel leicht neue Flights für ein bestimmtes Airplane
+      erstellen. Beispiel:<screen>stefan@swmbp 0 head railsair$ <command>rails console</command>
+Loading development environment (Rails 3.0.0.beta4)
+ruby-head &gt; <command>unser_flugzeug = Airplane.find(3)</command>
+ =&gt; #&lt;Airplane id: 3, name: "Miami", model: "Boing 777", production_year: 2002, seats: 300, created_at: "2010-06-13 15:57:41", updated_at: "2010-06-13 15:57:41"&gt; 
+ruby-head &gt; unser_flugzeug.flights
+ =&gt; [] 
+ </screen></para>
+
+      <para>Dieses Flugzeug hat also noch keinen eingetragenen Flug. Dann
+      legen wir einen neuen Flug an:<screen>ruby-head &gt; <command>neuer_flug = unser_flugzeug.flights.build(:flight_number =&gt; 'RA1002', :departure_airport =&gt; 'CGN', :destination_airport =&gt; 'MUC', :departure_time =&gt; Time.now + 1.month, :arrival_time =&gt; Time.now + 1.month + 1.hour, :list_price =&gt; 200)</command>
+ =&gt; #&lt;Flight id: nil, airplane_id: 3, flight_number: "RA1002", departure_airport: "CGN", destination_airport: "MUC", departure_time: "2010-07-15 20:39:56", arrival_time: "2010-07-15 21:39:56", list_price: #&lt;BigDecimal:10185da98,'0.2E3',9(18)&gt;, created_at: nil, updated_at: nil&gt; 
+ruby-head &gt; <command>neuer_flug.save</command>
+ =&gt; true 
+ruby-head &gt; <command>unser_flugzeug.flights</command>
+ =&gt; [#&lt;Flight id: 5, airplane_id: 3, flight_number: "RA1002", departure_airport: "CGN", destination_airport: "MUC", departure_time: "2010-07-15 20:39:56", arrival_time: "2010-07-15 21:39:56", list_price: #&lt;BigDecimal:105b8d0e8,'0.2E3',9(18)&gt;, created_at: "2010-06-15 18:40:10", updated_at: "2010-06-15 18:40:10"&gt;] 
+ruby-head &gt;</screen></para>
+
+      <para>Ohne die Angabe der <varname>airplane.id</varname> konnte so ein
+      neuer Flight erzeugt werden.</para>
+    </section>
+
+    <section xml:id="has_many_create">
+      <title xml:id="has_many_create.title">create</title>
+
+      <para>Die Methode create arbeitet wie <methodname>build</methodname>,
+      nur das danach quasi automatisch direkt ein
+      <methodname>save</methodname> aufgerufen wird. Beispiel:<screen>ruby-head &gt; <command>Airplane.find(3).flights</command>
+ =&gt; [#&lt;Flight id: 5, airplane_id: 3, flight_number: "RA1002", departure_airport: "CGN", destination_airport: "MUC", departure_time: "2000-01-01 18:39:56", arrival_time: "2000-01-01 19:39:56", list_price: #&lt;BigDecimal:105b60520,'0.2E3',9(18)&gt;, created_at: "2010-06-15 18:40:10", updated_at: "2010-06-15 18:40:10"&gt;] 
+ruby-head &gt; <command>Airplane.find(3).flights.count</command>
+ =&gt; 1 
+ruby-head &gt; <command>Airplane.find(3).flights.create(:flight_number =&gt; 'RA1002', :departure_airport =&gt; 'CGN', :destination_airport =&gt; 'MUC', :departure_time =&gt; Time.now + 1.month, :arrival_time =&gt; Time.now + 1.month + 1.hour, :list_price =&gt; 200)</command>
+ =&gt; #&lt;Flight id: 6, airplane_id: 3, flight_number: "RA1002", departure_airport: "CGN", destination_airport: "MUC", departure_time: "2010-07-15 20:46:08", arrival_time: "2010-07-15 21:46:08", list_price: #&lt;BigDecimal:105b0b688,'0.2E3',9(18)&gt;, created_at: "2010-06-15 18:46:08", updated_at: "2010-06-15 18:46:08"&gt; 
+ruby-head &gt; <command>Airplane.find(3).flights</command>                                            
+ =&gt; [#&lt;Flight id: 5, airplane_id: 3, flight_number: "RA1002", departure_airport: "CGN", destination_airport: "MUC", departure_time: "2000-01-01 18:39:56", arrival_time: "2000-01-01 19:39:56", list_price: #&lt;BigDecimal:105aed638,'0.2E3',9(18)&gt;, created_at: "2010-06-15 18:40:10", updated_at: "2010-06-15 18:40:10"&gt;, #&lt;Flight id: 6, airplane_id: 3, flight_number: "RA1002", departure_airport: "CGN", destination_airport: "MUC", departure_time: "2000-01-01 18:46:08", arrival_time: "2000-01-01 19:46:08", list_price: #&lt;BigDecimal:105aeb860,'0.2E3',9(18)&gt;, created_at: "2010-06-15 18:46:08", updated_at: "2010-06-15 18:46:08"&gt;] 
+ruby-head &gt; <command>Airplane.find(3).flights.count</command>
+ =&gt; 2 
+ruby-head &gt; </screen></para>
+
+      <para>Beim Programmieren sollte man allerdings drauf achten, ob der
+      Datensatz auch wirklich abgespeichert wurde. Bei einem fehlerhaften
+      Datensatz passiert das nämlich nicht (dafür haben wir ja die
+      Validierung): <screen>ruby-head &gt; <command>Airplane.find(3).flights.count</command>
+ =&gt; 2 
+ruby-head &gt; <command>Airplane.find(3).flights.create(:flight_number =&gt; 'RA1003')</command>
+ =&gt; #&lt;Flight id: nil, airplane_id: 3, flight_number: "RA1003", departure_airport: nil, destination_airport: nil, departure_time: nil, arrival_time: nil, list_price: nil, created_at: nil, updated_at: nil&gt; 
+ruby-head &gt; <command>Airplane.find(3).flights.count</command>
+ =&gt; 2 
+ruby-head &gt;</screen></para>
+
+      <para>Ob ein Datensatz gespeichert wurde, lässt sich entweder mit einer
+      erneuten Suche oder mit einem Vergleich mit true überprüfen:<screen>ruby-head &gt; <command>Airplane.find(3).flights.create(:flight_number =&gt; 'RA1003') == true</command>
+ =&gt; false 
+ruby-head &gt;</screen></para>
+    </section>
+
+    <section xml:id="has_many_delete" xml:lang="">
+      <title xml:id="has_many_delete.title">delete und destroy</title>
+
+      <para>Mit den Methoden <methodname>destroy</methodname>,
+      <methodname>destroy_all</methodname>, <methodname>delete</methodname>
+      und <methodname>delete_all</methodname> kann man wie in <xref
+      linkend="datensatz-loeschen" /> beschrieben Datensätze löschen. Im
+      Kontext von <methodname>has_many</methodname> bedeutet das, das man die
+      zu einem Flugzeug gelisteten Flüge in einem Streich löschen
+      kann:<screen>ruby-head &gt; <command>Airplane.find(3).flights.count</command>
+ =&gt; 2 
+ruby-head &gt; <command>Airplane.find(3).flights.destroy_all</command>
+ =&gt; {} 
+ruby-head &gt; <command>Airplane.find(3).flights.count</command>
+ =&gt; 0 
+ruby-head &gt;</screen></para>
     </section>
   </section>
 </chapter>
