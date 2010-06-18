@@ -356,6 +356,18 @@ Version:
 									</div>
 								</xsl:if>
 							</xsl:if>
+
+							<div id="amazonad">
+							<xsl:element name="iframe">
+								<xsl:attribute name="src">http://rcm-de.amazon.de/e/cm?lt1=_top&amp;bc1=FFFFFF&amp;IS2=1&amp;bg1=FFFFFF&amp;fc1=000000&amp;lc1=0000FF&amp;t=wwwamoomade-21&amp;o=3&amp;p=8&amp;l=as1&amp;m=amazon&amp;f=ifr&amp;asins=3827329892</xsl:attribute>
+								<xsl:attribute name="style">width:120px;height:240px;</xsl:attribute>
+								<xsl:attribute name="scrolling">no</xsl:attribute>
+								<xsl:attribute name="marginwidth">0</xsl:attribute>
+								<xsl:attribute name="marginheight">0</xsl:attribute>
+								<xsl:attribute name="frameborder">0</xsl:attribute>
+							</xsl:element>
+							</div>
+
 							<xsl:if test="$adincluded = 1">
 								<div id="adsense">
 									<script type="text/javascript">
