@@ -40,7 +40,7 @@
         Beispiele so übersichtlich wie möglich zu halten, werde ich deshalb
         keine Validierung (siehe <xref linkend="model_validierungen" />) und
         auch keine Tests (siehe <xref linkend="tests" />) einbauen. Ebenso
-        verzichte ich in diesem Beispiel auf ein Rechtemodel. </para>
+        verzichte ich in diesem Beispiel auf ein Rechtemodel.</para>
       </warning></para>
   </section>
 
@@ -987,7 +987,7 @@ ruby-1.9.1-p378 &gt; </screen></para>
     1:n Verknüpfung zu jeder Flugnummer alle Flüge ausgeben. Der Name des
     Foreign-Keys wird per Default immer aus dem Namen der Primary Datenbank
     (in unserem Fall <classname>Flight</classname>) und einem
-    "<code>_id</code>" zusammengefügt. </para>
+    "<code>_id</code>" zusammengefügt.</para>
 
     <para>Um nach dem letzten Kapitel einen gleichen Datenstand zu haben
     reseten wir erst mal unsere Entwicklungsdatenbank und spielen die
@@ -1151,7 +1151,7 @@ ruby-1.9.1-p378 &gt; <command>FlightSchedule.first.flight</command>
  =&gt; #&lt;Flight id: 1, flight_number: "RA 001", departure_airport: "FRA", destination_airport: "MUC", created_at: "2010-06-18 21:17:30", updated_at: "2010-06-18 21:17:30"&gt; 
 ruby-1.9.1-p378 &gt; <command>exit</command></screen></para>
         </listitem>
-      </orderedlist> </para>
+      </orderedlist></para>
 
     <para>So einfach ist es eine 1:n Verknüpfung zu erstellen? Ja! Ist
     ActiveRecord nicht toll?! :-)</para>
@@ -1259,8 +1259,8 @@ ruby-1.9.1-p378 &gt;</screen></para>
               <para>Damit wird bei einer Veränderung des
               <classname>FlightSchedules</classname> automatisch das Feld
               <varname>updated_at</varname> der Primary Datenbank
-              <classname>Flight</classname> auf die aktuelle Uhrzeit gesetzt.
-              </para>
+              <classname>Flight</classname> auf die aktuelle Uhrzeit
+              gesetzt.</para>
             </listitem>
           </itemizedlist></para>
 
@@ -1346,8 +1346,9 @@ ruby-1.9.1-p378 &gt;</screen></para>
       </section>
     </section>
 
-    <section>
-      <title>Umsetzung im Webinterface</title>
+    <section xml:id="has_many_webinterface_umsetzung">
+      <title xml:id="has_many_webinterface_umsetzung.title">Umsetzung im
+      Webinterface</title>
 
       <para>Ziel soll es sein, dem User des Webinterfaces nicht nur die beiden
       bestehenden <uri
@@ -1364,7 +1365,7 @@ ruby-1.9.1-p378 &gt;</screen></para>
         <title>IST-Zustand (Vorher)</title>
 
         <para>Erst schauen wir uns die Default Ansichten an, die vom
-        Scaffolding generiert wurden. </para>
+        Scaffolding generiert wurden.</para>
 
         <para><screenshot>
             <info>
@@ -1406,7 +1407,253 @@ ruby-1.9.1-p378 &gt;</screen></para>
         <title>SOLL-Zustand (Nachher)</title>
 
         <para>Jetzt zeige ich Ihnen wie die gleichen Seiten in Zukunft
-        aussehen sollen:</para>
+        aussehen sollen.</para>
+
+        <para>Bei der Flight Index-Ansicht sollen nicht nur die Flights
+        aufgelistet werden, sondern auch noch die dazu gehörigen
+        FlightSchedule-Einträge.</para>
+
+        <para><screenshot>
+            <info>
+              <title>Index-Ansicht der Flights</title>
+            </info>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/has_many_nachher_flights_index.jpg"
+                           format="JPG"></imagedata>
+              </imageobject>
+            </mediaobject>
+          </screenshot>Bei der Einzelansicht eines Flights sollen ebenfalls
+        die dazu gehörigen FlightSchedule-Einträge angezeigt
+        werden.<screenshot>
+            <info>
+              <title>Show-Ansicht des Flight mit der ID 1</title>
+            </info>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/has_many_nachher_flights_show_1.jpg"
+                           format="JPG"></imagedata>
+              </imageobject>
+            </mediaobject>
+          </screenshot></para>
+
+        <para>Bei er Index-Ansicht der FlightSchedule-Einträge soll die
+        Flugnummer mit einem Link zum entsprechenden Flug plus die Strecke
+        angezeigt werden.<screenshot>
+            <info>
+              <title>Index-Ansicht der FlightSchedules</title>
+            </info>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/has_many_nachher_flight_schedules_index.jpg"
+                           format="JPG"></imagedata>
+              </imageobject>
+            </mediaobject>
+          </screenshot></para>
+      </section>
+
+      <section>
+        <title>Die Routen</title>
+
+        <para>Die Datei <filename>config/routes.rb</filename> ist so eine Art
+        Landkarte für eine Rails-Application. Ich gehe in näher auf dieses
+        Thema ein. Aktuell reicht es den Inhalt dieser Datei wie folgt zu
+        füllen:<programlisting>Railsair::Application.routes.draw do |map|
+  resources :flight_schedules
+
+  resources :flights do
+    resources :flight_schedules
+  end
+end </programlisting></para>
+
+        <para>Die daraus resultierenden Routen können Sie übrigens auf der
+        Shell mit <command>rake routes</command> anzeigen (da lohnt es sich
+        auch mal das Terminal-Fenster etwas in die Breite zu ziehen):<screen>stefan@swmbp 0 1.9.1-p378 railsair$ <command>rake routes</command>
+(in /Users/stefan/book/railsair)
+                            GET    /flight_schedules(.:format)                             {:action=&gt;"index", :controller=&gt;"flight_schedules"}
+           flight_schedules POST   /flight_schedules(.:format)                             {:action=&gt;"create", :controller=&gt;"flight_schedules"}
+        new_flight_schedule GET    /flight_schedules/new(.:format)                         {:action=&gt;"new", :controller=&gt;"flight_schedules"}
+                            GET    /flight_schedules/:id(.:format)                         {:action=&gt;"show", :controller=&gt;"flight_schedules"}
+                            PUT    /flight_schedules/:id(.:format)                         {:action=&gt;"update", :controller=&gt;"flight_schedules"}
+            flight_schedule DELETE /flight_schedules/:id(.:format)                         {:action=&gt;"destroy", :controller=&gt;"flight_schedules"}
+       edit_flight_schedule GET    /flight_schedules/:id/edit(.:format)                    {:action=&gt;"edit", :controller=&gt;"flight_schedules"}
+                            GET    /flights/:flight_id/flight_schedules(.:format)          {:action=&gt;"index", :controller=&gt;"flight_schedules"}
+    flight_flight_schedules POST   /flights/:flight_id/flight_schedules(.:format)          {:action=&gt;"create", :controller=&gt;"flight_schedules"}
+ new_flight_flight_schedule GET    /flights/:flight_id/flight_schedules/new(.:format)      {:action=&gt;"new", :controller=&gt;"flight_schedules"}
+                            GET    /flights/:flight_id/flight_schedules/:id(.:format)      {:action=&gt;"show", :controller=&gt;"flight_schedules"}
+                            PUT    /flights/:flight_id/flight_schedules/:id(.:format)      {:action=&gt;"update", :controller=&gt;"flight_schedules"}
+     flight_flight_schedule DELETE /flights/:flight_id/flight_schedules/:id(.:format)      {:action=&gt;"destroy", :controller=&gt;"flight_schedules"}
+edit_flight_flight_schedule GET    /flights/:flight_id/flight_schedules/:id/edit(.:format) {:action=&gt;"edit", :controller=&gt;"flight_schedules"}
+                            GET    /flights(.:format)                                      {:action=&gt;"index", :controller=&gt;"flights"}
+                    flights POST   /flights(.:format)                                      {:action=&gt;"create", :controller=&gt;"flights"}
+                 new_flight GET    /flights/new(.:format)                                  {:action=&gt;"new", :controller=&gt;"flights"}
+                            GET    /flights/:id(.:format)                                  {:action=&gt;"show", :controller=&gt;"flights"}
+                            PUT    /flights/:id(.:format)                                  {:action=&gt;"update", :controller=&gt;"flights"}
+                     flight DELETE /flights/:id(.:format)                                  {:action=&gt;"destroy", :controller=&gt;"flights"}
+                edit_flight GET    /flights/:id/edit(.:format)                             {:action=&gt;"edit", :controller=&gt;"flights"}
+stefan@swmbp 0 1.9.1-p378 railsair$</screen></para>
+      </section>
+
+      <section>
+        <title>Die Models</title>
+
+        <para>Sollte eigentlich schon klar sein, aber sicher ist
+        sicher.</para>
+
+        <para>Die Datei
+        <filename>app/models/flight.rb</filename><programlisting>class Flight &lt; ActiveRecord::Base
+  has_many :flight_schedules, :order =&gt; :departure, :dependent =&gt; :destroy
+end</programlisting></para>
+
+        <para>Die Datei
+        <filename>app/models/flight_schedule.rb</filename><programlisting>class FlightSchedule &lt; ActiveRecord::Base
+  belongs_to :flight
+end</programlisting></para>
+      </section>
+
+      <section>
+        <title>Die Controller</title>
+
+        <para>Im der Controller-Datei
+        <filename>app/controllers/flights_controller.rb</filename> ändern wir
+        die Methode <methodname>index</methodname> wie folgt
+        ab:<programlisting>  def index
+    <emphasis>@flights = Flight.order(:departure_airport,:destination_airport)</emphasis>
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render :xml =&gt; @flights }
+    end
+  end
+</programlisting></para>
+
+        <para>Damit bekommen wir in der Instance-Variablen
+        <varname>@flights</varname> alle verfügbaren
+        <classname>Flights</classname> nach Ab- und Zielflughafen sortiert
+        gespeichert.</para>
+
+        <para>In der Controller-Datei
+        <filename>app/controllers/flight_schedules_controller.rb</filename>
+        ändern wir ebenfalls die Methode <methodname>index</methodname>
+        ab:<programlisting>  def index
+    @flight_schedules = FlightSchedule.order(:departure)
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render :xml =&gt; @flight_schedules }
+    end
+  end
+</programlisting></para>
+      </section>
+
+      <section>
+        <title>Die Views</title>
+
+        <para>Nachdem wir im Model und im Controller die Vorarbeit geleistet
+        haben, können wir in den Views die gewünschten Seiten rendern.</para>
+
+        <para>Fangen wir mit der Index-Seite von <classname>Flight</classname>
+        an. Die Datei <filename>app/views/flights/index.html.erb</filename>
+        muss wie folgt abgeändert werden:<programlisting>&lt;h1&gt;Alle RailsAir-Flüge&lt;/h1&gt;
+
+&lt;p&gt;&lt;%= link_to 'Neue Flug-Nr.', new_flight_path %&gt;&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Flug-Nr.&lt;/th&gt;
+    &lt;th&gt;Abflughafen&lt;/th&gt;
+    &lt;th&gt;Zielflughafen&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @flights.each do |flight| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= link_to flight.flight_number, flight_path(flight) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= flight.departure_airport %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= flight.destination_airport %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td&gt;&lt;/td&gt;
+   &lt;td colspan = "3"&gt;
+    &lt;%= render :partial =&gt; 'flight_schedules_index', :locals =&gt; { :flight =&gt; flight } %&gt;
+   &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;</programlisting></para>
+
+        <para>Zusätzlich muss die Partial-Datei
+        <filename>app/views/flights/_flight_schedules_index.html.erb</filename>
+        mit folgendem Inhalt neu angelegt werden:<programlisting>&lt;ul&gt;
+  &lt;% if flight.flight_schedules.count &gt; 0 %&gt;
+    &lt;% flight.flight_schedules.each do |flight_schedule| %&gt;
+    &lt;li&gt;
+     &lt;%= flight_schedule.departure.strftime("%d.%m.%y %H:%M") %&gt;
+     -
+     &lt;%= flight_schedule.arrival.strftime("%H:%M") %&gt;
+    &lt;/li&gt;
+    &lt;% end %&gt;
+  &lt;% end %&gt;
+  &lt;li&gt;&lt;%= link_to 'Neue Flugzeit', new_flight_flight_schedule_path(flight) %&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</programlisting></para>
+
+        <para>Warum dafür ein extra Partial? Dieser Programmteil wird nicht
+        nur in der index Action, sondern auch in der der
+        <methodname>show</methodname> Action und damit in der Datei
+        <filename>app/views/flights/show.html.erb</filename>
+        verwendet:<programlisting>&lt;p id="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
+
+&lt;h1&gt;&lt;%= @flight.flight_number %&gt;&lt;/h1&gt;
+
+&lt;p&gt;
+  &lt;%= @flight.departure_airport %&gt; - 
+  &lt;%= @flight.destination_airport %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;Flugzeiten:&lt;/b&gt;
+&lt;/p&gt;
+&lt;%= render :partial =&gt; 'flight_schedules_index', :locals =&gt; { :flight =&gt; @flight } %&gt;
+
+
+&lt;%= link_to 'Edit', edit_flight_path(@flight) %&gt; |
+&lt;%= link_to 'Destroy', @flight, :confirm =&gt; 'Are you sure?', :method =&gt; :delete %&gt; | 
+&lt;%= link_to 'Back', flights_path %&gt;
+</programlisting></para>
+
+        <para>Als nächstes müssen wir noch die Datei
+        <filename>app/views/flight_schedules/index.html.erb</filename>
+        anpassen:<programlisting>&lt;h1&gt;Flugplan&lt;/h1&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Flight&lt;/th&gt;
+    &lt;th&gt;Strecke&lt;/th&gt;
+    &lt;th&gt;Departure&lt;/th&gt;
+    &lt;th&gt;Arrival&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @flight_schedules.each do |flight_schedule| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= link_to flight_schedule.flight.flight_number, flight_path(flight_schedule.flight) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= "#{flight_schedule.flight.departure_airport} - #{flight_schedule.flight.destination_airport}" %&gt;
+    &lt;td&gt;&lt;%= flight_schedule.departure.strftime("%d.%m.%y %H:%M") %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= flight_schedule.arrival.strftime("%H:%M") %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Show', flight_schedule %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Edit', edit_flight_schedule_path(flight_schedule) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', flight_schedule, :confirm =&gt; 'Are you sure?', :method =&gt; :delete %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;</programlisting></para>
+
+        <para>Hier geht es weiter nach der nächsten Maus.</para>
       </section>
     </section>
   </section>
