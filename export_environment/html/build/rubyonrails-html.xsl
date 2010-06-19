@@ -145,7 +145,16 @@ Version:
 						</li>
 						<li class="maintitle">
 							<h1 class="booktitle">
-								<xsl:apply-templates select="(ancestor::node())[1]" mode="object.title.markup"/>
+								<a>
+									<xsl:attribute name="href">
+										<xsl:call-template name="href.target">
+											<xsl:with-param name="object" select="(ancestor::node())[1]"/>
+											<!--<xsl:with-param name="context" select="$this.node"/>-->
+										</xsl:call-template>
+									</xsl:attribute>
+									<xsl:apply-templates select="(ancestor::node())[1]" mode="title.markup"/>
+								</a>
+								<!--<xsl:apply-templates select="(ancestor::node())[1]" mode="object.title.markup"/>-->
 							</h1>
 						</li>
 						<li class="next">
@@ -356,18 +365,18 @@ Version:
 									</div>
 								</xsl:if>
 							</xsl:if>
-
+							
 							<div id="amazonad">
-							<xsl:element name="iframe">
-								<xsl:attribute name="src">http://rcm-de.amazon.de/e/cm?lt1=_top&amp;bc1=FFFFFF&amp;IS2=1&amp;bg1=FFFFFF&amp;fc1=000000&amp;lc1=0000FF&amp;t=wwwamoomade-21&amp;o=3&amp;p=8&amp;l=as1&amp;m=amazon&amp;f=ifr&amp;asins=3827329892</xsl:attribute>
-								<xsl:attribute name="style">width:120px;height:240px;</xsl:attribute>
-								<xsl:attribute name="scrolling">no</xsl:attribute>
-								<xsl:attribute name="marginwidth">0</xsl:attribute>
-								<xsl:attribute name="marginheight">0</xsl:attribute>
-								<xsl:attribute name="frameborder">0</xsl:attribute>
-							</xsl:element>
+								<xsl:element name="iframe">
+									<xsl:attribute name="src">http://rcm-de.amazon.de/e/cm?lt1=_top&amp;bc1=FFFFFF&amp;IS2=1&amp;bg1=FFFFFF&amp;fc1=000000&amp;lc1=0000FF&amp;t=wwwamoomade-21&amp;o=3&amp;p=8&amp;l=as1&amp;m=amazon&amp;f=ifr&amp;asins=3827329892</xsl:attribute>
+									<xsl:attribute name="style">width:120px;height:240px;</xsl:attribute>
+									<xsl:attribute name="scrolling">no</xsl:attribute>
+									<xsl:attribute name="marginwidth">0</xsl:attribute>
+									<xsl:attribute name="marginheight">0</xsl:attribute>
+									<xsl:attribute name="frameborder">0</xsl:attribute>
+								</xsl:element>
 							</div>
-
+							
 							<xsl:if test="$adincluded = 1">
 								<div id="adsense">
 									<script type="text/javascript">
@@ -429,15 +438,14 @@ Version:
 		<xsl:param name="this.node" select="."/>
 		<ul class="breadcrumbs">
 			<xsl:for-each select="$this.node/ancestor::*">
-				<xsl:if test="local-name(.) = 'chapter'">
+				<xsl:if test="local-name(.) = 'chapter' or local-name(.) = 'appendix'">
 					<xsl:call-template name="print-previous-chapters">
-						<xsl:with-param name="padding" select="(position() - 1) * 0.8"/>
 					</xsl:call-template>
 				</xsl:if>
 				<li>
 					<xsl:attribute name="class">
 						<xsl:value-of select="local-name(.)"/>
-						<xsl:text> breadcrumb-link</xsl:text>
+						<xsl:text> breadcrumb-link breadcrumb-first-level</xsl:text>
 						<xsl:if test="position() != 1">
 							<xsl:text> breadcrumb-bullet </xsl:text>
 						</xsl:if>
@@ -447,6 +455,15 @@ Version:
 						<xsl:choose>
 							<xsl:when test="local-name(.) = 'book'">
 								<xsl:value-of select="0"/>
+							</xsl:when>
+							<xsl:when test="local-name(.) = 'chapter'">
+								<xsl:value-of select="0"/>
+							</xsl:when>
+							<xsl:when test="local-name(.) = 'appendix'">
+								<xsl:value-of select="0"/>
+							</xsl:when>
+							<xsl:when test="local-name(.) = 'section'">
+								<xsl:value-of select="0.8"/>
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:value-of select="(position() - 1) * 0.8"/>
@@ -465,10 +482,9 @@ Version:
 					</a>
 				</li>
 				<xsl:if test="position() = last()">
-					<xsl:if test="local-name($this.node) = 'chapter'">
+					<xsl:if test="local-name($this.node) = 'chapter' or local-name($this.node) = 'appendix'">
 						<xsl:call-template name="special-print-previous-chapters">
 							<xsl:with-param name="node" select="$this.node"/>
-							<xsl:with-param name="padding" select="(position() - 1) * 0.8"/>
 						</xsl:call-template>
 					</xsl:if>
 					<xsl:call-template name="last-li-breadcrumb">
@@ -497,15 +513,12 @@ Version:
 	
 	<xsl:template name="print-following-chapters">
 		<xsl:param name="last-li-node"/>
-		<xsl:for-each select="$last-li-node/ancestor::*[name() = 'chapter']/following-sibling::*">
-			<xsl:if test="local-name(.) = 'chapter'">
+		<xsl:for-each select="$last-li-node/ancestor::*[name() = 'chapter' or name() = 'appendix']/following-sibling::*">
+			<xsl:if test="local-name(.) = 'chapter' or local-name(.) = 'appendix'">
 				<li>
 					<xsl:attribute name="class">
-						<xsl:text>breadcrumb-link breadcrumb-bullet </xsl:text>
+						<xsl:text>print-following breadcrumb-link breadcrumb-bullet </xsl:text>
 						<xsl:value-of select="local-name(.)"/>
-					</xsl:attribute>
-					<xsl:attribute name="style">
-						<xsl:text>margin-left: 0.8em</xsl:text>
 					</xsl:attribute>
 					<a>
 						<xsl:attribute name="href">
@@ -522,15 +535,12 @@ Version:
 	
 	<xsl:template name="special-print-following-chapters">
 		<xsl:param name="node"/>
-		<xsl:for-each select="$node/following-sibling::*[name() = 'chapter']">
-			<xsl:if test="local-name(.) = 'chapter'">
+		<xsl:for-each select="$node/following-sibling::*[name() = 'chapter' or name() = 'appendix']">
+			<xsl:if test="local-name(.) = 'chapter' or local-name(.) = 'appendix'">
 				<li>
 					<xsl:attribute name="class">
-						<xsl:text>breadcrumb-link breadcrumb-bullet </xsl:text>
+						<xsl:text>special-print-following breadcrumb-link breadcrumb-bullet </xsl:text>
 						<xsl:value-of select="local-name(.)"/>
-					</xsl:attribute>
-					<xsl:attribute name="style">
-						<xsl:text>margin-left: 0.8em</xsl:text>
 					</xsl:attribute>
 					<a>
 						<xsl:attribute name="href">
@@ -546,18 +556,12 @@ Version:
 	</xsl:template>
 	
 	<xsl:template name="print-previous-chapters">
-		<xsl:param name="padding"/>
 		<xsl:for-each select="preceding-sibling::*">
-			<xsl:if test="local-name(.) = 'chapter'">
+			<xsl:if test="local-name(.) = 'chapter' or local-name(.) = 'appendix'">
 				<li>
 					<xsl:attribute name="class">
-						<xsl:text>breadcrumb-link breadcrumb-bullet </xsl:text>
+						<xsl:text>print-previous breadcrumb-link breadcrumb-bullet </xsl:text>
 						<xsl:value-of select="local-name(.)"/>
-					</xsl:attribute>
-					<xsl:attribute name="style">
-						<xsl:text>margin-left: </xsl:text>
-						<xsl:value-of select="$padding"/>
-						<xsl:text>em</xsl:text>
 					</xsl:attribute>
 					<a>
 						<xsl:attribute name="href">
@@ -575,18 +579,12 @@ Version:
 	
 	<xsl:template name="special-print-previous-chapters">
 		<xsl:param name="node"/>
-		<xsl:param name="padding"/>
 		<xsl:for-each select="$node/preceding-sibling::*">
-			<xsl:if test="local-name(.) = 'chapter'">
+			<xsl:if test="local-name(.) = 'chapter' or local-name(.) = 'appendix'">
 				<li>
 					<xsl:attribute name="class">
-						<xsl:text>breadcrumb-link breadcrumb-bullet </xsl:text>
+						<xsl:text>special-print-previous breadcrumb-link breadcrumb-bullet </xsl:text>
 						<xsl:value-of select="local-name(.)"/>
-					</xsl:attribute>
-					<xsl:attribute name="style">
-						<xsl:text>margin-left: </xsl:text>
-						<xsl:value-of select="$padding"/>
-						<xsl:text>em</xsl:text>
 					</xsl:attribute>
 					<a>
 						<xsl:attribute name="href">
@@ -605,16 +603,46 @@ Version:
 		<xsl:param name="last-li-node"/>
 		<xsl:param name="padding"/>
 <!-- And display the current node, but not as a link -->
+		<xsl:for-each select="$last-li-node/preceding-sibling::*[name() = 'section']">
+			<li>
+				<xsl:attribute name="class">
+					<xsl:text>last-li-preceding breadcrumb-link breadcrumb-bullet </xsl:text>
+					<xsl:value-of select="local-name(.)"/>
+				</xsl:attribute>
+				<xsl:attribute name="style">
+					<xsl:text>margin-left: </xsl:text>
+					<xsl:value-of select="$padding"/>
+					<xsl:text>em</xsl:text>
+				</xsl:attribute>
+				<a>
+					<xsl:attribute name="href">
+						<xsl:call-template name="href.target">
+							<xsl:with-param name="object" select="."/>
+						</xsl:call-template>
+					</xsl:attribute>
+					<xsl:apply-templates select="." mode="title.markup"/>
+				</a>
+			</li>
+		</xsl:for-each>
 		<li>
 			<xsl:attribute name="class">
-				<xsl:text>breadcrumb-node breadcrumb-last breadcrumb-bullet </xsl:text>
-				<xsl:value-of select="local-name(.)"/>
+				<xsl:text>last-li breadcrumb-node breadcrumb-last breadcrumb-bullet </xsl:text>
+				<xsl:value-of select="local-name($last-li-node)"/>
 			</xsl:attribute>
+			<xsl:choose>
+			<xsl:when test="local-name($last-li-node)='chapter' or local-name($last-li-node) = 'appendix'">
+			<xsl:attribute name="style">
+				<xsl:text>margin-left: 0em</xsl:text>
+			</xsl:attribute>
+			</xsl:when>
+			<xsl:otherwise>
 			<xsl:attribute name="style">
 				<xsl:text>margin-left: </xsl:text>
-				<xsl:value-of select="$padding + 0.8"/>
+				<xsl:value-of select="$padding"/>
 				<xsl:text>em</xsl:text>
 			</xsl:attribute>
+			</xsl:otherwise>
+			</xsl:choose>
 			<xsl:choose>
 				<xsl:when test="count($last-li-node/child::*[name()!='para']) = 1">
 					<xsl:apply-templates select="$last-li-node" mode="title.markup"/>
@@ -632,10 +660,23 @@ Version:
 			</xsl:choose>
 		</li>
 		<xsl:for-each select="$last-li-node/child::*[name()!='para' and position() != 1]">
-			
+			<xsl:if test="local-name(.) != 'itemizedlist'">
 			<li>
+				<xsl:choose>
+				<xsl:when test="local-name($last-li-node)='chapter' or local-name($last-li-node) = 'appendix'">
 				<xsl:attribute name="class">
-					<xsl:text>breadcrumb-link breadcrumb-bullet-another </xsl:text>
+					<xsl:text>last-li-link breadcrumb-link breadcrumb-bullet </xsl:text>
+					<xsl:value-of select="local-name(.)"/>
+				</xsl:attribute>
+				<xsl:attribute name="style">
+					<xsl:text>margin-left: </xsl:text>
+					<xsl:value-of select="$padding + 0.8"/>
+					<xsl:text>em</xsl:text>
+				</xsl:attribute>
+				</xsl:when>
+				<xsl:otherwise>
+				<xsl:attribute name="class">
+					<xsl:text>last-li-link breadcrumb-link breadcrumb-bullet-another </xsl:text>
 					<xsl:value-of select="local-name(.)"/>
 				</xsl:attribute>
 				<xsl:attribute name="style">
@@ -643,6 +684,8 @@ Version:
 					<xsl:value-of select="$padding + 0.8 + 0.8"/>
 					<xsl:text>em</xsl:text>
 				</xsl:attribute>
+				</xsl:otherwise>
+				</xsl:choose>
 				<a>
 					<xsl:attribute name="href">
 						<xsl:call-template name="href.target">
@@ -653,6 +696,30 @@ Version:
 					<xsl:apply-templates select="." mode="title.markup"/>
 				</a>
 			</li>
+			</xsl:if>
+		</xsl:for-each>
+		<xsl:for-each select="$last-li-node/following-sibling::*[name()='section']">
+			<!--<xsl:if test="count($last-li-node/child::*[name()!='para']) = 1">-->
+				<li>
+					<xsl:attribute name="class">
+						<xsl:text>last-li-following breadcrumb-link breadcrumb-bullet </xsl:text>
+						<xsl:value-of select="local-name(.)"/>
+					</xsl:attribute>
+					<xsl:attribute name="style">
+						<xsl:text>margin-left: </xsl:text>
+						<xsl:value-of select="$padding"/>
+						<xsl:text>em</xsl:text>
+					</xsl:attribute>
+					<a>
+						<xsl:attribute name="href">
+							<xsl:call-template name="href.target">
+								<xsl:with-param name="object" select="."/>
+							</xsl:call-template>
+						</xsl:attribute>
+						<xsl:apply-templates select="." mode="title.markup"/>
+					</a>
+				</li>
+			<!--</xsl:if>-->
 		</xsl:for-each>
 	</xsl:template>
 	
