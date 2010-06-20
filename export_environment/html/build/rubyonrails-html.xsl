@@ -342,6 +342,13 @@ Version:
 				<div id="content">
 					<div id="content-inner">
 						<div id="rightcol" class="sidebar">
+							<xsl:if test="$extrahtml = 1">
+								<xsl:if test="count($extrahtmlfile//extrahtml/*) &gt; 0">
+									<div id="extrahtml">
+										<xsl:copy-of select="$extrahtmlfile/extrahtml/node()"/>
+									</div>
+								</xsl:if>
+							</xsl:if>
 							<xsl:call-template name="breadcrumbs"/>
 							
 							<div id="textsize">
@@ -358,13 +365,7 @@ Version:
 									<span class="plusts" style="font-size: x-large;">+</span>
 								</a>
 							</div>
-							<xsl:if test="$extrahtml = 1">
-								<xsl:if test="count($extrahtmlfile//extrahtml/*) &gt; 0">
-									<div id="extrahtml">
-										<xsl:copy-of select="$extrahtmlfile/extrahtml/node()"/>
-									</div>
-								</xsl:if>
-							</xsl:if>
+							
 							
 							<div id="amazonad">
 								<xsl:element name="iframe">
