@@ -986,24 +986,6 @@ sw@debian:~/sandbox$ </screen></para>
         lassen.</para>
       </section>
     </section>
-
-    <section xml:id="ruby_symbol">
-      <title xml:id="ruby_symbol.title">Symbol</title>
-
-      <para>Suchen Sie mit Google mal "Ruby Symbol" und Sie werden schnell
-      erahnen, welche Qual das Schreiben dieses kleinen Abschnittes war.
-      Zusätzlich kann man sich als Autor auch schlecht mit einem "ist nicht so
-      wichtig" rausreden. Aber ich werde genau dieses tun.</para>
-
-      <para>Zur Benutzung von Symbolen brauchen Sie erst mal nur zu wissen wie
-      ein Symbol aussieht, und das ist leicht gezeigt:<programlisting>:symbolname</programlisting></para>
-
-      <para>Es fängt also mit einem Doppelpunkt an, gefolgt von einem kleinen
-      Buchstaben. Symbole werden Sie in Rails einige Male sehen und im Lauf
-      der Zeit kommt Sinn rein. Fall Sie es dann nicht mehr aushalten, können
-      Sie mit <command>ri Symbol</command> die Hilfeseite zur Klasse
-      <classname>Symbol</classname> aufrufen.</para>
-    </section>
   </section>
 
   <section xml:id="noch_mal_methoden">
@@ -1810,17 +1792,6 @@ irb(main):003:0&gt; <command>preisliste.count</command>
 irb(main):004:0&gt; <command>exit</command>
 </screen></para>
 
-      <para>Die Benutzung von Symbolen als Schlüssel ist speicher-effizienter
-      (auch wenn das bei diesem Beispiel natürlich keinen großen Unterschied
-      macht):<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>farben = { :black =&gt; '#000000', :white =&gt; ':FFFFFF', :green =&gt; '#00C000', :blue =&gt; '#0000FF' }
-=&gt; {:black=&gt;"#000000", :white=&gt;":FFFFFF", :green=&gt;"#00C000", :blue=&gt;"#0000FF"}</command>
-irb(main):002:0&gt; <command>puts farben[:green]</command>
-#00C000
-=&gt; nil
-irb(main):003:0&gt; <command>exit</command>
-</screen></para>
-
       <para>Natürlich können in Hashes nicht nur Strings, sondern auch selbst
       definierte Klassen als Objekte in der Werten gespeichert werden (siehe
       Array-Beispiel).</para>
@@ -1865,6 +1836,78 @@ Instance methods:
      store, to_a, to_hash, to_s, to_yaml, update, value?, values,
      values_at, yaml_initialize
 sw@debian:~/sandbox$</screen></para>
+
+      <section xml:id="ruby_symbol">
+        <title xml:id="ruby_symbol.title">Symbol</title>
+
+        <para>Symbols sind eine "merkwürdige" und schwer erklärbare Sache.
+        Allerdings sind sie auch sehr praktisch und werden unter anderem bei
+        Hashes sehr oft benutzt. Normalerweise werden bei Variablen immer neue
+        Objekte angelegt:<screen>sw@swmbp 0 1.9.2-preview3 ~$ <command>irb</command>
+ruby-1.9.2-preview3 &gt; <command>a = 'Beispiel 1'</command>
+ =&gt; "Beispiel 1" 
+ruby-1.9.2-preview3 &gt; <command>a.object_id</command>
+ =&gt; 2156685080 
+ruby-1.9.2-preview3 &gt; <command>a = 'Beispiel 2'</command>
+ =&gt; "Beispiel 2" 
+ruby-1.9.2-preview3 &gt; <command>a.object_id</command>
+ =&gt; 2151901180 
+ruby-1.9.2-preview3 &gt; <command>exit</command>
+sw@swmbp 0 1.9.2-preview3 ~$</screen></para>
+
+        <para>Wir haben zwei mal die Variable <varname>a</varname>, aber
+        einmal hat sie die Objekt-ID 2156685080 und dann die Objekt-ID
+        2151901180. Wir könnten das immer so weitermachen. Es würde jedesmal
+        eine andere Objekt-ID und damit ein neues Objekt rauskommen. Das ist
+        prinzipiel nicht weiter schlimm und im Sinne der Objektorientierung
+        auch logisch. Allerdings ist es auch ein recht verschwenderischer
+        Umgang mit Speicherplatz. </para>
+
+        <para>Ein Symbol wird durch ein Doppelpunkt vor dem Namen definiert
+        und kann selber keine Werte speichern, aber hat immer die gleiche
+        Objekt-ID und ist deshalb sehr gut als Schlüssel (key)
+        geeignet:<screen>sw@swmbp 0 1.9.2-preview3 ~$ <command>irb</command>
+ruby-1.9.2-preview3 &gt; <command>:a.object_id</command>
+ =&gt; 373448 
+ruby-1.9.2-preview3 &gt; <command>exit</command>
+sw@swmbp 0 1.9.2-preview3 ~$ </screen></para>
+
+        <para>Machen wir noch mal einen kleinen Versuch, um den Unterschied
+        klarer rauszustellen. Wir benutzen 3 mal hintereinander ein Objekt
+        <varname>'white'</varname> und dann drei mal hintereinander das Symbol
+        <varname>:white</varname>. Bei <varname>'white'</varname> wird immer
+        ein neues Objekt angelegt. Beim Symbol <varname>:white</varname> nur
+        beim ersten mal:<screen>stefan@swmbp 0 1.9.2-preview3 ~$ <command>irb</command>
+ruby-1.9.2-preview3 &gt; <command>'white'.object_id</command>
+ =&gt; 2152156400 
+ruby-1.9.2-preview3 &gt; <command>'white'.object_id</command>
+ =&gt; 2152152240 
+ruby-1.9.2-preview3 &gt; <command>'white'.object_id</command>
+ =&gt; 2152164440 
+ruby-1.9.2-preview3 &gt; <command>:white.object_id</command>
+ =&gt; 373448 
+ruby-1.9.2-preview3 &gt; <command>:white.object_id</command>
+ =&gt; 373448 
+ruby-1.9.2-preview3 &gt; <command>:white.object_id</command>
+ =&gt; 373448 
+ruby-1.9.2-preview3 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-preview3 ~$</screen></para>
+
+        <para>Die Benutzung von Symbolen als Schlüssel ist bei Hashes sehr
+        viel Speicher-effizienter:<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>farben = { :black =&gt; '#000000', :white =&gt; ':FFFFFF', :green =&gt; '#00C000', :blue =&gt; '#0000FF' }
+=&gt; {:black=&gt;"#000000", :white=&gt;":FFFFFF", :green=&gt;"#00C000", :blue=&gt;"#0000FF"}</command>
+irb(main):002:0&gt; <command>puts farben[:green]</command>
+#00C000
+=&gt; nil
+irb(main):003:0&gt; <command>exit</command>
+</screen></para>
+
+        <para>Symbole werden Sie in Rails noch oft sehen. Wenn Sie weitere
+        Informationen zu Symbols suchen, können Sie mit <command>ri
+        Symbol</command> die Hilfeseite zur Klasse
+        <classname>Symbol</classname> aufrufen.</para>
+      </section>
 
       <section>
         <title>Iterator (each)</title>
