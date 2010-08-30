@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<section version="5.0" xml:id="ruby-on-rails-install-howto-mac-os-x"
+<section version="5.0" xml:id="rails3-install-osx"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -11,23 +11,23 @@
   Installation auf Mac OS 10.6</title>
 
   <para>Die Anzahl der Ruby on Rails Entwickler die auf Mac OS X entwickeln
-  ist erfreulich hoch. Auf Rails-Konferenzen sieht man bei über 70% der
+  ist erfreulich hoch. Auf Rails-Konferenzen sieht man bei gefühlten 70% der
   Teilnehmer ein MacBook.</para>
 
   <para>Mac OS 10.6 wird per Default schon mit Ruby und Ruby on Rails
   ausgeliefert. Dummerweise nur mit der Ruby-Version 1.8.7 und mit der
-  Rails-Version 2.2.2. Beides für uns uninteressant. Wir wollen ein 1.9er Ruby
-  und ein 3.0er Rails. Um die bestehende Ruby- und Rails-Installation und
+  Rails-Version 2.2.2. Beides für uns uninteressant. Wir wollen ein 1.9.2er
+  Ruby und ein 3.0er Rails. Um die bestehende Ruby- und Rails-Installation und
   damit das Paketmanagement von Mac OS X nicht zu beeinflussen, installieren
-  wir Ruby 1.9.1 und Rails 3.0 mit rvm (Ruby Version Manager). Infos zu rvm
+  wir Ruby 1.9.2 und Rails 3.0 mit rvm (Ruby Version Manager). Infos zu rvm
   finden Sie auf der rvm-Homepage unter
   <uri>http://rvm.beginrescueend.com/</uri></para>
 
   <para>Mit rvm können Sie im User-Space (also ohne Root-Rechte und in Ihrem
   Home-Verzeichnis) beliebig viele verschiedene Ruby und Rails Versionen
   installieren und laufen lassen. So können Sie parallel an alten Projekten
-  die vielleicht noch Ruby 1.8 benutzt haben und an neuen Projekte die Ruby
-  1.9 benutzen arbeiten.</para>
+  die vielleicht noch Ruby 1.8.7 benutzt haben und an neuen Projekte die Ruby
+  1.9.2 benutzen arbeiten.</para>
 
   <section>
     <title>Vorbereitung (Xcode-Update)</title>
@@ -38,128 +38,111 @@
     MB gross und kann unter folgender URL downgeloadet werden:</para>
 
     <para><uri>http://developer.apple.com/technology/xcode.html</uri></para>
+
+    <important>
+      <para>Zur Installation der Xcode Tools benötigen Sie Admin-Rechte auf
+      Ihrem System.</para>
+    </important>
   </section>
 
-  <section>
-    <title>rvm installieren</title>
+  <section xml:id="ruby-1.9.2-mit-rvm-macosx">
+    <title>Ruby 1.9.2 mit rvm installieren</title>
 
-    <para>Öffnen Sie bitte ein Terminal und gehen Sie nach folgender Anleitung
-    vor:<screen>MacBook:~ sw$ <command>gem sources -a http://gemcutter.org/</command>
-http://gemcutter.org/ added to sources
-MacBook:~ sw$ <command>gem install rvm</command>
-WARNING:  Installing to ~/.gem since /Library/Ruby/Gems/1.8 and
-   /usr/bin aren't both writable.
-WARNING:  You don't have /Users/sw/.gem/ruby/1.8/bin in your PATH,
-   gem executables will not run.
-********************************************************************************
+    <para>Öffnen Sie bitte mit Ihren normalen User-Rechten ein Terminal und
+    überprüfen Sie die installierte Ruby-Version:<screen>swmbp:~ xyz$ <command>ruby -v</command>
+ruby 1.8.7 (2009-06-12 patchlevel 174) [universal-darwin10.0]
+swmbp:~ xyz$ </screen></para>
 
-  In order to setup rvm for your user's environment you must now run rvm-install.
-  rvm-install will be found in your current gems bin directory corresponding to where the gem was installed.
+    <para>rvm lässt sich auf verschiedene Wege installieren. Ich empfehle das
+    nun folgende Monsterkommando, weil damit das aktuellste stabile rvm
+    installiert wird:<screen>swmbp:~ xyz$ <command>bash &lt; &lt;( curl http://rvm.beginrescueend.com/releases/rvm-install-head )</command>
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+121   364  121   364    0     0    922      0 --:--:-- --:--:-- --:--:--  1967
+Initialized empty Git repository in /Users/xyz/.rvm/src/rvm/.git/
+remote: Counting objects: 13224, done.
+remote: Compressing objects: 100% (3246/3246), done.
+remote: Total 13224 (delta 8709), reused 13116 (delta 8638)
+Receiving objects: 100% (13224/13224), 2.34 MiB | 212 KiB/s, done.
+Resolving deltas: 100% (8709/8709), done.
 
-  rvm-install will install the scripts to your user account and append itself to your profiles in order to
-  inject the proper rvm functions into your shell so that you can manage multiple rubies.
+RVM:   shell scripts which allow management of multiple ruby interpreters and environments.
+RTFM:  http://rvm.beginrescueend.com/
+HELP:  http://webchat.freenode.net/?channels=rvm (#rvm on irc.freenode.net)
 
-********************************************************************************
-Successfully installed rvm-0.1.24
-1 gem installed
-Installing ri documentation for rvm-0.1.24...
-Installing RDoc documentation for rvm-0.1.24...
-MacBook:~ sw$</screen></para>
-
-    <para>Die Warnungen zeigen an, das rvm im Home-Verzeichnis installiert
-    werden muss, weil der User keine Root-Recht hat. Das ist aber von uns auch
-    so gewollt.</para>
-
-    <para>Das rvm gem ist installiert, aber das Install-Skript muss noch
-    ausgeführt werden. Den genauen Pfad können Sie mit find suchen.<screen>MacBook:~ sw$ <command>find . -name "rvm-install"</command>
-./.gem/ruby/1.8/bin/rvm-install
-./.gem/ruby/1.8/gems/rvm-0.1.24/bin/rvm-install
-./.gem/ruby/1.8/gems/rvm-0.1.24/scripts/rvm-install
-MacBook:~ sw$ <command>./.gem/ruby/1.8/bin/rvm-install</command>
-
-Installing rvm to /Users/sw/.rvm/ ...
-
-rvm - shell scripts that allows a user to manage multiple ruby versions in their own account.
-
-**** NOTICE *************************************************************************************
-*  The rubies install path has moved to $rvm_path/rubies/ instead of directly in $rvm_path.     *
-*  If you encounter any issues with a ruby your best bet is to 'rvm remove X ; rvm install X'   *
-*  Gems are now per interpreter installation instead of per interpreter/version                 *
-*  so for example to upgrade an older install of 1.8.6 and preserve gems:                       *
-*  rm -rf ~/.rvm/gems/ruby-1.8.6-p383 ;  mv ~/.rvm/gems/ruby/1.8.6 ~/.rvm/gems/ruby-1.8.6-p383  *
-*************************************************************************************************
-
-
+* Installing rvm to /Users/xyz/.rvm/
+    Correct permissions for base binaries in /Users/xyz/.rvm/bin...
+    Copying manpages into place.
 Notes for Darwin ( Mac OS X ) 
 
-
     *  For Snow Leopard be sure to have XCode Tools Version 3.2.1 (1613) or later (there were bugs with the dvd release version).
-
     *  You should download the latest XCode tools from developer.apple.com. This is necessary since the dvd install for Snow Leopard has bugs.
-
     *  If you intend on installing MacRuby you must install LLVM first.
-
     *  If you intend on installing JRuby you must install the JDK.
-
     *  If you intend on installing IronRuby you must install Mono (version 2.6 or greater is recommended).
 
-RTFM:  http://rvm.beginrescueend.com/
 
-HELP:  http://webchat.freenode.net/?channels=rvm 
-
-********************************************************************************
-
-sw,
-
+xyz,
 
 Thank you for using rvm. I hope that it makes your work easier and more enjoyable.
 If you have any questions, issues and/or ideas for improvement please hop in #rvm on irc.freenode.net and let me know.
 My irc nickname is 'wayneeseguin' and I hang out from ~09:00-17:00EST and again from ~21:00EST-~00:00EST.
 If I do not respond right away, please hang around after asking your question, I will respond as soon as I am back.
-Be sure to get head often as rvm development happens fast, you can do this by typing 'rvm update --head'.
-
+Be sure to get head often as rvm development happens fast, you can do this by running 'rvm update --head'.
   w⦿‿⦿t!
-
     ~ Wayne
 
-********************************************************************************
-
 You must now finish the install manually:
-
-1) Place the folowing line at the end of your shell's loading files(.bashrc and then .bash_profile for bash and .zshrc for zsh), after all path/variable settings:
-
-     if [[ -s /Users/sw/.rvm/scripts/rvm ]] ; then source /Users/sw/.rvm/scripts/rvm ; fi
-
+1) Place the folowing line at the end of your shell's loading files(.bashrc or .bash_profile for bash and .zshrc for zsh), after all path/variable settings:
+     [[ -s $HOME/.rvm/scripts/rvm ]] &amp;&amp; source $HOME/.rvm/scripts/rvm
+   Please note that this must only occur once - so, you only need to add it the first time you install rvm.
 2) Ensure that there is no 'return' from inside the .bashrc file. (otherwise rvm will be prevented from working properly).
+   This means that if you see '[ -z "$PS1" ] &amp;&amp; return' then you must change this line to:
+   if [[ -n "$PS1" ]] ; then
+     ... original content that was below the &amp;&amp; return line ...
+   fi # &lt;= be sure to close the if.
+   #EOF .bashrc
+   Be absolutely *sure* to REMOVE the '&amp;&amp; return'.
+   If you wish to DRY up your config you can 'source ~/.bashrc' at the bottom of your .bash_profile.
+   placing all non-interactive items in the .bashrc, including the 'source' line above
+3) Then CLOSE THIS SHELL and open a new one in order to use rvm.
 
-   This means that if you see '[ -z  ] &amp;&amp; return' then you must remove it and split your .bashrc
+Installation of RVM to /Users/xyz/.rvm/ is complete.
 
-   Put everything *except the return code line(s)* into your .bash_profile, and everything above that code in your .bashrc.
+swmbp:~ xyz$ 
+</screen></para>
 
-   Be *sure* to REMOVE the '&amp;&amp; return' statement line.
-
-   If you wish to DRY up your config you can 'source ~/.bashrc' at the top of your .bash_profile.
-
-4) Then CLOSE THIS SHELL and open a new one in order to use rvm.
-
-MacBook:~ sw$</screen></para>
+    <note>
+      <para>Das obige Kommando zieht rvm per git. Das ist schnell, aber
+      funktioniert nicht hinter jeder Firewall. Sollten Sie hinter einer
+      solchen Firewall sitzen, dann müssen Sie <uri
+      xlink:href="http://rvm.beginrescueend.com/releases/rvm-install-head">http://rvm.beginrescueend.com/releases/rvm-install-head</uri>
+      von Hand downloaden und mit einem Editor alle git:// URIs auf http://
+      ändern. Danach normal als Shell-Script starten.</para>
+    </note>
 
     <para>rvm ist fertig installiert, aber Sie müssen zum täglichen Gebrauch
     noch die entsprechende Zeile in Ihre <filename>.bash_profile</filename>
-    einfügen. Falls die Datei noch nicht existiert, können Sie Sie mit
-    <command>touch .bash_profile</command> erstellen.<screen>MacBook:~ sw$ <command>touch .bash_profile</command>
+    einfügen. Mit <command>ls -la .bash_profile</command> können Sie
+    überprüfen, ob diese Datei bereits existiert:<screen>swmbp:~ xyz$ <command>ls -la .bash_profile</command>
+ls: .bash_profile: No such file or directory
+swmbp:~ xyz$</screen></para>
+
+    <para>Falls wie in diesem Fall die Datei noch nicht existiert, können Sie
+    Sie mit <command>touch .bash_profile</command> erstellen.<screen>MacBook:~ sw$ <command>touch .bash_profile</command>
 MacBook:~ sw$</screen></para>
 
     <note>
       <para>Falls Sie eine andere Shell als die Bash-Shell benutzen, müssen
-      Sie in der dann entsprechenden Datei diese Veränderung vornehmen.</para>
+      Sie in der dann entsprechenden Datei diese Veränderung vornehmen. Bitte
+      lesen Sie dazu die Ausgabe des rvm Installers.</para>
     </note>
 
     <para>Die folgende Zeile können Sie nicht per Cut-and-Paste aus diesem
     Dokument übernehmen, sondern müssen Sie selbst aus der Ausgabe der rvm
     Installation zusammenfügen. Ob Sie die Zeile dann mit einem Editor per
     Cut-and-Paste oder mit diesem echo Befehl in die Datei
-    <filename>.bash_profile</filename> einfügen ist egal.<screen>MacBook:~ sw$ <command>echo "if [[ -s ~/.rvm/scripts/rvm ]] ; then source ~/.rvm/scripts/rvm ; fi" &gt;&gt; .bash_profile</command> 
+    <filename>.bash_profile</filename> einfügen ist egal.<screen>MacBook:~ sw$ <command>echo "[[ -s $HOME/.rvm/scripts/rvm ]] &amp;&amp; source $HOME/.rvm/scripts/rvm" &gt;&gt; .bash_profile</command> 
 MacBook:~ sw$</screen></para>
 
     <important>
@@ -168,106 +151,110 @@ MacBook:~ sw$</screen></para>
     </important>
 
     <para>Zum Testen, ob <application>rvm</application> richtig installiert
-    ist, rufen wir es einmal mit <parameter>-v</parameter> auf.<screen>MacBook:~ sw$ <command>rvm -v</command>
+    ist, rufen wir es einmal mit <parameter>-v</parameter> auf.<screen>swmbp:~ xyz$ <command>rvm -v</command>
 
-rvm 0.1.32 by Wayne E. Seguin (wayneeseguin@gmail.com) [http://rvm.beginrescueend.com/]
+rvm 1.0.1 by Wayne E. Seguin (wayneeseguin@gmail.com) [http://rvm.beginrescueend.com/]
 
-MacBook:~ sw$
-</screen></para>
+swmbp:~ xyz$</screen></para>
 
     <para>Sollte hierbei als Antwort der Bash ein "command not found"
     ausgegeben worden sein, müssen Sie die obigen Schritte noch einmal
     überprüfen. Wahrscheinlich haben Sie einen Schritt ausgelassen.</para>
 
     <para>Mit <application>rvm</application> können Sie im neuen Terminal Ruby
-    1.9.1 installieren:<screen>MacBook$ <command>rvm install ruby-1.9.1</command>
-Installing Ruby from source to: /Users/sw/.rvm/rubies/ruby-1.9.1-p378
-/Users/sw/.rvm/src/ruby-1.9.1-p378 has already been extracted.
-Configuring ruby-1.9.1-p378, this may take a while depending on your cpu(s)...
-Compiling ruby-1.9.1-p378, this may take a while, depending on your cpu(s)...
-Installing ruby-1.9.1-p378
-Installation of ruby-1.9.1-p378 is complete.
-Updating rubygems for /Users/sw/.rvm/gems/ruby-1.9.1-p378@global
-Updating rubygems for /Users/sw/.rvm/gems/ruby-1.9.1-p378
-Installing gems for ruby-1.9.1-p378.
-Installing rdoc to /Users/sw/.rvm/gems/ruby-1.9.1-p378@global
-Installing rdoc to /Users/sw/.rvm/gems/ruby-1.9.1-p378
-Installing rake to /Users/sw/.rvm/gems/ruby-1.9.1-p378@global
-Installing rake to /Users/sw/.rvm/gems/ruby-1.9.1-p378
-Installation of gems for ruby-1.9.1-p378 is complete.
-MacBook:~ sw$</screen></para>
+    1.9.2 installieren:<screen>swmbp:~ xyz$ <command>rvm install ruby-1.9.2</command>
+
+info: Installing Ruby from source to: /Users/xyz/.rvm/rubies/ruby-1.9.2-p0
+
+info: Downloading ruby-1.9.2-p0, this may take a while depending on your connection...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 8296k  100 8296k    0     0  61062      0  0:02:19  0:02:19 --:--:-- 40501
+
+info: Extracting ruby-1.9.2-p0 ...
+
+info: Configuring ruby-1.9.2-p0, this may take a while depending on your cpu(s)...
+
+info: Compiling ruby-1.9.2-p0, this may take a while depending on your cpu(s)...
+
+info: Installing ruby-1.9.2-p0
+
+info: Installation of ruby-1.9.2-p0 is complete.
+
+info: Updating rubygems for /Users/xyz/.rvm/gems/ruby-1.9.2-p0@global
+
+info: Updating rubygems for /Users/xyz/.rvm/gems/ruby-1.9.2-p0
+
+info: adjusting shebangs for ruby-1.9.2-p0 (gem irb erb ri rdoc testrb rake).
+
+info: Importing initial gems...
+swmbp:~ xyz$</screen></para>
 
     <para>Noch werden Sie per Default ein 1.8er Ruby aufrufen. Das lässt sich
-    leicht mit <application>ruby -v</application> rausfinden.<screen>MacBook:~ sw$ <command>ruby -v</command>
-ruby 1.8.7 (2009-06-08 patchlevel 173) [universal-darwin10.0]
-MacBook:~ sw$</screen></para>
+    leicht mit <application>ruby -v</application> rausfinden.<screen>swmbp:~ xyz$ <command>ruby -v</command>
+ruby 1.8.7 (2009-06-12 patchlevel 174) [universal-darwin10.0]
+swmbp:~ xyz$ </screen></para>
 
-    <para>Mit dem Befehl <command>rvm 1.9.1</command> können Sie aber auf ein
-    1.9.1er Ruby wechseln.<screen>MacBook:~ sw$ <command>rvm 1.9.1</command>
-MacBook:~ sw$ <command>ruby -v</command>
-ruby 1.9.1p378 (2010-01-10 revision 26273) [i386-darwin10.3.0]
-MacBook:~ sw$</screen></para>
+    <para>Mit dem Befehl <command>rvm 1.9.2</command> können Sie aber auf ein
+    1.9.2er Ruby wechseln.<screen>swmbp:~ xyz$ <command>rvm 1.9.2</command>
+swmbp:~ xyz$ <command>ruby -v</command>
+ruby 1.9.2p0 (2010-08-18 revision 29036) [x86_64-darwin10.4.0]
+swmbp:~ xyz$</screen></para>
 
-    <para>Dummerweise müssten Sie jetzt in jeder neuen Shell <command>rvm
-    1.9.1</command> eingeben. Sie können für diesen User aber auch die
-    Ruby-Version 1.9.1 als Default einstellen:<screen>MacBook:~ sw$ <command>rvm --default 1.9.1</command>
-MacBook:~ sw$</screen></para>
+    <para>Um das nicht bei jedem Einloggen neu eingeben zu müssen, können Sie
+    Ruby 1.9.2 auch als Default einstellen:</para>
 
-    <para>Als nächstes installieren wir jetzt die aktuelle Version der
-    Paketmanagers gem:<screen>MacBook:~ sw$ <command>gem update --system</command>
+    <para><screen>swmbp:~ xyz$ <command>rvm --default 1.9.2</command>
+swmbp:~ xyz$</screen></para>
+
+    <para>Jetzt haben wir auf unserem Mac OS X 10.6 System mit rvm ein
+    aktuelles Ruby 1.9.2 installiert und können mit dem Programm rvm zwischen
+    den beiden Versionen hin und her schalten. Für den Rest des Buches gehe
+    ich immer von einer 1.9.2 Version aus.</para>
+
+    <note>
+      <para>Mit <command>rvm system</command> können Sie auch jederzeit wieder
+      auf die System-Ruby Version 1.8.x zurückgehen oder zwischen beiden
+      Versionen wechseln. Geben Sie einfach <command>rvm</command> ein, um
+      eine entsprechende Hilfe-Seite angezeigt zu bekommen.</para>
+    </note>
+  </section>
+
+  <section xml:id="rails3-gem-install-macosx">
+    <title>Rails 3.0 installieren</title>
+
+    <para>Zu erst überprüfen wir, ob ein Ruby in der Version 1.9.2 aufgerufen
+    wird. Falls dies nicht der Fall sein sollte, lesen Sie sich bitte <xref
+    linkend="ruby-1.9.2-mit-rvm-macosx" /> durch.<screen>swmbp:~ xyz$ <command>ruby -v</command>
+ruby 1.9.2p0 (2010-08-18 revision 29036) [x86_64-darwin10.4.0]
+swmbp:~ xyz$</screen></para>
+
+    <para>Als nächstes stellen wir sicher, das der Paketmanagers gem aktuell
+    ist:<screen>swmbp:~ xyz$ <command>gem update --system</command>
 Updating RubyGems
-Updating rubygems-update
-Successfully installed rubygems-update-1.3.6
+Nothing to update
+swmbp:~ xyz$ <command>gem update</command>
+Updating installed gems
+Updating bundler
+Successfully installed bundler-1.0.0
+Gems updated: bundler
+Installing ri documentation for bundler-1.0.0...
+Installing RDoc documentation for bundler-1.0.0...
+swmbp:~ xyz$</screen></para>
 
-[...]
+    <para>Der Rest ist einfach:<screen>swmbp:~ xyz$ <command>gem install rails --version 3.0.0</command>
+Successfully installed railties-3.0.0
+Successfully installed rails-3.0.0
+2 gems installed
+Installing ri documentation for railties-3.0.0...
+Installing ri documentation for rails-3.0.0...
+Installing RDoc documentation for railties-3.0.0...
+Installing RDoc documentation for rails-3.0.0...
+swmbp:~ xyz$</screen></para>
 
-* Bulk index update is no longer supported.
-* Gem::manage_gems was removed in 1.3.3.
-* Time::today was removed in 1.3.3.
-
-
-------------------------------------------------------------------------------
-
-RubyGems installed the following executables:
- /Users/sw/.rvm/rubies/ruby-head/bin/gem
-
-MacBook:~ sw$</screen></para>
-
-    <para>Dann müssen Sie nur noch Rails 3.0 installieren.<important>
-        <para>Solange Rails 3.0 nur als Beta-Version zur Verfügung steht,
-        müssen Sie diese Version hier mit "--pre" installieren.</para>
-      </important><screen>MacBook:~ sw$ <command>gem install rails --pre</command>
-gem install rails --pre
-Successfully installed i18n-0.3.7
-Successfully installed tzinfo-0.3.20
-Successfully installed builder-2.1.2
-Successfully installed memcache-client-1.8.3
-Successfully installed activesupport-3.0.0.beta3
-Successfully installed activemodel-3.0.0.beta3
-Successfully installed rack-1.1.0
-Successfully installed rack-test-0.5.3
-
-[...]
-
-Installing RDoc documentation for text-format-1.0.0...
-Installing RDoc documentation for actionmailer-3.0.0.beta3...
-Installing RDoc documentation for thor-0.13.6...
-Installing RDoc documentation for railties-3.0.0.beta3...
-Installing RDoc documentation for bundler-0.9.25...
-Installing RDoc documentation for rails-3.0.0.beta3...
-MacBook:~ sw$</screen></para>
-
-    <para>Perfekt. Jetzt haben Sie Ruby 1.9.1 und Rails 3.0
-    installiert.<screen>MacBook:~ sw$ <command>ruby -v</command>
-ruby 1.9.1p378 (2010-01-10 revision 26273) [i386-darwin10.3.0]
-MacBook:~ sw$ <command>rails -v</command>
-Rails 3.0.0.beta3
-MacBook:~ sw$</screen></para>
-
-    <para>Mit <command>rvm system</command> können Sie auch jederzeit wieder
-    auf die Ruby Version 1.8 zurückgehen oder zwischen beiden Versionen
-    wechseln. Geben Sie einfach <command>rvm</command> ein, um eine
-    entsprechende Hilfe-Seite angezeigt zu bekommen.</para>
+    <para>Perfekt. Jetzt haben Sie Rails 3.0 installiert. <screen>swmbp:~ xyz$ <command>rails -v</command>
+Rails 3.0.0
+swmbp:~ xyz$</screen></para>
   </section>
 
   <section>
