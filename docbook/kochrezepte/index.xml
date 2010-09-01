@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title>Rails Kochrezepte</title>
+
+  <para>In diesem Kapitel werden typische und irgendwie für den Programmierer
+  ganz alltägliche Probleme als Kochrezept gelöst.</para>
+
+  <section>
+    <title>User Authentifizierung</title>
+
+    <para>Scaffolding ist eine super Sache, um schnell eine minimale Web-GUI
+    zu realisieren. Dummerweise fehlt dann aber eine Authentifizierung der
+    User. Es soll ja nicht jeder Datensätze anlegen oder löschen
+    können.</para>
+
+    <para>Als Beispiel für dieses Kochrezept nehmen wir ein Mini-Blog.
+    Einträge können zwar von jedem gelesen werden, aber schreiben darf man
+    nur, wenn man sich registriert hat. Als Login wird die E-Mail Adresse
+    benutzt.<warning>
+        <para>Dies ist ein Kochrezept, für alle die sich schon ein wenig mit
+        Rails 3 auskennen! Es wird kaum erklärt, sondern einfach zu gezeigt.
+        Ruby on Rails 3 Anfänger sollten erst mal <xref
+        linkend="ruby-grundlagen" /> und <xref
+        linkend="erste_schritte_mit_rails" /> lesen.</para>
+      </warning></para>
+
+    <section>
+      <title>Ein minimales Blog-System</title>
+
+      <para>Erstellen wir mal unsere Rails Applikation:<screen>stefan@swmbp 0 1.9.2-preview3 ~$ <command>rails new blog</command>
+      create  
+      create  README
+      create  Rakefile
+      create  config.ru
+      
+      [...]
+      
+      create  tmp/pids
+      create  vendor/plugins
+      create  vendor/plugins/.gitkeep
+stefan@swmbp 0 1.9.2-preview3 ~$ <command>cd blog</command>
+stefan@swmbp 0 1.9.2-preview3 blog$ <command>bundle install</command>
+Fetching source index from http://rubygems.org/
+Using rake (0.8.7) from bundler gems 
+Using abstract (1.0.0) from bundler gems 
+
+[...]
+
+Using rails (3.0.0.beta4) from bundler gems 
+Using sqlite3-ruby (1.3.1) from bundler gems 
+Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
+stefan@swmbp 0 1.9.2-preview3 blog$</screen></para>
+
+      <para>Als nächstes bauen wir uns mit Scaffold eine Resource
+      <varname>post</varname>:<screen>stefan@swmbp 0 1.9.2-preview3 blog$ <command>rails generate scaffold post title:string content:text</command>
+      invoke  active_record
+      create    db/migrate/20100719102428_create_posts.rb
+      create    app/models/post.rb
+
+      [...]
+
+      create        test/unit/helpers/posts_helper_test.rb
+      invoke  stylesheets
+      create    public/stylesheets/scaffold.css
+stefan@swmbp 0 1.9.2-preview3 blog$</screen></para>
+
+      <para>Datenbank anlegen:<screen>stefan@swmbp 0 1.9.2-preview3 blog$ <command>rake db:migrate</command>
+(in /Users/stefan/blog)
+==  CreatePosts: migrating ====================================================
+-- create_table(:posts)
+   -&gt; 0.0011s
+==  CreatePosts: migrated (0.0012s) ===========================================
+
+stefan@swmbp 0 1.9.2-preview3 blog$</screen></para>
+
+      <para>Und wie immer den Webserver testweise starten:<screen>stefan@swmbp 0 1.9.2-preview3 blog$ <command>rails server</command>
+=&gt; Booting WEBrick
+=&gt; Rails 3.0.0.beta4 application starting in development on http://0.0.0.0:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2010-07-19 12:37:07] INFO  WEBrick 1.3.1
+[2010-07-19 12:37:07] INFO  ruby 1.9.2 (2010-05-31) [x86_64-darwin10.4.0]
+[2010-07-19 12:37:07] INFO  WEBrick::HTTPServer#start: pid=38563 port=3000
+
+</screen></para>
+
+      <para>Jetzt können wir unter der URL <uri
+      xlink:href="http://0.0.0.0:3000/posts">http://0.0.0.0:3000/posts</uri>
+      die Liste aller Einträge (aktuell keine) einsehen. Neue Einträge können
+      wir ohne jegliche Authorisierung unter <uri
+      xlink:href="http://0.0.0.0:3000/posts/new">http://0.0.0.0:3000/posts/new</uri>
+      eingeben.</para>
+    </section>
+
+    <section>
+      <title>Userauthentifizierung mit Authlogic</title>
+
+      <para>Es gibt zig verschiedene Weg, um eine User-Authentifizierung zu
+      realisieren. Ich benutze hier Authlogic.</para>
+
+      <para>In die Datei Gemfile fügen wir die folgende Zeile
+      ein:<programlisting>gem 'authlogic', :git =&gt; 'git://github.com/odorcicd/authlogic.git', :branch =&gt; 'rails3'</programlisting></para>
+
+      <para>Danach ein <command>bundle install</command>:<screen>stefan@swmbp 0 1.9.2-preview3 blog$ <command>bundle install</command>
+Updating git://github.com/odorcicd/authlogic.git
+Fetching source index from http://rubygems.org/
+Updating git://github.com/odorcicd/authlogic.git
+Using rake (0.8.7) from bundler gems 
+
+[...]
+
+Using authlogic (2.1.3) from git://github.com/odorcicd/authlogic.git (at rails3) 
+Using bundler (0.9.26) from bundler gems 
+Using thor (0.13.8) from bundler gems 
+Using railties (3.0.0.beta4) from bundler gems 
+Using rails (3.0.0.beta4) from bundler gems 
+Using sqlite3-ruby (1.3.1) from bundler gems 
+Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
+stefan@swmbp 0 1.9.2-preview3 blog$ </screen></para>
+
+      <para>Die User werden in einem User-Model gespeichert:<screen>stefan@swmbp 0 1.9.2-preview3 blog$ <command>rails generate model user</command>
+      invoke  active_record
+      create    db/migrate/20100719210155_create_users.rb
+      create    app/models/user.rb
+      invoke    test_unit
+      create      test/unit/user_test.rb
+      create      test/fixtures/users.yml
+stefan@swmbp 0 1.9.2-preview3 blog$</screen></para>
+
+      <para>Die entsprechende Users-Migrations-Datei (hier
+      <filename>db/migrate/20100719210155_create_users.rb</filename>) müssen
+      wir jetzt noch mit Leben füllen. Der hier benutze Code stammt im Kern
+      aus der Doku von Authlogic und ist ein sehr guter Start. Zusätzlich
+      legen wir noch ein paar Indexe an, um schneller arbeiten zu können (kann
+      man sich natürlich bei kleinen Userzahlen schenken):<programlisting>class CreateUsers &lt; ActiveRecord::Migration
+  def self.up
+    create_table :users do |t|
+      # Die folgenden Eintraege sind aus der Beispiel-Konfiguration von Authlogic 
+      # und recht selbsterklaerend.
+      t.string    :email,               :null =&gt; false                # optional, you can use login instead, or both
+      t.string    :crypted_password,    :null =&gt; false                # optional, see below
+      t.string    :password_salt,       :null =&gt; false                # optional, but highly recommended
+      t.string    :persistence_token,   :null =&gt; false                # required
+      t.string    :single_access_token, :null =&gt; false                # optional, see Authlogic::Session::Params
+      t.string    :perishable_token,    :null =&gt; false                # optional, see Authlogic::Session::Perishability
+
+      # Magic columns, just like ActiveRecord's created_at and updated_at. 
+      # These are automatically maintained by Authlogic if they are present.
+      t.integer   :login_count,         :null =&gt; false, :default =&gt; 0 # optional, see Authlogic::Session::MagicColumns
+      t.integer   :failed_login_count,  :null =&gt; false, :default =&gt; 0 # optional, see Authlogic::Session::MagicColumns
+      t.datetime  :last_request_at                                    # optional, see Authlogic::Session::MagicColumns
+      t.datetime  :current_login_at                                   # optional, see Authlogic::Session::MagicColumns
+      t.datetime  :last_login_at                                      # optional, see Authlogic::Session::MagicColumns
+      t.string    :current_login_ip                                   # optional, see Authlogic::Session::MagicColumns
+      t.string    :last_login_ip                                      # optional, see Authlogic::Session::MagicColumns
+
+      t.timestamps
+    end
+    
+    # Bei grosser User-Anzahl kann ein Index hilfreich sein.
+    add_index :users, :email, :unique =&gt; true
+    add_index :users, :single_access_token, :unique =&gt; true
+  end
+
+  def self.down
+    drop_table :users
+  end
+end
+</programlisting></para>
+
+      <para>Danach das obligatorische <command>rake
+      db:migrate</command>:<screen>stefan@swmbp 0 1.9.2-preview3 blog$ rake <command>db:migrate</command>
+(in /Users/stefan/blog)
+==  CreatePosts: migrating ====================================================
+-- create_table(:posts)
+   -&gt; 0.0013s
+==  CreatePosts: migrated (0.0014s) ===========================================
+
+==  CreateUsers: migrating ====================================================
+-- create_table(:users)
+   -&gt; 0.0124s
+-- add_index(:users, :email, {:unique=&gt;true})
+   -&gt; 0.0008s
+-- add_index(:users, :single_access_token, {:unique=&gt;true})
+   -&gt; 0.0007s
+==  CreateUsers: migrated (0.0141s) ===========================================
+
+stefan@swmbp 0 1.9.2-preview3 blog$</screen></para>
+
+      <para>Die Datei <filename>app/model/user.rb</filename> benötigt noch
+      folgende Anpassung:<programlisting>class User &lt; ActiveRecord::Base
+  acts_as_authentic do |c|
+    c.require_password_confirmation = false
+  end
+end</programlisting></para>
+
+      <para></para>
+    </section>
+  </section>
+</chapter>
