@@ -715,306 +715,108 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 &lt;/body&gt; 
 &lt;/html&gt;</programlisting></para>
 
-        <para></para>
+        <para>Alles klar? Es gibt zwei mögliche offene Fragen:<qandaset>
+            <qandadiv>
+              <qandaentry>
+                <question>
+                  <para>Ich verstehe gar nichts. Mit dem Ruby-Code komme ich
+                  nicht zurecht. Können Sie das noch mal erklären?</para>
+                </question>
 
-        <para></para>
+                <answer>
+                  <para>Kann es sein, das Sie <xref
+                  linkend="ruby-grundlagen" /> nicht komplett durchgearbeitet
+                  haben? Bitte die Zeit dafür nehmen. Sonst macht hier das
+                  alles keinen Sinn.</para>
+                </answer>
+              </qandaentry>
+
+              <qandaentry>
+                <question>
+                  <para>Ich verstehe den Ruby-Code und die HTML-Ausgabe.
+                  Allerdings verstehe ich nicht, warum drum rum noch HTML-Code
+                  gerendert wurde, den ich gar nicht geschrieben habe. Woher
+                  kommt der und kann ich Ihn beeinflussen?</para>
+                </question>
+
+                <answer>
+                  <para>Sehr gute Frage! Dazu kommen wir sofort (siehe <xref
+                  linkend="erb_layouts" />).</para>
+                </answer>
+              </qandaentry>
+            </qandadiv>
+          </qandaset></para>
+
+        <para>Die Feinheiten von erb werden Sie jetzt Stück für Stück
+        erlernen. Es handelt sich dabei nicht um Zauberei.</para>
       </section>
     </section>
-  </section>
 
-  <section xml:id="die_einfachst_anzunehmende_webseite">
-    <title xml:id="die_einfachst_anzunehmende_webseite.title">Die einfachst
-    anzunehmende Webseite</title>
+    <section xml:id="erb_layouts">
+      <title xml:id="erb_layouts.title">Layouts</title>
 
-    <para>Mit Ruby on Rails werden Webseiten erstellt bzw. ausgeliefert. Also
-    fangen wir als aller erstes mal mit den zwei einfachsten Varianten
-    an.</para>
+      <para>Die erb Datei im Verzeichnis
+      <filename>app/views/example/</filename> bilden nur den Kern der späteren
+      HTML-Seite. Per default wird immer eine automatisch generierte
+      <filename>app/views/layouts/application.html.erb</filename> drum rum
+      gerendert. Schauen wir uns die mal an:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>cat app/views/layouts/application.html.erb</command>
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Testproject&lt;/title&gt;
+  &lt;%= stylesheet_link_tag :all %&gt;
+  &lt;%= javascript_include_tag :defaults %&gt;
+  &lt;%= csrf_meta_tag %&gt;
+&lt;/head&gt;
+&lt;body&gt;
 
-    <section xml:id="einfache_erb_seite">
-      <title xml:id="einfache_erb_seite.title">Eine einfache
-      erb-Webseite</title>
+&lt;%= yield %&gt;
 
-      <para>Kennen Sie PHP? Dann wird Ihnen der Inhalt eine erb-Datei sehr
-      bekannt vorkommen. Es ist eine Mischung aus HTML und Ruby-Code.
-      Allerdings können wir eine solche erb-Webseite nicht einfach in das
-      <filename>public</filename> Verzeichnis legen, da dort abgelegte Seite
-      1:1 ausgeliefert werden und nicht durch einen erb-Parser gehen.
-      Dummerweise müssen wir dafür jetzt direkt mit dem MVC-Modell anrücken.
-      Wir brauchen einen Controler. Den können wir mit <command>rails generate
-      controller</command> anlegen. Schauen wir uns mal die Hilfe dazu
-      an:<screen>stefan@swmbp 0 1.9.2-p0 movie-app$ <command>rails generate controller</command>
-Usage:
-  rails generate controller NAME [action action] [options]
+&lt;/body&gt;
+&lt;/html&gt;
+stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 
-Options:
-  -e, [--template-engine=NAME]  # Template engine to be invoked
-                                # Default: erb
-  -t, [--test-framework=NAME]   # Test framework to be invoked
-                                # Default: test_unit
-      [--helper]                # Indicates when to generate helper
-                                # Default: true
+      <para>Ich löse das Rätsel auf: Interessant ist die Zeile<programlisting>&lt;%= yield %&gt;</programlisting>
+      </para>
 
-Runtime options:
-  -f, [--force]    # Overwrite files that already exist
-  -p, [--pretend]  # Run but do not make any changes
-  -q, [--quiet]    # Supress status output
-  -s, [--skip]     # Skip files that already exist
+      <para>Mit <code>&lt;%= yield %&gt;</code> wird die View-Datei
+      inkludiert. Die drei Zeilen mit den Stylesheets und dem JavaScript
+      lassen wir erst mal so wie sie sind. Darum kümmern wir uns
+      später.</para>
 
-Description:
-    Stubs out a new controller and its views. Pass the controller name, either
-    CamelCased or under_scored, and a list of views as arguments.
+      <para>Die <filename>app/views/layouts/application.html.erb</filename>
+      bietet Ihnen die Möglichkeit das Grundlayout über die gesamte
+      Rails-Applikation fest zu legen. Sie können aber auch im Verzeichnis
+      <filename>app/views/layouts/</filename> noch andere Layouts anlegen und
+      diese je nach Situation anwenden. Ich bin hin und hergerissen dieses
+      Thema jetzt zu vertiefen, aber lassen wir es jetzt erst mal. Wichtig ist
+      jetzt, das Sie die Grundidee verstehen.</para>
+    </section>
 
-    To create a controller within a module, specify the controller name as a
-    path like 'parent_module/controller_name'.
+    <section xml:id="erb_mit_programmierlogik">
+      <title>Instance-Variablen vom Controller zum View übergeben</title>
 
-    This generates a controller class in app/controllers and invokes helper,
-    template engine and test framework generators.
+      <para>Einer der todsünden im MVC Model ist ja bekanntlich zu viel
+      Programmierlogic im View unterzubringen. Quasi so wie man früher oft in
+      PHP programmiert hat. Bei MVC ist eins der Ziele, das quasi jeder
+      beliebige HTML-Designer einen View erstellen kann ohne sich über die
+      Programmierung gedanken machen zu müssen. Ja, ja, ... wenn das mal immer
+      so einfach wäre. Trotzdem gehen wir das mal gedanklich weiter: Wenn ich
+      im Controller einen Wert habe, den ich im View anzeigen will, so
+      benötige ich dafür einen Mechanismus. Dieser heißt Instance-Variable.
+      Wer sich nicht mehr 100% sicher welche Variable welchen Scope hat, der
+      sollte ganz fix noch mal einen Blick in <xref
+      linkend="scope_von_variablen" /> werfen (geht schnell und lohnt
+      sich).</para>
 
-Example:
-    `rails generate controller CreditCard open debit credit close`
+      <para>Wir brechen jetzt einfach mal ein Beispiel vom Zaun und fügen im
+      Controller eine Instance-Variable für die aktuelle Uhrzeit ein und fügen
+      diese dann im View ein. Wir nehmen also Programmierintelligenz aus dem
+      View in den Controller.</para>
 
-    Credit card controller with URLs like /credit_card/debit.
-        Controller:      app/controllers/credit_card_controller.rb
-        Functional Test: test/functional/credit_card_controller_test.rb
-        Views:           app/views/credit_card/debit.html.erb [...]
-        Helper:          app/helpers/credit_card_helper.rb
-stefan@swmbp 0 1.9.2-p0 movie-app$</screen></para>
-
-      <para>A-ha! Unten ist freundlicherweise direkt ein Beispiel angegeben
-      "<code>rails generate controller CreditCard open debit credit
-      close</code>". Passt aber nicht direkt für unseren Fall.</para>
-
-      <para>Ich bin mutig und schlage vor, das wir einfach mal was
-      ausprobieren:<screen>stefan@swmbp 0 1.9.2-p0 movie-app$ <command>rails generate controller example test</command>
-      create  app/controllers/example_controller.rb
-       route  get "example/test"
-      invoke  erb
-      create    app/views/example
-      create    app/views/example/test.html.erb
-      invoke  test_unit
-      create    test/functional/example_controller_test.rb
-      invoke  helper
-      create    app/helpers/example_helper.rb
-      invoke    test_unit
-      create      test/unit/helpers/example_helper_test.rb
-stefan@swmbp 0 1.9.2-p0 movie-app$</screen></para>
-
-      <para>Puhhh... da wird ja direkt ne ganze Menge erstellt. Unter anderem
-      eine Datei <filename>app/views/example/test.html.erb</filename>. Schauen
-      wir uns die mal an:<screen>stefan@swmbp 0 1.9.2-p0 movie-app$ <command>cat app/views/example/test.html.erb</command> 
-&lt;h1&gt;Example#test&lt;/h1&gt;
-&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt;
-stefan@swmbp 0 1.9.2-p0 movie-app$ </screen></para>
-
-      <para>Ist also auch HTML. Sogar noch einfacher, als unsere
-      <filename>hello-world.html</filename> Seite von oben (hier fehlen ja
-      einige Tags). Zum Testen starten wir den Webserver<screen>stefan@swmbp 0 1.9.2-p0 movie-app$ <command>rails server</command>
-=&gt; Booting WEBrick
-=&gt; Rails 3.0.0 application starting in development on http://0.0.0.0:3000
-=&gt; Call with -d to detach
-=&gt; Ctrl-C to shutdown server
-[2010-08-31 19:49:00] INFO  WEBrick 1.3.1
-[2010-08-31 19:49:00] INFO  ruby 1.9.2 (2010-08-18) [x86_64-darwin10.4.0]
-[2010-08-31 19:49:00] INFO  WEBrick::HTTPServer#start: pid=36254 port=3000</screen></para>
-
-      <para>und schauen uns die Webseite mit der URI <uri
-      xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
-      mal im Browser an:<screenshot>
-          <info>
-            <title>test.html.erb Screenshot</title>
-          </info>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screenshots/example-test-erb.jpg"></imagedata>
-            </imageobject>
-          </mediaobject>
-        </screenshot></para>
-
-      <para>Im Log <filename>log/development.log</filename> finden wir den
-      folgenden Eintrag:<programlisting>Started GET "/example/test" for 127.0.0.1 at 2010-08-31 19:49:44 +0200
-  Processing by ExampleController#test as HTML
-Rendered example/test.html.erb within layouts/application (1.7ms)
-Completed 200 OK in 7ms (Views: 6.1ms | ActiveRecord: 0.0ms)
-</programlisting></para>
-
-      <para>Das ist fast schon verständlich geschrieben. Es kam also vom
-      localhost (127.0.0.1) ein HTTP GET-Request für die URI "/example/test"
-      rein. Die wurde dann anscheinend vom Controller
-      <code>ExampleController</code> mit der Methode
-      <methodname>test</methodname> als HTML gerendert. Das ganze hat ungefähr
-      7ms gedauert.</para>
-
-      <section xml:id="erb_mit_programmierlogik">
-        <title>erb mit Programmierlogik</title>
-
-        <para>Rein statische HTML-Seiten sind ja nicht der Grund, um sich mit
-        Rails zu beschäftigen. Wie können wir also Ruby-Code in der erb-Datei
-        <filename>app/views/example/test.html.erb</filename> verwenden? Ich
-        zeige es mal an einem Beispiel und verändere die
-        <filename>app/views/example/test.html.erb</filename> wie
-        folgt:<programlisting>&lt;h1&gt;Example#test&lt;/h1&gt;
-&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt;
-
-&lt;p&gt;
-Die aktuelle Uhrzeit ist 
-&lt;%= Time.now %&gt;
-&lt;/p&gt;
-</programlisting></para>
-
-        <para>Die daraus resultierende Webseite sieht so aus:<screenshot>
-            <info>
-              <title>erb Seite mit Time.now Ausgabe</title>
-            </info>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="screenshots/time_now_example.jpg"></imagedata>
-              </imageobject>
-            </mediaobject>
-          </screenshot></para>
-
-        <para>Im Log erscheint:<screen>Started GET "/example/test" for 127.0.0.1 at 2010-04-21 23:03:47
-  Processing by ExampleController#test as HTML
-Rendered example/test.html.erb (0.6ms)
-Completed 200 OK in 5ms (Views: 4.1ms | ActiveRecord: 0.0ms)
-</screen></para>
-
-        <para>Daraus können wir jetzt folgende Informationen
-        ableiten:<itemizedlist>
-            <listitem>
-              <para>Der Autor (ich) hat um 23:03 noch an dem Buch geschrieben.
-              Selber schuld! ;-)</para>
-            </listitem>
-
-            <listitem>
-              <para>Das erstellen der Webseite hat 5ms und damit etwas länger
-              als bei der reinen HTML-Variante gedauert.</para>
-            </listitem>
-
-            <listitem>
-              <para>Innerhalb einer erb-Datei wird Ruby-Code anscheinend mit
-              <code>&lt;%=</code> und <code>%&gt;</code> eingeklammert.</para>
-            </listitem>
-
-            <listitem>
-              <para>Rails hat automatisch aus <code>Time.now</code> ein
-              <code>Time.now.to_s</code> gemacht. Denn <code>Time.now</code>
-              gehört zur Klasse Time und kann so gar nicht angezeigt werden.
-              Auf einer Webseite kann nur Text also ein String angezeigt
-              werden. Wir merken uns: Immer wenn Rails mit der Klasse eines
-              Ergebnisses nichts anfangen kann, dann fügt es automatisch die
-              Methode <methodname>to_s</methodname> an. Deshalb sollte man bei
-              selbst erstellten Klassen diese Methode immer mit
-              anbieten.</para>
-            </listitem>
-          </itemizedlist></para>
-
-        <para>Das mit dem Ruby-Code schauen wir uns mal genauer an. In einer
-        <filename>html.erb</filename> Datei gibt zusätzlich zu den
-        HTML-Elementen zwei Arten von Ruby-Code Elementen:<itemizedlist>
-            <listitem>
-              <para><code>&lt;% ... %&gt;</code></para>
-
-              <para>Führt den enthaltenen Ruby-Code aus, aber gibt nichts
-              aus.</para>
-            </listitem>
-
-            <listitem>
-              <para><code>&lt;%= ... %&gt;</code></para>
-
-              <para>Führt den enthaltenen Ruby-Code aus und gibt das Ergebnis
-              als Text aus. Dabei werden seit Ruby 3.0 automatisch
-              problematische Zeichen escaped (das musste man früher mit
-              <code>h</code> manuel machen). Falls Sie einmal nicht escapeten
-              Text ausgeben möchten, so müssen Sie das mit
-              <code>raw(string)</code> realisieren.</para>
-            </listitem>
-          </itemizedlist></para>
-
-        <para>Ich erkläre das am besten mal mit einem Beispiel. Bitte
-        verändern Sie die <filename>app/views/example/test.html.erb</filename>
-        Datei wie folgt:<programlisting>&lt;h1&gt;Example#test&lt;/h1&gt;
-&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt;
-
-&lt;p&gt;
-Die aktuelle Uhrzeit ist 
-&lt;%= Time.now %&gt;
-&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;% (1..5).each do |i| %&gt;
-&lt;li&gt;&lt;%= i %&gt;&lt;/li&gt;
-&lt;% end %&gt;
-&lt;/ul&gt;
-</programlisting></para>
-
-        <para>Danach schauen wir uns das Ergebnis im Browser an:<screenshot>
-            <info>
-              <title>Beispiel erb</title>
-            </info>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="screenshots/test_erb_html_example_2.jpg"></imagedata>
-              </imageobject>
-            </mediaobject>
-          </screenshot></para>
-
-        <para>Schauen wir uns den generierten HTML-Code an:<programlisting>&lt;h1&gt;Example#test&lt;/h1&gt; 
-&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt; 
- 
-&lt;p&gt; 
-Die aktuelle Uhrzeit ist 
-2010-04-22 14:08:47 +0200
-&lt;/p&gt; 
- 
-&lt;ul&gt; 
-&lt;li&gt;1&lt;/li&gt; 
-&lt;li&gt;2&lt;/li&gt; 
-&lt;li&gt;3&lt;/li&gt; 
-&lt;li&gt;4&lt;/li&gt; 
-&lt;li&gt;5&lt;/li&gt; 
-&lt;/ul&gt; </programlisting></para>
-
-        <para>Folgende Sachen fallen auf:<itemizedlist>
-            <listitem>
-              <para>Zwischen dem ersten und zweiten Screenshot ist einiges an
-              Zeit vergangen. ;-)</para>
-            </listitem>
-
-            <listitem>
-              <para>Der HTML-Code ist so nicht valide. Es fehlen noch ein paar
-              "Kleinigkeiten" wie ein <code>&lt;HTML&gt;</code> oder ein
-              <code>&lt;BODY&gt;</code> Tag.</para>
-            </listitem>
-
-            <listitem>
-              <para>Bei der Ausgabe der Variable <varname>i</varname> fügt
-              Rails wieder automatisch die <methodname>.to_s</methodname>
-              Methode hinzu. Denn <varname>i</varname> gehört zur Klasse
-              Integer.</para>
-            </listitem>
-          </itemizedlist></para>
-
-        <para>Ich glaube das Grundprinzip von erb ist jetzt klar. Der Rest
-        kommt mit der Übung. Einen Punkt möchte ich aber noch kurz anreissen:
-        Das Zusammenspiel vom Controller und vom View. Die erb-Datei ist im
-        View und soll damit so wenig wie möglich Eigenintelligenz besitzen. In
-        der idealen Welt kann eine erb-Datei jeder HTML-Designer ohne
-        Programmierkenntnisse verändern und alle Programmierer arbeiten nur im
-        Controller oder im Model (wozu wir später kommen). Leider gibt es
-        dabei immer eine grosse Grauzone, aber ich werde im Buch versuchen die
-        Vorteile einer sauberen Abtrennung aufzuzeigen.</para>
-
-        <para>Wir brechen jetzt einfach mal ein Beispiel vom Zaun und fügen im
-        Controller eine Instance-Variable für die aktuelle Uhrzeit ein und
-        fügen diese dann im View ein. Wir nehmen also Programmierintelligenz
-        aus dem View in den Controller.</para>
-
-        <para>Die Controller Datei
-        <filename>app/controllers/example_controller.rb</filename> sieht dann
-        so aus:<programlisting>class ExampleController &lt; ApplicationController
+      <para>Die Controller Datei
+      <filename>app/controllers/example_controller.rb</filename> sieht dann so
+      aus:<programlisting>class ExampleController &lt; ApplicationController
   def test
     <emphasis>@current_time</emphasis> = Time.now
   end
@@ -1022,123 +824,147 @@ Die aktuelle Uhrzeit ist
 end
 </programlisting></para>
 
-        <para>In der View Datei
-        <filename>app/views/example/test.html.erb</filename> können wir dann
-        auf diese Instance-Variable zurückgreifen:<programlisting>&lt;h1&gt;Example#test&lt;/h1&gt;
-&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt;
-
-&lt;p&gt;
+      <para>In der View Datei
+      <filename>app/views/example/test.html.erb</filename> können wir dann auf
+      diese Instance-Variable zurückgreifen:<programlisting>&lt;p&gt;
 Die aktuelle Uhrzeit ist 
 &lt;%= <emphasis>@current_time</emphasis> %&gt;
 &lt;/p&gt;
-
-&lt;ul&gt;
-&lt;% (1..5).each do |i| %&gt;
-&lt;li&gt;&lt;%= i %&gt;&lt;/li&gt;
-&lt;% end %&gt;
-&lt;/ul&gt;
 </programlisting></para>
 
-        <para>Die angezeigte HTML-Seite verändert sich nicht. OK, die Uhrzeit
-        ist natürlich immer die aktuelle. Aber wir haben eine Trennung von
-        Programmierlogik und Darstellungslogik mit dem Controller und dem
-        View.</para>
+      <para>Wir haben jetzt eine klare Trennung von Programmierlogik und
+      Darstellungslogik mit dem Controller und dem View. So können wir im
+      Controller die Uhrzeit je nach Zeitzone des Users automatisch anpassen,
+      ohne das sich der Designer der Seite darum kümmern muss.</para>
 
-        <para>Mir ist klar, das jetzt keiner aufspringen und schreien wird
-        "Danke für die Erleuchtung! Ich werde nur noch sauber nach MVC
-        programmieren". Das obige Beispiel ist der erste kleine Schritt in die
-        Richtung und zeigt wie wir einfach mit Instance Variablen (das sind
-        die mit dem @-Zeichen davor) Werte aus dem Controller in den View
-        bringen können.</para>
-      </section>
+      <para>Mir ist klar, das jetzt keiner aufspringen und schreien wird
+      "Danke für die Erleuchtung! Ich werde nur noch sauber nach MVC
+      programmieren". Das obige Beispiel ist der erste kleine Schritt in die
+      Richtung und zeigt wie wir einfach mit Instance-Variablen (das sind die
+      mit dem @-Zeichen davor) Werte aus dem Controller in den View bringen
+      können.</para>
     </section>
 
     <section xml:id="partials">
       <title xml:id="partials.title">Partials</title>
 
-      <para>Mit Partials lassen sich innerhalb von erb-Seiten andere Views die
-      mit einem Unterstrich (Underscore = _) anfangen einbetten. Nehmen wir
-      einmal an, das wir aus logischen (hier rein hypotetisch) Gründen den
-      folgenden Teil aus unserer
-      <filename>app/views/example/test.html.erb</filename> auslagern
-      wollen:<programlisting>&lt;ul&gt;
-&lt;% (1..5).each do |i| %&gt;
-&lt;li&gt;&lt;%= i %&gt;&lt;/li&gt;
-&lt;% end %&gt;
-&lt;/ul&gt;
-</programlisting></para>
+      <para>Selbst schon bei kleinen Webprojekten gibt es oft wiederkehrende
+      Elemente. Das kann zum Beispiel ein Footer der Seite mit den
+      Kontaktdaten sein oder ein Menü. Rails gibt uns die Möglichkeit diesen
+      HTML-Code in sogenannte Partials abzuspeichern und dann innerhalb eines
+      Views einzubinden. Ein Partial wird ebenfalls im
+      <filename>app/views/example/</filename> Verzeichnis abgespeichert.
+      Allerdings muss der Dateinamen mit einem Unterstrich (Underscore = _)
+      anfangen.</para>
 
-      <para>Dann können wir eine Datei
-      <filename>app/views/example/_simple_include_example.html.erb</filename>
-      mit genau diesem Inhalt erstellen und die
-      <filename>app/views/example/test.html.erb</filename> wie folgt
-      verändern:<programlisting>&lt;h1&gt;Example#test&lt;/h1&gt;
-&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt;
-
+      <para>Als Beispiel fügen wir unser Seite jetzt einen Mini-Footer hinzu.
+      Dafür schreiben wir in die neue Datei
+      <filename>app/views/example/_footer.html.erb</filename> den folgenden
+      Inhalt:<programlisting>&lt;hr /&gt;
 &lt;p&gt;
-Die aktuelle Uhrzeit ist 
-&lt;%= @current_time %&gt;
+Copyright 2009 - &lt;%= Date.today.year %&gt; beim Osterhasen
+&lt;/p&gt;</programlisting></para>
+
+      <para>Die Datei <filename>app/views/example/test.html.erb</filename>
+      verändern wir wie folgt und fügen mit dem Befehl <code>render</code> das
+      Partial ein:<programlisting>&lt;p&gt;Schleife von 0 bis 5:
+&lt;% (0..5).each do |i| %&gt;
+&lt;%= "#{i}, " %&gt;
+&lt;% end %&gt;
 &lt;/p&gt;
 
-<emphasis>&lt;%= render "simple_include_example" %&gt;</emphasis></programlisting></para>
+<emphasis>&lt;%= render "footer" %&gt;</emphasis></programlisting></para>
 
       <para>Es sind also jetzt folgende Dateien im Verzeichnis
-      <filename>app/views/example</filename>:<screen>stefan@swmbp 0 1.9.2-p0 movie-app$ <command>ls -l app/views/example/</command>
+      <filename>app/views/example</filename>:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>ls -l app/views/example</command>
 total 16
--rw-r--r--  1 stefan  staff   64 31 Aug 20:12 _simple_include_example.html.erb
--rw-r--r--  1 stefan  staff  164 31 Aug 20:21 test.html.erb
-stefan@swmbp 0 1.9.2-p0 movie-app$ </screen></para>
+-rw-r--r--  1 stefan  staff   63  1 Sep 20:12 _footer.html.erb
+-rw-r--r--  1 stefan  staff  105  1 Sep 20:14 test.html.erb
+stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
 
-      <para>Die gerenderte Webseite <uri
-      xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
-      sieht genauso aus wie vorher, aber wir haben die Teile logisch von
-      einander getrennt. Partials bieten damit die Möglichkeit gleiche Inhalte
-      in verschiedenen Views zu benutzen und nur einmal zu erstellen. Da DRY
-      (Don't Repeat Yourself) in der Rails Community sehr ausgeprägt gelebt
-      wird, ist dies eine gute Methode, um DRY innerhalb von Views zu
-      realisieren. <important>
-          <para>Der Name eines Partials wird immer ohne den Unterstrich am
-          Anfang und ohne die erb und HTML Endung angegeben. Aber die
-          wirkliche Datei muss im Dateinamen mit einem Unterstrich anfangen
-          und auch am Ende mir der erb und HTML Endung aufhören.</para>
+      <para>Die neue Webseite sieht jetzt so aus:<screenshot>
+          <info>
+            <title>Footer mit Partials</title>
+          </info>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/partials_footer.jpg"></imagedata>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
+
+      <para><important>
+          <para>Der Name eines Partials im Code wird immer
+          <emphasis>ohne</emphasis> den Unterstrich am Anfang und
+          <emphasis>ohne</emphasis> die erb und HTML Endung angegeben. Aber
+          die wirkliche Datei muss im Dateinamen mit einem Unterstrich
+          anfangen und auch am Ende mir der erb und HTML Endung
+          aufhören.</para>
         </important></para>
 
       <para>Partials können auch aus anderen Bereichen des Unterverzeichnisses
       <filename>app/views</filename> eingebunden werden. So können Sie für
       wiederkehrende und übergreifende Inhalte beispielsweise ein Verzeichnis
       <filename>app/views/shared</filename> anlegen und dort eine Datei
-      <filename>_one_more_example.html.erb</filename> anlegen. Das Einbetten
-      im erb Code würde dann mit folgender Zeile erfolgen:<programlisting>&lt;%= render "shared/one_more_example" %&gt;</programlisting></para>
+      <filename>_footer.html.erb</filename> anlegen. Das Einbetten im erb Code
+      würde dann mit folgender Zeile erfolgen:<programlisting>&lt;%= render "shared/footer" %&gt;</programlisting></para>
+
+      <note>
+        <para>Das Footer-Problem würde man in einem richtigen Projekt
+        wahrscheinlich nicht mit einem Partial lösen, das überall aufgerufen
+        wird, sondern eher zentral in der
+        <filename>app/views/layouts/application.html.erb</filename>. </para>
+      </note>
 
       <section xml:id="partials_locale_variables">
-        <title xml:id="partials_locale_variables.title">Lokale Variablen an
-        ein Partial übergeben</title>
+        <title xml:id="partials_locale_variables.title">Variablen an ein
+        Partial übergeben</title>
 
         <para>Partials sind im DRY (<emphasis>D</emphasis>on't
         <emphasis>R</emphasis>epeat <emphasis>Y</emphasis>ourself) Gedanken
         sehr gut. Aber was sie erst richtig praktisch macht, ist die
-        Möglichkeit lokale Variablen zu übergeben. Diese können dann im
-        Partial selbst benutzt werden. Beispielhaft zerpflücke ich unsere arme
-        Beispielseite noch mehr und erstelle eine
-        <filename>app/views/example/_current_time.html.erb</filename> mit
-        folgendem Inhalt:<programlisting>&lt;p&gt;
-Die aktuelle Uhrzeit ist 
-&lt;%= current_time %&gt;
-&lt;/p&gt;</programlisting></para>
+        Möglichkeit Variablen zu übergeben. Erweitern wir einmal die
+        <filename>app/views/example/_footer.html.erb</filename> Datei wie
+        folgt:<programlisting>&lt;hr /&gt;
+&lt;p&gt;
+Copyright 2009 - &lt;%= Date.today.year %&gt; beim Osterhasen
+&lt;/p&gt;
+&lt;% if (defined? additional_info) != nil %&gt;
+&lt;p&gt;
+&lt;%= additional_info %&gt;
+&lt;/p&gt;
+&lt;% end %&gt;
+</programlisting></para>
 
-        <para>Danach binde ich das Partial in der
-        <filename>app/views/example/test.html.erb</filename> wie folgt
-        ein:<programlisting>&lt;h1&gt;Example#test&lt;/h1&gt;
-&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt;
+        <para>Wenn wir jetzt die URI <uri
+        xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
+        aufrufen, so sehen wir die gleiche Seite wie vorhin. Das liegt daran,
+        weil <varname>additional_info</varname> nicht als Local Variable
+        übergeben wurde. Ändern wir dazu die
+        <filename>app/views/example/test.html.erb</filename> wie
+        folgt:<programlisting>&lt;p&gt;Schleife von 0 bis 5:
+&lt;% (0..5).each do |i| %&gt;
+&lt;%= "#{i}, " %&gt;
+&lt;% end %&gt;
+&lt;/p&gt;
 
-<emphasis>&lt;%= render :partial =&gt; "current_time", :locals =&gt; { :current_time =&gt; @current_time } %&gt;</emphasis>
+&lt;%= render :partial =&gt; 'footer', :locals =&gt; {:additional_info =&gt; "abcdef"} %&gt;
+</programlisting></para>
 
-&lt;%= render "simple_include_example" %&gt;</programlisting></para>
+        <para>Der Aufruf von <uri
+        xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
+        erzeugt erwartungsgemäß folgende Seite:<screenshot>
+            <info>
+              <title>Partial mit Locals</title>
+            </info>
 
-        <para>Wichtig dabei ist der Unterschied zwischen der Instance-Variable
-        <varname>@current_time</varname> und der lokalen Variable
-        <varname>current_time</varname>. Da hat man sich schnell mal
-        verhaspelt.</para>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/footer_partial_mit_locals.jpg"></imagedata>
+              </imageobject>
+            </mediaobject>
+          </screenshot></para>
 
         <para>Sie sehen ebenfalls, das ich beim Einbinden eines einfaches
         Partials eine kürzere Schreibweise benutzen kann, als bei der Version
@@ -1149,90 +975,12 @@ Die aktuelle Uhrzeit ist
         <title xml:id="weitere_doku_zu_partials.title">Weitere Dokumentation
         zum Thema Partials</title>
 
-        <para>Unter <uri
+        <para>Wir haben hier wirklich nur die Oberfläche angekratzt. Partials
+        sind sehr mächtige Werkzeuge. Unter <uri
         xlink:href="http://guides.rubyonrails.org/layouts_and_rendering.html#using-partials">http://guides.rubyonrails.org/layouts_and_rendering.html#using-partials</uri>
         finden Sie die Ruby on Rails Doku zum Thema Partials.</para>
       </section>
     </section>
-  </section>
-
-  <section xml:id="basics_generisches_html_framework">
-    <title xml:id="basics_generisches_html_framework.title">Generisches
-    HTML-Framework (Layout)</title>
-
-    <para>Bei allen bisherigen mit erb gerenderten HTML-Seiten fehlten
-    wichtige HTML-Elemente, die die Seite syntakisch erst korrekt machen.
-    Heute Webbrowser stellen die Seiten trotzdem dar, aber auch nur deshalb
-    weil sie so fehlertollerant programmiert wurden. Bis jetzt wurde von erb
-    immer nur der Inhalts-Kern der Seite gerendert und an den Browser
-    ausgeliefert. Hier der Code der <uri
-    xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
-    Seite:<programlisting>&lt;h1&gt;Example#test&lt;/h1&gt; 
-&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt; 
- 
-&lt;p&gt; 
-Die aktuelle Uhrzeit ist 
-2010-04-22 14:08:47 +0200 
-&lt;/p&gt; 
- 
-&lt;ul&gt; 
-&lt;li&gt;1&lt;/li&gt; 
-&lt;li&gt;2&lt;/li&gt; 
-&lt;li&gt;3&lt;/li&gt; 
-&lt;li&gt;4&lt;/li&gt; 
-&lt;li&gt;5&lt;/li&gt; 
-&lt;/ul&gt;</programlisting></para>
-
-    <para>Für das Gerüst drum rum müssen wir die Datei
-    <filename>app/views/layouts/application.html.erb</filename> mit einem
-    Editor erstellen und beispielhaft wie folgt befüllen:<programlisting>&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-  &lt;title&gt;Unsere Beispielapplikation&lt;/title&gt;
-&lt;/head&gt;
-&lt;body&gt;
-
-&lt;%= yield %&gt;
-
-&lt;/body&gt;
-&lt;/html&gt;
-</programlisting></para>
-
-    <para>Wenn wir danach die <uri
-    xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
-    Seite noch einmal aufrufen, bekommen wir folgenden HTML-Code
-    ausgeliefert:<programlisting>&lt;!DOCTYPE html&gt; 
-&lt;html&gt; 
-&lt;head&gt; 
-  &lt;title&gt;Unsere Beispielapplikation&lt;/title&gt; 
-&lt;/head&gt; 
-&lt;body&gt; 
- 
-&lt;h1&gt;Example#test&lt;/h1&gt; 
-&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt; 
- 
-&lt;p&gt; 
-Die aktuelle Uhrzeit ist 
-2010-04-22 14:08:47 +0200 
-&lt;/p&gt; 
- 
-&lt;ul&gt; 
-&lt;li&gt;1&lt;/li&gt; 
-&lt;li&gt;2&lt;/li&gt; 
-&lt;li&gt;3&lt;/li&gt; 
-&lt;li&gt;4&lt;/li&gt; 
-&lt;li&gt;5&lt;/li&gt; 
-&lt;/ul&gt; 
- 
-&lt;/body&gt; 
-&lt;/html&gt; </programlisting></para>
-
-    <para>Das sieht doch schon direkt viel besser aus. Mit dem Befehl
-    <code>yield</code> bzw. mit der erb-Zeite <code>&lt;%= yield %&gt;</code>
-    wird der Kern der Seite in das Aussengerüst eingebettet. Ich überlasse es
-    Ihrer Fantasie und Ihren HTML-Künsten mit der Möglichkeit zu zaubern.
-    Natürlich müssen Sie diese Konstrukt nicht benutzen und können jede Seite
-    im View direkt vollständig programmieren.</para>
   </section>
 
   <section xml:id="redirects">
