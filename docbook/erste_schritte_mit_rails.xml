@@ -1381,49 +1381,60 @@ redirect_to :action =&gt; :pong</programlisting></para>
     Rails-Umgebung abgebildet wird. So kann man leicht mal eine Methode
     ausprobieren ohne dafür direkt ein eigenes Programm zu schreiben.</para>
 
+    <para>Erzeugen wir kurz ein Rails Projekt mit einem Controller um mit der
+    Console zu arbeiten:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new pingpong</command>
+      create  
+      create  README
+      create  Rakefile
+      [...]
+      create  vendor/plugins
+      create  vendor/plugins/.gitkeep
+stefan@swmbp 0 1.9.2-p0 ~$ <command>cd pingpong</command>
+stefan@swmbp 0 1.9.2-p0 pingpong$ <command>bundle install</command>
+Fetching source index for http://rubygems.org/
+Using rake (0.8.7) 
+[...]
+Your bundle was installed to `/Users/stefan/.rvm/gems/ruby-1.9.2-p0`
+stefan@swmbp 0 1.9.2-p0 pingpong$ <command>rails generate controller Game ping pong</command>
+      create  app/controllers/game_controller.rb
+       route  get "game/pong"
+      [...]
+      invoke    test_unit
+      create      test/unit/helpers/game_helper_test.rb
+stefan@swmbp 0 1.9.2-p0 pingpong$</screen></para>
+
     <para>Die Console wird mit <command>rails console</command>
-    gestartet:<screen>MacBook:movie-app sw$ <command>rails console</command>
-Loading development environment (Rails 3.0.0.beta4)
-ruby-1.9.1-p378 &gt;</screen></para>
+    gestartet:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; </screen></para>
 
-    <para>Zum Beenden der Console muss man <command>exit</command>
-    eingeben:<screen>ruby-1.9.1-p378 &gt; <command>exit</command>
-MacBook:movie-app sw$ </screen></para>
+    <para>Und mit <command>exit</command> kommt man wieder raus:<screen>ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
 
-    <para>ActiveRecord ist ein Mechanismus, um innerhalb von Rails mit der
-    Datenbank zu arbeiten. Innerhalb dieses Kapitels gehe ich nur auf die
-    absoluten Basics ein, denn es geht ja jetzt nicht darum in ActiveRecord
-    einen Meistertitel zu erringen, sondern darum Ruby on Rails zu verstehen.
-    In einem späteren Kapitel werde ich mich noch einmal intensiv mit
-    ActiveRecords beschäftigen.</para>
+    <para>In der Console hat man Zugriff auf alle Variablen, die auch später
+    in der richtigen Applikation hat:<screen>stefan@swmbp 0 1.9.2-p0 pingpong$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>RAILS_ENV</command>
+ =&gt; "development" 
+ruby-1.9.2-p0 &gt; <command>RAILS_ROOT</command>
+ =&gt; "/Users/stefan/pingpong" 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
 
-    <para>Sie haben im <xref linkend="ruby-grundlagen" /> gelernt mit irb
-    umzugehen. In Rails gibt es dazu ein Pondon: Die Rails Console.
-    <command>rails console</command></para>
+    <para>Ganz praktisch ist auch <command>app</command>, um verschiedene
+    Routing-Sachen zu analysieren:<screen>stefan@swmbp 0 1.9.2-p0 pingpong$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>app.url_for(:controller =&gt; 'game', :action =&gt; 'ping')</command>
+ =&gt; "http://www.example.com/game/ping" 
+ruby-1.9.2-p0 &gt; <command>app.get 'game/ping'</command>
+ =&gt; 200 
+ruby-1.9.2-p0 &gt; <command>app.get 'game/nicht_existente_action'</command>
+ =&gt; 404 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 pingpong$</screen></para>
 
-    <para>Mit der Rails Console haben Sie nicht nur die normalen irb
-    Mechanismen, sondern auch direkt alle Klassen und Methoden aus Ihrer
-    Rails-Applikation. Und können somit auf die Datenbank zugreifen. Diese
-    werden automagisch per ActiveRecord als Objekte zur Verfügung
-    gestellt.</para>
-
-    <para>Die Rails-Console kann parallel zum Webserver oder anstatt des
-    Webservers gestartet werden. Wir führen als erstes auf der Shell ein
-    <command>rake db:reset</command> aus, damit wir eine frische und leere
-    Datenbank zum Üben vorfinden. <screen>MacBook:movie-app sw$ <command>rake db:reset</command>
-(in /Users/sw/Development/movie-app)
-db/test.sqlite3 already exists
-db/development.sqlite3 already exists
--- create_table("movies", {:force=&gt;true})
-   -&gt; 0.0155s
--- initialize_schema_migrations_table()
-   -&gt; 0.0049s
--- assume_migrated_upto_version(20100404113234, "db/migrate")
-   -&gt; 0.0026s
-MacBook:movie-app sw$ </screen></para>
-
-    <para>Danach starten wir die Console:<screen>MacBook:movie-app sw$ <command>rails console</command>
-Loading development environment (Rails 3.0.0.beta2)
-ruby-1.9.1-p378 &gt;</screen></para>
+    <para>Die Console ist in der Theorie schwer zu erklären. Schon in <xref
+    linkend="activerecord_chapter" /> werden Sie mehr mit der Console arbeiten
+    und die Vorteile zu schätzen lernen.</para>
   </section>
 </chapter>
