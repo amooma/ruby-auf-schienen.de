@@ -23,9 +23,6 @@
     MVC (Model-View-Controller)?". Ich habe mich für den "Wir fangen mal an
     und erklären bei der Arbeit."-Ansatz entschieden.</para>
 
-    <para>Als erstes kleines Projekt erstellen wir eine kleine
-    Filmdatenbank.</para>
-
     <section xml:id="arbeits-umgebung-development">
       <title>Arbeits-Umgebung (Development)</title>
 
@@ -72,6 +69,18 @@
         fertig installiert und müssen sich keinen Kopf machen. Später erkläre
         ich Ihnen dann wie Sie andere Datenbank (z.B. MySQL) ansteuern
         können.</para>
+      </section>
+
+      <section>
+        <title>Warum alle Feldnamen, Methoden und Klassen auf
+        Englisch?</title>
+
+        <para>Ganz tief im Herzen liebt Rails die englische Sprache. Damit
+        muss man sich abfinden und versuchen diese Liebe zu übernehmen. So
+        verwenden sehr viele Mechanismen automagisch Plural oder Singular von
+        Englischen Wörtern. Wenn man sich damit anfreundet Datenbankfelder und
+        Datenbanken an sich mit englischen Wörter zu benennen, dann kann man
+        die ganze Macht dieser Magie ausnutzen.</para>
       </section>
     </section>
   </section>
@@ -1358,159 +1367,32 @@ redirect_to :action =&gt; :pong</programlisting></para>
   <section xml:id="scaffolding">
     <title xml:id="scaffolding.title">Scaffolding</title>
 
-    <para>Die typischen "Ich zeige Euch mal Ruby on Rails in 15 Minuten"
-    Videos im Internet arbeiten alle mit der Magie des Scaffolding.
-    Scaffolding steht dabei für ein auf den ersten Blick sehr mächtiges
-    Grundgerüst mit einer fertigen GUI zum Arbeiten mit einer
-    Datenbanktabelle. Leider ist dieses Vorgehen meistens kontraproduktiv,
-    weil man zwar sehr schnell dieses Grundgerüst stehen hat, aber danach erst
-    mal im Regen steht. Das alte "ohne Ruby-Grundkenntnisse kommt man nicht
-    weiter"-Problem schlägt zu. Aber Sie haben sich ja schon das <xref
-    linkend="ruby-grundlagen" /> gekämpft. Falls nicht, sollten Sie es jetzt
-    nachholen.</para>
+    <para>Nach so viel recht trockenem Ruby- und Rails-Handwerk schauen wir
+    uns mal Scaffolding an. Sie werden bestimmt schon mal ein "Rails in 15
+    Minuten" Screencast gesehen haben, in dem mit Scaffolding ein Blog oder
+    sonst was in rasenhafter Geschwindigkeit erstellt wurde. Dumm ist nur, das
+    man danach nichts mit dem Code anfangen konnte, weil alle Grundlagen
+    fehlten. Gut das Sie sich dieses Buch gekauft und schon fleissig bis
+    hierhin gelesen haben! Mit diesem Vorwissen kann ich Ihnen jetzt die Magie
+    des Scaffolding erklären.</para>
+
+    <section>
+      <title>Was ist Scaffolding?</title>
+
+      <para>Scaffolding ist ein Generator-Skript, das dem Programmierer einen
+      Haufen Arbeit abnimmt. Man bekommt mit einem Aufruf ein Daten-Model,
+      einen Controller und eine Hand voll Views generiert, mit denen man die
+      Datenbank via Webinterface einfach administrieren kann. In gefühlten 50%
+      aller Fälle kann man mit Scaffolding Zeit sparen. </para>
+    </section>
 
     <section>
       <title>Neues Rails Projekt erstellen</title>
 
-      <para>Natürlich mit dem Befehl <command>rails new
-      movie-app</command><screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new movie-app</command>
-      create  
-      create  README
-      create  Rakefile
-      create  config.ru
-      create  .gitignore
-      create  Gemfile
-      create  app
-      create  app/controllers/application_controller.rb
-      create  app/helpers/application_helper.rb
-      create  app/views/layouts/application.html.erb
-      create  app/mailers
-      create  app/models
-      create  config
-      create  config/routes.rb
-      create  config/application.rb
-      create  config/environment.rb
-      create  config/environments
-      create  config/environments/development.rb
-      create  config/environments/production.rb
-      create  config/environments/test.rb
-      create  config/initializers
-      create  config/initializers/backtrace_silencers.rb
-      create  config/initializers/inflections.rb
-      create  config/initializers/mime_types.rb
-      create  config/initializers/secret_token.rb
-      create  config/initializers/session_store.rb
-      create  config/locales
-      create  config/locales/en.yml
-      create  config/boot.rb
-      create  config/database.yml
-      create  db
-      create  db/seeds.rb
-      create  doc
-      create  doc/README_FOR_APP
-      create  lib
-      create  lib/tasks
-      create  lib/tasks/.gitkeep
-      create  log
-      create  log/server.log
-      create  log/production.log
-      create  log/development.log
-      create  log/test.log
-      create  public
-      create  public/404.html
-      create  public/422.html
-      create  public/500.html
-      create  public/favicon.ico
-      create  public/index.html
-      create  public/robots.txt
-      create  public/images
-      create  public/images/rails.png
-      create  public/stylesheets
-      create  public/stylesheets/.gitkeep
-      create  public/javascripts
-      create  public/javascripts/application.js
-      create  public/javascripts/controls.js
-      create  public/javascripts/dragdrop.js
-      create  public/javascripts/effects.js
-      create  public/javascripts/prototype.js
-      create  public/javascripts/rails.js
-      create  script
-      create  script/rails
-      create  test
-      create  test/performance/browsing_test.rb
-      create  test/test_helper.rb
-      create  test/fixtures
-      create  test/functional
-      create  test/integration
-      create  test/unit
-      create  tmp
-      create  tmp/sessions
-      create  tmp/sockets
-      create  tmp/cache
-      create  tmp/pids
-      create  vendor/plugins
-      create  vendor/plugins/.gitkeep
-stefan@swmbp 0 1.9.2-p0 ~$</screen></para>
-
-      <para>Rails hat das Verzeichnis <filename>movie-app</filename> angelegt
-      und in dieses Verzeichnis die Grundstruktur einer Rails-Applikation
-      gespeichert.</para>
-
-      <para>Jetzt führen wir ein <command>bundle install</command>
-      aus:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>cd movie-app</command>
-stefan@swmbp 0 1.9.2-p0 movie-app$ <command>bundle install</command>
-Fetching source index for http://rubygems.org/
-Using rake (0.8.7) 
-Using abstract (1.0.0) 
-Using activesupport (3.0.0) 
-Using builder (2.1.2) 
-Using i18n (0.4.1) 
-Using activemodel (3.0.0) 
-Using erubis (2.6.6) 
-Using rack (1.2.1) 
-Using rack-mount (0.6.12) 
-Using rack-test (0.5.4) 
-Using tzinfo (0.3.23) 
-Using actionpack (3.0.0) 
-Using mime-types (1.16) 
-Using polyglot (0.3.1) 
-Using treetop (1.4.8) 
-Using mail (2.2.5) 
-Using actionmailer (3.0.0) 
-Using arel (1.0.1) 
-Using activerecord (3.0.0) 
-Using activeresource (3.0.0) 
-Using bundler (1.0.0) 
-Using thor (0.14.0) 
-Using railties (3.0.0) 
-Using rails (3.0.0) 
-Installing sqlite3-ruby (1.3.1) with native extensions 
-Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
-
-Your bundle was installed to `/Users/stefan/.rvm/gems/ruby-1.9.2-p0`
-stefan@swmbp 0 1.9.2-p0 movie-app$</screen></para>
-    </section>
-
-    <section xml:id="activerecord">
-      <title xml:id="activerecord.title">ActiveRecord</title>
-
-      <para>Ein ganz wichtiges Element für Rails ist ActiveRecord. Es
-      übernimmt für den Programmierer transparent die Arbeit mit der
-      SQL-Datenbank und stellt Tabellen und einzelne Tabellen-Zeilen als
-      Objekte zur Verfügung. Um das zu ermöglichen hat man sich auf bestimmte
-      Namenskonventionen geeinigt. In früheren Rails-Versionen musste man die
-      Datenbank von Hand anhand dieser Konventionen anlegen. ActiveRecord hat
-      dann die Felder an bestimmten Namensmerkmalen erkannt. Heute gibt es in
-      Rails dazu eigene, noch dazu äusserst praktische Tools. Denn Sie wollen
-      ja nicht nur jetzt eine Datenbank für Ihre Entwicklungs-Umgebung
-      einrichten, sondern benötigen später auch ein Tool, das Ihre
-      Produktions-Datenbank Schritt für Schritt mitzieht.</para>
-
-      <para>Wir wollen Filme katalogisieren. Dazu benötigen wir mindestens
-      folgende Datenbankfelder:<itemizedlist>
+      <para>Als Beispiel nehmen wir eine kleine Bücherliste mit den folgenden
+      Feldern:<itemizedlist>
           <listitem>
-            <para><varname>title:string</varname> - Titel oder Name des
-            Films</para>
+            <para><varname>title:string</varname> - Titel des Buches</para>
           </listitem>
 
           <listitem>
@@ -1519,39 +1401,28 @@ stefan@swmbp 0 1.9.2-p0 movie-app$</screen></para>
           </listitem>
 
           <listitem>
-            <para><varname>duration:integer</varname> - Dauer (in
-            Minuten)</para>
-          </listitem>
-
-          <listitem>
-            <para><varname>plot:text</varname> - Story des Films</para>
-          </listitem>
-
-          <listitem>
             <para><varname>rating:integer</varname> - Bewertung (als Ganzahl
             von 1 bis 5 Sterne)</para>
           </listitem>
         </itemizedlist></para>
 
-      <section>
-        <title>Warum alle Feldnamen, Methoden und Klassen auf
-        Englisch?</title>
+      <para>Erstellen wir mal eine neue Rails Applikation erstellen:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new bibliography</command>
+      create  
+      create  README
+      [...]
+      create  vendor/plugins
+      create  vendor/plugins/.gitkeep
+stefan@swmbp 0 1.9.2-p0 ~$ <command>cd bibliography</command>
+stefan@swmbp 0 1.9.2-p0 bibliography$ <command>bundle install</command>
+Fetching source index for http://rubygems.org/
+Using rake (0.8.7) 
+[...]
+Using rails (3.0.0) 
+Using sqlite3-ruby (1.3.1) 
+Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
 
-        <para>Ganz tief im Herzen liebt Rails die englische Sprache. Damit
-        muss man sich abfinden und versuchen diese Liebe zu übernehmen. So
-        verwenden sehr viele Mechanismen automagisch Plural oder Singular von
-        Englischen Wörtern. Wenn man sich damit anfreundet Datenbankfelder und
-        Datenbanken an sich mit englischen Wörter zu benennen, dann kann man
-        die ganze Macht dieser Magie ausnutzen.</para>
-      </section>
-
-      <section xml:id="dvd-ist-das-ein-model">
-        <title>Ist das jetzt ein Model (laut der MVC-Idee)?</title>
-
-        <para>Kurze Antwort: Ja. Wir müssen dem Model nur noch einen Namen
-        geben. "<varname>movie</varname>" macht wohl im Englischen am meisten
-        Sinn.</para>
-      </section>
+Your bundle was installed to `/Users/stefan/.rvm/gems/ruby-1.9.2-p0`
+stefan@swmbp 0 1.9.2-p0 bibliography$</screen></para>
     </section>
 
     <section xml:id="rails_generate_scaffold">
@@ -1561,42 +1432,8 @@ stefan@swmbp 0 1.9.2-p0 movie-app$</screen></para>
       <para>Mit dem Rails-Skript-Aufruf <command>rails generate
       scaffold</command> kann man fertige Code generieren. Wer (wie ich) gerne
       mal vergisst wie das Skript aufgerufen werden muss, der gibt einfach
-      <filename>rails generate</filename> ein und bekommt die folgende Hilfe
-      angezeigt:<screen>stefan@swmbp 0 1.9.2-p0 movie-app$ <command>rails generate</command>
-Usage: rails generate GENERATOR [args] [options]
-
-General options:
-  -h, [--help]     # Print generator's options and usage
-  -p, [--pretend]  # Run but do not make any changes
-  -f, [--force]    # Overwrite files that already exist
-  -s, [--skip]     # Skip files that already exist
-  -q, [--quiet]    # Suppress status output
-
-Please choose a generator below.
-
-Rails:
-  controller
-  generator
-  helper
-  integration_test
-  mailer
-  migration
-  model
-  observer
-  performance_test
-  plugin
-  resource
-  scaffold
-  scaffold_controller
-  session_migration
-  stylesheets
-
-stefan@swmbp 0 1.9.2-p0 movie-app$</screen></para>
-
-      <para>Interessant ist für uns der Teil "Please choose a generator
-      below.". Wenn wir <parameter>scaffold</parameter> benutzen wollen und
-      dazu weitere Hilfe brauchen, dann geht dies wiederrum einfach mit der
-      eingebauten Hilfe:<screen>stefan@swmbp 0 1.9.2-p0 movie-app$ <command>rails generate scaffold</command>
+      <command>rails generate scaffold</command> ein und bekommt die folgende
+      Hilfe angezeigt:<screen>stefan@swmbp 0 1.9.2-p0 bibliography$ <command>rails generate scaffold</command>
 Usage:
   rails generate scaffold NAME [field:type field:type] [options]
 
@@ -1637,38 +1474,38 @@ Runtime options:
 
 Description:
     Create rails files for scaffold generator.
-stefan@swmbp 0 1.9.2-p0 movie-app$</screen></para>
+stefan@swmbp 0 1.9.2-p0 bibliography$</screen></para>
 
       <para>Wir müssen also nach <command>rails generate scaffold</command>
-      den Namen des Models (bei uns "movie") und danach die Datenbankfelder
-      mit den entsprechenden Feldtypen angeben.</para>
+      den Namen des Models (bei uns <varname>book</varname>) und danach die
+      Datenbankfelder mit den entsprechenden Feldtypen angeben.</para>
 
-      <para>Dann legen wir mal los:<screen>stefan@swmbp 0 1.9.2-p0 movie-app$ <command>rails generate scaffold movie title:string production_year:integer duration:integer plot:text rating:integer</command>
+      <para>Dann legen wir mal los:<screen>stefan@swmbp 0 1.9.2-p0 bibliography$ <command>rails generate scaffold book title:string production_year:integer rating:integer</command>
       invoke  active_record
-      create    db/migrate/20100831193938_create_movies.rb
-      create    app/models/movie.rb
+      create    db/migrate/20100902141449_create_books.rb
+      create    app/models/book.rb
       invoke    test_unit
-      create      test/unit/movie_test.rb
-      create      test/fixtures/movies.yml
-       route  resources :movies
+      create      test/unit/book_test.rb
+      create      test/fixtures/books.yml
+       route  resources :books
       invoke  scaffold_controller
-      create    app/controllers/movies_controller.rb
+      create    app/controllers/books_controller.rb
       invoke    erb
-      create      app/views/movies
-      create      app/views/movies/index.html.erb
-      create      app/views/movies/edit.html.erb
-      create      app/views/movies/show.html.erb
-      create      app/views/movies/new.html.erb
-      create      app/views/movies/_form.html.erb
+      create      app/views/books
+      create      app/views/books/index.html.erb
+      create      app/views/books/edit.html.erb
+      create      app/views/books/show.html.erb
+      create      app/views/books/new.html.erb
+      create      app/views/books/_form.html.erb
       invoke    test_unit
-      create      test/functional/movies_controller_test.rb
+      create      test/functional/books_controller_test.rb
       invoke    helper
-      create      app/helpers/movies_helper.rb
+      create      app/helpers/books_helper.rb
       invoke      test_unit
-      create        test/unit/helpers/movies_helper_test.rb
+      create        test/unit/helpers/books_helper_test.rb
       invoke  stylesheets
       create    public/stylesheets/scaffold.css
-stefan@swmbp 0 1.9.2-p0 movie-app$</screen>Und schon ist alles fertig.
+stefan@swmbp 0 1.9.2-p0 bibliography$</screen>Und schon ist alles fertig.
       Allerdings ist in der Datenbank noch keine entsprechende Tabelle
       angelegt.</para>
     </section>
@@ -1677,20 +1514,18 @@ stefan@swmbp 0 1.9.2-p0 movie-app$</screen>Und schon ist alles fertig.
       <title xml:id="migration.title">Migrationen</title>
 
       <para><application>In der zweiten Ausgabezeile des Scaffoldings sehen
-      wir die Ausgabe:</application><screen>      create    db/migrate/20100831193938_create_movies.rb
+      wir die Ausgabe:</application><screen>      create    db/migrate/20100902141449_create_books.rb
 </screen></para>
 
       <para>In der Datei
-      <filename>db/migrate/20100831193938_create_movies.rb</filename> finden
-      sich die Anweisung, mit der die Datenbank erstellt (<code>def
-      self.up</code>) und auch beim Roll-Back (<code>def self.down</code>)
-      wieder gelöscht werden kann.<programlisting>class CreateMovies &lt; ActiveRecord::Migration
+      <filename>db/migrate/20100902141449_create_books.rb</filename> finden
+      sich die Anweisung, mit der die Datenbank erstellt und auch beim
+      Roll-Back wieder gelöscht werden kann.<screen>stefan@swmbp 0 1.9.2-p0 bibliography$ <command>cat db/migrate/20100902141449_create_books.rb</command> 
+class CreateBooks &lt; ActiveRecord::Migration
   def self.up
-    create_table :movies do |t|
+    create_table :books do |t|
       t.string :title
       t.integer :production_year
-      t.integer :duration
-      t.text :plot
       t.integer :rating
 
       t.timestamps
@@ -1698,13 +1533,13 @@ stefan@swmbp 0 1.9.2-p0 movie-app$</screen>Und schon ist alles fertig.
   end
 
   def self.down
-    drop_table :movies
+    drop_table :books
   end
 end
-</programlisting></para>
+stefan@swmbp 0 1.9.2-p0 bibliography$ </screen></para>
 
       <para>Die in dieser Ruby-Datei angelegte Klasse
-      <classname>CreateMovies</classname> ist ein Kind der Klasse
+      <classname>CreateBooks</classname> ist ein Kind der Klasse
       <classname>ActiveRecord::Migration</classname> (siehe Zeile 1) und hat
       zwei Methoden:<itemizedlist>
           <listitem>
@@ -1720,51 +1555,51 @@ end
         </itemizedlist></para>
 
       <para>Die Migration (also das Anlegen der Datenbank) wird mit
-      <command>rake db:migrate</command> durchgeführt:<screen>stefan@swmbp 0 1.9.2-p0 movie-app$ <command>rake db:migrate</command>
-(in /Users/stefan/movie-app)
-==  CreateMovies: migrating ===================================================
--- create_table(:movies)
-   -&gt; 0.0016s
-==  CreateMovies: migrated (0.0017s) ==========================================
+      <command>rake db:migrate</command> durchgeführt:<screen>stefan@swmbp 0 1.9.2-p0 bibliography$ <command>rake db:migrate</command>
+(in /Users/stefan/bibliography)
+==  CreateBooks: migrating ====================================================
+-- create_table(:books)
+   -&gt; 0.0015s
+==  CreateBooks: migrated (0.0016s) ===========================================
 
-stefan@swmbp 0 1.9.2-p0 movie-app$</screen></para>
+stefan@swmbp 0 1.9.2-p0 bibliography$</screen></para>
 
-      <para>Die Datenbank-Tabelle <varname>movies</varname> wird angelegt.
+      <para>Die Datenbank-Tabelle <varname>books</varname> wird angelegt.
       Dabei sehen wir, das Tabellen-Namen automatisch den Plural der Models
       bekommen. Aber welche Datenbank wird überhaupt benutzt? Das wird in der
       Konfigurationsdatei <filename>config/database.yml</filename>
-      definiert:<screen>stefan@swmbp 0 1.9.2-p0 movie-app$ <command>cat -n config/database.yml</command>
-     1 # SQLite version 3.x
-     2 #   gem install sqlite3-ruby (not necessary on OS X Leopard)
-     3 development:
-     4   adapter: sqlite3
-     5   database: db/development.sqlite3
-     6   pool: 5
-     7   timeout: 5000
-     8 
-     9 # Warning: The database defined as "test" will be erased and
-    10 # re-generated from your development database when you run "rake".
-    11 # Do not set this db to the same as development or production.
-    12 test:
-    13   adapter: sqlite3
-    14   database: db/test.sqlite3
-    15   pool: 5
-    16   timeout: 5000
-    17 
-    18 production:
-    19   adapter: sqlite3
-    20   database: db/production.sqlite3
-    21   pool: 5
-    22   timeout: 5000
-stefan@swmbp 0 1.9.2-p0 movie-app$</screen></para>
+      definiert:<screen>stefan@swmbp 0 1.9.2-p0 bibliography$ <command>cat config/database.yml</command> 
+# SQLite version 3.x
+#   gem install sqlite3-ruby (not necessary on OS X Leopard)
+development:
+  adapter: sqlite3
+  database: db/development.sqlite3
+  pool: 5
+  timeout: 5000
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  adapter: sqlite3
+  database: db/test.sqlite3
+  pool: 5
+  timeout: 5000
+
+production:
+  adapter: sqlite3
+  database: db/production.sqlite3
+  pool: 5
+  timeout: 5000
+stefan@swmbp 0 1.9.2-p0 bibliography$</screen></para>
 
       <para>Dort werden drei verschiedene Datenbanken im YAML-Format (siehe
       <uri xlink:href="http://www.yaml.org/">http://www.yaml.org/</uri> bzw.
       <uri
       xlink:href="http://de.wikipedia.org/wiki/YAML">http://de.wikipedia.org/wiki/YAML</uri>)
       definiert. Für uns wichtig ist erst mal nur die development-Datenbank
-      (Zeile 3 bis 7). Per default benutzt Rails dort
-      <application>Sqlite3</application>. Sqlite3 mag nicht die richtige Wahl
+      (erster Eintrag). Per default benutzt Rails dort
+      <application>SQLite3</application>. SQLite3 mag nicht die richtige Wahl
       für die Analyse der weltweit gesammelten Wetterdaten sein, aber für die
       schnelle und unkompliziete Entwicklung von Rails-Anwendungen lernt man
       sie schnell zu schätzen. In der Produktions-Umgebung kann man später
@@ -1779,57 +1614,58 @@ stefan@swmbp 0 1.9.2-p0 movie-app$</screen></para>
           nur MySQL.</para>
         </footnote></para>
 
-      <para>Um Ihre Neugierde zu befriedigen, schauen wir uns kurz noch die
-      Datenbank mit dem Command-Line-Tool <application>sqlite3</application>
-      an.<screen>stefan@swmbp 0 1.9.2-p0 movie-app$ <command>sqlite3 db/development.sqlite3</command> 
+      <para>Um Ihre sicherlich vorhandene Neugierde zu befriedigen, schauen
+      wir uns kurz noch die Datenbank mit dem Command-Line-Tool
+      <application>sqlite3</application> an.<screen>stefan@swmbp 1 1.9.2-p0 bibliography$ <command>sqlite3 db/development.sqlite3</command> 
 SQLite version 3.6.12
 Enter ".help" for instructions
 Enter SQL statements terminated with a ";"
 sqlite&gt; <command>.tables</command>
-movies             schema_migrations
-sqlite&gt; <command>.schema movies</command>
-CREATE TABLE "movies" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar(255), "production_year" integer, "duration" integer, "plot" text, "rating" integer, "created_at" datetime, "updated_at" datetime);
+books              schema_migrations
+sqlite&gt; <command>.schema books</command>
+CREATE TABLE "books" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar(255), "production_year" integer, "rating" integer, "created_at" datetime, "updated_at" datetime);
 sqlite&gt; <command>.quit</command>
-stefan@swmbp 0 1.9.2-p0 movie-app$</screen></para>
+stefan@swmbp 0 1.9.2-p0 bibliography$</screen></para>
 
       <para>Das Anlegen der Tabelle mit <command>rake db:migrate</command>
       wurde natürlich auch im <filename>log/development.log</filename>
-      eingetragen:<screen>  SQL (0.3ms)   SELECT name
+      eingetragen:<screen>stefan@swmbp 0 1.9.2-p0 bibliography$ <command>cat log/development.log </command>
+  SQL (0.3ms)   SELECT name
  FROM sqlite_master
  WHERE type = 'table' AND NOT name = 'sqlite_sequence'
 
   SQL (0.1ms)  select sqlite_version(*)
-  SQL (3.4ms)  CREATE TABLE "schema_migrations" ("version" varchar(255) NOT NULL) 
-  SQL (0.1ms)  PRAGMA index_list("schema_migrations")
-  SQL (3.0ms)  CREATE UNIQUE INDEX "unique_schema_migrations" ON "schema_migrations" ("version")
-  SQL (0.2ms)   SELECT name
+  SQL (1.7ms)  CREATE TABLE "schema_migrations" ("version" varchar(255) NOT NULL) 
+  SQL (0.0ms)  PRAGMA index_list("schema_migrations")
+  SQL (2.0ms)  CREATE UNIQUE INDEX "unique_schema_migrations" ON "schema_migrations" ("version")
+  SQL (0.3ms)   SELECT name
  FROM sqlite_master
  WHERE type = 'table' AND NOT name = 'sqlite_sequence'
-  SQL (0.1ms)   SELECT name
- FROM sqlite_master
- WHERE type = 'table' AND NOT name = 'sqlite_sequence'
-
-  SQL (0.1ms)  SELECT "schema_migrations"."version" FROM "schema_migrations"
-Migrating to CreateMovies (20100831193938)
-  SQL (0.4ms)  CREATE TABLE "movies" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar(255), "production_year" integer, "duration" integer, "plot" text, "rating" integer, "created_at" datetime, "updated_at" datetime) 
-  SQL (0.1ms)  INSERT INTO "schema_migrations" ("version") VALUES ('20100831193938')
   SQL (0.2ms)   SELECT name
  FROM sqlite_master
  WHERE type = 'table' AND NOT name = 'sqlite_sequence'
 
   SQL (0.1ms)  SELECT "schema_migrations"."version" FROM "schema_migrations"
+Migrating to CreateBooks (20100902141449)
+  SQL (0.5ms)  CREATE TABLE "books" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "title" varchar(255), "production_year" integer, "rating" integer, "created_at" datetime, "updated_at" datetime) 
+  SQL (0.1ms)  INSERT INTO "schema_migrations" ("version") VALUES ('20100902141449')
+  SQL (0.2ms)   SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+
+  SQL (0.1ms)  SELECT "schema_migrations"."version" FROM "schema_migrations"
   SQL (0.1ms)   SELECT name
  FROM sqlite_master
  WHERE type = 'table' AND NOT name = 'sqlite_sequence'
 
-  SQL (0.0ms)  PRAGMA index_list("movies")
-</screen></para>
+  SQL (0.0ms)  PRAGMA index_list("books")
+stefan@swmbp 0 1.9.2-p0 bibliography$</screen></para>
 
       <section xml:id="active-record-auto-felder">
         <title>Automatisch zugefügte Felder (id, created_at und
         updated_at)</title>
 
-        <para>Rails ist so freundlich uns beim Scaffolding per Default
+        <para>Rails ist so freundlich uns beim Scaffolding automatisch
         folgende Felder hinzuzufügen:<itemizedlist>
             <listitem>
               <para><varname>id:integer</varname></para>
@@ -1868,47 +1704,47 @@ Migrating to CreateMovies (20100831193938)
         ;-) Aber falls mal ein Freund von Ihnen in diese Predulie gerät: Keine
         Panik! Dafür wurde in der Migrations-Class die Methode
         <methodname>self.down</methodname> angelegt. Testweise können wir ja
-        mal unsere letzte Migration zurückrollen:<screen>stefan@swmbp 0 1.9.2-p0 movie-app$ <command>rake db:rollback</command>
-(in /Users/stefan/movie-app)
-==  CreateMovies: reverting ===================================================
--- drop_table(:movies)
-   -&gt; 0.0008s
-==  CreateMovies: reverted (0.0009s) ==========================================
+        mal unsere letzte Migration zurückrollen:<screen>stefan@swmbp 0 1.9.2-p0 bibliography$ <command>rake db:rollback</command>
+(in /Users/stefan/bibliography)
+==  CreateBooks: reverting ====================================================
+-- drop_table(:books)
+   -&gt; 0.0016s
+==  CreateBooks: reverted (0.0017s) ===========================================
 
-stefan@swmbp 0 1.9.2-p0 movie-app$</screen></para>
+stefan@swmbp 0 1.9.2-p0 bibliography$</screen></para>
 
         <para>Sie können alles auf einmal zurück-rollen oder auch nur einzelne
         Migrationen. Mit dem Schalter <parameter>-T</parameter> bekommen Sie
-        eine Hilfe zu allen möglichen Wegen aufgezeigt:<screen>stefan@swmbp 0 1.9.2-p0 movie-app$ <command>rake -T db</command>
-(in /Users/stefan/movie-app)
-rake db:create          # Create the database from config/database.yml for ...
-rake db:drop            # Drops the database for the current Rails.env (use...
-rake db:fixtures:load   # Load fixtures into the current environment's data...
-rake db:migrate         # Migrate the database (options: VERSION=x, VERBOSE...
+        eine Hilfe zu allen möglichen Wegen aufgezeigt:<screen>stefan@swmbp 0 1.9.2-p0 bibliography$ <command>rake -T db</command>
+(in /Users/stefan/bibliography)
+rake db:create          # Create the database from config/database.yml for th...
+rake db:drop            # Drops the database for the current Rails.env (use d...
+rake db:fixtures:load   # Load fixtures into the current environment's database.
+rake db:migrate         # Migrate the database (options: VERSION=x, VERBOSE=f...
 rake db:migrate:status  # Display status of migrations
-rake db:rollback        # Rolls the schema back to the previous version (sp...
-rake db:schema:dump     # Create a db/schema.rb file that can be portably u...
+rake db:rollback        # Rolls the schema back to the previous version (spec...
+rake db:schema:dump     # Create a db/schema.rb file that can be portably use...
 rake db:schema:load     # Load a schema.rb file into the database
 rake db:seed            # Load the seed data from db/seeds.rb
-rake db:setup           # Create the database, load the schema, and initial...
+rake db:setup           # Create the database, load the schema, and initializ...
 rake db:structure:dump  # Dump the database structure to an SQL file
 rake db:version         # Retrieves the current schema version number
-stefan@swmbp 0 1.9.2-p0 movie-app$</screen></para>
+stefan@swmbp 0 1.9.2-p0 bibliography$</screen></para>
 
         <para>Und mit <command>rake -T db:rollback</command> die Hilfe zu
-        diesem bestimmten Befehl:<screen>stefan@swmbp 0 1.9.2-p0 movie-app$ <command>rake -T db:rollback</command>
-(in /Users/stefan/movie-app)
-rake db:rollback  # Rolls the schema back to the previous version (specify ...
-stefan@swmbp 0 1.9.2-p0 movie-app$</screen></para>
+        diesem bestimmten Befehl:<screen>stefan@swmbp 0 1.9.2-p0 bibliography$ <command>rake -T db:rollback</command>
+(in /Users/stefan/bibliography)
+rake db:rollback  # Rolls the schema back to the previous version (specify st...
+stefan@swmbp 0 1.9.2-p0 bibliography$</screen></para>
 
-        <para>Aber spielen wir lieber unsere Migration wieder ein:<screen>stefan@swmbp 0 1.9.2-p0 movie-app$ <command>rake db:migrate</command>
-(in /Users/stefan/movie-app)
-==  CreateMovies: migrating ===================================================
--- create_table(:movies)
-   -&gt; 0.0014s
-==  CreateMovies: migrated (0.0015s) ==========================================
+        <para>Aber spielen wir lieber unsere Migration wieder ein:<screen>stefan@swmbp 0 1.9.2-p0 bibliography$ <command>rake db:migrate</command>
+(in /Users/stefan/bibliography)
+==  CreateBooks: migrating ====================================================
+-- create_table(:books)
+   -&gt; 0.0016s
+==  CreateBooks: migrated (0.0022s) ===========================================
 
-stefan@swmbp 0 1.9.2-p0 movie-app$ </screen></para>
+stefan@swmbp 0 1.9.2-p0 bibliography$</screen></para>
       </section>
     </section>
 
@@ -1917,8 +1753,8 @@ stefan@swmbp 0 1.9.2-p0 movie-app$ </screen></para>
       Datenbankzugriff per Webbrowser</title>
 
       <para>Die Datenbank ist angelegt. Und der Vorteil von Scaffolding
-      besteht darin, das wir jetzt auch direkt per Webbrowser in einer
-      aktzeptablen Web-GUI darauf zugreifen können.</para>
+      besteht darin, das wir jetzt auch direkt per Webbrowser in einer ersten
+      Web-GUI darauf zugreifen können.</para>
 
       <para>Gemäss der CRUD Idee (siehe <uri
       xlink:href="http://de.wikipedia.org/wiki/CRUD">http://de.wikipedia.org/wiki/CRUD</uri>)
@@ -1929,27 +1765,27 @@ stefan@swmbp 0 1.9.2-p0 movie-app$ </screen></para>
           <listitem>
             <para>C für CREATE</para>
 
-            <para>SQL: <code>INSERT INTO movies (title) VALUES ('Rain
-            Man')</code></para>
+            <para>SQL: <code>INSERT INTO books (title) VALUES ('The
+            Journey')</code></para>
           </listitem>
 
           <listitem>
             <para>R für READ</para>
 
-            <para>SQL: <code>SELECT * FROM movies</code></para>
+            <para>SQL: <code>SELECT * FROM books</code></para>
           </listitem>
 
           <listitem>
             <para>U für UPDATE</para>
 
-            <para>SQL: <code>UPDATE movies SET title = 'Rain Man' WHERE id =
+            <para>SQL: <code>UPDATE books SET title = 'The Journey' WHERE id =
             1</code></para>
           </listitem>
 
           <listitem>
             <para>D für DELETE</para>
 
-            <para>SQL: <code>DELETE FROM movies WHERE id = 1</code></para>
+            <para>SQL: <code>DELETE FROM books WHERE id = 1</code></para>
           </listitem>
         </itemizedlist>Für den Rails-Neuling ist nicht direkt ersichtlich, wo
       den hier der grosse Vorteil liegt. Nachfolgend eine Mini-FAQ:<qandaset>
@@ -1964,7 +1800,7 @@ stefan@swmbp 0 1.9.2-p0 movie-app$ </screen></para>
                 <para>Damit bekommt man ein sauberes und für alle
                 Programmierer leicht verständliches Interface zu Ihrem System.
                 Sie brauchen nur die URI
-                <uri>http://localhost:3000/movies</uri> und das Wissen, das es
+                <uri>http://localhost:3000/books</uri> und das Wissen, das es
                 sich um ein RESTful Webdienst handelt und Sie können direkt
                 loslegen.</para>
               </answer>
@@ -1997,17 +1833,37 @@ stefan@swmbp 0 1.9.2-p0 movie-app$ </screen></para>
         </qandaset></para>
 
       <section>
+        <title>Routen</title>
+
+        <para>Schauen wir uns als erstes mal die vom Scaffolding erstellten
+        Routen an:<screen>stefan@swmbp 0 1.9.2-p0 bibliography$ <command>rake routes</command>
+(in /Users/stefan/bibliography)
+    books GET    /books(.:format)          {:action=&gt;"index", :controller=&gt;"books"}
+    books POST   /books(.:format)          {:action=&gt;"create", :controller=&gt;"books"}
+ new_book GET    /books/new(.:format)      {:action=&gt;"new", :controller=&gt;"books"}
+edit_book GET    /books/:id/edit(.:format) {:action=&gt;"edit", :controller=&gt;"books"}
+     book GET    /books/:id(.:format)      {:action=&gt;"show", :controller=&gt;"books"}
+     book PUT    /books/:id(.:format)      {:action=&gt;"update", :controller=&gt;"books"}
+     book DELETE /books/:id(.:format)      {:action=&gt;"destroy", :controller=&gt;"books"}
+stefan@swmbp 0 1.9.2-p0 bibliography$ </screen></para>
+
+        <para>In der zweiten Spalte der Ausgabe finden Sie eine Auflistung der
+        URIs.</para>
+      </section>
+
+      <section>
         <title>Start des Webservers</title>
 
         <para>Als erstes starten wir wie immer mit rails server unseren
-        Entwicklungswebserver:<screen>stefan@swmbp 0 1.9.2-p0 movie-app$ <command>rails server</command>
+        Entwicklungswebserver:<screen>stefan@swmbp 0 1.9.2-p0 bibliography$ <command>rails server</command>
 =&gt; Booting WEBrick
 =&gt; Rails 3.0.0 application starting in development on http://0.0.0.0:3000
 =&gt; Call with -d to detach
 =&gt; Ctrl-C to shutdown server
-[2010-08-31 21:59:45] INFO  WEBrick 1.3.1
-[2010-08-31 21:59:45] INFO  ruby 1.9.2 (2010-08-18) [x86_64-darwin10.4.0]
-[2010-08-31 21:59:45] INFO  WEBrick::HTTPServer#start: pid=39137 port=3000
+[2010-09-02 16:32:22] INFO  WEBrick 1.3.1
+[2010-09-02 16:32:22] INFO  ruby 1.9.2 (2010-08-18) [x86_64-darwin10.4.0]
+[2010-09-02 16:32:22] INFO  WEBrick::HTTPServer#start: pid=54146 port=3000
+
 </screen></para>
       </section>
 
@@ -2016,7 +1872,7 @@ stefan@swmbp 0 1.9.2-p0 movie-app$ </screen></para>
 
         <para>Legen wir als erstes einmal einen neuen Datensatz an. Sie können
         das entsprechende Interface über die URI <uri
-        xlink:href="http://0.0.0.0:3000/movies/new">http://0.0.0.0:3000/movies/new</uri>
+        xlink:href="http://0.0.0.0:3000/movies/new">http://0.0.0.0:3000/books/new</uri>
         abrufen. Bitte benutzen Sie dieses Interface um einen Beispiel-Film
         einzutragen:<screenshot>
             <info>
@@ -2025,10 +1881,30 @@ stefan@swmbp 0 1.9.2-p0 movie-app$ </screen></para>
 
             <mediaobject>
               <imageobject>
-                <imagedata fileref="screenshots/movies_new.jpg" format="JPG"></imagedata>
+                <imagedata fileref="screenshots/new_book.jpg"></imagedata>
               </imageobject>
             </mediaobject>
           </screenshot></para>
+
+        <para>Sieht ja schon mal nicht schlecht aus. Jetzt gehen wir mal
+        Schritt für Schritt durch, was Rails gemacht hat. Die URI <uri
+        xlink:href="http://0.0.0.0:3000/books/new">http://0.0.0.0:3000/books/new</uri>
+        wird von der <code>new_book</code> Route gematched: <screen> new_book GET    /books/new(.:format)      {:action=&gt;"new", :controller=&gt;"books"}
+</screen></para>
+
+        <para>Dann öffnen wir mal die Datei für den Controller books
+        (<filename>app/controllers/books_controller.rb</filename>) und schauen
+        uns dort die Methode <methodname>new</methodname> an:<programlisting>  # GET /books/new
+  # GET /books/new.xml
+  def new
+    @book = Book.new
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml  { render :xml =&gt; @book }
+    end
+  end
+</programlisting></para>
 
         <para>Nachdem Sie auf "Create Movie" geklickt haben, können Sie im
         Log-File folgenden Eintrag verfolgen:<screen>Started POST "/movies" for 127.0.0.1 at 2010-08-31 22:01:13 +0200
@@ -2294,7 +2170,6 @@ MacBook:movie-app sw$</screen></para>
              PUT    /movies/:id(.:format)      {:action=&gt;"update", :controller=&gt;"movies"}
        movie DELETE /movies/:id(.:format)      {:action=&gt;"destroy", :controller=&gt;"movies"}
   edit_movie GET    /movies/:id/edit(.:format) {:action=&gt;"edit", :controller=&gt;"movies"}
-example_test GET    /example/test              {:controller=&gt;"example", :action=&gt;"test"}
 MacBook:movie-app sw$</screen></para>
 
       <para>Puh... das sind ja viel mehr, als wir oben benutzt haben. Oder
