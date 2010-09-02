@@ -777,8 +777,7 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 &lt;/html&gt;
 stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 
-      <para>Ich löse das Rätsel auf: Interessant ist die Zeile<programlisting>&lt;%= yield %&gt;</programlisting>
-      </para>
+      <para>Ich löse das Rätsel auf: Interessant ist die Zeile<programlisting>&lt;%= yield %&gt;</programlisting></para>
 
       <para>Mit <code>&lt;%= yield %&gt;</code> wird die View-Datei
       inkludiert. Die drei Zeilen mit den Stylesheets und dem JavaScript
@@ -915,7 +914,7 @@ stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
         <para>Das Footer-Problem würde man in einem richtigen Projekt
         wahrscheinlich nicht mit einem Partial lösen, das überall aufgerufen
         wird, sondern eher zentral in der
-        <filename>app/views/layouts/application.html.erb</filename>. </para>
+        <filename>app/views/layouts/application.html.erb</filename>.</para>
       </note>
 
       <section xml:id="partials_locale_variables">
@@ -1097,7 +1096,7 @@ stefan@swmbp 0 1.9.2-p0 redirect_beispiel$</screen></para>
     ab:<programlisting>class GameController &lt; ApplicationController
   def ping
     if (Time.now.hour &gt; 8) and (Time.now.hour &lt; 17)
-      <emphasis>redirect_to :action =&gt; :pong</emphasis>
+      <emphasis>redirect_to game_pong_path</emphasis>
     end    
   end
 
@@ -1106,6 +1105,20 @@ stefan@swmbp 0 1.9.2-p0 redirect_beispiel$</screen></para>
 
 end
 </programlisting></para>
+
+    <para>Aber was ist <code>game_pong_path</code>? Schauen wir uns dazu die
+    für diese Rails-Applikation generierten Routen an:<screen>stefan@swmbp 1 1.9.2-p0 pingpong$ <command>rake routes</command>
+(in /Users/stefan/pingpong)
+game_ping GET /game/ping(.:format) {:controller=&gt;"game", :action=&gt;"ping"}
+game_pong GET /game/pong(.:format) {:controller=&gt;"game", :action=&gt;"pong"}
+stefan@swmbp 0 1.9.2-p0 pingpong$</screen></para>
+
+    <para>Sie sehen, das die Route zur Action "ping" des Controllers "game"
+    den Namen <varname>game_ping</varname> bekommen hat. Wir könnten das
+    Redirect auch so schreiben:<programlisting>redirect_to :action =&gt; 'pong'</programlisting></para>
+
+    <para>Aber die Schreibweise mit den Routen ist sauberer und lässt sich
+    später besser warten.</para>
 
     <para>Wenn wir jetzt zwischen 9 und 17 Uhr mit dem Browser die Seite <uri
     xlink:href="http://0.0.0.0:3000/game/ping">http://0.0.0.0:3000/game/ping</uri>
@@ -1158,52 +1171,116 @@ Completed 200 OK in 5ms (Views: 4.9ms | ActiveRecord: 0.0ms)
   <section xml:id="flash">
     <title xml:id="flash.title">Flash Nachrichten</title>
 
-    <para>"Der Name "Flash Message" oder "Flash Nachricht" ist meiner Meinung
-    nach denkbar ungeeignet gewählt worden. Mit dem Wort "Flash" assoziiert
-    fast jeder mehr oder weniger bunte Webseiten, die mit dem
+    <para>Der Begriff "Flash Message" oder "Flash Nachricht" ist meiner
+    Meinung nach denkbar ungeeignet gewählt worden. Mit dem Wort "Flash"
+    assoziiert fast jeder mehr oder weniger bunte Webseiten, die mit dem
     Adobe-Flash-Plug-in realisiert wurden. Aber in Rails sind Flash
     Nachrichten etwas ganz anderes. Sie sind Nachrichten, die über ein
-    Redirect auf eine andere Seite weiter geleitet werden können.</para>
+    Redirect (siehe <xref linkend="redirect" />) auf eine andere Seite weiter
+    geleitet werden können.</para>
 
     <para>Flash Nachrichten sind quasi gute Freunde von Redirects. Nicht
     selten arbeiten beide ihm Team, um dem User ein Feedback über eine gerade
-    vollzogene Aktion zu geben. Als Beispiel erweitern wir die in <xref
-    linkend="redirects" /> erstellten
-    <filename>app/controllers/example_controller.rb</filename> wie
-    folgt:<programlisting>class ExampleController &lt; ApplicationController
-  def test
-    <emphasis>flash[:notice] = "Ein sinnfreies Beispiel."</emphasis>
-    redirect_to :action =&gt; :shopping_list
+    vollzogene Aktion zu geben. Ein typisches Beispiel einer Flash-Nachricht
+    ist das Feedback des Systems, wenn ein User sich eingeloggt hat. Dann wird
+    er oft wieder auf die ursprüngliche Seite redirected und bekommt
+    zusätzlich noch ein Feedback "Sie sind jetzt eingeloggt.".</para>
+
+    <para>Wir bauen als Beispiel noch mal das Ping-Pong Szenario aus <xref
+    linkend="redirect" /> auf:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new pingpong</command>
+      create  
+      create  README
+      [...]
+      create  vendor/plugins/.gitkeep
+stefan@swmbp 0 1.9.2-p0 ~$ <command>cd pingpong</command>
+stefan@swmbp 0 1.9.2-p0 pingpong$ <command>bundle install</command>
+Fetching source index for http://rubygems.org/
+Using rake (0.8.7) 
+[...]
+Your bundle was installed to `/Users/stefan/.rvm/gems/ruby-1.9.2-p0`
+stefan@swmbp 0 1.9.2-p0 pingpong$ <command>rails generate controller Game ping pong</command>
+      create  app/controllers/game_controller.rb
+      [...]
+      create      test/unit/helpers/game_helper_test.rb
+stefan@swmbp 0 1.9.2-p0 pingpong$</screen></para>
+
+    <para>Die <filename>app/controllers/game_controller.rb</filename> füllen
+    wir mit folgendem Inhalt:<programlisting>class GameController &lt; ApplicationController
+  def ping
+    <emphasis>redirect_to game_pong_path</emphasis>
   end
-  
-  def shopping_list
+
+  def pong
   end
 
 end
 </programlisting></para>
 
-    <para>Mit "<code>flash[:notice] = "Ein sinnfreies Beispiel."</code>"
-    übergeben wir eine Flash Message mit dem Status "<code>notice</code>" an
-    den nächsten View (in diesem Fall an
-    <methodname>shopping_list</methodname>).</para>
+    <para>Jetzt starten wir den Rails Webserver und browsen einmal auf <uri
+    xlink:href="http://0.0.0.0:3000/game/pong">http://0.0.0.0:3000/game/pong</uri>
+    und einmal auf <uri
+    xlink:href="http://0.0.0.0:3000/game/ping">http://0.0.0.0:3000/game/ping</uri>:<screen>stefan@swmbp 0 1.9.2-p0 pingpong$ <command>rails server</command>
+=&gt; Booting WEBrick
+=&gt; Rails 3.0.0 application starting in development on http://0.0.0.0:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2010-09-02 14:30:31] INFO  WEBrick 1.3.1
+[2010-09-02 14:30:31] INFO  ruby 1.9.2 (2010-08-18) [x86_64-darwin10.4.0]
+[2010-09-02 14:30:31] INFO  WEBrick::HTTPServer#start: pid=49354 port=3000
 
-    <para>Merkwürdigerweise verändert sich aber nichts beim erneuten Aufruf
-    von <uri
-    xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>.
-    Der Grund dafür ist einfach: Wir haben zwar eine Flash Message generiert,
-    aber im View wird nirgends überprüft, ob es Flash Messages gibt. Der
-    einfachste Weg evt. existierende Flash Nachrichten immer anzuzeigen ist
-    die folgende Erweiterung der
-    <filename>app/views/layouts/application.html.erb</filename>
-    Datei:<programlisting>&lt;!DOCTYPE html&gt;
+
+Started GET "/game/pong" for 127.0.0.1 at 2010-09-02 14:31:04 +0200
+  Processing by GameController#pong as HTML
+Rendered game/pong.html.erb within layouts/application (1.6ms)
+Completed 200 OK in 5ms (Views: 4.8ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/game/ping" for 127.0.0.1 at 2010-09-02 14:31:08 +0200
+  Processing by GameController#ping as HTML
+Redirected to http://0.0.0.0:3000/game/pong
+Completed 302 Found in 1ms
+
+
+Started GET "/game/pong" for 127.0.0.1 at 2010-09-02 14:31:08 +0200
+  Processing by GameController#pong as HTML
+Rendered game/pong.html.erb within layouts/application (1.4ms)
+Completed 200 OK in 5ms (Views: 4.5ms | ActiveRecord: 0.0ms)
+</screen></para>
+
+    <para>Wie nicht anders zu erwarten war: Egal, welche der beiden URIs wir
+    aufrufen, am Ende wird immer <uri
+    xlink:href="http://0.0.0.0:3000/game/pong">http://0.0.0.0:3000/game/pong</uri>
+    angezeigt. Wäre es nicht schön, wenn wir beim Redirect von ping auf pong
+    dem User eine Nachricht anzeigen könnten? Jetzt raten Sie mal, wie so eine
+    Nachricht bei Rails genannt wird? Ja, genau! Eine Flash-Nachricht!</para>
+
+    <para>Bitte erweitern Sie die Datei
+    <filename>app/controllers/game_controller.rb</filename> wie
+    folgt:<programlisting>class GameController &lt; ApplicationController
+  def ping
+    <emphasis>redirect_to game_pong_path, :notice =&gt; 'Ich wurde von Ping redirected.'</emphasis>
+  end
+
+  def pong
+  end
+
+end</programlisting></para>
+
+    <para>Und in der
+    <filename>app/views/layouts/application.html.erb</filename> müssen wir
+    auch noch eine Kleinigkeit einbauen:<programlisting>&lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
-  &lt;title&gt;Unsere Beispielapplikation&lt;/title&gt;
+  &lt;title&gt;Pingpong&lt;/title&gt;
+  &lt;%= stylesheet_link_tag :all %&gt;
+  &lt;%= javascript_include_tag :defaults %&gt;
+  &lt;%= csrf_meta_tag %&gt;
 &lt;/head&gt;
 &lt;body&gt;
 
-<emphasis>&lt;p class="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
-&lt;p class="alert"&gt;&lt;%= alert %&gt;&lt;/p&gt;</emphasis>
+<emphasis>&lt;% if (defined? notice) != nil and !notice.blank? %&gt;
+&lt;p class="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
+&lt;% end %&gt;</emphasis>
 
 &lt;%= yield %&gt;
 
@@ -1211,21 +1288,29 @@ end
 &lt;/html&gt;
 </programlisting></para>
 
-    <para>Wenn wir jetzt noch einmal die Seite <uri
-    xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
-    aufrufen, werden wir richtig an <methodname>shopping_list</methodname>
-    redirected und bekommen am Kopf der Seite die Flash Nachricht
-    angezeigt:<screenshot>
+    <para>Beim Aufruf von <uri
+    xlink:href="http://0.0.0.0:3000/game/pong">http://0.0.0.0:3000/game/pong</uri>
+    bekommen wir weiterhin normal die Pong-Seite angezeigt. Beim Aufruf von
+    <uri
+    xlink:href="http://0.0.0.0:3000/game/pong">http://0.0.0.0:3000/game/ping</uri>
+    werden wir aber zur Pong-Seite redirected und bekommen oben die
+    Flash-Nachricht angezeigt:<screenshot>
         <info>
-          <title>Beispiel für eine Flash Nachricht</title>
+          <title>Pong-Seite mit Flash-Nachricht</title>
         </info>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="screenshots/flash_example_shopping_list.jpg"></imagedata>
+            <imagedata fileref="screenshots/flash_pong_notice.jpg"></imagedata>
           </imageobject>
         </mediaobject>
       </screenshot></para>
+
+    <tip>
+      <para>Wenn Sie später mal eine Flash-Nachricht nicht angezeigt bekommen,
+      dann überprüfen Sie im View, ob dort die Flash-Nachricht überhaupt
+      ausgegeben wird.</para>
+    </tip>
 
     <section xml:id="verschiedene_arten_von_flash_nachrichten">
       <title
@@ -1240,21 +1325,33 @@ end
     </section>
 
     <section xml:id="neue_flash_redirect_schreibweise">
-      <title xml:id="neue_flash_redirect_schreibweise.title">Kürzere
-      Schreibweise innerhalb eines Redirects</title>
+      <title xml:id="neue_flash_redirect_schreibweise.title">Verschiedene
+      Syntaxen</title>
 
-      <para>Bis Rails 2.3.5 konnte man Flash Nachrichten nicht innerhalb eines
-      Redirect einbauen. Mit Rails 3.0 ist dies möglich. So können Sie unser
-      Beispiel von vorhin auch wie folgt schreiben: <programlisting>class ExampleController &lt; ApplicationController
-  def test
-    redirect_to :action =&gt; :shopping_list<emphasis>, :flash =&gt; { :notice =&gt; "Ein sinnfreies Beispiel." }</emphasis>
-  end
-  
-  def shopping_list
-  end
+      <para>Je nach Wissen und Vorliebe eines Programmierers werden Sie in der
+      Praxis auf verschiedene Syntaxen von Flash-Nachrichten treffen. Ich will
+      mich nicht an der Diskussion über die beste Syntax beteildigen (dafür
+      finde ich es einfach zu unwichtig), aber ich möchte Ihnen kurz die zwei
+      häufigsten Möglichkeiten darstellen:<itemizedlist>
+          <listitem>
+            <para><programlisting>redirect_to game_pong_path, :notice =&gt; 'Ich wurde von Ping redirected.'</programlisting></para>
+          </listitem>
 
-end
-</programlisting></para>
+          <listitem>
+            <para><programlisting>flash[:notice] = 'Ich wurde von Ping redirected.'
+redirect_to :action =&gt; :pong</programlisting></para>
+          </listitem>
+        </itemizedlist></para>
+    </section>
+
+    <section>
+      <title>Warum gibt es überhaupt Flash-Nachrichten?</title>
+
+      <para>Sie werden sich vielleicht fragen "Warum gibt es
+      Flash-Nachrichten? Das kann ich mir ja auch selber bauen, wenn ich es
+      brauche." Stimmt. Flash-Nachrichten haben hauptsächlich den Vorteil, das
+      sie einen definierten und für alle Programmierer gleichen Weg zur
+      Verfügung stellen. So muss man nicht das Rad neu erfinden.</para>
     </section>
   </section>
 
