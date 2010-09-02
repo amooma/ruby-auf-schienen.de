@@ -760,16 +760,15 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
         <para>Die Feinheiten von erb werden Sie jetzt Stück für Stück
         erlernen. Es handelt sich dabei nicht um Zauberei.</para>
       </section>
-    </section>
 
-    <section xml:id="erb_layouts">
-      <title xml:id="erb_layouts.title">Layouts</title>
+      <section xml:id="erb_layouts">
+        <title xml:id="erb_layouts.title">Layouts</title>
 
-      <para>Die erb Datei im Verzeichnis
-      <filename>app/views/example/</filename> bilden nur den Kern der späteren
-      HTML-Seite. Per default wird immer eine automatisch generierte
-      <filename>app/views/layouts/application.html.erb</filename> drum rum
-      gerendert. Schauen wir uns die mal an:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>cat app/views/layouts/application.html.erb</command>
+        <para>Die erb Datei im Verzeichnis
+        <filename>app/views/example/</filename> bilden nur den Kern der
+        späteren HTML-Seite. Per default wird immer eine automatisch
+        generierte <filename>app/views/layouts/application.html.erb</filename>
+        drum rum gerendert. Schauen wir uns die mal an:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>cat app/views/layouts/application.html.erb</command>
 &lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
@@ -786,46 +785,47 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 &lt;/html&gt;
 stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 
-      <para>Ich löse das Rätsel auf: Interessant ist die Zeile<programlisting>&lt;%= yield %&gt;</programlisting></para>
+        <para>Ich löse das Rätsel auf: Interessant ist die
+        Zeile<programlisting>&lt;%= yield %&gt;</programlisting></para>
 
-      <para>Mit <code>&lt;%= yield %&gt;</code> wird die View-Datei
-      inkludiert. Die drei Zeilen mit den Stylesheets und dem JavaScript
-      lassen wir erst mal so wie sie sind. Darum kümmern wir uns
-      später.</para>
+        <para>Mit <code>&lt;%= yield %&gt;</code> wird die View-Datei
+        inkludiert. Die drei Zeilen mit den Stylesheets und dem JavaScript
+        lassen wir erst mal so wie sie sind. Darum kümmern wir uns
+        später.</para>
 
-      <para>Die <filename>app/views/layouts/application.html.erb</filename>
-      bietet Ihnen die Möglichkeit das Grundlayout über die gesamte
-      Rails-Applikation fest zu legen. Sie können aber auch im Verzeichnis
-      <filename>app/views/layouts/</filename> noch andere Layouts anlegen und
-      diese je nach Situation anwenden. Ich bin hin und hergerissen dieses
-      Thema jetzt zu vertiefen, aber lassen wir es jetzt erst mal. Wichtig ist
-      jetzt, das Sie die Grundidee verstehen.</para>
-    </section>
+        <para>Die <filename>app/views/layouts/application.html.erb</filename>
+        bietet Ihnen die Möglichkeit das Grundlayout über die gesamte
+        Rails-Applikation fest zu legen. Sie können aber auch im Verzeichnis
+        <filename>app/views/layouts/</filename> noch andere Layouts anlegen
+        und diese je nach Situation anwenden. Ich bin hin und hergerissen
+        dieses Thema jetzt zu vertiefen, aber lassen wir es jetzt erst mal.
+        Wichtig ist jetzt, das Sie die Grundidee verstehen.</para>
+      </section>
 
-    <section xml:id="erb_mit_programmierlogik">
-      <title>Instance-Variablen vom Controller zum View übergeben</title>
+      <section xml:id="erb_mit_programmierlogik">
+        <title>Instance-Variablen vom Controller zum View übergeben</title>
 
-      <para>Einer der todsünden im MVC Model ist ja bekanntlich zu viel
-      Programmierlogic im View unterzubringen. Quasi so wie man früher oft in
-      PHP programmiert hat. Bei MVC ist eins der Ziele, das quasi jeder
-      beliebige HTML-Designer einen View erstellen kann ohne sich über die
-      Programmierung gedanken machen zu müssen. Ja, ja, ... wenn das mal immer
-      so einfach wäre. Trotzdem gehen wir das mal gedanklich weiter: Wenn ich
-      im Controller einen Wert habe, den ich im View anzeigen will, so
-      benötige ich dafür einen Mechanismus. Dieser heißt Instance-Variable.
-      Wer sich nicht mehr 100% sicher welche Variable welchen Scope hat, der
-      sollte ganz fix noch mal einen Blick in <xref
-      linkend="scope_von_variablen" /> werfen (geht schnell und lohnt
-      sich).</para>
+        <para>Einer der todsünden im MVC Model ist ja bekanntlich zu viel
+        Programmierlogic im View unterzubringen. Quasi so wie man früher oft
+        in PHP programmiert hat. Bei MVC ist eins der Ziele, das quasi jeder
+        beliebige HTML-Designer einen View erstellen kann ohne sich über die
+        Programmierung gedanken machen zu müssen. Ja, ja, ... wenn das mal
+        immer so einfach wäre. Trotzdem gehen wir das mal gedanklich weiter:
+        Wenn ich im Controller einen Wert habe, den ich im View anzeigen will,
+        so benötige ich dafür einen Mechanismus. Dieser heißt
+        Instance-Variable. Wer sich nicht mehr 100% sicher welche Variable
+        welchen Scope hat, der sollte ganz fix noch mal einen Blick in <xref
+        linkend="scope_von_variablen" /> werfen (geht schnell und lohnt
+        sich).</para>
 
-      <para>Wir brechen jetzt einfach mal ein Beispiel vom Zaun und fügen im
-      Controller eine Instance-Variable für die aktuelle Uhrzeit ein und fügen
-      diese dann im View ein. Wir nehmen also Programmierintelligenz aus dem
-      View in den Controller.</para>
+        <para>Wir brechen jetzt einfach mal ein Beispiel vom Zaun und fügen im
+        Controller eine Instance-Variable für die aktuelle Uhrzeit ein und
+        fügen diese dann im View ein. Wir nehmen also Programmierintelligenz
+        aus dem View in den Controller.</para>
 
-      <para>Die Controller Datei
-      <filename>app/controllers/example_controller.rb</filename> sieht dann so
-      aus:<programlisting>class ExampleController &lt; ApplicationController
+        <para>Die Controller Datei
+        <filename>app/controllers/example_controller.rb</filename> sieht dann
+        so aus:<programlisting>class ExampleController &lt; ApplicationController
   def test
     <emphasis>@current_time</emphasis> = Time.now
   end
@@ -833,50 +833,51 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 end
 </programlisting></para>
 
-      <para>In der View Datei
-      <filename>app/views/example/test.html.erb</filename> können wir dann auf
-      diese Instance-Variable zurückgreifen:<programlisting>&lt;p&gt;
+        <para>In der View Datei
+        <filename>app/views/example/test.html.erb</filename> können wir dann
+        auf diese Instance-Variable zurückgreifen:<programlisting>&lt;p&gt;
 Die aktuelle Uhrzeit ist 
 &lt;%= <emphasis>@current_time</emphasis> %&gt;
 &lt;/p&gt;
 </programlisting></para>
 
-      <para>Wir haben jetzt eine klare Trennung von Programmierlogik und
-      Darstellungslogik mit dem Controller und dem View. So können wir im
-      Controller die Uhrzeit je nach Zeitzone des Users automatisch anpassen,
-      ohne das sich der Designer der Seite darum kümmern muss.</para>
+        <para>Wir haben jetzt eine klare Trennung von Programmierlogik und
+        Darstellungslogik mit dem Controller und dem View. So können wir im
+        Controller die Uhrzeit je nach Zeitzone des Users automatisch
+        anpassen, ohne das sich der Designer der Seite darum kümmern
+        muss.</para>
 
-      <para>Mir ist klar, das jetzt keiner aufspringen und schreien wird
-      "Danke für die Erleuchtung! Ich werde nur noch sauber nach MVC
-      programmieren". Das obige Beispiel ist der erste kleine Schritt in die
-      Richtung und zeigt wie wir einfach mit Instance-Variablen (das sind die
-      mit dem @-Zeichen davor) Werte aus dem Controller in den View bringen
-      können.</para>
-    </section>
+        <para>Mir ist klar, das jetzt keiner aufspringen und schreien wird
+        "Danke für die Erleuchtung! Ich werde nur noch sauber nach MVC
+        programmieren". Das obige Beispiel ist der erste kleine Schritt in die
+        Richtung und zeigt wie wir einfach mit Instance-Variablen (das sind
+        die mit dem @-Zeichen davor) Werte aus dem Controller in den View
+        bringen können.</para>
+      </section>
 
-    <section xml:id="partials">
-      <title xml:id="partials.title">Partials</title>
+      <section xml:id="partials">
+        <title xml:id="partials.title">Partials</title>
 
-      <para>Selbst schon bei kleinen Webprojekten gibt es oft wiederkehrende
-      Elemente. Das kann zum Beispiel ein Footer der Seite mit den
-      Kontaktdaten sein oder ein Menü. Rails gibt uns die Möglichkeit diesen
-      HTML-Code in sogenannte Partials abzuspeichern und dann innerhalb eines
-      Views einzubinden. Ein Partial wird ebenfalls im
-      <filename>app/views/example/</filename> Verzeichnis abgespeichert.
-      Allerdings muss der Dateinamen mit einem Unterstrich (Underscore = _)
-      anfangen.</para>
+        <para>Selbst schon bei kleinen Webprojekten gibt es oft wiederkehrende
+        Elemente. Das kann zum Beispiel ein Footer der Seite mit den
+        Kontaktdaten sein oder ein Menü. Rails gibt uns die Möglichkeit diesen
+        HTML-Code in sogenannte Partials abzuspeichern und dann innerhalb
+        eines Views einzubinden. Ein Partial wird ebenfalls im
+        <filename>app/views/example/</filename> Verzeichnis abgespeichert.
+        Allerdings muss der Dateinamen mit einem Unterstrich (Underscore = _)
+        anfangen.</para>
 
-      <para>Als Beispiel fügen wir unser Seite jetzt einen Mini-Footer hinzu.
-      Dafür schreiben wir in die neue Datei
-      <filename>app/views/example/_footer.html.erb</filename> den folgenden
-      Inhalt:<programlisting>&lt;hr /&gt;
+        <para>Als Beispiel fügen wir unser Seite jetzt einen Mini-Footer
+        hinzu. Dafür schreiben wir in die neue Datei
+        <filename>app/views/example/_footer.html.erb</filename> den folgenden
+        Inhalt:<programlisting>&lt;hr /&gt;
 &lt;p&gt;
 Copyright 2009 - &lt;%= Date.today.year %&gt; beim Osterhasen
 &lt;/p&gt;</programlisting></para>
 
-      <para>Die Datei <filename>app/views/example/test.html.erb</filename>
-      verändern wir wie folgt und fügen mit dem Befehl <code>render</code> das
-      Partial ein:<programlisting>&lt;p&gt;Schleife von 0 bis 5:
+        <para>Die Datei <filename>app/views/example/test.html.erb</filename>
+        verändern wir wie folgt und fügen mit dem Befehl <code>render</code>
+        das Partial ein:<programlisting>&lt;p&gt;Schleife von 0 bis 5:
 &lt;% (0..5).each do |i| %&gt;
 &lt;%= "#{i}, " %&gt;
 &lt;% end %&gt;
@@ -884,58 +885,59 @@ Copyright 2009 - &lt;%= Date.today.year %&gt; beim Osterhasen
 
 <emphasis>&lt;%= render "footer" %&gt;</emphasis></programlisting></para>
 
-      <para>Es sind also jetzt folgende Dateien im Verzeichnis
-      <filename>app/views/example</filename>:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>ls -l app/views/example</command>
+        <para>Es sind also jetzt folgende Dateien im Verzeichnis
+        <filename>app/views/example</filename>:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>ls -l app/views/example</command>
 total 16
 -rw-r--r--  1 stefan  staff   63  1 Sep 20:12 _footer.html.erb
 -rw-r--r--  1 stefan  staff  105  1 Sep 20:14 test.html.erb
 stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
 
-      <para>Die neue Webseite sieht jetzt so aus:<screenshot>
-          <info>
-            <title>Footer mit Partials</title>
-          </info>
+        <para>Die neue Webseite sieht jetzt so aus:<screenshot>
+            <info>
+              <title>Footer mit Partials</title>
+            </info>
 
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screenshots/partials_footer.jpg"></imagedata>
-            </imageobject>
-          </mediaobject>
-        </screenshot></para>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/partials_footer.jpg"></imagedata>
+              </imageobject>
+            </mediaobject>
+          </screenshot></para>
 
-      <para><important>
-          <para>Der Name eines Partials im Code wird immer
-          <emphasis>ohne</emphasis> den Unterstrich am Anfang und
-          <emphasis>ohne</emphasis> die erb und HTML Endung angegeben. Aber
-          die wirkliche Datei muss im Dateinamen mit einem Unterstrich
-          anfangen und auch am Ende mir der erb und HTML Endung
-          aufhören.</para>
-        </important></para>
+        <para><important>
+            <para>Der Name eines Partials im Code wird immer
+            <emphasis>ohne</emphasis> den Unterstrich am Anfang und
+            <emphasis>ohne</emphasis> die erb und HTML Endung angegeben. Aber
+            die wirkliche Datei muss im Dateinamen mit einem Unterstrich
+            anfangen und auch am Ende mir der erb und HTML Endung
+            aufhören.</para>
+          </important></para>
 
-      <para>Partials können auch aus anderen Bereichen des Unterverzeichnisses
-      <filename>app/views</filename> eingebunden werden. So können Sie für
-      wiederkehrende und übergreifende Inhalte beispielsweise ein Verzeichnis
-      <filename>app/views/shared</filename> anlegen und dort eine Datei
-      <filename>_footer.html.erb</filename> anlegen. Das Einbetten im erb Code
-      würde dann mit folgender Zeile erfolgen:<programlisting>&lt;%= render "shared/footer" %&gt;</programlisting></para>
+        <para>Partials können auch aus anderen Bereichen des
+        Unterverzeichnisses <filename>app/views</filename> eingebunden werden.
+        So können Sie für wiederkehrende und übergreifende Inhalte
+        beispielsweise ein Verzeichnis <filename>app/views/shared</filename>
+        anlegen und dort eine Datei <filename>_footer.html.erb</filename>
+        anlegen. Das Einbetten im erb Code würde dann mit folgender Zeile
+        erfolgen:<programlisting>&lt;%= render "shared/footer" %&gt;</programlisting></para>
 
-      <note>
-        <para>Das Footer-Problem würde man in einem richtigen Projekt
-        wahrscheinlich nicht mit einem Partial lösen, das überall aufgerufen
-        wird, sondern eher zentral in der
-        <filename>app/views/layouts/application.html.erb</filename>.</para>
-      </note>
+        <note>
+          <para>Das Footer-Problem würde man in einem richtigen Projekt
+          wahrscheinlich nicht mit einem Partial lösen, das überall aufgerufen
+          wird, sondern eher zentral in der
+          <filename>app/views/layouts/application.html.erb</filename>.</para>
+        </note>
 
-      <section xml:id="partials_locale_variables">
-        <title xml:id="partials_locale_variables.title">Variablen an ein
-        Partial übergeben</title>
+        <section xml:id="partials_locale_variables">
+          <title xml:id="partials_locale_variables.title">Variablen an ein
+          Partial übergeben</title>
 
-        <para>Partials sind im DRY (<emphasis>D</emphasis>on't
-        <emphasis>R</emphasis>epeat <emphasis>Y</emphasis>ourself) Gedanken
-        sehr gut. Aber was sie erst richtig praktisch macht, ist die
-        Möglichkeit Variablen zu übergeben. Erweitern wir einmal die
-        <filename>app/views/example/_footer.html.erb</filename> Datei wie
-        folgt:<programlisting>&lt;hr /&gt;
+          <para>Partials sind im DRY (<emphasis>D</emphasis>on't
+          <emphasis>R</emphasis>epeat <emphasis>Y</emphasis>ourself) Gedanken
+          sehr gut. Aber was sie erst richtig praktisch macht, ist die
+          Möglichkeit Variablen zu übergeben. Erweitern wir einmal die
+          <filename>app/views/example/_footer.html.erb</filename> Datei wie
+          folgt:<programlisting>&lt;hr /&gt;
 &lt;p&gt;
 Copyright 2009 - &lt;%= Date.today.year %&gt; beim Osterhasen
 &lt;/p&gt;
@@ -946,13 +948,13 @@ Copyright 2009 - &lt;%= Date.today.year %&gt; beim Osterhasen
 &lt;% end %&gt;
 </programlisting></para>
 
-        <para>Wenn wir jetzt die URI <uri
-        xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
-        aufrufen, so sehen wir die gleiche Seite wie vorhin. Das liegt daran,
-        weil <varname>additional_info</varname> nicht als Local Variable
-        übergeben wurde. Ändern wir dazu die
-        <filename>app/views/example/test.html.erb</filename> wie
-        folgt:<programlisting>&lt;p&gt;Schleife von 0 bis 5:
+          <para>Wenn wir jetzt die URI <uri
+          xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
+          aufrufen, so sehen wir die gleiche Seite wie vorhin. Das liegt
+          daran, weil <varname>additional_info</varname> nicht als Local
+          Variable übergeben wurde. Ändern wir dazu die
+          <filename>app/views/example/test.html.erb</filename> wie
+          folgt:<programlisting>&lt;p&gt;Schleife von 0 bis 5:
 &lt;% (0..5).each do |i| %&gt;
 &lt;%= "#{i}, " %&gt;
 &lt;% end %&gt;
@@ -961,33 +963,34 @@ Copyright 2009 - &lt;%= Date.today.year %&gt; beim Osterhasen
 &lt;%= render :partial =&gt; 'footer', :locals =&gt; {:additional_info =&gt; "abcdef"} %&gt;
 </programlisting></para>
 
-        <para>Der Aufruf von <uri
-        xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
-        erzeugt erwartungsgemäß folgende Seite:<screenshot>
-            <info>
-              <title>Partial mit Locals</title>
-            </info>
+          <para>Der Aufruf von <uri
+          xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
+          erzeugt erwartungsgemäß folgende Seite:<screenshot>
+              <info>
+                <title>Partial mit Locals</title>
+              </info>
 
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="screenshots/footer_partial_mit_locals.jpg"></imagedata>
-              </imageobject>
-            </mediaobject>
-          </screenshot></para>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="screenshots/footer_partial_mit_locals.jpg"></imagedata>
+                </imageobject>
+              </mediaobject>
+            </screenshot></para>
 
-        <para>Sie sehen ebenfalls, das ich beim Einbinden eines einfaches
-        Partials eine kürzere Schreibweise benutzen kann, als bei der Version
-        mit locals.</para>
-      </section>
+          <para>Sie sehen ebenfalls, das ich beim Einbinden eines einfaches
+          Partials eine kürzere Schreibweise benutzen kann, als bei der
+          Version mit locals.</para>
+        </section>
 
-      <section xml:id="weitere_doku_zu_partials">
-        <title xml:id="weitere_doku_zu_partials.title">Weitere Dokumentation
-        zum Thema Partials</title>
+        <section xml:id="weitere_doku_zu_partials">
+          <title xml:id="weitere_doku_zu_partials.title">Weitere Dokumentation
+          zum Thema Partials</title>
 
-        <para>Wir haben hier wirklich nur die Oberfläche angekratzt. Partials
-        sind sehr mächtige Werkzeuge. Unter <uri
-        xlink:href="http://guides.rubyonrails.org/layouts_and_rendering.html#using-partials">http://guides.rubyonrails.org/layouts_and_rendering.html#using-partials</uri>
-        finden Sie die Ruby on Rails Doku zum Thema Partials.</para>
+          <para>Wir haben hier wirklich nur die Oberfläche angekratzt.
+          Partials sind sehr mächtige Werkzeuge. Unter <uri
+          xlink:href="http://guides.rubyonrails.org/layouts_and_rendering.html#using-partials">http://guides.rubyonrails.org/layouts_and_rendering.html#using-partials</uri>
+          finden Sie die Ruby on Rails Doku zum Thema Partials.</para>
+        </section>
       </section>
     </section>
   </section>
