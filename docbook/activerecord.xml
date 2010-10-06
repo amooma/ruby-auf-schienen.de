@@ -423,10 +423,11 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
     </section>
 
     <section xml:id="seed_rb">
-      <title xml:id="seed_rb.title">Mit seed.rb die Datenbank betanken</title>
+      <title xml:id="seed_rb.title">Mit seeds.rb die Datenbank
+      betanken</title>
 
       <para>Die Rails-Götter haben mit der Datei
-      <filename>db/seed.rb</filename> einen Weg geschaffen, eine frische
+      <filename>db/seeds.rb</filename> einen Weg geschaffen, eine frische
       Installation einfach und schnell mit Default-Werten zu füttern. Es
       handelt sich um ein normales Ruby-Programm innerhalb der Rails-Umgebung.
       Sie haben also vollen Zugriff auf alle Klassen und Methoden aus Ihrer
@@ -435,8 +436,8 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
       <para>Um die in <xref linkend="activerecord_create" /> erstellten
       Datensätze in einer neuen Rails-Applikation zur Verfügung zu stellen,
       müssen Sie so nicht manuel mit <command>rails console</command> alles
-      eingeben, sondern es reicht die folgende <filename>db/seed.rb</filename>
-      Datei:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
+      eingeben, sondern es reicht die folgende
+      <filename>db/seeds.rb</filename> Datei:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
 #
 # Examples:
@@ -452,7 +453,7 @@ Album.create("name"=&gt;"Highway 61 Revisited", "position"=&gt;4, "release_year"
       <para>Das einspielen der Daten erfolgt dann mit <command>rake
       db:seed</command>. Um ganz sicher zu sein, sollten Sie im Rahmen dieses
       Buches immer mit <command>rake db:setup</command> die Datenbank neu
-      aufsetzen und dann automatisch mit der seed.rb füttern. Das sieht dann
+      aufsetzen und dann automatisch mit der seeds.rb füttern. Das sieht dann
       so aus:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake db:setup</command>
 (in /Users/stefan/jukebox)
 db/test.sqlite3 already exists
@@ -465,7 +466,7 @@ db/development.sqlite3 already exists
    -&gt; 0.0005s
 -- assume_migrated_upto_version(20101004085045, "db/migrate")
    -&gt; 0.0004s
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen>Die <filename>db/seed.rb</filename>
+stefan@swmbp 0 1.9.2-p0 jukebox$</screen>Die <filename>db/seeds.rb</filename>
       Datei bringe ich an dieser Stelle ein, weil sie einen einfachen
       Mechanismus bietet eine leere Datenbank mit Default-Werten zu fühlen.
       Das erleichtert uns im weiteren Verlauf des Buches das schnelle Setup
@@ -474,7 +475,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen>Die <filename>db/seed.rb</filename>
       <section>
         <title>Alternative Programmierung</title>
 
-        <para>Die <filename>seed.rb</filename> ist ein Ruby Programm.
+        <para>Die <filename>seeds.rb</filename> ist ein Ruby Programm.
         Entsprechend können wir alternativ auch folgenen Weg
         gehen:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
@@ -497,27 +498,56 @@ end</programlisting></para>
 
         <para>Das Ergebnis ist das gleiche. Ich zeige Ihnen dieses Beispiel
         hier, um noch mal klar rauszuarbeiten, das Sie innerhalb der
-        <filename>seed.rb</filename> ganz normal programmieren können. </para>
+        <filename>seeds.rb</filename> ganz normal programmieren können.
+        </para>
+      </section>
+
+      <section>
+        <title>seeds.rb aus bestehenden Daten erstellen</title>
+
+        <para>Manchmal ist es praktisch den aktuellen Datenbestand einer
+        Rails-Applikation in eine <filename>seeds.rb</filename> zu
+        exportieren. Beim Schreiben dieses Buches hatte ich dieses Problem
+        fast in jedem Kapitel. Es gibt dafür keinen Standard-Weg. Ich zeige
+        Ihnen wie ich es in diesem Fall gemacht habe. Daraus können Sie
+        ableiten wie es funktioniert.</para>
+
+        <para>Füllen Sie die Datei
+        <filename>lib/tasks/apfelmus.rake</filename> mit folgendem
+        Inhalt:<programlisting>namespace :album do
+  desc "Prints all the Albums in a seeds.rb way."
+  task :seed_format =&gt; :environment do
+    Album.order('position').all.each do |album|
+      puts "Album.create(#{album.serializable_hash.delete_if {|key, value| ['created_at','updated_at','id'].include?(key)}.to_s.gsub(/[{}]/,'')})"
+    end
+  end
+end</programlisting></para>
+
+        <para>Danach können Sie mit <command>rake album:seed_format</command>
+        die entsprechende rake Task abrufen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake album:seed_format</command>
+(in /Users/stefan/jukebox)
+Album.create("name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "position"=&gt;1, "release_year"=&gt;1967)
+Album.create("name"=&gt;"Pet Sounds", "position"=&gt;2, "release_year"=&gt;1966)
+Album.create("name"=&gt;"Revolver", "position"=&gt;3, "release_year"=&gt;1966)
+Album.create("name"=&gt;"Highway 61 Revisited", "position"=&gt;4, "release_year"=&gt;1965)
+stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+
+        <para>Entweder können Sie dieses Programm so erweitern, das die
+        Ausgabe direkt in die <filename>seeds.rb</filename> geschrieben wird
+        oder Sie benutzen einfach die Shell:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake album:seed_format &gt;&gt; db/seeds.rb</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
       </section>
     </section>
 
-    <section>
-      <title>Queries</title>
+    <section xml:id="queries">
+      <title xml:id="queries.title">Suchen und Finden mit Queries</title>
 
       <para>Die Methoden <methodname>first</methodname> und
       <methodname>all</methodname> sind ja schon ganz nett, aber meistens will
       man ja doch nach etwas ganz bestimmten suchen.</para>
 
       <para>Für die hier verwendeten Beispiele verwenden Sie bitte folgende
-      <filename>db/seed.rb</filename> Datei:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
-#   Mayor.create(:name =&gt; 'Daley', :city =&gt; cities.first)
-
-Album.create("name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "position"=&gt;1, "release_year"=&gt;1967)
+      <filename>db/seeds.rb</filename> Datei:<programlisting>Album.create("name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "position"=&gt;1, "release_year"=&gt;1967)
 Album.create("name"=&gt;"Pet Sounds", "position"=&gt;2, "release_year"=&gt;1966)
 Album.create("name"=&gt;"Revolver", "position"=&gt;3, "release_year"=&gt;1966)
 Album.create("name"=&gt;"Highway 61 Revisited", "position"=&gt;4, "release_year"=&gt;1965)
@@ -546,9 +576,9 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       <section>
         <title>where</title>
 
-        <para>Mit <methodname>where</methodname> kann man nach bestimmten
-        Werten in der Datenbank suchen. Suchen wir mal alle Alben aus dem Jahr
-        1966:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+        <para>Mit der Methode <methodname>where</methodname> kann man nach
+        bestimmten Werten in der Datenbank suchen. Suchen wir mal alle Alben
+        aus dem Jahr 1966:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1966)</command>
  =&gt; [#&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-09-03 09:06:28", updated_at: "2010-09-03 09:06:28"&gt;] 
@@ -557,7 +587,8 @@ ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1966).count</command
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
-        <para>Sie können mir where auch nach Ranges suchen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+        <para>Sie können mir <methodname>where</methodname> auch nach Ranges
+        suchen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1960..1966)</command>
  =&gt; [#&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-09-03 09:04:45", updated_at: "2010-09-03 09:04:45"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-09-03 09:06:28", updated_at: "2010-09-03 09:06:28"&gt;] 
@@ -566,8 +597,8 @@ ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1960..1966).count</c
 ruby-1.9.2-p0 &gt; exit
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
-        <para>Und Sie können auch mehrere Suchfaktoren gleichzeitig
-        angeben:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+        <para>Und Sie können auch mehrere Suchfaktoren mit Komma abgetrennt
+        gleichzeitig angeben:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1960..1966, :position =&gt; 1..5)</command>
  =&gt; [#&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-09-03 09:04:45", updated_at: "2010-09-03 09:04:45"&gt;] 
