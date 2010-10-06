@@ -181,8 +181,8 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
     <para>Deshalb werde ich sie hier nicht abbilden und überlasse es Ihrer
     Neugierde einmal <command>ri ActiveRecord</command> aufzurufen.</para>
 
-    <section>
-      <title>Datensätze hinzufügen</title>
+    <section xml:id="activerecord_create">
+      <title xml:id="activerecord_create.title">Datensätze hinzufügen</title>
 
       <para>Neue Datensätze können mit verschiedenen Methoden erstellt werden.
       Schauen wir uns als erstes mal die <methodname>create</methodname>
@@ -423,29 +423,125 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
     </section>
 
     <section>
+      <title>seed.rb</title>
+
+      <para>Die Rails-Götter haben mit der Datei
+      <filename>db/seed.rb</filename> einen Weg geschaffen, eine frische
+      Installation einfach und schnell mit Default-Werten zu füttern. Es
+      handelt sich um ein normales Ruby-Programm innerhalb der Rails-Umgebung.
+      Sie haben also vollen Zugriff auf alle Klassen und Methoden aus Ihrer
+      Applikation. </para>
+
+      <para>Um die in <xref linkend="activerecord_create" /> erstellten
+      Datensätze in einer neuen Rails-Applikation zur Verfügung zu stellen,
+      müssen Sie so nicht manuel mit <command>rails console</command> alles
+      eingeben, sondern es reicht die folgende <filename>db/seed.rb</filename>
+      Datei:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
+# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
+#
+# Examples:
+#
+#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
+#   Mayor.create(:name =&gt; 'Daley', :city =&gt; cities.first)
+
+Album.create("name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "position"=&gt;1, "release_year"=&gt;1967)
+Album.create("name"=&gt;"Pet Sounds", "position"=&gt;2, "release_year"=&gt;1966)
+Album.create("name"=&gt;"Revolver", "position"=&gt;3, "release_year"=&gt;1966)
+Album.create("name"=&gt;"Highway 61 Revisited", "position"=&gt;4, "release_year"=&gt;1965)</programlisting></para>
+
+      <para>Das einspielen der Daten erfolgt dann mit <command>rake
+      db:seed</command>. Um ganz sicher zu sein, sollten Sie im Rahmen dieses
+      Buches immer mit <command>rake db:setup</command> die Datenbank neu
+      aufsetzen und dann automatisch mit der seed.rb füttern. Das sieht dann
+      so aus:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake db:setup</command>
+(in /Users/stefan/jukebox)
+db/test.sqlite3 already exists
+db/test.sqlite3 already exists
+db/development.sqlite3 already exists
+db/development.sqlite3 already exists
+-- create_table("albums", {:force=&gt;true})
+   -&gt; 0.0159s
+-- initialize_schema_migrations_table()
+   -&gt; 0.0005s
+-- assume_migrated_upto_version(20101004085045, "db/migrate")
+   -&gt; 0.0004s
+stefan@swmbp 0 1.9.2-p0 jukebox$</screen>Die <filename>db/seed.rb</filename>
+      Datei bringe ich an dieser Stelle ein, weil sie einen einfachen
+      Mechanismus bietet eine leere Datenbank mit Default-Werten zu fühlen.
+      Das erleichtert uns im weiteren Verlauf des Buches das schnelle Setup
+      von Beispiel-Szenarien.</para>
+
+      <section>
+        <title>Alternative Programmierung</title>
+
+        <para>Die <filename>seed.rb</filename> ist ein Ruby Programm.
+        Entsprechend können wir alternativ auch folgenen Weg
+        gehen:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
+# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
+#
+# Examples:
+#
+#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
+#   Mayor.create(:name =&gt; 'Daley', :city =&gt; cities.first)
+
+album_list = [["Sgt. Pepper's Lonely Hearts Club Band", 1967], 
+              ["Pet Sounds", 1966], 
+              ["Revolver", 1966], 
+              ["Highway 61 Revisited", 1965]]
+
+position = 1
+album_list.each do |album|
+  Album.create(:name =&gt; album[0], :release_year =&gt; album[1], :position =&gt; position )
+  position = position + 1
+end</programlisting></para>
+
+        <para>Das Ergebnis ist das gleiche. Ich zeige Ihnen dieses Beispiel
+        hier, um noch mal klar rauszuarbeiten, das Sie innerhalb der
+        <filename>seed.rb</filename> ganz normal programmieren können. </para>
+      </section>
+    </section>
+
+    <section>
       <title>Queries</title>
 
       <para>Die Methoden <methodname>first</methodname> und
       <methodname>all</methodname> sind ja schon ganz nett, aber meistens will
       man ja doch nach etwas ganz bestimmten suchen.</para>
 
-      <para>Füllen wir aber als erstes unsere Datenbank mit mehr Alben. Dann
-      macht das Suchen auch mehr Spass.<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-ruby-1.9.2-p0 &gt; <command>Album.create(:name =&gt; "Rubber Soul", :release_year =&gt; 1965, :position =&gt; 5)</command>
- =&gt; #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-09-03 09:04:45", updated_at: "2010-09-03 09:04:45"&gt; 
-ruby-1.9.2-p0 &gt; <command>Album.create(:name =&gt; "What's Going On", :release_year =&gt; 1971, :position =&gt; 6)</command>
- =&gt; #&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-09-03 09:05:09", updated_at: "2010-09-03 09:05:09"&gt; 
-ruby-1.9.2-p0 &gt; <command>Album.create(:name =&gt; "Exile on Main St.", :release_year =&gt; 1972, :position =&gt; 7)</command>
- =&gt; #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-09-03 09:05:28", updated_at: "2010-09-03 09:05:28"&gt; 
-ruby-1.9.2-p0 &gt; <command>Album.create(:name =&gt; "London Calling", :release_year =&gt; 1979, :position =&gt; 8)</command>
- =&gt; #&lt;Album id: 8, position: 8, name: "London Calling", release_year: 1979, created_at: "2010-09-03 09:05:46", updated_at: "2010-09-03 09:05:46"&gt; 
-ruby-1.9.2-p0 &gt; <command>Album.create(:name =&gt; "Blonde on Blonde", :release_year =&gt; 1966, :position =&gt; 9)</command>
- =&gt; #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-09-03 09:06:28", updated_at: "2010-09-03 09:06:28"&gt; 
-ruby-1.9.2-p0 &gt; <command>Album.create(:name =&gt; "The Beatles", :release_year =&gt; 1968, :position =&gt; 10)</command>
- =&gt; #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-09-03 09:06:45", updated_at: "2010-09-03 09:06:45"&gt; 
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+      <para>Für die hier verwendeten Beispiele verwenden Sie bitte folgende
+      <filename>db/seed.rb</filename> Datei:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
+# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
+#
+# Examples:
+#
+#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
+#   Mayor.create(:name =&gt; 'Daley', :city =&gt; cities.first)
+
+Album.create("name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "position"=&gt;1, "release_year"=&gt;1967)
+Album.create("name"=&gt;"Pet Sounds", "position"=&gt;2, "release_year"=&gt;1966)
+Album.create("name"=&gt;"Revolver", "position"=&gt;3, "release_year"=&gt;1966)
+Album.create("name"=&gt;"Highway 61 Revisited", "position"=&gt;4, "release_year"=&gt;1965)
+Album.create("name"=&gt;"Rubber Soul", "position"=&gt;5, "release_year"=&gt;1965)
+Album.create("name"=&gt;"What's Going On", "position"=&gt;6, "release_year"=&gt;1971)
+Album.create("name"=&gt;"Exile on Main St.", "position"=&gt;7, "release_year"=&gt;1972)
+Album.create("name"=&gt;"London Calling", "position"=&gt;8, "release_year"=&gt;1979)
+Album.create("name"=&gt;"Blonde on Blonde", "position"=&gt;9, "release_year"=&gt;1966)
+Album.create("name"=&gt;"The Beatles", "position"=&gt;10, "release_year"=&gt;1968)</programlisting></para>
+
+      <para>Danach die Datenbank mit <command>rake db:setup</command> neu
+      aufsetzen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake db:setup</command>
+(in /Users/stefan/jukebox)
+db/test.sqlite3 already exists
+db/test.sqlite3 already exists
+db/development.sqlite3 already exists
+db/development.sqlite3 already exists
+-- create_table("albums", {:force=&gt;true})
+   -&gt; 0.0183s
+-- initialize_schema_migrations_table()
+   -&gt; 0.0004s
+-- assume_migrated_upto_version(20101004085045, "db/migrate")
+   -&gt; 0.0004s
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <section>
         <title>where</title>
@@ -480,7 +576,7 @@ ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1960..1966, :positio
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
-        <para>Oder noch cooler ein Array von Parametern:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+        <para>Oder auch ein Array von Parametern:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; [1966,1968])</command>
  =&gt; [#&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-09-03 09:06:28", updated_at: "2010-09-03 09:06:28"&gt;, #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-09-03 09:06:45", updated_at: "2010-09-03 09:06:45"&gt;] 
@@ -488,9 +584,9 @@ ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
         <important>
-          <para>Das Ergegebnis von where is immer ein Array. Auch wenn nur ein
-          Treffer drin ist oder auch wenn gar kein Treffer ausgegeben
-          wird.</para>
+          <para>Das Ergegebnis von <methodname>where</methodname> is immer ein
+          Array. Auch wenn nur ein Treffer drin ist oder auch wenn gar kein
+          Treffer ausgegeben wird.</para>
         </important>
       </section>
 
@@ -498,8 +594,9 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
         <title>Attribute-based find_by, find_last_by und find_all_by</title>
 
         <para>Das Attribute-based <methodname>find_by</methodname> ist eine
-        "magische" Methode. Aber eine Consolenbeispiel sagt mehr als tausend
-        Worte. Ich verwende erst <methodname>where</methodname> und dann
+        "magische" Methode, denn sie kann von Ihnen dynamisch erweitert
+        werden. Aber eine Consolenbeispiel sagt mehr als tausend Worte. Ich
+        verwende erst <methodname>where</methodname> und dann
         <methodname>find_by</methodname> für die gleiche Abfage:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1966).first</command>
@@ -517,11 +614,12 @@ ruby-1.9.2-p0 &gt; <command>Album.find_all_by_release_year(1966).count</command>
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
-        <para>Im Gegensatz zu <methodname>where</methodname> gibt
-        <methodname>find_by</methodname> entweder ein Objekt der gesuchten
-        Klasse (hier <classname>Album</classname>) oder
-        <classname>nil</classname> aus (where gibt <emphasis>immer</emphasis>
-        ein Array aus):<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+        <important>
+          <para>Im Gegensatz zu <methodname>where</methodname> gibt
+          <methodname>find_by</methodname> entweder ein Objekt der gesuchten
+          Klasse (hier <classname>Album</classname>) oder
+          <classname>nil</classname> aus. <methodname>where</methodname> gibt
+          <emphasis>immer</emphasis> ein Array aus!<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.find_by_release_year(1972)</command>
  =&gt; #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-09-03 09:05:28", updated_at: "2010-09-03 09:05:28"&gt; 
@@ -533,6 +631,7 @@ ruby-1.9.2-p0 &gt; <command>Album.find_by_release_year(2010).class</command>
  =&gt; NilClass 
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+        </important>
 
         <para>Die Methode <methodname>find_all_by</methodname> gibt wie
         <methodname>where</methodname> immer ein Array aus:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
