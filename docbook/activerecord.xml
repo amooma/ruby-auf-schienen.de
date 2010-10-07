@@ -60,6 +60,17 @@
         immer, was gerade auf Datenbank-Ebene abläuft.</para>
       </tip>
     </section>
+
+    <section>
+      <title>Blut lecken</title>
+
+      <para>Diese Buch ist ein Einsteigerbuch. Entsprechend werden hier die
+      Grundlagen für die Benutzung von ActiveRecord besprochen. Es wäre ein
+      leichtes ein doppelt so dickes Buch nur über ActiveRecord zu schreiben.
+      Lassen Sie sich von diesem Kapitel anfixen und forschen Sie in den
+      Dokumentationen zu Rails weiter (siehe <xref
+      linkend="weiterfuehrende_doku" />).</para>
+    </section>
   </section>
 
   <section xml:id="activerecord_datenbank_anlegen">
@@ -508,9 +519,9 @@ end</programlisting></para>
         <para>Manchmal ist es praktisch den aktuellen Datenbestand einer
         Rails-Applikation in eine <filename>seeds.rb</filename> zu
         exportieren. Beim Schreiben dieses Buches hatte ich dieses Problem
-        fast in jedem Kapitel. Es gibt dafür keinen Standard-Weg. Ich zeige
-        Ihnen wie ich es in diesem Fall gemacht habe. Daraus können Sie
-        ableiten wie es funktioniert.</para>
+        fast in jedem Kapitel. Es gibt dafür leider keinen Standard-Weg. Ich
+        zeige Ihnen man es in diesem Fall machen kann. Komplexere Szenarien
+        lassen sich daraus ableiten.</para>
 
         <para>Füllen Sie die Datei
         <filename>lib/tasks/apfelmus.rake</filename> mit folgendem
@@ -782,14 +793,46 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
           linkend="activerecord_validierung" />).</para>
         </warning>
 
-        <para>Man kann bei der Angabe der Parameter auch folgenden Mix ...
-        TODO</para>
+        <para>Wenn Sie zwar nach einem Album-Namen suchen, aber beim evtuellen
+        <methodname>create</methodname> auch noch andere Daten angeben wollen,
+        so geht das auch mit
+        <methodname>find_or_create_by_</methodname>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>crying_time = Album.find_or_create_by_name('Genius Loves Company', :release_year =&gt; 2004)</command>
+ =&gt; #&lt;Album id: 12, position: nil, name: "Genius Loves Company", release_year: 2004, created_at: "2010-10-07 13:23:58", updated_at: "2010-10-07 13:23:58"&gt; 
+ruby-1.9.2-p0 &gt; <command>crying_time</command>
+ =&gt; #&lt;Album id: 12, position: nil, name: "Genius Loves Company", release_year: 2004, created_at: "2010-10-07 13:23:58", updated_at: "2010-10-07 13:23:58"&gt; 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+
+        <para>Ein Blick in die <filename>log/development.log</filename> zeigt,
+        das zwar nur nach "Genius Loves Company" gesucht wurde, aber der neue
+        Datensatz inklusive dem <varname>release_year</varname> angelegt
+        wurde:<programlisting>  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."name" = 'Genius Loves Company') LIMIT 1
+  SQL (0.4ms)  INSERT INTO "albums" ("created_at", "name", "position", "release_year", "updated_at") VALUES ('2010-10-07 13:23:58.446037', 'Genius Loves Company', NULL, 2004, '2010-10-07 13:23:58.446037')
+</programlisting></para>
       </section>
 
       <section>
-        <title>find_or_</title>
+        <title>find_or_initialize_</title>
 
-        <para></para>
+        <para>Die Methode <methodname>find_or_initialize_</methodname>
+        arbeitet wie <methodname>find_or_create_by_</methodname>. Allerdings
+        gibt es einen entscheidenen Unterschied:
+        <methodname>find_or_initialize_</methodname> speichert einen neuen
+        Datensatz nicht ab. Das muss später per <methodname>save</methodname>
+        erfolgen. Kleines Beispiel:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>i_got_a_woman = Album.find_or_initialize_by_name('I Got a Woman', :release_year =&gt; 1955)</command>
+ =&gt; #&lt;Album id: nil, position: nil, name: "I Got a Woman", release_year: 1955, created_at: nil, updated_at: nil&gt; 
+ruby-1.9.2-p0 &gt; <command>Album.last</command>
+ =&gt; #&lt;Album id: 12, position: nil, name: "Genius Loves Company", release_year: 2004, created_at: "2010-10-07 13:23:58", updated_at: "2010-10-07 13:23:58"&gt; 
+ruby-1.9.2-p0 &gt; <command>i_got_a_woman.save</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt; <command>Album.last</command>
+ =&gt; #&lt;Album id: 13, position: nil, name: "I Got a Woman", release_year: 1955, created_at: "2010-10-07 16:05:59", updated_at: "2010-10-07 16:05:59"&gt; 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
       </section>
 
       <section xml:id="activerecord_find_by_all_performance">
@@ -882,7 +925,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
         <para>Die komplette Hilfe zur Methode <methodname>find</methodname>
         können Sie sich mit <command>ri
         ActiveRecord::FinderMethods.find</command> anzeigen lassen. Dort gibt
-        es auch viele Beispiele.</para>
+        es auch sehr viele Anwendungsbeispiele.</para>
       </tip>
 
       <section>
