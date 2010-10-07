@@ -48,7 +48,7 @@
 				</xsl:if>
 			</xsl:for-each>
 			<xsl:if test="count($this.node/ancestor::*) = 0">
-				<li class="breadcrumb-text highlight">
+				<li class="breadcrumb-text highlight indexpage">
 					<xsl:apply-templates select="$this.node" mode="title.markup"/>
 				</li>
 				<xsl:for-each select="$this.node/child::*[local-name() != 'bookinfo' and local-name() != 'info' and local-name() != 'articleinfo']">
