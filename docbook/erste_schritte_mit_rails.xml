@@ -611,7 +611,16 @@ Completed 200 OK in 60ms (Views: 1.2ms | ActiveRecord: 0.3ms)
     einfach in das Verzeichnis <filename>public</filename> legen, da dort
     abgelegte Seiten 1:1 ausgeliefert werden und nicht durch einen
     <literal>erb</literal>-Parser gehen. Dummerweise müssen wir dafür jetzt
-    direkt mit dem MVC-Modell anrücken. Wir brauchen einen <indexterm>
+    direkt mit dem <indexterm>
+        <primary>Model&#8211;View&#8211;Controller</primary>
+
+        <see>MVC</see>
+      </indexterm><indexterm>
+        <primary>MVC</primary>
+      </indexterm>MVC-Modell <footnote>
+        <para><uri
+        xlink:href="http://de.wikipedia.org/wiki/Model_View_Controller">http://de.wikipedia.org/wiki/Model_View_Controller</uri></para>
+      </footnote> anrücken. Wir brauchen einen <indexterm>
         <primary>Controller</primary>
       </indexterm>Controller. Den können wir mit dem Befehl <command>rails
     generate controller</command> anlegen. Schauen wir uns mal die Hilfe
@@ -1027,31 +1036,59 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
     </section>
 
     <section xml:id="erb_mit_programmierlogik">
-      <title>Instance-Variablen vom Controller zum View übergeben</title>
+      <title>Instanz-Variablen vom Controller zum View übergeben</title>
 
-      <para>Einer der todsünden im MVC Model ist ja bekanntlich zu viel
-      Programmierlogic im View unterzubringen. Quasi so wie man früher oft in
-      PHP programmiert hat. Bei MVC ist eins der Ziele, das quasi jeder
-      beliebige HTML-Designer einen View erstellen kann ohne sich über die
-      Programmierung gedanken machen zu müssen. Ja, ja, ... wenn das mal immer
-      so einfach wäre. Trotzdem gehen wir das mal gedanklich weiter: Wenn ich
-      im Controller einen Wert habe, den ich im View anzeigen will, so
-      benötige ich dafür einen Mechanismus. Dieser heißt Instance-Variable.
-      Wer sich nicht mehr 100% sicher welche Variable welchen Scope hat, der
-      sollte ganz fix noch mal einen Blick in <xref
+      <indexterm>
+        <primary>MVC</primary>
+      </indexterm>
+
+      <indexterm>
+        <primary>Model&#8211;View&#8211;Controller</primary>
+
+        <see>MVC</see>
+      </indexterm>
+
+      <indexterm>
+        <primary>Controller</primary>
+      </indexterm>
+
+      <indexterm>
+        <primary>View</primary>
+      </indexterm>
+
+      <indexterm>
+        <primary>Instanz-Variablen</primary>
+      </indexterm>
+
+      <para>Einer der Todsünden im MVC-Modell <footnote>
+          <para><uri
+          xlink:href="http://de.wikipedia.org/wiki/Model_View_Controller">http://de.wikipedia.org/wiki/Model_View_Controller</uri></para>
+        </footnote> ist ja bekanntlich zu viel Programm-Logik im View
+      unterzubringen. Quasi so wie man früher oft in PHP programmiert hat. Bei
+      MVC ist eins der Ziele, dass quasi jeder beliebige HTML-Designer einen
+      View erstellen kann ohne sich über die Programmierung Gedanken machen zu
+      müssen. Ja, ja, … wenn das mal immer so einfach wäre. Trotzdem gehen wir
+      das mal gedanklich weiter: Wenn ich im Controller einen Wert habe, den
+      ich im View anzeigen will, so benötige ich dafür einen Mechanismus.
+      Dieser heißt Instanz-Variable (<foreignphrase xml:lang="en">instance
+      variable</foreignphrase>). Wer sich nicht mehr 100 % sicher ist welche
+      Variable welchen Geltungsbereich (<indexterm>
+          <primary>Scope</primary>
+        </indexterm><foreignphrase xml:lang="en">Scope</foreignphrase>) hat,
+      der sollte ganz fix noch mal einen Blick in <xref
       linkend="scope_von_variablen" /> werfen (geht schnell und lohnt
       sich).</para>
 
       <para>Wir brechen jetzt einfach mal ein Beispiel vom Zaun und fügen im
       Controller eine Instance-Variable für die aktuelle Uhrzeit ein und fügen
-      diese dann im View ein. Wir nehmen also Programmierintelligenz aus dem
+      diese dann im View ein. Wir nehmen also Programmier-Intelligenz aus dem
       View in den Controller.</para>
 
       <para>Die Controller Datei
       <filename>app/controllers/example_controller.rb</filename> sieht dann so
       aus:<programlisting>class ExampleController &lt; ApplicationController
   def test
-    <emphasis>@current_time</emphasis> = Time.now
+    <emphasis role="bold">@current_time</emphasis> = Time.now
   end
 
 end
@@ -1061,25 +1098,34 @@ end
       <filename>app/views/example/test.html.erb</filename> können wir dann auf
       diese Instance-Variable zurückgreifen:<programlisting>&lt;p&gt;
 Die aktuelle Uhrzeit ist 
-&lt;%= <emphasis>@current_time</emphasis> %&gt;
+&lt;%= <emphasis role="bold">@current_time</emphasis> %&gt;
 &lt;/p&gt;
 </programlisting></para>
 
       <para>Wir haben jetzt eine klare Trennung von Programmierlogik und
       Darstellungslogik mit dem Controller und dem View. So können wir im
-      Controller die Uhrzeit je nach Zeitzone des Users automatisch anpassen,
-      ohne das sich der Designer der Seite darum kümmern muss.</para>
+      Controller die Uhrzeit je nach Zeitzone des Anwenders automatisch
+      anpassen, ohne dass sich der Designer der Seite darum kümmern
+      muss.</para>
 
-      <para>Mir ist klar, das jetzt keiner aufspringen und schreien wird
-      "Danke für die Erleuchtung! Ich werde nur noch sauber nach MVC
-      programmieren". Das obige Beispiel ist der erste kleine Schritt in die
-      Richtung und zeigt wie wir einfach mit Instance-Variablen (das sind die
-      mit dem @-Zeichen davor) Werte aus dem Controller in den View bringen
-      können.</para>
+      <para>Mir ist klar, dass jetzt keiner aufspringen und schreien wird:
+      <quote>Danke für die Erleuchtung! Ich werde nur noch sauber nach MVC
+      programmieren.</quote> Das obige Beispiel ist der erste kleine Schritt
+      in die Richtung und zeigt wie wir einfach mit Instance-Variablen (das
+      sind die mit dem <code>@</code>-Zeichen davor) Werte aus dem Controller
+      in den View bringen können.</para>
     </section>
 
     <section xml:id="partials">
       <title xml:id="partials.title">Partials</title>
+
+      <indexterm>
+        <primary>Partials</primary>
+      </indexterm>
+
+      <indexterm>
+        <primary>erb</primary>
+      </indexterm>
 
       <para>Selbst schon bei kleinen Webprojekten gibt es oft wiederkehrende
       Elemente. Das kann zum Beispiel ein Footer der Seite mit den
