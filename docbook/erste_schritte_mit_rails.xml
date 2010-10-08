@@ -140,6 +140,10 @@
 
           <see>Inflections</see>
         </indexterm><indexterm>
+          <primary>Flexion</primary>
+
+          <see>Inflections</see>
+        </indexterm><indexterm>
           <primary>Pluralization</primary>
 
           <see>Inflections</see>
@@ -150,7 +154,16 @@
         </indexterm>So verwenden sehr viele Mechanismen automagisch Plural
       oder Singular von englischen Wörtern. Wenn man sich damit anfreundet
       Datenbankfelder und -tabellen mit englischen Begriffen zu benennen, dann
-      kann man die ganze Macht dieser Magie ausnutzen.</para>
+      kann man die ganze Macht dieser Magie ausnutzen. Diesen Mechanismus
+      nennt man <code>Inflector</code> <footnote>
+          <para>siehe <uri
+          xlink:href="http://api.rubyonrails.org/classes/ActiveSupport/Inflector.html">http://api.rubyonrails.org/classes/ActiveSupport/Inflector.html</uri></para>
+        </footnote> oder <foreignphrase
+      xml:lang="en">Inflections</foreignphrase> (Beugungen / Flexionen
+      <footnote>
+          <para>siehe <uri
+          xlink:href="http://de.wikipedia.org/wiki/Flexion">http://de.wikipedia.org/wiki/Flexion</uri></para>
+        </footnote>).</para>
 
       <para>Im Buch werde ich für Variablen, Klassen und Methoden englische
       Namen verwenden. Die Kommentare werde ich auf Deutsch schreiben. Falls
@@ -578,6 +591,16 @@ Completed 200 OK in 60ms (Views: 1.2ms | ActiveRecord: 0.3ms)
       <see>erb</see>
     </indexterm>
 
+    <indexterm>
+      <primary>Templates</primary>
+
+      <seealso>erb</seealso>
+
+      <seealso>Views</seealso>
+
+      <seealso>Layouts</seealso>
+    </indexterm>
+
     <para>Kennen Sie PHP (ohne Frameworks)? Dann wird Ihnen der Inhalt einer
     <literal>erb</literal>-Datei sehr bekannt vorkommen. Es ist eine Mischung
     aus (beispielsweise) HTML und Ruby-Code. (<literal>erb</literal> steht für
@@ -588,9 +611,11 @@ Completed 200 OK in 60ms (Views: 1.2ms | ActiveRecord: 0.3ms)
     einfach in das Verzeichnis <filename>public</filename> legen, da dort
     abgelegte Seiten 1:1 ausgeliefert werden und nicht durch einen
     <literal>erb</literal>-Parser gehen. Dummerweise müssen wir dafür jetzt
-    direkt mit dem MVC-Modell anrücken. Wir brauchen einen Controller. Den
-    können wir mit dem Befehl <command>rails generate controller</command>
-    anlegen. Schauen wir uns mal die Hilfe an:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rails generate controller</command>
+    direkt mit dem MVC-Modell anrücken. Wir brauchen einen <indexterm>
+        <primary>Controller</primary>
+      </indexterm>Controller. Den können wir mit dem Befehl <command>rails
+    generate controller</command> anlegen. Schauen wir uns mal die Hilfe
+    an:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rails generate controller</command>
 Usage:
   rails generate controller NAME [action action] [options]
 
@@ -652,10 +677,8 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
     <para>Puhhh… da wird ja direkt ne ganze Menge erstellt. Unter anderem eine
     Datei <filename>app/views/example/test.html.erb</filename>. Schauen wir
     uns die mal an:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>cat app/views/example/test.html.erb </command>
-&lt;h1&gt;Example#test&lt;/h1&gt;
-&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt;
-
-stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
+</screen><programlisting>&lt;h1&gt;Example#test&lt;/h1&gt;
+&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt;</programlisting></para>
 
     <para>Ist also auch HTML. Da <quote>fehlt</quote> anscheinend oben und
     unten etwas, aber prinzipiell sieht das stark nach HTML aus. Zum Testen
@@ -683,7 +706,9 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
         </mediaobject>
       </screenshot></para>
 
-    <para>Im Log <filename>log/development.log</filename> finden wir den
+    <para>Im <indexterm>
+        <primary>Log</primary>
+      </indexterm>Log <filename>log/development.log</filename> finden wir den
     folgenden Eintrag:<programlisting>Started GET "/example/test" for 127.0.0.1 at 2010-09-01 10:31:24 +0200
   Processing by ExampleController#test as HTML
 Rendered example/test.html.erb within layouts/application (2.1ms)
@@ -707,36 +732,43 @@ total 16
 -rw-r--r--  1 stefan  staff  80  1 Sep 09:29 application_controller.rb
 -rw-r--r--  1 stefan  staff  70  1 Sep 10:29 example_controller.rb
 stefan@swmbp 0 1.9.2-p0 testproject$ <command>cat app/controllers/example_controller.rb</command> 
-class ExampleController &lt; ApplicationController
+</screen><programlisting>class ExampleController &lt; ApplicationController
   def test
   end
 
-end
-stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
+end</programlisting></para>
 
     <para>Das ist jetzt sehr übersichtlich. Der Controller
     <code>ExampleController</code> stammt vom
-    <code>ApplicationController</code> ab und besteht aktuell aus genau einer
+    <code>ApplicationController</code> ab und enthält aktuell genau eine
     Methode mit dem Namen <methodname>test</methodname>. Und diese Methode
     macht nichts.</para>
 
-    <para>Sie werden sich fragen, woher Rails weiß, das bei der URI
-    <uri>/example/test</uri> der Controller <code>example</code> und die
-    Methode <code>test</code> abzuarbeiten ist. Das wird nämlich nicht durch
-    eine magische Logik, sondern durch eine einfache Routing-Konfiguration
-    gesteuert. Diese finden Sie in der Datei
-    <filename>config/routes.rb</filename> in der zweiten Zeile:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>cat config/routes.rb | grep example</command>
-  get "example/test"
-stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
+    <para><indexterm>
+        <primary>Routing</primary>
+      </indexterm><indexterm>
+        <primary>routes.rb</primary>
+      </indexterm><indexterm>
+        <primary>Inflections</primary>
+      </indexterm>Sie werden sich fragen, woher Rails weiß, dass bei dem
+    URL-Pfad <uri>/example/test</uri> der Controller
+    <code>ExampleController</code> und die Methode <code>test</code>
+    abzuarbeiten ist. Das wird nämlich nicht durch eine magische Logik,
+    sondern durch eine einfache <foreignphrase
+    xml:lang="en">Routing</foreignphrase>-Konfiguration gesteuert. Diese
+    finden Sie in der Datei <filename>config/routes.rb</filename> in der
+    zweiten Zeile:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>cat config/routes.rb | grep example</command>
+</screen><programlisting>  get "example/test"</programlisting></para>
 
-    <para>Diese Zeile wurde vom <command>rails generate controller</command>
-    automatisch eingefügt. In der Routing-Datei können Sie auch beliebiges
-    Mapping vornehmen. Aber dazu später mehr. Aktuell sehen unsere Routen sehr
-    einfach aus. Mit dem Befehl <command>rake routes</command> können wir
-    diese abfragen:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rake routes</command>
+    <para>Diese Zeile wurde vom Befehl <command>rails generate
+    controller</command> automatisch eingefügt. In der Routing-Datei können
+    Sie auch beliebiges <foreignphrase xml:lang="en">Mapping</foreignphrase>
+    vornehmen. Aber dazu später mehr. Aktuell sehen unsere Routen sehr einfach
+    aus. Mit dem Befehl <command>rake routes</command> können wir diese
+    abfragen:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rake routes</command>
 (in /Users/stefan/testproject)
 example_test GET /example/test(.:format) {:controller=&gt;"example", :action=&gt;"test"}
-stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
+stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 
     <para>Wir kümmern uns später noch genauer um die Routen. Ich wollte es an
     dieser Stelle nur nicht gänzlich überspringen.</para>
@@ -749,20 +781,26 @@ stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
       würde die Route nicht mehr greifen.</para>
     </important>
 
-    <section>
+    <section xml:id="erb-programmieren">
       <title>Programmieren in einer erb-Datei</title>
 
-      <para>Erb-Seiten können Ruby-Code enthalten. Damit kann programmiert
-      werden und damit können diese Seite dynamischen Inhalt bekommen.</para>
+      <indexterm>
+        <primary>erb</primary>
+      </indexterm>
 
-      <para>Fangen wir mal mit etwas ganz einfachem an: Der Addition von 1 und
-      1. Als erstes probieren wir den Code im irb aus:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>irb</command>
+      <para><literal>Erb</literal>-Seiten können Ruby-Code enthalten. Damit
+      kann programmiert werden, und damit können diese Seiten dynamischen
+      Inhalt bekommen.</para>
+
+      <para>Fangen wir mal mit etwas ganz einfachem an: der Addition von 1 und
+      1. Als erstes probieren wir den Code im <literal>irb</literal>
+      aus:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>irb</command>
 ruby-1.9.2-p0 &gt; <command>1 + 1</command>
  =&gt; 2 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
+stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 
-      <para>Das war einfach. Die darum erweiterte erb-Datei
+      <para>Das war einfach. Die <literal>erb</literal>-Datei
       <filename>app/views/example/test.html.erb</filename> füllen wir wie
       folgt:<programlisting>&lt;h1&gt;Erste Versuche mit erb&lt;/h1&gt;
 &lt;p&gt;Addition:
@@ -770,9 +808,8 @@ stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
 &lt;/p&gt;
 </programlisting></para>
 
-      <para>Danach mit <command>rails server</command> den Server starten
-      (falls noch nicht getan) und per Web-Server auf die Seite
-      gehen:<screenshot>
+      <para>Danach mit <command>rails server</command> den Web-Server starten
+      (falls noch nicht getan) und per Browser auf die Seite gehen:<screenshot>
           <info>
             <title>Einfache Addition</title>
           </info>
@@ -784,26 +821,31 @@ stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
           </mediaobject>
         </screenshot></para>
 
-      <para>Ruby Code dessen Ergebnis ausgegeben werden soll, wird von einem
+      <para>Ruby-Code dessen Ergebnis ausgegeben werden soll, wird von einem
       <code>&lt;%=</code> und einem <code>%&gt;</code> eingeschlossen.
       Ausgegeben werden können nur Strings.</para>
 
       <para>Jetzt werden Sie sich vielleicht fragen: Wie kann den das Ergebnis
       einer Addion von zwei Fixnums als Text angezeigt werden? Schauen wir
-      erstmal im irb nach, ob es wirklich ein Fixnum ist:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>irb</command>
+      erstmal im <literal>irb</literal> nach, ob es wirklich ein Fixnum
+      ist:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>irb</command>
 ruby-1.9.2-p0 &gt; <command>1.class</command>
  =&gt; Fixnum 
 ruby-1.9.2-p0 &gt; <command>(1 + 1).class</command>
  =&gt; Fixnum 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
+stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 
-      <para>Ja, sowohl die Zahl 1 wie auch das Ergebnis von 1 + 1 ist ein
+      <para>Ja, sowohl die Zahl 1 also auch das Ergebnis von 1 + 1 ist ein
       Fixnum. Was ist passiert? Rails ist so intelligent alle Objekte in einem
-      View (das ist die Datei <filename>test.html.erb</filename>) die nicht
-      ein String sind automatisch mit der Methode
-      <methodname>.to_s</methodname> aufzurufen. Noch mal kurz ins
-      irb:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>irb</command>
+      <indexterm>
+          <primary>View</primary>
+        </indexterm>View (das ist die Datei
+      <filename>test.html.erb</filename>) die nicht bereits ein String sind
+      automatisch mit der Methode <indexterm>
+          <primary>to_s()</primary>
+        </indexterm><methodname>.to_s</methodname> aufzurufen. Noch mal kurz
+      ins <literal>irb</literal>:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>irb</command>
 ruby-1.9.2-p0 &gt; <command>(1 + 1).class</command>
  =&gt; Fixnum 
 ruby-1.9.2-p0 &gt; <command>(1 + 1).to_s.class</command>
@@ -812,28 +854,32 @@ ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 
       <para>Das mit dem Ruby-Code schauen wir uns mal genauer an. In einer
-      <filename>html.erb</filename> Datei gibt zusätzlich zu den
-      HTML-Elementen zwei Arten von Ruby-Code Elementen:<itemizedlist>
+      <filename>.html.erb</filename>-Datei gibt zusätzlich zu den
+      HTML-Elementen zwei Arten von Ruby-Code-Anweisungen:<itemizedlist>
           <listitem>
-            <para><code>&lt;% ... %&gt;</code></para>
+            <para><emphasis role="bold"><code>&lt;%
+            <replaceable>…</replaceable> %&gt;</code></emphasis></para>
 
-            <para>Führt den enthaltenen Ruby-Code aus, aber gibt nichts
-            aus.</para>
+            <para>Führt den enthaltenen Ruby-Code aus, aber gibt nichts aus
+            (außer Sie verwenden explizit sowas wie <code>print</code> oder
+            <code>puts</code>).</para>
           </listitem>
 
           <listitem>
-            <para><code>&lt;%= ... %&gt;</code></para>
+            <para><emphasis role="bold"><code>&lt;%=
+            <replaceable>…</replaceable> %&gt;</code></emphasis></para>
 
             <para>Führt den enthaltenen Ruby-Code aus und gibt das Ergebnis
             als Text aus. Dabei werden seit Ruby 3.0 automatisch
-            "problematische" Zeichen escaped. Falls Sie einmal nicht escapeten
-            Text ausgeben möchten, so müssen Sie das mit
+            problematische Zeichen <quote>escapt</quote>. Falls Sie einmal
+            nicht escapten Text ausgeben möchten, so müssen Sie das mit
             <code>raw(string)</code> realisieren.</para>
 
-            <para>So lange also ein Objekt eine Methode
+            <para>Sofern also ein Objekt eine Methode
             <methodname>.to_s</methodname> hat oder das Objekt selber schon
             ein String ist, kann man es als Ergebnis im View innerhalb einer
-            <code>&lt;%= ... %&gt;</code> Kapselung ausgeben.</para>
+            <code>&lt;%= <replaceable>…</replaceable> %&gt;</code> Kapselung
+            ausgeben.</para>
           </listitem>
         </itemizedlist>Um ganz sicher zu sein, noch ein Beispiel. Wir ändern
       die <filename>app/views/example/test.html.erb</filename> wie
@@ -856,7 +902,7 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
           </mediaobject>
         </screenshot></para>
 
-      <para>Schauen wir uns mal den HTML-Source-Code im Browser
+      <para>Schauen wir uns mal den HTML-Source-Code (-Quelltext) im Browser
       an:<programlisting>&lt;!DOCTYPE html&gt; 
 &lt;html&gt; 
 &lt;head&gt; 
@@ -895,9 +941,10 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
               </question>
 
               <answer>
-                <para>Kann es sein, das Sie <xref linkend="ruby-grundlagen" />
-                nicht komplett durchgearbeitet haben? Bitte die Zeit dafür
-                nehmen. Sonst macht hier das alles keinen Sinn.</para>
+                <para>Kann es sein, dass Sie <xref
+                linkend="ruby-grundlagen" /> nicht komplett durchgearbeitet
+                haben? Bitte nehmen Sie sich die Zeit dafür. Sonst macht hier
+                das alles keinen Sinn.</para>
               </answer>
             </qandaentry>
 
@@ -906,7 +953,7 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
                 <para>Ich verstehe den Ruby-Code und die HTML-Ausgabe.
                 Allerdings verstehe ich nicht, warum drum rum noch HTML-Code
                 gerendert wurde, den ich gar nicht geschrieben habe. Woher
-                kommt der und kann ich Ihn beeinflussen?</para>
+                kommt der, und kann ich ihn beeinflussen?</para>
               </question>
 
               <answer>
@@ -917,19 +964,35 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
           </qandadiv>
         </qandaset></para>
 
-      <para>Die Feinheiten von erb werden Sie jetzt Stück für Stück erlernen.
-      Es handelt sich dabei nicht um Zauberei.</para>
+      <para>Die Feinheiten von <literal>erb</literal> werden Sie jetzt Stück
+      für Stück erlernen. Es handelt sich dabei nicht um Zauberei.</para>
     </section>
 
     <section xml:id="erb_layouts">
       <title xml:id="erb_layouts.title">Layouts</title>
 
-      <para>Die erb Datei im Verzeichnis
-      <filename>app/views/example/</filename> bilden nur den Kern der späteren
-      HTML-Seite. Per default wird immer eine automatisch generierte
+      <indexterm>
+        <primary>Layouts</primary>
+      </indexterm>
+
+      <indexterm>
+        <primary>Views</primary>
+      </indexterm>
+
+      <indexterm>
+        <primary>application.html.erb</primary>
+      </indexterm>
+
+      <indexterm>
+        <primary>Templates</primary>
+      </indexterm>
+
+      <para>Die <literal>erb</literal>-Datei im Verzeichnis
+      <filename>app/views/example/</filename> bildet nur den Kern der späteren
+      HTML-Seite. Per Default wird immer eine automatisch generierte
       <filename>app/views/layouts/application.html.erb</filename> drum rum
       gerendert. Schauen wir uns die mal an:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>cat app/views/layouts/application.html.erb</command>
-&lt;!DOCTYPE html&gt;
+</screen><programlisting>&lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
   &lt;title&gt;Testproject&lt;/title&gt;
@@ -942,22 +1005,25 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 &lt;%= yield %&gt;
 
 &lt;/body&gt;
-&lt;/html&gt;
-stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
+&lt;/html&gt;</programlisting></para>
 
-      <para>Ich löse das Rätsel auf: Interessant ist die Zeile<programlisting>&lt;%= yield %&gt;</programlisting></para>
+      <para><indexterm>
+          <primary>yield()</primary>
+        </indexterm>Ich löse das Rätsel auf: Interessant ist die
+      Zeile<programlisting>&lt;%= yield %&gt;</programlisting></para>
 
-      <para>Mit <code>&lt;%= yield %&gt;</code> wird die View-Datei
+      <para>Mit <code>&lt;%= yield %&gt;</code> wird hier die View-Datei
       inkludiert. Die drei Zeilen mit den Stylesheets und dem JavaScript
       lassen wir erstmal so wie sie sind. Darum kümmern wir uns später.</para>
 
-      <para>Die <filename>app/views/layouts/application.html.erb</filename>
-      bietet Ihnen die Möglichkeit das Grundlayout über die gesamte
-      Rails-Applikation fest zu legen. Sie können aber auch im Verzeichnis
+      <para>Die Datei
+      <filename>app/views/layouts/application.html.erb</filename> bietet Ihnen
+      die Möglichkeit das Grund-Layout über die gesamte Rails-Applikation fest
+      zu legen. Sie können aber auch im Verzeichnis
       <filename>app/views/layouts/</filename> noch andere Layouts anlegen und
-      diese je nach Situation anwenden. Ich bin hin und hergerissen dieses
+      diese je nach Situation anwenden. Ich bin hin- und hergerissen dieses
       Thema jetzt zu vertiefen, aber lassen wir es jetzt erstmal. Wichtig ist
-      jetzt, das Sie die Grundidee verstehen.</para>
+      jetzt, dass Sie die Grundidee verstehen.</para>
     </section>
 
     <section xml:id="erb_mit_programmierlogik">
