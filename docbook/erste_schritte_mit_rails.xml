@@ -139,6 +139,14 @@
           <primary>Inflector</primary>
 
           <see>Inflections</see>
+        </indexterm><indexterm>
+          <primary>Pluralization</primary>
+
+          <see>Inflections</see>
+        </indexterm><indexterm>
+          <primary>Singularization</primary>
+
+          <see>Inflections</see>
         </indexterm>So verwenden sehr viele Mechanismen automagisch Plural
       oder Singular von englischen Wörtern. Wenn man sich damit anfreundet
       Datenbankfelder und -tabellen mit englischen Begriffen zu benennen, dann
@@ -354,7 +362,7 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 
       <para>Dann rufen wir doch mal genau diese URL (<uri
       xlink:href="http://0.0.0.0:3000">http://0.0.0.0:3000</uri>) im
-      Webbrowser auf.<screenshot>
+      Web-Browser auf.<screenshot>
           <info>
             <title>Default Index-Seite in einem frischen
             Rails-Projekt.</title>
@@ -411,20 +419,33 @@ Completed 200 OK in 60ms (Views: 1.2ms | ActiveRecord: 0.3ms)
       <para>Mit <keycombo>
           <keycap function="control">Ctrl</keycap>
 
-          <keycap>S</keycap>
-        </keycombo> können Sie den Web-Server wieder stoppen.</para>
+          <keycap>C</keycap>
+        </keycombo> können Sie den Web-Server wieder stoppen.<remark>In einem
+      Mac-Terminal müßte auch wie gewohnt Cmd-. gehen oder? Für den Menübefehl
+      der Ctrl-C sendet.</remark></para>
     </section>
 
-    <section>
+    <section xml:id="rails-statische-inhalte">
       <title>Statische Seiten</title>
 
-      <para>Wie eben gesehen gibt es bestimmte statische Seiten und Grafiken
-      die von Rails automatisch und per default sogar ohne Logging
-      ausgeliefert werden. Erinnern wir uns noch mal an eine Teilausgabe vom
-      Befehl <command>rails new testproject</command>: <screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new testproject</command>
+      <indexterm>
+        <primary>Statische Seiten/Inhalte</primary>
 
-      [...]
+        <secondary>in einer Rails-Applikation</secondary>
+      </indexterm>
 
+      <indexterm>
+        <primary>public</primary>
+
+        <secondary>Verzeichnis</secondary>
+      </indexterm>
+
+      <para>Wie eben gesehen gibt es bestimmte statische Seiten, Bilder und
+      JavaScript-Dateien die von Rails automatisch und per Default sogar ohne
+      Logging ausgeliefert werden. Erinnern wir uns noch mal an eine
+      Teilausgabe vom Befehl <command>rails new testproject</command>:
+      <screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new testproject</command>
+      <replaceable>[...]</replaceable>
       create  public
       create  public/404.html
       create  public/422.html
@@ -443,13 +464,20 @@ Completed 200 OK in 60ms (Views: 1.2ms | ActiveRecord: 0.3ms)
       create  public/javascripts/effects.js
       create  public/javascripts/prototype.js
       create  public/javascripts/rails.js
-
-      [...]
+      <replaceable>[...]</replaceable>
 </screen></para>
 
       <para>Der Verzeichnisname <filename>public</filename> und die darin
       enthaltenen Dateien sehen schon sehr nach statischen Seiten aus.
-      Probieren wir es einfach mal aus und legen die Datei
+      <indexterm>
+          <primary>Hello World</primary>
+
+          <secondary>In Rails</secondary>
+        </indexterm><indexterm>
+          <primary>Hallo Welt</primary>
+
+          <see>Hello World</see>
+        </indexterm>Probieren wir es einfach mal aus und legen die Datei
       <filename>public/hello-world.html</filename> mit folgendem Inhalt
       an:<programlisting>&lt;html&gt;
 &lt;title&gt;Hello World!&lt;/title&gt;
@@ -460,11 +488,11 @@ Completed 200 OK in 60ms (Views: 1.2ms | ActiveRecord: 0.3ms)
 &lt;/html&gt;</programlisting></para>
 
       <note>
-        <para>Ich gehe davon aus, das Sie rudimentäre HTML-Kenntnisse haben -
-        für viel mehr reicht mein HTML-Wissen auch nicht ;-).</para>
+        <para>Ich gehe davon aus, dass Sie rudimentäre HTML-Kenntnisse haben
+        &#8211; für viel mehr reicht mein HTML-Wissen auch nicht ;-).</para>
       </note>
 
-      <para>Jetzt noch den Rails Web-Server starten:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rails server</command>
+      <para>Jetzt noch den Rails-Web-Server starten:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rails server</command>
 =&gt; Booting WEBrick
 =&gt; Rails 3.0.0 application starting in development on http://0.0.0.0:3000
 =&gt; Call with -d to detach
@@ -475,44 +503,60 @@ Completed 200 OK in 60ms (Views: 1.2ms | ActiveRecord: 0.3ms)
 
 </screen></para>
 
-      <para>Diese Webseite können wir uns mit der URI <uri
+      <para>Diese Webseite können wir uns unter der URL <uri
       xlink:href="http://0.0.0.0:3000/hello-world">http://0.0.0.0:3000/hello-world</uri>
       anschauen:<screenshot>
           <info>
-            <title>Hello-World HTML Seite</title>
+            <title>Hello-World-HTML-Seite</title>
           </info>
 
           <mediaobject>
             <imageobject>
               <imagedata fileref="screenshots/hello-world-html.jpg"></imagedata>
             </imageobject>
+
+            <textobject>
+              <para>Hello World!</para>
+            </textobject>
           </mediaobject>
         </screenshot></para>
 
-      <para>Wir können natürlich auch die URI <uri
+      <para>Wir können natürlich auch die URL <uri
       xlink:href="http://0.0.0.0:3000/hello-world.html">http://0.0.0.0:3000/hello-world.html</uri>
       nehmen. Allerdings sieht Rails HTML und damit die Datei-Endung
-      <filename>html</filename> quasi als Standard-Ausgabe-Format an und
-      deshalb kann man sich das ".html" hier sparen.</para>
+      <literal>.html</literal> quasi als Standard-Ausgabe-Format an und
+      deshalb kann man sich das <quote><literal>.html</literal></quote> hier
+      sparen.</para>
 
-      <para>So, jetzt wissen Sie schon mal, wie man ganz statische Seiten in
-      Rails integrieren kann. Das ist manchmal für Seiten praktisch, die sich
-      nie, aber wirklich gar nie ändern. Natürlich gilt dies für jegliche Art
-      von Datei. So sind Klassiker die Favicon-Datei und die
-      <filename>robots.txt</filename> Datei. Beide legt man einfach in das
-      <filename>public/</filename> Verzeichnis.</para>
+      <para>So, jetzt wissen Sie schon mal wie man gänzlich statische Seiten
+      in Rails integrieren kann. Das ist manchmal für Seiten praktisch die
+      sich nie ändern. Natürlich gilt dies für jegliche Art von Datei. Tyische
+      Beispiele sind die <indexterm>
+          <primary>Favicon</primary>
+        </indexterm>Favicon-Datei (normalerweise
+      <filename>favicon.ico</filename>) <footnote>
+          <para>weitere Informationen zu Favicons: <uri
+          xlink:href="http://de.wikipedia.org/wiki/Favicon">http://de.wikipedia.org/wiki/Favicon</uri></para>
+        </footnote> und die Datei <indexterm>
+          <primary>robots.txt</primary>
+        </indexterm><filename>robots.txt</filename> <footnote>
+          <para>weitere Informationen zur Datei
+          <filename>robots.txt</filename>: <uri
+          xlink:href="http://de.wikipedia.org/wiki/Robots_Exclusion_Standard">http://de.wikipedia.org/wiki/Robots_Exclusion_Standard</uri></para>
+        </footnote>. Beide legt man einfach in das Verzeichnis
+      <filename>public/</filename>.</para>
 
       <para><qandaset>
           <qandadiv>
             <qandaentry>
               <question>
-                <para>Wo speichern Sie Ihr Firmenlogo
-                (<filename>logo.png</filename>)?</para>
+                <para>Wo speichern Sie Ihr Firmenlogo (z.B.
+                <filename>logo.png</filename>)?</para>
               </question>
 
               <answer>
-                <para>Natürlich im <filename>public/</filename> Verzeichnis.
-                Denn es ist eine statische Datei.</para>
+                <para>Natürlich im <filename>public/</filename>-Verzeichnis,
+                denn es ist eine statische Datei.</para>
               </answer>
             </qandaentry>
           </qandadiv>
@@ -524,14 +568,29 @@ Completed 200 OK in 60ms (Views: 1.2ms | ActiveRecord: 0.3ms)
     <title xml:id="dynamische_webseiten.title">Dynamisch mit erb erzeugtes
     HTML</title>
 
-    <para>Kennen Sie PHP? Dann wird Ihnen der Inhalt eine erb-Datei sehr
-    bekannt vorkommen. Es ist eine Mischung aus HTML und Ruby-Code. Allerdings
-    können wir eine solche erb-Webseite nicht einfach in das
-    <filename>public</filename> Verzeichnis legen, da dort abgelegte Seite 1:1
-    ausgeliefert werden und nicht durch einen erb-Parser gehen. Dummerweise
-    müssen wir dafür jetzt direkt mit dem MVC-Modell anrücken. Wir brauchen
-    einen Controler. Den können wir mit <command>rails generate
-    controller</command> anlegen. Schauen wir uns mal die Hilfe an:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rails generate controller</command>
+    <indexterm>
+      <primary>erb</primary>
+    </indexterm>
+
+    <indexterm>
+      <primary>rhtml</primary>
+
+      <see>erb</see>
+    </indexterm>
+
+    <para>Kennen Sie PHP (ohne Frameworks)? Dann wird Ihnen der Inhalt einer
+    <literal>erb</literal>-Datei sehr bekannt vorkommen. Es ist eine Mischung
+    aus (beispielsweise) HTML und Ruby-Code. (<literal>erb</literal> steht für
+    <foreignphrase xml:lang="en"><emphasis role="bold">e</emphasis>mbedded
+    <emphasis role="bold">R</emphasis>u<emphasis
+    role="bold">b</emphasis>y</foreignphrase>, also eingebettetes Ruby).
+    Allerdings können wir eine solche <literal>erb</literal>-Webseite nicht
+    einfach in das Verzeichnis <filename>public</filename> legen, da dort
+    abgelegte Seiten 1:1 ausgeliefert werden und nicht durch einen
+    <literal>erb</literal>-Parser gehen. Dummerweise müssen wir dafür jetzt
+    direkt mit dem MVC-Modell anrücken. Wir brauchen einen Controller. Den
+    können wir mit dem Befehl <command>rails generate controller</command>
+    anlegen. Schauen wir uns mal die Hilfe an:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rails generate controller</command>
 Usage:
   rails generate controller NAME [action action] [options]
 
@@ -567,13 +626,14 @@ Example:
         Functional Test: test/functional/credit_card_controller_test.rb
         Views:           app/views/credit_card/debit.html.erb [...]
         Helper:          app/helpers/credit_card_helper.rb
+
 stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 
-    <para>A-ha! Unten ist freundlicherweise direkt ein Beispiel angegeben
-    "<code>rails generate controller CreditCard open debit credit
-    close</code>". Passt aber nicht direkt für unseren Fall.</para>
+    <para>Aha! Unten ist freundlicherweise direkt ein Beispiel
+    angegeben:<programlisting>rails generate controller CreditCard open debit credit close</programlisting>Passt
+    aber nicht direkt für unseren Fall.</para>
 
-    <para>Ich bin mutig und schlage vor, das wir einfach mal was
+    <para>Ich bin mutig und schlage vor, dass wir einfach mal was
     ausprobieren:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rails generate controller Example test</command>
       create  app/controllers/example_controller.rb
        route  get "example/test"
@@ -586,18 +646,20 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
       create    app/helpers/example_helper.rb
       invoke    test_unit
       create      test/unit/helpers/example_helper_test.rb
-stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
 
-    <para>Puhhh... da wird ja direkt ne ganze Menge erstellt. Unter anderem
-    eine Datei <filename>app/views/example/test.html.erb</filename>. Schauen
-    wir uns die mal an:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>cat app/views/example/test.html.erb </command>
+stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
+
+    <para>Puhhh… da wird ja direkt ne ganze Menge erstellt. Unter anderem eine
+    Datei <filename>app/views/example/test.html.erb</filename>. Schauen wir
+    uns die mal an:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>cat app/views/example/test.html.erb </command>
 &lt;h1&gt;Example#test&lt;/h1&gt;
 &lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt;
-stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
 
-    <para>Ist also auch HTML. Fehlt oben und unten etwas, aber prinzipiel
-    sieht das stark nach HTML aus. Zum Testen starten wir den
-    Web-Server<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rails server</command>
+stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
+
+    <para>Ist also auch HTML. Da <quote>fehlt</quote> anscheinend oben und
+    unten etwas, aber prinzipiell sieht das stark nach HTML aus. Zum Testen
+    starten wir den Web-Server<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rails server</command>
 =&gt; Booting WEBrick
 =&gt; Rails 3.0.0 application starting in development on http://0.0.0.0:3000
 =&gt; Call with -d to detach
@@ -607,11 +669,11 @@ stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
 [2010-09-01 10:30:50] INFO  WEBrick::HTTPServer#start: pid=40964 port=3000
 </screen></para>
 
-    <para>und schauen uns die Webseite mit der URI <uri
+    <para>und schauen uns die Webseite unter der URL <uri
     xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
     mal im Browser an:<screenshot>
         <info>
-          <title>test.html.erb Screenshot</title>
+          <title>test.html.erb-Webseite</title>
         </info>
 
         <mediaobject>
@@ -629,15 +691,15 @@ Completed 200 OK in 21ms (Views: 20.7ms | ActiveRecord: 0.0ms)
 </programlisting></para>
 
     <para>Das ist fast schon verständlich geschrieben. Es kam also vom
-    localhost (127.0.0.1) ein HTTP GET-Request für die URI "/example/test"
-    rein. Die wurde dann anscheinend vom Controller
-    <code>ExampleController</code> mit der Methode
+    <literal>localhost</literal> (127.0.0.1) ein HTTP-GET-Request für die URI
+    <quote><literal>/example/test</literal></quote> rein. Die wurde dann
+    anscheinend vom Controller <code>ExampleController</code> mit der Methode
     <methodname>test</methodname> als HTML gerendert. Das ganze hat hier
-    ungefähr 21ms gedauert.</para>
+    ungefähr 21 ms gedauert.</para>
 
     <para>Jetzt müssen wir nur noch den Controller finden. Aber Sie haben
-    Glück ... ich weiß es nämlich. ;-) Alle Controller befinden sich im
-    Verzeichnis <filename>app/controllers</filename> und siehe da, dort ist
+    Glück … ich weiß es nämlich. ;-) Alle Controller befinden sich im
+    Verzeichnis <filename>app/controllers</filename>, und siehe da, dort ist
     auch tatsächlich die entsprechende Datei
     <filename>app/controllers/example_controller.rb</filename>. Schauen wir
     mal rein:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>ls -l app/controllers/</command>
