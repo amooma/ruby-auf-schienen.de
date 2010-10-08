@@ -308,7 +308,9 @@ stefan@swmbp 0 1.9.2-p0 ~$ </screen></para>
           <replaceable>projectname</replaceable></command> kommt immer
           <command>cd <replaceable>projectname</replaceable> &amp;&amp; bundle
           install</command>!</para>
-        </important><screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>cd testproject</command>
+        </important><remark>FIXME: Wird später noch erklärt wie man wenn man
+      zusätzliche Gems benutzt diese per bundle/bundler
+      einfügt?</remark><screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>cd testproject</command>
 stefan@swmbp 0 1.9.2-p0 testproject$ <command>bundle install</command>
 Fetching source index for http://rubygems.org/
 Using rake (0.8.7) 
@@ -433,9 +435,9 @@ Completed 200 OK in 60ms (Views: 1.2ms | ActiveRecord: 0.3ms)
           <keycap function="control">Ctrl</keycap>
 
           <keycap>C</keycap>
-        </keycombo> können Sie den Web-Server wieder stoppen.<remark>In einem
-      Mac-Terminal müßte auch wie gewohnt Cmd-. gehen oder? Für den Menübefehl
-      der Ctrl-C sendet.</remark></para>
+        </keycombo> können Sie den Web-Server wieder stoppen.<remark>FIXME: In
+      einem Mac-Terminal müßte auch wie gewohnt Cmd-. gehen oder? Für den
+      Menübefehl der Ctrl-C sendet.</remark></para>
     </section>
 
     <section xml:id="rails-statische-inhalte">
@@ -773,8 +775,8 @@ end</programlisting></para>
     controller</command> automatisch eingefügt. In der Routing-Datei können
     Sie auch beliebiges <foreignphrase xml:lang="en">Mapping</foreignphrase>
     vornehmen. Aber dazu später mehr. Aktuell sehen unsere Routen sehr einfach
-    aus. Mit dem Befehl <command>rake routes</command> können wir diese
-    abfragen:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rake routes</command>
+    aus. Mit dem Befehl <command>rake routes</command><remark>FIXME: Wurde
+    rake vorher schon mal erwähnt?</remark> können wir diese abfragen:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rake routes</command>
 (in /Users/stefan/testproject)
 example_test GET /example/test(.:format) {:controller=&gt;"example", :action=&gt;"test"}
 stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
@@ -1128,13 +1130,27 @@ Die aktuelle Uhrzeit ist
       </indexterm>
 
       <para>Selbst schon bei kleinen Webprojekten gibt es oft wiederkehrende
-      Elemente. Das kann zum Beispiel ein Footer der Seite mit den
-      Kontaktdaten sein oder ein Menü. Rails gibt uns die Möglichkeit diesen
-      HTML-Code in sogenannte Partials abzuspeichern und dann innerhalb eines
-      Views einzubinden. Ein Partial wird ebenfalls im
+      Elemente. Das kann zum Beispiel ein <indexterm>
+          <primary>Footer</primary>
+        </indexterm><foreignphrase xml:lang="en">Footer</foreignphrase> der
+      Seite mit den Kontaktdaten sein oder ein Menü. Rails gibt uns die
+      Möglichkeit diesen HTML-Code in sogenannte <quote><foreignphrase
+      xml:lang="en">Partials</foreignphrase></quote> abzuspeichern und dann
+      innerhalb eines <indexterm>
+          <primary>View</primary>
+        </indexterm>Views einzubinden. Ein Partial wird ebenfalls im
       <filename>app/views/example/</filename> Verzeichnis abgespeichert.
-      Allerdings muss der Dateinamen mit einem Unterstrich (Underscore = _)
+      Allerdings muss der Dateinamen mit einem Unterstrich (<foreignphrase
+      xml:lang="en">Underscore</foreignphrase> = <literal>_</literal>)
       anfangen.</para>
+
+      <note>
+        <para>Das englische Adjektiv <foreignphrase
+        xml:lang="en">partial</foreignphrase> heißt sowas wie Teil-…, partiell
+        oder unvollständig. <foreignphrase
+        xml:lang="en">Partials</foreignphrase> sind also sowas wie Teile,
+        Stückchen oder Vorlagen-Schnipsel.</para>
+      </note>
 
       <para>Als Beispiel fügen wir unser Seite jetzt einen Mini-Footer hinzu.
       Dafür schreiben wir in die neue Datei
@@ -1145,8 +1161,10 @@ Copyright 2009 - &lt;%= Date.today.year %&gt; beim Osterhasen
 &lt;/p&gt;</programlisting></para>
 
       <para>Die Datei <filename>app/views/example/test.html.erb</filename>
-      verändern wir wie folgt und fügen mit dem Befehl <code>render</code> das
-      Partial ein:<programlisting>&lt;p&gt;Schleife von 0 bis 5:
+      verändern wir wie folgt und fügen mit dem Befehl <indexterm>
+          <primary>render()</primary>
+        </indexterm><methodname>render</methodname> das Partial
+      ein:<programlisting>&lt;p&gt;Schleife von 0 bis 5:
 &lt;% (0..5).each do |i| %&gt;
 &lt;%= "#{i}, " %&gt;
 &lt;% end %&gt;
@@ -1159,11 +1177,11 @@ Copyright 2009 - &lt;%= Date.today.year %&gt; beim Osterhasen
 total 16
 -rw-r--r--  1 stefan  staff   63  1 Sep 20:12 _footer.html.erb
 -rw-r--r--  1 stefan  staff  105  1 Sep 20:14 test.html.erb
-stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
+stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 
       <para>Die neue Webseite sieht jetzt so aus:<screenshot>
           <info>
-            <title>Footer mit Partials</title>
+            <title>Seite mit Footer als Partial</title>
           </info>
 
           <mediaobject>
@@ -1175,10 +1193,11 @@ stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
 
       <para><important>
           <para>Der Name eines Partials im Code wird immer
-          <emphasis>ohne</emphasis> den Unterstrich am Anfang und
-          <emphasis>ohne</emphasis> die erb und HTML Endung angegeben. Aber
-          die wirkliche Datei muss im Dateinamen mit einem Unterstrich
-          anfangen und auch am Ende mir der erb und HTML Endung
+          <emphasis>ohne</emphasis> den Unterstrich (<literal>_</literal>) am
+          Anfang und <emphasis>ohne</emphasis> die <literal>.erb</literal> und
+          <literal>.html</literal>-Endung angegeben. Aber die wirkliche Datei
+          muss im Dateinamen mit einem Unterstrich anfangen und auch am Ende
+          mir der <literal>.erb</literal> und <literal>.html</literal>-Endung
           aufhören.</para>
         </important></para>
 
@@ -1186,25 +1205,40 @@ stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
       <filename>app/views</filename> eingebunden werden. So können Sie für
       wiederkehrende und übergreifende Inhalte beispielsweise ein Verzeichnis
       <filename>app/views/shared</filename> anlegen und dort eine Datei
-      <filename>_footer.html.erb</filename> anlegen. Das Einbetten im erb Code
-      würde dann mit folgender Zeile erfolgen:<programlisting>&lt;%= render "shared/footer" %&gt;</programlisting></para>
+      <filename>_footer.html.erb</filename> anlegen. Das Einbetten im
+      <literal>erb</literal>-Code würde dann mit folgender Zeile
+      erfolgen:<indexterm>
+          <primary>render()</primary>
+        </indexterm><programlisting>&lt;%= render "shared/footer" %&gt;</programlisting></para>
 
       <note>
         <para>Das Footer-Problem würde man in einem richtigen Projekt
-        wahrscheinlich nicht mit einem Partial lösen, das überall aufgerufen
+        wahrscheinlich nicht mit einem Partial lösen das überall aufgerufen
         wird, sondern eher zentral in der
-        <filename>app/views/layouts/application.html.erb</filename>.</para>
+        <filename>app/views/layouts/application.html.erb</filename>.<remark>FIXME:
+        Warum?</remark></para>
       </note>
 
       <section xml:id="partials_locale_variables">
         <title xml:id="partials_locale_variables.title">Variablen an ein
         Partial übergeben</title>
 
-        <para>Partials sind im DRY (<emphasis>D</emphasis>on't
-        <emphasis>R</emphasis>epeat <emphasis>Y</emphasis>ourself) Gedanken
+        <indexterm>
+          <primary>Partial</primary>
+        </indexterm>
+
+        <para>Partials sind im <indexterm>
+            <primary>DRY</primary>
+          </indexterm><indexterm>
+            <primary>Don't Repeat Yourself</primary>
+
+            <see>DRY</see>
+          </indexterm>DRY-(<foreignphrase xml:lang="en"><emphasis
+        role="bold">D</emphasis>on't <emphasis role="bold">R</emphasis>epeat
+        <emphasis role="bold">Y</emphasis>ourself</foreignphrase>)-Gedanken
         sehr gut. Aber was sie erst richtig praktisch macht, ist die
-        Möglichkeit Variablen zu übergeben. Erweitern wir einmal die
-        <filename>app/views/example/_footer.html.erb</filename> Datei wie
+        Möglichkeit Variablen zu übergeben. Erweitern wir einmal die Datei
+        <filename>app/views/example/_footer.html.erb</filename> wie
         folgt:<programlisting>&lt;hr /&gt;
 &lt;p&gt;
 Copyright 2009 - &lt;%= Date.today.year %&gt; beim Osterhasen
@@ -1214,15 +1248,17 @@ Copyright 2009 - &lt;%= Date.today.year %&gt; beim Osterhasen
 &lt;%= additional_info %&gt;
 &lt;/p&gt;
 &lt;% end %&gt;
-</programlisting></para>
+</programlisting><remark>FIXME: Methode defined?() erklären?</remark></para>
 
-        <para>Wenn wir jetzt die URI <uri
+        <para>Wenn wir jetzt die URL <uri
         xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
-        aufrufen, so sehen wir die gleiche Seite wie vorhin. Das liegt daran,
-        weil <varname>additional_info</varname> nicht als Local Variable
+        aufrufen, so sehen wir die gleiche Seite wie vorhin. Das liegt daran
+        dass <varname>additional_info</varname> nicht als lokale Variable
         übergeben wurde. Ändern wir dazu die
         <filename>app/views/example/test.html.erb</filename> wie
-        folgt:<programlisting>&lt;p&gt;Schleife von 0 bis 5:
+        folgt:<indexterm>
+            <primary>render()</primary>
+          </indexterm><programlisting>&lt;p&gt;Schleife von 0 bis 5:
 &lt;% (0..5).each do |i| %&gt;
 &lt;%= "#{i}, " %&gt;
 &lt;% end %&gt;
@@ -1247,7 +1283,7 @@ Copyright 2009 - &lt;%= Date.today.year %&gt; beim Osterhasen
 
         <para>Sie sehen ebenfalls, das ich beim Einbinden eines einfaches
         Partials eine kürzere Schreibweise benutzen kann, als bei der Version
-        mit locals.</para>
+        mit <literal>locals</literal>.</para>
       </section>
 
       <section xml:id="weitere_doku_zu_partials">
@@ -1257,42 +1293,56 @@ Copyright 2009 - &lt;%= Date.today.year %&gt; beim Osterhasen
         <para>Wir haben hier wirklich nur die Oberfläche angekratzt. Partials
         sind sehr mächtige Werkzeuge. Unter <uri
         xlink:href="http://guides.rubyonrails.org/layouts_and_rendering.html#using-partials">http://guides.rubyonrails.org/layouts_and_rendering.html#using-partials</uri>
-        finden Sie die Ruby on Rails Doku zum Thema Partials.</para>
+        finden Sie die Doku von Ruby on Rails zum Thema Partials.</para>
       </section>
     </section>
   </section>
 
   <section xml:id="redirects">
-    <title xml:id="redirects.title">Redirects</title>
+    <title xml:id="redirects.title">Redirects (Umleitungen)</title>
 
-    <para>Redirects sind Befehle, mit denen Sie innerhalb des Controllers auf
-    andere Methoden oder auch auf ganz andere Webseiten "springen" also
-    redirecten können. Legen wir ein neues Rails-Projekt für ein
-    entsprechendes Beispiel an:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new redirect_beispiel</command>
+    <indexterm>
+      <primary>Redirects</primary>
+    </indexterm>
+
+    <indexterm>
+      <primary>Umleitungen</primary>
+
+      <see>Redirects</see>
+    </indexterm>
+
+    <indexterm>
+      <primary>Weiterleitungen</primary>
+
+      <see>Redirects</see>
+    </indexterm>
+
+    <para><foreignphrase xml:lang="en">Redirects</foreignphrase> sind Befehle,
+    mit denen Sie innerhalb des Controllers auf andere Methoden oder auch auf
+    ganz andere Webseiten <quote>springen</quote> also weiterleiten können.
+    Legen wir ein neues Rails-Projekt für ein entsprechendes Beispiel
+    an:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new redirect_beispiel</command>
       create  
       create  README
       create  Rakefile
       create  config.ru
-
-      [...]
-
+      <replaceable>[...]</replaceable>
       create  tmp/pids
       create  vendor/plugins
       create  vendor/plugins/.gitkeep
+
 stefan@swmbp 0 1.9.2-p0 ~$ <command>cd redirect_beispiel</command>
 stefan@swmbp 0 1.9.2-p0 redirect_beispiel$ <command>bundle install</command>
 Fetching source index for http://rubygems.org/
 Using rake (0.8.7) 
 Using abstract (1.0.0) 
-
-[...]
-
+<replaceable>[...]</replaceable>
 Using rails (3.0.0) 
 Using sqlite3-ruby (1.3.1) 
 Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
 
 Your bundle was installed to `/Users/stefan/.rvm/gems/ruby-1.9.2-p0`
-stefan@swmbp 0 1.9.2-p0 redirect_beispiel$</screen></para>
+stefan@swmbp 0 1.9.2-p0 redirect_beispiel$ </screen></para>
 
     <para>Um zu springen brauchen wir mindestens einen Controller und in dem
     mindestens zwei verschiedene Methoden. Und auf gehts:<screen>stefan@swmbp 0 1.9.2-p0 redirect_beispiel$ <command>rails generate controller Game ping pong</command>
@@ -1309,7 +1359,7 @@ stefan@swmbp 0 1.9.2-p0 redirect_beispiel$</screen></para>
       create    app/helpers/game_helper.rb
       invoke    test_unit
       create      test/unit/helpers/game_helper_test.rb
-stefan@swmbp 0 1.9.2-p0 redirect_beispiel$</screen></para>
+stefan@swmbp 0 1.9.2-p0 redirect_beispiel$ </screen></para>
 
     <para>Starten wir mal den Rails-Server und rufen mit dem Browser erst <uri
     xlink:href="http://0.0.0.0:3000/game/ping">http://0.0.0.0:3000/game/ping</uri>
@@ -1347,18 +1397,17 @@ stefan@swmbp 0 1.9.2-p0 redirect_beispiel$</screen></para>
     <para>Der Controller
     <filename>app/controllers/game_controller.rb</filename> hat folgenden
     Inhalt:<screen>stefan@swmbp 0 1.9.2-p0 redirect_beispiel$ <command>cat app/controllers/game_controller.rb</command> 
-class GameController &lt; ApplicationController
+</screen><programlisting>class GameController &lt; ApplicationController
   def ping
   end
 
   def pong
   end
 
-end
-stefan@swmbp 0 1.9.2-p0 redirect_beispiel$</screen></para>
+end</programlisting></para>
 
-    <para>Jetzt zum Redirect: Wie können wir es erreichen, das wir beim Aufruf
-    von <uri
+    <para>Jetzt zum Redirect: Wie können wir es erreichen, dass wir beim
+    Aufruf von <uri
     xlink:href="http://0.0.0.0:3000/game/ping">http://0.0.0.0:3000/game/ping</uri>
     direkt auf die Methode <methodname>pong</methodname> weitergeleitet
     werden? Einfach werden Sie sagen, in dem wir die Route in der
