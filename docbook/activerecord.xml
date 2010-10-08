@@ -196,14 +196,15 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
     <para>Deshalb werde ich sie hier nicht abbilden und überlasse es Ihrer
     Neugierde einmal <command>ri ActiveRecord</command> aufzurufen.</para>
+  </section>
 
-    <section xml:id="activerecord_create">
-      <title xml:id="activerecord_create.title">Datensätze hinzufügen</title>
+  <section xml:id="activerecord_create">
+    <title xml:id="activerecord_create.title">Datensätze hinzufügen</title>
 
-      <para>Neue Datensätze können mit verschiedenen Methoden erstellt werden.
-      Schauen wir uns als erstes mal die <methodname>create</methodname>
-      Methode an. Wie immer gibt es dazu eine eigene kleine Hilfeseite im
-      System:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>ri -T ActiveRecord::Base.create</command>
+    <para>Neue Datensätze können mit verschiedenen Methoden erstellt werden.
+    Schauen wir uns als erstes mal die <methodname>create</methodname> Methode
+    an. Wie immer gibt es dazu eine eigene kleine Hilfeseite im
+    System:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>ri -T ActiveRecord::Base.create</command>
 ActiveRecord::Base.create
 
 (from gem activerecord-3.0.0)
@@ -239,8 +240,8 @@ Examples
 
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
-      <para>Super, direkt mit Beispielen! Was will man mehr? Versuchen wir mal
-      so in der Console die ersten 3 Alben einzutragen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+    <para>Super, direkt mit Beispielen! Was will man mehr? Versuchen wir mal
+    so in der Console die ersten 3 Alben einzutragen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album</command>
  =&gt; Album(id: integer, position: integer, name: string, release_year: integer, created_at: datetime, updated_at: datetime) 
@@ -253,9 +254,9 @@ ruby-1.9.2-p0 &gt; <command>Album.create(:position =&gt; 3, :name =&gt; "Revolve
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
-      <para>Sieht ja ganz gut aus, aber wo sind die Daten gespeichert worden?
-      Schauen wir mal in die Konfigurationsdatei für die Datenbank
-      (<filename>config/database.yml</filename>):<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>cat config/database.yml</command> 
+    <para>Sieht ja ganz gut aus, aber wo sind die Daten gespeichert worden?
+    Schauen wir mal in die Konfigurationsdatei für die Datenbank
+    (<filename>config/database.yml</filename>):<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>cat config/database.yml</command> 
 # SQLite version 3.x
 #   gem install sqlite3-ruby (not necessary on OS X Leopard)
 development:
@@ -280,15 +281,15 @@ production:
   timeout: 5000
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
-      <para>Da wir im development Modus arbeiten hat Rails beim <command>rake
-      db:migrate</command> eine neue SQLite3 Datenbank
-      <filename>db/development.sqlite3</filename> angelegt und dort alle Daten
-      gespeichert.</para>
+    <para>Da wir im development Modus arbeiten hat Rails beim <command>rake
+    db:migrate</command> eine neue SQLite3 Datenbank
+    <filename>db/development.sqlite3</filename> angelegt und dort alle Daten
+    gespeichert.</para>
 
-      <para>Schauen wir mal mit dem Kommandozeilen-Client
-      <command>sqlite3</command> rein:</para>
+    <para>Schauen wir mal mit dem Kommandozeilen-Client
+    <command>sqlite3</command> rein:</para>
 
-      <para><screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>sqlite3 db/development.sqlite3 </command>
+    <para><screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>sqlite3 db/development.sqlite3 </command>
 SQLite version 3.6.12
 Enter ".help" for instructions
 Enter SQL statements terminated with a ";"
@@ -303,15 +304,15 @@ sqlite&gt; <command>SELECT * FROM albums;</command>
 sqlite&gt; <command>.exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
-      <para>Tatsächlich, da ist eine Datenbank mit dem Namen
-      <varname>albums</varname> und in der sind die von uns eben erstellten
-      Einträge.</para>
+    <para>Tatsächlich, da ist eine Datenbank mit dem Namen
+    <varname>albums</varname> und in der sind die von uns eben erstellten
+    Einträge.</para>
 
-      <para>Neben <methodname>create</methodname> gibt es auch
-      <methodname>new</methodname>. Allerdings muss ein mit
-      <methodname>new</methodname> erzeugtes Objekt extra mit
-      <methodname>save</methodname> gespeichert werden (hat Vor- und
-      Nachteile):<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+    <para>Neben <methodname>create</methodname> gibt es auch
+    <methodname>new</methodname>. Allerdings muss ein mit
+    <methodname>new</methodname> erzeugtes Objekt extra mit
+    <methodname>save</methodname> gespeichert werden (hat Vor- und
+    Nachteile):<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>highway61 = Album.new</command>
  =&gt; #&lt;Album id: nil, position: nil, name: nil, release_year: nil, created_at: nil, updated_at: nil&gt; 
@@ -330,22 +331,22 @@ ruby-1.9.2-p0 &gt; <command>highway61</command>
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
-      <para>Was passiert im Hintergrund? ActiveRecord übernimmt alle Arbeit
-      für uns. Bei jedem <methodname>create</methodname> oder beim initialen
-      <methodname>save</methodname> wird mit <code>INSERT</code> ein neuer
-      Datensatz in der SQL-Datenbank angelegt. Im Log können wir dies
-      überprüfen:<programlisting>  SQL (0.9ms)  INSERT INTO "albums" ("created_at", "name", "position", "release_year", "updated_at") VALUES ('2010-09-02 20:30:34.872261', 'Highway 61 Revisited', 4, 1965, '2010-09-02 20:30:34.872261')
+    <para>Was passiert im Hintergrund? ActiveRecord übernimmt alle Arbeit für
+    uns. Bei jedem <methodname>create</methodname> oder beim initialen
+    <methodname>save</methodname> wird mit <code>INSERT</code> ein neuer
+    Datensatz in der SQL-Datenbank angelegt. Im Log können wir dies
+    überprüfen:<programlisting>  SQL (0.9ms)  INSERT INTO "albums" ("created_at", "name", "position", "release_year", "updated_at") VALUES ('2010-09-02 20:30:34.872261', 'Highway 61 Revisited', 4, 1965, '2010-09-02 20:30:34.872261')
 </programlisting></para>
-    </section>
+  </section>
 
-    <section>
-      <title>first, last und all</title>
+  <section>
+    <title>first, last und all</title>
 
-      <para>Aus irgend einem magischen Grund braucht man ja immer mal den
-      ersten oder den letzten oder auch alle Datensätze. Wahrscheinlich
-      deshalb gibt es für alle drei Fälle eine fertige Methode. Fangen wir mit
-      den einfachsten <methodname>first</methodname> und
-      <methodname>last</methodname> an:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+    <para>Aus irgend einem magischen Grund braucht man ja immer mal den ersten
+    oder den letzten oder auch alle Datensätze. Wahrscheinlich deshalb gibt es
+    für alle drei Fälle eine fertige Methode. Fangen wir mit den einfachsten
+    <methodname>first</methodname> und <methodname>last</methodname>
+    an:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.first</command>
  =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt; 
@@ -354,27 +355,27 @@ ruby-1.9.2-p0 &gt; <command>Album.last</command>
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
-      <para>Ein kurzer Blick in <filename>log/development.log</filename> zeigt
-      uns wie ActiveRecord das gemacht hat:<programlisting>  Album Load (0.4ms)  SELECT "albums".* FROM "albums" LIMIT 1
+    <para>Ein kurzer Blick in <filename>log/development.log</filename> zeigt
+    uns wie ActiveRecord das gemacht hat:<programlisting>  Album Load (0.4ms)  SELECT "albums".* FROM "albums" LIMIT 1
   Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY albums.id DESC LIMIT 1
 </programlisting></para>
 
-      <para>Und jetzt mal alle auf einemal mit
-      <methodname>all</methodname>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+    <para>Und jetzt mal alle auf einemal mit
+    <methodname>all</methodname>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.all</command>
  =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
-      <para>Der dazu gehörige SQL-Code ist nicht überraschen:<programlisting>  Album Load (0.2ms)  SELECT "albums".* FROM "albums"
+    <para>Der dazu gehörige SQL-Code ist nicht überraschen:<programlisting>  Album Load (0.2ms)  SELECT "albums".* FROM "albums"
 </programlisting></para>
 
-      <para>Die von <methodname>first</methodname>,
-      <methodname>last</methodname> und <methodname>all</methodname> erzeugten
-      Objekte sind aber unterschiedlich. Bei <methodname>first</methodname>
-      und <methodname>all</methodname> wird ein <classname>Album</classname>
-      ausgegeben und bei <methodname>all</methodname> ein Array:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+    <para>Die von <methodname>first</methodname>,
+    <methodname>last</methodname> und <methodname>all</methodname> erzeugten
+    Objekte sind aber unterschiedlich. Bei <methodname>first</methodname> und
+    <methodname>all</methodname> wird ein <classname>Album</classname>
+    ausgegeben und bei <methodname>all</methodname> ein Array:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.first</command>
  =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt; 
@@ -387,11 +388,11 @@ ruby-1.9.2-p0 &gt; <command>Album.all.class</command>
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
-      <para>Wenn <methodname>Album.all</methodname> ein Array ist, dann müsste
-      man doch auch Iteratoren (siehe <xref linkend="iterator" /> und <xref
-      linkend="array_iterator" />) benutzen können, oder? Ja, natürlich! Das
-      ist ja das schöne daran. Kleiner Versuch mit
-      <methodname>each</methodname>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+    <para>Wenn <methodname>Album.all</methodname> ein Array ist, dann müsste
+    man doch auch Iteratoren (siehe <xref linkend="iterator" /> und <xref
+    linkend="array_iterator" />) benutzen können, oder? Ja, natürlich! Das ist
+    ja das schöne daran. Kleiner Versuch mit
+    <methodname>each</methodname>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.all.each do |album|</command>
 ruby-1.9.2-p0 &gt;     <command>puts album.name</command>
@@ -404,9 +405,9 @@ Highway 61 Revisited
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
-      <para>Kann man dann auch <methodname>Album.all.first</methodname> als
-      Alternative zu <methodname>first</methodname> benutzen? Ja, aber es
-      macht keinen Sinn. Schauen wir mal:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+    <para>Kann man dann auch <methodname>Album.all.first</methodname> als
+    Alternative zu <methodname>first</methodname> benutzen? Ja, aber es macht
+    keinen Sinn. Schauen wir mal:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.first</command>
  =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt; 
@@ -415,45 +416,42 @@ ruby-1.9.2-p0 &gt; <command>Album.all.first</command>
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
-      <para>Sicherlich, das Ergebnis ist das gleiche, aber werfen wir mal
-      einen Blick ins
-      <filename>log/development.log</filename>:<programlisting>  Album Load (0.1ms)  SELECT "albums".* FROM "albums" LIMIT 1
+    <para>Sicherlich, das Ergebnis ist das gleiche, aber werfen wir mal einen
+    Blick ins <filename>log/development.log</filename>:<programlisting>  Album Load (0.1ms)  SELECT "albums".* FROM "albums" LIMIT 1
   Album Load (0.3ms)  SELECT "albums".* FROM "albums"
 </programlisting></para>
 
-      <para>Selbst bei unserer Mini-Datenbank sehen wir schon einen
-      Geschwindigkeitsunterschied. Bei der Methode first wird ein <code>SELECT
-      *</code> mit einem <code>LIMIT 1</code> abgerufen (erste Zeile). Beim
-      <methodname>Album.all.first</methodname> wird ein die ganze Tabelle mit
-      <code>SELECT *</code> eingelesen und dann innerhalb von Ruby das erste
-      Element dieses Arrays rausgezogen. Bei dieser kleinen Applikation kann
-      man sich das noch leisten, aber stellen Sie sich mal vor, es würde sich
-      um eine Datenbank mit zig Millionen Einträgen handeln.</para>
+    <para>Selbst bei unserer Mini-Datenbank sehen wir schon einen
+    Geschwindigkeitsunterschied. Bei der Methode first wird ein <code>SELECT
+    *</code> mit einem <code>LIMIT 1</code> abgerufen (erste Zeile). Beim
+    <methodname>Album.all.first</methodname> wird ein die ganze Tabelle mit
+    <code>SELECT *</code> eingelesen und dann innerhalb von Ruby das erste
+    Element dieses Arrays rausgezogen. Bei dieser kleinen Applikation kann man
+    sich das noch leisten, aber stellen Sie sich mal vor, es würde sich um
+    eine Datenbank mit zig Millionen Einträgen handeln.</para>
 
-      <tip>
-        <para>Auch wenn ActiveRecord dem Programmierer schon sehr viel
-        Denkarbeit abnimmt, sollte man immer überlegen, ob das gleiche
-        Ergebnis nicht auch mit einem optimaleren Weg realisiert werden
-        kann.</para>
-      </tip>
-    </section>
+    <tip>
+      <para>Auch wenn ActiveRecord dem Programmierer schon sehr viel
+      Denkarbeit abnimmt, sollte man immer überlegen, ob das gleiche Ergebnis
+      nicht auch mit einem optimaleren Weg realisiert werden kann.</para>
+    </tip>
+  </section>
 
-    <section xml:id="seed_rb">
-      <title xml:id="seed_rb.title">Mit seeds.rb die Datenbank
-      betanken</title>
+  <section xml:id="seed_rb">
+    <title xml:id="seed_rb.title">Mit seeds.rb die Datenbank betanken</title>
 
-      <para>Die Rails-Götter haben mit der Datei
-      <filename>db/seeds.rb</filename> einen Weg geschaffen, eine frische
-      Installation einfach und schnell mit Default-Werten zu füttern. Es
-      handelt sich um ein normales Ruby-Programm innerhalb der Rails-Umgebung.
-      Sie haben also vollen Zugriff auf alle Klassen und Methoden aus Ihrer
-      Applikation.</para>
+    <para>Die Rails-Götter haben mit der Datei
+    <filename>db/seeds.rb</filename> einen Weg geschaffen, eine frische
+    Installation einfach und schnell mit Default-Werten zu füttern. Es handelt
+    sich um ein normales Ruby-Programm innerhalb der Rails-Umgebung. Sie haben
+    also vollen Zugriff auf alle Klassen und Methoden aus Ihrer
+    Applikation.</para>
 
-      <para>Um die in <xref linkend="activerecord_create" /> erstellten
-      Datensätze in einer neuen Rails-Applikation zur Verfügung zu stellen,
-      müssen Sie so nicht manuel mit <command>rails console</command> alles
-      eingeben, sondern es reicht die folgende
-      <filename>db/seeds.rb</filename> Datei:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
+    <para>Um die in <xref linkend="activerecord_create" /> erstellten
+    Datensätze in einer neuen Rails-Applikation zur Verfügung zu stellen,
+    müssen Sie so nicht manuel mit <command>rails console</command> alles
+    eingeben, sondern es reicht die folgende <filename>db/seeds.rb</filename>
+    Datei:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
 #
 # Examples:
@@ -466,11 +464,11 @@ Album.create("name"=&gt;"Pet Sounds", "position"=&gt;2, "release_year"=&gt;1966)
 Album.create("name"=&gt;"Revolver", "position"=&gt;3, "release_year"=&gt;1966)
 Album.create("name"=&gt;"Highway 61 Revisited", "position"=&gt;4, "release_year"=&gt;1965)</programlisting></para>
 
-      <para>Das einspielen der Daten erfolgt dann mit <command>rake
-      db:seed</command>. Um ganz sicher zu sein, sollten Sie im Rahmen dieses
-      Buches immer mit <command>rake db:setup</command> die Datenbank neu
-      aufsetzen und dann automatisch mit der seeds.rb füttern. Das sieht dann
-      so aus:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake db:setup</command>
+    <para>Das einspielen der Daten erfolgt dann mit <command>rake
+    db:seed</command>. Um ganz sicher zu sein, sollten Sie im Rahmen dieses
+    Buches immer mit <command>rake db:setup</command> die Datenbank neu
+    aufsetzen und dann automatisch mit der seeds.rb füttern. Das sieht dann so
+    aus:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake db:setup</command>
 (in /Users/stefan/jukebox)
 db/test.sqlite3 already exists
 db/test.sqlite3 already exists
@@ -483,17 +481,17 @@ db/development.sqlite3 already exists
 -- assume_migrated_upto_version(20101004085045, "db/migrate")
    -&gt; 0.0004s
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen>Die <filename>db/seeds.rb</filename>
-      Datei bringe ich an dieser Stelle ein, weil sie einen einfachen
-      Mechanismus bietet eine leere Datenbank mit Default-Werten zu fühlen.
-      Das erleichtert uns im weiteren Verlauf des Buches das schnelle Setup
-      von Beispiel-Szenarien.</para>
+    Datei bringe ich an dieser Stelle ein, weil sie einen einfachen
+    Mechanismus bietet eine leere Datenbank mit Default-Werten zu fühlen. Das
+    erleichtert uns im weiteren Verlauf des Buches das schnelle Setup von
+    Beispiel-Szenarien.</para>
 
-      <section>
-        <title>Alternative Programmierung</title>
+    <section>
+      <title>Alternative Programmierung</title>
 
-        <para>Die <filename>seeds.rb</filename> ist ein Ruby Programm.
-        Entsprechend können wir alternativ auch folgenen Weg
-        gehen:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
+      <para>Die <filename>seeds.rb</filename> ist ein Ruby Programm.
+      Entsprechend können wir alternativ auch folgenen Weg
+      gehen:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
 #
 # Examples:
@@ -512,24 +510,23 @@ album_list.each do |album|
   position = position + 1
 end</programlisting></para>
 
-        <para>Das Ergebnis ist das gleiche. Ich zeige Ihnen dieses Beispiel
-        hier, um noch mal klar rauszuarbeiten, das Sie innerhalb der
-        <filename>seeds.rb</filename> ganz normal programmieren können.</para>
-      </section>
+      <para>Das Ergebnis ist das gleiche. Ich zeige Ihnen dieses Beispiel
+      hier, um noch mal klar rauszuarbeiten, das Sie innerhalb der
+      <filename>seeds.rb</filename> ganz normal programmieren können.</para>
+    </section>
 
-      <section>
-        <title>seeds.rb aus bestehenden Daten erstellen</title>
+    <section>
+      <title>seeds.rb aus bestehenden Daten erstellen</title>
 
-        <para>Manchmal ist es praktisch den aktuellen Datenbestand einer
-        Rails-Applikation in eine <filename>seeds.rb</filename> zu
-        exportieren. Beim Schreiben dieses Buches hatte ich dieses Problem
-        fast in jedem Kapitel. Es gibt dafür leider keinen Standard-Weg. Ich
-        zeige Ihnen man es in diesem Fall machen kann. Komplexere Szenarien
-        lassen sich daraus ableiten.</para>
+      <para>Manchmal ist es praktisch den aktuellen Datenbestand einer
+      Rails-Applikation in eine <filename>seeds.rb</filename> zu exportieren.
+      Beim Schreiben dieses Buches hatte ich dieses Problem fast in jedem
+      Kapitel. Es gibt dafür leider keinen Standard-Weg. Ich zeige Ihnen man
+      es in diesem Fall machen kann. Komplexere Szenarien lassen sich daraus
+      ableiten.</para>
 
-        <para>Füllen Sie die Datei
-        <filename>lib/tasks/apfelmus.rake</filename> mit folgendem
-        Inhalt:<programlisting>namespace :album do
+      <para>Füllen Sie die Datei <filename>lib/tasks/apfelmus.rake</filename>
+      mit folgendem Inhalt:<programlisting>namespace :album do
   desc "Prints all the Albums in a seeds.rb way."
   task :seed_format =&gt; :environment do
     Album.order('position').all.each do |album|
@@ -538,8 +535,8 @@ end</programlisting></para>
   end
 end</programlisting></para>
 
-        <para>Danach können Sie mit <command>rake album:seed_format</command>
-        die entsprechende rake Task abrufen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake album:seed_format</command>
+      <para>Danach können Sie mit <command>rake album:seed_format</command>
+      die entsprechende rake Task abrufen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake album:seed_format</command>
 (in /Users/stefan/jukebox)
 Album.create("name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "position"=&gt;1, "release_year"=&gt;1967)
 Album.create("name"=&gt;"Pet Sounds", "position"=&gt;2, "release_year"=&gt;1966)
@@ -547,11 +544,10 @@ Album.create("name"=&gt;"Revolver", "position"=&gt;3, "release_year"=&gt;1966)
 Album.create("name"=&gt;"Highway 61 Revisited", "position"=&gt;4, "release_year"=&gt;1965)
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
-        <para>Entweder können Sie dieses Programm so erweitern, das die
-        Ausgabe direkt in die <filename>seeds.rb</filename> geschrieben wird
-        oder Sie benutzen einfach die Shell:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake album:seed_format &gt;&gt; db/seeds.rb</command>
+      <para>Entweder können Sie dieses Programm so erweitern, das die Ausgabe
+      direkt in die <filename>seeds.rb</filename> geschrieben wird oder Sie
+      benutzen einfach die Shell:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake album:seed_format &gt;&gt; db/seeds.rb</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
-      </section>
     </section>
   </section>
 
@@ -675,7 +671,14 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
       <important>
         <para>Das Ergegebnis von <methodname>where</methodname> is immer ein
         Array. Auch wenn nur ein Treffer drin ist oder auch wenn gar kein
-        Treffer ausgegeben wird.</para>
+        Treffer ausgegeben wird. Wenn Sie den ersten Treffer suchen, dann
+        müssen Sie <methodname>where</methodname> mit der
+        <methodname>first</methodname> Methode verketten:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; [1966,1968]).first</command>
+ =&gt; #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 19:53:00"&gt; 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
       </important>
 
       <section xml:id="activerecord_sql">
@@ -1469,6 +1472,194 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
     </section>
   </section>
 
+  <section xml:id="activerecord_datensatz_veraendern">
+    <title xml:id="activerecord_datensatz_veraendern.title">Einen Datensatz
+    verändern</title>
+
+    <para>Daten hinzufügen ist ja schon ganz nett, aber hin und wieder will
+    man ja auch einen Datensatz editieren. Wir benutzen zur Beschreibung die
+    Album-Datenbank aus <xref linkend="queries" />. </para>
+
+    <section xml:id="activerecord_einfaches_editieren">
+      <title xml:id="activerecord_einfaches_editieren.title">Einfaches
+      editieren</title>
+
+      <para>Das einfache editieren eines Datensatzes erfolgt in folgenden
+      Schritten:<orderedlist>
+          <listitem>
+            <para>Suche des Datensatzes und erstellen einer entsprechenden
+            Instanz.</para>
+          </listitem>
+
+          <listitem>
+            <para>Verändern der Werte.</para>
+          </listitem>
+
+          <listitem>
+            <para>Abspeichern des Datensatzes mit der Methode
+            <methodname>save</methodname>.</para>
+          </listitem>
+        </orderedlist></para>
+
+      <para>Wir suchen uns jetzt das Album mit dem Namen "The Beatles" und
+      verändern den Namen in "Ein Test":<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>apfelmus = Album.where(:name =&gt; 'The Beatles').first</command>
+ =&gt; #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 19:53:00"&gt; 
+ruby-1.9.2-p0 &gt; <command>apfelmus.name = 'Ein Test'</command>
+ =&gt; "Ein Test" 
+ruby-1.9.2-p0 &gt; <command>apfelmus</command>
+ =&gt; #&lt;Album id: 10, position: 10, name: "Ein Test", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 19:53:00"&gt; 
+ruby-1.9.2-p0 &gt; <command>apfelmus.save</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt; <command>Album.last</command>
+ =&gt; #&lt;Album id: 10, position: 10, name: "Ein Test", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 19:56:49"&gt; 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+    </section>
+
+    <section>
+      <title>changed?</title>
+
+      <para>Wenn man sich nicht sicher ist, ob ein Datensatz verändert und
+      noch nicht abgespeichert wurde, dann kann man dies mit der
+      <methodname>changed?</methodname> Methode rausfinden:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>apfelmus = Album.last</command>
+ =&gt; #&lt;Album id: 10, position: 10, name: "Ein Test", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 19:56:49"&gt; 
+ruby-1.9.2-p0 &gt; <command>apfelmus.changed?</command>
+ =&gt; false 
+ruby-1.9.2-p0 &gt; <command>apfelmus.name = 'The Beatles'</command>
+ =&gt; "The Beatles" 
+ruby-1.9.2-p0 &gt; <command>apfelmus.changed?</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt; <command>apfelmus.save</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt; <command>apfelmus.changed?</command>
+ =&gt; false 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+    </section>
+
+    <section xml:id="activerecord_update_attributes">
+      <title
+      xml:id="activerecord_update_attributes.title">update_attributes</title>
+
+      <para>Mit der Methode <methodname>update_attributes</methodname> kann
+      man verschiedene Attribute eines Objektes auf einmal ändern und danach
+      automatisch direkt speichern.</para>
+
+      <para>Setzten wir damit das Beispiel von <xref
+      linkend="activerecord_einfaches_editieren" /> um:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>apfelmus = Album.where(:name =&gt; 'The Beatles').first</command>
+ =&gt; #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 20:22:17"&gt; 
+ruby-1.9.2-p0 &gt; <command>apfelmus.changed?</command>
+ =&gt; false 
+ruby-1.9.2-p0 &gt; <command>apfelmus.update_attributes(:name =&gt; 'Ein Test')</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt; <command>apfelmus.changed?</command>
+ =&gt; false 
+ruby-1.9.2-p0 &gt; <command>Album.last</command>
+ =&gt; #&lt;Album id: 10, position: 10, name: "Ein Test", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 20:22:38"&gt; 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+
+      <para>Ein solches Update lässt sich auch direkt an eine
+      <methodname>where</methodname> Methode anknüpfen und ist dann fast
+      atomar:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>Album.where(:name =&gt; 'Ein Test').first</command>
+ =&gt; #&lt;Album id: 10, position: 10, name: "Ein Test", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 20:22:38"&gt; 
+ruby-1.9.2-p0 &gt; <command>Album.where(:name =&gt; 'Ein Test').first.update_attributes(:name =&gt; 'The Beatles')</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt; <command>Album.where(:name =&gt; 'Ein Test').first</command> 
+ =&gt; nil 
+ruby-1.9.2-p0 &gt; <command>Album.last</command>
+ =&gt; #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 20:24:41"&gt; 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+
+      <para>Das es aber doch noch zwei SQL-Befehle sind zeigt sich in der
+      <filename>log/development.log</filename>:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."name" = 'Ein Test') LIMIT 1
+  SQL (0.3ms)  UPDATE "albums" SET "name" = 'The Beatles', "updated_at" = '2010-10-08 20:24:41.644808' WHERE ("albums"."id" = 10)
+</programlisting></para>
+    </section>
+
+    <section xml:id="activerecord_locking">
+      <title xml:id="activerecord_locking.title">Locking</title>
+
+      <para>Per Default benutzt Rails Optimistisches Locking der Datensätze.
+      Dies kann aber umgeschaltet werden. Da für die meisten User
+      Optimistisches Locking optimal ist und viele vor diesem Absatz nicht mal
+      über das Problem nachgedacht haben, werde ich nicht weiter drauf
+      eingehen, sondern auf die ri Hilfe verweisen. Wer pessimistisches
+      Locking benötigt, der findet dort die notwendigen Schalter.</para>
+
+      <para><screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>ri -T ActiveRecord::Locking::Optimistic</command>
+ActiveRecord::Locking::Optimistic
+
+(from gem activerecord-3.0.0)
+------------------------------------------------------------------------------
+What is Optimistic Locking
+
+Optimistic locking allows multiple users to access the same record for edits,
+and assumes a minimum of conflicts with the data.  It does this by checking
+whether another process has made changes to a record since it was opened, an
+ActiveRecord::StaleObjectError is thrown if that has occurred and the update
+is ignored.
+
+Check out ActiveRecord::Locking::Pessimistic for an alternative.
+
+Usage
+
+Active Records support optimistic locking if the field lock_version is
+present.  Each update to the record increments the lock_version column and the
+locking facilities ensure that records instantiated twice will let the last
+one saved raise a StaleObjectError if the first was also updated. Example:
+
+  p1 = Person.find(1)
+  p2 = Person.find(1)
+
+  p1.first_name = "Michael"
+  p1.save
+
+  p2.first_name = "should fail"
+  p2.save # Raises a ActiveRecord::StaleObjectError
+
+Optimistic locking will also check for stale data when objects are destroyed. 
+Example:
+
+  p1 = Person.find(1)
+  p2 = Person.find(1)
+
+  p1.first_name = "Michael"
+  p1.save
+
+  p2.destroy # Raises a ActiveRecord::StaleObjectError
+
+You're then responsible for dealing with the conflict by rescuing the
+exception and either rolling back, merging, or otherwise apply the business
+logic needed to resolve the conflict.
+
+You must ensure that your database schema defaults the lock_version column to
+0.
+
+This behavior can be turned off by setting
+ActiveRecord::Base.lock_optimistically = false. To override the name of
+the lock_version column, invoke the set_locking_column method. This
+method uses the same syntax as set_table_name
+
+------------------------------------------------------------------------------
+Instance methods:
+
+  attributes_from_column_definition
+
+
+stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+    </section>
+  </section>
+
   <section xml:id="has_many">
     <title xml:id="has_many.title">has_many - 1:n Verknüpfung</title>
 
@@ -2106,660 +2297,6 @@ end</programlisting></para>
 
         <para>Hier geht es weiter nach der nächsten Maus.</para>
       </section>
-    </section>
-  </section>
-
-  <section xml:id="railsair">
-    <title xml:id="railsair.title">Die Fluggesellschaft RailsAir</title>
-
-    <para>Damit das Kapitel in sich selbst abschlossen ist, erstellen wir ein
-    neues Rails-Projekt, in dem wir dann alle Beispiele einbauen. Dabei habe
-    ich etwas aus dem "täglichen Leben" genommen und schlage vor, das wir
-    gemeinsam eine neue regionale Fluggesellschaft gründen. Die RailsAir!
-    Fangen wir mal an:<screen>stefan@swmbp 0 1.9.1-p378 book$ <command>rails new railsair</command>
-      create  
-      create  README
-      create  Rakefile
-      create  config.ru
-      create  .gitignore
-      create  Gemfile
-      create  app
-      create  app/controllers/application_controller.rb
-
-      [...]
-
-      create  tmp/pids
-      create  vendor/plugins
-      create  vendor/plugins/.gitkeep
-stefan@swmbp 0 1.9.1-p378 book$</screen></para>
-
-    <para>So jetzt noch in das neue Verzeichnis wechseln und <command>bundle
-    install</command> ausführen:<screen>stefan@swmbp 0 1.9.1-p378 book$ <command>cd railsair</command>
-stefan@swmbp 0 1.9.1-p378 railsair$ <command>bundle install</command>
-Fetching source index from http://rubygems.org/
-Using rake (0.8.7) from bundler gems 
-Using abstract (1.0.0) from bundler gems 
-Using activesupport (3.0.0.beta4) from bundler gems 
-
-[...]
-
-Using rails (3.0.0.beta4) from bundler gems 
-Using sqlite3-ruby (1.3.0) from bundler gems 
-Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
-stefan@swmbp 0 1.9.1-p378 railsair$</screen></para>
-  </section>
-
-  <section xml:id="railsair_flight_scaffold">
-    <title xml:id="railsair_flight_scaffold.title">Welche Flugnummern werden
-    mit welchen Routen geflogen?</title>
-
-    <para>Als Basis für dieses Kapitel erstellen wir jetzt eine Flugdatenbank.
-    Der Einfachheit halber mit Scaffolding:</para>
-
-    <para><screen>stefan@swmbp 0 1.9.1-p378 railsair$ <command>rails generate scaffold flight flight_number:string departure_airport:string destination_airport:string</command>
-      invoke  active_record
-      create    db/migrate/20100617123001_create_flights.rb
-      create    app/models/flight.rb
-
-      [...]
-
-      create        test/unit/helpers/flights_helper_test.rb
-      invoke  stylesheets
-      create    public/stylesheets/scaffold.css
-stefan@swmbp 0 1.9.1-p378 railsair$</screen></para>
-
-    <para>Die Datenbank anlegen:<screen>stefan@swmbp 0 1.9.1-p378 railsair$ <command>rake db:migrate</command>
-(in /Users/stefan/book/railsair)
-==  CreateFlights: migrating ==================================================
--- create_table(:flights)
-   -&gt; 0.0017s
-==  CreateFlights: migrated (0.0018s) =========================================
-
-stefan@swmbp 0 1.9.1-p378 railsair$</screen></para>
-  </section>
-
-  <section xml:id="anlegen_und_anzeigen_von_datensaetzen">
-    <title xml:id="anlegen_und_anzeigen_von_datensaetzen.title">Anlegen und
-    Anzeigen von Datensätzen</title>
-
-    <para>Wir arbeiten mit der Rails Console (siehe <xref
-    linkend="die_console" />):<screen>stefan@swmbp 0 1.9.1-p378 railsair$ <command>rails console</command>
-Loading development environment (Rails 3.0.0.beta4)
-ruby-1.9.1-p378 &gt; </screen></para>
-
-    <section>
-      <title>Neuen Datensatz anlegen</title>
-
-      <para>ActiveRecord stellt uns automagisch eine Klasse aus der Datenbank
-      <parameter>flights</parameter> mit dem Namen
-      <classname>Flight</classname> zur Verfügung. Diese Klasse hat eine
-      Methode <methodname>new</methodname> und mit der können wir ein neues
-      Objekt erstellen. <screen>ruby-1.9.1-p378 &gt; <command>apfelmus = Flight.new</command>
- =&gt; #&lt;Flight id: nil, flight_number: nil, departure_airport: nil, destination_airport: nil, created_at: nil, updated_at: nil&gt; 
-ruby-1.9.1-p378 &gt; </screen></para>
-
-      <para>Wir können uns sicherheitshalber noch mal die Klasse der Instance
-      <varname>apfelmus</varname> ausgeben lassen.<screen>ruby-1.9.1-p378 &gt; <command>apfelmus.class</command>
- =&gt; Flight(id: integer, flight_number: string, departure_airport: string, destination_airport: string, created_at: datetime, updated_at: datetime) 
-ruby-1.9.1-p378 &gt; </screen></para>
-
-      <para>Das neue Objekt <varname>apfelmus</varname> hat automatsch
-      Accessors (siehe <xref linkend="getter_und_setter_methoden" />) zu den
-      einzelnen Datenfeldern. Diese benutzen wir zum Füllen des ersten
-      Datensatzes:<screen>ruby-1.9.1-p378 &gt; <command>apfelmus.flight_number = 'RA 001'</command>
- =&gt; "RA 001" 
-ruby-1.9.1-p378 &gt; <command>apfelmus.departure_airport = 'FRA'</command>
- =&gt; "FRA" 
-ruby-1.9.1-p378 &gt; <command>apfelmus.destination_airport = 'MUC'</command>
- =&gt; "MUC" 
-ruby-1.9.1-p378 &gt; <command>apfelmus</command>
- =&gt; #&lt;Flight id: nil, flight_number: "RA 001", departure_airport: "FRA", destination_airport: "MUC", created_at: nil, updated_at: nil&gt; 
-ruby-1.9.1-p378 &gt;</screen></para>
-
-      <para>Das Objekt ist allerdings noch nicht in der Datenbank gespeichert.
-      Das erfolgt erst durch Aufruf der Methode
-      <methodname>save</methodname>.<screen>ruby-1.9.1-p378 &gt; <command>apfelmus.save</command>
- =&gt; true 
-ruby-1.9.1-p378 &gt; </screen></para>
-
-      <section>
-        <title>Datensatz mit create anlegen</title>
-
-        <para>Sie können nicht nur mit der Methode
-        <methodname>new</methodname> ein neues Objekt der Klasse
-        <classname>Flight</classname> anlegen, um dieses später mit
-        <methodname>save</methodname> in der Datenbank zu speichern. Sie
-        können auch direkt mit der Methode <methodname>create</methodname>
-        einen Datensatz in der Datenbank anlegen:</para>
-
-        <para>Alternative können wir einen zweiten Datensatz auch direkt mit
-        der Methode <methodname>create</methodname> anlegen.<screen>ruby-1.9.1-p378 &gt; <command>Flight.create(:flight_number =&gt; 'RA 002', :departure_airport =&gt; 'FRA', :destination_airport =&gt; 'HAM')</command>
- =&gt; #&lt;Flight id: 2, flight_number: "RA 002", departure_airport: "FRA", destination_airport: "HAM", created_at: "2010-06-17 13:02:03", updated_at: "2010-06-17 13:02:03"&gt; 
-ruby-1.9.1-p378 &gt; </screen></para>
-
-        <para>Sie können einen so neu erstellten Datensatz auch direkt in
-        einer Variable speichern:<screen>ruby-1.9.1-p378 &gt; <command>pflaumenmus = Flight.create(:flight_number =&gt; 'RA 003', :departure_airport =&gt; 'MUC', :destination_airport =&gt; 'HAM')</command>
- =&gt; #&lt;Flight id: 3, flight_number: "RA 003", departure_airport: "MUC", destination_airport: "HAM", created_at: "2010-06-17 13:03:46", updated_at: "2010-06-17 13:03:46"&gt; 
-ruby-1.9.1-p378 &gt; <command>pflaumenmus.class</command>
- =&gt; Flight(id: integer, flight_number: string, departure_airport: string, destination_airport: string, created_at: datetime, updated_at: datetime) 
-ruby-1.9.1-p378 &gt; </screen></para>
-
-        <para>Die Methode <methodname>create</methodname> nimmt übrigens auch
-        ein Array (siehe <xref linkend="ruby_array" />) von neuen Objekten an.
-        So können Sie auch mehr als einen <varname>Flight</varname> auf einmal
-        erzeugen:<screen>ruby-1.9.1-p378 &gt; <command>Flight.create([{:flight_number =&gt; 'RA 004', :departure_airport =&gt; 'MUC', :destination_airport =&gt; 'DUS'},{:flight_number =&gt; 'RA 005', :departure_airport =&gt; 'FRA', :destination_airport =&gt; 'TXL'}])</command>
- =&gt; [#&lt;Flight id: 4, flight_number: "RA 004", departure_airport: "MUC", destination_airport: "DUS", created_at: "2010-06-17 13:06:28", updated_at: "2010-06-17 13:06:28"&gt;, #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 13:06:28", updated_at: "2010-06-17 13:06:28"&gt;] 
-ruby-1.9.1-p378 &gt;</screen></para>
-
-        <section>
-          <title>Hilfe zu create</title>
-
-          <para>Die Methode <methodname>create</methodname> gehört zu
-          <classname>ActiveRecord::Base</classname>. Die online Hilfe dazu
-          kann mit <command>ri ActiveRecord::Base.create</command> abgerufen
-          werden. Wenn Sie das jetzt ausprobieren wollen, müssen Sie natürlich
-          erst mit <command>exit</command> aus der Console raus.<screen>stefan@swmbp 0 1.9.1-p378 railsair$ <command>ri ActiveRecord::Base.create</command>
-ActiveRecord::Base.create
-
-(from gem activerecord-3.0.0.beta4)
-------------------------------------------------------------------------------
-  create(attributes = nil) { |object| ... }
-
-------------------------------------------------------------------------------
-
-Creates an object (or multiple objects) and saves it to the database, if
-validations pass. The resulting object is returned whether the object was
-saved successfully to the database or not.
-
-The attributes parameter can be either be a Hash or an Array of Hashes.
- These Hashes describe the attributes on the objects that are to be created.
-
-Examples
-  # Create a single new object
-  User.create(:first_name =&gt; 'Jamie')
-
-  # Create an Array of new objects
-  User.create([{ :first_name =&gt; 'Jamie' }, { :first_name =&gt; 'Jeremy' }])
-
-  # Create a single object and pass it into a block to set other attributes.
-  User.create(:first_name =&gt; 'Jamie') do |u|
-    u.is_admin = false
-  end
-
-  # Creating an Array of new objects using a block, where the block is executed for each object:
-  User.create([{ :first_name =&gt; 'Jamie' }, { :first_name =&gt; 'Jeremy' }]) do |u|
-    u.is_admin = false
-  end
-
-
-stefan@swmbp 0 1.9.1-p378 railsair$
-</screen></para>
-        </section>
-      </section>
-    </section>
-  </section>
-
-  <section xml:id="einfache_queries">
-    <title xml:id="einfache_queries.title">Query</title>
-
-    <para>So, das wird jetzt ein wenig komplexer. Muss man sich nicht beim
-    ersten mal ganz durchlesen, aber schaden kann es auch nicht.</para>
-
-    <note>
-      <para>In diesem Kapitel werden absichtlich keine Methoden benutzt, die
-      in Rails 3.0 deprecated sind.</para>
-    </note>
-
-    <section>
-      <title>first und last</title>
-
-      <para>Mit den Methoden <methodname>first</methodname> und
-      <methodname>last</methodname> können wir uns den ersten und den letzten
-      Datensatz aus einer Datenbank-Tabelle ausgeben lassen:<screen>ruby-1.9.1-p378 &gt; <command>Flight.first</command>
- =&gt; #&lt;Flight id: 1, flight_number: "RA 001", departure_airport: "FRA", destination_airport: "MUC", created_at: "2010-06-17 13:41:06", updated_at: "2010-06-17 13:41:06"&gt; 
-ruby-1.9.1-p378 &gt; <command>Flight.last</command>
- =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 13:41:16", updated_at: "2010-06-17 13:41:16"&gt; 
-ruby-1.9.1-p378 &gt;</screen></para>
-
-      <para>Das Ergebnis von <methodname>Flight.first</methodname> ist
-      natürlich eine <classname>Flight</classname> Klasse:<screen>ruby-1.9.1-p378 &gt; <command>Flight.first.class</command>
- =&gt; Flight(id: integer, flight_number: string, departure_airport: string, destination_airport: string, created_at: datetime, updated_at: datetime) 
-ruby-1.9.1-p378 &gt;</screen></para>
-    </section>
-
-    <section>
-      <title>all</title>
-
-      <para>Der einfachste Weg alle Datensätze aus der Datenbank
-      <varname>flights</varname> anzuzeigen ist die Methode
-      <methodname>all</methodname>:<screen>ruby-1.9.1-p378 &gt; <command>Flight.all</command>
- =&gt; [#&lt;Flight id: 1, flight_number: "RA 001", departure_airport: "FRA", destination_airport: "MUC", created_at: "2010-06-17 13:41:06", updated_at: "2010-06-17 13:41:06"&gt;, #&lt;Flight id: 2, flight_number: "RA 002", departure_airport: "FRA", destination_airport: "HAM", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt;, #&lt;Flight id: 3, flight_number: "RA 003", departure_airport: "MUC", destination_airport: "HAM", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt;, #&lt;Flight id: 4, flight_number: "RA 004", departure_airport: "MUC", destination_airport: "DUS", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt;, #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 13:41:16", updated_at: "2010-06-17 13:41:16"&gt;] 
-ruby-1.9.1-p378 &gt;</screen></para>
-
-      <tip>
-        <para>Sie können sich mit dem Programm <command>pp</command> die
-        Ausgabe von <methodname>Flight.all</methodname> etwas übersichtlicher
-        darstellen lassen:<screen>ruby-1.9.1-p378 &gt; <command>pp Flight.all</command>
-[#&lt;Flight id: 1, flight_number: "RA 001", departure_airport: "FRA", destination_airport: "MUC", created_at: "2010-06-17 13:41:06", updated_at: "2010-06-17 13:41:06"&gt;,
- #&lt;Flight id: 2, flight_number: "RA 002", departure_airport: "FRA", destination_airport: "HAM", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt;,
- #&lt;Flight id: 3, flight_number: "RA 003", departure_airport: "MUC", destination_airport: "HAM", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt;,
- #&lt;Flight id: 4, flight_number: "RA 004", departure_airport: "MUC", destination_airport: "DUS", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt;,
- #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 13:41:16", updated_at: "2010-06-17 13:41:16"&gt;]
- =&gt; nil 
-ruby-1.9.1-p378 &gt; </screen></para>
-      </tip>
-
-      <para>Was für eine Klasse ist das Ergebnis von
-      <classname>Flight.all</classname>? Schauen wir mal mit der Methode
-      <methodname>class</methodname> nach:<screen>ruby-1.9.1-p378 &gt; <command>Flight.all.class</command>
- =&gt; Array 
-ruby-1.9.1-p378 &gt;</screen></para>
-
-      <para>Dann können wir ja die Iterator-Methode
-      <methodname>each</methodname> anwenden (siehe <xref
-      linkend="array_iterator" />), um durch die einzelnen Elemente des Arrays
-      zu gehen. Damit können Sie sich als Beispiel alle Flugnummern ausgeben
-      lassen.<screen>ruby-1.9.1-p378 &gt; <command>Flight.all.each { |flight| puts flight.flight_number }</command>
-RA 001
-RA 002
-RA 003
-RA 004
-RA 005
- =&gt; [#&lt;Flight id: 1, flight_number: "RA 001", departure_airport: "FRA", destination_airport: "MUC", created_at: "2010-06-17 13:41:06", updated_at: "2010-06-17 13:41:06"&gt;, #&lt;Flight id: 2, flight_number: "RA 002", departure_airport: "FRA", destination_airport: "HAM", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt;, #&lt;Flight id: 3, flight_number: "RA 003", departure_airport: "MUC", destination_airport: "HAM", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt;, #&lt;Flight id: 4, flight_number: "RA 004", departure_airport: "MUC", destination_airport: "DUS", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt;, #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 13:41:16", updated_at: "2010-06-17 13:41:16"&gt;] 
-ruby-1.9.1-p378 &gt;</screen></para>
-    </section>
-
-    <section>
-      <title>Nach ID suchen</title>
-
-      <para>Einen Flight nach der Datenbank-ID zu suchen geht mit der Methode
-      <methodname>find</methodname>(ID):<screen>ruby-1.9.1-p378 &gt; <command>Flight.find(1)</command>
- =&gt; #&lt;Flight id: 1, flight_number: "RA 001", departure_airport: "FRA", destination_airport: "MUC", created_at: "2010-06-17 13:41:06", updated_at: "2010-06-17 13:41:06"&gt; 
-ruby-1.9.1-p378 &gt;</screen></para>
-
-      <para>Das Ergebnis von <methodname>Flight.find(1)</methodname> ist
-      natürlich eine <classname>Flight</classname> Klasse:<screen>ruby-1.9.1-p378 &gt; <command>Flight.find(1).class</command>
- =&gt; Flight(id: integer, flight_number: string, departure_airport: string, destination_airport: string, created_at: datetime, updated_at: datetime) 
-ruby-1.9.1-p378 &gt;</screen></para>
-
-      <para>Wir können aber auch mehrere IDs auf einmal suchen:<screen>ruby-1.9.1-p378 &gt; <command>Flight.find(2,4,5)</command>
- =&gt; [#&lt;Flight id: 2, flight_number: "RA 002", departure_airport: "FRA", destination_airport: "HAM", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt;, #&lt;Flight id: 4, flight_number: "RA 004", departure_airport: "MUC", destination_airport: "DUS", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt;, #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 13:41:16", updated_at: "2010-06-17 13:41:16"&gt;] 
-ruby-1.9.1-p378 &gt;</screen></para>
-
-      <para>Das Ergebnis ist dann logischerweise dann wiederum ein Array
-      (siehe <xref linkend="ruby_array" />):<screen>ruby-1.9.1-p378 &gt; <command>Flight.find(2,4,5).class</command>
- =&gt; Array 
-ruby-1.9.1-p378 &gt;</screen></para>
-
-      <para>Mit diesem Array können Sie dann wieder die Iterator-Methoden
-      benutzen (siehe <xref linkend="array_iterator" />).</para>
-
-      <section>
-        <title>Verhalten bei "nicht gefunden"</title>
-
-        <para>Wer mit <methodname>find(ID)</methodname> einen bestimmten
-        Datensatz abrufen will, sollte sicher sein, das es diesen Datensatz
-        auch gibt. Sonst kommt es zu einem Fehler, den man extra abfangen
-        müsste:<screen>ruby-1.9.1-p378 &gt; <command>Flight.find(100)</command>
-ActiveRecord::RecordNotFound: Couldn't find Flight with ID=100
- from /Users/stefan/.rvm/gems/ruby-1.9.1-p378/gems/activerecord-3.0.0.beta4/lib/active_record/relation/finder_methods.rb:287:in `find_one'
- from /Users/stefan/.rvm/gems/ruby-1.9.1-p378/gems/activerecord-3.0.0.beta4/lib/active_record/relation/finder_methods.rb:274:in `find_with_ids'
- from /Users/stefan/.rvm/gems/ruby-1.9.1-p378/gems/activerecord-3.0.0.beta4/lib/active_record/relation/finder_methods.rb:102:in `find'
- from /Users/stefan/.rvm/gems/ruby-1.9.1-p378/gems/activerecord-3.0.0.beta4/lib/active_record/base.rb:403:in `find'
- from (irb):27
- from /Users/stefan/.rvm/gems/ruby-1.9.1-p378/gems/railties-3.0.0.beta4/lib/rails/commands/console.rb:47:in `start'
- from /Users/stefan/.rvm/gems/ruby-1.9.1-p378/gems/railties-3.0.0.beta4/lib/rails/commands/console.rb:8:in `start'
- from /Users/stefan/.rvm/gems/ruby-1.9.1-p378/gems/railties-3.0.0.beta4/lib/rails/commands.rb:23:in `&lt;top (required)&gt;'
- from script/rails:6:in `require'
- from script/rails:6:in `&lt;main&gt;'
-ruby-1.9.1-p378 &gt;</screen></para>
-
-        <para>Man kann übrigens mit der Methode
-        <methodname>exists?(ID)</methodname> vor einem
-        <methodname>find(ID)</methodname> überprüfen, ob der entsprechende
-        Datensatz in der Datenbank existiert. Das Ergebnis von
-        <methodname>exists?(ID)</methodname> ist ein Boolean.<screen>ruby-1.9.1-p378 &gt; <command>Flight.exists?(100)</command>
- =&gt; false 
-ruby-1.9.1-p378 &gt; <command>Flight.exists?(2)</command>
- =&gt; true 
-ruby-1.9.1-p378 &gt; </screen></para>
-
-        <para><warning>
-            <para>Mehr der Form halber möchte ich hier erwähnen, das es bei
-            einem <methodname>exists(ID)</methodname> gefolgt von einem
-            <methodname>find(ID)</methodname> durchaus zu einer Race-Condition
-            kommen kann. Unwahrscheinlich, aber nicht unmöglich. Es kann ja
-            sein, das in der minimalen Zeit zwischen den beiden Befehlen ein
-            anderes Programm genau diese Tabellen-ID löscht.</para>
-          </warning></para>
-      </section>
-    </section>
-
-    <section>
-      <title>find_by_x und find_all_by_x</title>
-
-      <para>Bei der Benutzung von find_by kommt ein wenig Ruby-Magie ins
-      Spiel. Die Methode <methodname>find</methodname> kann dynamisch mit
-      <methodname>_by_</methodname> und dem Feldnamen erweitert werden und
-      gibt dann den ersten Treffer der Suche aus. Am einfachsten zeigt sich
-      das mit ein paar Beispielen:<screen>ruby-1.9.1-p378 &gt; <command>Flight.find_by_departure_airport('FRA')</command>
- =&gt; #&lt;Flight id: 1, flight_number: "RA 001", departure_airport: "FRA", destination_airport: "MUC", created_at: "2010-06-17 13:41:06", updated_at: "2010-06-17 13:41:06"&gt; 
-ruby-1.9.1-p378 &gt; <command>Flight.find_by_destination_airport('TXL')</command>
- =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 13:41:16", updated_at: "2010-06-17 13:41:16"&gt; 
-ruby-1.9.1-p378 &gt;</screen></para>
-
-      <para>Man kann <methodname>find_by_x</methodname> Methoden weiterhin
-      beliebig mit <methodname>_and_</methodname> um weitere Feldnamen
-      verlängern:<screen>ruby-1.9.1-p378 &gt; <command>Flight.find_by_departure_airport_and_destination_airport('MUC','DUS')</command>
- =&gt; #&lt;Flight id: 4, flight_number: "RA 004", departure_airport: "MUC", destination_airport: "DUS", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt; 
-ruby-1.9.1-p378 &gt; </screen></para>
-
-      <para>Während <methodname>find_by_x</methodname> immer nur den ersten
-      gefundenen Datensatz ausgibt, kann man mit
-      <methodname>find_all_by_x</methodname> alle Treffer für diese Anfrage
-      als Array bekommen:<screen>ruby-1.9.1-p378 &gt; <command>Flight.find_all_by_departure_airport('FRA')</command>
- =&gt; [#&lt;Flight id: 1, flight_number: "RA 001", departure_airport: "FRA", destination_airport: "MUC", created_at: "2010-06-17 13:41:06", updated_at: "2010-06-17 13:41:06"&gt;, #&lt;Flight id: 2, flight_number: "RA 002", departure_airport: "FRA", destination_airport: "HAM", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt;, #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 13:41:16", updated_at: "2010-06-17 13:41:16"&gt;] 
-ruby-1.9.1-p378 &gt; <command>Flight.find_all_by_departure_airport('FRA').class</command>
- =&gt; Array 
-ruby-1.9.1-p378 &gt;</screen></para>
-
-      <section>
-        <title>Verhalten bei "nicht gefunden"</title>
-
-        <para>Wenn ein <methodname>find_by</methodname> keinen Treffer findet,
-        dann ist das Ergebnis nil:<screen>ruby-1.9.1-p378 &gt; <command>Flight.find_by_departure_airport('LAX')</command>
- =&gt; nil 
-ruby-1.9.1-p378 &gt; <command>Flight.find_by_departure_airport('LAX').class</command>
- =&gt; NilClass 
-ruby-1.9.1-p378 &gt;</screen></para>
-
-        <para>Kein Treffer bei einem <methodname>find_all_by</methodname>
-        Aufruf ist ein leeres Array:<screen>ruby-1.9.1-p378 &gt; <command>Flight.find_all_by_departure_airport('LAX')</command>
- =&gt; [] 
-ruby-1.9.1-p378 &gt; <command>Flight.find_all_by_departure_airport('LAX').class</command>
- =&gt; Array 
-ruby-1.9.1-p378 &gt; </screen></para>
-      </section>
-    </section>
-
-    <section>
-      <title>where</title>
-
-      <para>Eine sehr mächtige Alternative zu
-      <methodname>find_all_by</methodname> die Methode
-      <methodname>where</methodname>:<screen>ruby-1.9.1-p378 &gt; <command>Flight.where(:departure_airport =&gt; 'FRA')</command>
- =&gt; [#&lt;Flight id: 1, flight_number: "RA 001", departure_airport: "FRA", destination_airport: "MUC", created_at: "2010-06-17 13:41:06", updated_at: "2010-06-17 13:41:06"&gt;, #&lt;Flight id: 2, flight_number: "RA 002", departure_airport: "FRA", destination_airport: "HAM", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt;, #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 13:41:16", updated_at: "2010-06-17 13:41:16"&gt;] 
-ruby-1.9.1-p378 &gt; </screen></para>
-
-      <para>Einer der Vorteile von <methodname>where</methodname> im Vergleich
-      zu <methodname>find_all_by</methodname> ist die Möglichkeit es
-      hintereinander zu schalten:<screen>ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').where(:production_year =&gt; 2007)</command>
- =&gt; [#&lt;Airplane id: 5, name: "Orlando", model: "Boing 747", production_year: 2007, seats: 467, created_at: "2010-06-14 11:51:10", updated_at: "2010-06-14 11:51:10"&gt;] 
-ruby-head &gt;</screen></para>
-
-      <section>
-        <title>count</title>
-
-        <para>Mit der Methode <methodname>count</methodname> kann man sich
-        dann die Anzahl der gefundenen Flights ausrechnen lassen:<screen>ruby-1.9.1-p378 &gt; <command>Flight.where(:departure_airport =&gt; 'FRA').count</command>
- =&gt; 3 
-ruby-1.9.1-p378 &gt; </screen></para>
-
-        <para>Jetzt mal eine kleine Quizfrage: "Zählt Rails die Anzahl der
-        Objekte im Array, das von <command>Flight.where(:departure_airport
-        =&gt; 'FRA').count</command> ausgegeben wird oder geht es
-        intelligenter vor?". Die Antwort liegt im Logfile
-        <filename>log/development.log</filename><screen>  SQL (0.2ms)  SELECT COUNT(*) AS count_id FROM "flights" WHERE ("flights"."departure_airport" = 'FRA')
-</screen></para>
-
-        <para>ActiveRecord überlässt also nicht Ruby on Rails das Zählen des
-        Ergebnis-Arrays von <command>Flight.where(:departure_airport =&gt;
-        'FRA')</command> sondern fügt das <code>COUNT</code> der SQL Anweisung
-        hinzu und lässt die Datenbank diese Berechnung vollziehen (was viel
-        schneller und Resourcen-schonender ist).</para>
-      </section>
-
-      <section>
-        <title>Verhalten bei "nicht gefunden"</title>
-
-        <para>Die Methode <methodname>where</methodname> gibt als Ergebnis
-        einer nicht erfolgreichen Suche ein leeres Array aus:<screen>ruby-1.9.1-p378 &gt; <command>Flight.where(:departure_airport =&gt; 'LAX')</command>
- =&gt; [] 
-ruby-1.9.1-p378 &gt;</screen></para>
-
-        <note>
-          <para>Man kann natürlich argumentieren, das das Ergebnis einer
-          erfolglosen Suche ein ActiveRecord::Relation ist, das erst bei einem
-          weiteren Vergleich wirklich aufgelöst wird. Stimmt. Da sich aber
-          ActiveRecord darum automatisch kümmert, kann man diese Genauigkeit
-          in der Praxis getrost vernachlässigen:<screen>ruby-1.9.1-p378 &gt; <command>Flight.where(:departure_airport =&gt; 'LAX')</command>
- =&gt; [] 
-ruby-1.9.1-p378 &gt; <command>Flight.where(:departure_airport =&gt; 'LAX').class</command>
- =&gt; ActiveRecord::Relation 
-ruby-1.9.1-p378 &gt; <command>Flight.where(:departure_airport =&gt; 'LAX') == Array.new</command>
- =&gt; true 
-ruby-1.9.1-p378 &gt;</screen></para>
-        </note>
-      </section>
-    </section>
-
-    <section>
-      <title>Sortieren</title>
-
-      <para>Mit der Methode <methodname>order()</methodname> können Sie die
-      Ergebnisse einer Abfrage sortieren. Dabei können Sie als Parameter ein
-      Symbol (siehe <xref linkend="ruby_symbol" />) oder den entsprechenden
-      SQL-Befehl (<code>asc</code> = aufsteigend und <code>desc</code> =
-      absteigend) übergeben.<screen>ruby-1.9.1-p378 &gt; <command>Flight.order(:departure_airport)</command>
- =&gt; [#&lt;Flight id: 1, flight_number: "RA 001", departure_airport: "FRA", destination_airport: "MUC", created_at: "2010-06-17 13:41:06", updated_at: "2010-06-17 13:41:06"&gt;, #&lt;Flight id: 2, flight_number: "RA 002", departure_airport: "FRA", destination_airport: "HAM", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt;, #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 13:41:16", updated_at: "2010-06-17 13:41:16"&gt;, #&lt;Flight id: 3, flight_number: "RA 003", departure_airport: "MUC", destination_airport: "HAM", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt;, #&lt;Flight id: 4, flight_number: "RA 004", departure_airport: "MUC", destination_airport: "DUS", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt;] 
-ruby-1.9.1-p378 &gt; <command>Flight.where(:departure_airport =&gt; 'FRA').order('flight_number desc')</command>
- =&gt; [#&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 13:41:16", updated_at: "2010-06-17 13:41:16"&gt;, #&lt;Flight id: 2, flight_number: "RA 002", departure_airport: "FRA", destination_airport: "HAM", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt;, #&lt;Flight id: 1, flight_number: "RA 001", departure_airport: "FRA", destination_airport: "MUC", created_at: "2010-06-17 13:41:06", updated_at: "2010-06-17 13:41:06"&gt;] 
-ruby-1.9.1-p378 &gt;</screen></para>
-
-      <para>Wenn Sie erst nach Abflug- und dann nach Zielflughafen sortieren
-      wollen, so können Sie dies wie folgt machen:<screen>ruby-1.9.1-p378 &gt; <command>Flight.order(:departure_airport, :destination_airport)</command>
- =&gt; [#&lt;Flight id: 2, flight_number: "RA 002", departure_airport: "FRA", destination_airport: "HAM", created_at: "2010-06-18 14:29:01", updated_at: "2010-06-18 14:29:01"&gt;, #&lt;Flight id: 1, flight_number: "RA 001", departure_airport: "FRA", destination_airport: "MUC", created_at: "2010-06-18 14:28:54", updated_at: "2010-06-18 14:28:54"&gt;, #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-18 14:29:01", updated_at: "2010-06-18 14:29:01"&gt;, #&lt;Flight id: 4, flight_number: "RA 004", departure_airport: "MUC", destination_airport: "DUS", created_at: "2010-06-18 14:29:01", updated_at: "2010-06-18 14:29:01"&gt;, #&lt;Flight id: 3, flight_number: "RA 003", departure_airport: "MUC", destination_airport: "HAM", created_at: "2010-06-18 14:29:01", updated_at: "2010-06-18 14:29:01"&gt;] 
-ruby-1.9.1-p378 &gt; </screen></para>
-
-      <para>Auch hier sorgt Lazy Loading (siehe <xref
-      linkend="lazy_loading" />) im Hintergrund für performantere
-      Programme:<screen>ruby-1.9.1-p378 &gt; <command>Flight.order(:departure_airport).class</command>
- =&gt; ActiveRecord::Relation 
-ruby-1.9.1-p378 &gt; <command>Flight.order(:departure_airport).to_sql</command>
- =&gt; "SELECT     \"flights\".* FROM       \"flights\" ORDER BY  departure_airport" 
-ruby-1.9.1-p378 &gt; <command>Flight.where(:departure_airport =&gt; 'FRA').order('flight_number desc').class</command>
- =&gt; ActiveRecord::Relation 
-ruby-1.9.1-p378 &gt; <command>Flight.where(:departure_airport =&gt; 'FRA').order('flight_number desc').to_sql</command>
- =&gt; "SELECT     \"flights\".* FROM       \"flights\" WHERE     (\"flights\".\"departure_airport\" = 'FRA') ORDER BY  flight_number desc" 
-ruby-1.9.1-p378 &gt;</screen></para>
-    </section>
-
-    <section>
-      <title>Limit</title>
-
-      <para>Zum Schluss zeige ich Ihnen noch die
-      <methodname>limit</methodname> Methode, mit der Sie die Anzahl der
-      Ergebnisse limitieren können:<screen>ruby-1.9.1-p378 &gt; <command>Flight.where(:departure_airport =&gt; 'FRA').limit(2)</command>
- =&gt; [#&lt;Flight id: 1, flight_number: "RA 001", departure_airport: "FRA", destination_airport: "MUC", created_at: "2010-06-17 13:41:06", updated_at: "2010-06-17 13:41:06"&gt;, #&lt;Flight id: 2, flight_number: "RA 002", departure_airport: "FRA", destination_airport: "HAM", created_at: "2010-06-17 13:41:15", updated_at: "2010-06-17 13:41:15"&gt;] 
-ruby-1.9.1-p378 &gt; </screen></para>
-
-      <para>Ja, auch dies ist wieder ein Fall für Lazy Loading (siehe <xref
-      linkend="lazy_loading" />):<screen>ruby-1.9.1-p378 &gt; <command>Flight.where(:departure_airport =&gt; 'FRA').limit(2).to_sql</command>
- =&gt; "SELECT     \"flights\".* FROM       \"flights\" WHERE     (\"flights\".\"departure_airport\" = 'FRA') LIMIT 2" 
-ruby-1.9.1-p378 &gt;</screen></para>
-    </section>
-
-    <section>
-      <title>Berechnungen</title>
-
-      <para>ActiveRecord gibt uns direkten Zugriff auf eine Hand voll
-      Berechnungsmethoden die von einer SQL-Datenbank durchgeführt werden
-      können. Auch hier gilt der Grundsatz: Im Zweifel kann die Datenbank eine
-      dieser Berechnungen schneller, als wir im Programm.<note>
-          <para>Dummerweise habe ich ihm Beispiel keine Zahlen in den Tabellen
-          eingebaut. Das hat man davon, wenn man möglichst einfache Beispiele
-          wählt. Aus diesem Grund greife ich bei den folgenden Methoden
-          teilweise auf eine imaginäre <classname>Airplane</classname>
-          Datenbank zurück, die die Fehler <varname>:production_year</varname>
-          und <varname>:seats</varname> hat.</para>
-        </note></para>
-
-      <section>
-        <title>count</title>
-
-        <para>Mit <methodname>count</methodname> kann man die Anzahl der
-        Datensätze berechnen:<screen>ruby-1.9.1-p378 &gt; <command>Flight.where(:departure_airport =&gt; 'FRA').count</command>
- =&gt; 3 
-ruby-1.9.1-p378 &gt;</screen></para>
-      </section>
-
-      <section>
-        <title>average</title>
-
-        <para>Mit <methodname>average</methodname> kann man den
-        Durchschnittswert eines Tabellenfeldes berechnen:<screen>ruby-head &gt; <command>Airplane.average(:seats)</command>
- =&gt; #&lt;BigDecimal:101377858,'0.4941667E3',18(18)&gt; 
-ruby-head &gt; <command>Airplane.average(:seats).to_i</command>
- =&gt; 494 
-ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').average(:production_year)</command>
- =&gt; #&lt;BigDecimal:1013321e0,'0.20056667E4',18(18)&gt; 
-ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').average(:production_year).to_i</command> 
- =&gt; 2005 
-ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').average(:production_year).to_f</command> 
- =&gt; 2005.6667 
-ruby-head &gt;</screen></para>
-      </section>
-
-      <section>
-        <title>minimum und maximum</title>
-
-        <para>Mit den Methoden <methodname>minimum</methodname> und
-        <methodname>maximum</methodname> kann man das jeweilige Minimum oder
-        Maximum eines Feldes berechnen:<screen>ruby-head &gt; <command>Airplane.minimum(:seats)</command>
- =&gt; 300 
-ruby-head &gt; <command>Airplane.maximum(:seats)</command>
- =&gt; 852 
-ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').minimum(:production_year)</command>
- =&gt; 2005 
-ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').maximum(:production_year)</command>
- =&gt; 2007 
-ruby-head &gt; </screen></para>
-      </section>
-
-      <section>
-        <title>sum</title>
-
-        <para>Mit der Methode <methodname>sum</methodname> kann man die Summe
-        eines bestimmten Feldes in Einträgen berechnen: <screen>ruby-head &gt; <command>Airplane.sum(:seats)</command>
- =&gt; 2965 
-ruby-head &gt; <command>Airplane.where(:model =&gt; 'Boing 747').sum(:seats)</command>
- =&gt; 1401 
-ruby-head &gt; </screen></para>
-      </section>
-    </section>
-  </section>
-
-  <section xml:id="datensatz-editieren">
-    <title>Einen Datensatz editieren</title>
-
-    <para>Das Verändern eines Datensatzes erfolgt in zwei
-    Schritten:<orderedlist>
-        <listitem>
-          <para>Suche des Datensatzes und erstellen einer entsprechenden
-          Instanz.</para>
-        </listitem>
-
-        <listitem>
-          <para>Verändern der Werte.</para>
-        </listitem>
-
-        <listitem>
-          <para>Abspeichern des Datensatzes mit der Methode
-          <methodname>save</methodname>.</para>
-        </listitem>
-      </orderedlist></para>
-
-    <para>Beispiel:<screen>ruby-1.9.1-p378 &gt; <command>apfelmus = Flight.find_by_destination_airport('TXL')</command>
- =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 13:41:16", updated_at: "2010-06-17 13:41:16"&gt; 
-ruby-1.9.1-p378 &gt; <command>apfelmus.destination_airport = 'CDG'</command>
- =&gt; "CDG" 
-ruby-1.9.1-p378 &gt; <command>apfelmus.save</command>
- =&gt; true 
-ruby-1.9.1-p378 &gt; <command>Flight.find_by_destination_airport('CDG')</command>
- =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "CDG", created_at: "2010-06-17 13:41:16", updated_at: "2010-06-17 15:13:29"&gt; 
-ruby-1.9.1-p378 &gt;</screen></para>
-
-    <section xml:id="activerecord_locking">
-      <title xml:id="activerecord_locking.title">Locking</title>
-
-      <para>Per Default benutzt Rails Optimistisches Locking der Datensätze.
-      Dies kann aber umgeschaltet werden. Da für die meisten User
-      Optimistisches Locking optimal ist und viele vor diesem Absatz nicht mal
-      über das Problem nachgedacht haben, werde ich nicht weiter drauf
-      eingehen, sondern auf die ri Hilfe verweisen. Wer pessimistisches
-      Locking benötigt, der findet dort die notwendigen Schalter.</para>
-
-      <para><screen>stefan@swmbp 0 1.9.1-p378 railsair$ <command>ri ActiveRecord::Locking::Optimistic</command>
-ActiveRecord::Locking::Optimistic
-
-(from gem activerecord-3.0.0.beta4)
-------------------------------------------------------------------------------
-What is Optimistic Locking
-
-Optimistic locking allows multiple users to access the same record for edits,
-and assumes a minimum of conflicts with the data.  It does this by checking
-whether another process has made changes to a record since it was opened, an
-ActiveRecord::StaleObjectError is thrown if that has occurred and the update
-is ignored.
-
-Check out ActiveRecord::Locking::Pessimistic for an alternative.
-
-Usage
-
-Active Records support optimistic locking if the field lock_version is
-present.  Each update to the record increments the lock_version column and the
-locking facilities ensure that records instantiated twice will let the last
-one saved raise a StaleObjectError if the first was also updated. Example:
-
-  p1 = Person.find(1)
-  p2 = Person.find(1)
-
-  p1.first_name = "Michael"
-  p1.save
-
-  p2.first_name = "should fail"
-  p2.save # Raises a ActiveRecord::StaleObjectError
-
-Optimistic locking will also check for stale data when objects are destroyed. 
-Example:
-
-  p1 = Person.find(1)
-  p2 = Person.find(1)
-
-  p1.first_name = "Michael"
-  p1.save
-
-  p2.destroy # Raises a ActiveRecord::StaleObjectError
-
-You're then responsible for dealing with the conflict by rescuing the
-exception and either rolling back, merging, or otherwise apply the business
-logic needed to resolve the conflict.
-
-You must ensure that your database schema defaults the lock_version column to
-0.
-
-This behavior can be turned off by setting
-ActiveRecord::Base.lock_optimistically = false. To override the name of
-the lock_version column, invoke the set_locking_column method. This
-method uses the same syntax as set_table_name
-
-------------------------------------------------------------------------------
-Instance methods:
-
-  attributes_from_column_definition
-
-
-stefan@swmbp 0 1.9.1-p378 railsair$</screen></para>
     </section>
   </section>
 
