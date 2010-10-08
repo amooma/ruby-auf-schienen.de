@@ -1663,145 +1663,172 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
   <section xml:id="has_many">
     <title xml:id="has_many.title">has_many - 1:n Verknüpfung</title>
 
-    <warning>
-      <para>Dieser Abschnitt wird gerade überarbeitet und passt so nicht zum
-      Rest des Buches. Bitte in ein paar Tagen noch mal reinschauen.
-      TODO</para>
-    </warning>
+    <para>Um has_many zu erklären erstellen wir uns ein Mini Telefonbuch. In
+    diesem Telefonbuch gibt es ein Model mit Personen und ein Model mit
+    Telefonnummern. Da jede Person mehrere Telefonnummern haben kann (z.B.
+    Handy, Arbeit und Zuhause) benötigen wir zum Abbilden eine 1:n
+    Verknüpfung.</para>
 
-    <para>In unserer Album-Datenbank haben wir alle Top-Alben gelistet.
-    Allerdings fehlen uns die Songs auf den einzelnen Alben. Die sauberste
-    Lösung dafür ist eine weitere Tabelle die einen Foreign-Key (foreign_key)
-    mit der ID des Albums. Dann können wir über eine 1:n Verknüpfung zu jedem
-    Album alle Songs ausgeben. Der Name des Foreign-Keys wird per Default
-    immer aus dem Namen der Primary Datenbank (in unserem Fall
-    <classname>Album</classname>) und einem "<code>_id</code>"
-    zusammengefügt.</para>
+    <para>Erstellen wir als erstes die Rails Applikation:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new phonebook</command>
+      create  
+      create  README
+      [...]
+      create  vendor/plugins/.gitkeep
+stefan@swmbp 0 1.9.2-p0 ~$ <command>cd phonebook</command>
+stefan@swmbp 0 1.9.2-p0 phonebook$ <command>bundle install</command>
+Fetching source index for http://rubygems.org/
+Using rake (0.8.7) 
+[...]
+Your bundle was installed to `/Users/stefan/.rvm/gems/ruby-1.9.2-p0`
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
-    <para>Legen wir die zweite Tabelle für die Songs an: <screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails generate model Track album_id:integer title:string length:integer</command>
+    <para>Jetzt legen wir die Personen Datenbank an:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails generate model person firstname:string lastname:string</command>
       invoke  active_record
-      create    db/migrate/20100905215323_create_tracks.rb
-      create    app/models/track.rb
+      create    db/migrate/20101008205425_create_people.rb
+      create    app/models/person.rb
       invoke    test_unit
-      create      test/unit/track_test.rb
-      create      test/fixtures/tracks.yml
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+      create      test/unit/person_test.rb
+      create      test/fixtures/people.yml
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
 
-    <para>Danach wieder <command>rake db:migrate</command> ausführen, damit
-    die Datenbank auch angelegt wird:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake db:migrate</command>
-(in /Users/stefan/jukebox)
-==  CreateTracks: migrating ===================================================
--- create_table(:tracks)
-   -&gt; 0.0012s
-==  CreateTracks: migrated (0.0013s) ==========================================
+    <important>
+      <para>Haben Sie gesehen wie Rails automatisch den Plural von person
+      (nämlich people) genommen hat?</para>
+    </important>
 
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+    <para>Und zum Schluss legen wir noch die Datenbank für die Telefonnummern
+    an. In dieser benötigen wir ein Zuordnungsfeld zur Hauptdatenbank. Dieser
+    Foreign-Key wird per Default immer als Name der Datenbank plus einem
+    <varname>_id</varname> gesetzt:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails generate model phonenumber person_id:integer name:string number:string</command>
+      invoke  active_record
+      create    db/migrate/20101008205906_create_phonenumbers.rb
+      create    app/models/phonenumber.rb
+      invoke    test_unit
+      create      test/unit/phonenumber_test.rb
+      create      test/fixtures/phonenumbers.yml
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
 
-    <para>Schauen wir uns das mal auf der Console an:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+    <para>Danach ein <command>rake db:migrate</command> ausführen, damit die
+    Datenbanken auch angelegt werden:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:migrate</command>
+(in /Users/stefan/phonebook)
+==  CreatePeople: migrating ===================================================
+-- create_table(:people)
+   -&gt; 0.0013s
+==  CreatePeople: migrated (0.0014s) ==========================================
+
+==  CreatePhonenumbers: migrating =============================================
+-- create_table(:phonenumbers)
+   -&gt; 0.0018s
+==  CreatePhonenumbers: migrated (0.0020s) ====================================
+
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+
+    <para>Schauen wir uns das mal auf der Console an:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
-ruby-1.9.2-p0 &gt; <command>Album</command>
- =&gt; Album(id: integer, position: integer, name: string, release_year: integer, created_at: datetime, updated_at: datetime) 
-ruby-1.9.2-p0 &gt; <command>Track</command>
- =&gt; Track(id: integer, album_id: integer, title: string, length: integer, created_at: datetime, updated_at: datetime) 
-ruby-1.9.2-p0 &gt; <command>Album.all.count</command>
- =&gt; 10 
-ruby-1.9.2-p0 &gt; <command>Track.all.count</command>
- =&gt; 0 
+ruby-1.9.2-p0 &gt; <command>Person</command>
+ =&gt; Person(id: integer, firstname: string, lastname: string, created_at: datetime, updated_at: datetime) 
+ruby-1.9.2-p0 &gt; <command>Phonenumber</command>
+ =&gt; Phonenumber(id: integer, person_id: integer, name: string, number: string, created_at: datetime, updated_at: datetime) 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
-
-    <para>Es fehlen Einträge in der <varname>flight_schedules</varname>
-    Datenbank. Tragen wir mal drei Beispielflüge ein:<screen>ruby-1.9.1-p378 &gt; <command>FlightSchedule.create(:flight_id =&gt; 1, :departure =&gt; DateTime.parse('01.01.2012 10:00'), :arrival =&gt; DateTime.parse('01.01.2012 11:05'))</command>
- =&gt; #&lt;FlightSchedule id: 1, flight_id: 1, departure: "2012-01-01 10:00:00", arrival: "2012-01-01 11:05:00", created_at: "2010-06-18 21:22:19", updated_at: "2010-06-18 21:22:19"&gt; 
-ruby-1.9.1-p378 &gt; <command>FlightSchedule.create(:flight_id =&gt; 1, :departure =&gt; DateTime.parse('03.01.2012 10:00'), :arrival =&gt; DateTime.parse('03.01.2012 11:05'))</command>
- =&gt; #&lt;FlightSchedule id: 2, flight_id: 1, departure: "2012-01-03 10:00:00", arrival: "2012-01-03 11:05:00", created_at: "2010-06-18 21:23:27", updated_at: "2010-06-18 21:23:27"&gt; 
-ruby-1.9.1-p378 &gt; <command>FlightSchedule.create(:flight_id =&gt; 1, :departure =&gt; DateTime.parse('02.01.2012 10:00'), :arrival =&gt; DateTime.parse('02.01.2012 11:05'))</command>
- =&gt; #&lt;FlightSchedule id: 3, flight_id: 1, departure: "2012-01-02 10:00:00", arrival: "2012-01-02 11:05:00", created_at: "2010-06-18 21:23:37", updated_at: "2010-06-18 21:23:37"&gt; 
-ruby-1.9.1-p378 &gt; <command>pp FlightSchedule.all</command>
-[#&lt;FlightSchedule id: 1, flight_id: 1, departure: "2012-01-01 10:00:00", arrival: "2012-01-01 11:05:00", created_at: "2010-06-18 21:22:19", updated_at: "2010-06-18 21:22:19"&gt;,
- #&lt;FlightSchedule id: 2, flight_id: 1, departure: "2012-01-03 10:00:00", arrival: "2012-01-03 11:05:00", created_at: "2010-06-18 21:23:27", updated_at: "2010-06-18 21:23:27"&gt;,
- #&lt;FlightSchedule id: 3, flight_id: 1, departure: "2012-01-02 10:00:00", arrival: "2012-01-02 11:05:00", created_at: "2010-06-18 21:23:37", updated_at: "2010-06-18 21:23:37"&gt;]
- =&gt; nil 
-ruby-1.9.1-p378 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.1-p378 railsair$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
 
     <para>Die zwei Datenbanken sind eingerichtet und können mit ActiveRecord
     benutzt werden. Allerdings weiß ActiveRecord noch nichts von der 1:n
     Beziehung der beiden. Das ist aber recht einfach in zwei
-    Schritten:<orderedlist>
+    Schritten:<itemizedlist>
         <listitem>
           <para>Wir fügen die <code>has_many</code> Option in die Model-Datei
-          <filename>app/models/flight.rb</filename> ein:<programlisting>class Flight &lt; ActiveRecord::Base
-  has_many :flight_schedules
+          <filename>app/models/person.rb</filename> ein:<programlisting>class Person &lt; ActiveRecord::Base
+  has_many :phonenumbers
 end</programlisting></para>
-
-          <para>Mit diesem Eintrag bekommen wir automagisch ein paar neue
-          Methoden für die Flight Klasse. So können wir jetzt mit der Methode
-          <methodname>flight_schedules</methodname> alle
-          <classname>FlightSchedule</classname> Einträge für den aktuellen
-          <classname>Flight</classname> abrufen:<screen>stefan@swmbp 0 1.9.1-p378 railsair$ <command>rails console</command>
-Loading development environment (Rails 3.0.0.beta4)
-ruby-1.9.1-p378 &gt; <command>pp Flight.find(1).flight_schedules</command>
-[#&lt;FlightSchedule id: 1, flight_id: 1, departure: "2012-01-01 10:00:00", arrival: "2012-01-01 11:05:00", created_at: "2010-06-18 21:22:19", updated_at: "2010-06-18 21:22:19"&gt;,
- #&lt;FlightSchedule id: 2, flight_id: 1, departure: "2012-01-03 10:00:00", arrival: "2012-01-03 11:05:00", created_at: "2010-06-18 21:23:27", updated_at: "2010-06-18 21:23:27"&gt;,
- #&lt;FlightSchedule id: 3, flight_id: 1, departure: "2012-01-02 10:00:00", arrival: "2012-01-02 11:05:00", created_at: "2010-06-18 21:23:37", updated_at: "2010-06-18 21:23:37"&gt;]
- =&gt; nil 
-ruby-1.9.1-p378 &gt; <command>Flight.find(1).flight_schedules.count</command>
- =&gt; 3 
-ruby-1.9.1-p378 &gt;</screen></para>
-
-          <para>Da wir für den zweiten Flug noch keine
-          <classname>FlightSchedule</classname> Einträge haben bekommen wir
-          hier als Ergebnis ein leeres Array:<screen>ruby-1.9.1-p378 &gt; <command>Flight.find(2).flight_schedules</command>
- =&gt; [] 
-ruby-1.9.1-p378 &gt; <command>Flight.find(2).flight_schedules.class</command>
- =&gt; Array 
-ruby-1.9.1-p378 &gt; </screen></para>
-
-          <para>Ebenfalls funktioniert der umgekehrte Weg auch noch nicht. Wir
-          haben noch keine Zuordnung eines Flight zu einem FlightSchedule. Die
-          entsprechende Methode ist noch nicht existent:<screen>ruby-1.9.1-p378 &gt; <command>FlightSchedule.first.flight</command>
-NoMethodError: undefined method `flight' for #&lt;FlightSchedule:0x00000105016870&gt;
- from /Users/stefan/.rvm/gems/ruby-1.9.1-p378/gems/activemodel-3.0.0.beta4/lib/active_model/attribute_methods.rb:358:in `method_missing'
- from /Users/stefan/.rvm/gems/ruby-1.9.1-p378/gems/activerecord-3.0.0.beta4/lib/active_record/attribute_methods.rb:45:in `method_missing'
- from /Users/stefan/.rvm/gems/ruby-1.9.1-p378/gems/activerecord-3.0.0.beta4/lib/active_record/attribute_methods.rb:43:in `method_missing'
- from (irb):9
- from /Users/stefan/.rvm/gems/ruby-1.9.1-p378/gems/railties-3.0.0.beta4/lib/rails/commands/console.rb:47:in `start'
- from /Users/stefan/.rvm/gems/ruby-1.9.1-p378/gems/railties-3.0.0.beta4/lib/rails/commands/console.rb:8:in `start'
- from /Users/stefan/.rvm/gems/ruby-1.9.1-p378/gems/railties-3.0.0.beta4/lib/rails/commands.rb:23:in `&lt;top (required)&gt;'
- from script/rails:6:in `require'
- from script/rails:6:in `&lt;main&gt;'
-ruby-1.9.1-p378 &gt; <command>exit</command></screen></para>
         </listitem>
 
         <listitem>
           <para>Im zweiten Schritt fügen wir in der Model-Datei
-          <filename>app/models/flight_schedule.rb</filename> die
-          <code>belongs_to</code> Option ein:<programlisting>class FlightSchedule &lt; ActiveRecord::Base
-  belongs_to :flight
+          <filename>app/models/phonenumber.rb</filename> die
+          <code>belongs_to</code> Option ein:<programlisting>class Phonenumber &lt; ActiveRecord::Base
+  belongs_to :person
 end</programlisting></para>
-
-          <para>Damit bekommen wir automagisch die Methode
-          <methodname>flight</methodname> in der Klasse
-          <classname>FlightSchedule</classname> angeboten und können zu einem
-          <classname>FlightSchedule</classname> den
-          <classname>Flight</classname> anzeigen:<screen>stefan@swmbp 0 1.9.1-p378 railsair$ <command>rails console</command>
-Loading development environment (Rails 3.0.0.beta4)
-ruby-1.9.1-p378 &gt; <command>FlightSchedule.first</command>
- =&gt; #&lt;FlightSchedule id: 1, flight_id: 1, departure: "2012-01-01 10:00:00", arrival: "2012-01-01 11:05:00", created_at: "2010-06-18 21:22:19", updated_at: "2010-06-18 21:22:19"&gt; 
-ruby-1.9.1-p378 &gt; <command>FlightSchedule.first.flight</command>
- =&gt; #&lt;Flight id: 1, flight_number: "RA 001", departure_airport: "FRA", destination_airport: "MUC", created_at: "2010-06-18 21:17:30", updated_at: "2010-06-18 21:17:30"&gt; 
-ruby-1.9.1-p378 &gt; <command>exit</command></screen></para>
         </listitem>
-      </orderedlist></para>
+      </itemizedlist></para>
 
-    <para>So einfach ist es eine 1:n Verknüpfung zu erstellen? Ja! Ist
-    ActiveRecord nicht toll?! :-)</para>
+    <para>Diese zwei einfachen Einträge generieren jetzt eine ganze Menge
+    Rails-Magie.</para>
 
-    <para>Sie müssen natürlich nicht immer ein <code>has_many</code> mit einem
-    <code>belongs_to</code> verknüpfen. Wenn Sie nur eine Seite benötigen, so
-    können Sie auf die jeweils andere verzichten. In der Regel ist es aber
-    meistens praktisch in beide Richtungen agieren zu können.</para>
+    <section>
+      <title>Methoden</title>
+
+      <section xml:id="has_many_build">
+        <title xml:id="has_many_build.title">build</title>
+
+        <para>Die Methode <methodname>build</methodname> erstellt eine neue
+        Kind-Instanz die automatisch die Eltern-ID enthält:<screen>ruby-1.9.1-p378 &gt; <command>Flight.last</command>
+ =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 16:24:15", updated_at: "2010-06-17 16:24:15"&gt; 
+ruby-1.9.1-p378 &gt; <command>fra_txl = Flight.last</command>
+ =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 16:24:15", updated_at: "2010-06-17 16:24:15"&gt; 
+ruby-1.9.1-p378 &gt; <command>neuer_flugplan = fra_txl.flight_schedules.build(:departure =&gt; Time.now + 1.year, :arrival =&gt; Time.now + 1.year + 1.hour)</command>
+ =&gt; #&lt;FlightSchedule id: nil, flight_id: 5, departure: "2011-06-17 21:05:43", arrival: "2011-06-17 22:05:43", created_at: nil, updated_at: nil&gt; 
+ruby-1.9.1-p378 &gt;
+</screen></para>
+
+        <para>Jetzt muss <varname>neuer_flugplan</varname> nur noch mit
+        <methodname>save</methodname> abgespeichert werden:<screen>ruby-1.9.1-p378 &gt; <command>neuer_flugplan.save</command>
+ =&gt; true 
+ruby-1.9.1-p378 &gt;</screen></para>
+
+        <para>Der Vorteil liegt in der Sicherheit keine falsche ID zu nehmen
+        und oft im übersichtlicheren Code.</para>
+      </section>
+
+      <section xml:id="has_many_create">
+        <title xml:id="has_many_create.title">create</title>
+
+        <para>Die Methode create arbeitet wie <methodname>build</methodname>,
+        nur das danach quasi automatisch direkt ein
+        <methodname>save</methodname> aufgerufen wird. Beispiel:<screen>ruby-1.9.1-p378 &gt; <command>Flight.find(5)</command>
+ =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 16:24:15", updated_at: "2010-06-17 16:24:15"&gt; 
+ruby-1.9.1-p378 &gt; <command>Flight.find(5).flight_schedules.count</command>
+ =&gt; 1 
+ruby-1.9.1-p378 &gt; <command>Flight.find(5).flight_schedules.create(:departure =&gt; Time.now + 1.month, :arrival =&gt; Time.now + 1.month + 1.hour)</command>
+ =&gt; #&lt;FlightSchedule id: 5, flight_id: 5, departure: "2010-07-17 21:14:08", arrival: "2010-07-17 22:14:08", created_at: "2010-06-17 19:14:08", updated_at: "2010-06-17 19:14:08"&gt; 
+ruby-1.9.1-p378 &gt; <command>Flight.find(5).flight_schedules.count</command>
+ =&gt; 2 
+ruby-1.9.1-p378 &gt;</screen></para>
+
+        <important>
+          <para>Bitte achten Sie bei der Verwendung von
+          <methodname>create</methodname> immer auch auf die von Ihnen
+          verwendeten Validierungs-Regeln (siehe <xref
+          linkend="model_validierungen" />). Denn falls die Validierung einen
+          Fehler ausgibt, dann der der neue Datensatz natürlich nicht
+          gespeichert. Da ist manchmal der kleine Umweg über build
+          einfacher.</para>
+        </important>
+      </section>
+
+      <section xml:id="has_many_delete" xml:lang="">
+        <title xml:id="has_many_delete.title">delete und destroy</title>
+
+        <para>Mit den Methoden <methodname>destroy</methodname>,
+        <methodname>destroy_all</methodname>, <methodname>delete</methodname>
+        und <methodname>delete_all</methodname> kann man wie in <xref
+        linkend="datensatz-loeschen" /> beschrieben Datensätze löschen. Im
+        Kontext von <methodname>has_many</methodname> bedeutet das, das man
+        die zu einem <classname>Flight</classname> gelisteten
+        <classname>FlightSchedule</classname>-Datensätze in einem Streich
+        löschen kann:<screen>ruby-1.9.1-p378 &gt; <command>Flight.find(5)</command>
+ =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 16:24:15", updated_at: "2010-06-17 16:24:15"&gt; 
+ruby-1.9.1-p378 &gt; <command>Flight.find(5).flight_schedules.count</command>
+ =&gt; 4 
+ruby-1.9.1-p378 &gt; <command>Flight.find(5).flight_schedules.destroy_all</command>
+ =&gt; {} 
+ruby-1.9.1-p378 &gt; <command>Flight.find(5).flight_schedules.count</command>
+ =&gt; 0 
+ruby-1.9.1-p378 &gt; <command>Flight.find(5)</command>
+ =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 16:24:15", updated_at: "2010-06-17 16:24:15"&gt; 
+ruby-1.9.1-p378 &gt;</screen></para>
+      </section>
+    </section>
 
     <section>
       <title>Optionen</title>
@@ -1910,81 +1937,6 @@ ruby-1.9.1-p378 &gt;</screen></para>
         Optionen einen kurzen Blick werfen. Dazu in der Shell <command>ri
         ActiveRecord::Associations::ClassMethods#belongs_to</command>
         aufrufen.</para>
-      </section>
-    </section>
-
-    <section>
-      <title>Methoden</title>
-
-      <section xml:id="has_many_build">
-        <title xml:id="has_many_build.title">build</title>
-
-        <para>Die Methode <methodname>build</methodname> erstellt eine neue
-        Kind-Instanz die automatisch die Eltern-ID enthält:<screen>ruby-1.9.1-p378 &gt; <command>Flight.last</command>
- =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 16:24:15", updated_at: "2010-06-17 16:24:15"&gt; 
-ruby-1.9.1-p378 &gt; <command>fra_txl = Flight.last</command>
- =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 16:24:15", updated_at: "2010-06-17 16:24:15"&gt; 
-ruby-1.9.1-p378 &gt; <command>neuer_flugplan = fra_txl.flight_schedules.build(:departure =&gt; Time.now + 1.year, :arrival =&gt; Time.now + 1.year + 1.hour)</command>
- =&gt; #&lt;FlightSchedule id: nil, flight_id: 5, departure: "2011-06-17 21:05:43", arrival: "2011-06-17 22:05:43", created_at: nil, updated_at: nil&gt; 
-ruby-1.9.1-p378 &gt;
-</screen></para>
-
-        <para>Jetzt muss <varname>neuer_flugplan</varname> nur noch mit
-        <methodname>save</methodname> abgespeichert werden:<screen>ruby-1.9.1-p378 &gt; <command>neuer_flugplan.save</command>
- =&gt; true 
-ruby-1.9.1-p378 &gt;</screen></para>
-
-        <para>Der Vorteil liegt in der Sicherheit keine falsche ID zu nehmen
-        und oft im übersichtlicheren Code.</para>
-      </section>
-
-      <section xml:id="has_many_create">
-        <title xml:id="has_many_create.title">create</title>
-
-        <para>Die Methode create arbeitet wie <methodname>build</methodname>,
-        nur das danach quasi automatisch direkt ein
-        <methodname>save</methodname> aufgerufen wird. Beispiel:<screen>ruby-1.9.1-p378 &gt; <command>Flight.find(5)</command>
- =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 16:24:15", updated_at: "2010-06-17 16:24:15"&gt; 
-ruby-1.9.1-p378 &gt; <command>Flight.find(5).flight_schedules.count</command>
- =&gt; 1 
-ruby-1.9.1-p378 &gt; <command>Flight.find(5).flight_schedules.create(:departure =&gt; Time.now + 1.month, :arrival =&gt; Time.now + 1.month + 1.hour)</command>
- =&gt; #&lt;FlightSchedule id: 5, flight_id: 5, departure: "2010-07-17 21:14:08", arrival: "2010-07-17 22:14:08", created_at: "2010-06-17 19:14:08", updated_at: "2010-06-17 19:14:08"&gt; 
-ruby-1.9.1-p378 &gt; <command>Flight.find(5).flight_schedules.count</command>
- =&gt; 2 
-ruby-1.9.1-p378 &gt;</screen></para>
-
-        <important>
-          <para>Bitte achten Sie bei der Verwendung von
-          <methodname>create</methodname> immer auch auf die von Ihnen
-          verwendeten Validierungs-Regeln (siehe <xref
-          linkend="model_validierungen" />). Denn falls die Validierung einen
-          Fehler ausgibt, dann der der neue Datensatz natürlich nicht
-          gespeichert. Da ist manchmal der kleine Umweg über build
-          einfacher.</para>
-        </important>
-      </section>
-
-      <section xml:id="has_many_delete" xml:lang="">
-        <title xml:id="has_many_delete.title">delete und destroy</title>
-
-        <para>Mit den Methoden <methodname>destroy</methodname>,
-        <methodname>destroy_all</methodname>, <methodname>delete</methodname>
-        und <methodname>delete_all</methodname> kann man wie in <xref
-        linkend="datensatz-loeschen" /> beschrieben Datensätze löschen. Im
-        Kontext von <methodname>has_many</methodname> bedeutet das, das man
-        die zu einem <classname>Flight</classname> gelisteten
-        <classname>FlightSchedule</classname>-Datensätze in einem Streich
-        löschen kann:<screen>ruby-1.9.1-p378 &gt; <command>Flight.find(5)</command>
- =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 16:24:15", updated_at: "2010-06-17 16:24:15"&gt; 
-ruby-1.9.1-p378 &gt; <command>Flight.find(5).flight_schedules.count</command>
- =&gt; 4 
-ruby-1.9.1-p378 &gt; <command>Flight.find(5).flight_schedules.destroy_all</command>
- =&gt; {} 
-ruby-1.9.1-p378 &gt; <command>Flight.find(5).flight_schedules.count</command>
- =&gt; 0 
-ruby-1.9.1-p378 &gt; <command>Flight.find(5)</command>
- =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 16:24:15", updated_at: "2010-06-17 16:24:15"&gt; 
-ruby-1.9.1-p378 &gt;</screen></para>
       </section>
     </section>
 
@@ -2436,5 +2388,17 @@ ruby-1.9.1-p378 &gt; </screen></para>
     <title xml:id="activerecord_validierung.title">Validierung</title>
 
     <para>TODO</para>
+  </section>
+
+  <section>
+    <title>Index anlegen</title>
+
+    <para></para>
+  </section>
+
+  <section>
+    <title>Scope</title>
+
+    <para></para>
   </section>
 </chapter>
