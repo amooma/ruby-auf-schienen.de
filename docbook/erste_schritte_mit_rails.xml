@@ -1517,45 +1517,73 @@ Completed 200 OK in 5ms (Views: 4.9ms | ActiveRecord: 0.0ms)
   </section>
 
   <section xml:id="flash">
-    <title xml:id="flash.title">Flash-Nachrichten</title>
+    <title xml:id="flash.title">Flash-Meldungen (Flash messages)</title>
 
-    <para>Der Begriff "Flash Message" oder "Flash Nachricht" ist meiner
-    Meinung nach denkbar ungeeignet gewählt worden. Mit dem Wort "Flash"
+    <indexterm>
+      <primary>Flash-Meldungen</primary>
+    </indexterm>
+
+    <indexterm>
+      <primary>Einblendungen</primary>
+
+      <see>Flash-Meldungen</see>
+    </indexterm>
+
+    <indexterm>
+      <primary>Redirects</primary>
+    </indexterm>
+
+    <para>Der Begriff <quote><foreignphrase xml:lang="en">Flash
+    messages</foreignphrase></quote> oder <quote>Flash-Meldungen</quote> ist
+    meiner Meinung nach denkbar ungeeignet gewählt worden. Mit dem
+    <quote><foreignphrase xml:lang="en">Flash</foreignphrase></quote>
     assoziiert fast jeder mehr oder weniger bunte Webseiten, die mit dem
-    Adobe-Flash-Plug-in realisiert wurden. Aber in Rails sind Flash
-    Nachrichten etwas ganz anderes. Sie sind Nachrichten, die über ein
-    Redirect (siehe <xref linkend="redirects" />) auf eine andere Seite weiter
-    geleitet werden können.</para>
+    Adobe-Shockwave-Flash-Plug-in realisiert wurden. Aber in Rails sind
+    Flash-Nachrichten etwas ganz anderes. Das sind Meldungen, die über ein
+    Redirect (siehe <xref linkend="redirects" />) auf eine andere Seite
+    weitergeleitet werden können.<remark>FIXME: Die Meldungen werden
+    redirectet?</remark></para>
 
-    <para>Flash Nachrichten sind quasi gute Freunde von Redirects. Nicht
-    selten arbeiten beide ihm Team, um dem User ein Feedback über eine gerade
-    vollzogene Aktion zu geben. Ein typisches Beispiel einer Flash-Nachricht
-    ist das Feedback des Systems, wenn ein User sich eingeloggt hat. Dann wird
-    er oft wieder auf die ursprüngliche Seite redirected und bekommt
-    zusätzlich noch ein Feedback "Sie sind jetzt eingeloggt.".</para>
+    <para>Flash-Nachrichten sind quasi gute Freunde von Redirects. Nicht
+    selten arbeiten beide im Team, um dem User Feedback über eine gerade
+    vollzogene Aktion zu geben. Ein typisches Beispiel einer Flash-Meldung ist
+    das Feedback des Systems, wenn ein User sich eingeloggt hat. Dann wird er
+    oft wieder auf die ursprüngliche Seite <quote>redirectet</quote> und
+    bekommt zusätzlich noch das Feedback: <quote>Sie sind jetzt
+    eingeloggt.</quote></para>
 
-    <para>Wir bauen als Beispiel noch mal das Ping-Pong Szenario aus <xref
+    <note>
+      <para>Der englische Begriff <foreignphrase xml:lang="en">Flash
+      message</foreignphrase> lässt sich hier halbwegs gut mit
+      <emphasis>Einblendung</emphasis> / <emphasis>eingeblendete
+      Meldung</emphasis> übersetzen.</para>
+    </note>
+
+    <para>Wir bauen als Beispiel noch mal das Ping-Pong-Szenario aus <xref
     linkend="redirects" /> auf:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new pingpong</command>
       create  
       create  README
-      [...]
+      <replaceable>[...]</replaceable>
       create  vendor/plugins/.gitkeep
+
 stefan@swmbp 0 1.9.2-p0 ~$ <command>cd pingpong</command>
 stefan@swmbp 0 1.9.2-p0 pingpong$ <command>bundle install</command>
 Fetching source index for http://rubygems.org/
 Using rake (0.8.7) 
-[...]
+<replaceable>[...]</replaceable>
 Your bundle was installed to `/Users/stefan/.rvm/gems/ruby-1.9.2-p0`
+
 stefan@swmbp 0 1.9.2-p0 pingpong$ <command>rails generate controller Game ping pong</command>
       create  app/controllers/game_controller.rb
-      [...]
+      <replaceable>[...]</replaceable>
       create      test/unit/helpers/game_helper_test.rb
-stefan@swmbp 0 1.9.2-p0 pingpong$</screen></para>
+
+stefan@swmbp 0 1.9.2-p0 pingpong$ </screen></para>
 
     <para>Die <filename>app/controllers/game_controller.rb</filename> füllen
     wir mit folgendem Inhalt:<programlisting>class GameController &lt; ApplicationController
   def ping
-    <emphasis>redirect_to game_pong_path</emphasis>
+    <emphasis role="bold">redirect_to game_pong_path</emphasis>
   end
 
   def pong
@@ -1564,9 +1592,10 @@ stefan@swmbp 0 1.9.2-p0 pingpong$</screen></para>
 end
 </programlisting></para>
 
-    <para>Jetzt starten wir den Rails Web-Server und browsen einmal auf <uri
+    <para>Jetzt starten wir den Rails-Web-Server und gehen mal per Browser auf
+    <uri
     xlink:href="http://0.0.0.0:3000/game/pong">http://0.0.0.0:3000/game/pong</uri>
-    und einmal auf <uri
+    und auf <uri
     xlink:href="http://0.0.0.0:3000/game/ping">http://0.0.0.0:3000/game/ping</uri>:<screen>stefan@swmbp 0 1.9.2-p0 pingpong$ <command>rails server</command>
 =&gt; Booting WEBrick
 =&gt; Rails 3.0.0 application starting in development on http://0.0.0.0:3000
@@ -1595,18 +1624,19 @@ Rendered game/pong.html.erb within layouts/application (1.4ms)
 Completed 200 OK in 5ms (Views: 4.5ms | ActiveRecord: 0.0ms)
 </screen></para>
 
-    <para>Wie nicht anders zu erwarten war: Egal, welche der beiden URIs wir
+    <para>Wie nicht anders zu erwarten war: Egal, welche der beiden URLs wir
     aufrufen, am Ende wird immer <uri
     xlink:href="http://0.0.0.0:3000/game/pong">http://0.0.0.0:3000/game/pong</uri>
-    angezeigt. Wäre es nicht schön, wenn wir beim Redirect von ping auf pong
-    dem User eine Nachricht anzeigen könnten? Jetzt raten Sie mal, wie so eine
-    Nachricht bei Rails genannt wird? Ja, genau! Eine Flash-Nachricht!</para>
+    angezeigt. Wäre es nicht schön, wenn wir beim Redirect von
+    <literal>ping</literal> auf <literal>pong</literal> dem Anwender eine
+    Nachricht anzeigen könnten? Jetzt raten Sie mal, wie so eine Nachricht bei
+    Rails genannt wird? Ja, genau! Eine Flash-Nachricht!</para>
 
     <para>Bitte erweitern Sie die Datei
     <filename>app/controllers/game_controller.rb</filename> wie
     folgt:<programlisting>class GameController &lt; ApplicationController
   def ping
-    <emphasis>redirect_to game_pong_path, :notice =&gt; 'Ich wurde von Ping redirected.'</emphasis>
+    <emphasis role="bold">redirect_to game_pong_path, :notice =&gt; 'Ich wurde von Ping redirected.'</emphasis>
   end
 
   def pong
@@ -1626,7 +1656,7 @@ end</programlisting></para>
 &lt;/head&gt;
 &lt;body&gt;
 
-<emphasis>&lt;% if (defined? notice) != nil and !notice.blank? %&gt;
+<emphasis role="bold">&lt;% if (defined? notice) != nil and ! notice.blank? %&gt;
 &lt;p class="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
 &lt;% end %&gt;</emphasis>
 
@@ -1634,17 +1664,19 @@ end</programlisting></para>
 
 &lt;/body&gt;
 &lt;/html&gt;
-</programlisting></para>
+</programlisting><remark>FIXME: Werden im Ruby-Kapitel bool'sche
+    Verknüpfungen/Operatoren wie "!", "&amp;&amp;", "and", "||", "or"
+    erklärt?</remark></para>
 
     <para>Beim Aufruf von <uri
     xlink:href="http://0.0.0.0:3000/game/pong">http://0.0.0.0:3000/game/pong</uri>
     bekommen wir weiterhin normal die Pong-Seite angezeigt. Beim Aufruf von
     <uri
     xlink:href="http://0.0.0.0:3000/game/pong">http://0.0.0.0:3000/game/ping</uri>
-    werden wir aber zur Pong-Seite redirected und bekommen oben die
+    werden wir aber zur Pong-Seite redirectet und bekommen oben die
     Flash-Nachricht angezeigt:<screenshot>
         <info>
-          <title>Pong-Seite mit Flash-Nachricht</title>
+          <title>Pong-Seite mit Flash-Meldung</title>
         </info>
 
         <mediaobject>
@@ -1663,30 +1695,39 @@ end</programlisting></para>
     <section xml:id="verschiedene_arten_von_flash_nachrichten">
       <title
       xml:id="verschiedene_arten_von_flash_nachrichten.title">Verschiedene
-      Arten von Flash Nachrichten</title>
+      Arten von Flash-Meldungen</title>
 
-      <para>Per default werden die Arten "error", "notice" und "warning"
-      unterschieden. Allerdings kann man auch selber eine Kategorie erfinden
-      und diese später im View abfragen. Beim Arbeiten mit <xref
-      linkend="scaffolding" /> werden Sie Beispiele für die verschiedenen
-      Arten finden.</para>
+      <indexterm>
+        <primary>Flash-Meldungen</primary>
+      </indexterm>
+
+      <para>Per default werden die Arten <literal>error</literal> (Fehler),
+      <literal>warning</literal> (Warnung) und <literal>notice</literal>
+      (Notiz, Hinweis) unterschieden. Allerdings kann man auch selber eine
+      Kategorie erfinden und diese später im View abfragen. Beim Arbeiten mit
+      <xref linkend="scaffolding" /> werden Sie Beispiele für die
+      verschiedenen Arten finden.</para>
     </section>
 
     <section xml:id="neue_flash_redirect_schreibweise">
       <title xml:id="neue_flash_redirect_schreibweise.title">Verschiedene
       Syntaxen</title>
 
+      <indexterm>
+        <primary>Flash-Meldungen</primary>
+      </indexterm>
+
       <para>Je nach Wissen und Vorliebe eines Programmierers werden Sie in der
       Praxis auf verschiedene Syntaxen von Flash-Nachrichten treffen. Ich will
-      mich nicht an der Diskussion über die beste Syntax beteildigen (dafür
+      mich nicht an der Diskussion über die beste Syntax beteiligen (dafür
       finde ich es einfach zu unwichtig), aber ich möchte Ihnen kurz die zwei
       häufigsten Möglichkeiten darstellen:<itemizedlist>
           <listitem>
-            <para><programlisting>redirect_to game_pong_path, :notice =&gt; 'Ich wurde von Ping redirected.'</programlisting></para>
+            <para><programlisting>redirect_to game_pong_path, :notice =&gt; 'Ich wurde von Ping redirectet.'</programlisting></para>
           </listitem>
 
           <listitem>
-            <para><programlisting>flash[:notice] = 'Ich wurde von Ping redirected.'
+            <para><programlisting>flash[:notice] = 'Ich wurde von Ping redirectet.'
 redirect_to :action =&gt; :pong</programlisting></para>
           </listitem>
         </itemizedlist></para>
@@ -1695,65 +1736,95 @@ redirect_to :action =&gt; :pong</programlisting></para>
     <section>
       <title>Warum gibt es überhaupt Flash-Nachrichten?</title>
 
-      <para>Sie werden sich vielleicht fragen "Warum gibt es
+      <indexterm>
+        <primary>Flash-Meldungen</primary>
+      </indexterm>
+
+      <para>Sie werden sich vielleicht fragen: <quote>Warum gibt es
       Flash-Nachrichten? Das kann ich mir ja auch selber bauen, wenn ich es
-      brauche." Stimmt. Flash-Nachrichten haben hauptsächlich den Vorteil, das
-      sie einen definierten und für alle Programmierer gleichen Weg zur
-      Verfügung stellen. So muss man nicht das Rad neu erfinden.</para>
+      brauche.</quote> Stimmt. Flash-Nachrichten haben hauptsächlich den
+      Vorteil, dass sie einen definierten und für alle Programmierer gleichen
+      Weg zur Verfügung stellen. So muss man nicht das Rad neu
+      erfinden.</para>
     </section>
   </section>
 
   <section xml:id="die_console" xml:lang="">
-    <title xml:base="" xml:id="die_console.title">Die Console</title>
+    <title xml:base="" xml:id="die_console.title">Die Rails-Konsole
+    (Console)</title>
 
-    <para>Die Console in Rails ist nichts weiter als ein aufgebohrtes irb
-    (siehe <xref linkend="irb" />). Sowohl beim Entwicklen wie auch beim
-    Administrieren ist die Console sehr praktisch, da die komplete
-    Rails-Umgebung abgebildet wird. So kann man leicht mal eine Methode
+    <indexterm>
+      <primary>Rails</primary>
+
+      <secondary>Console</secondary>
+    </indexterm>
+
+    <indexterm>
+      <primary>Console</primary>
+    </indexterm>
+
+    <indexterm>
+      <primary>Konsole</primary>
+
+      <see>Console</see>
+    </indexterm>
+
+    <para>Die <foreignphrase xml:lang="en">Console</foreignphrase> in Rails
+    ist nichts weiter als ein aufgebohrtes <literal>irb</literal> (siehe <xref
+    linkend="irb" />). Sowohl beim Entwicklen als auch bei der Administration
+    ist die Console sehr praktisch, da die komplete Rails-Umgebung abgebildet
+    wird und zur Verfügung steht. So kann man leicht mal eine Methode
     ausprobieren ohne dafür direkt ein eigenes Programm zu schreiben.</para>
 
-    <para>Erzeugen wir kurz ein Rails Projekt mit einem Controller um mit der
+    <para>Erzeugen wir kurz ein Rails-Projekt mit einem Controller um mit der
     Console zu arbeiten:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new pingpong</command>
       create  
       create  README
       create  Rakefile
-      [...]
+      <replaceable>[...]</replaceable>
       create  vendor/plugins
       create  vendor/plugins/.gitkeep
+
 stefan@swmbp 0 1.9.2-p0 ~$ <command>cd pingpong</command>
 stefan@swmbp 0 1.9.2-p0 pingpong$ <command>bundle install</command>
 Fetching source index for http://rubygems.org/
 Using rake (0.8.7) 
-[...]
+<replaceable>[...]</replaceable>
 Your bundle was installed to `/Users/stefan/.rvm/gems/ruby-1.9.2-p0`
+
 stefan@swmbp 0 1.9.2-p0 pingpong$ <command>rails generate controller Game ping pong</command>
       create  app/controllers/game_controller.rb
        route  get "game/pong"
-      [...]
+      <replaceable>[...]</replaceable>
       invoke    test_unit
       create      test/unit/helpers/game_helper_test.rb
-stefan@swmbp 0 1.9.2-p0 pingpong$</screen></para>
 
-    <para>Die Console wird mit <command>rails console</command>
-    gestartet:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rails console</command>
+stefan@swmbp 0 1.9.2-p0 pingpong$ </screen></para>
+
+    <para>Die Rails-Console wird mit dem Befehl <command>rails
+    console</command> gestartet:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; </screen></para>
 
     <para>Und mit <command>exit</command> kommt man wieder raus:<screen>ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
+stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 
-    <para>In der Console hat man Zugriff auf alle Variablen, die auch später
-    in der richtigen Applikation hat:<screen>stefan@swmbp 0 1.9.2-p0 pingpong$ <command>rails console</command>
+    <para>In der Console hat man Zugriff auf alle Variablen, die man auch
+    später in der richtigen Applikation hat:<screen>stefan@swmbp 0 1.9.2-p0 pingpong$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>RAILS_ENV</command>
  =&gt; "development" 
 ruby-1.9.2-p0 &gt; <command>RAILS_ROOT</command>
  =&gt; "/Users/stefan/pingpong" 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 testproject$</screen></para>
+stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 
-    <para>Ganz praktisch ist auch <command>app</command>, um verschiedene
-    Routing-Sachen zu analysieren:<screen>stefan@swmbp 0 1.9.2-p0 pingpong$ <command>rails console</command>
+    <para><indexterm>
+        <primary>app</primary>
+      </indexterm><indexterm>
+        <primary>Routing</primary>
+      </indexterm>Ganz praktisch ist auch <command>app</command>, um
+    verschiedene Routing-Sachen zu analysieren:<screen>stefan@swmbp 0 1.9.2-p0 pingpong$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>app.url_for(:controller =&gt; 'game', :action =&gt; 'ping')</command>
  =&gt; "http://www.example.com/game/ping" 
