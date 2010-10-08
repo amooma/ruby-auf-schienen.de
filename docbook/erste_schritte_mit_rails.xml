@@ -1317,11 +1317,16 @@ Copyright 2009 - &lt;%= Date.today.year %&gt; beim Osterhasen
       <see>Redirects</see>
     </indexterm>
 
+    <indexterm>
+      <primary>Routing</primary>
+    </indexterm>
+
     <para><foreignphrase xml:lang="en">Redirects</foreignphrase> sind Befehle,
     mit denen Sie innerhalb des Controllers auf andere Methoden oder auch auf
-    ganz andere Webseiten <quote>springen</quote> also weiterleiten können.
-    Legen wir ein neues Rails-Projekt für ein entsprechendes Beispiel
-    an:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new redirect_beispiel</command>
+    ganz andere Webseiten <quote>springen</quote> also weiterleiten
+    können.<remark>FIXME: Erklären daß Redirects HTTP-Redirects (302?) sind
+    …</remark> Legen wir ein neues Rails-Projekt für ein entsprechendes
+    Beispiel an:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new redirect_beispiel</command>
       create  
       create  README
       create  Rakefile
@@ -1410,21 +1415,24 @@ end</programlisting></para>
     Aufruf von <uri
     xlink:href="http://0.0.0.0:3000/game/ping">http://0.0.0.0:3000/game/ping</uri>
     direkt auf die Methode <methodname>pong</methodname> weitergeleitet
-    werden? Einfach werden Sie sagen, in dem wir die Route in der
-    <filename>config/routes.rb</filename> ändern. Da haben Sie recht. Dafür
-    brauchen wir also nicht zwingend ein Redirect.</para>
+    werden? Einfach, werden Sie sagen, in dem wir die Route in der <indexterm>
+        <primary>routes.rb</primary>
+      </indexterm><filename>config/routes.rb</filename> ändern. Da haben Sie
+    recht. Dafür brauchen wir also nicht zwingend ein Redirect.</para>
 
     <para>Machen wir die Aufgabe etwas schwieriger: Wie können wir es
-    erreichen, das zwischen 9 und 17 Uhr beim Aufruf von <uri
+    erreichen, dass zwischen 9 und 17 Uhr beim Aufruf von <uri
     xlink:href="http://0.0.0.0:3000/game/ping">http://0.0.0.0:3000/game/ping</uri>
     direkt auf die Methode <methodname>pong</methodname> weitergeleitet wird?
     Das können wir nur mit einem Redirect im Controller realisieren. Bitte
     ändern Sie die Datei
     <filename>app/controllers/game_controller.rb</filename> wie folgt
-    ab:<programlisting>class GameController &lt; ApplicationController
+    ab:<indexterm>
+        <primary>redirect_to()</primary>
+      </indexterm><programlisting>class GameController &lt; ApplicationController
   def ping
     if (Time.now.hour &gt; 8) and (Time.now.hour &lt; 17)
-      <emphasis>redirect_to game_pong_path</emphasis>
+      <emphasis role="bold">redirect_to game_pong_path</emphasis>
     end    
   end
 
@@ -1439,18 +1447,23 @@ end
 (in /Users/stefan/pingpong)
 game_ping GET /game/ping(.:format) {:controller=&gt;"game", :action=&gt;"ping"}
 game_pong GET /game/pong(.:format) {:controller=&gt;"game", :action=&gt;"pong"}
-stefan@swmbp 0 1.9.2-p0 pingpong$</screen></para>
+stefan@swmbp 0 1.9.2-p0 pingpong$ </screen></para>
 
-    <para>Sie sehen, das die Route zur Action "ping" des Controllers "game"
-    den Namen <varname>game_ping</varname> bekommen hat. Wir könnten das
-    Redirect auch so schreiben:<programlisting>redirect_to :action =&gt; 'pong'</programlisting></para>
+    <para>Sie sehen, dass die Route zur <foreignphrase
+    xml:lang="en">Action</foreignphrase><remark>FIXME: Wurde schon erklärt daß
+    eine Action eine Methode(?) ist?</remark><literal>ping</literal> des
+    Controllers <literal>game</literal><remark>FIXME: game ist kein
+    Controller. Der Controller heißt GameController. Irgendwie muß man da in
+    der Bezeichnung unterscheiden.</remark> den Namen
+    <literal>game_ping</literal> bekommen hat. Wir könnten den Redirect auch
+    so schreiben:<programlisting>redirect_to :action =&gt; 'pong'</programlisting></para>
 
     <para>Aber die Schreibweise mit den Routen ist sauberer und lässt sich
     später besser warten.</para>
 
     <para>Wenn wir jetzt zwischen 9 und 17 Uhr mit dem Browser die Seite <uri
     xlink:href="http://0.0.0.0:3000/game/ping">http://0.0.0.0:3000/game/ping</uri>
-    aufrufen, werden wir automatisch auf die Seite <uri
+    aufrufen werden wir automatisch auf die Seite <uri
     xlink:href="http://0.0.0.0:3000/game/pong">http://0.0.0.0:3000/game/pong</uri>
     geleitet. Schauen wir uns das mal im Log an:<screen>Started GET "/game/ping" for 127.0.0.1 at 2010-09-01 13:44:37 +0200
   Processing by GameController#ping as HTML
@@ -1464,32 +1477,39 @@ Rendered game/pong.html.erb within layouts/application (1.6ms)
 Completed 200 OK in 5ms (Views: 4.9ms | ActiveRecord: 0.0ms)
 </screen></para>
 
-    <para>Wie Sie sehen, wurde zwar im ersten Schritt mit
-    <code>GameController#ping as HTML</code> die Methode
-    <methodname>ping</methodname> im Controller <code>GameController</code>
-    aufgerufen, aber danach fand ein Redirect zur Methode
-    <methodname>pong</methodname> statt.</para>
+    <para>Wie Sie sehen wurde zwar im ersten Schritt die Methode
+    <methodname>ping</methodname> im Controller
+    <classname>GameController</classname> aufgerufen, aber danach fand ein
+    Redirect zur Methode <methodname>pong</methodname> statt.</para>
 
     <para>Auf die Details und einzelnen Möglichkeiten des Redirects gehen wir
-    später im jeweils konkreten Fall ein. Nur schon so viel vorweg: Man kann
+    später im jeweils konkreten Fall ein. Nur schon soviel vorweg: Man kann
     nicht nur auf eine andere Methode, sondern auch auf einen anderen
-    Controller oder eine ganze andere Seite redirecten.</para>
+    Controller oder eine ganz andere Seite redirecten.</para>
 
-    <section>
+    <section xml:id="warum-redirects">
       <title>Warum Redirects?</title>
+
+      <indexterm>
+        <primary>Redirects</primary>
+      </indexterm>
+
+      <indexterm>
+        <primary>Routing</primary>
+      </indexterm>
 
       <para>Beim obigen Beispiel fragt man sich natürlich, warum man denn im
       Controller einen Redirect einbaut und nicht direkt die Routen ändert.
-      Das ist der Nachteil von der "wir benutzen nur bisheriges
-      Wissen"-Methode. Schon im <xref linkend="scaffolding" /> werden Sie
+      Das ist der Nachteil der Methode <quote>wir benutzen nur bisheriges
+      Wissen</quote>. Schon in <xref linkend="scaffolding" /> werden Sie
       verstehen warum Redirects so praktisch sind. Sie können z.B. in einem
-      Controller überprüfen, ob bestimmte Eingabedaten valide sind oder nicht
+      Controller überprüfen, ob bestimmte Eingabedaten valide sind oder nicht,
       und wenn etwas fehlt zur ursprünglichen Eingabeseite redirecten. Das
       wäre mit einer statischen Route nicht lösbar.</para>
 
       <para>Allerdings muss man beim Programmieren auch darauf achten, nicht
       beliebig viele Redirects einzubauen. Wenn man tatsächlich mal in der
-      Versuchung kommen zwei oder mehr Redirects hinter einander zu schachteln
+      Versuchung kommen zwei oder mehr Redirects hintereinander zu setzen
       (also in verschiedene Methoden), dann sollte man einen Schritt zurück
       gehen und sich Gedanken über die Gesamtidee machen. Meist geht es dann
       anders einfacher und sauberer.</para>
@@ -1497,7 +1517,7 @@ Completed 200 OK in 5ms (Views: 4.9ms | ActiveRecord: 0.0ms)
   </section>
 
   <section xml:id="flash">
-    <title xml:id="flash.title">Flash Nachrichten</title>
+    <title xml:id="flash.title">Flash-Nachrichten</title>
 
     <para>Der Begriff "Flash Message" oder "Flash Nachricht" ist meiner
     Meinung nach denkbar ungeeignet gewählt worden. Mit dem Wort "Flash"
