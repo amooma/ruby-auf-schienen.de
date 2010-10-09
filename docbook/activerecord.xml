@@ -10,12 +10,21 @@
   <title xml:id="activerecord_chapter.title">ActiveRecord</title>
 
   <para>ActiveRecord ist eine Abstaktionsschicht, die es uns einen sehr
-  leichten Zugang zu einer SQL-Datenbank zur Verfügung stellt. Einer der
-  Erfolgsrezepte von Rails ist sicherlich die Benutzung von ActiveRecord. Die
-  Programmierung und Benutzung "fühlt sich gut an" und es ist viel weniger
-  fehleranfällig als pures SQL. Bei der Arbeit mit diesem Kapitel hilft
-  SQL-Wissen, aber es wird nicht vorrausgesetzt und es ist auch für die Arbeit
-  mit ActiveRecord nicht notwendig.</para>
+  leichten Zugang zu einer SQL-Datenbank zur Verfügung stellt.</para>
+
+  <note>
+    <para>Das nennt sich dann objektrelationale Abbildung. Ich empfinde das
+    als zu trocken und langweilig, aber falls Sie heute Abend nicht
+    einschlafen können, werfen Sie doch mal einen Blick auf <uri
+    xlink:href="http://de.wikipedia.org/wiki/Objektrelationale_Abbildung">http://de.wikipedia.org/wiki/Objektrelationale_Abbildung</uri>.
+    </para>
+  </note>
+
+  <para>Einer der Erfolgsrezepte von Rails ist sicherlich die Benutzung von
+  ActiveRecord. Die Programmierung und Benutzung "fühlt sich gut an" und es
+  ist viel weniger fehleranfällig als pures SQL. Bei der Arbeit mit diesem
+  Kapitel hilft SQL-Wissen, aber es wird nicht vorrausgesetzt und es ist auch
+  für die Arbeit mit ActiveRecord nicht notwendig.</para>
 
   <section>
     <title>Howto zum Kapitel</title>
@@ -197,6 +206,131 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
     <para>Deshalb werde ich sie hier nicht abbilden und überlasse es Ihrer
     Neugierde einmal <command>ri ActiveRecord</command> aufzurufen.</para>
 
+    <section xml:base="activerecord_moegliche_datentypen">
+      <title xml:id="activerecord_moegliche_datentypen.title">Mögliche
+      Datentypen</title>
+
+      <para>ActiveRecord ist ein Layer (Schicht) zwischen Ruby und
+      verschiedenen Datenbanken. </para>
+
+      <para>Leider haben selbst SQL-Datenbanken sehr unterschiedliche
+      Sichtweisen auf die Definition von Spalten und deren Inhalt. Darüber
+      müssen wir uns keine Sorgen machen, da ActiveRecord dieses Problem für
+      uns transparent löst.<itemizedlist>
+          <listitem>
+            <para>Vorteil:</para>
+
+            <para>Wir können die Datenbanken hinter einer Rails-Applikation
+            austauschen ohne das dafür der Programmcode angefasst werden
+            muss.</para>
+          </listitem>
+
+          <listitem>
+            <para>Nachteil:</para>
+
+            <para>Wir können nicht alle Besonderheiten unserer Datenbank
+            benutzen. Wir müssen quasi einen kleinsten gemeinsamen Nenner
+            benutzen.</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <para>Um ein Model zu generieren können Sie folgende Feldtypen
+      benutzen:<itemizedlist>
+          <listitem>
+            <para><varname>:binary</varname></para>
+
+            <para>Das ist im klassischen Sinn ein BLOB. Noch nie gehört? Dann
+            werden sie es wahrscheinlich nicht brauchen.</para>
+          </listitem>
+
+          <listitem>
+            <para><varname>:boolean</varname></para>
+
+            <para>Ein Boolean. Kann true (wahr) oder false (falsch) sein.
+            </para>
+
+            <para>Siehe auch <uri
+            xlink:href="http://de.wikipedia.org/wiki/Boolesche_Variable">http://de.wikipedia.org/wiki/Boolesche_Variable</uri></para>
+          </listitem>
+
+          <listitem>
+            <para><varname>:date</varname></para>
+
+            <para>Hier kann ein Datum abgespeichert werden.</para>
+          </listitem>
+
+          <listitem>
+            <para><varname>:datetime</varname></para>
+
+            <para>Hier kann eine Uhrzeit inklusive Datum abgespeichert
+            werden.</para>
+          </listitem>
+
+          <listitem>
+            <para><varname>:float</varname></para>
+
+            <para>Zum Speichern eines Floats (Gleitkommazahl). </para>
+
+            <para>Siehe auch <uri
+            xlink:href="http://de.wikipedia.org/wiki/Gleitkommazahl">http://de.wikipedia.org/wiki/Gleitkommazahl</uri></para>
+          </listitem>
+
+          <listitem>
+            <para><varname>:integer</varname></para>
+
+            <para>Zum Speichern eines Integers (Ganzzahl). </para>
+
+            <para>Siehe auch <uri
+            xlink:href="http://de.wikipedia.org/wiki/Integer_(Datentyp)">http://de.wikipedia.org/wiki/Integer_(Datentyp)</uri></para>
+          </listitem>
+
+          <listitem>
+            <para><varname>:primary_key</varname></para>
+
+            <para>Das ist ein Integer, der von der Datenbank automatisch bei
+            jedem neuen Eintrag um eins hochgezählt wird. Dieser Feldtyp wird
+            häufig als Suchschlüssel für die Verknüpfung von verschiedenen
+            Modelen genommen. </para>
+
+            <para>Siehe auch <uri
+            xlink:href="http://de.wikipedia.org/wiki/Primary_Key">http://de.wikipedia.org/wiki/Primary_Key</uri></para>
+          </listitem>
+
+          <listitem>
+            <para><varname>:string</varname></para>
+
+            <para>Ein String. Also eine beliebige Zeichenkette (bis max. 255
+            Zeichen). </para>
+
+            <para>Siehe auch <uri
+            xlink:href="http://de.wikipedia.org/wiki/Zeichenkette">http://de.wikipedia.org/wiki/Zeichenkette</uri></para>
+          </listitem>
+
+          <listitem>
+            <para><varname>:text</varname></para>
+
+            <para>Auch ein String. Allerdings ein gutes Stück grösser. Hier
+            können per Default bis zu 65536 Zeichen gespeichert werden.</para>
+          </listitem>
+
+          <listitem>
+            <para><varname>:time</varname></para>
+
+            <para>Eine Uhrzeit.</para>
+          </listitem>
+
+          <listitem>
+            <para><varname>:timestamp</varname></para>
+
+            <para>Eine Uhrzeit mit Datum, die von der Datenbank automatisch
+            befühlt wird.</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <para>Wir gehen in <xref linkend="migrations" /> auf die einzelnen
+      Datentypen noch näher ein und sprechen über verfügbare Optionen.</para>
+    </section>
+
     <section>
       <title>Datenbank-Konfiguration</title>
 
@@ -343,7 +477,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
     </section>
 
     <section xml:id="activerecord_new">
-      <title xml:id="activerecord_new.title">new</title>
+      <title xml:id="activerecord_new">new</title>
 
       <para>Neben <methodname>create</methodname> gibt es auch
       <methodname>new</methodname>. Allerdings muss ein mit
@@ -1965,28 +2099,19 @@ stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
       <section xml:id="activerecord_hinzufuegen_build">
         <title xml:id="activerecord_hinzufuegen_build.title">build</title>
 
-        <para>Die Methode build haben wir bereits in druchgenommen.</para>
-      </section>
-    </section>
-
-    <section>
-      <title>Methoden</title>
-
-      <section xml:id="has_many_build">
-        <title xml:id="has_many_build.title">build</title>
-
-        <para>Die Methode <methodname>build</methodname> erstellt eine neue
-        Kind-Instanz die automatisch die Eltern-ID enthält:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+        <para>Die Methode <methodname>build</methodname> ähnelt der
+        <methodname>create</methodname> Methode. Allerdings wird der Datensatz
+        nicht abgespeichert. Dies erfolgt erst nach einem
+        <methodname>save</methodname>:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
+(in /Users/stefan/phonebook)
+[...]
+stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>fritz = Person.create(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier')</command>
- =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 10:05:30", updated_at: "2010-10-09 10:05:30"&gt; 
+ =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 14:40:38", updated_at: "2010-10-09 14:40:38"&gt; 
 ruby-1.9.2-p0 &gt; <command>fritz_handy = fritz.phonenumbers.build(:name =&gt; 'Mobile', :number =&gt; '0171-12345678')</command>
  =&gt; #&lt;Phonenumber id: nil, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: nil, updated_at: nil&gt; 
-ruby-1.9.2-p0 &gt;</screen></para>
-
-        <para>Da <methodname>build</methodname> aber nur das Objekt erstellt
-        und nicht automatisch den Datensatz abspeichert, müssen wir das noch
-        mit <methodname>save</methodname> machen:<screen>ruby-1.9.2-p0 &gt; <command>fritz_handy.new_record?</command>
+ruby-1.9.2-p0 &gt; <command>fritz_handy.new_record?</command>
  =&gt; true 
 ruby-1.9.2-p0 &gt; <command>fritz_handy.save</command>
  =&gt; true 
@@ -1995,48 +2120,412 @@ ruby-1.9.2-p0 &gt; <command>fritz_handy.new_record?</command>
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
 
-        <para>Natürlich könnten Sie die beiden Datensätze auch manuel anlegen,
-        aber die benutzung von build stellt sicher, das alle IDs korret sind.
-        Ausserdem wird der Code übersichtlicher.</para>
+        <warning>
+          <para>Im Gegensatz zu <methodname>create</methodname> kann man mit
+          build natürlich nicht eine Mutter und eine Elterninstanz mit jeweils
+          einem <methodname>build</methodname> aufbauen. Das führt zu einem
+          Fehler. Die Elterninstanz muss immer bereits existieren bzw. mit
+          <methodname>create</methodname> erstellt werden. Beispiel:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>Person.build(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier').phonenumbers.build([{:name =&gt; 'Mobile', :number =&gt; '0171-12345678'}, {:name =&gt; 'Office', :number =&gt; '030-7777777'}, {:name =&gt; 'Home', :number =&gt; '030-8888888'}])</command>
+ NoMethodError: undefined method `build' for #&lt;Class:0x00000102c06018&gt;
+ from /Users/stefan/.rvm/gems/ruby-1.9.2-p0/gems/activerecord-3.0.0/lib/active_record/base.rb:1016:in `method_missing'
+ from (irb):2
+ from /Users/stefan/.rvm/gems/ruby-1.9.2-p0/gems/railties-3.0.0/lib/rails/commands/console.rb:44:in `start'
+ from /Users/stefan/.rvm/gems/ruby-1.9.2-p0/gems/railties-3.0.0/lib/rails/commands/console.rb:8:in `start'
+ from /Users/stefan/.rvm/gems/ruby-1.9.2-p0/gems/railties-3.0.0/lib/rails/commands.rb:23:in `&lt;top (required)&gt;'
+ from script/rails:6:in `require'
+ from script/rails:6:in `&lt;main&gt;'
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+        </warning>
       </section>
+    </section>
 
-      <section xml:id="has_many_create">
-        <title xml:id="has_many_create.title">create</title>
+    <section xml:id="activerecord_1n_zugreifen">
+      <title xml:id="activerecord_1n_zugreifen.title">Auf Datensätze
+      zugreifen</title>
 
-        <para>Die Methode create arbeitet wie <methodname>build</methodname>,
-        nur das danach quasi automatisch direkt ein
-        <methodname>save</methodname> aufgerufen wird. Beispiel:<screen>ruby-1.9.1-p378 &gt; <command>Flight.find(5)</command>
- =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 16:24:15", updated_at: "2010-06-17 16:24:15"&gt; 
-ruby-1.9.1-p378 &gt; <command>Flight.find(5).flight_schedules.count</command>
+      <para>Dafür brauchen wir Beispieldaten. Deshalb füllen Sie bitte die
+      Datei <filename>db/seeds.rb</filename> mit folgendem
+      Inhalt:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
+# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
+#
+# Examples:
+#
+#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
+#   Mayor.create(:name =&gt; 'Daley', :city =&gt; cities.first)
+
+Person.create(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier').phonenumbers.create([
+             {:name =&gt; 'Mobile', :number =&gt; '0171-12345678'}, 
+             {:name =&gt; 'Office', :number =&gt; '030-7777777'}, 
+             {:name =&gt; 'Home', :number =&gt; '030-8888888'}])
+Person.create(:firstname =&gt; 'Ute', :lastname =&gt; 'Meier').phonenumbers.create([
+             {:name =&gt; 'Home', :number =&gt; '030-8888888'}])
+Person.create(:firstname =&gt; 'Horst', :lastname =&gt; 'Apfelmus').phonenumbers.create([
+             {:name =&gt; 'Mobile', :number =&gt; '0171-1188811'}])
+Person.create(:lastname =&gt; 'Udelhoven')
+Person.create(:firstname =&gt; 'Ernst', :lastname =&gt; 'Steinwurf').phonenumbers.create([
+             {:name =&gt; 'Mobile', :number =&gt; '0172-22225678'}, 
+             {:name =&gt; 'Home', :number =&gt; '040-8888222'}])
+</programlisting></para>
+
+      <para>Jetzt die Datenbank löschen und neu mit der
+      <filename>db/seeds.rb</filename> befüllen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
+(in /Users/stefan/phonebook)
+db/test.sqlite3 already exists
+db/test.sqlite3 already exists
+db/development.sqlite3 already exists
+-- create_table("people", {:force=&gt;true})
+   -&gt; 0.0035s
+-- create_table("phonenumbers", {:force=&gt;true})
+   -&gt; 0.0029s
+-- initialize_schema_migrations_table()
+   -&gt; 0.0047s
+-- assume_migrated_upto_version(20101008205906, "db/migrate")
+   -&gt; 0.0039s
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+
+      <para>Das praktische an der 1:n Zuordnung in ActiveRecord ist der super
+      einfache Zugang zu den n-Instanzen. Schauen wir uns das mal für den
+      ersten Datensatz an:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>Person.first</command>
+ =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt; 
+ruby-1.9.2-p0 &gt; <command>Person.first.phonenumbers</command>
+ =&gt; [#&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+ruby-1.9.2-p0 &gt; <command>Person.first.phonenumbers.class</command>
+ =&gt; Array 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+      <para>Ist das cool?! Daran freue ich mich jedes mal wieder aufs neue.
+      Man kann einfach durch die Pluralform des n-Models auf die Datensätze
+      zugreifen. Das Ergebnis wird als Array ausgegeben. Ob es auch andersrum
+      geht? Schauen wir uns mal die erste Telefonnummer an:<screen>ruby-1.9.2-p0 &gt; <command>Phonenumber.first</command>
+ =&gt; #&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt; 
+ruby-1.9.2-p0 &gt; <command>Phonenumber.first.person</command>
+ =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt; 
+ruby-1.9.2-p0 &gt; <command>Phonenumber.first.person.class</command>
+ =&gt; Person(id: integer, firstname: string, lastname: string, created_at: datetime, updated_at: datetime) 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+      <para>Bingo! Auch ist ist der Zugriff zur zugeordneten Person-Klasse
+      ganz einfach. Und da es sich nur um einen Datensatz handelt, wird hier
+      die Singularform genommen.</para>
+
+      <para>Und wenn ein Datensatz keine Telefonnummern hat? Schauen wir doch
+      mal bei Herrn Udelhoven rein:<screen>ruby-1.9.2-p0 &gt; <command>udelhoven = Person.where(:lastname =&gt; 'Udelhoven').first</command>
+ =&gt; #&lt;Person id: 4, firstname: nil, lastname: "Udelhoven", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt; 
+ruby-1.9.2-p0 &gt; <command>udelhoven.phonenumbers</command>
+ =&gt; [] 
+ruby-1.9.2-p0 &gt; <command>udelhoven.phonenumbers.count</command>
+ =&gt; 0 
+ruby-1.9.2-p0 &gt; </screen></para>
+
+      <para>Da zu diesem Datensatz keine Telefonnummern zugeordnet werden
+      können, gibt <methodname>phonenumbers</methodname> ein leeres Array
+      aus.</para>
+
+      <para>Der Vollständigkeit halber müssten wir jetzt auch schauen was
+      passiert, wenn zu einer Telefonnummer keine Person zuzuordnen
+      ist:<screen>ruby-1.9.2-p0 &gt; <command>karteileiche = Phonenumber.create(:name =&gt; 'Auskunft', :number =&gt; '11833')</command>
+ =&gt; #&lt;Phonenumber id: 8, person_id: nil, name: "Auskunft", number: "11833", created_at: "2010-10-09 20:29:38", updated_at: "2010-10-09 20:29:38"&gt; 
+ruby-1.9.2-p0 &gt; <command>karteileiche.person</command>
+ =&gt; nil 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+
+      <para>Dieser neue Datensatz hatte keinen Eintrag (also
+      <varname>nil</varname>) in der Spalte <varname>person_id</varname> und
+      konnte deshalb keiner Person zugeordnet werden. Entsprechend ist das
+      Ergebnis von <methodname>person</methodname> auch
+      <varname>nil</varname>.</para>
+    </section>
+
+    <section>
+      <title>Datensätze suchen</title>
+
+      <para>Zum Suchen brauchen wir wieder definierte Beispieldaten. Deshalb
+      füllen Sie bitte die Datei <filename>db/seeds.rb</filename> mit
+      folgendem Inhalt:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
+# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
+#
+# Examples:
+#
+#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
+#   Mayor.create(:name =&gt; 'Daley', :city =&gt; cities.first)
+
+Person.create(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier').phonenumbers.create([
+             {:name =&gt; 'Mobile', :number =&gt; '0171-12345678'}, 
+             {:name =&gt; 'Office', :number =&gt; '030-7777777'}, 
+             {:name =&gt; 'Home', :number =&gt; '030-8888888'}])
+Person.create(:firstname =&gt; 'Ute', :lastname =&gt; 'Meier').phonenumbers.create([
+             {:name =&gt; 'Home', :number =&gt; '030-8888888'}])
+Person.create(:firstname =&gt; 'Horst', :lastname =&gt; 'Apfelmus').phonenumbers.create([
+             {:name =&gt; 'Mobile', :number =&gt; '0171-1188811'}])
+Person.create(:lastname =&gt; 'Udelhoven')
+Person.create(:firstname =&gt; 'Ernst', :lastname =&gt; 'Steinwurf').phonenumbers.create([
+             {:name =&gt; 'Mobile', :number =&gt; '0172-22225678'}, 
+             {:name =&gt; 'Home', :number =&gt; '040-8888222'}])
+</programlisting></para>
+
+      <para>Jetzt die Datenbank löschen und neu mit der
+      <filename>db/seeds.rb</filename> befüllen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
+(in /Users/stefan/phonebook)
+db/test.sqlite3 already exists
+db/test.sqlite3 already exists
+db/development.sqlite3 already exists
+-- create_table("people", {:force=&gt;true})
+   -&gt; 0.0035s
+-- create_table("phonenumbers", {:force=&gt;true})
+   -&gt; 0.0029s
+-- initialize_schema_migrations_table()
+   -&gt; 0.0047s
+-- assume_migrated_upto_version(20101008205906, "db/migrate")
+   -&gt; 0.0039s
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+
+      <para>Legen wir mal los. Als erstes schauen wir uns mal an, wie viele
+      Personen in der Datenbank sind:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>Person.count</command>
+ =&gt; 5 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+      <para>Und wie viele Telefonnummern?<screen>ruby-1.9.2-p0 &gt; <command>Phonenumber.count</command>
+ =&gt; 7 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+      <para>Die normalen Suchen kennen Sie bereits aus <xref
+      linkend="queries" />. So können Sie mit <methodname>where</methodname>
+      z.B. alle Meier Einträge suchen:<screen>ruby-1.9.2-p0 &gt; <command>Person.where(:lastname =&gt; 'Meier')</command>
+ =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 14:59:14", updated_at: "2010-10-09 14:59:14"&gt;, #&lt;Person id: 2, firstname: "Ute", lastname: "Meier", created_at: "2010-10-09 14:59:14", updated_at: "2010-10-09 14:59:14"&gt;] 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
+
+      <warning>
+        <para>Bitte achten Sie immer darauf, das
+        <methodname>where</methodname> als Ergebnis immer ein Array ausgibt.
+        Wenn Sie den ersten Datensatz aus der Ergebnisliste benötigen, müssen
+        Sie noch ein <methodname>first</methodname> anfügen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>Person.where(:lastname =&gt; 'Meier').first</command>
+ =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt; 
+ruby-1.9.2-p0 &gt; <command>Person.where(:lastname =&gt; 'Meier').first.class</command>
+ =&gt; Person(id: integer, firstname: string, lastname: string, created_at: datetime, updated_at: datetime) 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+      </warning>
+
+      <para>Aber in dem 1:n Kontext ist es natürlich interessanter
+      verschachtelt zu suchen. Dazu gibt es verschiedene Möglichkeiten.</para>
+
+      <section xml:id="activerecord_1n_joins">
+        <title xml:id="activerecord_1n_joins.title">joins</title>
+
+        <para>Wie können wir alle Personen rausfinden, die in unserer
+        Datenbank eine Handynummer abgespeichert haben? Das geht mit einem
+        join. Damit können wir die beiden Modele auch in der Suche
+        verknüpfen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'})</command>
+ =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'}).count</command>
+ =&gt; 3 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+        <para>Drei Personen haben eine Handynummer. Und das konnten wir mit
+        einer Zeile Ruby-Code rausbekommen. Bonus-Punkt: Man kann diese Zeile
+        auch sehr leicht lesen! Schauen wir uns zu dieser Abfrage noch gerade
+        die <filename>log/development.log</filename> an:<programlisting>  Person Load (0.3ms)  SELECT "people".* FROM "people" INNER JOIN "phonenumbers" ON "phonenumbers"."person_id" = "people"."id" WHERE ("phonenumbers"."name" = 'Mobile')
+  SQL (0.2ms)  SELECT COUNT(*) AS count_id FROM "people" INNER JOIN "phonenumbers" ON "phonenumbers"."person_id" = "people"."id" WHERE ("phonenumbers"."name" = 'Mobile')
+</programlisting></para>
+
+        <para>Die Methode <methodname>joins</methodname> führt also zu einem
+        SQL "INNER JOIN".</para>
+
+        <para>Aber wir haben noch einen kleinen Denkfehler gemacht. Was ist
+        wenn jemand zwei Handynummern in der Datenbank gespeichert hat? Wird
+        diese Person dann doppelt gezählt? Probieren wir mal eine Suche nach
+        allen Personen, die eine Handynummer und eine Privatnummer gespeichert
+        haben aus.<screen>ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; ['Mobile', 'Home']})</command>
+ =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 2, firstname: "Ute", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; ['Mobile', 'Home']}).count</command>
+ =&gt; 6 
+ruby-1.9.2-p0 &gt; <command>Person.count</command>
+ =&gt; 5 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+        <para>Tatsächlich! Obwohl wir nur 5 Personen in der Datenbank haben,
+        gibt unser Logikfehler 6 Personen als Ergebnis aus. Aber kein Problem!
+        Das Ergebnis unserer Abfrage ist ein Array und in einem Array können
+        wir mit der Methode <methodname>uniq</methodname> alle doppelten
+        Einträge löschen:<screen>ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; ['Mobile', 'Home']}).uniq</command>
+ =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 2, firstname: "Ute", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; ['Mobile', 'Home']}).uniq.count</command>
+ =&gt; 4 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+        <para>Tatsächlich haben also nur 4 Personen in unserer Datenbank eine
+        Handynummer oder eine Privatnummer gespeichert.</para>
+
+        <para>Über den gleichen <methodname>joins</methodname> Mechanismus
+        können wir auch alle Personen, die mit Nachnamen 'Meier' heissen und
+        eine Handynummer haben abfragen:<screen>ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:lastname =&gt; 'Meier', :phonenumbers =&gt; {:name =&gt; 'Mobile'})</command>
+ =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:lastname =&gt; 'Meier', :phonenumbers =&gt; {:name =&gt; 'Mobile'}).count</command>
  =&gt; 1 
-ruby-1.9.1-p378 &gt; <command>Flight.find(5).flight_schedules.create(:departure =&gt; Time.now + 1.month, :arrival =&gt; Time.now + 1.month + 1.hour)</command>
- =&gt; #&lt;FlightSchedule id: 5, flight_id: 5, departure: "2010-07-17 21:14:08", arrival: "2010-07-17 22:14:08", created_at: "2010-06-17 19:14:08", updated_at: "2010-06-17 19:14:08"&gt; 
-ruby-1.9.1-p378 &gt; <command>Flight.find(5).flight_schedules.count</command>
- =&gt; 2 
-ruby-1.9.1-p378 &gt;</screen></para>
+ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:lastname =&gt; 'Meier', :phonenumbers =&gt; {:name =&gt; 'Mobile'}).first</command>
+ =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt; 
+ruby-1.9.2-p0 &gt; </screen></para>
 
-        <important>
-          <para>Bitte achten Sie bei der Verwendung von
-          <methodname>create</methodname> immer auch auf die von Ihnen
-          verwendeten Validierungs-Regeln (siehe <xref
-          linkend="model_validierungen" />). Denn falls die Validierung einen
-          Fehler ausgibt, dann der der neue Datensatz natürlich nicht
-          gespeichert. Da ist manchmal der kleine Umweg über build
-          einfacher.</para>
-        </important>
+        <para>Es gibt nur eine Person, auf die diese Suchkriterien
+        zutreffen.</para>
+
+        <para>Als letztes suchen wir jetzt mal alle Personen mit einer
+        Berliner (030 Vorwahl) Rufnummer raus:<screen>ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where("phonenumbers.number like ?", '030-%').uniq.count</command>
+ =&gt; 2 
+ruby-1.9.2-p0 &gt; </screen></para>
+
+        <para>Natürlich können wir das ganze auch umdrehen. Lassen Sie uns mal
+        alle Telefonnummern aus Berlin (030 Vorwahl) raussuchen, deren Person
+        mit Nachnamen 'Meier' heißt:<screen>ruby-1.9.2-p0 &gt; <command>Phonenumber.joins(:person).where("number like ?", '030-%').where(:people =&gt; {:lastname =&gt; 'Meier'})</command>
+ =&gt; [#&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Phonenumber id: 4, person_id: 2, name: "Home", number: "030-8888888", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+ruby-1.9.2-p0 &gt; <command>Phonenumber.joins(:person).where("number like ?", '030-%').where(:people =&gt; {:lastname =&gt; 'Meier'}).count</command>
+ =&gt; 3 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+        <para>Der <methodname>uniq</methodname> Trick klappt hier übrigens
+        nicht:<screen>ruby-1.9.2-p0 &gt; <command>Phonenumber.joins(:person).where("number like ?", '030-%').where(:people =&gt; {:lastname =&gt; 'Meier'}).uniq.count</command>
+ =&gt; 3 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
+
+        <para>Bei der Personensuche konnte wir <methodname>uniq</methodname>
+        auf das Ergebnis-Array sinnvoll ausführen, weil die einzelnen Personen
+        doppelt im Array waren. Hier haben wir zwar bei den Phonenumber
+        Datensätzen 3 und 4 die gleiche Telefonnummer '030-8888888', aber es
+        sich halt verschiedene Datensätze. Man muss halt immer auch noch
+        mitdenken. ;-)</para>
       </section>
 
-      <section xml:id="has_many_delete" xml:lang="">
-        <title xml:id="has_many_delete.title">delete und destroy</title>
+      <section>
+        <title>includes</title>
 
-        <para>Mit den Methoden <methodname>destroy</methodname>,
-        <methodname>destroy_all</methodname>, <methodname>delete</methodname>
-        und <methodname>delete_all</methodname> kann man wie in <xref
-        linkend="datensatz-loeschen" /> beschrieben Datensätze löschen. Im
-        Kontext von <methodname>has_many</methodname> bedeutet das, das man
-        die zu einem <classname>Flight</classname> gelisteten
-        <classname>FlightSchedule</classname>-Datensätze in einem Streich
-        löschen kann:<screen>ruby-1.9.1-p378 &gt; <command>Flight.find(5)</command>
+        <para>includes ähneln sehr joins (siehe <xref
+        linkend="activerecord_1n_joins" />). Auch mit Ihnen kann man innerhalb
+        einer 1:n Verknüpfung suchen. Schauen wir uns mal das "Wir suchen alle
+        Personen mit einer Handynummer."-Beispiel mit
+        <methodname>includes</methodname> und mit
+        <methodname>joins</methodname> an:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>Person.includes(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'})</command>
+ =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'})</command>
+ =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+        <para>Die Ergebnisse sind identisch, oder?<screen>ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'}).all == Person.includes(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'}).all</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+        <para>Ja, die Ergebnisse sind identisch. Aber vielleicht haben Sie
+        gemerkt, das ich bei beiden Anfragen ein <methodname>all</methodname>
+        eingeschmuggelt habe. Schauen wir uns einmal den <code>==</code>
+        Vergleich der beiden <classname>ActiveRecord::Relation</classname>
+        an:<screen>ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'}) == Person.includes(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'})</command>
+ =&gt; false 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+        <para>Es handelt sich also um zwei verschiedene Abfragen, die das
+        gleiche Ergebnis liefern. Da hilft nur ein Blick in die
+        <filename>log/development.log</filename>. Als erstes die Ausgabe von
+        <methodname>joins</methodname>:<programlisting>  Person Load (0.2ms)  SELECT "people".* FROM "people" INNER JOIN "phonenumbers" ON "phonenumbers"."person_id" = "people"."id" WHERE ("phonenumbers"."name" = 'Mobile')
+</programlisting></para>
+
+        <para>Und jetzt die <filename>log/development.log</filename> Ausgabe
+        des includes:<programlisting>  Person Load (0.3ms)  SELECT "people"."id" AS t0_r0, "people"."firstname" AS t0_r1, "people"."lastname" AS t0_r2, "people"."created_at" AS t0_r3, "people"."updated_at" AS t0_r4, "phonenumbers"."id" AS t1_r0, "phonenumbers"."person_id" AS t1_r1, "phonenumbers"."name" AS t1_r2, "phonenumbers"."number" AS t1_r3, "phonenumbers"."created_at" AS t1_r4, "phonenumbers"."updated_at" AS t1_r5 FROM "people" LEFT OUTER JOIN "phonenumbers" ON "phonenumbers"."person_id" = "people"."id" WHERE ("phonenumbers"."name" = 'Mobile')
+</programlisting></para>
+
+        <para>Ich erspare Ihnen das Rätselraten:
+        <methodname>joins</methodname> liest nur die <varname>people</varname>
+        Datensätze ein und <methodname>includes</methodname> liesst auch noch
+        die dazu gehörigen <varname>phonenumbers</varname>. Schon bei unserem
+        kleinen Beispiel sieht man das dies natürlich länger dauert. </para>
+
+        <para>Warum kann der Einsatz von <methodname>includes</methodname>
+        dann überhaupt Sinn machen? Wenn Sie schon bei dieser Abfrage wissen,
+        das Sie alle Telefonnummern ebenfalls benötigen, dann macht ein
+        <methodname>includes</methodname> Sinn, da dann nur eine
+        Datenbankanfrage gestellt wird. ActiveRecord cached nämlich die
+        Antwort.</para>
+
+        <para>Ich zeige Ihnen das mal an einem Beispiel. Wir werden wieder
+        alle Meiers mit einem Handy raussuchen und dann alle Handynummern
+        ausgeben. Zur besseren Analyse der SQL-Abfragen, werden wir mit
+        <command>ActiveRecord::Base.logger = Logger.new(STDOUT)</command> alle
+        Ausgabe die normalerweise nur in
+        <filename>log/development.log</filename> landen direkt auf der Console
+        ausgeben. Als erstes die <methodname>joins</methodname>
+        Variante:<screen>ruby-1.9.2-p0 &gt; <command>ActiveRecord::Base.logger = Logger.new(STDOUT)</command>
+ =&gt; #&lt;Logger:0x00000102d3a308 @progname=nil, @level=0, @default_formatter=#&lt;Logger::Formatter:0x00000102d3a2e0 @datetime_format=nil&gt;, @formatter=nil, @logdev=#&lt;Logger::LogDevice:0x00000102d3a290 @shift_size=nil, @shift_age=nil, @filename=nil, @dev=#&lt;IO:&lt;STDOUT&gt;&gt;, @mutex=#&lt;Logger::LogDevice::LogDeviceMutex:0x00000102d3a268 @mon_owner=nil, @mon_count=0, @mon_mutex=#&lt;Mutex:0x00000102d3a218&gt;&gt;&gt;&gt; 
+ruby-1.9.2-p0 &gt; <command>handybesitzer = Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'})</command>
+<emphasis>  Person Load (0.2ms)  SELECT "people".* FROM "people" INNER JOIN "phonenumbers" ON "phonenumbers"."person_id" = "people"."id" WHERE ("phonenumbers"."name" = 'Mobile')
+</emphasis> =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+ruby-1.9.2-p0 &gt; <command>handybesitzer.each do |einzelperson|</command>
+ruby-1.9.2-p0 &gt;     <command>puts einzelperson.phonenumbers.first.number</command>
+ruby-1.9.2-p0 ?&gt;  <command>end</command>
+<emphasis>  Phonenumber Load (0.3ms)  SELECT "phonenumbers".* FROM "phonenumbers" WHERE ("phonenumbers".person_id = 1) LIMIT 1
+</emphasis>0171-12345678
+<emphasis>  Phonenumber Load (0.2ms)  SELECT "phonenumbers".* FROM "phonenumbers" WHERE ("phonenumbers".person_id = 3) LIMIT 1
+</emphasis>0171-1188811
+<emphasis>  Phonenumber Load (0.1ms)  SELECT "phonenumbers".* FROM "phonenumbers" WHERE ("phonenumbers".person_id = 5) LIMIT 1
+</emphasis>0172-22225678
+ =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+ruby-1.9.2-p0 &gt; </screen></para>
+
+        <para>Wir haben für die Ausgabe aller Handynummern insgesamt 4
+        SQL-Abfragen gemacht und die brauchten in der Summe 0.8ms Zeit. Jetzt
+        machen wir das gleiche Beispiel mal mit
+        <methodname>includes</methodname>:<screen>ruby-1.9.2-p0 &gt; <command>handybesitzer = Person.includes(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'})</command>
+<emphasis>  Person Load (0.3ms)  SELECT "people"."id" AS t0_r0, "people"."firstname" AS t0_r1, "people"."lastname" AS t0_r2, "people"."created_at" AS t0_r3, "people"."updated_at" AS t0_r4, "phonenumbers"."id" AS t1_r0, "phonenumbers"."person_id" AS t1_r1, "phonenumbers"."name" AS t1_r2, "phonenumbers"."number" AS t1_r3, "phonenumbers"."created_at" AS t1_r4, "phonenumbers"."updated_at" AS t1_r5 FROM "people" LEFT OUTER JOIN "phonenumbers" ON "phonenumbers"."person_id" = "people"."id" WHERE ("phonenumbers"."name" = 'Mobile')
+</emphasis> =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+ruby-1.9.2-p0 &gt; <command>handybesitzer.each do |einzelperson|</command>
+ruby-1.9.2-p0 &gt;     <command>puts einzelperson.phonenumbers.first.number</command>                 
+ruby-1.9.2-p0 ?&gt;  <command>end</command>                                                           
+0171-12345678
+0171-1188811
+0172-22225678
+ =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+
+        <para>Hier haben wir nur eine SQL-Abfrage die 0.3ms gedauert hat. Die
+        erste SQL-Abfrage dauert also länger, dafür spart man sich aber
+        nachfolgende.</para>
+
+        <para>Wäre es dann nicht besser immer mit
+        <methodname>includes</methodname> zu arbeiten? Nein, es kommt immer
+        auf den konkreten Fall an. Denn bei der Benutzung von includes werden
+        ja initial viel mehr Daten transportiert. Die müssen von Ruby gecached
+        und verarbeitet werden. Bei unserer kleinen Datenbank ist das egal.
+        Aber stellen Sie sich das ganze mal mit allen Handynummern
+        Deutschlands vor. Das ist eine Datenmenge, die man nicht unbedingt
+        cachen will.</para>
+      </section>
+    </section>
+
+    <section xml:id="has_many_delete" xml:lang="">
+      <title xml:id="has_many_delete.title">delete und destroy</title>
+
+      <para>Mit den Methoden <methodname>destroy</methodname>,
+      <methodname>destroy_all</methodname>, <methodname>delete</methodname>
+      und <methodname>delete_all</methodname> kann man wie in <xref
+      linkend="datensatz-loeschen" /> beschrieben Datensätze löschen. Im
+      Kontext von <methodname>has_many</methodname> bedeutet das, das man die
+      zu einem <classname>Flight</classname> gelisteten
+      <classname>FlightSchedule</classname>-Datensätze in einem Streich
+      löschen kann:<screen>ruby-1.9.1-p378 &gt; <command>Flight.find(5)</command>
  =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 16:24:15", updated_at: "2010-06-17 16:24:15"&gt; 
 ruby-1.9.1-p378 &gt; <command>Flight.find(5).flight_schedules.count</command>
  =&gt; 4 
@@ -2047,7 +2536,6 @@ ruby-1.9.1-p378 &gt; <command>Flight.find(5).flight_schedules.count</command>
 ruby-1.9.1-p378 &gt; <command>Flight.find(5)</command>
  =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 16:24:15", updated_at: "2010-06-17 16:24:15"&gt; 
 ruby-1.9.1-p378 &gt;</screen></para>
-      </section>
     </section>
 
     <section>
@@ -2618,6 +3106,12 @@ ruby-1.9.1-p378 &gt; </screen></para>
 
   <section>
     <title>Scope</title>
+
+    <para></para>
+  </section>
+
+  <section xml:id="migrations">
+    <title xml:id="migrations.title">Migrations</title>
 
     <para></para>
   </section>
