@@ -1667,7 +1667,8 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
     diesem Telefonbuch gibt es ein Model mit Personen und ein Model mit
     Telefonnummern. Da jede Person mehrere Telefonnummern haben kann (z.B.
     Handy, Arbeit und Zuhause) benötigen wir zum Abbilden eine 1:n
-    Verknüpfung.</para>
+    Verknüpfung. Mal schauen wie einfach das ganze mit ActiveRecord
+    ist.</para>
 
     <para>Erstellen wir als erstes die Rails Applikation:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new phonebook</command>
       create  
@@ -1734,8 +1735,8 @@ stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
 
     <para>Die zwei Datenbanken sind eingerichtet und können mit ActiveRecord
     benutzt werden. Allerdings weiß ActiveRecord noch nichts von der 1:n
-    Beziehung der beiden. Das ist aber recht einfach in zwei
-    Schritten:<itemizedlist>
+    Beziehung der beiden. Das ist aber recht einfach in zwei Schritten
+    realisierbar:<itemizedlist>
         <listitem>
           <para>Wir fügen die <code>has_many</code> Option in die Model-Datei
           <filename>app/models/person.rb</filename> ein:<programlisting>class Person &lt; ActiveRecord::Base
@@ -1753,7 +1754,146 @@ end</programlisting></para>
       </itemizedlist></para>
 
     <para>Diese zwei einfachen Einträge generieren jetzt eine ganze Menge
-    Rails-Magie.</para>
+    Rails-Magie. </para>
+
+    <section xml:id="activerecord_1n_erstellen">
+      <title xml:id="activerecord_1n_erstellen.title">Datensätze
+      erstellen</title>
+
+      <para>Wir wollen in diesem Beispiel für Fritz Meier seine Handy-Nummer
+      (0171-12345678), seine Büro-Nummer (030-7777777) und seine
+      Privat-Festnetznummer (030-8888888) abspeichern.</para>
+
+      <section xml:id="activerecord_hinzufuegen_manuell">
+        <title xml:id="activerecord_hinzufuegen_manuell.title">Manuell</title>
+
+        <para>Wir löschen die Datenbank und erstellen erst ein Objekt mit den
+        Person-Daten. Dann merken wir uns die ID für diesen Datensatz und
+        erstellen danach die drei Telefonnummern-Datensätze mit dieser ID im
+        Feld <varname>person_id</varname>:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
+(in /Users/stefan/phonebook)
+db/test.sqlite3 already exists
+db/development.sqlite3 already exists
+-- create_table("people", {:force=&gt;true})
+   -&gt; 0.0039s
+-- create_table("phonenumbers", {:force=&gt;true})
+   -&gt; 0.0033s
+-- initialize_schema_migrations_table()
+   -&gt; 0.0060s
+-- assume_migrated_upto_version(20101008205906, "db/migrate")
+   -&gt; 0.0043s
+stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>fritz = Person.create(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier')</command>
+ =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 10:28:42", updated_at: "2010-10-09 10:28:42"&gt; 
+ruby-1.9.2-p0 &gt; <command>fritz_handy = Phonenumber.create(:person_id =&gt; 1, :name =&gt; 'Mobile', :number =&gt; '0171-12345678')</command>
+ =&gt; #&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 10:35:09", updated_at: "2010-10-09 10:35:09"&gt; 
+ruby-1.9.2-p0 &gt; <command>fritz_office = Phonenumber.create(:person_id =&gt; 1, :name =&gt; 'Office', :number =&gt; '030-7777777')</command>
+ =&gt; #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 10:35:45", updated_at: "2010-10-09 10:35:45"&gt; 
+ruby-1.9.2-p0 &gt; <command>fritz_home = Phonenumber.create(:person_id =&gt; 1, :name =&gt; 'Home', :number =&gt; '030-8888888')</command>
+ =&gt; #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 10:36:29", updated_at: "2010-10-09 10:36:29"&gt; 
+ruby-1.9.2-p0 &gt; <command>Person.all</command>
+ =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 10:28:42", updated_at: "2010-10-09 10:28:42"&gt;] 
+ruby-1.9.2-p0 &gt; <command>Phonenumber.all</command>
+ =&gt; [#&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 10:35:09", updated_at: "2010-10-09 10:35:09"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 10:35:45", updated_at: "2010-10-09 10:35:45"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 10:36:29", updated_at: "2010-10-09 10:36:29"&gt;] 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+
+        <para>Die person_id von Hand einzutragen ist natürlich sehr
+        fehleranfällig. Das gleiche Ergebnis könnten wir auch einen Tick
+        schöner mit <varname>fritz.id</varname> realisieren:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
+(in /Users/stefan/phonebook)
+[...]
+stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>fritz = Person.create(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier')</command>
+ =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 10:28:42", updated_at: "2010-10-09 10:28:42"&gt; 
+ruby-1.9.2-p0 &gt; <command>fritz_handy = Phonenumber.create(:person_id =&gt; fritz.id, :name =&gt; 'Mobile', :number =&gt; '0171-12345678')</command>
+ =&gt; #&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 10:35:09", updated_at: "2010-10-09 10:35:09"&gt; 
+ruby-1.9.2-p0 &gt; <command>fritz_office = Phonenumber.create(:person_id =&gt; fritz.id, :name =&gt; 'Office', :number =&gt; '030-7777777')</command>
+ =&gt; #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 10:35:45", updated_at: "2010-10-09 10:35:45"&gt; 
+ruby-1.9.2-p0 &gt; <command>fritz_home = Phonenumber.create(:person_id =&gt; fritz.id, :name =&gt; 'Home', :number =&gt; '030-8888888')</command>
+ =&gt; #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 10:36:29", updated_at: "2010-10-09 10:36:29"&gt; 
+ruby-1.9.2-p0 &gt; <command>Person.all</command>
+ =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 10:28:42", updated_at: "2010-10-09 10:28:42"&gt;] 
+ruby-1.9.2-p0 &gt; <command>Phonenumber.all</command>
+ =&gt; [#&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 10:35:09", updated_at: "2010-10-09 10:35:09"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 10:35:45", updated_at: "2010-10-09 10:35:45"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 10:36:29", updated_at: "2010-10-09 10:36:29"&gt;] 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+
+        <para>Immer noch nicht super praktisch, oder? Nur Geduld! ;-)</para>
+      </section>
+
+      <section xml:id="activerecord_hinzufuegen_create">
+        <title xml:id="activerecord_hinzufuegen_create.title">create</title>
+
+        <para>Jetzt versuchen wir das gleiche wie in <xref
+        linkend="activerecord_hinzufuegen_manuell" />, aber benutzen diesmal
+        ein wenige ActiveRecord Magie. Wir können mit der Methode
+        <methodname>phonenumbers.create</methodname>
+        (<methodname>phonenumbers</methodname> im Plural, weil ja 1 zu many =
+        mehrere) zu jedem Person Objekt neue Telefonnummern hinzufügen. Diese
+        werden automagisch korrekt mit der <varname>person_id</varname>
+        bestückt:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
+(in /Users/stefan/phonebook)
+[...]
+stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>fritz = Person.create(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier')</command>
+ =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 10:54:12", updated_at: "2010-10-09 10:54:12"&gt; 
+ruby-1.9.2-p0 &gt; <command>fritz_handy = fritz.phonenumbers.create(:name =&gt; 'Mobile', :number =&gt; '0171-12345678')</command>
+ =&gt; #&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 10:54:58", updated_at: "2010-10-09 10:54:58"&gt; 
+ruby-1.9.2-p0 &gt; <command>fritz_office = fritz.phonenumbers.create(:name =&gt; 'Office', :number =&gt; '030-7777777')</command>
+ =&gt; #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 10:56:35", updated_at: "2010-10-09 10:56:35"&gt; 
+ruby-1.9.2-p0 &gt; <command>fritz_home = fritz.phonenumbers.create(:name =&gt; 'Home', :number =&gt; '030-8888888')</command>
+ =&gt; #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 10:57:21", updated_at: "2010-10-09 10:57:21"&gt; 
+ruby-1.9.2-p0 &gt; <command>Person.all</command>
+ =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 10:54:12", updated_at: "2010-10-09 10:54:12"&gt;] 
+ruby-1.9.2-p0 &gt; <command>Phonenumber.all</command>
+ =&gt; [#&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 10:54:58", updated_at: "2010-10-09 10:54:58"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 10:56:35", updated_at: "2010-10-09 10:56:35"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 10:57:21", updated_at: "2010-10-09 10:57:21"&gt;] 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+
+        <para>Es geht sogar noch kürzer, da <methodname>create</methodname>
+        auch ein Array von Hashes aktzeptiert. Wir können also alle
+        Telefonnummer mit einer Zeile eintragen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
+(in /Users/stefan/phonebook)
+[...]
+stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>fritz = Person.create(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier')</command>
+ =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 11:04:39", updated_at: "2010-10-09 11:04:39"&gt; 
+ruby-1.9.2-p0 &gt; <command>fritz.phonenumbers.create([{:name =&gt; 'Mobile', :number =&gt; '0171-12345678'}, {:name =&gt; 'Office', :number =&gt; '030-7777777'}, {:name =&gt; 'Home', :number =&gt; '030-8888888'}])</command>
+ =&gt; [#&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 11:05:45", updated_at: "2010-10-09 11:05:45"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 11:05:45", updated_at: "2010-10-09 11:05:45"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 11:05:45", updated_at: "2010-10-09 11:05:45"&gt;] 
+ruby-1.9.2-p0 &gt; <command>Person.all</command>
+ =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 11:04:39", updated_at: "2010-10-09 11:04:39"&gt;] 
+ruby-1.9.2-p0 &gt; <command>Phonenumber.all</command>
+ =&gt; [#&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 11:05:45", updated_at: "2010-10-09 11:05:45"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 11:05:45", updated_at: "2010-10-09 11:05:45"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 11:05:45", updated_at: "2010-10-09 11:05:45"&gt;] 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+
+        <para>Ich ahne was Sie sich jetzt fragen: "Geht es noch kürzer?".
+        Klar: Wir können ja auch alles direkt in eine Zeile schreiben:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
+(in /Users/stefan/phonebook)
+[...]
+stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>Person.create(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier').phonenumbers.create([{:name =&gt; 'Mobile', :number =&gt; '0171-12345678'}, {:name =&gt; 'Office', :number =&gt; '030-7777777'}, {:name =&gt; 'Home', :number =&gt; '030-8888888'}])</command>
+ =&gt; [#&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 11:13:43", updated_at: "2010-10-09 11:13:43"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 11:13:43", updated_at: "2010-10-09 11:13:43"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 11:13:43", updated_at: "2010-10-09 11:13:43"&gt;] 
+ruby-1.9.2-p0 &gt; <command>Person.all</command>
+ =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 11:13:43", updated_at: "2010-10-09 11:13:43"&gt;] 
+ruby-1.9.2-p0 &gt; <command>Phonenumber.all</command>
+ =&gt; [#&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 11:13:43", updated_at: "2010-10-09 11:13:43"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 11:13:43", updated_at: "2010-10-09 11:13:43"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 11:13:43", updated_at: "2010-10-09 11:13:43"&gt;] 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+      </section>
+
+      <section xml:id="activerecord_hinzufuegen_build">
+        <title xml:id="activerecord_hinzufuegen_build.title">build</title>
+
+        <para></para>
+      </section>
+    </section>
 
     <section>
       <title>Methoden</title>
@@ -1762,22 +1902,28 @@ end</programlisting></para>
         <title xml:id="has_many_build.title">build</title>
 
         <para>Die Methode <methodname>build</methodname> erstellt eine neue
-        Kind-Instanz die automatisch die Eltern-ID enthält:<screen>ruby-1.9.1-p378 &gt; <command>Flight.last</command>
- =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 16:24:15", updated_at: "2010-06-17 16:24:15"&gt; 
-ruby-1.9.1-p378 &gt; <command>fra_txl = Flight.last</command>
- =&gt; #&lt;Flight id: 5, flight_number: "RA 005", departure_airport: "FRA", destination_airport: "TXL", created_at: "2010-06-17 16:24:15", updated_at: "2010-06-17 16:24:15"&gt; 
-ruby-1.9.1-p378 &gt; <command>neuer_flugplan = fra_txl.flight_schedules.build(:departure =&gt; Time.now + 1.year, :arrival =&gt; Time.now + 1.year + 1.hour)</command>
- =&gt; #&lt;FlightSchedule id: nil, flight_id: 5, departure: "2011-06-17 21:05:43", arrival: "2011-06-17 22:05:43", created_at: nil, updated_at: nil&gt; 
-ruby-1.9.1-p378 &gt;
-</screen></para>
+        Kind-Instanz die automatisch die Eltern-ID enthält:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>fritz = Person.create(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier')</command>
+ =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 10:05:30", updated_at: "2010-10-09 10:05:30"&gt; 
+ruby-1.9.2-p0 &gt; <command>fritz_handy = fritz.phonenumbers.build(:name =&gt; 'Mobile', :number =&gt; '0171-12345678')</command>
+ =&gt; #&lt;Phonenumber id: nil, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: nil, updated_at: nil&gt; 
+ruby-1.9.2-p0 &gt;</screen></para>
 
-        <para>Jetzt muss <varname>neuer_flugplan</varname> nur noch mit
-        <methodname>save</methodname> abgespeichert werden:<screen>ruby-1.9.1-p378 &gt; <command>neuer_flugplan.save</command>
+        <para>Da <methodname>build</methodname> aber nur das Objekt erstellt
+        und nicht automatisch den Datensatz abspeichert, müssen wir das noch
+        mit <methodname>save</methodname> machen:<screen>ruby-1.9.2-p0 &gt; <command>fritz_handy.new_record?</command>
  =&gt; true 
-ruby-1.9.1-p378 &gt;</screen></para>
+ruby-1.9.2-p0 &gt; <command>fritz_handy.save</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt; <command>fritz_handy.new_record?</command>
+ =&gt; false 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
 
-        <para>Der Vorteil liegt in der Sicherheit keine falsche ID zu nehmen
-        und oft im übersichtlicheren Code.</para>
+        <para>Natürlich könnten Sie die beiden Datensätze auch manuel anlegen,
+        aber die benutzung von build stellt sicher, das alle IDs korret sind.
+        Ausserdem wird der Code übersichtlicher.</para>
       </section>
 
       <section xml:id="has_many_create">
