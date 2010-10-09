@@ -196,15 +196,75 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
     <para>Deshalb werde ich sie hier nicht abbilden und überlasse es Ihrer
     Neugierde einmal <command>ri ActiveRecord</command> aufzurufen.</para>
+
+    <section>
+      <title>Datenbank-Konfiguration</title>
+
+      <para>Welche Datenbank wird per Default benutzt? Schauen wir mal in die
+      Konfigurationsdatei für die Datenbank
+      (<filename>config/database.yml</filename>):<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>cat config/database.yml</command> 
+# SQLite version 3.x
+#   gem install sqlite3-ruby (not necessary on OS X Leopard)
+development:
+  adapter: sqlite3
+  database: db/development.sqlite3
+  pool: 5
+  timeout: 5000
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  adapter: sqlite3
+  database: db/test.sqlite3
+  pool: 5
+  timeout: 5000
+
+production:
+  adapter: sqlite3
+  database: db/production.sqlite3
+  pool: 5
+  timeout: 5000
+stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+
+      <para>Da wir im development Modus arbeiten hat Rails beim <command>rake
+      db:migrate</command> eine neue SQLite3 Datenbank
+      <filename>db/development.sqlite3</filename> angelegt und dort alle Daten
+      gespeichert.</para>
+
+      <para>Schauen wir mal mit dem Kommandozeilen-Client
+      <command>sqlite3</command> rein:</para>
+
+      <para><screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>sqlite3 db/development.sqlite3 </command>
+SQLite version 3.6.12
+Enter ".help" for instructions
+Enter SQL statements terminated with a ";"
+sqlite&gt; <command>.tables</command>
+albums             schema_migrations
+sqlite&gt; <command>.schema albums</command>
+CREATE TABLE "albums" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "position" integer, "name" varchar(255), "release_year" integer, "created_at" datetime, "updated_at" datetime);
+sqlite&gt; <command>.exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+
+      <para>Tatsächlich, da ist eine Datenbank mit dem Namen
+      <varname>albums</varname>. Diese wird von ActiveRecord benutzt.</para>
+    </section>
   </section>
 
   <section xml:id="activerecord_create">
     <title xml:id="activerecord_create.title">Datensätze hinzufügen</title>
 
-    <para>Neue Datensätze können mit verschiedenen Methoden erstellt werden.
-    Schauen wir uns als erstes mal die <methodname>create</methodname> Methode
-    an. Wie immer gibt es dazu eine eigene kleine Hilfeseite im
-    System:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>ri -T ActiveRecord::Base.create</command>
+    <para>Eigentlich würde ich Ihnen ja gerne erst zeigen wie man sich
+    Datensätze anzeigen lassen kann, aber da haben wir natürlich ein
+    Henne-Ei-Problem. Deshalb jetzt erst mal das anlegen von neuen Datensätzen
+    mit ActiveRecord.</para>
+
+    <section xml:id="activerecord_create">
+      <title xml:id="activerecord_create.title">create</title>
+
+      <para>Die am häufigten zum Anlegen von neuen Datensätzen benutzte
+      Methode ist <methodname>create</methodname>. Wie immer gibt es dazu eine
+      eigene Hilfeseite im System:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>ri -T ActiveRecord::Base.create</command>
 ActiveRecord::Base.create
 
 (from gem activerecord-3.0.0)
@@ -240,8 +300,8 @@ Examples
 
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
-    <para>Super, direkt mit Beispielen! Was will man mehr? Versuchen wir mal
-    so in der Console die ersten 3 Alben einzutragen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+      <para>Super, direkt mit Beispielen! Was will man mehr? Versuchen wir mal
+      so in der Console die ersten 3 Alben anzulegen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album</command>
  =&gt; Album(id: integer, position: integer, name: string, release_year: integer, created_at: datetime, updated_at: datetime) 
@@ -254,49 +314,16 @@ ruby-1.9.2-p0 &gt; <command>Album.create(:position =&gt; 3, :name =&gt; "Revolve
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
-    <para>Sieht ja ganz gut aus, aber wo sind die Daten gespeichert worden?
-    Schauen wir mal in die Konfigurationsdatei für die Datenbank
-    (<filename>config/database.yml</filename>):<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>cat config/database.yml</command> 
-# SQLite version 3.x
-#   gem install sqlite3-ruby (not necessary on OS X Leopard)
-development:
-  adapter: sqlite3
-  database: db/development.sqlite3
-  pool: 5
-  timeout: 5000
+      <para>Sieht ja ganz gut aus, aber sind die Daten auch wirklich
+      gespeichert worden? Schauen wir sicherheitshalber mal mit dem
+      Kommandozeilen-Client <command>sqlite3</command> rein:</para>
 
-# Warning: The database defined as "test" will be erased and
-# re-generated from your development database when you run "rake".
-# Do not set this db to the same as development or production.
-test:
-  adapter: sqlite3
-  database: db/test.sqlite3
-  pool: 5
-  timeout: 5000
-
-production:
-  adapter: sqlite3
-  database: db/production.sqlite3
-  pool: 5
-  timeout: 5000
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
-
-    <para>Da wir im development Modus arbeiten hat Rails beim <command>rake
-    db:migrate</command> eine neue SQLite3 Datenbank
-    <filename>db/development.sqlite3</filename> angelegt und dort alle Daten
-    gespeichert.</para>
-
-    <para>Schauen wir mal mit dem Kommandozeilen-Client
-    <command>sqlite3</command> rein:</para>
-
-    <para><screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>sqlite3 db/development.sqlite3 </command>
+      <para><screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>sqlite3 db/development.sqlite3 </command>
 SQLite version 3.6.12
 Enter ".help" for instructions
 Enter SQL statements terminated with a ";"
 sqlite&gt; <command>.tables</command>
 albums             schema_migrations
-sqlite&gt; <command>.schema albums</command>
-CREATE TABLE "albums" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "position" integer, "name" varchar(255), "release_year" integer, "created_at" datetime, "updated_at" datetime);
 sqlite&gt; <command>SELECT * FROM albums;</command>
 1|1|Sgt. Pepper's Lonely Hearts Club Band|1967|2010-09-02 19:48:42.744962|2010-09-02 19:48:42.744962
 2|2|Pet Sounds|1966|2010-09-02 19:49:07.513328|2010-09-02 19:49:07.513328
@@ -304,15 +331,24 @@ sqlite&gt; <command>SELECT * FROM albums;</command>
 sqlite&gt; <command>.exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
-    <para>Tatsächlich, da ist eine Datenbank mit dem Namen
-    <varname>albums</varname> und in der sind die von uns eben erstellten
-    Einträge.</para>
+      <para>Tatsächlich, da ist eine Datenbank mit dem Namen
+      <varname>albums</varname> und in der sind die von uns eben erstellten
+      Einträge. Die dafür von ActiveRecord erstellten SQL-Befehle können Sie
+      sich in der <filename>log/development.log</filename>
+      anschauen:<programlisting>  SQL (0.3ms)  INSERT INTO "albums" ("created_at", "name", "position", "release_year", "updated_at") VALUES ('2010-10-09 11:56:42.140062', 'Sgt. Pepper''s Lonely Hearts Club Band', 1, 1967, '2010-10-09 11:56:42.140062')
+  SQL (0.7ms)  INSERT INTO "albums" ("created_at", "name", "position", "release_year", "updated_at") VALUES ('2010-10-09 11:56:47.647848', 'Pet Sounds', 2, 1966, '2010-10-09 11:56:47.647848')
+  SQL (0.3ms)  INSERT INTO "albums" ("created_at", "name", "position", "release_year", "updated_at") VALUES ('2010-10-09 11:56:52.232803', 'Revolver', 3, 1966, '2010-10-09 11:56:52.232803')
+</programlisting></para>
+    </section>
 
-    <para>Neben <methodname>create</methodname> gibt es auch
-    <methodname>new</methodname>. Allerdings muss ein mit
-    <methodname>new</methodname> erzeugtes Objekt extra mit
-    <methodname>save</methodname> gespeichert werden (hat Vor- und
-    Nachteile):<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+    <section xml:id="activerecord_new">
+      <title xml:id="activerecord_new">new</title>
+
+      <para>Neben <methodname>create</methodname> gibt es auch
+      <methodname>new</methodname>. Allerdings muss ein mit
+      <methodname>new</methodname> erzeugtes Objekt extra mit
+      <methodname>save</methodname> gespeichert werden (was Vor- und Nachteile
+      hat):<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>highway61 = Album.new</command>
  =&gt; #&lt;Album id: nil, position: nil, name: nil, release_year: nil, created_at: nil, updated_at: nil&gt; 
@@ -331,12 +367,49 @@ ruby-1.9.2-p0 &gt; <command>highway61</command>
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
 
-    <para>Was passiert im Hintergrund? ActiveRecord übernimmt alle Arbeit für
-    uns. Bei jedem <methodname>create</methodname> oder beim initialen
-    <methodname>save</methodname> wird mit <code>INSERT</code> ein neuer
-    Datensatz in der SQL-Datenbank angelegt. Im Log können wir dies
-    überprüfen:<programlisting>  SQL (0.9ms)  INSERT INTO "albums" ("created_at", "name", "position", "release_year", "updated_at") VALUES ('2010-09-02 20:30:34.872261', 'Highway 61 Revisited', 4, 1965, '2010-09-02 20:30:34.872261')
-</programlisting></para>
+      <para>In der log/development.log finden Sie den zu erwartenden INSERT
+      Befehl:<programlisting>SQL (0.9ms)  INSERT INTO "albums" ("created_at", "name", "position", "release_year", "updated_at") VALUES ('2010-09-02 20:30:34.872261', 'Highway 61 Revisited', 4, 1965, '2010-09-02 20:30:34.872261')</programlisting></para>
+
+      <para>Sie können der Methode <methodname>new</methodname> wie
+      <methodname>create</methodname> auch direkt Parameter für den neuen
+      Datensatz übergeben. Hier das obige Beispiel in einer Zeile:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>highway61 = Album.new(:position =&gt; 4, :name =&gt; 'Highway 61 Revisited', :release_year =&gt; 1965)</command>
+ =&gt; #&lt;Album id: nil, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: nil, updated_at: nil&gt; 
+ruby-1.9.2-p0 &gt; <command>highway61.save</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+    </section>
+
+    <section xml:id="activerecord_new_record">
+      <title xml:id="activerecord_new_record.title">new_record?</title>
+
+      <para>Mit der Methode <methodname>new_record?</methodname> können Sie
+      sich anzeigen lassen, ob ein Datensatz schon gespeichert wurde oder
+      nicht. Wurde ein neues Objekt mit <methodname>new</methodname> erstellt
+      und noch nicht abgespeichert, dann ist das Ergebnis von
+      <methodname>new_record?</methodname> <varname>true</varname>. Nach einem
+      <methodname>save</methodname> ist es <varname>false</varname>.</para>
+
+      <para>Gehen wir noch mal das Beispiel von <xref
+      linkend="activerecord_new" /> durch, um dies zu zeigen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>highway61 = Album.new(:position =&gt; 4, :name =&gt; 'Highway 61 Revisited', :release_year =&gt; 1965)</command>
+ =&gt; #&lt;Album id: nil, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: nil, updated_at: nil&gt; 
+ruby-1.9.2-p0 &gt; <command>highway61.new_record?</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt; <command>highway61.save</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt; <command>highway61.new_record?</command>
+ =&gt; false 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$</screen><tip>
+          <para>Bei bereits bestehenden Datensätzen können Sie eine
+          Veränderung auch mit der Methode <methodname>changed?</methodname>
+          überprüfen (siehe <xref linkend="activerecord_changed" />).</para>
+        </tip></para>
+    </section>
   </section>
 
   <section>
@@ -1518,8 +1591,8 @@ ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
     </section>
 
-    <section>
-      <title>changed?</title>
+    <section xml:id="activerecord_changed">
+      <title xml:id="activerecord_changed.title">changed?</title>
 
       <para>Wenn man sich nicht sicher ist, ob ein Datensatz verändert und
       noch nicht abgespeichert wurde, dann kann man dies mit der
@@ -1891,7 +1964,7 @@ stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
       <section xml:id="activerecord_hinzufuegen_build">
         <title xml:id="activerecord_hinzufuegen_build.title">build</title>
 
-        <para></para>
+        <para>Die Methode build haben wir bereits in druchgenommen.</para>
       </section>
     </section>
 
