@@ -36,14 +36,13 @@
     <para>Der Rails-Anfänger sollte das Kapitel einmal von oben bis unten
     durcharbeiten. Das heißt konkret: Alle Schritte in der eigenen Console
     (siehe <xref linkend="die_console" />) mit ausprobieren und ruhig selber
-    links und recht mal ein wenig experimentieren.</para>
+    links und recht mal ein wenig experimentieren. Bitte nehmen Sie sich Zeit.
+    Es ist ein wichtiges Kapitel!</para>
 
     <para><note>
         <para>Es geht in diesem Kapitel um ActiveRecord. Deshalb: Um die
         Beispiele so übersichtlich wie möglich zu halten, werde ich deshalb
-        keine Tests (siehe <xref linkend="tests" />) einbauen. Ebenso
-        verzichte ich in diesem Beispiel auf ein Rechtemodel. Wir sind Root
-        und dürfen alles. ;-)</para>
+        keine Tests (siehe <xref linkend="tests" />) einbauen.</para>
       </note></para>
 
     <section>
@@ -330,10 +329,64 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
       Datentypen noch näher ein und sprechen über verfügbare Optionen.</para>
     </section>
 
-    <section>
-      <title>CallFile vs call_file (Namenskonvention)</title>
+    <section xml:id="activerecord_namenskonvention">
+      <title xml:id="activerecord_namenskonvention.title">Nameskonventionen
+      (CallRecord vs. call_record vs. call_records)</title>
 
-      <para>TODO</para>
+      <para>Für den Rails-Anfänger ist es oft schwer zu "erfühlen", wann man
+      z.B. <classname>CallRecord</classname> oder
+      <methodname>call_record</methodname> benutzt. Ausserdem ist nicht immer
+      klar "erfühlbar", wann ein Begriff im Plural und wann im Singular
+      benutzt wird. So viel vorweg: Es ist alles logisch und man bekommt den
+      Dreh auch recht schnell raus. Wichtig ist nur immer bei Englischen
+      Wörtern zu bleiben (siehe <xref linkend="warum_english" />).</para>
+
+      <para>An dieser Stelle wollte ich ursprünglich in aller Länge und Breite
+      über die Namenskonventionen philosophieren. Dann habe ich mir gedacht:
+      "Mein Gott, die Leser wollen schnell weiterkommen und nicht hier
+      Ewigkeiten mit Theorie verbringen." Deshalb stelle ich Ihnen hier die
+      Methoden vor, mit denen Sie sich selbst die Schreibweisen in der Rails
+      Console rausfinden können:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>"album".classify</command>
+ =&gt; "Album" 
+ruby-1.9.2-p0 &gt; <command>"album".tableize</command>
+ =&gt; "albums" 
+ruby-1.9.2-p0 &gt; <command>"album".foreign_key</command>
+ =&gt; "album_id" 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
+
+      <para>Wenn Sie zusammengesetzte Begriffe verwenden funktioniert das
+      genauso:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>"call_record".classify</command>
+ =&gt; "CallRecord" 
+ruby-1.9.2-p0 &gt; <command>"call_record".tableize</command>
+ =&gt; "call_records" 
+ruby-1.9.2-p0 &gt; <command>"call_record".foreign_key</command>
+ =&gt; "call_record_id" 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+
+      <para>Wenn Sie sich bei einer Klasse nicht sicher sind, können Sie auch
+      mit der Klasse und der Methode name arbeiten. Ich zeige Ihnen das mal
+      anhand der Klasse Person (achten Sie einmal auf den Plural
+      people):<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>Person.name.tableize</command>
+ =&gt; "people" 
+ruby-1.9.2-p0 &gt; <command>Person.name.foreign_key</command>
+ =&gt; "person_id" 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+
+      <para>Auf <uri
+      xlink:href="http://rails.rubyonrails.org/classes/ActiveSupport/CoreExtensions/String/Inflections.html">http://rails.rubyonrails.org/classes/ActiveSupport/CoreExtensions/String/Inflections.html</uri>
+      finden Sie eine komplette Liste der entsprechenden Methoden. Ich
+      empfehle Ihnen aber jetzt erst mal sich in der Strömung treiben zu
+      lassen. Falls Sie mal nicht sicher sind, können Sie mit den hier
+      gezeigten Methoden die richtige Schreibweise rausfinden.</para>
     </section>
 
     <section>
@@ -3162,7 +3215,7 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 </programlisting></para>
 
     <para>Da unsere Entwicklungsdatenbank SQLite keine Transaktionen
-    unterstützt, sehen wir nur zwei normale SQL-Befehle. </para>
+    unterstützt, sehen wir nur zwei normale SQL-Befehle.</para>
 
     <para>Jetzt werden Sie sagen "Ja, das hätte ich aber auch einfacher mit
     <methodname>update_attributes</methodname> realisieren können (siehe <xref
@@ -3186,16 +3239,16 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
       </warning></para>
   </section>
 
-  <section xml:id="activerecord_validierung">
-    <title xml:id="activerecord_validierung.title">Validierung</title>
-
-    <para>TODO</para>
-  </section>
-
   <section>
     <title>Scope</title>
 
     <para></para>
+  </section>
+
+  <section xml:id="activerecord_validierung">
+    <title xml:id="activerecord_validierung.title">Validierung</title>
+
+    <para>TODO</para>
   </section>
 
   <section xml:id="migrations">
