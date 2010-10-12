@@ -3239,10 +3239,68 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
       </warning></para>
   </section>
 
-  <section>
-    <title>Scope</title>
+  <section xml:id="activerecord_named_scope">
+    <title xml:id="activerecord_named_scope.title">Named Scopes</title>
 
-    <para></para>
+    <para>Manchmal ist es beim Programmieren von Rails Applikationen
+    übersichtlicher und einfacher häufig auftauchende Suchen als eigene
+    Methode zu definieren. Diese heißen in Rails-Sprech NamedScope.</para>
+
+    <para>Falls Sie noch die Rails-Applikation von <xref
+    linkend="activerecord_has_many" /> greifbereit haben, können Sie diese
+    benutzen. Ansonsten bauen wir sie kurz neu auf:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new phonebook</command>
+      create  
+      [...]
+stefan@swmbp 0 1.9.2-p0 ~$ <command>cd phonebook</command>
+stefan@swmbp 0 1.9.2-p0 phonebook$ <command>bundle install</command>
+Fetching source index for http://rubygems.org/
+[...]
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
+
+    <para>Jetzt legen wir die Personen Datenbank an:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails generate model person firstname:string lastname:string</command>
+      invoke  active_record
+      [...]
+      create      test/fixtures/people.yml
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+
+    <para>Und zum Schluss legen wir noch die Datenbank für die Telefonnummern
+    an:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails generate model phonenumber person_id:integer name:string number:string</command>
+      invoke  active_record
+      [...]
+      create      test/fixtures/phonenumbers.yml
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+
+    <para>Danach ein <command>rake db:migrate</command> ausführen, damit die
+    Datenbanken auch angelegt werden:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:migrate</command>
+(in /Users/stefan/phonebook)
+==  CreatePeople: migrating ===================================================
+-- create_table(:people)
+   -&gt; 0.0013s
+[...]
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+
+    <para>Füllen Sie bitte die Datei <filename>db/seeds.rb</filename> mit
+    folgendem Inhalt:<programlisting>Person.create(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier').phonenumbers.create([
+             {:name =&gt; 'Mobile', :number =&gt; '0171-12345678'}, 
+             {:name =&gt; 'Office', :number =&gt; '030-7777777'}, 
+             {:name =&gt; 'Home', :number =&gt; '030-8888888'}])
+Person.create(:firstname =&gt; 'Ute', :lastname =&gt; 'Meier').phonenumbers.create([
+             {:name =&gt; 'Home', :number =&gt; '030-8888888'}])
+Person.create(:firstname =&gt; 'Horst', :lastname =&gt; 'Apfelmus').phonenumbers.create([
+             {:name =&gt; 'Mobile', :number =&gt; '0171-1188811'}])
+Person.create(:lastname =&gt; 'Udelhoven')
+Person.create(:firstname =&gt; 'Ernst', :lastname =&gt; 'Steinwurf').phonenumbers.create([
+             {:name =&gt; 'Mobile', :number =&gt; '0172-22225678'}, 
+             {:name =&gt; 'Home', :number =&gt; '040-8888222'}])
+</programlisting></para>
+
+    <para>Jetzt die Datenbank löschen und neu mit der
+    <filename>db/seeds.rb</filename> befüllen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
+(in /Users/stefan/phonebook)
+[...]
+stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+
+    <para>Eine Transaktion wird nach folgendem Muster</para>
   </section>
 
   <section xml:id="activerecord_validierung">
