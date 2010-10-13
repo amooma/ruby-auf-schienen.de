@@ -46,7 +46,7 @@ stefan@swmbp 0 1.9.2-p0 online_shop$</screen></para>
       create      test/fixtures/users.yml
 stefan@swmbp 0 1.9.2-p0 online_shop$ </screen></para>
 
-    <para>Ein Telefonnummern-Model:<screen>stefan@swmbp 0 1.9.2-p0 online_shop$ <command>rails generate model phone name:string country_code:integer area_code:integer number:integer</command>
+    <para>Ein Telefonnummern-Model:<screen>stefan@swmbp 0 1.9.2-p0 online_shop$ <command>rails generate model phone name:string country_code:string area_code:string number:string</command>
       invoke  active_record
       create    db/migrate/20101013105612_create_phones.rb
       create    app/models/phone.rb
@@ -497,6 +497,187 @@ ruby-1.9.2-p0 &gt;</screen></para>
 
       <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
       validates_length_of</command> auf der Kommandozeile aufrufen.</para>
+    </section>
+  </section>
+
+  <section xml:id="validates_numericality_of">
+    <title
+    xml:id="validates_numericality_of.title">validates_numericality_of</title>
+
+    <para>Mit <methodname>validates_numericality_of</methodname> können Sie
+    überprüfen, ob ein Attributes eine Zahl ist. Erklärt sich am Beispiel am
+    einfachsten.</para>
+
+    <para><filename>app/models/phone.rb</filename><programlisting>class Phone &lt; ActiveRecord::Base
+  belongs_to :user
+
+  # Validations
+  validates_presence_of :country_code, :area_code, :number
+  
+  validates_length_of :country_code, :within =&gt; 1..3
+  validates_length_of :area_code, :within =&gt; 2..5
+  validates_length_of :number, :minimum =&gt; 3
+  
+<emphasis>  validates_numericality_of :country_code, 
+                            :only_integer =&gt; true, 
+                            :greater_than_or_equal_to =&gt; 1,
+                            :less_than_or_equal_to =&gt; 99
+  validates_numericality_of [:area_code, :number], :only_integer =&gt; true
+</emphasis>end
+</programlisting></para>
+
+    <para>Wenn wir jetzt die Telefonnummer die nicht aus Zahlen, sondern auch
+    aus Zeichen besteht, bekommen wir einen Fehler angezeigt:<screen>stefan@swmbp 0 1.9.2-p0 online_shop$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>home_number = Phone.create(:country_code =&gt; '+49', :area_code =&gt; '30', :number =&gt; '88888-88')</command>
+ =&gt; #&lt;Phone id: nil, name: nil, country_code: "+49", area_code: "30", number: "88888-88", created_at: nil, updated_at: nil&gt; 
+ruby-1.9.2-p0 &gt; <command>home_number.save</command>
+ =&gt; false 
+ruby-1.9.2-p0 &gt; <command>home_number.errors</command>
+ =&gt; {:number=&gt;["is not a number"]} 
+ruby-1.9.2-p0 &gt; </screen></para>
+
+    <section xml:id="validates_numericality_of_optionen">
+      <title
+      xml:id="validates_numericality_of_optionen.title">Optionen</title>
+
+      <para><methodname>validates_numericality_of</methodname> kann mit
+      folgenden Optionen aufgerufen werden:<itemizedlist>
+          <listitem>
+            <para><code>:message</code></para>
+
+            <para>Um eine eigene Fehlermeldung auszugeben. Default: "can‘t be
+            blank". Beispiel:<programlisting>validates_numericality_of :attribute, :message =&gt; 'must be a number'
+</programlisting><note>
+                <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
+                linkend="i18n" />.</para>
+              </note></para>
+          </listitem>
+
+          <listitem>
+            <para><methodname>:on</methodname></para>
+
+            <para>Um zu definieren, ob diese Validierung bei einem
+            <methodname>save</methodname>, einem
+            <methodname>create</methodname> oder einem
+            <methodname>update</methodname> durchgeführt werden soll. Der
+            Default ist <methodname>save</methodname> (also bei
+            <methodname>create</methodname> und bei
+            <methodname>update</methodname>). Beispiel:<programlisting>validates_numericality_of :attribute, :on =&gt; :create
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:only_integer</code></para>
+
+            <para>Das Attribut darf nur eine Integer Zahl enthalten. Default:
+            false. Beispiel:<programlisting>validates_numericality_of :attribute, :only_integer =&gt; true
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:allow_nil</code></para>
+
+            <para>Das Attribut darf den Wert nil haben.
+            Beispiel:<programlisting>validates_numericality_of :attribute, :allow_nil =&gt; true
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:greater_than</code></para>
+
+            <para>Die im Attribut gespeicherte Zahl muss grösser sein, als der
+            hier angegebene Wert. Beispiel:<programlisting>validates_numericality_of :attribute, :greater_than =&gt; 23
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:greater_than_or_equal_to</code></para>
+
+            <para>Die im Attribut gespeicherte Zahl muss grösser oder gleich
+            dem hier angegebene Wert sein. Beispiel:<programlisting>validates_numericality_of :attribute, :greater_than_or_equal_to =&gt; 23
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:equal_to</code></para>
+
+            <para>Definiert einen bestimmten Wert, den das Attribute haben
+            muss. Beispiel:<programlisting>validates_numericality_of :attribute, :equal_to =&gt; 23
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:less_than</code></para>
+
+            <para>Die im Attribut gespeicherte Zahl muss kleiner sein, als der
+            hier angegebene Wert. Beispiel:<programlisting>validates_numericality_of :attribute, :less_than =&gt; 23
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:less_than_or_equal_to</code></para>
+
+            <para>Die im Attribut gespeicherte Zahl muss kleiner oder gleich
+            dem hier angegebene Wert sein. Beispiel:<programlisting>validates_numericality_of :attribute, :less_than_or_equal_to =&gt; 23
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:odd</code></para>
+
+            <para>Die im Attribut gespeicherte Zahl muss ungerade sein.
+            Beispiel:<programlisting>validates_numericality_of :attribute, :odd
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:even</code></para>
+
+            <para>Die im Attribut gespeicherte Zahl muss gerade sein.
+            Beispiel:<programlisting>validates_numericality_of :attribute, :even
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:if</code></para>
+
+            <para>Definiert eine Methode, einen Proc oder einen String der
+            definiert, ob die Validierung ausgeführt werden soll.
+            Beispiel:<programlisting>validates_numericality_of :attribute, :if =&gt; Date.today.monday?
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:unless</code></para>
+
+            <para>Wie <methodname>if</methodname>, nur das hier definiert
+            wird, wann die Validierung nicht erfolgen soll.
+            Beispiel:<programlisting>validates_numericality_of :attribute, :unless =&gt; Date.today.tuesday?
+</programlisting></para>
+          </listitem>
+        </itemizedlist><note>
+          <para>Die folgenden Validationen können als Wert auch ein Proc oder
+          ein Symbol, das mit einer Methode korrespondiert enthalten:
+          <methodname>:greater_than</methodname>,
+          <methodname>:greater_than_or_equal_to</methodname>,
+          <methodname>:equal_to</methodname>,
+          <methodname>:less_than</methodname>,
+          <methodname>:less_than_or_equal_to</methodname></para>
+
+          <para>Beispiel dazu aus <command>ri
+          validates_numericality_of</command>:<programlisting>validates_numericality_of :width, :less_than =&gt; Proc.new { |person| person.height }
+</programlisting></para>
+        </note></para>
+    </section>
+
+    <section xml:id="validates_numericality_of_doku">
+      <title xml:id="validates_numericality_of_doku.title">Weitere
+      Doku</title>
+
+      <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
+      validates_numericality_of</command> auf der Kommandozeile
+      aufrufen.</para>
     </section>
   </section>
 </section>
