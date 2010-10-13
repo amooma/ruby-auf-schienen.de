@@ -9,5 +9,235 @@
          xmlns:db="http://docbook.org/ns/docbook">
   <title xml:id="activerecord_validation.title">Validierung</title>
 
-  <para>TODO</para>
+  <para>ActiveRecord stellt mit validates eine schnelle und einfache
+  Möglichkeit zur Validierung von Datensätzen zur Verfügung. So können Sie
+  sicher sein, das auch wirklich nur sinnvolle Datensätze den Weg in Ihr
+  Datenbank finden.</para>
+
+  <section xml:id="validation_vorbereitung">
+    <title
+    xml:id="activerecord_validation_vorbereitung.title">Vorbereitung</title>
+
+    <para>Erstellen wir eine neue Applikation für dieses Kapitel:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new online_shop</command>
+      create  
+      create  README
+      create  Rakefile
+
+      [...]
+
+      create  vendor/plugins
+      create  vendor/plugins/.gitkeep
+stefan@swmbp 0 1.9.2-p0 ~$ <command>cd online_shop</command>
+stefan@swmbp 0 1.9.2-p0 online_shop$ <command>bundle install</command>
+Fetching source index for http://rubygems.org/
+Using rake (0.8.7) 
+
+[...]
+
+Your bundle was installed to `/Users/stefan/.rvm/gems/ruby-1.9.2-p0`
+stefan@swmbp 0 1.9.2-p0 online_shop$</screen></para>
+
+    <para>Ein User-Model:<screen>stefan@swmbp 0 1.9.2-p0 online_shop$ <command>rails generate model user login:string password_hash:string email:string firstname:string lastname:string gender:string birthday:date</command>
+      invoke  active_record
+      create    db/migrate/20101013104942_create_users.rb
+      create    app/models/user.rb
+      invoke    test_unit
+      create      test/unit/user_test.rb
+      create      test/fixtures/users.yml
+stefan@swmbp 0 1.9.2-p0 online_shop$ </screen></para>
+
+    <para>Ein Telefonnummern-Model:<screen>stefan@swmbp 0 1.9.2-p0 online_shop$ <command>rails generate model phone name:string country_code:integer area_code:integer number:integer</command>
+      invoke  active_record
+      create    db/migrate/20101013105612_create_phones.rb
+      create    app/models/phone.rb
+      invoke    test_unit
+      create      test/unit/phone_test.rb
+      create      test/fixtures/phones.yml
+stefan@swmbp 0 1.9.2-p0 online_shop$</screen></para>
+
+    <para>Die Datenbank anlegen:<screen>stefan@swmbp 0 1.9.2-p0 online_shop$ <command>rake db:migrate</command>
+(in /Users/stefan/online_shop)
+==  CreateUsers: migrating ====================================================
+-- create_table(:users)
+   -&gt; 0.0018s
+==  CreateUsers: migrated (0.0019s) ===========================================
+
+==  CreatePhones: migrating ===================================================
+-- create_table(:phones)
+   -&gt; 0.0014s
+==  CreatePhones: migrated (0.0015s) ==========================================
+
+stefan@swmbp 0 1.9.2-p0 online_shop$</screen></para>
+
+    <para>Ein <classname>User</classname> kann mehrere Telefonnummern haben
+    (siehe <xref linkend="activerecord_has_many" />). Hier die entsprechende
+    <filename>app/models/user.rb</filename>:<programlisting>class User &lt; ActiveRecord::Base
+  has_many :phones, :dependent =&gt; :destroy
+end</programlisting></para>
+
+    <para>Und natürlich gehört ein <classname>Phone</classname> zu einem
+    <classname>User</classname>. Die entsprechende
+    <filename>app/models/phone.rb</filename>:<programlisting>class Phone &lt; ActiveRecord::Base
+  belongs_to :user
+end</programlisting></para>
+
+    <para>Brauchen wir auch Beispieldaten? Nein, die können wir auf der
+    Console eingeben.</para>
+  </section>
+
+  <section>
+    <title>Die Grundidee</title>
+
+    <para>Zu jedem Model gibt es im Verzeichnis
+    <filename>app/models/</filename> eine passende Datei. In dieser Datei
+    können wir nicht nur Datenbankabhängikeiten definieren, sondern auch
+    sämtliche Validations realisieren. Der Vorteil ist: Alles an einer Stelle.
+    Convention over Configuration!</para>
+
+    <para>Ohne jegliche Validierung können wir problemlos einen leeren
+    Datensatz in beiden Modellen anlegen:<screen>stefan@swmbp 0 1.9.2-p0 online_shop$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>test1 = User.create</command>
+ =&gt; #&lt;User id: 1, login: nil, password_hash: nil, email: nil, firstname: nil, lastname: nil, gender: nil, birthday: nil, created_at: "2010-10-13 11:17:44", updated_at: "2010-10-13 11:17:44"&gt; 
+ruby-1.9.2-p0 &gt; <command>test2 = Phone.create</command>
+ =&gt; #&lt;Phone id: 1, name: nil, country_code: nil, area_code: nil, number: nil, created_at: "2010-10-13 11:17:49", updated_at: "2010-10-13 11:17:49"&gt; 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 online_shop$</screen></para>
+
+    <para>Beide Datensätze machen aber in der Realität keinen Sinn. Ein
+    <classname>User</classname> braucht ein <varname>login</varname> und eine
+    Telefonnummer ohne Nummer ist auch sinnfrei. In zeige <xref
+    linkend="activerecord_validation" /> ich Ihnen anhand von Beispielen, wie
+    Sie für Ihre Applikation die richtigen Validations erarbeiten und sich
+    damit langfristig viel Arbeit sparen können.</para>
+
+    <para>Ich greife zur Veranschauling des Mechanismus mal <xref
+    linkend="validates_presence_of" /> vorweg. Bitte füllen Sie Ihre
+    <filename>app/model/user.rb</filename> mit folgendem
+    Inhalt:<programlisting>class User &lt; ActiveRecord::Base
+  has_many :phones, :dependent =&gt; :destroy
+  
+  # Validations
+<emphasis>  validates_presence_of :login
+</emphasis>end
+</programlisting></para>
+
+    <para>Jetzt versuchen wir noch mal in der Console einen leeren Datensatz
+    anzulegen:<screen>stefan@swmbp 0 1.9.2-p0 online_shop$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>apfelmus = User.create</command>
+ =&gt; #&lt;User id: nil, login: nil, password_hash: nil, email: nil, firstname: nil, lastname: nil, gender: nil, birthday: nil, created_at: nil, updated_at: nil&gt; 
+ruby-1.9.2-p0 &gt; <command>apfelmus</command>
+ =&gt; #&lt;User id: nil, login: nil, password_hash: nil, email: nil, firstname: nil, lastname: nil, gender: nil, birthday: nil, created_at: nil, updated_at: nil&gt; 
+ruby-1.9.2-p0 &gt; <command>apfelmus.new_record?</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt; </screen></para>
+
+    <para>Obwohl wir mit der Methode <methodname>create</methodname> (siehe
+    <xref linkend="activerecord_create" />) einen neuen Datensatz anlegen
+    wollten, ist dies nicht geschehen. Der Validierungs-Mechanismus hat vor
+    dem Abspeichern des Datensatzes eingegriffen. Es wird also erst validiert
+    und dann gespeichert.</para>
+
+    <para>Haben wir Zugriff auf die Fehler? Ja, mit der Methode
+    <methodname>errors</methodname> können wir uns die aufgetretenen Fehler
+    anschauen:<screen>ruby-1.9.2-p0 &gt; <command>apfelmus.errors</command>
+ =&gt; {:login=&gt;["can't be blank"]} 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+    <para>Diese Fehlermeldung ist für den menschlichen Benutzer definiert
+    (mehr dazu und wie die Fehler ins Deutsche übersetzt werden können in
+    <xref linkend="i18n" />). Wir können aber noch eine Ebene höher gehen und
+    uns mit der Methode <methodname>validators</methodname> alle aktiven
+    Validierungen anschauen:<screen>ruby-1.9.2-p0 &gt; <command>User.validators</command>
+ =&gt; [#&lt;ActiveModel::Validations::PresenceValidator:0x00000102b6c530 @attributes=[:login], @options={}&gt;] 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+    <para>In diesem einfachen Beispiel ist die Ausgabe noch sehr
+    übersichtlich. Aber wenn Sie komplexere Validierungen haben, können Sie
+    sich auch mit <methodname>validators_on</methodname> nur die Regeln für
+    das Attribut <varname>login</varname> anschauen:<screen>ruby-1.9.2-p0 &gt; <command>User.validators_on(:login)</command>
+ =&gt; [#&lt;ActiveModel::Validations::PresenceValidator:0x00000102b6c530 @attributes=[:login], @options={}&gt;] 
+ruby-1.9.2-p0 &gt; </screen></para>
+
+    <para>Die Ausgabe <code>ActiveModel::Validations::PresenceValidator</code>
+    zeigt an, das es sich hierbei um einen
+    <classname>PresenceValidator</classname> handelt.</para>
+
+    <para>Erst wenn wir dem Attribute <varname>login</varname> einen Wert
+    zuweisen, können wir das Objekt abspeichern:<screen>ruby-1.9.2-p0 &gt; <command>apfelmus.login = 'apfelmus'</command>
+ =&gt; "apfelmus" 
+ruby-1.9.2-p0 &gt; <command>apfelmus.save</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt; <command>apfelmus</command>
+ =&gt; #&lt;User id: 2, login: "apfelmus", password_hash: nil, email: nil, firstname: nil, lastname: nil, gender: nil, birthday: nil, created_at: "2010-10-13 12:23:16", updated_at: "2010-10-13 12:23:16"&gt; 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+    <section xml:id="validation_valid">
+      <title xml:id="validation_valid.title">valid?</title>
+
+      <para>Die Methode <methodname>valid?</methodname> gibt als Boolean aus,
+      ob ein Objekt valide ist. So kann man schon vor dem eigentlichem
+      Abspeichern eine entsprechende Kontrolle machen:<screen>ruby-1.9.2-p0 &gt; <command>pflaumenmus = User.new</command>
+ =&gt; #&lt;User id: nil, login: nil, password_hash: nil, email: nil, firstname: nil, lastname: nil, gender: nil, birthday: nil, created_at: nil, updated_at: nil&gt; 
+ruby-1.9.2-p0 &gt; <command>pflaumenmus.valid?</command>
+ =&gt; false 
+ruby-1.9.2-p0 &gt; <command>pflaumenmus.login = 'pflaumenmus'</command>
+ =&gt; "pflaumenmus" 
+ruby-1.9.2-p0 &gt; <command>pflaumenmus.valid?</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt;</screen></para>
+    </section>
+
+    <section xml:id="validation_safe_validate_false">
+      <title xml:id="validation_safe_validate_false.title">safe(:validate
+      =&gt; false)</title>
+
+      <para>Wie so oft im Leben kann man auch hier alles umgehen. Wenn man der
+      <methodname>safe</methodname> Methode als Parameter <code>:validate
+      =&gt; false</code> mitgibt, dann wird der Datensatz von Validation
+      abgespeichert:<screen>ruby-1.9.2-p0 &gt; <command>egon = User.new</command>
+ =&gt; #&lt;User id: nil, login: nil, password_hash: nil, email: nil, firstname: nil, lastname: nil, gender: nil, birthday: nil, created_at: nil, updated_at: nil&gt; 
+ruby-1.9.2-p0 &gt; <command>egon.save</command>
+ =&gt; false 
+ruby-1.9.2-p0 &gt; <command>egon.valid?</command>
+ =&gt; false 
+ruby-1.9.2-p0 &gt; <command>egon.save(:validate =&gt; false)</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt; <command>egon</command>
+ =&gt; #&lt;User id: 3, login: nil, password_hash: nil, email: nil, firstname: nil, lastname: nil, gender: nil, birthday: nil, created_at: "2010-10-13 12:32:33", updated_at: "2010-10-13 12:32:33"&gt; 
+ruby-1.9.2-p0 &gt; </screen></para>
+
+      <warning>
+        <para>Ich gehe davon aus, das Sie die hier auftauchende Problematik
+        verstehen. Diese Möglichkeit bitte nur einsetzen, wenn es einen guten
+        Grund gibt. Sonst könnte man sich die ganze Validierung ja auch direkt
+        ganz sparen.</para>
+      </warning>
+    </section>
+  </section>
+
+  <section xml:id="validates_presence_of">
+    <title xml:id="validates_presence_of.title">validates_presence_of</title>
+
+    <para>In unseren beiden Modellen <varname>users</varname> und
+    <varname>phones</varname> gibt es ein paar Felder die auf jeden Fall
+    ausgefüllt werden müssen. Das erreichen wir mit
+    validates_presence_of.</para>
+
+    <para><filename>app/models/user.rb</filename><programlisting>class User &lt; ActiveRecord::Base
+  has_many :phones, :dependent =&gt; :destroy
+  
+  # Validations
+<emphasis>  validates_presence_of :login, :email, :lastname, :gender, :birthday
+</emphasis>end
+</programlisting></para>
+
+    <para><filename>app/models/phone.rb</filename><programlisting>class Phone &lt; ActiveRecord::Base
+  belongs_to :user
+
+  # Validations
+<emphasis>  validates_presence_of :country_code, :area_code, :number
+</emphasis>end</programlisting></para>
+  </section>
 </section>
