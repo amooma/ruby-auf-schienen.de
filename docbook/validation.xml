@@ -223,7 +223,7 @@ ruby-1.9.2-p0 &gt; </screen></para>
     <para>In unseren beiden Modellen <varname>users</varname> und
     <varname>phones</varname> gibt es ein paar Felder die auf jeden Fall
     ausgefüllt werden müssen. Das erreichen wir mit
-    validates_presence_of.</para>
+    <methodname>validates_presence_of</methodname>.</para>
 
     <para><filename>app/models/user.rb</filename><programlisting>class User &lt; ActiveRecord::Base
   has_many :phones, :dependent =&gt; :destroy
@@ -239,5 +239,264 @@ ruby-1.9.2-p0 &gt; </screen></para>
   # Validations
 <emphasis>  validates_presence_of :country_code, :area_code, :number
 </emphasis>end</programlisting></para>
+
+    <para>Wenn wir damit einen leeren User Datensatz anlegen wollen, bekommen
+    wir massig Validierungsfehler:<screen>stefan@swmbp 0 1.9.2-p0 online_shop$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+ruby-1.9.2-p0 &gt; <command>egon = User.create</command>
+ =&gt; #&lt;User id: nil, login: nil, password_hash: nil, email: nil, firstname: nil, lastname: nil, gender: nil, birthday: nil, created_at: nil, updated_at: nil&gt; 
+ruby-1.9.2-p0 &gt; <command>egon.errors</command>
+ =&gt; {:login=&gt;["can't be blank"], :email=&gt;["can't be blank"], :lastname=&gt;["can't be blank"], :gender=&gt;["can't be blank"], :birthday=&gt;["can't be blank"]} 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+    <para>Erst wenn wir alle Angaben gemacht haben, kann der Datensatz
+    gespeichert werden:<screen>ruby-1.9.2-p0 &gt; <command>egon.login = 'egon'</command>
+ =&gt; "egon" 
+ruby-1.9.2-p0 &gt; <command>egon.email = 'egon@company.com'</command>
+ =&gt; "egon@company.com" 
+ruby-1.9.2-p0 &gt; <command>egon.lastname = 'Meier'</command>
+ =&gt; "Meier" 
+ruby-1.9.2-p0 &gt; <command>egon.gender = 'male'</command>
+ =&gt; "male" 
+ruby-1.9.2-p0 &gt; <command>egon.birthday = Date.today - 20.years</command>
+ =&gt; Sat, 13 Oct 1990 
+ruby-1.9.2-p0 &gt; <command>egon.save</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt; <command>egon</command>
+ =&gt; #&lt;User id: 4, login: "egon", password_hash: nil, email: "egon@company.com", firstname: nil, lastname: "Meier", gender: "male", birthday: "1990-10-13", created_at: "2010-10-13 20:02:18", updated_at: "2010-10-13 20:02:18"&gt; 
+ruby-1.9.2-p0 &gt; </screen></para>
+
+    <section xml:id="validates_presence_of_optionen">
+      <title xml:id="validates_presence_of_optionen.title">Optionen</title>
+
+      <para><methodname>validates_presence_of</methodname> kann mit folgenden
+      Optionen aufgerufen werden:<itemizedlist>
+          <listitem>
+            <para><code>:message</code></para>
+
+            <para>Um eine eigene Fehlermeldung auszugeben. Default: "can‘t be
+            blank". Beispiel:</para>
+
+            <para><programlisting>validates_presence_of :attribute, :message =&gt; "can't be blank" </programlisting><note>
+                <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
+                linkend="i18n" />.</para>
+              </note></para>
+          </listitem>
+
+          <listitem>
+            <para><methodname>:on</methodname></para>
+
+            <para>Um zu definieren, ob diese Validierung bei einem
+            <methodname>save</methodname>, einem
+            <methodname>create</methodname> oder einem
+            <methodname>update</methodname> durchgeführt werden soll. Der
+            Default ist <methodname>save</methodname> (also bei
+            <methodname>create</methodname> und bei
+            <methodname>update</methodname>). Beispiel:<programlisting>validates_presence_of :attribute, :on =&gt; :create
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:if</code></para>
+
+            <para>Definiert eine Methode, einen Proc oder einen String der
+            definiert, ob die Validierung ausgeführt werden soll.
+            Beispiel:<programlisting>validates_presence_of :attribute, :if =&gt; Date.today.monday?
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:unless</code></para>
+
+            <para>Wie <methodname>if</methodname>, nur das hier definiert
+            wird, wann die Validierung nicht erfolgen soll.
+            Beispiel:<programlisting>validates_presence_of :attribute, :unless =&gt; Date.today.tuesday?
+</programlisting></para>
+          </listitem>
+        </itemizedlist></para>
+    </section>
+
+    <section xml:id="validates_presence_of_doku">
+      <title xml:id="validates_presence_of_doku.title">Weitere Doku</title>
+
+      <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
+      validates_presence_of</command> auf der Kommandozeile aufrufen.</para>
+    </section>
+  </section>
+
+  <section xml:id="validates_length_of">
+    <title xml:id="validates_length_of.title">validates_length_of</title>
+
+    <para>Mit <methodname>validates_length_of</methodname> können Sie die
+    Länge eines bestimmten Attributes eingrenzen. Erklärt sich am Beispiel am
+    einfachsten.</para>
+
+    <para><filename>app/models/user.rb</filename><programlisting>class User &lt; ActiveRecord::Base
+  has_many :phones, :dependent =&gt; :destroy
+  
+  # Validations
+  validates_presence_of :login, :email, :lastname, :gender, :birthday
+  
+<emphasis>  validates_length_of :login, :within =&gt; 3..20
+  validates_length_of :email, :within =&gt; 6..255
+  validates_length_of :lastname, :minimum =&gt; 2
+</emphasis>end
+</programlisting></para>
+
+    <para><filename>app/models/phone.rb</filename><programlisting>class Phone &lt; ActiveRecord::Base
+  belongs_to :user
+
+  # Validations
+  validates_presence_of :country_code, :area_code, :number
+  
+<emphasis>  validates_length_of :country_code, :within =&gt; 1..3
+  validates_length_of :area_code, :within =&gt; 2..5
+  validates_length_of :number, :minimum =&gt; 3
+</emphasis>end</programlisting></para>
+
+    <para>Wenn wir jetzt einen <classname>User</classname> mit einem
+    <methodname>login</methodname> aus einem oder zwei Buchstaben abspeichern
+    wollen, dann bekommen wir einen Fehler aufgezeigt:<screen>ruby-1.9.2-p0 &gt; <command>ed = User.create(:login =&gt; 'ed', :email =&gt; 'ed@company.com', :lastname =&gt; 'Steinbruch', :gender =&gt; 'male', :birthday =&gt; Date.today - 23.years)</command>
+ =&gt; #&lt;User id: nil, login: "ed", password_hash: nil, email: "ed@company.com", firstname: nil, lastname: "Steinbruch", gender: "male", birthday: "1987-10-13", created_at: nil, updated_at: nil&gt; 
+ruby-1.9.2-p0 &gt; <command>ed.errors</command>
+ =&gt; {:login=&gt;["is too short (minimum is 3 characters)"]} 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+    <section xml:id="validates_length_of_optionen">
+      <title xml:id="validates_presence_of_optionen.title">Optionen</title>
+
+      <para><methodname>validates_length_of</methodname> kann mit folgenden
+      Optionen aufgerufen werden:<itemizedlist>
+          <listitem>
+            <para><code>:minimum</code></para>
+
+            <para>Die minimale Länge eines Attributes. Beispiel:</para>
+
+            <para><programlisting>validates_length_of :attribute, :minimum =&gt; 3</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><methodname>:maximum</methodname></para>
+
+            <para>Die maximale Länge eines Attributes.
+            Beispiel:<programlisting>validates_length_of :attribute, :maximum =&gt; 255
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:is</code></para>
+
+            <para>Ist genau so viele Zeichen lang. Beispiel:<programlisting>validates_length_of :attribute, :is =&gt; 23
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:within</code></para>
+
+            <para>Definiert einen Längenraum. Als erstes kommt das Minimum und
+            als zweites das Maximum. Beispiel:<programlisting>validates_length_of :attribute, :within =&gt; 6..255
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:allow_nil</code></para>
+
+            <para>Das Attribut darf den Wert nil haben.
+            Beispiel:<programlisting>validates_length_of :attribute, :allow_nil =&gt; true
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:allow_blank</code></para>
+
+            <para>Das Attribut darf ganz leer sein. Beispiel:<programlisting>validates_length_of :attribute, :is =&gt; 23
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:too_long</code></para>
+
+            <para>Definiert die Fehlermeldung von
+            <methodname>:maximum</methodname>. Default: "is too long (maximum
+            is %d characters)". Beispiel:<programlisting>validates_length_of :attribute, :too_long =&gt; 'way too many characters'
+</programlisting><note>
+                <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
+                linkend="i18n" />.</para>
+              </note></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:too_short</code></para>
+
+            <para>Definiert die Fehlermeldung von
+            <methodname>:minimum</methodname>. Default: "is too short (min is
+            %d characters)". Beispiel:<programlisting>validates_length_of :attribute, :too_short =&gt; 'just not enough characters'
+</programlisting><note>
+                <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
+                linkend="i18n" />.</para>
+              </note></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:wrong_length</code></para>
+
+            <para>Definiert die Fehlermeldung von
+            <methodname>:is</methodname>. Default: "is the wrong length
+            (should be %d characters)". Beispiel:<programlisting>validates_length_of :attribute, :wrong_length =&gt; 'not the right number of characters'
+</programlisting><note>
+                <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
+                linkend="i18n" />.</para>
+              </note></para>
+          </listitem>
+
+          <listitem>
+            <para><methodname>:on</methodname></para>
+
+            <para>Um zu definieren, ob diese Validierung bei einem
+            <methodname>save</methodname>, einem
+            <methodname>create</methodname> oder einem
+            <methodname>update</methodname> durchgeführt werden soll. Der
+            Default ist <methodname>save</methodname> (also bei
+            <methodname>create</methodname> und bei
+            <methodname>update</methodname>). Beispiel:<programlisting>validates_length_of :attribute, :on =&gt; :create
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:if</code></para>
+
+            <para>Definiert eine Methode, einen Proc oder einen String der
+            definiert, ob die Validierung ausgeführt werden soll.
+            Beispiel:<programlisting>validates_length_of :attribute, :if =&gt; Date.today.monday?
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:unless</code></para>
+
+            <para>Wie <methodname>if</methodname>, nur das hier definiert
+            wird, wann die Validierung nicht erfolgen soll.
+            Beispiel:<programlisting>validates_length_of :attribute, :unless =&gt; Date.today.tuesday?
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:tokenizer</code></para>
+
+            <para>Damit kann definiert werden wie das Attribut zum Zählen
+            gesplittet werden soll. Default: Default: <code>lambda{ |value|
+            value.split(//) }</code> (damit werden einzelne Zeichen gezählt).
+            Beispiel (zum Zählen von Wörtern):<programlisting>validates_length_of :attribute, :tokenizer =&gt; lambda {|str| str.scan(/\w+/)}
+</programlisting></para>
+          </listitem>
+        </itemizedlist></para>
+    </section>
+
+    <section xml:id="validates_presence_of_doku">
+      <title xml:id="validates_length_of_doku.title">Weitere Doku</title>
+
+      <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
+      validates_length_of</command> auf der Kommandozeile aufrufen.</para>
+    </section>
   </section>
 </section>
