@@ -771,14 +771,16 @@ Examples
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album</command>
  =&gt; Album(id: integer, position: integer, name: string, release_year: integer, created_at: datetime, updated_at: datetime) 
-ruby-1.9.2-p0 &gt; <command>Album.create(:position =&gt; 1, :name =&gt; "Sgt. Pepper's Lonely Hearts Club Band", :release_year =&gt; 1967)</command>
+ruby-1.9.2-p0 &gt; <command>Album.create( :position =&gt; 1, :name =&gt; "Sgt. Pepper's Lonely Hearts Club Band", :release_year =&gt; 1967 )</command>
  =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt; 
-ruby-1.9.2-p0 &gt; <command>Album.create(:position =&gt; 2, :name =&gt; "Pet Sounds", :release_year =&gt; 1966)</command>
+ruby-1.9.2-p0 &gt; <command>Album.create( :position =&gt; 2, :name =&gt; "Pet Sounds", :release_year =&gt; 1966 )</command>
  =&gt; #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt; 
-ruby-1.9.2-p0 &gt; <command>Album.create(:position =&gt; 3, :name =&gt; "Revolver", :release_year =&gt; 1966)</command>
+ruby-1.9.2-p0 &gt; <command>Album.create( :position =&gt; 3, :name =&gt; "Revolver", :release_year =&gt; 1966 )</command>
  =&gt; #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt; 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen><remark>FIXME: Evtl. ein anderes
+      Beispiel als "Sgt. Pepper's Lonely Hearts Club Band" finden? Führt in
+      allen weiteren Beispielen zu sehr langen Zeilen.</remark></para>
 
       <para>Sieht ja ganz gut aus, aber sind die Daten auch wirklich
       gespeichert worden? Schauen wir sicherheitshalber mal mit dem
@@ -858,7 +860,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       <methodname>create</methodname> auch direkt Parameter für den neuen
       Datensatz übergeben. Hier das obige Beispiel in einer Zeile:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
-ruby-1.9.2-p0 &gt; <command>highway61 = Album.new(:position =&gt; 4, :name =&gt; 'Highway 61 Revisited', :release_year =&gt; 1965)</command>
+ruby-1.9.2-p0 &gt; <command>highway61 = Album.new( :position =&gt; 4, :name =&gt; 'Highway 61 Revisited', :release_year =&gt; 1965 )</command>
  =&gt; #&lt;Album id: nil, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: nil, updated_at: nil&gt; 
 ruby-1.9.2-p0 &gt; <command>highway61.save</command>
  =&gt; true 
@@ -884,7 +886,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       <methodname>new_record?</methodname> <literal>true</literal>. Nach einem
       <methodname>save</methodname> ist es <literal>false</literal>.</para>
 
-      <para>Gehen wir noch mal das Beispiel von <xref
+      <para>Gehen wir nochmal das Beispiel von <xref
       linkend="activerecord_new" /> durch, um dies zu zeigen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>highway61 = Album.new(:position =&gt; 4, :name =&gt; 'Highway 61 Revisited', :release_year =&gt; 1965)</command>
@@ -932,8 +934,11 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen><tip>
     </indexterm>
 
     <para>In dem ein oder anderen Fall braucht man ja immer mal den ersten
-    oder den letzten oder auch alle Datensätze. Wahrscheinlich deshalb gibt es
-    für alle drei Fälle eine fertige Methode. Fangen wir mit den einfachsten
+    oder den letzten oder auch alle Datensätze.<remark>FIXME: Da first() und
+    last() anscheinend nach der ID (Primärschlüssel ohne weitere Bedeutung)
+    sortieren sind die Anwändungsfälle dafür doch eher sehr beschränkt oder?
+    Braucht man recht selten.</remark> Wahrscheinlich deshalb gibt es für alle
+    drei Fälle eine fertige Methode. Fangen wir mit den einfachsten
     <methodname>first</methodname> und <methodname>last</methodname>
     an:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
@@ -946,8 +951,11 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Ein kurzer Blick in <filename>log/development.log</filename> zeigt
     uns wie ActiveRecord das gemacht hat:<programlisting>  Album Load (0.4ms)  SELECT "albums".* FROM "albums" LIMIT 1
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY albums.id DESC LIMIT 1
-</programlisting></para>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY albums.id DESC LIMIT 1</programlisting><remark>FIXME:
+    Werden für MySQL hier die gleichen Queries ausgeführt? Ansonsten wäre
+    nämlich in dem ersten Query das Problem daß ohne ORDER BY id ASC LIMIT 1
+    keine spezielle Sortierung gewährt ist. Funktioniert meistens aber nicht
+    immer.</remark></para>
 
     <para>Und jetzt mal alle auf einemal mit
     <methodname>all</methodname>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
@@ -955,15 +963,19 @@ Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.all</command>
  =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen><remark>FIXME: Gibt's eine
+    Möglichkeit mit p oder pp oder so die Ausgabe von Album.all schöner
+    auszugeben? Ist sonst sehr unübersichtlich.</remark></para>
 
-    <para>Der dazu gehörige SQL-Code ist nicht überraschen:<programlisting>  Album Load (0.2ms)  SELECT "albums".* FROM "albums"</programlisting></para>
+    <para>Der dazu gehörige SQL-Code ist nicht überraschend:<programlisting>  Album Load (0.2ms)  SELECT "albums".* FROM "albums"</programlisting></para>
 
     <para>Die von <methodname>first</methodname>,
     <methodname>last</methodname> und <methodname>all</methodname> erzeugten
     Objekte sind aber unterschiedlich. Bei <methodname>first</methodname> und
-    <methodname>all</methodname> wird ein <classname>Album</classname>
-    ausgegeben und bei <methodname>all</methodname> ein Array:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+    <methodname>all</methodname> wird ein Objekt der Klasse
+    <classname>Album</classname> ausgegeben und bei
+    <methodname>all</methodname> natürlich ein <literal>Array</literal>
+    solcher Objekte:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.first</command>
  =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt; 
@@ -979,7 +991,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <para>Wenn <methodname>Album.all</methodname> ein Array zurückgibt, dann
     müsste man doch auch Iteratoren (siehe <xref linkend="iterator" /> und
     <xref linkend="array_iterator" />) benutzen können, oder? Ja, natürlich!
-    Das ist ja das schöne daran. Kleiner Versuch mit
+    Das ist ja das Schöne daran. Kleiner Versuch mit
     <methodname>each</methodname>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.all.each do |album|</command>
@@ -993,9 +1005,9 @@ Highway 61 Revisited
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
-    <para>Kann man dann auch <methodname>Album.all.first</methodname> als
-    Alternative zu <methodname>first</methodname> benutzen? Ja, aber es macht
-    keinen Sinn. Schauen wir mal:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+    <para>Kann man dann auch <code>.all.first</code> als Alternative zu
+    <code>.first</code> benutzen? Ja, aber es macht keinen Sinn. Schauen wir
+    mal:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.first</command>
  =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt; 
@@ -1004,14 +1016,14 @@ ruby-1.9.2-p0 &gt; <command>Album.all.first</command>
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
-    <para>Sicherlich, das Ergebnis ist das gleiche, aber werfen wir mal einen
+    <para>Sicher, das Ergebnis ist das gleiche, aber werfen wir mal einen
     Blick ins <filename>log/development.log</filename>:<programlisting>  Album Load (0.1ms)  SELECT "albums".* FROM "albums" LIMIT 1
   Album Load (0.3ms)  SELECT "albums".* FROM "albums"</programlisting></para>
 
     <para>Selbst bei unserer Mini-Datenbank sehen wir schon einen
-    Geschwindigkeitsunterschied. Bei der Methode first wird ein <code>SELECT
-    *</code> mit einem <code>LIMIT 1</code> abgerufen (erste Zeile). Beim
-    <methodname>Album.all.first</methodname> wird ein die ganze Tabelle mit
+    Geschwindigkeitsunterschied. Bei <code>Album.first</code> wird ein
+    <code>SELECT *</code> mit einem <code>LIMIT 1</code> abgerufen (erste
+    Zeile). Bei <code>Album.all.first</code> wird erst die ganze Tabelle mit
     <code>SELECT *</code> eingelesen und dann innerhalb von Ruby das erste
     Element dieses Arrays rausgezogen. Bei dieser kleinen Applikation kann man
     sich das noch leisten, aber stellen Sie sich mal vor, es würde sich um
@@ -1041,8 +1053,8 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <para>Um die in <xref linkend="activerecord_create" /> erstellten
     Datensätze in einer neuen Rails-Applikation zur Verfügung zu stellen,
     müssen Sie so nicht manuel mit <command>rails console</command> alles
-    eingeben, sondern es reicht die folgende <filename>db/seeds.rb</filename>
-    Datei:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
+    eingeben, sondern es reicht die folgende Datei
+    <filename>db/seeds.rb</filename>:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
 #
 # Examples:
@@ -1050,16 +1062,20 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 #   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
 #   Mayor.create(:name =&gt; 'Daley', :city =&gt; cities.first)
 
-Album.create("name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "position"=&gt;1, "release_year"=&gt;1967)
-Album.create("name"=&gt;"Pet Sounds", "position"=&gt;2, "release_year"=&gt;1966)
-Album.create("name"=&gt;"Revolver", "position"=&gt;3, "release_year"=&gt;1966)
-Album.create("name"=&gt;"Highway 61 Revisited", "position"=&gt;4, "release_year"=&gt;1965)</programlisting></para>
+Album.create( "name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "position"=&gt;1, "release_year"=&gt;1967 )
+Album.create( "name"=&gt;"Pet Sounds", "position"=&gt;2, "release_year"=&gt;1966 )
+Album.create( "name"=&gt;"Revolver", "position"=&gt;3, "release_year"=&gt;1966 )
+Album.create( "name"=&gt;"Highway 61 Revisited", "position"=&gt;4, "release_year"=&gt;1965 )</programlisting><remark>FIXME:
+    Warum werden hier (anders als in dem Beispiel weiter oben) die Keys als
+    Strings statt als Symbols angegeben? Wir vermutlich beides gehen, aber
+    vielleicht wäre eine kurze Erklärung dazu gut a la "Sehen Sie: Geht
+    beides." (falls in der seeds.rb Symbols funktionieren).</remark></para>
 
-    <para>Das einspielen der Daten erfolgt dann mit <command>rake
+    <para>Das Einspielen der Daten erfolgt dann mit <command>rake
     db:seed</command>. Um ganz sicher zu sein, sollten Sie im Rahmen dieses
     Buches immer mit <command>rake db:setup</command> die Datenbank neu
-    aufsetzen und dann automatisch mit der seeds.rb füttern. Das sieht dann so
-    aus:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake db:setup</command>
+    aufsetzen und dann automatisch mit der <filename>seeds.rb</filename>
+    füttern. Das sieht dann so aus:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake db:setup</command>
 (in /Users/stefan/jukebox)
 db/test.sqlite3 already exists
 db/test.sqlite3 already exists
@@ -1071,11 +1087,11 @@ db/development.sqlite3 already exists
    -&gt; 0.0005s
 -- assume_migrated_upto_version(20101004085045, "db/migrate")
    -&gt; 0.0004s
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen>Die <filename>db/seeds.rb</filename>
-    Datei bringe ich an dieser Stelle ein, weil sie einen einfachen
-    Mechanismus bietet eine leere Datenbank mit Default-Werten zu fühlen. Das
-    erleichtert uns im weiteren Verlauf des Buches das schnelle Setup von
-    Beispiel-Szenarien.</para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen>Die Datei
+    <filename>db/seeds.rb</filename> bringe ich an dieser Stelle ein, weil sie
+    einen einfachen Mechanismus bietet eine leere Datenbank mit Default-Werten
+    zu fühlen. Das erleichtert uns im weiteren Verlauf des Buches das schnelle
+    Setup von Beispiel-Szenarien.</para>
 
     <section>
       <title>Alternative Programmierung</title>
@@ -1084,7 +1100,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen>Die <filename>db/seeds.rb</filename>
         <primary>seeds.rb</primary>
       </indexterm>
 
-      <para>Die <filename>seeds.rb</filename> ist ein Ruby Programm.
+      <para>Die <filename>seeds.rb</filename> ist ein Ruby-Programm.
       Entsprechend können wir alternativ auch folgenen Weg
       gehen:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
@@ -1101,12 +1117,12 @@ album_list = [["Sgt. Pepper's Lonely Hearts Club Band", 1967],
 
 position = 1
 album_list.each do |album|
-  Album.create(:name =&gt; album[0], :release_year =&gt; album[1], :position =&gt; position )
+  Album.create( :name =&gt; album[0], :release_year =&gt; album[1], :position =&gt; position )
   position = position + 1
 end</programlisting></para>
 
       <para>Das Ergebnis ist das gleiche. Ich zeige Ihnen dieses Beispiel
-      hier, um noch mal klar rauszuarbeiten, das Sie innerhalb der
+      hier, um noch mal klar rauszuarbeiten, dass Sie innerhalb der
       <filename>seeds.rb</filename> ganz normal programmieren können.</para>
     </section>
 
@@ -1120,9 +1136,9 @@ end</programlisting></para>
       <para>Manchmal ist es praktisch den aktuellen Datenbestand einer
       Rails-Applikation in eine <filename>seeds.rb</filename> zu exportieren.
       Beim Schreiben dieses Buches hatte ich dieses Problem fast in jedem
-      Kapitel. Es gibt dafür leider keinen Standard-Weg. Ich zeige Ihnen man
-      es in diesem Fall machen kann. Komplexere Szenarien lassen sich daraus
-      ableiten.</para>
+      Kapitel. Es gibt dafür leider keinen Standard-Weg. Ich zeige Ihnen wie
+      man es in diesem Fall machen kann. Komplexere Szenarien lassen sich
+      daraus ableiten.</para>
 
       <para>Füllen Sie die Datei <filename>lib/tasks/apfelmus.rake</filename>
       mit folgendem Inhalt:<programlisting>namespace :album do
@@ -1134,20 +1150,24 @@ end</programlisting></para>
   end
 end</programlisting></para>
 
-      <para>Danach können Sie mit <command>rake album:seed_format</command>
-      den entsprechenden <literal>rake</literal>-<quote><foreignphrase
+      <para>Danach können Sie mit dem Befehl <command>rake
+      album:seed_format</command> den entsprechenden
+      <literal>rake</literal>-<quote><foreignphrase
       xml:lang="en">Task</foreignphrase></quote> abrufen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake album:seed_format</command>
 (in /Users/stefan/jukebox)
 Album.create("name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "position"=&gt;1, "release_year"=&gt;1967)
 Album.create("name"=&gt;"Pet Sounds", "position"=&gt;2, "release_year"=&gt;1966)
 Album.create("name"=&gt;"Revolver", "position"=&gt;3, "release_year"=&gt;1966)
 Album.create("name"=&gt;"Highway 61 Revisited", "position"=&gt;4, "release_year"=&gt;1965)
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen><remark>FIXME: Hier sind wie weiter
+      oben die Keys auch als Strings statt als Symbols
+      angegeben.</remark></para>
 
-      <para>Entweder können Sie dieses Programm so erweitern, das die Ausgabe
+      <para>Entweder können Sie dieses Programm so erweitern, dass die Ausgabe
       direkt in die <filename>seeds.rb</filename> geschrieben wird oder Sie
       benutzen einfach die Shell:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake album:seed_format &gt;&gt; db/seeds.rb</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen><remark>FIXME: Warum mit &gt;&gt;
+      anhängen statt mit &gt; ersetzen?</remark></para>
     </section>
   </section>
 
@@ -1168,7 +1188,9 @@ Album.create("name"=&gt;"What's Going On", "position"=&gt;6, "release_year"=&gt;
 Album.create("name"=&gt;"Exile on Main St.", "position"=&gt;7, "release_year"=&gt;1972)
 Album.create("name"=&gt;"London Calling", "position"=&gt;8, "release_year"=&gt;1979)
 Album.create("name"=&gt;"Blonde on Blonde", "position"=&gt;9, "release_year"=&gt;1966)
-Album.create("name"=&gt;"The Beatles", "position"=&gt;10, "release_year"=&gt;1968)</programlisting></para>
+Album.create("name"=&gt;"The Beatles", "position"=&gt;10, "release_year"=&gt;1968)</programlisting><remark>FIXME:
+    Hier sind wie weiter oben die Keys auch als Strings statt als Symbols
+    angegeben.</remark></para>
 
     <para>Danach die Datenbank mit <command>rake db:setup</command> neu
     aufsetzen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake db:setup</command>
@@ -1204,17 +1226,18 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
         <tertiary>where()</tertiary>
       </indexterm>
 
-      <para>Jahrelang war die <methodname>find</methodname> Methode die erste
+      <para>Jahrelang war die Methode <methodname>find</methodname> die erste
       Wahl für Datenbankabfragen in Rails. Mit Rails 3.0 wurde
-      <methodname>where</methodname> und Lazy Loading (siehe <xref
-      linkend="lazy_loading" />) eingeführt. Die <methodname>find</methodname>
-      Methode gibt es weiterhin und es wird sie wahrscheinlich aus
-      historischen Gründen auch noch eine ganze Zeit geben. Meiner Meinung
-      nach macht die Benutzung von <methodname>find</methodname> keinen Sinn,
-      wenn ich die gleiche Abfrage auch performanter mit
-      <methodname>where</methodname> realisieren kann. Deshalb werde ich auf
-      <methodname>find</methodname> in diesem Buch nicht intensiv eingehen und
-      nur die Suche nach einer Datenbank-ID und
+      <methodname>where</methodname> und <quote><foreignphrase
+      xml:lang="en">Lazy Loading</foreignphrase></quote> (siehe <xref
+      linkend="lazy_loading" />) eingeführt. Die Methode
+      <methodname>find</methodname> gibt es weiterhin und es wird sie
+      wahrscheinlich aus historischen Gründen auch noch eine ganze Zeit geben.
+      Meiner Meinung nach macht die Benutzung von
+      <methodname>find</methodname> keinen Sinn, wenn ich die gleiche Abfrage
+      auch performanter mit <methodname>where</methodname> realisieren kann.
+      Deshalb werde ich auf <methodname>find</methodname> in diesem Buch nicht
+      intensiv eingehen und nur die Suche nach einer Datenbank-ID und
       <methodname>find_by_<replaceable>*</replaceable></methodname>
       vorstellen. Alle Freunde von <methodname>find</methodname> verweise ich
       auf <command>ri ActiveRecord::FinderMethods.find</command> und auf <xref
