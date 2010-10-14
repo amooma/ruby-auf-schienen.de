@@ -135,11 +135,37 @@
   </section>
 
   <section xml:id="activerecord_datenbank_anlegen">
-    <title xml:id="activerecord_datenbank_anlegen.title">Datenbank/Model
+    <title
+    xml:id="activerecord_datenbank_anlegen.title">Datenbank/<quote>Model</quote>
     anlegen</title>
 
+    <indexterm>
+      <primary>Datenbank</primary>
+    </indexterm>
+
+    <indexterm>
+      <primary>Model</primary>
+    </indexterm>
+
+    <note>
+      <indexterm>
+        <primary>Model&#8211;View&#8211;Controller</primary>
+
+        <see>MVC</see>
+      </indexterm>
+
+      <indexterm>
+        <primary>MVC</primary>
+      </indexterm>
+
+      <para><foreignphrase xml:lang="en">Model</foreignphrase> bezieht sich
+      hier auf das Daten-Modell aus <foreignphrase
+      xml:lang="en">Model&#8211;View&#8211;Controller</foreignphrase>
+      (<acronym>MVC</acronym>).</para>
+    </note>
+
     <para>Auch wenn ich mich nicht für Musik interessiere, so sind Musikalben
-    für ein Datenbankbeispiel sehr gut geeignet. Die benutzen Daten entnehme
+    für ein Datenbank-Beispiel sehr gut geeignet. Die benutzen Daten entnehme
     ich dabei der Wikipedia-Seite <uri
     xlink:href="http://en.wikipedia.org/wiki/The_500_Greatest_Albums_of_All_Time">http://en.wikipedia.org/wiki/The_500_Greatest_Albums_of_All_Time</uri>.</para>
 
@@ -147,15 +173,16 @@
       create  
       create  README
       create  Rakefile
-      [...]
+      <replaceable>[...]</replaceable>
       create  vendor/plugins
       create  vendor/plugins/.gitkeep
+
 stefan@swmbp 0 1.9.2-p0 ~$ <command>cd jukebox</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$ <command>bundle install</command>
 Fetching source index for http://rubygems.org/
 Using rake (0.8.7) 
 Using abstract (1.0.0) 
-[...]
+<replaceable>[...]</replaceable>
 Your bundle was installed to `/Users/stefan/.rvm/gems/ruby-1.9.2-p0`
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
@@ -190,26 +217,56 @@ Runtime options:
 
 Description:
     Create rails files for model generator.
+
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
-    <para>Das kling alles halbwegs logisch. Leben wir also das Model
-    <classname>album</classname> an:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails generate model album position:integer name:string release_year:integer</command>
+    <remark>FIXME: Wo bekommt man eine Liste der in ActiveRecord erlaubten
+    types (integer, string, ...)? Geht z.B. statt integer auch int als
+    Abkürzung?</remark>
+
+    <para>Das klingt alles halbwegs logisch. Legen wir also das <foreignphrase
+    xml:lang="en">Model</foreignphrase> <literal>album</literal> an:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails generate model album position:integer name:string release_year:integer</command>
       invoke  active_record
       create    db/migrate/20100902194019_create_albums.rb
       create    app/models/album.rb
       invoke    test_unit
       create      test/unit/album_test.rb
       create      test/fixtures/albums.yml
+
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
-    <para>Rails hat ein Datenbank-Migrations-File mit dem Namen
+    <indexterm>
+      <primary>Migrations</primary>
+    </indexterm>
+
+    <indexterm>
+      <primary>Datenbank</primary>
+
+      <secondary>Migrations</secondary>
+
+      <see>Migrations</see>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Migrations</secondary>
+
+      <see>Migrations</see>
+    </indexterm>
+
+    <para>Rails hat eine Datenbank-Migrations-Datei mit dem Namen
     <filename>db/migrate/20100902194019_create_albums.rb</filename> angelegt.
     In dieser Datei wird eine Klasse <classname>CreateAlbums</classname> als
     Tochter von <classname>ActiveRecord::Migration</classname> definiert. Die
     Methoden <methodname>self.up</methodname> und
     <methodname>self.down</methodname> werden benutzt, um eine Migration oder
-    den dazu gehörigen Roll-Back zu definieren.<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>cat db/migrate/20100902194019_create_albums.rb</command>
-class CreateAlbums &lt; ActiveRecord::Migration
+    den dazu gehörigen Roll-Back zu definieren.<remark>FIXME:
+    Modules/Namespaces sind noch nicht bekannt.</remark><remark>FIXME: Ich
+    glaube die Methoden self.up/self.down werden üblicherweise nur up/down
+    genannt, sind aber eben keine Instanz-Methoden (instance methods) sondern
+    Klassen-Methoden (class methods) - oder umgekehrt. Siehe Remark dazu an
+    anderer Stelle weiter vorne im Buch.</remark><screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>cat db/migrate/20100902194019_create_albums.rb</command></screen><programlisting>class CreateAlbums &lt; ActiveRecord::Migration
   def self.up
     create_table :albums do |t|
       t.integer :position
@@ -223,11 +280,10 @@ class CreateAlbums &lt; ActiveRecord::Migration
   def self.down
     drop_table :albums
   end
-end
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+end</programlisting></para>
 
-    <para>Mit <command>rake db:migrate</command> können wir die entsprechende
-    Datenbank anlegen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake db:migrate</command>
+    <para>Mit <command>rake db:migrate</command> können wir die Migrationen
+    ausführen, also die entsprechende Datenbank-Tabelle anlegen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake db:migrate</command>
 (in /Users/stefan/jukebox)
 ==  CreateAlbums: migrating ===================================================
 -- create_table(:albums)
@@ -236,15 +292,16 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
-    <para>Schauen wir mal in die Datei
-    <filename>app/models/album.rb</filename>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>cat app/models/album.rb</command> 
-class Album &lt; ActiveRecord::Base
-end
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+    <para>Weitere Details zu Migrationen werden wir später in <xref
+    linkend="activerecord_migration" /> kennenlernen.</para>
 
-    <para>hmmm... die Klasse Album ist also eine Tochter von
-    ActiveRecord::Base. Logisch, da wir ja in diesem Kapitel ActiveRecord
-    besprechen. ;-)</para>
+    <para>Schauen wir mal in die Datei
+    <filename>app/models/album.rb</filename>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>cat app/models/album.rb</command></screen><programlisting>class Album &lt; ActiveRecord::Base
+end</programlisting></para>
+
+    <para>hmmm… die Klasse <classname>Album</classname> ist also eine Tochter
+    von <classname>ActiveRecord::Base</classname>. Logisch, da wir ja in
+    diesem Kapitel ActiveRecord besprechen. ;-)</para>
 
     <para>Die eingebaute Hilfeseite zu
     <classname>ActiveRecord::Base</classname> ist etwas länger:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>ri -T ActiveRecord::Base | wc -l</command>
@@ -252,131 +309,222 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Deshalb werde ich sie hier nicht abbilden und überlasse es Ihrer
-    Neugierde einmal <command>ri ActiveRecord</command> aufzurufen.</para>
+    Neugierde, mal <command>ri ActiveRecord</command>
+    aufzurufen.<remark>FIXME: Was macht das -T bei ri?</remark></para>
 
-    <section xml:base="activerecord_moegliche_datentypen">
-      <title xml:id="activerecord_moegliche_datentypen.title">Mögliche
-      Datentypen</title>
+    <section xml:base="activerecord-types">
+      <title xml:id="activerecord-types.title">Mögliche Datentypen in
+      ActiveRecord</title>
 
-      <para>ActiveRecord ist ein Layer (Schicht) zwischen Ruby und
-      verschiedenen Datenbanken.</para>
+      <para>ActiveRecord ist ein <foreignphrase
+      xml:lang="en">Layer</foreignphrase> (Schicht, Ebene) zwischen
+      Ruby<remark>FIXME: Ruby oder Rails? Geht ActiveRecord auch ohne
+      Rails?</remark> und verschiedenen relationalen Datenbanken.</para>
 
-      <para>Leider haben selbst SQL-Datenbanken sehr unterschiedliche
-      Sichtweisen auf die Definition von Spalten und deren Inhalt. Darüber
-      müssen wir uns keine Sorgen machen, da ActiveRecord dieses Problem für
-      uns transparent löst.<itemizedlist>
+      <para>Leider haben SQL-Datenbanken unterschiedliche Sichtweisen auf die
+      Definition von Spalten und deren Inhalt. Darüber müssen wir uns keine
+      Sorgen machen, da ActiveRecord dieses Problem für uns transparent
+      löst.<itemizedlist>
           <listitem>
             <para>Vorteil:</para>
 
-            <para>Wir können die Datenbanken hinter einer Rails-Applikation
-            austauschen ohne das dafür der Programmcode angefasst werden
+            <para>Wir können das DBMS hinter einer Rails-Applikation
+            austauschen ohne dass dafür der Programmcode angefasst werden
             muss.</para>
           </listitem>
 
           <listitem>
             <para>Nachteil:</para>
 
-            <para>Wir können nicht alle Besonderheiten unserer Datenbank
+            <para>Wir können nicht alle Besonderheiten des jeweiligen DBMS
             benutzen. Wir müssen quasi einen kleinsten gemeinsamen Nenner
             benutzen.</para>
           </listitem>
         </itemizedlist></para>
 
-      <para>Um ein Model zu generieren können Sie folgende Feldtypen
-      benutzen:<itemizedlist>
+      <para>Um ein <foreignphrase xml:lang="en">Model</foreignphrase> zu
+      generieren können Sie folgende Feldtypen benutzen:<itemizedlist>
           <listitem>
-            <para><varname>:binary</varname></para>
+            <indexterm>
+              <primary>binary</primary>
 
-            <para>Das ist im klassischen Sinn ein BLOB. Noch nie gehört? Dann
-            werden sie es wahrscheinlich nicht brauchen.</para>
+              <secondary>ActiveRecord</secondary>
+            </indexterm>
+
+            <para><literal>:binary</literal></para>
+
+            <para>Das ist im klassischen Sinn ein BLOB (<foreignphrase
+            xml:lang="en">Binary Large Object</foreignphrase>). Noch nie
+            gehört? Dann werden sie es wahrscheinlich nicht brauchen.</para>
+
+            <para>Siehe auch <uri
+            xlink:href="http://de.wikipedia.org/wiki/Binary_Large_Object">http://de.wikipedia.org/wiki/Binary_Large_Object</uri></para>
           </listitem>
 
           <listitem>
-            <para><varname>:boolean</varname></para>
+            <indexterm>
+              <primary>boolean</primary>
 
-            <para>Ein Boolean. Kann true (wahr) oder false (falsch)
-            sein.</para>
+              <secondary>ActiveRecord</secondary>
+            </indexterm>
+
+            <para><literal>:boolean</literal><remark>FIXME: Kann man das als
+            bool abkürzen?</remark></para>
+
+            <para>Ein Bool'scher Wert. Kann <literal>true</literal> (wahr)
+            oder <literal>false</literal> (falsch) sein.</para>
 
             <para>Siehe auch <uri
             xlink:href="http://de.wikipedia.org/wiki/Boolesche_Variable">http://de.wikipedia.org/wiki/Boolesche_Variable</uri></para>
           </listitem>
 
           <listitem>
-            <para><varname>:date</varname></para>
+            <indexterm>
+              <primary>date</primary>
 
-            <para>Hier kann ein Datum abgespeichert werden.</para>
+              <secondary>ActiveRecord</secondary>
+            </indexterm>
+
+            <para><literal>:date</literal></para>
+
+            <para>Hier kann ein Datum abgespeichert werden.<remark>FIXME:
+            Genauer. Format?</remark></para>
           </listitem>
 
           <listitem>
-            <para><varname>:datetime</varname></para>
+            <indexterm>
+              <primary>datetime</primary>
 
-            <para>Hier kann eine Uhrzeit inklusive Datum abgespeichert
-            werden.</para>
+              <secondary>ActiveRecord</secondary>
+            </indexterm>
+
+            <para><literal>:datetime</literal></para>
+
+            <para>Hier kann ein Datum inklusive Uhrzeit abgespeichert
+            werden.<remark>FIXME: Genauer. Format?</remark></para>
           </listitem>
 
           <listitem>
-            <para><varname>:float</varname></para>
+            <indexterm>
+              <primary>float</primary>
 
-            <para>Zum Speichern eines Floats (Gleitkommazahl).</para>
+              <secondary>ActiveRecord</secondary>
+            </indexterm>
+
+            <para><literal>:float</literal></para>
+
+            <para>Zum Speichern einer Gleitkommazahl.<remark>FIXME: Genauer.
+            Genauigkeit?</remark></para>
 
             <para>Siehe auch <uri
             xlink:href="http://de.wikipedia.org/wiki/Gleitkommazahl">http://de.wikipedia.org/wiki/Gleitkommazahl</uri></para>
           </listitem>
 
           <listitem>
-            <para><varname>:integer</varname></para>
+            <indexterm>
+              <primary>integer</primary>
 
-            <para>Zum Speichern eines Integers (Ganzzahl).</para>
+              <secondary>ActiveRecord</secondary>
+            </indexterm>
+
+            <para><literal>:integer</literal><remark>FIXME: Kann man das als
+            int abkürzen?</remark></para>
+
+            <para>Zum Speichern einer Ganzzahl.<remark>FIXME: Genauer.
+            Min./max.?</remark></para>
 
             <para>Siehe auch <uri
             xlink:href="http://de.wikipedia.org/wiki/Integer_(Datentyp)">http://de.wikipedia.org/wiki/Integer_(Datentyp)</uri></para>
           </listitem>
 
           <listitem>
-            <para><varname>:primary_key</varname></para>
+            <indexterm>
+              <primary>primary_key</primary>
 
-            <para>Das ist ein Integer, der von der Datenbank automatisch bei
-            jedem neuen Eintrag um eins hochgezählt wird. Dieser Feldtyp wird
-            häufig als Suchschlüssel für die Verknüpfung von verschiedenen
-            Modelen genommen.</para>
+              <secondary>ActiveRecord</secondary>
+            </indexterm>
+
+            <para><literal>:primary_key</literal></para>
+
+            <remark>FIXME: Ist das ein eigenständiger Feldtyp? Im DBMS können
+            ja z.B. auch Strings Primärschlüssel sein, d.h. der Feldtyp ist
+            unabhängig vom Schlüssel-Typ.</remark>
+
+            <para>Das ist ein Integer (Ganzzahl), der von der Datenbank
+            automatisch bei jedem neuen Eintrag um 1 hochgezählt
+            wird<remark>FIXME: Ist ein primary_key in ActiveRecord immer ein
+            *auto_increment* primary_key in MySQL?</remark>. Dieser Feldtyp
+            wird häufig als Schlüssel für die Verknüpfung von verschiedenen
+            Datenbank-Tabellen bzw. <foreignphrase
+            xml:lang="en">Models</foreignphrase> genommen.</para>
 
             <para>Siehe auch <uri
-            xlink:href="http://de.wikipedia.org/wiki/Primary_Key">http://de.wikipedia.org/wiki/Primary_Key</uri></para>
+            xlink:href="http://de.wikipedia.org/wiki/Schl%C3%BCssel_%28Datenbank%29">http://de.wikipedia.org/wiki/Schlüssel_(Datenbank)</uri></para>
           </listitem>
 
           <listitem>
-            <para><varname>:string</varname></para>
+            <indexterm>
+              <primary>string</primary>
 
-            <para>Ein String. Also eine beliebige Zeichenkette (bis max. 255
-            Zeichen).</para>
+              <secondary>ActiveRecord</secondary>
+            </indexterm>
+
+            <para><literal>:string</literal><remark>FIXME: Kann man das als
+            str abkürzen?</remark></para>
+
+            <para>Ein String. Also eine beliebige Zeichenkette, bis max.
+            2<superscript>8</superscript>-1 (= 255) Zeichen.<remark>255 oder
+            doch 256? Zeichen oder Bytes?</remark></para>
 
             <para>Siehe auch <uri
             xlink:href="http://de.wikipedia.org/wiki/Zeichenkette">http://de.wikipedia.org/wiki/Zeichenkette</uri></para>
           </listitem>
 
           <listitem>
-            <para><varname>:text</varname></para>
+            <indexterm>
+              <primary>text</primary>
 
-            <para>Auch ein String. Allerdings ein gutes Stück grösser. Hier
-            können per Default bis zu 65536 Zeichen gespeichert werden.</para>
+              <secondary>ActiveRecord</secondary>
+            </indexterm>
+
+            <para><literal>:text</literal></para>
+
+            <para>Auch ein String. Allerdings ein gutes Stück größer. Hier
+            können per Default bis zu 2<superscript>16</superscript> (= 65536)
+            Zeichen gespeichert werden.</para>
           </listitem>
 
           <listitem>
-            <para><varname>:time</varname></para>
+            <indexterm>
+              <primary>time</primary>
 
-            <para>Eine Uhrzeit.</para>
+              <secondary>ActiveRecord</secondary>
+            </indexterm>
+
+            <para><literal>:time</literal></para>
+
+            <para>Eine Uhrzeit.<remark>FIXME: Genauer. Format?</remark></para>
           </listitem>
 
           <listitem>
-            <para><varname>:timestamp</varname></para>
+            <indexterm>
+              <primary>timestamp</primary>
 
-            <para>Eine Uhrzeit mit Datum, die von der Datenbank automatisch
-            befühlt wird.</para>
+              <secondary>ActiveRecord</secondary>
+            </indexterm>
+
+            <para><literal>:timestamp</literal></para>
+
+            <para>Eine Uhrzeit mit Datum<remark>FIXME: Genauer.</remark>, die
+            von der Datenbank automatisch befüllt wird.</para>
           </listitem>
         </itemizedlist></para>
 
       <para>Wir gehen in <xref linkend="migration" /> auf die einzelnen
       Datentypen noch näher ein und sprechen über verfügbare Optionen.</para>
+
+      <remark>FIXME: Wie kann man einen kombinierten Primärschlüssel oder
+      Sekundärschlüssel (Indizes, Keys) anlegen? Oder kommt das noch?</remark>
     </section>
 
     <section xml:id="activerecord_namenskonvention">
@@ -1990,13 +2138,13 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <para>Erstellen wir als erstes die Rails Applikation:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new phonebook</command>
       create  
       create  README
-      [...]
+      <replaceable>[...]</replaceable>
       create  vendor/plugins/.gitkeep
 stefan@swmbp 0 1.9.2-p0 ~$ <command>cd phonebook</command>
 stefan@swmbp 0 1.9.2-p0 phonebook$ <command>bundle install</command>
 Fetching source index for http://rubygems.org/
 Using rake (0.8.7) 
-[...]
+<replaceable>[...]</replaceable>
 Your bundle was installed to `/Users/stefan/.rvm/gems/ruby-1.9.2-p0`
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
@@ -2120,7 +2268,7 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
         fehleranfällig. Das gleiche Ergebnis könnten wir auch einen Tick
         schöner mit <varname>fritz.id</varname> realisieren:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
 (in /Users/stefan/phonebook)
-[...]
+<replaceable>[...]</replaceable>
 stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>fritz = Person.create(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier')</command>
@@ -2153,7 +2301,7 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
         werden automagisch korrekt mit der <varname>person_id</varname>
         bestückt:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
 (in /Users/stefan/phonebook)
-[...]
+<replaceable>[...]</replaceable>
 stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>fritz = Person.create(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier')</command>
@@ -2175,7 +2323,7 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
         auch ein Array von Hashes aktzeptiert. Wir können also alle
         Telefonnummer mit einer Zeile eintragen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
 (in /Users/stefan/phonebook)
-[...]
+<replaceable>[...]</replaceable>
 stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>fritz = Person.create(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier')</command>
@@ -2192,7 +2340,7 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
         <para>Ich ahne was Sie sich jetzt fragen: "Geht es noch kürzer?".
         Klar: Wir können ja auch alles direkt in eine Zeile schreiben:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
 (in /Users/stefan/phonebook)
-[...]
+<replaceable>[...]</replaceable>
 stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Person.create(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier').phonenumbers.create([{:name =&gt; 'Mobile', :number =&gt; '0171-12345678'}, {:name =&gt; 'Office', :number =&gt; '030-7777777'}, {:name =&gt; 'Home', :number =&gt; '030-8888888'}])</command>
@@ -2213,7 +2361,7 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
         nicht abgespeichert. Dies erfolgt erst nach einem
         <methodname>save</methodname>:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
 (in /Users/stefan/phonebook)
-[...]
+<replaceable>[...]</replaceable>
 stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>fritz = Person.create(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier')</command>
