@@ -1995,13 +1995,49 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
         <title
         xml:id="activerecord_find_by_all_performance.title">Performance</title>
 
+        <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Methoden</secondary>
+
+          <tertiary>where()</tertiary>
+        </indexterm>
+
+        <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Methoden</secondary>
+
+          <tertiary>find_all_by()</tertiary>
+        </indexterm>
+
+        <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Methoden</secondary>
+
+          <tertiary>count()</tertiary>
+        </indexterm>
+
+        <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Lazy Loading</secondary>
+        </indexterm>
+
+        <indexterm>
+          <primary>Lazy Loading</primary>
+
+          <see>ActiveRecord, Lazy Loading</see>
+        </indexterm>
+
         <para>Auch wenn die Methoden <methodname>where</methodname> und
         <methodname>find_all_by</methodname> sich oft gleich anfühlen, so gibt
         es bei einigen Szeanrien deutliche Performance-Unterschiede.
         Vereinfacht gesagt: Mit where machen Sie nie einen Fehler, da
         <methodname>where</methodname> Lazy Loading (siehe <xref
         linkend="lazy_loading" />) benutzt. Auf Lazy Loading gehen wir später
-        noch mal dediziet ein. Hier aber schon mal ein kleiner
+        noch mal dediziert ein. Hier aber schon mal ein kleiner
         Vorgeschmack:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>ActiveRecord::Base.logger = Logger.new(STDOUT)</command>
@@ -2044,6 +2080,14 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <section xml:id="activerecord_exists">
       <title xml:id="activerecord_exists.title">exists?</title>
 
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Methoden</secondary>
+
+        <tertiary>exists?()</tertiary>
+      </indexterm>
+
       <para>Hin und wieder muss man wissen, ob es einen bestimmten Datensatz
       gibt und genau dafür gibt es die Methode
       <methodname>exists?</methodname>. Sie gibt als Ergebnis
@@ -2070,12 +2114,31 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <section xml:id="lazy_loading">
       <title xml:id="lazy_loading.title">Lazy Loading</title>
 
-      <para>Seit Rails 3.0 wird bei ActiveRecords die Methode
-      <methodname>where</methodname> und damit <emphasis>Lazy
-      Loading</emphasis> verwendet. Dies ist ein Mechanismus, der eine
-      Datenbankabfrage erst dann stellt, wenn der weitere Programmablauf nicht
-      ohne das Ergebnis dieser realisiert werden kann. Vorher wird die Anfrage
-      als <classname>ActiveRecord::Relation</classname> gespeichert.</para>
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Lazy Loading</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>Lazy Loading</primary>
+
+        <see>ActiveRecord, Lazy Loading</see>
+      </indexterm>
+
+      <para>Seit Rails 3.0 wird bei ActiveRecords die Methode <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Methoden</secondary>
+
+          <tertiary>where()</tertiary>
+        </indexterm><methodname>where</methodname> und damit
+      <emphasis><foreignphrase xml:lang="en">Lazy
+      Loading</foreignphrase></emphasis> verwendet. Dies ist ein Mechanismus,
+      der eine Datenbankabfrage erst dann stellt, wenn der weitere
+      Programmablauf nicht ohne das Ergebnis dieser realisiert werden kann.
+      Vorher wird die Anfrage als
+      <classname>ActiveRecord::Relation</classname> gespeichert.</para>
 
       <para>Schauen wir uns die Abfrage nach allen Alben aus dem Jahr 1966
       an.</para>
@@ -2095,7 +2158,13 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       <classname>ActiveRecord::Relation</classname> ist, warum bekommen wir
       dann in der Console ein Array ausgegeben? Die Console will uns das
       Entwicklerleben etwas einfacher machen und zeigt uns quasi automatisch
-      das Ergebnis der <methodname>all</methodname> Methode an:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+      das Ergebnis der Methode <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Methoden</secondary>
+
+          <tertiary>all()</tertiary>
+        </indexterm><methodname>all</methodname> an:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1966).class</command>
  =&gt; ActiveRecord::Relation 
@@ -2129,8 +2198,14 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       dem folgenden Beispiel wird <varname>a</varname> immer weiter definiert
       und erst ganz zum Schluss (beim Aufruf der Methode
       <methodname>all</methodname>) wird die Datenbankabfrage wirklich
-      getätigt. Mit der Methode <methodname>to_sql</methodname> kann man sich
-      immer die aktuelle SQL-Query ausgeben lassen.<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+      getätigt. Mit der Methode <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Methoden</secondary>
+
+          <tertiary>to_sql()</tertiary>
+        </indexterm><methodname>to_sql</methodname> kann man sich immer das
+      aktuelle SQL-Query ausgeben lassen.<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>a = Album.where(:release_year =&gt; 1965..1968)</command>
  =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-05 21:29:19"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-09-03 09:04:45", updated_at: "2010-09-03 09:04:45"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-09-03 09:06:28", updated_at: "2010-09-03 09:06:28"&gt;, #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-09-03 09:06:45", updated_at: "2010-09-03 09:06:45"&gt;] 
@@ -2233,8 +2308,13 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
           </listitem>
 
           <listitem>
-            <para>Abspeichern des Datensatzes mit der Methode
-            <methodname>save</methodname></para>
+            <para>Abspeichern des Datensatzes mit der Methode <indexterm>
+                <primary>ActiveRecord</primary>
+
+                <secondary>Methoden</secondary>
+
+                <tertiary>save()</tertiary>
+              </indexterm><methodname>save</methodname></para>
           </listitem>
         </orderedlist></para>
 
@@ -2342,6 +2422,12 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <section xml:id="activerecord_locking">
       <title xml:id="activerecord_locking.title">Locking</title>
 
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Locking</secondary>
+      </indexterm>
+
       <para>Per Default benutzt Rails Optimistisches Locking der Datensätze.
       Dies kann aber umgeschaltet werden. Da für die meisten User
       Optimistisches Locking optimal ist und viele vor diesem Absatz nicht mal
@@ -2416,6 +2502,22 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
   <section xml:id="activerecord_has_many">
     <title xml:id="activerecord_has_many.title">has_many - 1:n
     Verknüpfung</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Relationen</secondary>
+
+      <tertiary>has_many()</tertiary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Relationen</secondary>
+
+      <tertiary>belongs_to()</tertiary>
+    </indexterm>
 
     <para>Um has_many zu erklären erstellen wir uns ein Mini Telefonbuch. In
     diesem Telefonbuch gibt es ein Model mit Personen und ein Model mit
@@ -2581,6 +2683,14 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
       <section xml:id="activerecord_hinzufuegen_create">
         <title xml:id="activerecord_hinzufuegen_create.title">create</title>
 
+        <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Methoden</secondary>
+
+          <tertiary>create()</tertiary>
+        </indexterm>
+
         <para>Jetzt versuchen wir das gleiche wie in <xref
         linkend="activerecord_hinzufuegen_manuell" />, aber benutzen diesmal
         ein wenige ActiveRecord Magie. Wir können mit der Methode
@@ -2644,6 +2754,14 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <section xml:id="activerecord_hinzufuegen_build">
         <title xml:id="activerecord_hinzufuegen_build.title">build</title>
+
+        <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Methoden</secondary>
+
+          <tertiary>build()</tertiary>
+        </indexterm>
 
         <para>Die Methode <methodname>build</methodname> ähnelt der
         <methodname>create</methodname> Methode. Allerdings wird der Datensatz
@@ -2869,6 +2987,14 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
       <section xml:id="activerecord_1n_joins">
         <title xml:id="activerecord_1n_joins.title">joins</title>
 
+        <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Methoden</secondary>
+
+          <tertiary>joins()</tertiary>
+        </indexterm>
+
         <para>Wie können wir alle Personen rausfinden, die in unserer
         Datenbank eine Handynummer abgespeichert haben? Das geht mit einem
         join. Damit können wir die beiden Modele auch in der Suche
@@ -2957,6 +3083,22 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <section>
         <title>includes</title>
+
+        <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Methoden</secondary>
+
+          <tertiary>includes()</tertiary>
+        </indexterm>
+
+        <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Methoden</secondary>
+
+          <tertiary>joins()</tertiary>
+        </indexterm>
 
         <para>includes ähneln sehr joins (siehe <xref
         linkend="activerecord_1n_joins" />). Auch mit Ihnen kann man innerhalb
@@ -3064,6 +3206,38 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
     <section xml:id="has_many_delete" xml:lang="">
       <title xml:id="has_many_delete.title">delete und destroy</title>
 
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Methoden</secondary>
+
+        <tertiary>delete()</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Methoden</secondary>
+
+        <tertiary>delete_all()</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Methoden</secondary>
+
+        <tertiary>destroy()</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Methoden</secondary>
+
+        <tertiary>destroy_all()</tertiary>
+      </indexterm>
+
       <para>Mit den Methoden <methodname>destroy</methodname>,
       <methodname>destroy_all</methodname>, <methodname>delete</methodname>
       und <methodname>delete_all</methodname> kann man wie in <xref
@@ -3099,6 +3273,14 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <section>
         <title>has_many</title>
+
+        <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Relationen</secondary>
+
+          <tertiary>has_many()</tertiary>
+        </indexterm>
 
         <para>Die meiner Meinung nach wichtigsten Optionen für
         <code>has_many</code>:<itemizedlist>
@@ -3170,6 +3352,14 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
       <section>
         <title>belongs_to</title>
 
+        <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Relationen</secondary>
+
+          <tertiary>belongs_to()</tertiary>
+        </indexterm>
+
         <para>Die meiner Meinung nach wichtigste Option für
         <methodname>belongs_to</methodname> ist:<itemizedlist>
             <listitem>
@@ -3196,6 +3386,17 @@ end</programlisting></para>
     <section xml:id="activerecord_has_many_through">
       <title xml:id="activerecord_has_many_through.title">has_many
       through</title>
+
+      <remark>FIXME: Warum steht through nicht als Parameter unter Optionen
+      -&gt; has_many?</remark>
+
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Relationen</secondary>
+
+        <tertiary>has_many()</tertiary>
+      </indexterm>
 
       <para>Zum Erklären von has_many through müssen wir unser Datenbank Model
       erweitern. Nehmen wir einmal an, das wir jeden Anruf mit Start- und
@@ -3326,6 +3527,12 @@ ruby-1.9.2-p0 &gt; </screen></para>
     <section xml:id="activerecord_polymorphic">
       <title xml:id="activerecord_polymorphic.title">Polymorphic Association
       (Verknüpfungen)</title>
+
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Polymorphic Associations</secondary>
+      </indexterm>
 
       <para>Schon das Wort "Polymorphic" lässt einen angespannt werden. Was
       mag damit gemeint sein? Auf <uri
@@ -3464,6 +3671,9 @@ ruby-1.9.2-p0 &gt; </screen></para>
       immer daran denken, das sie mehr Last auf der Datenbank erzeugen, als
       eine normale 1:n Abbildung. Normalerweise macht das den Bock nicht fett,
       aber man sollte es bei der Planung im Hinterkopf halten.</para>
+
+      <remark>FIXME: Gibt es außer has_many() und belongs_to() noch andere
+      Relationen? 1:1? n:n?</remark>
     </section>
   </section>
 
@@ -3477,6 +3687,14 @@ ruby-1.9.2-p0 &gt; </screen></para>
 
     <section xml:id="activerecord_destroy">
       <title xml:id="activerecord_destroy.title">destroy</title>
+
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Methoden</secondary>
+
+        <tertiary>destroy()</tertiary>
+      </indexterm>
 
       <para>Mit <methodname>destroy</methodname> können Sie einen Datensatz
       löschen und dabei werden auch vorhandene Abhängigkeiten beachtet (siehe
@@ -3545,10 +3763,12 @@ ruby-1.9.2-p0 &gt; <command>Person.where(:lastname =&gt; 'Meier', :firstname =&g
   =&gt; [] 
 ruby-1.9.2-p0 &gt; </screen></para>
 
-      <para>Das war einfach. Was ist allerdings mit der Varible
+      <para>Das war einfach. Was ist allerdings mit der Variable
       <literal>fritz_meier</literal>? Die existiert noch mit den Daten im
-      sogenannten frozen-State. Zum Überprüfen gibt es die Methode
-      <methodname>frozen?</methodname>:<screen>ruby-1.9.2-p0 &gt; <command>fritz_meier</command>
+      sogenannten frozen-State<remark>FIXME: Wurde frozen schon
+      erklärt?</remark>. Zum Überprüfen gibt es die Methode <indexterm>
+          <primary>frozen?()</primary>
+        </indexterm><methodname>frozen?</methodname>:<screen>ruby-1.9.2-p0 &gt; <command>fritz_meier</command>
  =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt; 
 ruby-1.9.2-p0 &gt; <command>fritz_meier.phonenumbers</command>
  =&gt; [#&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt;] 
@@ -3573,6 +3793,14 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
     <section xml:id="activerecord_delete">
       <title xml:id="activerecord_delete.title">delete</title>
+
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Methoden</secondary>
+
+        <tertiary>delete()</tertiary>
+      </indexterm>
 
       <para>Mit <methodname>delete</methodname> können Sie einen Datensatz
       direkt in der Datenbank löschen. Dabei werden keine Abhängigkeiten zu
