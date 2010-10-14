@@ -859,8 +859,8 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       sich anzeigen lassen, ob ein Datensatz schon gespeichert wurde oder
       nicht. Wurde ein neues Objekt mit <methodname>new</methodname> erstellt
       und noch nicht abgespeichert, dann ist das Ergebnis von
-      <methodname>new_record?</methodname> <varname>true</varname>. Nach einem
-      <methodname>save</methodname> ist es <varname>false</varname>.</para>
+      <methodname>new_record?</methodname> <literal>true</literal>. Nach einem
+      <methodname>save</methodname> ist es <literal>false</literal>.</para>
 
       <para>Gehen wir noch mal das Beispiel von <xref
       linkend="activerecord_new" /> durch, um dies zu zeigen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
@@ -929,8 +929,7 @@ ruby-1.9.2-p0 &gt; <command>Album.all</command>
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
-    <para>Der dazu gehörige SQL-Code ist nicht überraschen:<programlisting>  Album Load (0.2ms)  SELECT "albums".* FROM "albums"
-</programlisting></para>
+    <para>Der dazu gehörige SQL-Code ist nicht überraschen:<programlisting>  Album Load (0.2ms)  SELECT "albums".* FROM "albums"</programlisting></para>
 
     <para>Die von <methodname>first</methodname>,
     <methodname>last</methodname> und <methodname>all</methodname> erzeugten
@@ -979,8 +978,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Sicherlich, das Ergebnis ist das gleiche, aber werfen wir mal einen
     Blick ins <filename>log/development.log</filename>:<programlisting>  Album Load (0.1ms)  SELECT "albums".* FROM "albums" LIMIT 1
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums"
-</programlisting></para>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums"</programlisting></para>
 
     <para>Selbst bei unserer Mini-Datenbank sehen wir schon einen
     Geschwindigkeitsunterschied. Bei der Methode first wird ein <code>SELECT
@@ -1000,6 +998,10 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
   <section xml:id="seed_rb">
     <title xml:id="seed_rb.title">Mit seeds.rb die Datenbank betanken</title>
+
+    <indexterm>
+      <primary>seeds.rb</primary>
+    </indexterm>
 
     <para>Die Rails-Götter haben mit der Datei
     <filename>db/seeds.rb</filename> einen Weg geschaffen, eine frische
@@ -1050,6 +1052,10 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen>Die <filename>db/seeds.rb</filename>
     <section>
       <title>Alternative Programmierung</title>
 
+      <indexterm>
+        <primary>seeds.rb</primary>
+      </indexterm>
+
       <para>Die <filename>seeds.rb</filename> ist ein Ruby Programm.
       Entsprechend können wir alternativ auch folgenen Weg
       gehen:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
@@ -1079,6 +1085,10 @@ end</programlisting></para>
     <section>
       <title>seeds.rb aus bestehenden Daten erstellen</title>
 
+      <indexterm>
+        <primary>seeds.rb</primary>
+      </indexterm>
+
       <para>Manchmal ist es praktisch den aktuellen Datenbestand einer
       Rails-Applikation in eine <filename>seeds.rb</filename> zu exportieren.
       Beim Schreiben dieses Buches hatte ich dieses Problem fast in jedem
@@ -1097,7 +1107,8 @@ end</programlisting></para>
 end</programlisting></para>
 
       <para>Danach können Sie mit <command>rake album:seed_format</command>
-      die entsprechende rake Task abrufen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake album:seed_format</command>
+      den entsprechenden <literal>rake</literal>-<quote><foreignphrase
+      xml:lang="en">Task</foreignphrase></quote> abrufen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake album:seed_format</command>
 (in /Users/stefan/jukebox)
 Album.create("name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "position"=&gt;1, "release_year"=&gt;1967)
 Album.create("name"=&gt;"Pet Sounds", "position"=&gt;2, "release_year"=&gt;1966)
@@ -1119,8 +1130,12 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <methodname>all</methodname> sind ja schon ganz nett, aber meistens will
     man ja doch nach etwas ganz bestimmten suchen.</para>
 
-    <para>Für die hier verwendeten Beispiele verwenden Sie bitte folgende
-    <filename>db/seeds.rb</filename> Datei:<programlisting>Album.create("name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "position"=&gt;1, "release_year"=&gt;1967)
+    <indexterm>
+      <primary>seeds.rb</primary>
+    </indexterm>
+
+    <para>Für die hier verwendeten Beispiele verwenden Sie bitte die Datei
+    <filename>db/seeds.rb</filename> mit folgendem Inhalt:<programlisting>Album.create("name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "position"=&gt;1, "release_year"=&gt;1967)
 Album.create("name"=&gt;"Pet Sounds", "position"=&gt;2, "release_year"=&gt;1966)
 Album.create("name"=&gt;"Revolver", "position"=&gt;3, "release_year"=&gt;1966)
 Album.create("name"=&gt;"Highway 61 Revisited", "position"=&gt;4, "release_year"=&gt;1965)
@@ -1160,9 +1175,9 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       <methodname>where</methodname> realisieren kann. Deshalb werde ich auf
       <methodname>find</methodname> in diesem Buch nicht intensiv eingehen und
       nur die Suche nach einer Datenbank-ID und
-      <methodname>find_by_</methodname> vorstellen. Alle Freunde von
-      <methodname>find</methodname> verweise ich auf <command>ri
-      ActiveRecord::FinderMethods.find</command> und auf <xref
+      <methodname>find_by_<replaceable>*</replaceable></methodname>
+      vorstellen. Alle Freunde von <methodname>find</methodname> verweise ich
+      auf <command>ri ActiveRecord::FinderMethods.find</command> und auf <xref
       linkend="weiterfuehrende_doku" />.</para>
     </section>
 
@@ -1787,7 +1802,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
         <para>Ein Blick in die <filename>log/development.log</filename> zeigt,
         das zwar nur nach "Genius Loves Company" gesucht wurde, aber der neue
-        Datensatz inklusive dem <varname>release_year</varname> angelegt
+        Datensatz inklusive dem <literal>release_year</literal> angelegt
         wurde:<programlisting>  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."name" = 'Genius Loves Company') LIMIT 1
   SQL (0.4ms)  INSERT INTO "albums" ("created_at", "name", "position", "release_year", "updated_at") VALUES ('2010-10-07 13:23:58.446037', 'Genius Loves Company', NULL, 2004, '2010-10-07 13:23:58.446037')
 </programlisting></para>
@@ -1871,7 +1886,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       <para>Hin und wieder muss man wissen, ob es einen bestimmten Datensatz
       gibt und genau dafür gibt es die Methode
       <methodname>exists?</methodname>. Sie gibt als Ergebnis
-      <varname>true</varname> oder <varname>false</varname> aus:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+      <literal>true</literal> oder <literal>false</literal> aus:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.last</command>
  =&gt; #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-09-03 09:06:45", updated_at: "2010-09-03 09:06:45"&gt; 
@@ -2274,7 +2289,7 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
     <para>Und zum Schluss legen wir noch die Datenbank für die Telefonnummern
     an. In dieser benötigen wir ein Zuordnungsfeld zur Hauptdatenbank. Dieser
     Foreign-Key wird per Default immer als Name der Datenbank plus einem
-    <varname>_id</varname> gesetzt:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails generate model phonenumber person_id:integer name:string number:string</command>
+    <literal>_id</literal> gesetzt:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails generate model phonenumber person_id:integer name:string number:string</command>
       invoke  active_record
       create    db/migrate/20101008205906_create_phonenumbers.rb
       create    app/models/phonenumber.rb
@@ -2344,7 +2359,7 @@ end</programlisting></para>
         <para>Wir löschen die Datenbank und erstellen erst ein Objekt mit den
         Person-Daten. Dann merken wir uns die ID für diesen Datensatz und
         erstellen danach die drei Telefonnummern-Datensätze mit dieser ID im
-        Feld <varname>person_id</varname>:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
+        Feld <literal>person_id</literal>:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
 (in /Users/stefan/phonebook)
 db/test.sqlite3 already exists
 db/development.sqlite3 already exists
@@ -2375,7 +2390,7 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
         <para>Die person_id von Hand einzutragen ist natürlich sehr
         fehleranfällig. Das gleiche Ergebnis könnten wir auch einen Tick
-        schöner mit <varname>fritz.id</varname> realisieren:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
+        schöner mit <literal>fritz.id</literal> realisieren:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
 (in /Users/stefan/phonebook)
 <replaceable>[...]</replaceable>
 stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
@@ -2407,7 +2422,7 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
         <methodname>phonenumbers.create</methodname>
         (<methodname>phonenumbers</methodname> im Plural, weil ja 1 zu many =
         mehrere) zu jedem Person Objekt neue Telefonnummern hinzufügen. Diese
-        werden automagisch korrekt mit der <varname>person_id</varname>
+        werden automagisch korrekt mit der <literal>person_id</literal>
         bestückt:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
 (in /Users/stefan/phonebook)
 <replaceable>[...]</replaceable>
@@ -2602,10 +2617,10 @@ ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <para>Dieser neue Datensatz hatte keinen Eintrag (also
-      <varname>nil</varname>) in der Spalte <varname>person_id</varname> und
+      <literal>nil</literal>) in der Spalte <literal>person_id</literal> und
       konnte deshalb keiner Person zugeordnet werden. Entsprechend ist das
       Ergebnis von <methodname>person</methodname> auch
-      <varname>nil</varname>.</para>
+      <literal>nil</literal>.</para>
     </section>
 
     <section>
@@ -2814,9 +2829,9 @@ ruby-1.9.2-p0 &gt;</screen></para>
 </programlisting></para>
 
         <para>Ich erspare Ihnen das Rätselraten:
-        <methodname>joins</methodname> liest nur die <varname>people</varname>
-        Datensätze ein und <methodname>includes</methodname> liesst auch noch
-        die dazu gehörigen <varname>phonenumbers</varname>. Schon bei unserem
+        <methodname>joins</methodname> liest nur die <literal>people</literal>
+        Datensätze ein und <methodname>includes</methodname> liest auch noch
+        die dazu gehörigen <literal>phonenumbers</literal>. Schon bei unserem
         kleinen Beispiel sieht man das dies natürlich länger dauert.</para>
 
         <para>Warum kann der Einsatz von <methodname>includes</methodname>
@@ -2997,7 +3012,7 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
               <para>Damit wird bei einer Veränderung einer
               <classname>Phonenumber</classname> automatisch das Feld
-              <varname>updated_at</varname> der Primary Datenbank
+              <literal>updated_at</literal> der Primary Datenbank
               <classname>People</classname> auf die aktuelle Uhrzeit gesetzt.
               Das sähe in der <filename>app/models/phonenumber.rb</filename>
               so aus:<programlisting>class Phonenumber &lt; ActiveRecord::Base
@@ -3366,7 +3381,7 @@ ruby-1.9.2-p0 &gt; <command>Person.where(:lastname =&gt; 'Meier', :firstname =&g
 ruby-1.9.2-p0 &gt; </screen></para>
 
       <para>Das war einfach. Was ist allerdings mit der Varible
-      <varname>fritz_meier</varname>? Die existiert noch mit den Daten im
+      <literal>fritz_meier</literal>? Die existiert noch mit den Daten im
       sogenannten frozen-State. Zum Überprüfen gibt es die Methode
       <methodname>frozen?</methodname>:<screen>ruby-1.9.2-p0 &gt; <command>fritz_meier</command>
  =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt; 
