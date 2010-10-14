@@ -531,6 +531,10 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <remark>FIXME: Wie kann man einen kombinierten Primärschlüssel oder
       Sekundärschlüssel (Indizes, Keys) anlegen? Oder kommt das noch?</remark>
+
+      <remark>FIXME: Was ist mit NULL/NOT NULL?</remark>
+
+      <remark>FIXME: Können Spalten Default-Werte haben?</remark>
     </section>
 
     <section xml:id="activerecord_namenskonvention">
@@ -685,7 +689,7 @@ CREATE TABLE "albums" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "positio
 sqlite&gt; <command>.exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
-      <para>Tatsächlich, da ist eine Datenbank mit dem Namen
+      <para>Tatsächlich, da ist eine Datenbank-Tabelle mit dem Namen
       <literal>albums</literal>. Diese wird von ActiveRecord benutzt.</para>
     </section>
   </section>
@@ -701,6 +705,12 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <section xml:id="activerecord_create">
       <title xml:id="activerecord_create.title">create</title>
+
+      <indexterm>
+        <primary>ActiveRecord::Base</primary>
+
+        <secondary>.create()</secondary>
+      </indexterm>
 
       <para>Die am häufigten zum Anlegen von neuen Datensätzen benutzte
       Methode ist <methodname>create</methodname>. Wie immer gibt es dazu eine
@@ -735,7 +745,9 @@ Examples
   User.create([{ :first_name =&gt; 'Jamie' }, { :first_name =&gt; 'Jeremy' }]) do |u|
     u.is_admin = false
   end</screen><remark>FIXME: Wird die Ausgabe eigentlich anders umgebrochen
-      wenn das Terminal-Fenster kleiner ist?</remark></para>
+      wenn das Terminal-Fenster kleiner ist? Oder ist sichergestellt daß im
+      Buch/Web 80 Monospace-Zeichen ohne Umbruch in eine Zeile
+      passen?</remark></para>
 
       <para>Super, direkt mit Beispielen! Was will man mehr? Versuchen wir mal
       so in der <foreignphrase xml:lang="en">Console</foreignphrase> die
@@ -784,6 +796,18 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <section xml:id="activerecord_new">
       <title xml:id="activerecord_new.title">new</title>
 
+      <indexterm>
+        <primary>ActiveRecord::Base</primary>
+
+        <secondary>.new()</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>ActiveRecord::Base</primary>
+
+        <secondary>.save()</secondary>
+      </indexterm>
+
       <para>Neben <methodname>create</methodname> gibt es auch
       <methodname>new</methodname>. Allerdings muss ein mit
       <methodname>new</methodname> erzeugtes Objekt extra mit
@@ -825,6 +849,12 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <section xml:id="activerecord_new_record">
       <title xml:id="activerecord_new_record.title">new_record?</title>
 
+      <indexterm>
+        <primary>ActiveRecord::Base</primary>
+
+        <secondary>.new_record?()</secondary>
+      </indexterm>
+
       <para>Mit der Methode <methodname>new_record?</methodname> können Sie
       sich anzeigen lassen, ob ein Datensatz schon gespeichert wurde oder
       nicht. Wurde ein neues Objekt mit <methodname>new</methodname> erstellt
@@ -854,6 +884,24 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen><tip>
 
   <section>
     <title>first, last und all</title>
+
+    <indexterm>
+      <primary>ActiveRecord::Base</primary>
+
+      <secondary>::first()</secondary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord::Base</primary>
+
+      <secondary>::last()</secondary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord::Base</primary>
+
+      <secondary>::all()</secondary>
+    </indexterm>
 
     <para>Aus irgend einem magischen Grund braucht man ja immer mal den ersten
     oder den letzten oder auch alle Datensätze. Wahrscheinlich deshalb gibt es
@@ -1995,7 +2043,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <section xml:id="activerecord_einfaches_editieren">
       <title xml:id="activerecord_einfaches_editieren.title">Einfaches
-      editieren</title>
+      Editieren</title>
 
       <para>Das einfache editieren eines Datensatzes erfolgt in folgenden
       Schritten:<orderedlist>
@@ -2034,6 +2082,12 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <section xml:id="activerecord_changed">
       <title xml:id="activerecord_changed.title">changed?</title>
 
+      <indexterm>
+        <primary>ActiveRecord::Base</primary>
+
+        <secondary>.changed?()</secondary>
+      </indexterm>
+
       <para>Wenn man sich nicht sicher ist, ob ein Datensatz verändert und
       noch nicht abgespeichert wurde, dann kann man dies mit der
       <methodname>changed?</methodname> Methode rausfinden:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
@@ -2058,11 +2112,17 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       <title
       xml:id="activerecord_update_attributes.title">update_attributes</title>
 
+      <indexterm>
+        <primary>ActiveRecord::Base</primary>
+
+        <secondary>.update_attributes?()</secondary>
+      </indexterm>
+
       <para>Mit der Methode <methodname>update_attributes</methodname> kann
       man verschiedene Attribute eines Objektes auf einmal ändern und danach
       automatisch direkt speichern.</para>
 
-      <para>Setzten wir damit das Beispiel von <xref
+      <para>Setzen wir damit das Beispiel von <xref
       linkend="activerecord_einfaches_editieren" /> um:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>apfelmus = Album.where(:name =&gt; 'The Beatles').first</command>
@@ -3365,7 +3425,27 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
   <section xml:id="activerecord_transaction">
     <title xml:id="activerecord_transaction.title">Transaktionen
-    (Transaction)</title>
+    (Transactions)</title>
+
+    <indexterm>
+      <primary>Transaktionen</primary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Transaktionen</secondary>
+
+      <see>Transaktionen</see>
+    </indexterm>
+
+    <indexterm>
+      <primary>Datenbank</primary>
+
+      <secondary>Transaktionen</secondary>
+
+      <see>Transaktionen</see>
+    </indexterm>
 
     <para>Es gibt immer mal wieder Anwendungsgebiete, bei denen man eine
     Datenbank-Transaktion durchführen muss. Das klassische Beispiel dafür ist
