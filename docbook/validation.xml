@@ -537,6 +537,13 @@ ruby-1.9.2-p0 &gt; <command>home_number.errors</command>
  =&gt; {:number=&gt;["is not a number"]} 
 ruby-1.9.2-p0 &gt; </screen></para>
 
+    <note>
+      <para>Obwohl die Attribute von Phone alle als String definiert sind,
+      können wir trotzdem mit
+      <methodname>validates_numericality_of</methodname> den Inhalt auf
+      Integers festlegen.</para>
+    </note>
+
     <section xml:id="validates_numericality_of_optionen">
       <title
       xml:id="validates_numericality_of_optionen.title">Optionen</title>
@@ -678,6 +685,134 @@ ruby-1.9.2-p0 &gt; </screen></para>
       <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
       validates_numericality_of</command> auf der Kommandozeile
       aufrufen.</para>
+    </section>
+  </section>
+
+  <section xml:id="validates_uniqueness_of">
+    <title
+    xml:id="validates_uniqueness_of.title">validates_uniqueness_of</title>
+
+    <para>Mit <methodname>validates_uniqueness_of</methodname> können Sie
+    definieren, das der Wert dieses Attribut einzigartig in der Datenbank ist.
+    Ein Klassiker dafür sind Accounts. Da sollte man immer sicher stellen, das
+    ein Account nicht doppelt vorhanden ist.. Erklärt sich am Beispiel am
+    einfachsten.</para>
+
+    <para><filename>app/models/user.rb</filename><programlisting>class User &lt; ActiveRecord::Base
+  has_many :phones, :dependent =&gt; :destroy
+  
+  # Validations
+  validates_presence_of :login, :email, :lastname, :gender, :birthday
+  
+  validates_length_of :login, :within =&gt; 3..20
+  validates_length_of :email, :within =&gt; 6..255
+  validates_length_of :lastname, :minimum =&gt; 2
+  
+<emphasis>  validates_uniqueness_of :login, :email
+</emphasis>end
+</programlisting></para>
+
+    <para>Wenn wir jetzt einen <classname>User</classname> mit einem schon
+    existierenden <methodname>login</methodname> einrichten wollen, bekommen
+    wir einen Fehler ausgegeben:<screen>ruby-1.9.2-p0 &gt; <command>ted = User.create(:login =&gt; 'ted', :email =&gt; 'ted@company.com', :lastname =&gt; 'Steinbruch', :gender =&gt; 'male', :birthday =&gt; Date.today - 23.years)</command>
+ =&gt; #&lt;User id: 1, login: "ted", password_hash: nil, email: "ted@company.com", firstname: nil, lastname: "Steinbruch", gender: "male", birthday: "1987-10-14", created_at: "2010-10-14 06:24:54", updated_at: "2010-10-14 06:24:54"&gt; 
+ruby-1.9.2-p0 &gt; <command>ted2 = User.create(:login =&gt; 'ted', :email =&gt; 'ted@company.com', :lastname =&gt; 'Steinbruch', :gender =&gt; 'male', :birthday =&gt; Date.today - 23.years)</command>
+ =&gt; #&lt;User id: nil, login: "ted", password_hash: nil, email: "ted@company.com", firstname: nil, lastname: "Steinbruch", gender: "male", birthday: "1987-10-14", created_at: nil, updated_at: nil&gt; 
+ruby-1.9.2-p0 &gt; <command>ted2.valid?</command>
+ =&gt; false 
+ruby-1.9.2-p0 &gt; <command>ted2.errors</command>
+ =&gt; {:login=&gt;["has already been taken"], :email=&gt;["has already been taken"]} 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+    <warning>
+      <para>Die Validierung mit validates_uniqueness_of ist kein absoluter
+      Garant für eine echte Einzigartigkeit des Attributes in der Datenbank.
+      Es kann dabei zu einer Race-Condition kommen (siehe <uri
+      xlink:href="http://de.wikipedia.org/wiki/Race_Condition">http://de.wikipedia.org/wiki/Race_Condition</uri>).
+      Die detailierte Diskussion dieses Effektes übersteigt allerdings die
+      Tiefe eines Einsteigerbuches (es handelt sich um ein sehr seltenes
+      Phänomen). Wenn Sie sich für diese Problematik interessieren, schauen
+      Sie bitte einmal in die Doku von validates_uniqueness_of (<command>ri
+      validates_uniqueness_of</command>). Dort werden Möglichkeiten
+      aufgelistet, wie man dieses Problem lösen kann. </para>
+    </warning>
+
+    <section xml:id="validates_uniqueness_of_optionen">
+      <title xml:id="validates_uniqueness_of_optionen.title">Optionen</title>
+
+      <para><methodname>validates_uniqueness_of</methodname> kann mit
+      folgenden Optionen aufgerufen werden:<itemizedlist>
+          <listitem>
+            <para><code>:message</code></para>
+
+            <para>Um eine eigene Fehlermeldung auszugeben. Default: "has
+            already been taken". Beispiel:<programlisting>validates_numericality_of :attribute, :message =&gt; 'hmmm... not good. It has been already taken.'
+</programlisting><note>
+                <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
+                linkend="i18n" />.</para>
+              </note></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:scope</code></para>
+
+            <para>Definiert einen Geltungsbereich für die Einzigartigkeit.
+            Wenn wir eine anderes strukturiere Telefonnummerndatenbank hätten
+            (mit nur einem Feld für die Telefonnummer, dann könnten wir damit
+            definieren, das eine Telefonnummer pro User nur einmal gespeichert
+            werden darf. Das sähe dann so aus:</para>
+
+            <para><programlisting>validates_uniqueness_of :phone_number, :scope =&gt; :user_id</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><methodname>:case_sensitive</methodname></para>
+
+            <para>Überprüft die Einzigartikeit auch auf Gross- und
+            Kleinschreibung. Default: False. Beispiel:<programlisting>validates_uniqueness_of :attribute, :case_sensitive =&gt; true
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:allow_nil</code></para>
+
+            <para>Das Attribut darf den Wert nil haben.
+            Beispiel:<programlisting>validates_uniqueness_of :attribute, :allow_nil =&gt; true
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:allow_blank</code></para>
+
+            <para>Das Attribut darf ganz leer sein. Beispiel:<programlisting>validates_uniqueness_of :attribute, :is =&gt; 23
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:if</code></para>
+
+            <para>Definiert eine Methode, einen Proc oder einen String der
+            definiert, ob die Validierung ausgeführt werden soll.
+            Beispiel:<programlisting>validates_uniqueness_of :attribute, :if =&gt; Date.today.monday?
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:unless</code></para>
+
+            <para>Wie <methodname>if</methodname>, nur das hier definiert
+            wird, wann die Validierung nicht erfolgen soll.
+            Beispiel:<programlisting>validates_uniqueness_of :attribute, :unless =&gt; Date.today.tuesday?
+</programlisting></para>
+          </listitem>
+        </itemizedlist></para>
+    </section>
+
+    <section xml:id="validates_uniqueness_of_doku">
+      <title xml:id="validates_uniqueness_of_doku.title">Weitere Doku</title>
+
+      <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
+      validates_uniqueness_of</command> auf der Kommandozeile aufrufen.</para>
     </section>
   </section>
 </section>
