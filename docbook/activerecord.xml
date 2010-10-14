@@ -9,64 +9,114 @@
          xmlns:db="http://docbook.org/ns/docbook">
   <title xml:id="activerecord_chapter.title">ActiveRecord</title>
 
-  <para>ActiveRecord ist eine Abstaktionsschicht, die es uns einen sehr
-  leichten Zugang zu einer SQL-Datenbank zur Verfügung stellt.</para>
+  <info>
+    <collab>
+      <person>
+        <personname><firstname>Philipp</firstname><surname>Kempgen</surname></personname>
+      </person>
+    </collab>
+  </info>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+  </indexterm>
+
+  <indexterm>
+    <primary>Active Record (Muster)</primary>
+  </indexterm>
+
+  <para><literal>ActiveRecord</literal> ist eine Abstaktionsschicht, die es
+  uns einen sehr leichten Zugang zu einer <indexterm>
+      <primary>SQL-Datenbank</primary>
+
+      <see>Datenbank</see>
+    </indexterm><indexterm>
+      <primary>Datenbank</primary>
+
+      <secondary>relational (SQL)</secondary>
+    </indexterm><indexterm>
+      <primary>relationale Datenbank</primary>
+
+      <see>Datenbank</see>
+    </indexterm>SQL-Datenbank zur Verfügung stellt.
+  <literal>ActiveRecord</literal> implementiert das Architektur-Muster
+  <foreignphrase xml:lang="en">Active Record</foreignphrase> <footnote>
+      <para>siehe <uri
+      xlink:href="http://en.wikipedia.org/wiki/Active_record_pattern">http://en.wikipedia.org/wiki/Active_record_pattern</uri></para>
+    </footnote>.</para>
 
   <note>
-    <para>Das nennt sich dann objektrelationale Abbildung. Ich empfinde das
-    als zu trocken und langweilig, aber falls Sie heute Abend nicht
-    einschlafen können, werfen Sie doch mal einen Blick auf <uri
+    <para>Das nennt sich dann <indexterm>
+        <primary>Objektrelationale Abbildung</primary>
+
+        <see>ORM</see>
+      </indexterm>objektrelationale Abbildung (<indexterm>
+        <primary>Object-relational mapping</primary>
+
+        <see>ORM</see>
+      </indexterm><foreignphrase xml:lang="en">Object-relational
+    mapping</foreignphrase>, <indexterm>
+        <primary>ORM (Object-relational mapping)</primary>
+      </indexterm><foreignphrase xml:lang="en">ORM</foreignphrase>). Ich
+    empfinde das als zu trocken und langweilig, aber falls Sie heute Abend
+    nicht einschlafen können, werfen Sie doch mal einen Blick auf <uri
     xlink:href="http://de.wikipedia.org/wiki/Objektrelationale_Abbildung">http://de.wikipedia.org/wiki/Objektrelationale_Abbildung</uri>.</para>
   </note>
 
   <para>Einer der Erfolgsrezepte von Rails ist sicherlich die Benutzung von
-  ActiveRecord. Die Programmierung und Benutzung "fühlt sich gut an" und es
-  ist viel weniger fehleranfällig als pures SQL. Bei der Arbeit mit diesem
-  Kapitel hilft SQL-Wissen, aber es wird nicht vorrausgesetzt und es ist auch
-  für die Arbeit mit ActiveRecord nicht notwendig.</para>
+  <literal>ActiveRecord</literal>. Die Programmierung und Benutzung
+  <quote>fühlt sich gut an</quote> und es ist viel weniger fehleranfällig als
+  pures SQL. Bei der Arbeit mit diesem Kapitel hilft SQL-Wissen, aber es wird
+  nicht vorausgesetzt, und es ist auch für die Arbeit mit
+  <literal>ActiveRecord</literal> nicht notwendig.</para>
 
-  <section>
+  <remark>FIXME: Wird irgendwo gesagt daß ActiveRecord der Default-ORM von
+  Rails ist?</remark>
+
+  <section xml:id="activerecord-howto-zum-kapitel">
     <title>Howto zum Kapitel</title>
 
     <para>Dieses Kapitel ist in sich selbst geschlossen. Allerdings wird das
     Wissen aus <xref linkend="ruby-grundlagen" /> und <xref
     linkend="erste_schritte_mit_rails" /> vorausgesetzt. Ohne dieses
-    Grundwissen, werden Sie keinen Spass an diesem Kapitel haben!</para>
+    Grundwissen werden Sie keinen Spaß an diesem Kapitel haben!</para>
 
     <para>Der Rails-Anfänger sollte das Kapitel einmal von oben bis unten
-    durcharbeiten. Das heißt konkret: Alle Schritte in der eigenen Console
-    (siehe <xref linkend="die_console" />) mit ausprobieren und ruhig selber
-    links und recht mal ein wenig experimentieren. Bitte nehmen Sie sich Zeit.
-    Es ist ein wichtiges Kapitel!</para>
+    durcharbeiten. Das heißt konkret: Alle Schritte in der eigenen
+    <foreignphrase xml:lang="en">Console</foreignphrase> (siehe <xref
+    linkend="die_console" />) mit ausprobieren und ruhig selber links und
+    rechts mal ein wenig experimentieren. Bitte nehmen Sie sich Zeit. Es ist
+    ein wichtiges Kapitel!</para>
 
     <para><note>
         <para>Es geht in diesem Kapitel um ActiveRecord. Deshalb: Um die
-        Beispiele so übersichtlich wie möglich zu halten, werde ich deshalb
+        Beispiele so übersichtlich wie möglich zu halten werde ich deshalb
         keine Tests (siehe <xref linkend="tests" />) einbauen.</para>
       </note></para>
 
-    <section>
+    <section xml:id="activerecord-keine-lust-auf-sql">
       <title>Keine Lust auf SQL?</title>
 
-      <para>Hin und wieder werde ich den durch eine ActiveRecord Methode
-      erzeugten SQL-Code im Logfile nachschlagen. Wenn Sie sich nicht für SQL
-      interessieren: Einfach überlesen. Das schöne an ActiveRecord ist ja das
-      man sich darum keinen Kopf machen muss. Für alle anderen dient es zum
-      besseren Verständnis der im Hintergrund laufenden Optimierungen.</para>
+      <para>Hin und wieder werde ich den durch eine ActiveRecord-Methode
+      erzeugten SQL-Code in der Log-Datei nachschlagen. Wenn Sie sich nicht
+      für SQL interessieren: Einfach überlesen. Das Schöne an ActiveRecord ist
+      ja dass man sich darum keinen Kopf machen muss. Für alle anderen dient
+      es zum besseren Verständnis der im Hintergrund laufenden
+      Optimierungen.</para>
 
       <tip>
-        <para>Wenn Sie sich für diese Optimierung interessieren, so empfehle
+        <para>Wenn Sie sich für diese Optimierungen interessieren, so empfehle
         ich Ihnen bei diesen Übungen und auch später bei der Entwicklung immer
         noch ein zweites Terminal mit einem <command>tail -f
         log/development.log</command> laufen zu lassen. Dort sehen Sie dann
-        immer, was gerade auf Datenbank-Ebene abläuft.</para>
+        immer, was gerade auf der Datenbank-Ebene abläuft.</para>
       </tip>
     </section>
 
     <section xml:id="activerecord_blut_lecken">
       <title xml:id="activerecord_blut_lecken.title">Blut lecken</title>
 
-      <para>Diese Buch ist ein Einsteigerbuch. Entsprechend werden hier die
+      <para>Dieses Buch ist ein Einsteigerbuch. Entsprechend werden hier die
       Grundlagen für die Benutzung von ActiveRecord besprochen. Es wäre ein
       leichtes ein doppelt so dickes Buch nur über ActiveRecord zu schreiben.
       Lassen Sie sich von diesem Kapitel anfixen und forschen Sie in den
@@ -75,9 +125,9 @@
 
       <tip>
         <para>Einer meiner besten Freunde bei der Entwicklung von
-        Rails-Applikationen ist die Tabulator-Taste. Wenn immer Sie eine
+        Rails-Applikationen ist die Tabulator-Taste. Wann immer Sie eine
         Methode für ein bestimmte Problem suchen, dann stellen Sie es in der
-        Rails Console nach und drücken Sie zwei mal auf die Tabulatortaste um
+        Rails-Console nach, und drücken Sie zweimal auf die Tabulatortaste um
         alle verfügbaren Methoden für die entsprechende Klasse aufzulisten.
         Die Namen der Methoden sind meistens selbsterklärend.</para>
       </tip>
@@ -88,10 +138,10 @@
     <title xml:id="activerecord_datenbank_anlegen.title">Datenbank/Model
     anlegen</title>
 
-    <para>Auch wenn ich mich nicht für Musik interessiere, sind Musikalben für
-    ein Datenbankbeispiel sehr gut geeignet. Die benutzen Daten entnehme ich
-    dabei der Wikipedia-Seite <uri
-    xlink:href="http://en.wikipedia.org/wiki/The_500_Greatest_Albums_of_All_Time">http://en.wikipedia.org/wiki/The_500_Greatest_Albums_of_All_Time</uri></para>
+    <para>Auch wenn ich mich nicht für Musik interessiere, so sind Musikalben
+    für ein Datenbankbeispiel sehr gut geeignet. Die benutzen Daten entnehme
+    ich dabei der Wikipedia-Seite <uri
+    xlink:href="http://en.wikipedia.org/wiki/The_500_Greatest_Albums_of_All_Time">http://en.wikipedia.org/wiki/The_500_Greatest_Albums_of_All_Time</uri>.</para>
 
     <para>Legen wir erst mal ein neues Rails-Projekt an:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new jukebox</command>
       create  
@@ -107,7 +157,7 @@ Using rake (0.8.7)
 Using abstract (1.0.0) 
 [...]
 Your bundle was installed to `/Users/stefan/.rvm/gems/ruby-1.9.2-p0`
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Schauen wir uns mal die Hilfeseite von <command>rails generate
     model</command> an:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails generate model</command>
@@ -140,7 +190,7 @@ Runtime options:
 
 Description:
     Create rails files for model generator.
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Das kling alles halbwegs logisch. Leben wir also das Model
     <classname>album</classname> an:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails generate model album position:integer name:string release_year:integer</command>
@@ -150,7 +200,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
       invoke    test_unit
       create      test/unit/album_test.rb
       create      test/fixtures/albums.yml
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Rails hat ein Datenbank-Migrations-File mit dem Namen
     <filename>db/migrate/20100902194019_create_albums.rb</filename> angelegt.
@@ -174,7 +224,7 @@ class CreateAlbums &lt; ActiveRecord::Migration
     drop_table :albums
   end
 end
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Mit <command>rake db:migrate</command> können wir die entsprechende
     Datenbank anlegen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake db:migrate</command>
@@ -184,13 +234,13 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
    -&gt; 0.0015s
 ==  CreateAlbums: migrated (0.0016s) ==========================================
 
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Schauen wir mal in die Datei
     <filename>app/models/album.rb</filename>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>cat app/models/album.rb</command> 
 class Album &lt; ActiveRecord::Base
 end
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>hmmm... die Klasse Album ist also eine Tochter von
     ActiveRecord::Base. Logisch, da wir ja in diesem Kapitel ActiveRecord
@@ -199,7 +249,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
     <para>Die eingebaute Hilfeseite zu
     <classname>ActiveRecord::Base</classname> ist etwas länger:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>ri -T ActiveRecord::Base | wc -l</command>
      454
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Deshalb werde ich sie hier nicht abbilden und überlasse es Ihrer
     Neugierde einmal <command>ri ActiveRecord</command> aufzurufen.</para>
@@ -367,7 +417,7 @@ ruby-1.9.2-p0 &gt; <command>"call_record".tableize</command>
 ruby-1.9.2-p0 &gt; <command>"call_record".foreign_key</command>
  =&gt; "call_record_id" 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <para>Wenn Sie sich bei einer Klasse nicht sicher sind, können Sie auch
       mit der Klasse und der Methode name arbeiten. Ich zeige Ihnen das mal
@@ -379,7 +429,7 @@ ruby-1.9.2-p0 &gt; <command>Person.name.tableize</command>
 ruby-1.9.2-p0 &gt; <command>Person.name.foreign_key</command>
  =&gt; "person_id" 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <para>Auf <uri
       xlink:href="http://rails.rubyonrails.org/classes/ActiveSupport/CoreExtensions/String/Inflections.html">http://rails.rubyonrails.org/classes/ActiveSupport/CoreExtensions/String/Inflections.html</uri>
@@ -417,7 +467,7 @@ production:
   database: db/production.sqlite3
   pool: 5
   timeout: 5000
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Da wir im development Modus arbeiten hat Rails beim <command>rake
       db:migrate</command> eine neue SQLite3 Datenbank
@@ -436,7 +486,7 @@ albums             schema_migrations
 sqlite&gt; <command>.schema albums</command>
 CREATE TABLE "albums" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "position" integer, "name" varchar(255), "release_year" integer, "created_at" datetime, "updated_at" datetime);
 sqlite&gt; <command>.exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Tatsächlich, da ist eine Datenbank mit dem Namen
       <varname>albums</varname>. Diese wird von ActiveRecord benutzt.</para>
@@ -491,7 +541,7 @@ Examples
   end
 
 
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Super, direkt mit Beispielen! Was will man mehr? Versuchen wir mal
       so in der Console die ersten 3 Alben anzulegen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
@@ -505,7 +555,7 @@ ruby-1.9.2-p0 &gt; <command>Album.create(:position =&gt; 2, :name =&gt; "Pet Sou
 ruby-1.9.2-p0 &gt; <command>Album.create(:position =&gt; 3, :name =&gt; "Revolver", :release_year =&gt; 1966)</command>
  =&gt; #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt; 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Sieht ja ganz gut aus, aber sind die Daten auch wirklich
       gespeichert worden? Schauen wir sicherheitshalber mal mit dem
@@ -522,7 +572,7 @@ sqlite&gt; <command>SELECT * FROM albums;</command>
 2|2|Pet Sounds|1966|2010-09-02 19:49:07.513328|2010-09-02 19:49:07.513328
 3|3|Revolver|1966|2010-09-02 19:49:27.511745|2010-09-02 19:49:27.511745
 sqlite&gt; <command>.exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Tatsächlich, da ist eine Datenbank mit dem Namen
       <varname>albums</varname> und in der sind die von uns eben erstellten
@@ -558,7 +608,7 @@ ruby-1.9.2-p0 &gt; <command>highway61.save</command>
 ruby-1.9.2-p0 &gt; <command>highway61</command>
  =&gt; #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt; 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>In der log/development.log finden Sie den zu erwartenden INSERT
       Befehl:<programlisting>SQL (0.9ms)  INSERT INTO "albums" ("created_at", "name", "position", "release_year", "updated_at") VALUES ('2010-09-02 20:30:34.872261', 'Highway 61 Revisited', 4, 1965, '2010-09-02 20:30:34.872261')</programlisting></para>
@@ -572,7 +622,7 @@ ruby-1.9.2-p0 &gt; <command>highway61 = Album.new(:position =&gt; 4, :name =&gt;
 ruby-1.9.2-p0 &gt; <command>highway61.save</command>
  =&gt; true 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     </section>
 
     <section xml:id="activerecord_new_record">
@@ -597,7 +647,7 @@ ruby-1.9.2-p0 &gt; <command>highway61.save</command>
 ruby-1.9.2-p0 &gt; <command>highway61.new_record?</command>
  =&gt; false 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen><tip>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen><tip>
           <para>Bei bereits bestehenden Datensätzen können Sie eine
           Veränderung auch mit der Methode <methodname>changed?</methodname>
           überprüfen (siehe <xref linkend="activerecord_changed" />).</para>
@@ -619,7 +669,7 @@ ruby-1.9.2-p0 &gt; <command>Album.first</command>
 ruby-1.9.2-p0 &gt; <command>Album.last</command>
  =&gt; #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt; 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Ein kurzer Blick in <filename>log/development.log</filename> zeigt
     uns wie ActiveRecord das gemacht hat:<programlisting>  Album Load (0.4ms)  SELECT "albums".* FROM "albums" LIMIT 1
@@ -632,7 +682,7 @@ Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.all</command>
  =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Der dazu gehörige SQL-Code ist nicht überraschen:<programlisting>  Album Load (0.2ms)  SELECT "albums".* FROM "albums"
 </programlisting></para>
@@ -652,7 +702,7 @@ ruby-1.9.2-p0 &gt; <command>Album.all</command>
 ruby-1.9.2-p0 &gt; <command>Album.all.class</command>
  =&gt; Array 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Wenn <methodname>Album.all</methodname> ein Array ist, dann müsste
     man doch auch Iteratoren (siehe <xref linkend="iterator" /> und <xref
@@ -669,7 +719,7 @@ Revolver
 Highway 61 Revisited
  =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Kann man dann auch <methodname>Album.all.first</methodname> als
     Alternative zu <methodname>first</methodname> benutzen? Ja, aber es macht
@@ -680,7 +730,7 @@ ruby-1.9.2-p0 &gt; <command>Album.first</command>
 ruby-1.9.2-p0 &gt; <command>Album.all.first</command>
  =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt; 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Sicherlich, das Ergebnis ist das gleiche, aber werfen wir mal einen
     Blick ins <filename>log/development.log</filename>:<programlisting>  Album Load (0.1ms)  SELECT "albums".* FROM "albums" LIMIT 1
@@ -746,7 +796,7 @@ db/development.sqlite3 already exists
    -&gt; 0.0005s
 -- assume_migrated_upto_version(20101004085045, "db/migrate")
    -&gt; 0.0004s
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen>Die <filename>db/seeds.rb</filename>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen>Die <filename>db/seeds.rb</filename>
     Datei bringe ich an dieser Stelle ein, weil sie einen einfachen
     Mechanismus bietet eine leere Datenbank mit Default-Werten zu fühlen. Das
     erleichtert uns im weiteren Verlauf des Buches das schnelle Setup von
@@ -808,12 +858,12 @@ Album.create("name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "position"=&gt;
 Album.create("name"=&gt;"Pet Sounds", "position"=&gt;2, "release_year"=&gt;1966)
 Album.create("name"=&gt;"Revolver", "position"=&gt;3, "release_year"=&gt;1966)
 Album.create("name"=&gt;"Highway 61 Revisited", "position"=&gt;4, "release_year"=&gt;1965)
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Entweder können Sie dieses Programm so erweitern, das die Ausgabe
       direkt in die <filename>seeds.rb</filename> geschrieben wird oder Sie
       benutzen einfach die Shell:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake album:seed_format &gt;&gt; db/seeds.rb</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     </section>
   </section>
 
@@ -883,7 +933,7 @@ ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1966)</command>
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1966).count</command>
  =&gt; 3 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Ein Blick in die <filename>log/development.log</filename> zeigt
       uns die an die Datenbank gerichtete SQL-Abfrage dazu:<programlisting>  SQL (0.5ms)   SELECT name
@@ -917,7 +967,7 @@ ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1960..1966, :positio
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1960..1966, :position =&gt; 1..5).count</command>
  =&gt; 4 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Das erzeugte SQL wird entsprechend komplexer:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1966) AND ("albums"."position" BETWEEN 1 AND 5)
   SQL (0.3ms)  SELECT COUNT(*) AS count_id FROM (SELECT 1 FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1966) AND ("albums"."position" BETWEEN 1 AND 5)) AS subquery
@@ -928,7 +978,7 @@ Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; [1966,1968])</command>
  =&gt; [#&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-09-03 09:06:28", updated_at: "2010-09-03 09:06:28"&gt;, #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-09-03 09:06:45", updated_at: "2010-09-03 09:06:45"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Der Vollständigkeit halber auch hier noch die
       SQL-Abfrage:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" IN (1966, 1968))
@@ -944,7 +994,7 @@ Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; [1966,1968]).first</command>
  =&gt; #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 19:53:00"&gt; 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       </important>
 
       <section xml:id="activerecord_sql">
@@ -976,7 +1026,7 @@ Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.where("name like ?", '%on%')</command>
  =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 8, position: 8, name: "London Calling", release_year: 1979, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
           <para>Die SQL-Abfrage wird korrekt ausgeführt (Auszug aus
           <filename>log/development.log</filename>):<programlisting>  Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE (name like '%on%')
@@ -987,7 +1037,7 @@ Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.where("release_year &gt; ?", 1964)</command>
  =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 8, position: 8, name: "London Calling", release_year: 1979, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;]
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
           <para>Auszug aus
           <filename>log/development.log</filename>:<programlisting>  Album Load (0.5ms)  SELECT "albums".* FROM "albums" WHERE (release_year &gt; 1964)
@@ -999,7 +1049,7 @@ Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.where("name like ? AND release_year &gt; ?", '%on%', 1970)</command>
  =&gt; [#&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 8, position: 8, name: "London Calling", release_year: 1979, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
           <para>Auszug aus
           <filename>log/development.log</filename>:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE (name like '%on%' AND release_year &gt; 1970)
@@ -1014,7 +1064,7 @@ ruby-1.9.2-p0 &gt; <command>apfelmus = 'ing'</command>
 ruby-1.9.2-p0 &gt; <command>Album.where("name like ?", "%#{apfelmus}%")</command>
  =&gt; [#&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 8, position: 8, name: "London Calling", release_year: 1979, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
           <para>Auszug aus
           <filename>log/development.log</filename>:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE (name like '%ing%')
@@ -1034,7 +1084,7 @@ Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.where("name like '%on%'")</command>
  =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 8, position: 8, name: "London Calling", release_year: 1979, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
           <para>Natürlich sind die Ergebnisse dieser einfachen Abfrage
           identisch mit der gesanitizten Variante:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
@@ -1042,7 +1092,7 @@ Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.where("name like '%on%'") == Album.where("name like ?", "%on%")</command>
  =&gt; true 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
           <para>Problematisch wird das ganze beim Einsatz von Variablen.
           Arbeiten wir nochmal mit der Variable apfelmus und fügen nach dem
@@ -1063,7 +1113,7 @@ Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1960..1969).order(:name)</command>
  =&gt; [#&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Natürlich können wir auch alle Alben aus den 70ern in umgekehrter
       Reihenfolge sortieren:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
@@ -1071,7 +1121,7 @@ Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1970..1979).order('name DESC')</command>
  =&gt; [#&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 8, position: 8, name: "London Calling", release_year: 1979, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Hier noch die Ausgabe aus <filename>log/development.log</filename>
       zu den beiden Suchen:<programlisting>  Album Load (0.5ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969) ORDER BY name
@@ -1091,21 +1141,21 @@ Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.limit(3)</command>
  =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Die ersten 5 Alben aus den 60ern:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1960..1969).limit(5)</command>
  =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Die ersten 5 Alben aus den 60ern nach dem Namen sortiert:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1960..1969).order(:release_year).limit(5).order(:name)</command>
  =&gt; [#&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Die zu den drei Abfragen gehörenden Einträge in der
       <filename>log/development.log</filename> Datei:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" LIMIT 3
@@ -1128,7 +1178,7 @@ ruby-1.9.2-p0 &gt; <command>Album.limit(2)</command>
 ruby-1.9.2-p0 &gt; <command>Album.limit(2).offset(5)</command>
  =&gt; [#&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
         <para>Die <filename>log/development.log</filename> zeigt die
         entsprechende SQL-Abfrage:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" LIMIT 2
@@ -1152,7 +1202,7 @@ ruby-1.9.2-p0 &gt; <command>Album.average(:release_year)</command>
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1960..1969).average(:release_year)</command>
  =&gt; 1966.142857142857 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Die <filename>log/development.log</filename> zeigt die
       entsprechende SQL-Abfrage:<programlisting>  SQL (0.2ms)  SELECT AVG("albums"."release_year") AS avg_id FROM "albums"
@@ -1175,7 +1225,7 @@ ruby-1.9.2-p0 &gt; <command>Album.group(:release_year)</command>
 ruby-1.9.2-p0 &gt; <command>Album.order(:name).group(:release_year)</command>
  =&gt; [#&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 8, position: 8, name: "London Calling", release_year: 1979, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Die <filename>log/development.log</filename> zeigt die
       entsprechende SQL-Abfrage:<programlisting>  Album Load (0.5ms)  SELECT "albums".* FROM "albums" GROUP BY release_year
@@ -1189,7 +1239,7 @@ Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>Album.group(:release_year) == Album.order(:name).group(:release_year)</command>
  =&gt; false 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       </note>
     </section>
 
@@ -1207,7 +1257,7 @@ ruby-1.9.2-p0 &gt; <command>Album.count</command>
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1960..1969).count</command>
  =&gt; 7 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Die <filename>log/development.log</filename> zeigt die
       entsprechende SQL-Abfrage:<programlisting>  SQL (0.2ms)  SELECT COUNT(*) AS count_id FROM "albums"
@@ -1230,7 +1280,7 @@ ruby-1.9.2-p0 &gt; <command>Album.maximum(:release_year)</command>
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1960..1969).maximum(:release_year)</command>
  =&gt; 1968 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Die <filename>log/development.log</filename> zeigt die
       entsprechende SQL-Abfrage:<programlisting>  SQL (0.2ms)  SELECT MAX("albums"."release_year") AS max_id FROM "albums"
@@ -1253,7 +1303,7 @@ ruby-1.9.2-p0 &gt; <command>Album.minimum(:release_year)</command>
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1970..1979).minimum(:release_year)</command>
  =&gt; 1971 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Die <filename>log/development.log</filename> zeigt die
       entsprechende SQL-Abfrage:<programlisting>  SQL (0.2ms)  SELECT MIN("albums"."release_year") AS min_id FROM "albums"
@@ -1276,7 +1326,7 @@ ruby-1.9.2-p0 &gt; <command>Album.sum(:release_year)</command>
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1970..1979).sum(:release_year)</command>
  =&gt; 5922 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Die <filename>log/development.log</filename> zeigt die
       entsprechende SQL-Abfrage:<programlisting>  SQL (0.2ms)  SELECT SUM("albums"."release_year") AS sum_id FROM "albums"
@@ -1302,7 +1352,7 @@ ruby-1.9.2-p0 &gt; <command>Album.find([1,3,7])</command>
 ruby-1.9.2-p0 &gt; <command>Album.find([1,3,7]).class</command>
  =&gt; Array 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Wenn man immer ein Array als Ergebnis haben will muss man nur nur
       einfach immer auch ein Array als Parameter übergeben:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
@@ -1312,7 +1362,7 @@ ruby-1.9.2-p0 &gt; <command>Album.find(5).class</command>
 ruby-1.9.2-p0 &gt; <command>Album.find([5]).class</command>
  =&gt; Array 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Wenn man nach einer ID sucht, sollte man sich allerdings ganz
       sicher sein, das es diese Idee auch gibt. Im Zweifelsfall kann/muss man
@@ -1336,7 +1386,7 @@ ActiveRecord::RecordNotFound: Couldn't find Album with ID=50
 ruby-1.9.2-p0 &gt; <command>Album.exists?(50)</command>
  =&gt; false 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     </section>
 
     <section xml:id="activerecord_find_by">
@@ -1389,7 +1439,7 @@ ruby-1.9.2-p0 &gt; <command>Album.find_last_by_release_year(1966)</command>
 </emphasis> =&gt; #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-10-06 10:16:18", updated_at: "2010-10-06 10:16:18"&gt; 
 
 ruby-1.9.2-p0 &gt; exit
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <important>
         <para>Im Gegensatz zu <methodname>where</methodname> gibt
@@ -1409,7 +1459,7 @@ ruby-1.9.2-p0 &gt; <command>Album.find_by_release_year(2010)</command>
 ruby-1.9.2-p0 &gt; <command>Album.find_by_release_year(2010).class</command>
  =&gt; NilClass 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       </important>
 
       <para>Die Methode <methodname>find_all_by</methodname> gibt wie
@@ -1420,7 +1470,7 @@ ruby-1.9.2-p0 &gt; <command>Album.find_all_by_release_year(2020).class</command>
 ruby-1.9.2-p0 &gt; <command>Album.find_all_by_release_year(1966).class</command>
  =&gt; Array 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <section xml:id="activerecord_find_by_and_verkettung">
         <title xml:id="activerecord_find_by_and_verkettung.title">Verkettung
@@ -1442,7 +1492,7 @@ ruby-1.9.2-p0 &gt; <command>Album.find_all_by_position_and_release_year(1,1967)<
 ruby-1.9.2-p0 &gt; <command>Album.find_by_position_and_name(5,'The Beatles')</command>
  =&gt; nil 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       </section>
 
       <section>
@@ -1459,7 +1509,7 @@ ruby-1.9.2-p0 &gt; <command>beatles = Album.find_or_create_by_name('The Beatles'
 ruby-1.9.2-p0 &gt; <command>ray_charles = Album.find_or_create_by_name('Crying Time')</command>
  =&gt; #&lt;Album id: 11, position: nil, name: "Crying Time", release_year: nil, created_at: "2010-10-06 12:15:26", updated_at: "2010-10-06 12:15:26"&gt; 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
         <para>In der <filename>log/development.log</filename> lässt sich
         nachvollziehen, das nach der zweiten Anfrage direkt ein INSERT
@@ -1488,7 +1538,7 @@ ruby-1.9.2-p0 &gt; <command>crying_time = Album.find_or_create_by_name('Genius L
 ruby-1.9.2-p0 &gt; <command>crying_time</command>
  =&gt; #&lt;Album id: 12, position: nil, name: "Genius Loves Company", release_year: 2004, created_at: "2010-10-07 13:23:58", updated_at: "2010-10-07 13:23:58"&gt; 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
         <para>Ein Blick in die <filename>log/development.log</filename> zeigt,
         das zwar nur nach "Genius Loves Company" gesucht wurde, aber der neue
@@ -1517,7 +1567,7 @@ ruby-1.9.2-p0 &gt; <command>i_got_a_woman.save</command>
 ruby-1.9.2-p0 &gt; <command>Album.last</command>
  =&gt; #&lt;Album id: 13, position: nil, name: "I Got a Woman", release_year: 1955, created_at: "2010-10-07 16:05:59", updated_at: "2010-10-07 16:05:59"&gt; 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       </section>
 
       <section xml:id="activerecord_find_by_all_performance">
@@ -1552,7 +1602,7 @@ ruby-1.9.2-p0 &gt; <command>Album.find_all_by_release_year(1966).count</command>
 <emphasis>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" = 1966)
 </emphasis> =&gt; 3 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
         <para>Die Kombination der Methoden <methodname>where</methodname> und
         <methodname>count</methodname> erstellt eine SQL-Abfrage die das
@@ -1618,7 +1668,7 @@ ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1966).class</command
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1966).to_sql</command>
  =&gt; "SELECT     \"albums\".* FROM       \"albums\"  WHERE     (\"albums\".\"release_year\" = 1966)" 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Wenn aber <code>Album.where(:release_year =&gt; 1966)</code> ein
       <classname>ActiveRecord::Relation</classname> ist, warum bekommen wir
@@ -1631,7 +1681,7 @@ ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1966).class</command
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1966).all.class</command>
  =&gt; Array 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Noch nicht ganz klar? Dann machen wir einen anderen Versuch. Hier
       schauen wir uns die Klassen von einem <methodname>find</methodname> und
@@ -1651,7 +1701,7 @@ ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1966).class == Album
 ruby-1.9.2-p0 &gt; <command>Album.find_all_by_release_year(1966) == Album.where(:release_year =&gt; 1966)</command>
  =&gt; true 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Prinzipiel klar, aber der Sinn noch nicht ganz? Dann bauen wir uns
       mal eine Abfrage zusammen, in der wir mehrere Methoden verschachteln. In
@@ -1682,7 +1732,7 @@ ruby-1.9.2-p0 &gt; <command>a.to_sql</command>
 ruby-1.9.2-p0 &gt; <command>a.all</command>
  =&gt; [#&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-09-03 09:04:45", updated_at: "2010-09-03 09:04:45"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <section xml:id="activerecord_lazyloading_automatische_optimierung">
         <title
@@ -1701,7 +1751,7 @@ ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1970..1979).sum(:rel
 ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1970..1979).order(:name).sum(:release_year)</command>
  =&gt; 5922 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
         <para>Das Ergebnis ist bei beiden Abfragen logischerweise identisch.
         Und ein Blick in die <filename>log/development.log</filename> zeigt
@@ -1734,7 +1784,7 @@ ruby-1.9.2-p0 &gt; <command>Album.first</command>
   Album Load (0.1ms)  SELECT "albums".* FROM "albums" LIMIT 1
  =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt; 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     </section>
   </section>
 
@@ -1781,7 +1831,7 @@ ruby-1.9.2-p0 &gt; <command>apfelmus.save</command>
 ruby-1.9.2-p0 &gt; <command>Album.last</command>
  =&gt; #&lt;Album id: 10, position: 10, name: "Ein Test", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 19:56:49"&gt; 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     </section>
 
     <section xml:id="activerecord_changed">
@@ -1804,7 +1854,7 @@ ruby-1.9.2-p0 &gt; <command>apfelmus.save</command>
 ruby-1.9.2-p0 &gt; <command>apfelmus.changed?</command>
  =&gt; false 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     </section>
 
     <section xml:id="activerecord_update_attributes">
@@ -1829,7 +1879,7 @@ ruby-1.9.2-p0 &gt; <command>apfelmus.changed?</command>
 ruby-1.9.2-p0 &gt; <command>Album.last</command>
  =&gt; #&lt;Album id: 10, position: 10, name: "Ein Test", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 20:22:38"&gt; 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Ein solches Update lässt sich auch direkt an eine
       <methodname>where</methodname> Methode anknüpfen und ist dann fast
@@ -1844,7 +1894,7 @@ ruby-1.9.2-p0 &gt; <command>Album.where(:name =&gt; 'Ein Test').first</command>
 ruby-1.9.2-p0 &gt; <command>Album.last</command>
  =&gt; #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 20:24:41"&gt; 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Das es aber doch noch zwei SQL-Befehle sind zeigt sich in der
       <filename>log/development.log</filename>:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."name" = 'Ein Test') LIMIT 1
@@ -1922,7 +1972,7 @@ Instance methods:
   attributes_from_column_definition
 
 
-stefan@swmbp 0 1.9.2-p0 jukebox$</screen></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     </section>
   </section>
 
@@ -1957,7 +2007,7 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
       invoke    test_unit
       create      test/unit/person_test.rb
       create      test/fixtures/people.yml
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
     <important>
       <para>Haben Sie gesehen wie Rails automatisch den Plural von person
@@ -1974,7 +2024,7 @@ stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
       invoke    test_unit
       create      test/unit/phonenumber_test.rb
       create      test/fixtures/phonenumbers.yml
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
     <para>Danach ein <command>rake db:migrate</command> ausführen, damit die
     Datenbanken auch angelegt werden:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:migrate</command>
@@ -1989,7 +2039,7 @@ stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
    -&gt; 0.0018s
 ==  CreatePhonenumbers: migrated (0.0020s) ====================================
 
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
     <para>Schauen wir uns das mal auf der Console an:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
@@ -1998,7 +2048,7 @@ ruby-1.9.2-p0 &gt; <command>Person</command>
 ruby-1.9.2-p0 &gt; <command>Phonenumber</command>
  =&gt; Phonenumber(id: integer, person_id: integer, name: string, number: string, created_at: datetime, updated_at: datetime) 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
     <para>Die zwei Datenbanken sind eingerichtet und können mit ActiveRecord
     benutzt werden. Allerdings weiß ActiveRecord noch nichts von der 1:n
@@ -2064,7 +2114,7 @@ ruby-1.9.2-p0 &gt; <command>Person.all</command>
 ruby-1.9.2-p0 &gt; <command>Phonenumber.all</command>
  =&gt; [#&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 10:35:09", updated_at: "2010-10-09 10:35:09"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 10:35:45", updated_at: "2010-10-09 10:35:45"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 10:36:29", updated_at: "2010-10-09 10:36:29"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
         <para>Die person_id von Hand einzutragen ist natürlich sehr
         fehleranfällig. Das gleiche Ergebnis könnten wir auch einen Tick
@@ -2086,7 +2136,7 @@ ruby-1.9.2-p0 &gt; <command>Person.all</command>
 ruby-1.9.2-p0 &gt; <command>Phonenumber.all</command>
  =&gt; [#&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 10:35:09", updated_at: "2010-10-09 10:35:09"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 10:35:45", updated_at: "2010-10-09 10:35:45"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 10:36:29", updated_at: "2010-10-09 10:36:29"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
         <para>Immer noch nicht super praktisch, oder? Nur Geduld! ;-)</para>
       </section>
@@ -2119,7 +2169,7 @@ ruby-1.9.2-p0 &gt; <command>Person.all</command>
 ruby-1.9.2-p0 &gt; <command>Phonenumber.all</command>
  =&gt; [#&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 10:54:58", updated_at: "2010-10-09 10:54:58"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 10:56:35", updated_at: "2010-10-09 10:56:35"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 10:57:21", updated_at: "2010-10-09 10:57:21"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
         <para>Es geht sogar noch kürzer, da <methodname>create</methodname>
         auch ein Array von Hashes aktzeptiert. Wir können also alle
@@ -2137,7 +2187,7 @@ ruby-1.9.2-p0 &gt; <command>Person.all</command>
 ruby-1.9.2-p0 &gt; <command>Phonenumber.all</command>
  =&gt; [#&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 11:05:45", updated_at: "2010-10-09 11:05:45"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 11:05:45", updated_at: "2010-10-09 11:05:45"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 11:05:45", updated_at: "2010-10-09 11:05:45"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
         <para>Ich ahne was Sie sich jetzt fragen: "Geht es noch kürzer?".
         Klar: Wir können ja auch alles direkt in eine Zeile schreiben:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
@@ -2152,7 +2202,7 @@ ruby-1.9.2-p0 &gt; <command>Person.all</command>
 ruby-1.9.2-p0 &gt; <command>Phonenumber.all</command>
  =&gt; [#&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 11:13:43", updated_at: "2010-10-09 11:13:43"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 11:13:43", updated_at: "2010-10-09 11:13:43"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 11:13:43", updated_at: "2010-10-09 11:13:43"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
       </section>
 
       <section xml:id="activerecord_hinzufuegen_build">
@@ -2177,7 +2227,7 @@ ruby-1.9.2-p0 &gt; <command>fritz_handy.save</command>
 ruby-1.9.2-p0 &gt; <command>fritz_handy.new_record?</command>
  =&gt; false 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
         <warning>
           <para>Im Gegensatz zu <methodname>create</methodname> kann man mit
@@ -2196,7 +2246,7 @@ ruby-1.9.2-p0 &gt; <command>Person.build(:firstname =&gt; 'Fritz', :lastname =&g
  from script/rails:6:in `require'
  from script/rails:6:in `&lt;main&gt;'
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
         </warning>
       </section>
     </section>
@@ -2243,7 +2293,7 @@ db/development.sqlite3 already exists
    -&gt; 0.0047s
 -- assume_migrated_upto_version(20101008205906, "db/migrate")
    -&gt; 0.0039s
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <para>Das praktische an der 1:n Zuordnung in ActiveRecord ist der super
       einfache Zugang zu den n-Instanzen. Schauen wir uns das mal für den
@@ -2292,7 +2342,7 @@ ruby-1.9.2-p0 &gt; </screen></para>
 ruby-1.9.2-p0 &gt; <command>karteileiche.person</command>
  =&gt; nil 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <para>Dieser neue Datensatz hatte keinen Eintrag (also
       <varname>nil</varname>) in der Spalte <varname>person_id</varname> und
@@ -2342,7 +2392,7 @@ db/development.sqlite3 already exists
    -&gt; 0.0047s
 -- assume_migrated_upto_version(20101008205906, "db/migrate")
    -&gt; 0.0039s
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <para>Legen wir mal los. Als erstes schauen wir uns mal an, wie viele
       Personen in der Datenbank sind:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
@@ -2373,7 +2423,7 @@ ruby-1.9.2-p0 &gt; <command>Person.where(:lastname =&gt; 'Meier').first</command
 ruby-1.9.2-p0 &gt; <command>Person.where(:lastname =&gt; 'Meier').first.class</command>
  =&gt; Person(id: integer, firstname: string, lastname: string, created_at: datetime, updated_at: datetime) 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
       </warning>
 
       <para>Aber in dem 1:n Kontext ist es natürlich interessanter
@@ -2557,7 +2607,7 @@ ruby-1.9.2-p0 ?&gt;  <command>end</command>
 0172-22225678
  =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
         <para>Hier haben wir nur eine SQL-Abfrage die 0.3ms gedauert hat. Die
         erste SQL-Abfrage dauert also länger, dafür spart man sich aber
@@ -2595,7 +2645,7 @@ ruby-1.9.2-p0 &gt; <command>Person.first.phonenumbers.destroy_all</command>
 ruby-1.9.2-p0 &gt; <command>Person.first.phonenumbers</command>
  =&gt; [] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
     </section>
 
     <section xml:id="activerecord_1n_optionen">
@@ -2660,7 +2710,7 @@ ruby-1.9.2-p0 &gt; <command>Person.first.destroy</command>
 ruby-1.9.2-p0 &gt; <command>Phonenumber.where(:person_id =&gt; 1).count</command>
  =&gt; 0 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
               <important>
                 <para>Bitte denken Sie immer an den Unterschied zwischen den
@@ -2722,7 +2772,7 @@ end</programlisting></para>
       invoke    test_unit
       create      test/unit/call_record_test.rb
       create      test/fixtures/call_records.yml
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <para>Die Datenbank-Tabelle anlegen:<screen>stefan@swmbp 1 1.9.2-p0 phonebook$ <command>rake db:migrate</command>
 (in /Users/stefan/phonebook)
@@ -2790,7 +2840,7 @@ ruby-1.9.2-p0 &gt; <command>fritz.phonenumbers.first.call_records</command>
 ruby-1.9.2-p0 &gt; <command>fritz.phonenumbers.first.call_records.count</command>
  =&gt; 6 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <para>Im <filename>log/development.log</filename> schauen wir uns die
       letzten zwei Anfragen noch mal genau an:<programlisting>  Phonenumber Load (0.2ms)  SELECT "phonenumbers".* FROM "phonenumbers" WHERE ("phonenumbers".person_id = 1) LIMIT 1
@@ -2873,7 +2923,7 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:migrate</command>
    -&gt; 0.0013s
 ==  CreateComments: migrated (0.0013s) ========================================
 
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <para>Das "able" beim Namen "commentable" ist Rails-üblich, muss aber
       nicht sein. Wir brauchen ja zum Verknüpfen jetzt nicht nur die ID des
@@ -2941,7 +2991,7 @@ db/development.sqlite3 already exists
    -&gt; 0.0004s
 -- assume_migrated_upto_version(20101011084411, "db/migrate")
    -&gt; 0.0004s
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <para>Gehen wir mal in die Console und versuchen mal zwei Kommentare zu
       Herrn Fritz Meier anzulegen.<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
@@ -3045,7 +3095,7 @@ db/development.sqlite3 already exists
    -&gt; 0.0047s
 -- assume_migrated_upto_version(20101008205906, "db/migrate")
    -&gt; 0.0039s
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <para>Als erstes löschen wir Herrn Fritz Meier inklusive all seiner
       Telefonnummern:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
@@ -3077,7 +3127,7 @@ ruby-1.9.2-p0 &gt;</screen></para>
 ruby-1.9.2-p0 &gt; <command>Person.where(:lastname =&gt; 'Meier', :firstname =&gt; 'Fritz')</command>
  =&gt; [#&lt;Person id: 6, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <para>Jetzt fehlen allerdings noch die Telefonnummern. Die können Sie
       aber extra abspeichern (da sie ja noch im frozen Objekt vorhanden
@@ -3104,7 +3154,7 @@ ruby-1.9.2-p0 &gt; <command>Person.first.delete</command>
 ruby-1.9.2-p0 &gt; <command>Phonenumber.where(:person_id =&gt; 2)</command>
  =&gt; [#&lt;Phonenumber id: 4, person_id: 2, name: "Home", number: "030-8888888", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt;] 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <para>Es wird zwar der Datensatz von Frau Meier gelöscht, aber die
       Telefonnummern in der <classname>Phonenumber</classname> Datenbank
@@ -3163,7 +3213,7 @@ db/development.sqlite3 already exists
    -&gt; 0.0047s
 -- assume_migrated_upto_version(20101008205906, "db/migrate")
    -&gt; 0.0039s
-stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
+stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
     <para>Eine Transaktion wird nach folgendem Muster
     durchgeführt:<programlisting>ActiveRecord::Base.transaction do
@@ -3239,11 +3289,9 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
       </warning></para>
   </section>
 
-
   <xi:include href="named_scope.xml" />
 
   <xi:include href="validation.xml" />
 
   <xi:include href="migration.xml" />
-
 </chapter>
