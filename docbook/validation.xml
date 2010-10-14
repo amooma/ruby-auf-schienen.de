@@ -46,7 +46,7 @@ stefan@swmbp 0 1.9.2-p0 online_shop$</screen></para>
       create      test/fixtures/users.yml
 stefan@swmbp 0 1.9.2-p0 online_shop$ </screen></para>
 
-    <para>Ein Telefonnummern-Model:<screen>stefan@swmbp 0 1.9.2-p0 online_shop$ <command>rails generate model phone name:string country_code:string area_code:string number:string</command>
+    <para>Ein Telefonnummern-Model:<screen>stefan@swmbp 0 1.9.2-p0 online_shop$ <command>rails generate model phone user_id:integer name:string country_code:string area_code:string number:string</command>
       invoke  active_record
       create    db/migrate/20101013105612_create_phones.rb
       create    app/models/phone.rb
@@ -100,7 +100,7 @@ Loading development environment (Rails 3.0.0)
 ruby-1.9.2-p0 &gt; <command>test1 = User.create</command>
  =&gt; #&lt;User id: 1, login: nil, password_hash: nil, email: nil, firstname: nil, lastname: nil, gender: nil, birthday: nil, created_at: "2010-10-13 11:17:44", updated_at: "2010-10-13 11:17:44"&gt; 
 ruby-1.9.2-p0 &gt; <command>test2 = Phone.create</command>
- =&gt; #&lt;Phone id: 1, name: nil, country_code: nil, area_code: nil, number: nil, created_at: "2010-10-13 11:17:49", updated_at: "2010-10-13 11:17:49"&gt; 
+ =&gt; #&lt;Phone id: 1, user_id: integer, name: nil, country_code: nil, area_code: nil, number: nil, created_at: "2010-10-13 11:17:49", updated_at: "2010-10-13 11:17:49"&gt; 
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 online_shop$</screen></para>
 
@@ -401,7 +401,7 @@ ruby-1.9.2-p0 &gt;</screen></para>
           <listitem>
             <para><code>:allow_nil</code></para>
 
-            <para>Das Attribut darf den Wert nil haben.
+            <para>Das Attribut darf den Wert nil haben. Default: false.
             Beispiel:<programlisting>validates_length_of :attribute, :allow_nil =&gt; true
 </programlisting></para>
           </listitem>
@@ -409,7 +409,8 @@ ruby-1.9.2-p0 &gt;</screen></para>
           <listitem>
             <para><code>:allow_blank</code></para>
 
-            <para>Das Attribut darf ganz leer sein. Beispiel:<programlisting>validates_length_of :attribute, :is =&gt; 23
+            <para>Das Attribut darf ganz leer sein. Default: false.
+            Beispiel:<programlisting>validates_length_of :attribute, :allow_blank =&gt; true
 </programlisting></para>
           </listitem>
 
@@ -734,7 +735,7 @@ ruby-1.9.2-p0 &gt;</screen></para>
       Phänomen). Wenn Sie sich für diese Problematik interessieren, schauen
       Sie bitte einmal in die Doku von validates_uniqueness_of (<command>ri
       validates_uniqueness_of</command>). Dort werden Möglichkeiten
-      aufgelistet, wie man dieses Problem lösen kann. </para>
+      aufgelistet, wie man dieses Problem lösen kann.</para>
     </warning>
 
     <section xml:id="validates_uniqueness_of_optionen">
@@ -746,7 +747,7 @@ ruby-1.9.2-p0 &gt;</screen></para>
             <para><code>:message</code></para>
 
             <para>Um eine eigene Fehlermeldung auszugeben. Default: "has
-            already been taken". Beispiel:<programlisting>validates_numericality_of :attribute, :message =&gt; 'hmmm... not good. It has been already taken.'
+            already been taken". Beispiel:<programlisting>validates_uniqueness_of :attribute, :message =&gt; 'hmmm... not good. It has been already taken.'
 </programlisting><note>
                 <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
                 linkend="i18n" />.</para>
@@ -776,7 +777,7 @@ ruby-1.9.2-p0 &gt;</screen></para>
           <listitem>
             <para><code>:allow_nil</code></para>
 
-            <para>Das Attribut darf den Wert nil haben.
+            <para>Das Attribut darf den Wert nil haben. Default: false.
             Beispiel:<programlisting>validates_uniqueness_of :attribute, :allow_nil =&gt; true
 </programlisting></para>
           </listitem>
@@ -784,7 +785,8 @@ ruby-1.9.2-p0 &gt;</screen></para>
           <listitem>
             <para><code>:allow_blank</code></para>
 
-            <para>Das Attribut darf ganz leer sein. Beispiel:<programlisting>validates_uniqueness_of :attribute, :is =&gt; 23
+            <para>Das Attribut darf ganz leer sein. Default: false.
+            Beispiel:<programlisting>validates_uniqueness_of :attribute, :allow_blank =&gt; true
 </programlisting></para>
           </listitem>
 
@@ -813,6 +815,347 @@ ruby-1.9.2-p0 &gt;</screen></para>
 
       <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
       validates_uniqueness_of</command> auf der Kommandozeile aufrufen.</para>
+    </section>
+  </section>
+
+  <section xml:id="validates_inclusion_of">
+    <title
+    xml:id="validates_inclusion_of.title">validates_inclusion_of</title>
+
+    <para>Mit <methodname>validates_inclusion_of</methodname> können Sie
+    definieren, aus welchen Werten der Inhalt dieses Attributes erstellt
+    werden kann. Bei unserem Beispiel können wir das am Attribute
+    <methodname>gender</methodname> veranschaulischen.</para>
+
+    <para><filename>app/models/user.rb</filename><programlisting>class User &lt; ActiveRecord::Base
+  has_many :phones, :dependent =&gt; :destroy
+  
+  # Validations
+  validates_presence_of :login, :email, :lastname, :gender, :birthday
+  
+  validates_length_of :login, :within =&gt; 3..20
+  validates_length_of :email, :within =&gt; 6..255
+  validates_length_of :lastname, :minimum =&gt; 2
+  
+  validates_uniqueness_of :login, :email
+  
+<emphasis>  validates_inclusion_of :gender, :in =&gt; %w( male female )
+</emphasis>end</programlisting></para>
+
+    <para>In unserem Datenmodel muss ein <classname>User</classname> als
+    <methodname>gender</methodname> entweder "male" (männlich) oder "female"
+    (weiblich) sein. Wenn wir einen anderen Wert als "male" oder "female"
+    eingeben, wird ein Validation-Fehler gemeldet:<screen>ruby-1.9.2-p0 &gt; <command>liz = User.create(:login =&gt; 'liz', :email =&gt; 'liz@company.com', :lastname =&gt; 'Steinbruch', :gender =&gt; 'weiblich', :birthday =&gt; Date.today - 23.years)</command>
+ =&gt; #&lt;User id: nil, login: "liz", password_hash: nil, email: "liz@company.com", firstname: nil, lastname: "Steinbruch", gender: "weiblich", birthday: "1987-10-14", created_at: nil, updated_at: nil&gt; 
+ruby-1.9.2-p0 &gt; <command>liz.valid?</command>
+ =&gt; false 
+ruby-1.9.2-p0 &gt; <command>liz.errors</command>
+ =&gt; {:gender=&gt;["is not included in the list"]} 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+    <tip>
+      <para>Denken Sie immer an die Macht von Ruby! Sie können so z.B. das
+      Enumerable Objekt für in immer live aus einer anderen Datenbank
+      generieren. Das heißt die Validation ist nicht statisch
+      definiert.</para>
+    </tip>
+
+    <section xml:id="validates_inclusion_of_optionen">
+      <title xml:id="validates_inclusion_of_optionen.title">Optionen</title>
+
+      <para><methodname>validates_inclusion_of</methodname> kann mit folgenden
+      Optionen aufgerufen werden:<itemizedlist>
+          <listitem>
+            <para><code>:message</code></para>
+
+            <para>Um eine eigene Fehlermeldung auszugeben. Default: "is not
+            included in the list". Beispiel:<programlisting>validates_inclusion_of :attribute, :message =&gt; 'this one is not allowed'
+</programlisting><note>
+                <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
+                linkend="i18n" />.</para>
+              </note></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:in</code></para>
+
+            <para>Definiert das Enumerable Objekt mit allen erlaubten Werten
+            für dieses Attribut. Beispiele:</para>
+
+            <para><programlisting>validates_inclusion_of :gender, :in =&gt; %w( male female )
+validates_inclusion_of :age, :in =&gt; 18..105
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:allow_nil</code></para>
+
+            <para>Das Attribut darf den Wert nil haben. Default: false.
+            Beispiel:<programlisting>validates_inclusion_of :attribute, :allow_nil =&gt; true
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:allow_blank</code></para>
+
+            <para>Das Attribut darf ganz leer sein. Default:false.
+            Beispiel:<programlisting>validates_inclusion_of :attribute, :allow_blank =&gt; true
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:if</code></para>
+
+            <para>Definiert eine Methode, einen Proc oder einen String der
+            definiert, ob die Validierung ausgeführt werden soll.
+            Beispiel:<programlisting>validates_inclusion_of :attribute, :if =&gt; Date.today.monday?
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:unless</code></para>
+
+            <para>Wie <methodname>if</methodname>, nur das hier definiert
+            wird, wann die Validierung nicht erfolgen soll.
+            Beispiel:<programlisting>validates_inclusion_of :attribute, :unless =&gt; Date.today.tuesday?
+</programlisting></para>
+          </listitem>
+        </itemizedlist></para>
+    </section>
+
+    <section xml:id="validates_inclusion_of_doku">
+      <title xml:id="validates_inclusion_of_doku.title">Weitere Doku</title>
+
+      <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
+      validates_inclusion_of</command> auf der Kommandozeile aufrufen.</para>
+    </section>
+  </section>
+
+  <section xml:id="validates_exclusion_of">
+    <title
+    xml:id="validates_exclusion_of.title">validates_exclusion_of</title>
+
+    <para>Mit <methodname>validates_exclusion_of</methodname> können Sie
+    definieren, aus welchen Werten der Inhalt dieses Attributes nicht erstellt
+    werden darf. Bei unserem Beispiel können wir das am Attribute
+    <methodname>login</methodname> veranschaulischen.</para>
+
+    <para><filename>app/models/user.rb</filename><programlisting>class User &lt; ActiveRecord::Base
+  has_many :phones, :dependent =&gt; :destroy
+  
+  # Validations
+  validates_presence_of :login, :email, :lastname, :gender, :birthday
+  
+  validates_length_of :login, :within =&gt; 3..20
+  validates_length_of :email, :within =&gt; 6..255
+  validates_length_of :lastname, :minimum =&gt; 2
+  
+  validates_uniqueness_of :login, :email
+  
+  validates_inclusion_of :gender, :in =&gt; %w( male female )
+<emphasis>  validates_exclusion_of :login, :in =&gt; %w( admin sysadmin administrator root )
+</emphasis>end</programlisting></para>
+
+    <para>Wir gehen dabei davon aus, das z.B. "admin" kein
+    <methodname>login</methodname> sein darf. Falls das doch versucht wird,
+    wird ein Validation-Fehler gemeldet:<screen>ruby-1.9.2-p0 &gt; <command>admin = User.create(:login =&gt; 'admin', :email =&gt; 'admin@company.com', :lastname =&gt; 'Master', :gender =&gt; 'male', :birthday =&gt; Date.today - 23.years)</command>
+ =&gt; #&lt;User id: nil, login: "admin", password_hash: nil, email: "admin@company.com", firstname: nil, lastname: "Master", gender: "male", birthday: "1987-10-14", created_at: nil, updated_at: nil&gt; 
+ruby-1.9.2-p0 &gt; <command>admin.valid?</command>
+ =&gt; false 
+ruby-1.9.2-p0 &gt; <command>admin.errors</command>
+ =&gt; {:login=&gt;["is reserved"]} 
+ruby-1.9.2-p0 &gt; </screen></para>
+
+    <tip>
+      <para>Denken Sie immer an die Macht von Ruby! Sie können so z.B. das
+      Enumerable Objekt für in immer live aus einer anderen Datenbank
+      generieren. Das heißt die Validation ist nicht statisch
+      definiert.</para>
+    </tip>
+
+    <section xml:id="validates_exclusion_of_optionen">
+      <title xml:id="validates_exclusion_of_optionen.title">Optionen</title>
+
+      <para><methodname>validates_exclusion_of</methodname> kann mit folgenden
+      Optionen aufgerufen werden:<itemizedlist>
+          <listitem>
+            <para><code>:message</code></para>
+
+            <para>Um eine eigene Fehlermeldung auszugeben. Default: "is not
+            included in the list". Beispiel:<programlisting>validates_exclusion_of :attribute, :message =&gt; 'this one is not allowed'
+</programlisting><note>
+                <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
+                linkend="i18n" />.</para>
+              </note></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:in</code></para>
+
+            <para>Definiert das Enumerable Objekt mit allen nicht erlaubten
+            Werten für dieses Attribut. Beispiele:</para>
+
+            <para><programlisting>validates_exclusion_of :login, :in =&gt; %w( admin root sysadmin )
+validates_exclusion_of :age, :in =&gt; 0..17
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:allow_nil</code></para>
+
+            <para>Das Attribut darf den Wert nil haben. Default: false.
+            Beispiel:<programlisting>validates_exclusion_of :attribute, :allow_nil =&gt; true
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:allow_blank</code></para>
+
+            <para>Das Attribut darf ganz leer sein. Default: false.
+            Beispiel:<programlisting>validates_exclusion_of :attribute, :allow_blank =&gt; true
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:if</code></para>
+
+            <para>Definiert eine Methode, einen Proc oder einen String der
+            definiert, ob die Validierung ausgeführt werden soll.
+            Beispiel:<programlisting>validates_exclusion_of :attribute, :if =&gt; Date.today.monday?
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:unless</code></para>
+
+            <para>Wie <methodname>if</methodname>, nur das hier definiert
+            wird, wann die Validierung nicht erfolgen soll.
+            Beispiel:<programlisting>validates_exclusion_of :attribute, :unless =&gt; Date.today.tuesday?
+</programlisting></para>
+          </listitem>
+        </itemizedlist></para>
+    </section>
+
+    <section xml:id="validates_exclusion_of_doku">
+      <title xml:id="validates_exclusion_of_doku.title">Weitere Doku</title>
+
+      <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
+      validates_exclusion_of</command> auf der Kommandozeile aufrufen.</para>
+    </section>
+  </section>
+
+  <section xml:id="validates_format_of">
+    <title xml:id="validates_format_of.title">validates_format_of</title>
+
+    <para>Mit <methodname>validates_format_of</methodname> können Sie mit
+    einer Regular Expression (siehe <uri
+    xlink:href="http://de.wikipedia.org/wiki/Regul%C3%A4rer_Ausdruck">http://de.wikipedia.org/wiki/Regul%C3%A4rer_Ausdruck</uri>)
+    definieren wie sich der Inhalt eines Attributes aufbauen darf.</para>
+
+    <para><filename>app/models/user.rb</filename><programlisting>class User &lt; ActiveRecord::Base
+  has_many :phones, :dependent =&gt; :destroy
+  
+  # Validations
+  validates_presence_of :login, :email, :lastname, :gender, :birthday
+  
+  validates_length_of :login, :within =&gt; 3..20
+  validates_length_of :email, :within =&gt; 6..255
+  validates_length_of :lastname, :minimum =&gt; 2
+  
+  validates_uniqueness_of :login, :email
+  
+  validates_inclusion_of :gender, :in =&gt; %w( male female )
+  validates_exclusion_of :login, :in =&gt; %w( admin sysadmin administrator root )
+  
+<emphasis>  validates_format_of :email, :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
+</emphasis>end</programlisting></para>
+
+    <para>Diese einfache Validierung einer E-Mail Adresse auf syntaktische
+    Korrektheit habe ich aus <command>ri validates_format_of</command>
+    übernommen. Falls eine syntaktisch nicht korrekte E-Mail Adresse
+    eingegeben wird, kommt es zu einem Validation-Fehler:<screen>ruby-1.9.2-p0 &gt; <command>ingo = User.create(:login =&gt; 'ingo', :email =&gt; '@company.', :lastname =&gt; 'Udelhoven', :gender =&gt; 'male', :birthday =&gt; Date.today - 23.years)</command>
+  =&gt; #&lt;User id: nil, login: "ingo", password_hash: nil, email: "@company.", firstname: nil, lastname: "Udelhoven", gender: "male", birthday: "1987-10-14", created_at: nil, updated_at: nil&gt; 
+ruby-1.9.2-p0 &gt; <command>ingo.valid?</command>
+ =&gt; false 
+ruby-1.9.2-p0 &gt; <command>ingo.errors</command>
+ =&gt; {:email=&gt;["is invalid"]} 
+ruby-1.9.2-p0 &gt; </screen></para>
+
+    <warning>
+      <para>Es sollte klar sein, das die hier gezeigte E-Mail Adressen
+      Validierung nicht vollständig ist. Es geht hier nur um ein Beispiel.
+      Damit kann man nur die syntaktische Korrektheit einer E-Mail Adresse
+      überprüfen.</para>
+    </warning>
+
+    <section xml:id="validates_format_of_optionen">
+      <title xml:id="validates_format_of_optionen.title">Optionen</title>
+
+      <para><methodname>validates_format_of</methodname> kann mit folgenden
+      Optionen aufgerufen werden:<itemizedlist>
+          <listitem>
+            <para><code>:message</code></para>
+
+            <para>Um eine eigene Fehlermeldung auszugeben. Default: "is
+            invalid". Beispiel:<programlisting>validates_format_of :attribute, :message =&gt; 'not the right format'
+</programlisting><note>
+                <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
+                linkend="i18n" />.</para>
+              </note></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:allow_nil</code></para>
+
+            <para>Das Attribut darf den Wert nil haben. Default: false.
+            Beispiel:<programlisting>validates_format_of :attribute, :allow_nil =&gt; true
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:allow_blank</code></para>
+
+            <para>Das Attribut darf ganz leer sein. Default: false.
+            Beispiel:<programlisting>validates_format_of :attribute, :allow_blank =&gt; true
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:with</code></para>
+
+            <para>Definiert die Regular Expression (siehe <uri
+            xlink:href="http://de.wikipedia.org/wiki/Regul%C3%A4rer_Ausdruck">http://de.wikipedia.org/wiki/Regul%C3%A4rer_Ausdruck</uri>)
+            zur Überprüfung des Formates. Beispiel:</para>
+
+            <para><programlisting>validates_format_of :email, :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:if</code></para>
+
+            <para>Definiert eine Methode, einen Proc oder einen String der
+            definiert, ob die Validierung ausgeführt werden soll.
+            Beispiel:<programlisting>validates_format_of :attribute, :if =&gt; Date.today.monday?
+</programlisting></para>
+          </listitem>
+
+          <listitem>
+            <para><code>:unless</code></para>
+
+            <para>Wie <methodname>if</methodname>, nur das hier definiert
+            wird, wann die Validierung nicht erfolgen soll.
+            Beispiel:<programlisting>validates_format_of :attribute, :unless =&gt; Date.today.tuesday?
+</programlisting></para>
+          </listitem>
+        </itemizedlist></para>
+    </section>
+
+    <section xml:id="validates_format_of_doku">
+      <title xml:id="validates_format_of_doku.title">Weitere Doku</title>
+
+      <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
+      validates_format_of</command> auf der Kommandozeile aufrufen.</para>
     </section>
   </section>
 </section>
