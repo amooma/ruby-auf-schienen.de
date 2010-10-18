@@ -1158,4 +1158,82 @@ ruby-1.9.2-p0 &gt; </screen></para>
       validates_format_of</command> auf der Kommandozeile aufrufen.</para>
     </section>
   </section>
+
+  <section xml:id="method_validates">
+    <title xml:id="method_validates.title">validates</title>
+
+    <para>Mit der Methode <methodname>validates</methodname> können Sie ab
+    Rails 3 ebenfalls alle Validierungen vornehmen. Ich zeige Ihnen mal den
+    Unterschied an der app/models/user.rb<itemizedlist>
+        <listitem>
+          <para>Traditionell</para>
+
+          <para><filename>app/models/user.rb</filename><programlisting>class User &lt; ActiveRecord::Base
+  has_many :phones, :dependent =&gt; :destroy
+  
+  # Validations
+  validates_presence_of :login, :email, :lastname, :gender, :birthday
+  
+  validates_length_of :login, :within =&gt; 3..20
+  validates_length_of :email, :within =&gt; 6..255
+  validates_length_of :lastname, :minimum =&gt; 2
+  
+  validates_uniqueness_of :login, :email
+  
+  validates_inclusion_of :gender, :in =&gt; %w( male female )
+  validates_exclusion_of :login, :in =&gt; %w( admin sysadmin administrator root )
+  
+<emphasis><emphasis>  validates_format_of :email, :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
+</emphasis></emphasis>end</programlisting></para>
+        </listitem>
+
+        <listitem>
+          <para>mit <methodname>validates</methodname></para>
+
+          <para><filename>app/models/user.rb</filename><programlisting>class User &lt; ActiveRecord::Base
+  has_many :phones, :dependent =&gt; :destroy
+  
+  # Validations
+  validates :login,
+            :presence =&gt; true,
+            :uniqueness =&gt; true,
+            :length =&gt; { :within =&gt; 3..20 }
+            :exclusion =&gt; %w( admin sysadmin administrator root )
+
+  validates :email,
+            :presence =&gt; true,
+            :uniqueness =&gt; true,
+            :format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i },
+            :length =&gt; { :within =&gt; 6..255 }
+
+  validates :lastname,
+            :presence =&gt; true,
+            :length =&gt; { :minimum =&gt; 2 }
+
+  validates :gender,
+            :presence =&gt; true,
+            :inclusion =&gt; %w( male female )
+  
+  validates :birthday,
+            :presence =&gt; true
+end</programlisting></para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>Man kann sich streiten, welche Variante besser lesbar ist.</para>
+
+    <section xml:id="validates_format_of_doku">
+      <title xml:id="validates_format_of_doku.title">Weitere Doku</title>
+
+      <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
+      validates</command> auf der Kommandozeile aufrufen.</para>
+    </section>
+  </section>
+
+  <section>
+    <title>Eigene Validatoren schreiben</title>
+
+    <para>Hin und wieder braucht man exotische Validatoren und die muss man
+    sich dann selber schreiben. </para>
+  </section>
 </section>
