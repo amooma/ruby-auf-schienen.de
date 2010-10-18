@@ -3376,36 +3376,43 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
       <para>Legen wir mal los. Als erstes schauen wir uns mal an, wie viele
       Personen in der Datenbank sind:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
+
 ruby-1.9.2-p0 &gt; <command>Person.count</command>
  =&gt; 5 
-ruby-1.9.2-p0 &gt;</screen></para>
+
+ruby-1.9.2-p0 &gt; </screen></para>
 
       <para>Und wie viele Telefonnummern?<screen>ruby-1.9.2-p0 &gt; <command>Phonenumber.count</command>
  =&gt; 7 
-ruby-1.9.2-p0 &gt;</screen></para>
+
+ruby-1.9.2-p0 &gt; </screen></para>
 
       <para>Die normalen Suchen kennen Sie bereits aus <xref
       linkend="queries" />. So können Sie mit <methodname>where</methodname>
-      z.B. alle Meier Einträge suchen:<screen>ruby-1.9.2-p0 &gt; <command>Person.where(:lastname =&gt; 'Meier')</command>
+      z.B. alle <quote>Meier</quote>-Einträge suchen:<screen>ruby-1.9.2-p0 &gt; <command>Person.where( :lastname =&gt; 'Meier' )</command>
  =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 14:59:14", updated_at: "2010-10-09 14:59:14"&gt;, #&lt;Person id: 2, firstname: "Ute", lastname: "Meier", created_at: "2010-10-09 14:59:14", updated_at: "2010-10-09 14:59:14"&gt;] 
+
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <warning>
-        <para>Bitte achten Sie immer darauf, das
-        <methodname>where</methodname> als Ergebnis immer ein Array ausgibt.
-        Wenn Sie den ersten Datensatz aus der Ergebnisliste benötigen, müssen
-        Sie noch ein <methodname>first</methodname> anfügen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+        <para>Bitte beachten Sie, dass <methodname>where</methodname> als
+        Ergebnis immer ein Array zurpckgibt. Wenn Sie den ersten Datensatz aus
+        der Ergebnisliste benötigen, müssen Sie noch ein
+        <methodname>first</methodname> anfügen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
-ruby-1.9.2-p0 &gt; <command>Person.where(:lastname =&gt; 'Meier').first</command>
+
+ruby-1.9.2-p0 &gt; <command>Person.where( :lastname =&gt; 'Meier' ).first</command>
  =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt; 
-ruby-1.9.2-p0 &gt; <command>Person.where(:lastname =&gt; 'Meier').first.class</command>
+
+ruby-1.9.2-p0 &gt; <command>Person.where( :lastname =&gt; 'Meier' ).first.class</command>
  =&gt; Person(id: integer, firstname: string, lastname: string, created_at: datetime, updated_at: datetime) 
+
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
       </warning>
 
-      <para>Aber in dem 1:n Kontext ist es natürlich interessanter
+      <para>Aber in dem 1:n-Kontext ist es natürlich interessanter,
       verschachtelt zu suchen. Dazu gibt es verschiedene Möglichkeiten.</para>
 
       <section xml:id="activerecord_1n_joins">
@@ -3421,92 +3428,121 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
         <para>Wie können wir alle Personen rausfinden, die in unserer
         Datenbank eine Handynummer abgespeichert haben? Das geht mit einem
-        join. Damit können wir die beiden Modele auch in der Suche
+        <foreignphrase xml:lang="en">Join</foreignphrase>.<footnote>
+            <para>Falls Sie sich für den theoretischen Hintergrund zu
+            <foreignphrase xml:lang="en">Joins</foreignphrase> interessieren
+            finden Sie weitere Informationen unter: <uri
+            xlink:href="http://de.wikipedia.org/wiki/SQL#Abfrage_mit_verkn.C3.BCpften_Tabellen">http://de.wikipedia.org/wiki/SQL#Abfrage_mit_verkn.C3.BCpften_Tabellen</uri>,
+            <uri
+            xlink:href="http://en.wikipedia.org/wiki/Join_%28SQL%29">http://en.wikipedia.org/wiki/Join_(SQL)</uri>,
+            <uri
+            xlink:href="http://de.wikipedia.org/wiki/Relationale_Algebra#Join">http://de.wikipedia.org/wiki/Relationale_Algebra#Join</uri></para>
+          </footnote> Damit können wir die beiden <foreignphrase
+        xml:lang="en">Models</foreignphrase> auch in der Suche
         verknüpfen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
-ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'})</command>
+
+ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where( :phonenumbers =&gt; {:name =&gt; 'Mobile'} )</command>
  =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
-ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'}).count</command>
+
+ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where( :phonenumbers =&gt; {:name =&gt; 'Mobile'} ).count</command>
  =&gt; 3 
-ruby-1.9.2-p0 &gt;</screen></para>
+
+ruby-1.9.2-p0 &gt; </screen></para>
 
         <para>Drei Personen haben eine Handynummer. Und das konnten wir mit
         einer Zeile Ruby-Code rausbekommen. Bonus-Punkt: Man kann diese Zeile
         auch sehr leicht lesen! Schauen wir uns zu dieser Abfrage noch gerade
         die <filename>log/development.log</filename> an:<programlisting>  Person Load (0.3ms)  SELECT "people".* FROM "people" INNER JOIN "phonenumbers" ON "phonenumbers"."person_id" = "people"."id" WHERE ("phonenumbers"."name" = 'Mobile')
-  SQL (0.2ms)  SELECT COUNT(*) AS count_id FROM "people" INNER JOIN "phonenumbers" ON "phonenumbers"."person_id" = "people"."id" WHERE ("phonenumbers"."name" = 'Mobile')
-</programlisting></para>
+  SQL (0.2ms)  SELECT COUNT(*) AS count_id FROM "people" INNER JOIN "phonenumbers" ON "phonenumbers"."person_id" = "people"."id" WHERE ("phonenumbers"."name" = 'Mobile')</programlisting></para>
 
-        <para>Die Methode <methodname>joins</methodname> führt also zu einem
-        SQL "INNER JOIN".</para>
+        <para>Die Methode <methodname>joins</methodname> führt also in SQL zu
+        einem <literal>INNER JOIN</literal>.</para>
 
         <para>Aber wir haben noch einen kleinen Denkfehler gemacht. Was ist
         wenn jemand zwei Handynummern in der Datenbank gespeichert hat? Wird
         diese Person dann doppelt gezählt? Probieren wir mal eine Suche nach
-        allen Personen, die eine Handynummer und eine Privatnummer gespeichert
-        haben aus.<screen>ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; ['Mobile', 'Home']})</command>
+        allen Personen die eine Handynummer und eine private Festnetznummer
+        gespeichert haben:<screen>ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where( :phonenumbers =&gt; { :name =&gt; ['Mobile', 'Home'] } )</command>
  =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 2, firstname: "Ute", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
-ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; ['Mobile', 'Home']}).count</command>
+
+ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where( :phonenumbers =&gt; { :name =&gt; ['Mobile', 'Home'] } ).count</command>
  =&gt; 6 
+
 ruby-1.9.2-p0 &gt; <command>Person.count</command>
  =&gt; 5 
+
 ruby-1.9.2-p0 &gt;</screen></para>
 
         <para>Tatsächlich! Obwohl wir nur 5 Personen in der Datenbank haben,
-        gibt unser Logikfehler 6 Personen als Ergebnis aus. Aber kein Problem!
-        Das Ergebnis unserer Abfrage ist ein Array und in einem Array können
-        wir mit der Methode <methodname>uniq</methodname> alle doppelten
-        Einträge löschen:<screen>ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; ['Mobile', 'Home']}).uniq</command>
+        enthält die Ergebnismenge 6 Einträge. Aber kein Problem! Das Ergebnis
+        unserer Abfrage ist ein Array, und in einem Array können wir mit der
+        Methode <methodname>uniq</methodname> alle doppelten Einträge
+        löschen:<remark>FIXME: Gibt's da keine schönere
+        Lösung?</remark><screen>ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; ['Mobile', 'Home']}).uniq</command>
  =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 2, firstname: "Ute", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+
 ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; ['Mobile', 'Home']}).uniq.count</command>
  =&gt; 4 
-ruby-1.9.2-p0 &gt;</screen></para>
+
+ruby-1.9.2-p0 &gt; </screen></para>
 
         <para>Tatsächlich haben also nur 4 Personen in unserer Datenbank eine
         Handynummer oder eine Privatnummer gespeichert.</para>
 
-        <para>Über den gleichen <methodname>joins</methodname> Mechanismus
-        können wir auch alle Personen, die mit Nachnamen 'Meier' heissen und
-        eine Handynummer haben abfragen:<screen>ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:lastname =&gt; 'Meier', :phonenumbers =&gt; {:name =&gt; 'Mobile'})</command>
+        <para>Über den gleichen Mechanismus <methodname>joins</methodname>
+        können wir auch alle Personen die mit Nachnamen <quote>Meier</quote>
+        heißen und eine Handynummer haben abfragen:<screen>ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where( :lastname =&gt; 'Meier', :phonenumbers =&gt; {:name =&gt; 'Mobile'} )</command>
  =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
-ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:lastname =&gt; 'Meier', :phonenumbers =&gt; {:name =&gt; 'Mobile'}).count</command>
+
+ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where( :lastname =&gt; 'Meier', :phonenumbers =&gt; {:name =&gt; 'Mobile'} ).count</command>
  =&gt; 1 
-ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:lastname =&gt; 'Meier', :phonenumbers =&gt; {:name =&gt; 'Mobile'}).first</command>
+
+ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where( :lastname =&gt; 'Meier', :phonenumbers =&gt; {:name =&gt; 'Mobile'} ).first</command>
  =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt; 
+
 ruby-1.9.2-p0 &gt; </screen></para>
 
         <para>Es gibt nur eine Person, auf die diese Suchkriterien
         zutreffen.</para>
 
         <para>Als letztes suchen wir jetzt mal alle Personen mit einer
-        Berliner (030 Vorwahl) Rufnummer raus:<screen>ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where("phonenumbers.number like ?", '030-%').uniq.count</command>
+        Berliner Rufnummer (Vorwahl <literal>030</literal>) raus:<screen>ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where( "phonenumbers.number LIKE ?", '030%' ).uniq.count</command>
  =&gt; 2 
-ruby-1.9.2-p0 &gt; </screen></para>
+ruby-1.9.2-p0 &gt; </screen><remark>FIXME: (Diese Anmerkung gehört eigentlich
+        schon weiter oben hin:) Müßte man nicht in dem String
+        "phonenumbers.number LIKE ?" die Spalten-/Felder-Identifiers quoten?
+        Zumindest wenn das reservierte SQL-Wörter sind?</remark></para>
 
         <para>Natürlich können wir das ganze auch umdrehen. Lassen Sie uns mal
-        alle Telefonnummern aus Berlin (030 Vorwahl) raussuchen, deren Person
-        mit Nachnamen 'Meier' heißt:<screen>ruby-1.9.2-p0 &gt; <command>Phonenumber.joins(:person).where("number like ?", '030-%').where(:people =&gt; {:lastname =&gt; 'Meier'})</command>
+        alle Telefonnummern aus Berlin (Vorwahl <literal>030</literal>)
+        raussuchen, deren zugeordnete Person mit Nachnamen
+        <quote>Meier</quote> heißt:<screen>ruby-1.9.2-p0 &gt; <command>Phonenumber.joins(:person).where( "number LIKE ?", '030%' ).where( :people =&gt; {:lastname =&gt; 'Meier'} )</command>
  =&gt; [#&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Phonenumber id: 4, person_id: 2, name: "Home", number: "030-8888888", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
-ruby-1.9.2-p0 &gt; <command>Phonenumber.joins(:person).where("number like ?", '030-%').where(:people =&gt; {:lastname =&gt; 'Meier'}).count</command>
- =&gt; 3 
-ruby-1.9.2-p0 &gt;</screen></para>
 
-        <para>Der <methodname>uniq</methodname> Trick klappt hier übrigens
-        nicht:<screen>ruby-1.9.2-p0 &gt; <command>Phonenumber.joins(:person).where("number like ?", '030-%').where(:people =&gt; {:lastname =&gt; 'Meier'}).uniq.count</command>
+ruby-1.9.2-p0 &gt; <command>Phonenumber.joins(:person).where( "number LIKE ?", '030%' ).where( :people =&gt; {:lastname =&gt; 'Meier'} ).count</command>
  =&gt; 3 
+
+ruby-1.9.2-p0 &gt; </screen></para>
+
+        <para>Der Trick mit <methodname>uniq</methodname> klappt hier übrigens
+        nicht:<screen>ruby-1.9.2-p0 &gt; <command>Phonenumber.joins(:person).where( "number LIKE ?", '030%' ).where(:people =&gt; {:lastname =&gt; 'Meier'} ).uniq.count</command>
+ =&gt; 3 
+
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
-        <para>Bei der Personensuche konnte wir <methodname>uniq</methodname>
-        auf das Ergebnis-Array sinnvoll ausführen, weil die einzelnen Personen
-        doppelt im Array waren. Hier haben wir zwar bei den Phonenumber
-        Datensätzen 3 und 4 die gleiche Telefonnummer '030-8888888', aber es
-        sich halt verschiedene Datensätze. Man muss halt immer auch noch
-        mitdenken. ;-)</para>
+        <para>Bei der Personensuche konnten wir <methodname>uniq</methodname>
+        auf das Ergebnis-Array sinnvoll anwenden, weil die einzelnen Personen
+        doppelt im Array waren. Hier haben wir zwar bei den
+        <literal>Phonenumber</literal>-Datensätzen 3 und 4 die gleiche
+        Telefonnummer <quote>030-8888888</quote>, aber es sind eben
+        verschiedene Datensätze. Man muss halt immer auch noch mitdenken.
+        ;-)</para>
       </section>
 
-      <section>
-        <title>includes</title>
+      <section xml:id="activerecord_1n_includes">
+        <title xml:id="activerecord_1n_includes.title">includes</title>
 
         <indexterm>
           <primary>ActiveRecord</primary>
@@ -3524,68 +3560,78 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
           <tertiary>joins()</tertiary>
         </indexterm>
 
-        <para>includes ähneln sehr joins (siehe <xref
-        linkend="activerecord_1n_joins" />). Auch mit Ihnen kann man innerhalb
-        einer 1:n Verknüpfung suchen. Schauen wir uns mal das "Wir suchen alle
-        Personen mit einer Handynummer."-Beispiel mit
+        <para><methodname>includes</methodname> ähnelt sehr der Methode
+        <methodname>joins</methodname> (siehe <xref
+        linkend="activerecord_1n_joins" />). Auch damit kann man innerhalb
+        einer 1:n-Verknüpfung suchen. Schauen wir uns mal das Beispiel
+        <quote>Wir suchen alle Personen mit einer Handynummer</quote> mit
         <methodname>includes</methodname> und mit
         <methodname>joins</methodname> an:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
-ruby-1.9.2-p0 &gt; <command>Person.includes(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'})</command>
- =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
-ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'})</command>
- =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
-ruby-1.9.2-p0 &gt;</screen></para>
 
-        <para>Die Ergebnisse sind identisch, oder?<screen>ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'}).all == Person.includes(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'}).all</command>
+ruby-1.9.2-p0 &gt; <command>Person.includes(:phonenumbers).where( :phonenumbers =&gt; {:name =&gt; 'Mobile'} )</command>
+ =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+
+ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where( :phonenumbers =&gt; {:name =&gt; 'Mobile'} )</command>
+ =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+
+ruby-1.9.2-p0 &gt; </screen></para>
+
+        <para>Die Ergebnisse sind identisch, oder?<screen>ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where( :phonenumbers =&gt; {:name =&gt; 'Mobile'} ).all == Person.includes(:phonenumbers).where( :phonenumbers =&gt; {:name =&gt; 'Mobile'} ).all</command>
  =&gt; true 
-ruby-1.9.2-p0 &gt;</screen></para>
+
+ruby-1.9.2-p0 &gt; </screen></para>
 
         <para>Ja, die Ergebnisse sind identisch. Aber vielleicht haben Sie
-        gemerkt, das ich bei beiden Anfragen ein <methodname>all</methodname>
-        eingeschmuggelt habe. Schauen wir uns einmal den <code>==</code>
-        Vergleich der beiden <classname>ActiveRecord::Relation</classname>
-        an:<screen>ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'}) == Person.includes(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'})</command>
+        gemerkt, dass ich bei beiden Anfragen ein <methodname>all</methodname>
+        eingeschmuggelt habe. Schauen wir uns einmal den Vergleich
+        (<code>==</code>) der beiden
+        <classname>ActiveRecord::Relation</classname> an:<screen>ruby-1.9.2-p0 &gt; <command>Person.joins(:phonenumbers).where( :phonenumbers =&gt; {:name =&gt; 'Mobile'} ) == Person.includes(:phonenumbers).where( :phonenumbers =&gt; {:name =&gt; 'Mobile'} )</command>
  =&gt; false 
-ruby-1.9.2-p0 &gt;</screen></para>
+
+ruby-1.9.2-p0 &gt; </screen></para>
 
         <para>Es handelt sich also um zwei verschiedene Abfragen, die das
-        gleiche Ergebnis liefern. Da hilft nur ein Blick in die
+        gleiche Ergebnis liefern. Da hilft nur ein Blick in
         <filename>log/development.log</filename>. Als erstes die Ausgabe von
-        <methodname>joins</methodname>:<programlisting>  Person Load (0.2ms)  SELECT "people".* FROM "people" INNER JOIN "phonenumbers" ON "phonenumbers"."person_id" = "people"."id" WHERE ("phonenumbers"."name" = 'Mobile')
-</programlisting></para>
+        <methodname>joins</methodname>:<programlisting>  Person Load (0.2ms)  SELECT "people".* FROM "people" INNER JOIN "phonenumbers" ON "phonenumbers"."person_id" = "people"."id" WHERE ("phonenumbers"."name" = 'Mobile')</programlisting></para>
 
-        <para>Und jetzt die <filename>log/development.log</filename> Ausgabe
-        des includes:<programlisting>  Person Load (0.3ms)  SELECT "people"."id" AS t0_r0, "people"."firstname" AS t0_r1, "people"."lastname" AS t0_r2, "people"."created_at" AS t0_r3, "people"."updated_at" AS t0_r4, "phonenumbers"."id" AS t1_r0, "phonenumbers"."person_id" AS t1_r1, "phonenumbers"."name" AS t1_r2, "phonenumbers"."number" AS t1_r3, "phonenumbers"."created_at" AS t1_r4, "phonenumbers"."updated_at" AS t1_r5 FROM "people" LEFT OUTER JOIN "phonenumbers" ON "phonenumbers"."person_id" = "people"."id" WHERE ("phonenumbers"."name" = 'Mobile')
-</programlisting></para>
+        <para>Und jetzt die Ausgabe des
+        <methodname>includes</methodname>:<programlisting>  Person Load (0.3ms)  SELECT "people"."id" AS t0_r0, "people"."firstname" AS t0_r1, "people"."lastname" AS t0_r2, "people"."created_at" AS t0_r3, "people"."updated_at" AS t0_r4, "phonenumbers"."id" AS t1_r0, "phonenumbers"."person_id" AS t1_r1, "phonenumbers"."name" AS t1_r2, "phonenumbers"."number" AS t1_r3, "phonenumbers"."created_at" AS t1_r4, "phonenumbers"."updated_at" AS t1_r5 FROM "people" LEFT OUTER JOIN "phonenumbers" ON "phonenumbers"."person_id" = "people"."id" WHERE ("phonenumbers"."name" = 'Mobile')</programlisting></para>
 
         <para>Ich erspare Ihnen das Rätselraten:
-        <methodname>joins</methodname> liest nur die <literal>people</literal>
-        Datensätze ein und <methodname>includes</methodname> liest auch noch
-        die dazu gehörigen <literal>phonenumbers</literal>. Schon bei unserem
-        kleinen Beispiel sieht man das dies natürlich länger dauert.</para>
+        <methodname>joins</methodname> liest nur die
+        <literal>people</literal>-Datensätze ein und
+        <methodname>includes</methodname> liest auch noch die dazu gehörigen
+        <literal>phonenumbers</literal>. Schon bei unserem kleinen Beispiel
+        sieht man, dass dies natürlich länger dauert.</para>
 
         <para>Warum kann der Einsatz von <methodname>includes</methodname>
         dann überhaupt Sinn machen? Wenn Sie schon bei dieser Abfrage wissen,
-        das Sie alle Telefonnummern ebenfalls benötigen, dann macht ein
+        dass Sie alle Telefonnummern ebenfalls benötigen, dann macht ein
         <methodname>includes</methodname> Sinn, da dann nur eine
-        Datenbankanfrage gestellt wird. ActiveRecord cached nämlich die
-        Antwort.</para>
+        Datenbankanfrage gestellt wird. ActiveRecord <quote><foreignphrase
+        xml:lang="en">cach</foreignphrase>'t</quote><remark>FIXME: Schöner
+        ausdrücken.</remark> nämlich die Antwort.</para>
 
         <para>Ich zeige Ihnen das mal an einem Beispiel. Wir werden wieder
         alle Meiers mit einem Handy raussuchen und dann alle Handynummern
         ausgeben. Zur besseren Analyse der SQL-Abfragen, werden wir mit
         <command>ActiveRecord::Base.logger = Logger.new(STDOUT)</command> alle
         Ausgabe die normalerweise nur in
-        <filename>log/development.log</filename> landen direkt auf der Console
-        ausgeben. Als erstes die <methodname>joins</methodname>
-        Variante:<screen>ruby-1.9.2-p0 &gt; <command>ActiveRecord::Base.logger = Logger.new(STDOUT)</command>
+        <filename>log/development.log</filename> landen direkt auf der
+        <foreignphrase xml:lang="en">Console</foreignphrase> ausgeben. Als
+        erstes die Variante mit <methodname>joins</methodname>:<screen>ruby-1.9.2-p0 &gt; <command>ActiveRecord::Base.logger = Logger.new(STDOUT)</command>
  =&gt; #&lt;Logger:0x00000102d3a308 @progname=nil, @level=0, @default_formatter=#&lt;Logger::Formatter:0x00000102d3a2e0 @datetime_format=nil&gt;, @formatter=nil, @logdev=#&lt;Logger::LogDevice:0x00000102d3a290 @shift_size=nil, @shift_age=nil, @filename=nil, @dev=#&lt;IO:&lt;STDOUT&gt;&gt;, @mutex=#&lt;Logger::LogDevice::LogDeviceMutex:0x00000102d3a268 @mon_owner=nil, @mon_count=0, @mon_mutex=#&lt;Mutex:0x00000102d3a218&gt;&gt;&gt;&gt; 
-ruby-1.9.2-p0 &gt; <command>handybesitzer = Person.joins(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'})</command>
+
+ruby-1.9.2-p0 &gt; <command>handybesitzer = Person.joins(:phonenumbers).where( :phonenumbers =&gt; {:name =&gt; 'Mobile'} )</command>
 <emphasis>  Person Load (0.2ms)  SELECT "people".* FROM "people" INNER JOIN "phonenumbers" ON "phonenumbers"."person_id" = "people"."id" WHERE ("phonenumbers"."name" = 'Mobile')
 </emphasis> =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+
 ruby-1.9.2-p0 &gt; <command>handybesitzer.each do |einzelperson|</command>
+
 ruby-1.9.2-p0 &gt;     <command>puts einzelperson.phonenumbers.first.number</command>
+
 ruby-1.9.2-p0 ?&gt;  <command>end</command>
 <emphasis>  Phonenumber Load (0.3ms)  SELECT "phonenumbers".* FROM "phonenumbers" WHERE ("phonenumbers".person_id = 1) LIMIT 1
 </emphasis>0171-12345678
@@ -3594,14 +3640,16 @@ ruby-1.9.2-p0 ?&gt;  <command>end</command>
 <emphasis>  Phonenumber Load (0.1ms)  SELECT "phonenumbers".* FROM "phonenumbers" WHERE ("phonenumbers".person_id = 5) LIMIT 1
 </emphasis>0172-22225678
  =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+
 ruby-1.9.2-p0 &gt; </screen></para>
 
         <para>Wir haben für die Ausgabe aller Handynummern insgesamt 4
-        SQL-Abfragen gemacht und die brauchten in der Summe 0.8ms Zeit. Jetzt
+        SQL-Abfragen gemacht, und die brauchten in der Summe 0,8 ms. Jetzt
         machen wir das gleiche Beispiel mal mit
-        <methodname>includes</methodname>:<screen>ruby-1.9.2-p0 &gt; <command>handybesitzer = Person.includes(:phonenumbers).where(:phonenumbers =&gt; {:name =&gt; 'Mobile'})</command>
+        <methodname>includes</methodname>:<screen>ruby-1.9.2-p0 &gt; <command>handybesitzer = Person.includes(:phonenumbers).where( :phonenumbers =&gt; {:name =&gt; 'Mobile'} )</command>
 <emphasis>  Person Load (0.3ms)  SELECT "people"."id" AS t0_r0, "people"."firstname" AS t0_r1, "people"."lastname" AS t0_r2, "people"."created_at" AS t0_r3, "people"."updated_at" AS t0_r4, "phonenumbers"."id" AS t1_r0, "phonenumbers"."person_id" AS t1_r1, "phonenumbers"."name" AS t1_r2, "phonenumbers"."number" AS t1_r3, "phonenumbers"."created_at" AS t1_r4, "phonenumbers"."updated_at" AS t1_r5 FROM "people" LEFT OUTER JOIN "phonenumbers" ON "phonenumbers"."person_id" = "people"."id" WHERE ("phonenumbers"."name" = 'Mobile')
 </emphasis> =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+
 ruby-1.9.2-p0 &gt; <command>handybesitzer.each do |einzelperson|</command>
 ruby-1.9.2-p0 &gt;     <command>puts einzelperson.phonenumbers.first.number</command>                 
 ruby-1.9.2-p0 ?&gt;  <command>end</command>                                                           
@@ -3609,21 +3657,23 @@ ruby-1.9.2-p0 ?&gt;  <command>end</command>
 0171-1188811
 0172-22225678
  =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 3, firstname: "Horst", lastname: "Apfelmus", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Person id: 5, firstname: "Ernst", lastname: "Steinwurf", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
-        <para>Hier haben wir nur eine SQL-Abfrage die 0.3ms gedauert hat. Die
+        <para>Hier haben wir nur eine SQL-Abfrage die 0,3 ms gedauert hat. Die
         erste SQL-Abfrage dauert also länger, dafür spart man sich aber
         nachfolgende.</para>
 
         <para>Wäre es dann nicht besser immer mit
         <methodname>includes</methodname> zu arbeiten? Nein, es kommt immer
-        auf den konkreten Fall an. Denn bei der Benutzung von includes werden
-        ja initial viel mehr Daten transportiert. Die müssen von Ruby gecached
-        und verarbeitet werden. Bei unserer kleinen Datenbank ist das egal.
-        Aber stellen Sie sich das ganze mal mit allen Handynummern
-        Deutschlands vor. Das ist eine Datenmenge, die man nicht unbedingt
-        cachen will.</para>
+        auf den konkreten Fall an. Denn bei der Benutzung von
+        <methodname>includes</methodname> werden ja initial viel mehr Daten
+        transportiert. Die müssen von Ruby gecached<remark>FIXME: Schöner
+        ausdrücken.</remark> und verarbeitet werden. Bei unserer kleinen
+        Datenbank ist das egal. Aber stellen Sie sich das ganze mal mit allen
+        Handynummern Deutschlands vor. Das ist eine Datenmenge, die man nicht
+        unbedingt cachen will.</para>
       </section>
     </section>
 
