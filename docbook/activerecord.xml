@@ -2840,8 +2840,9 @@ Instance methods:
     xml:lang="en">Model</foreignphrase> mit Personen und ein <foreignphrase
     xml:lang="en">Model</foreignphrase> mit Telefonnummern. Da jede Person
     mehrere Telefonnummern haben kann (z.B. Handy, Arbeit und Zuhause)
-    benötigen wir zum Abbilden eine 1:n-Verknüpfung. Mal schauen wie einfach
-    das ganze mit ActiveRecord ist.</para>
+    benötigen wir zum Abbilden eine 1:n-Verknüpfung (<foreignphrase
+    xml:lang="en">one-to-many association</foreignphrase>). Mal schauen wie
+    einfach das ganze mit ActiveRecord ist.</para>
 
     <note>
       <para>Verknüpfungen nennt man übrigens auch Beziehung, Relationen
@@ -3712,29 +3713,28 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
         <tertiary>destroy_all()</tertiary>
       </indexterm>
 
-      <remark>================================
-      =================================== ===================================
-      BIS HIER GELESEN. --philipp ===================================
-      ===================================
-      ===================================</remark>
-
       <para>Mit den Methoden <methodname>destroy</methodname>,
       <methodname>destroy_all</methodname>, <methodname>delete</methodname>
       und <methodname>delete_all</methodname> kann man wie in <xref
       linkend="datensatz-loeschen" /> beschrieben Datensätze löschen. Im
-      Kontext von <methodname>has_many</methodname> bedeutet das, das man die
-      zu einer <classname>Person</classname> gelisteten
+      Kontext von <methodname>has_many</methodname> bedeutet das, dass man die
+      zu einer <classname>Person</classname> gehörigen
       <classname>Phonenumber</classname>-Datensätze in einem Streich löschen
       kann:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
+
 ruby-1.9.2-p0 &gt; <command>Person.first</command>
  =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt; 
+
 ruby-1.9.2-p0 &gt; <command>Person.first.phonenumbers</command>
  =&gt; [#&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+
 ruby-1.9.2-p0 &gt; <command>Person.first.phonenumbers.destroy_all</command>
  =&gt; [#&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt;] 
+
 ruby-1.9.2-p0 &gt; <command>Person.first.phonenumbers</command>
  =&gt; [] 
+
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
     </section>
@@ -3744,11 +3744,11 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <para>Ich will an dieser Stelle nicht auf alle möglichen Optionen
       eingehen. Aber ein paar sind so praktisch und werden von mir in jedem
-      Projekt benutzt, das ich sie hier vorstellen möchte. Für alle anderen
-      verweise ich auf die Ruby on Rails Doku die Sie im Internet unter <uri
+      Projekt benutzt, dass ich sie hier vorstellen möchte. Für alle anderen
+      verweise ich auf die Ruby-on-Rails-Doku, die Sie im Internet unter <uri
       xlink:href="http://rails.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html">http://rails.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html</uri>
-      bzw. auf Ihrem System mit <command>ri
-      ActiveRecord::Associations::ClassMethods</command> auf der Shell abrufen
+      bzw. auf Ihrem System auf der Shell mit <command>ri
+      ActiveRecord::Associations::ClassMethods</command> aufrufen
       können.</para>
 
       <section>
@@ -3765,60 +3765,89 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
         <para>Die meiner Meinung nach wichtigsten Optionen für
         <code>has_many</code>:<itemizedlist>
             <listitem>
-              <para><code>:order =&gt; :apfelmus</code></para>
+              <para><emphasis role="bold"><code>:order</code></emphasis><code>
+              =&gt; :apfelmus</code></para>
 
               <para>Wer die Telefonnummern nach den Namen sortieren will, kann
               dies mit folgender <filename>app/models/person.rb</filename>
               erreichen:<programlisting>class Person &lt; ActiveRecord::Base
-  has_many :phonenumbers, :order =&gt; :name
+  has_many :phonenumbers, <emphasis role="bold">:order =&gt; :name</emphasis>
 end</programlisting></para>
 
-              <para>Das Ergebnis in der Console sieht dann so aus:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+              <para>Das Ergebnis in der <foreignphrase
+              xml:lang="en">Console</foreignphrase> sieht dann so aus:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
+
 ruby-1.9.2-p0 &gt; <command>Person.first.phonenumbers</command>
  =&gt; [#&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-09 22:27:37", updated_at: "2010-10-09 22:27:37"&gt;, #&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 22:27:37", updated_at: "2010-10-09 22:27:37"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-09 22:27:37", updated_at: "2010-10-09 22:27:37"&gt;] 
+
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
-              <para>Und falls es einmal umgekehrt sortiert werden
-              sollte:<programlisting>has_many :phonenumbers, :order =&gt; 'name DESC'
-</programlisting></para>
+              <para>Und falls mal umgekehrt sortiert werden
+              soll:<programlisting>has_many :phonenumbers, <emphasis
+                    role="bold">:order =&gt; 'name DESC'</emphasis></programlisting></para>
             </listitem>
 
             <listitem>
-              <para><code>:dependent =&gt; :destroy</code></para>
+              <para><emphasis
+              role="bold"><code>:dependent</code></emphasis><code> =&gt;
+              :destroy</code></para>
 
-              <para>Wird eine Person gelöscht wird, dann ist es ja nur
-              sinnvoll, das auch alle Telefonnummern dieser Person automatisch
-              mitgelöscht werden. Das kann mit <code>:dependent =&gt;
-              :destroy</code> in der <filename>app/models/person.rb</filename>
-              realisiert werden:<programlisting>class Person &lt; ActiveRecord::Base
-  has_many :phonenumbers, :dependent =&gt; :destroy
+              <para>Wird eine Person gelöscht, dann ist es ja oft sinnvoll,
+              dass auch alle von dieser Person abhängigen (<foreignphrase
+              xml:lang="en">dependent</foreignphrase>) Telefonnummern
+              automatisch mitgelöscht werden. Das kann mit <code>:dependent
+              =&gt; :destroy</code> in der
+              <filename>app/models/person.rb</filename> realisiert
+              werden:<programlisting>class Person &lt; ActiveRecord::Base
+  has_many :phonenumbers, <emphasis role="bold">:dependent =&gt; :destroy</emphasis>
 end</programlisting></para>
 
               <para>Im folgenden Beispiel löschen wir die erste Person in der
-              Datenbank. Dadurch werden automatisch alle Telefonnummern dieser
-              Person mitgelöscht:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+              Datenbank-Tabelle. Dabei werden automatisch alle Telefonnummern
+              dieser Person ebenfalls gelöscht:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
+
 ruby-1.9.2-p0 &gt; <command>Person.first</command>
  =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 22:27:36", updated_at: "2010-10-09 22:27:36"&gt; 
+
 ruby-1.9.2-p0 &gt; <command>Phonenumber.where(:person_id =&gt; 1).count</command>
  =&gt; 3 
+
 ruby-1.9.2-p0 &gt; <command>Person.first.destroy</command>
  =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 22:27:36", updated_at: "2010-10-09 22:27:36"&gt; 
+
 ruby-1.9.2-p0 &gt; <command>Phonenumber.where(:person_id =&gt; 1).count</command>
  =&gt; 0 
+
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
               <important>
+                <indexterm>
+                  <primary>ActiveRecord</primary>
+
+                  <secondary>Methoden</secondary>
+
+                  <tertiary>destroy()</tertiary>
+                </indexterm>
+
+                <indexterm>
+                  <primary>ActiveRecord</primary>
+
+                  <secondary>Methoden</secondary>
+
+                  <tertiary>delete()</tertiary>
+                </indexterm>
+
                 <para>Bitte denken Sie immer an den Unterschied zwischen den
                 Methoden <methodname>destroy</methodname> (siehe <xref
                 linkend="activerecord_destroy" />) und
                 <methodname>delete</methodname> (siehe <xref
                 linkend="activerecord_delete" />). Diese Abhängigkeit
-                funktioniert nur mit der <methodname>destroy</methodname>
-                Methode.</para>
+                funktioniert nur mit der Methode
+                <methodname>destroy</methodname>.</para>
               </important>
             </listitem>
           </itemizedlist></para>
@@ -3843,15 +3872,16 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
         <para>Die meiner Meinung nach wichtigste Option für
         <methodname>belongs_to</methodname> ist:<itemizedlist>
             <listitem>
-              <para><code>:touch =&gt; :true</code></para>
+              <para><emphasis role="bold"><code>:touch</code></emphasis><code>
+              =&gt; :true</code></para>
 
               <para>Damit wird bei einer Veränderung einer
               <classname>Phonenumber</classname> automatisch das Feld
-              <literal>updated_at</literal> der Primary Datenbank
+              <literal>updated_at</literal> des Eintrags in der Tabelle
               <classname>People</classname> auf die aktuelle Uhrzeit gesetzt.
               Das sähe in der <filename>app/models/phonenumber.rb</filename>
               so aus:<programlisting>class Phonenumber &lt; ActiveRecord::Base
-  belongs_to :person, :touch =&gt; :true
+  belongs_to :person, <emphasis role="bold">:touch =&gt; :true</emphasis>
 end</programlisting></para>
             </listitem>
           </itemizedlist></para>
@@ -3865,7 +3895,7 @@ end</programlisting></para>
 
     <section xml:id="activerecord_has_many_through">
       <title xml:id="activerecord_has_many_through.title">has_many
-      through</title>
+      :through</title>
 
       <remark>FIXME: Warum steht through nicht als Parameter unter Optionen
       -&gt; has_many?</remark>
@@ -3878,21 +3908,25 @@ end</programlisting></para>
         <tertiary>has_many()</tertiary>
       </indexterm>
 
-      <para>Zum Erklären von has_many through müssen wir unser Datenbank Model
-      erweitern. Nehmen wir einmal an, das wir jeden Anruf mit Start- und
-      Endzeit protokolieren. Das wäre dann eine 1:n Verknüpfung von
-      <classname>Phonenumber</classname> auf ein
-      <classname>CallRecord</classname>. Erstellen wir erst mal ein
-      entsprechendes Model:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails generate model CallRecord phonenumber_id:integer start:datetime end:datetime</command>
+      <para>Um <code>has_many <replaceable>…</replaceable>, :through =&gt;
+      <replaceable>…</replaceable></code> zu erklären müssen wir unser
+      Datenbank-<foreignphrase xml:lang="en">Model</foreignphrase> erweitern.
+      Nehmen wir einmal an, dass wir jeden Anruf mit Start- und Endzeit
+      protokollieren. Das wäre dann eine 1:n-Verknüpfung von
+      <classname>Phonenumber</classname> zu <classname>CallRecord</classname>.
+      Erstellen wir erst mal ein entsprechendes <foreignphrase
+      xml:lang="en">Model</foreignphrase>:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails generate model CallRecord phonenumber_id:integer start:datetime end:datetime</command>
       invoke  active_record
       create    db/migrate/20101011071702_create_call_records.rb
       create    app/models/call_record.rb
       invoke    test_unit
       create      test/unit/call_record_test.rb
       create      test/fixtures/call_records.yml
+
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
-      <para>Die Datenbank-Tabelle anlegen:<screen>stefan@swmbp 1 1.9.2-p0 phonebook$ <command>rake db:migrate</command>
+      <para>Die Datenbank-Migration ausführen und damit die Tabelle
+      anlegen:<screen>stefan@swmbp 1 1.9.2-p0 phonebook$ <command>rake db:migrate</command>
 (in /Users/stefan/phonebook)
 ==  CreateCallRecords: migrating ==============================================
 -- create_table(:call_records)
@@ -3904,7 +3938,7 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
       <para>Die <filename>app/models/phonenumber.rb</filename> muss noch
       angepasst werden:<programlisting>class Phonenumber &lt; ActiveRecord::Base
   belongs_to :person
-  has_many :call_records
+  <emphasis role="bold">has_many :call_records</emphasis>
 end</programlisting></para>
 
       <para>Und jetzt passen wir noch die <filename>db/seeds.rb</filename> mit
@@ -3949,16 +3983,23 @@ db/development.sqlite3 already exists
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <para>So, dann schauen wir uns jetzt mal an, wie oft Herr Fritz Meier
-      die erste Nummer in seinem Telefonbuch angerufen hat:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+      die erste Nummer in seinem Telefonbuch<remark>FIXME: Das ist nicht sein
+      Telefonbuch sondern seine eigenen Telefonnummern, oder?</remark>
+      angerufen hat:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
+
 ruby-1.9.2-p0 &gt; <command>fritz = Person.first</command>
  =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-11 07:36:12", updated_at: "2010-10-11 07:36:12"&gt; 
+
 ruby-1.9.2-p0 &gt; <command>fritz.phonenumbers.first</command>
  =&gt; #&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-11 07:36:12", updated_at: "2010-10-11 07:36:12"&gt; 
+
 ruby-1.9.2-p0 &gt; <command>fritz.phonenumbers.first.call_records</command>
  =&gt; [#&lt;CallRecord id: 1, phonenumber_id: 1, start: "2010-10-11 07:36:12", end: "2010-10-11 07:37:12", created_at: "2010-10-11 07:36:12", updated_at: "2010-10-11 07:36:12"&gt;, #&lt;CallRecord id: 2, phonenumber_id: 1, start: "2010-10-11 07:36:13", end: "2010-10-11 07:38:13", created_at: "2010-10-11 07:36:13", updated_at: "2010-10-11 07:36:13"&gt;, #&lt;CallRecord id: 3, phonenumber_id: 1, start: "2010-10-11 07:36:13", end: "2010-10-11 07:39:13", created_at: "2010-10-11 07:36:13", updated_at: "2010-10-11 07:36:13"&gt;, #&lt;CallRecord id: 4, phonenumber_id: 1, start: "2010-10-11 07:36:13", end: "2010-10-11 07:40:13", created_at: "2010-10-11 07:36:13", updated_at: "2010-10-11 07:36:13"&gt;, #&lt;CallRecord id: 5, phonenumber_id: 1, start: "2010-10-11 07:36:13", end: "2010-10-11 07:41:13", created_at: "2010-10-11 07:36:13", updated_at: "2010-10-11 07:36:13"&gt;, #&lt;CallRecord id: 6, phonenumber_id: 1, start: "2010-10-11 07:36:13", end: "2010-10-11 07:42:13", created_at: "2010-10-11 07:36:13", updated_at: "2010-10-11 07:36:13"&gt;] 
+
 ruby-1.9.2-p0 &gt; <command>fritz.phonenumbers.first.call_records.count</command>
  =&gt; 6 
+
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
@@ -3967,8 +4008,7 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
   CallRecord Load (0.2ms)  SELECT "call_records".* FROM "call_records" WHERE ("call_records".phonenumber_id = 1)
 
   Phonenumber Load (0.2ms)  SELECT "phonenumbers".* FROM "phonenumbers" WHERE ("phonenumbers".person_id = 1) LIMIT 1
-  SQL (0.1ms)  SELECT COUNT(*) AS count_id FROM (SELECT 1 FROM "call_records" WHERE ("call_records".phonenumber_id = 1)) AS subquery
-</programlisting></para>
+  SQL (0.1ms)  SELECT COUNT(*) AS count_id FROM (SELECT 1 FROM "call_records" WHERE ("call_records".phonenumber_id = 1)) AS subquery</programlisting></para>
 
       <para>Um jetzt eine Aufstellung von allen Telefonaten von Herrn Fritz
       Meier zu erhalten, müssten wir umständlich alle seine eingetragenen
@@ -3976,18 +4016,22 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
       auch einfacher. Bitte ändern Sie Ihre
       <filename>app/models/person.rb</filename> wie folgt ab:<programlisting>class Person &lt; ActiveRecord::Base
   has_many :phonenumbers, :dependent =&gt; :destroy
-<emphasis>  has_many :call_records, :through =&gt; :phonenumbers
-</emphasis>end</programlisting></para>
+  has_many :call_records, <emphasis role="bold">:through =&gt; :phonenumbers</emphasis>
+end</programlisting></para>
 
-      <para>Das schauen wir uns jetzt mal in der Console an. Es liegt die
-      Vermutung nahe, das wir jetzt auch ein
-      <methodname>call_records</methodname> Zugriff von der Klasse
-      <classname>Person</classname> haben:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+      <para>Das schauen wir uns jetzt mal in der <foreignphrase
+      xml:lang="en">Console</foreignphrase> an. Es liegt die Vermutung nahe,
+      dass wir jetzt auch einen
+      <methodname>call_records</methodname>-Zugriff<remark>FIXME: Hä?</remark>
+      von der Klasse <classname>Person</classname> haben:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
+
 ruby-1.9.2-p0 &gt; <command>Person.first.call_records.limit(5)</command>
  =&gt; [#&lt;CallRecord id: 1, phonenumber_id: 1, start: "2010-10-11 07:36:12", end: "2010-10-11 07:37:12", created_at: "2010-10-11 07:36:12", updated_at: "2010-10-11 07:36:12"&gt;, #&lt;CallRecord id: 2, phonenumber_id: 1, start: "2010-10-11 07:36:13", end: "2010-10-11 07:38:13", created_at: "2010-10-11 07:36:13", updated_at: "2010-10-11 07:36:13"&gt;, #&lt;CallRecord id: 3, phonenumber_id: 1, start: "2010-10-11 07:36:13", end: "2010-10-11 07:39:13", created_at: "2010-10-11 07:36:13", updated_at: "2010-10-11 07:36:13"&gt;, #&lt;CallRecord id: 4, phonenumber_id: 1, start: "2010-10-11 07:36:13", end: "2010-10-11 07:40:13", created_at: "2010-10-11 07:36:13", updated_at: "2010-10-11 07:36:13"&gt;, #&lt;CallRecord id: 5, phonenumber_id: 1, start: "2010-10-11 07:36:13", end: "2010-10-11 07:41:13", created_at: "2010-10-11 07:36:13", updated_at: "2010-10-11 07:36:13"&gt;] 
+
 ruby-1.9.2-p0 &gt; <command>Person.first.call_records.count</command>
  =&gt; 15 
+
 ruby-1.9.2-p0 &gt; </screen></para>
 
       <para>Bingo! ActiveRecord übernimmt wieder die Schwerstarbeit und
@@ -3996,19 +4040,23 @@ ruby-1.9.2-p0 &gt; </screen></para>
   CallRecord Load (0.3ms)  SELECT "call_records".* FROM "call_records" INNER JOIN "phonenumbers" ON "call_records".phonenumber_id = "phonenumbers".id WHERE (("phonenumbers".person_id = 1)) LIMIT 5
 
   Person Load (0.3ms)  SELECT "people".* FROM "people" LIMIT 1
-  SQL (0.2ms)  SELECT COUNT(*) AS count_id FROM "call_records" INNER JOIN "phonenumbers" ON "call_records".phonenumber_id = "phonenumbers".id WHERE (("phonenumbers".person_id = 1))
-</programlisting></para>
+  SQL (0.2ms)  SELECT COUNT(*) AS count_id FROM "call_records" INNER JOIN "phonenumbers" ON "call_records".phonenumber_id = "phonenumbers".id WHERE (("phonenumbers".person_id = 1))</programlisting></para>
 
       <para>Praktisch? Praktisch!</para>
 
-      <para>Mehr Informationen und Beispiele zu has_many through finden Sie
-      unter dem Stichwort "Many-to-many" auf <uri
+      <para>Mehr Informationen und Beispiele zu <code>has_many
+      <replaceable>…</replaceable>, :through =&gt;
+      <replaceable>…</replaceable></code> finden Sie unter dem Stichwort
+      <quote>Many-to-many</quote> auf <uri
       xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html">http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html</uri></para>
+
+      <remark>FIXME: Wir sind hier im 1:n-Abschnitt. Warum wird auf n:n
+      verwiesen?</remark>
     </section>
 
     <section xml:id="activerecord_polymorphic">
-      <title xml:id="activerecord_polymorphic.title">Polymorphic Associations
-      (Polymorphe Assoziationen)</title>
+      <title xml:id="activerecord_polymorphic.title">Polymorphe Assoziationen
+      (polymorphic associations)</title>
 
       <indexterm>
         <primary>ActiveRecord</primary>
@@ -4016,26 +4064,32 @@ ruby-1.9.2-p0 &gt; </screen></para>
         <secondary>Polymorphic Associations</secondary>
       </indexterm>
 
-      <para>Schon das Wort "polymorphic" lässt einen angespannt werden. Was
-      mag damit gemeint sein? Auf <uri
+      <para>Schon das Wort "polymorph" lässt einen angespannt werden. Was mag
+      damit gemeint sein? Auf <uri
       xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html">http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html</uri>
-      steht dazu: "Polymorphic associations on models are not restricted on
-      what types of models they can be associated with." Na, das ist ja jetzt
-      klar wir Klossbrühe! ;-)</para>
+      steht dazu: <quote>Polymorphic associations on models are not restricted
+      on what types of models they can be associated with.</quote> Na, das ist
+      ja jetzt klar wir Kloßbrühe! ;-)</para>
 
-      <para>Ein Beispiel! Nehmen wir an, das wir zu den Personen und den
+      <para>Ein Beispiel! Nehmen wir an, dass wir zu den Personen und den
       Telefonnummern in unserer Applikation Kommentare einbauen wollen. Und
       zwar beliebig viele Kommentare. Mit dem Wissen aus <xref
       linkend="activerecord_has_many_through" /> könnten wir uns zwei Modelle
-      anlegen und jeweils eine <methodname>has_many</methodname> Verbindung zu
-      Person oder zu Phonenumber aufbauen. Bei zweien würde das sogar noch
-      halbwegs praktikabel sein. Aber stellen Sie sich mal vor, Sie hätten
-      gerne bei mehr Daten solche Kommentare. Dafür jedesmal ein eigenes Model
-      bauen? Genau da kommt die Polymorphic Association zum tragen. Damit
-      können Sie ein Model Comment mit beliebig vielen and Modellen
-      verknüpfen.</para>
+      anlegen und jeweils eine <methodname>has_many</methodname>-Verbindung zu
+      <classname>Person</classname> oder zu <classname>Phonenumber</classname>
+      aufbauen. Bei zweien würde das sogar noch halbwegs praktikabel sein.
+      Aber stellen Sie sich mal vor, Sie hätten gerne bei mehr Daten solche
+      Kommentare. Dafür jedesmal ein eigenes <foreignphrase
+      xml:lang="en">Model</foreignphrase> bauen? Genau da kommt die
+      <foreignphrase xml:lang="en">Polymorphic Association</foreignphrase> zum
+      Tragen. Damit können Sie ein <foreignphrase
+      xml:lang="en">Model</foreignphrase> <classname>Comment</classname> mit
+      beliebig vielen and<remark>FIXME: "and" oder "anderen"?</remark>
+      Modellen verknüpfen.</para>
 
-      <para>Erstellen wir erst mal das Model Comment:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails generate model Comment commentable_type:string commentable_id:integer comment:string</command>
+      <para>Erstellen wir erst mal das <foreignphrase
+      xml:lang="en">Model</foreignphrase>
+      <classname>Comment</classname>:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails generate model Comment commentable_type:string commentable_id:integer comment:string</command>
       invoke  active_record
       create    db/migrate/20101011084411_create_comments.rb
       create    app/models/comment.rb
@@ -4051,17 +4105,21 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:migrate</command>
 
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
-      <para>Das "able" beim Namen "commentable" ist Rails-üblich, muss aber
-      nicht sein. Wir brauchen ja zum Verknüpfen jetzt nicht nur die ID des
-      Eintrages, sondern müssen auch noch wissen, um welches Model es sich
-      eigentlich handelt. Da macht der Begriff "commentable_type" halbwegs
+      <para>Das Suffix <quote><foreignphrase
+      xml:lang="en">able</foreignphrase></quote>
+      (<replaceable>…</replaceable>bar) beim Namen <quote><foreignphrase
+      xml:lang="en">commentable</foreignphrase></quote> (kommentierbar) ist
+      Rails-üblich, muss aber nicht sein. Wir brauchen ja zum Verknüpfen jetzt
+      nicht nur die ID des Eintrags, sondern müssen auch noch wissen, um
+      welches <foreignphrase xml:lang="en">Model</foreignphrase> es sich
+      eigentlich handelt. Da macht der Begriff <quote><foreignphrase
+      xml:lang="en">commentable_type</foreignphrase></quote> halbwegs
       Sinn.</para>
 
       <para>Jetzt müssen wir in <filename>app/models/comment.rb</filename>
       folgenden Eintrag machen:<programlisting>class Comment &lt; ActiveRecord::Base
   belongs_to :commentable, :polymorphic =&gt; true
-end
-</programlisting></para>
+end</programlisting></para>
 
       <para>Jetzt den Eintrag in
       <filename>app/models/person.rb</filename><programlisting>class Person &lt; ActiveRecord::Base
@@ -4121,40 +4179,52 @@ db/development.sqlite3 already exists
    -&gt; 0.0004s
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
-      <para>Gehen wir mal in die Console und versuchen mal zwei Kommentare zu
-      Herrn Fritz Meier anzulegen.<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+      <para>Gehen wir mal in die <foreignphrase
+      xml:lang="en">Console</foreignphrase> und versuchen mal zwei Kommentare
+      zu Herrn Fritz Meier anzulegen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
+
 ruby-1.9.2-p0 &gt; <command>fritz = Person.first</command>
  =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-11 09:00:51", updated_at: "2010-10-11 09:00:51"&gt; 
+
 ruby-1.9.2-p0 &gt; <command>fritz.comments.count</command>
  =&gt; 0 
-ruby-1.9.2-p0 &gt; <command>fritz.comments.create(:comment =&gt; 'Ein Beispiel')</command>
+
+ruby-1.9.2-p0 &gt; <command>fritz.comments.create( :comment =&gt; 'Ein Beispiel' )</command>
  =&gt; #&lt;Comment id: 1, commentable_type: "Person", commentable_id: 1, comment: "Ein Beispiel", created_at: "2010-10-11 09:07:38", updated_at: "2010-10-11 09:07:38"&gt; 
-ruby-1.9.2-p0 &gt; <command>fritz.comments.create(:comment =&gt; 'Noch ein Beispiel')</command>
+
+ruby-1.9.2-p0 &gt; <command>fritz.comments.create( :comment =&gt; 'Noch ein Beispiel' )</command>
  =&gt; #&lt;Comment id: 2, commentable_type: "Person", commentable_id: 1, comment: "Noch ein Beispiel", created_at: "2010-10-11 09:07:44", updated_at: "2010-10-11 09:07:44"&gt; 
+
 ruby-1.9.2-p0 &gt; <command>fritz.comments.count</command>
  =&gt; 2 
-ruby-1.9.2-p0 &gt;</screen></para>
+
+ruby-1.9.2-p0 &gt; </screen></para>
 
       <para>Das funktioniert also. Schauen wir uns mal den ersten Kommentar
       an:<screen>ruby-1.9.2-p0 &gt; <command>Comment.first</command>
  =&gt; #&lt;Comment id: 1, commentable_type: "Person", commentable_id: 1, comment: "Ein Beispiel", created_at: "2010-10-11 09:07:38", updated_at: "2010-10-11 09:07:38"&gt; 
-ruby-1.9.2-p0 &gt;</screen></para>
+
+ruby-1.9.2-p0 &gt; </screen></para>
 
       <para>Alles logisch. Alles gut. Aber so wie ich Sie einschätze wollen
       Sie jetzt auch sehen wie das mit Telefonnummern geht. Kein
-      Problem.<screen>ruby-1.9.2-p0 &gt; <command>Phonenumber.first.comments.create(:comment =&gt; 'Und wieder ein Beispiel.')</command>
+      Problem:<screen>ruby-1.9.2-p0 &gt; <command>Phonenumber.first.comments.create( :comment =&gt; 'Und wieder ein Beispiel.' )</command>
  =&gt; #&lt;Comment id: 3, commentable_type: "Phonenumber", commentable_id: 1, comment: "Und wieder ein Beispiel.", created_at: "2010-10-11 09:17:29", updated_at: "2010-10-11 09:17:29"&gt; 
-ruby-1.9.2-p0 &gt; <command>Phonenumber.first.comments.create(:comment =&gt; 'xyz Beispiel')</command>
+
+ruby-1.9.2-p0 &gt; <command>Phonenumber.first.comments.create( :comment =&gt; 'xyz Beispiel' )</command>
  =&gt; #&lt;Comment id: 4, commentable_type: "Phonenumber", commentable_id: 1, comment: "xyz Beispiel", created_at: "2010-10-11 09:18:06", updated_at: "2010-10-11 09:18:06"&gt; 
+
 ruby-1.9.2-p0 &gt; <command>Phonenumber.first.comments</command>
  =&gt; [#&lt;Comment id: 3, commentable_type: "Phonenumber", commentable_id: 1, comment: "Und wieder ein Beispiel.", created_at: "2010-10-11 09:17:29", updated_at: "2010-10-11 09:17:29"&gt;, #&lt;Comment id: 4, commentable_type: "Phonenumber", commentable_id: 1, comment: "xyz Beispiel", created_at: "2010-10-11 09:18:06", updated_at: "2010-10-11 09:18:06"&gt;] 
+
 ruby-1.9.2-p0 &gt; </screen></para>
 
-      <para>Polymorphic Association sind sehr praktisch. Man sollte aber auch
-      immer daran denken, das sie mehr Last auf der Datenbank erzeugen, als
-      eine normale 1:n Abbildung. Normalerweise macht das den Bock nicht fett,
-      aber man sollte es bei der Planung im Hinterkopf halten.</para>
+      <para><foreignphrase xml:lang="en">Polymorphic
+      Associations</foreignphrase> sind sehr praktisch. Man sollte aber auch
+      immer daran denken, dass sie mehr Last auf der Datenbank erzeugen als
+      eine normale 1:n-Verknüpfung. Normalerweise macht das den Bock nicht
+      fett, aber man sollte es bei der Planung im Hinterkopf haben.</para>
 
       <remark>FIXME: Gibt es außer has_many() und belongs_to() noch andere
       Relationen? 1:1 has_one(), n:n has_and_belongs_to_many()?</remark>
@@ -4184,11 +4254,11 @@ ruby-1.9.2-p0 &gt; </screen></para>
       löschen und dabei werden auch vorhandene Abhängigkeiten beachtet (siehe
       z.B. <code>:dependent =&gt; :destroy</code> in <xref
       linkend="activerecord_1n_optionen" />). Vereinfacht kann man sagen:
-      "Lieber destroy nehmen, das ist sicherer, weil das Rails-System dann
-      mehr mitdenkt."<important>
-          <para>Die Instanz wird nach dem Löschen des Datenbankfeldes frozen
-          (eingefroren). Sie ist also noch da, kann aber nicht verändert
-          werden.</para>
+      Lieber <methodname>destroy</methodname> nehmen; das ist sicherer, weil
+      das Rails-System dann mehr mitdenkt.<important>
+          <para>Die Instanz wird nach dem Löschen des Datenbankfeldes
+          <foreignphrase xml:lang="en">frozen</foreignphrase> (eingefroren).
+          Sie ist also noch da, kann aber nicht verändert werden.</para>
         </important></para>
 
       <para>Für die Beispiele brauchen wir wieder definierte Daten. Deshalb
@@ -4241,40 +4311,49 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
       <para>Als erstes löschen wir Herrn Fritz Meier inklusive all seiner
       Telefonnummern:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
-ruby-1.9.2-p0 &gt; <command>fritz_meier = Person.where(:lastname =&gt; 'Meier', :firstname =&gt; 'Fritz').first</command>
+
+ruby-1.9.2-p0 &gt; <command>fritz_meier = Person.where( :lastname =&gt; 'Meier', :firstname =&gt; 'Fritz' ).first</command>
  =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt; 
+
 ruby-1.9.2-p0 &gt; <command>fritz_meier.destroy</command>
  =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt; 
-ruby-1.9.2-p0 &gt; <command>Person.where(:lastname =&gt; 'Meier', :firstname =&gt; 'Fritz')</command>
+
+ruby-1.9.2-p0 &gt; <command>Person.where( :lastname =&gt; 'Meier', :firstname =&gt; 'Fritz' )</command>
   =&gt; [] 
+
 ruby-1.9.2-p0 &gt; </screen></para>
 
-      <para>Das war einfach. Was ist allerdings mit der Variable
-      <literal>fritz_meier</literal>? Die existiert noch mit den Daten im
-      sogenannten frozen-State<remark>FIXME: Wurde frozen schon
-      erklärt?</remark>. Zum Überprüfen gibt es die Methode <indexterm>
+      <para>Das war einfach. Was ist allerdings mit der Variablen
+      <varname>fritz_meier</varname>? Die existiert noch mit den Daten im
+      sogenannten <foreignphrase xml:lang="en">frozen state</foreignphrase>
+      (eingefrorener Zustand). Zum Überprüfen gibt es die Methode <indexterm>
           <primary>frozen?()</primary>
         </indexterm><methodname>frozen?</methodname>:<screen>ruby-1.9.2-p0 &gt; <command>fritz_meier</command>
  =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt; 
+
 ruby-1.9.2-p0 &gt; <command>fritz_meier.phonenumbers</command>
  =&gt; [#&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt;] 
+
 ruby-1.9.2-p0 &gt; <command>fritz_meier.frozen?</command>
  =&gt; true 
-ruby-1.9.2-p0 &gt;</screen></para>
+
+ruby-1.9.2-p0 &gt; </screen></para>
 
       <para>Der Datensatz ist also in der Datenbank gelöscht, aber das Objekt
-      mit allen Daten ist noch im System vorhanden. Könnten wir damit den
-      gesamten Datensatz wiederbeleben? Ja, allerdings ist das dann ein neuer
-      Datensatz (er hat also nicht mehr die ID 1):<screen>ruby-1.9.2-p0 &gt; <command>Person.create(fritz_meier.attributes)</command>
+      mit allen Daten ist noch im laufenden Ruby-Programm vorhanden. Könnten
+      wir damit den gesamten Datensatz wiederbeleben? Ja, allerdings ist das
+      dann ein neuer Datensatz (er hat also nicht mehr die ID 1):<screen>ruby-1.9.2-p0 &gt; <command>Person.create( fritz_meier.attributes )</command>
  =&gt; #&lt;Person id: 6, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt; 
-ruby-1.9.2-p0 &gt; <command>Person.where(:lastname =&gt; 'Meier', :firstname =&gt; 'Fritz')</command>
+
+ruby-1.9.2-p0 &gt; <command>Person.where( :lastname =&gt; 'Meier', :firstname =&gt; 'Fritz' )</command>
  =&gt; [#&lt;Person id: 6, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt;] 
+
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <para>Jetzt fehlen allerdings noch die Telefonnummern. Die können Sie
-      aber extra abspeichern (da sie ja noch im frozen Objekt vorhanden
-      sind).</para>
+      aber separat abspeichern (da sie ja noch im <foreignphrase
+      xml:lang="en">frozen</foreignphrase> Objekt vorhanden sind).</para>
     </section>
 
     <section xml:id="activerecord_delete">
@@ -4290,30 +4369,39 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <para>Mit <methodname>delete</methodname> können Sie einen Datensatz
       direkt in der Datenbank löschen. Dabei werden keine Abhängigkeiten zu
-      anderen Datensätzen im Model beachtet. Die Methode
+      anderen Datensätzen im <foreignphrase
+      xml:lang="en">Model</foreignphrase> beachtet. Die Methode
       <methodname>delete</methodname> löscht also nur die eine Zeile in der
       Datenbank und sonst nichts.</para>
 
       <para>Löschen wir mal den Datensatz von Frau Meier:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
+
 ruby-1.9.2-p0 &gt; <command>Person.first</command>
  =&gt; #&lt;Person id: 2, firstname: "Ute", lastname: "Meier", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt; 
+
 ruby-1.9.2-p0 &gt; <command>Person.first.phonenumbers</command>
  =&gt; [#&lt;Phonenumber id: 4, person_id: 2, name: "Home", number: "030-8888888", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt;] 
+
 ruby-1.9.2-p0 &gt; <command>Person.first.delete</command>
  =&gt; #&lt;Person id: 2, firstname: "Ute", lastname: "Meier", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt; 
-ruby-1.9.2-p0 &gt; <command>Phonenumber.where(:person_id =&gt; 2)</command>
+
+ruby-1.9.2-p0 &gt; <command>Phonenumber.where( :person_id =&gt; 2 )</command>
  =&gt; [#&lt;Phonenumber id: 4, person_id: 2, name: "Home", number: "030-8888888", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt;] 
+
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
       <para>Es wird zwar der Datensatz von Frau Meier gelöscht, aber die
-      Telefonnummern in der <classname>Phonenumber</classname> Datenbank
-      bleiben als Karteileichen im System.</para>
+      Telefonnummern in der zu <classname>Phonenumber</classname> gehörenden
+      Datenbank-Tabelle bleiben als Karteileichen im System.</para>
 
       <para>Wie bei <methodname>destroy</methodname> geht das Objekt auch bei
-      delete ein Objekt nach dem <methodname>delete</methodname> in den
-      frozen-Status (siehe <xref linkend="activerecord_destroy" />).</para>
+      <methodname>delete</methodname> ein Objekt nach dem
+      <methodname>delete</methodname> in den <foreignphrase
+      xml:lang="en">frozen</foreignphrase>-Status (siehe <xref
+      linkend="activerecord_destroy" />).<remark>FIXME: Den Satz verstehe ich
+      nicht.</remark></para>
     </section>
   </section>
 
@@ -4352,9 +4440,10 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
     <para>Es gibt immer mal wieder Anwendungsgebiete, bei denen man eine
     Datenbank-Transaktion durchführen muss. Das klassische Beispiel dafür ist
     eine Geldbewegung von einem zu einem anderen Konto. Die macht nur Sinn,
-    wenn beide Aktionen ausgeführt werden.</para>
+    wenn beide Aktionen (von einem Konto abbuchen und auf das Konto des
+    Empfängers draufbuchen) ausgeführt werden.</para>
 
-    <para>Zum Zeigen einer Transaktion brauchen wir wieder definierte
+    <para>Zum Demonstrieren einer Transaktion brauchen wir wieder definierte
     Beispieldaten. Deshalb füllen Sie bitte die Datei
     <filename>db/seeds.rb</filename> mit folgendem Inhalt:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
@@ -4397,79 +4486,98 @@ db/development.sqlite3 already exists
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
     <para>Eine Transaktion wird nach folgendem Muster
-    durchgeführt:<programlisting>ActiveRecord::Base.transaction do
-    was_immer_der_erste_schritt_ist
-    was_immer_der_zweite_schritt_ist
-    was_immer_der_dritte_schritt_ist
-end</programlisting></para>
+    durchgeführt:<programlisting><emphasis role="bold">ActiveRecord::Base.transaction do</emphasis>
+  <replaceable>was_auch_immer_der_erste_schritt_ist</replaceable>
+  <replaceable>was_auch_immer_der_zweite_schritt_ist</replaceable>
+  <replaceable>was_auch_immer_der_dritte_schritt_ist</replaceable>
+<emphasis role="bold">end</emphasis></programlisting></para>
 
     <para>Herr und Frau Meier haben beide die gleiche Telefonnummer:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
-ruby-1.9.2-p0 &gt; <command>Person.includes(:phonenumbers).where(:phonenumbers =&gt; {:number =&gt; '030-8888888'})</command>
+
+ruby-1.9.2-p0 &gt; <command>Person.includes(:phonenumbers).where( :phonenumbers =&gt; {:number =&gt; '030-8888888'} )</command>
  =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:21:57", updated_at: "2010-10-10 08:21:57"&gt;, #&lt;Person id: 2, firstname: "Ute", lastname: "Meier", created_at: "2010-10-10 08:21:57", updated_at: "2010-10-10 08:21:57"&gt;] 
-ruby-1.9.2-p0 &gt;</screen></para>
+
+ruby-1.9.2-p0 &gt; </screen></para>
 
     <para>Jetzt wollen beide nach Hamburg umziehen und bekommen dort eine neue
-    Telefonnummer. Jetzt wollen wir beim Ändern der Nummer sicher stellen, das
-    beide Nummern sicher und in einer Transaktion geändert werden.</para>
+    Telefonnummer. Jetzt wollen wir beim Ändern der Nummer sicherstellen, dass
+    beide Nummern in einer Transaktion geändert werden.</para>
 
-    <para>Hier ist der Code dazu:</para>
+    <para>Hier ist der Code dazu:<remark>FIXME: Fehlt hier was? Hier steht
+    kein Code zu den Telefonnummern. Danach geht es mit Flugnummern
+    weiter.</remark></para>
 
-    <para>Wenn wir in unserem Flugplan die Flugnummern des ersten und des
-    zweiten Datensatzes austauschen wollen, dann wäre das auch ein klassischer
-    Fall für eine Transaktion. An sonsten hätten wir bei einem Fehler zwei mal
-    die gleiche Flugnummer in der Datenbank. Versuchen wir es einmal:<screen>ruby-1.9.2-p0 &gt; <command>Person.includes(:phonenumbers).where(:phonenumbers =&gt; {:number =&gt; '030-8888888'})</command>
+    <para>Wenn wir in unserem Flugplan<remark>FIXME: In welchem Flugplan?
+    Davon war bisher noch nicht die Rede oder?</remark> die Flugnummern des
+    ersten und des zweiten Datensatzes austauschen wollen, dann wäre das auch
+    ein klassischer Fall für eine Transaktion. Ansonsten hätten wir bei einem
+    Fehler zweimal die gleiche Flugnummer in der Datenbank-Tabelle. Versuchen
+    wir es mal:<remark>FIXME: Hm, hier geht es jetzt wieder mit Phonenumbers
+    weiter.</remark><screen>ruby-1.9.2-p0 &gt; <command>Person.includes(:phonenumbers).where( :phonenumbers =&gt; {:number =&gt; '030-8888888'} )</command>
  =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:21:57", updated_at: "2010-10-10 08:21:57"&gt;, #&lt;Person id: 2, firstname: "Ute", lastname: "Meier", created_at: "2010-10-10 08:21:57", updated_at: "2010-10-10 08:21:57"&gt;] 
-ruby-1.9.2-p0 &gt; <command>die_meiers = Person.includes(:phonenumbers).where(:phonenumbers =&gt; {:number =&gt; '030-8888888'})</command>
+
+ruby-1.9.2-p0 &gt; <command>die_meiers = Person.includes(:phonenumbers).where( :phonenumbers =&gt; {:number =&gt; '030-8888888'} )</command>
  =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:21:57", updated_at: "2010-10-10 08:21:57"&gt;, #&lt;Person id: 2, firstname: "Ute", lastname: "Meier", created_at: "2010-10-10 08:21:57", updated_at: "2010-10-10 08:21:57"&gt;] 
+
 ruby-1.9.2-p0 &gt; <command>herr_meier_telefon = die_meiers.first.phonenumbers.first</command>
  =&gt; #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-10 08:21:57", updated_at: "2010-10-10 08:21:57"&gt; 
+
 ruby-1.9.2-p0 &gt; <command>frau_meier_telefon = die_meiers.last.phonenumbers.first</command>
  =&gt; #&lt;Phonenumber id: 4, person_id: 2, name: "Home", number: "030-8888888", created_at: "2010-10-10 08:21:57", updated_at: "2010-10-10 08:21:57"&gt; 
+
 ruby-1.9.2-p0 &gt; <command>ActiveRecord::Base.transaction do</command>
 ruby-1.9.2-p0 &gt;     <command>neue_nummer = '040-9999999'</command>
-ruby-1.9.2-p0 ?&gt;  <command>herr_meier_telefon.number = neue_nummer</command>
-ruby-1.9.2-p0 ?&gt;  <command>herr_meier_telefon.save</command>
-ruby-1.9.2-p0 ?&gt;  <command>frau_meier_telefon.number = neue_nummer</command>
-ruby-1.9.2-p0 ?&gt;  <command>frau_meier_telefon.save</command>
+ruby-1.9.2-p0 ?&gt;  <command>  herr_meier_telefon.number = neue_nummer</command>
+ruby-1.9.2-p0 ?&gt;    <command>herr_meier_telefon.save</command>
+ruby-1.9.2-p0 ?&gt;  <command>  frau_meier_telefon.number = neue_nummer</command>
+ruby-1.9.2-p0 ?&gt;  <command>  frau_meier_telefon.save</command>
 ruby-1.9.2-p0 ?&gt;  <command>end</command>
  =&gt; true 
-ruby-1.9.2-p0 &gt; <command>die_meiers = Person.includes(:phonenumbers).where(:phonenumbers =&gt; {:number =&gt; '040-9999999'})</command>
+
+ruby-1.9.2-p0 &gt; <command>die_meiers = Person.includes(:phonenumbers).where( :phonenumbers =&gt; {:number =&gt; '040-9999999'} )</command>
  =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:21:57", updated_at: "2010-10-10 08:21:57"&gt;, #&lt;Person id: 2, firstname: "Ute", lastname: "Meier", created_at: "2010-10-10 08:21:57", updated_at: "2010-10-10 08:21:57"&gt;] 
+
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
     <para>Beim Ende der Transaktion sehen wir dann in der
-    <filename>log/development.log</filename> den entsprechenden
-    Eintrag:<programlisting>  SQL (0.3ms)  UPDATE "phonenumbers" SET "number" = '040-9999999', "updated_at" = '2010-10-10 08:28:08.669155' WHERE ("phonenumbers"."id" = 3)
-  SQL (0.1ms)  UPDATE "phonenumbers" SET "number" = '040-9999999', "updated_at" = '2010-10-10 08:28:08.678647' WHERE ("phonenumbers"."id" = 4)
-</programlisting></para>
+    <filename>log/development.log</filename> die entsprechenden
+    Befehle:<programlisting>  SQL (0.3ms)  UPDATE "phonenumbers" SET "number" = '040-9999999', "updated_at" = '2010-10-10 08:28:08.669155' WHERE ("phonenumbers"."id" = 3)
+  SQL (0.1ms)  UPDATE "phonenumbers" SET "number" = '040-9999999', "updated_at" = '2010-10-10 08:28:08.678647' WHERE ("phonenumbers"."id" = 4)</programlisting></para>
 
-    <para>Da unsere Entwicklungsdatenbank SQLite keine Transaktionen
-    unterstützt, sehen wir nur zwei normale SQL-Befehle.</para>
+    <para>Da unsere Entwicklungs-Datenbank SQLite keine Transaktionen
+    unterstützt, sehen wir nur zwei normale SQL-Befehle.<remark>FIXME: Laut
+    http://de.wikipedia.org/wiki/Sqlite und http://www.sqlite.org/ unterstützt
+    SQLite Transaktionen.</remark><remark>FIXME: Es wäre gut die Log-Datei zu
+    sehen mit einem DBMS das Transaktionen unterstützt.</remark><remark>FIXME:
+    Wenn das DBMS keine Transaktionen unterstützt werden also die SQL-Befehle
+    einzeln ausgeführt? Kann man auch sagen daß etwas *nur* als Transaktion
+    laufen soll oder abbrechen wenn das DBMS das nicht kann?</remark></para>
 
-    <para>Jetzt werden Sie sagen "Ja, das hätte ich aber auch einfacher mit
-    <methodname>update_attributes</methodname> realisieren können (siehe <xref
-    linkend="activerecord_update_attributes" />)!" Meine Antwort darauf: Gut
-    aufgepasst! Das hier ist ja nur ein Beispiel. ;-)</para>
+    <para>Jetzt werden Sie sagen: <quote>Ja, das hätte ich aber auch einfacher
+    mit <methodname>update_attributes</methodname> realisieren können (siehe
+    <xref linkend="activerecord_update_attributes" />)!</quote> Meine Antwort
+    darauf: Gut aufgepasst! Das hier ist ja nur ein Beispiel. ;-)</para>
 
-    <para>Tansaktionen sind ein komplexes Thema. Wenn Sie mehr Informationen
+    <para>Transaktionen sind ein komplexes Thema. Wenn Sie mehr Informationen
     dazu suchen, können Sie die ri Hilfe dafür mit <command>ri
     ActiveRecord::Transactions::ClassMethods</command><remark>FIXME: Ist
     ...ClassMethods hier wirklich eine Klasse und keine Methode?</remark> auf
     der Shell abrufen.<important>
         <para>Die Methoden <methodname>save</methodname> und
-        <methodname>destroy</methodname> werden automatisch in
-        Transaktions-Wrapper ausgeführt. So stellt Rails sicher, das bei
-        diesen Methoden kein undefinierter Zustand entsteht.</para>
+        <methodname>destroy</methodname> werden automatisch im
+        Transaktions-<foreignphrase xml:lang="en">Wrapper</foreignphrase>
+        ausgeführt. So stellt Rails sicher, dass bei diesen Methoden kein
+        undefinierter Zustand entsteht.</para>
       </important><warning>
         <para>Transaktionen werden nicht von jeder Datenbank nativ
         unterstützt. Bei unserem Beispiel oben sehen Sie, dass SQLite es zum
-        Beispiel nicht unterstützt<remark>FIXME: Ich glaube mal gelesen zu
-        haben daß SQLite Transaktionen unterstützt.</remark>. Meiner Meinung
-        nach schadet es nicht sie zu benutzen. Es kann ja sein, das die
-        nächste Version Ihrer Lieblingsdatenbank Transaktionen
-        unterstützt.</para>
+        Beispiel nicht unterstützt<remark>FIXME: Laut
+        http://de.wikipedia.org/wiki/Sqlite und http://www.sqlite.org/
+        unterstützt SQLite Transaktionen.</remark>. Meiner Meinung nach
+        schadet es nicht sie zu benutzen. Es kann ja sein, dass die nächste
+        Version Ihrer Lieblingsdatenbank Transaktionen unterstützt.</para>
       </warning></para>
   </section>
 
