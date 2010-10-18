@@ -21,33 +21,32 @@
     <title>Einleitung</title>
 
     <para>Genauso wie dieses Buch Grundkenntnisse in HTML voraussetzt, so muss
-    der Leser auch ein Grundverständnis von Programmierung mitbringen.
-    Allerdings schreibt schon der Ruby-Erfinder Yukihiro Matsumoto in seinem
-    Buch <quote><citetitle>The Ruby Programming
+    der Leser - also Sie - auch ein Grundverständnis von Programmierung
+    mitbringen. Allerdings schreibt schon der Ruby-Erfinder Yukihiro Matsumoto
+    in seinem Buch <quote><citetitle>The Ruby Programming
     Language</citetitle></quote><footnote>
         <para>Das Buch ist sehr empfehlenswert für jeden der Ruby verstehen
         will. David Flanagan hat zusammen mit Yukihiro Matsumoto (a.k.a. Matz)
         super Arbeit geleistet.</para>
-      </footnote>:</para>
+      </footnote> über Ruby:</para>
 
     <para><quote>It is easy to program in Ruby, but Ruby is not a simple
     language.</quote></para>
 
     <para>Dieses Kapitel ist eine Gratwanderung zwischen falscher
-    Vereinfachung und unnötiger Ausführlichkeit. Es geht ja nicht darum ein
-    Ruby-Guru zu werden, sondern Rails zu verstehen. Ich kann Ihnen nicht
-    versprechen, dass Sie nach diesem Kapitel alles verstehen. Ich kann Ihnen
-    auch nicht versprechen, dass es gerade in diesem Kapitel nicht auch ein
-    wenig holprig zugeht. Ich kann Ihnen aber versprechen, dass sich die
-    Lektüre lohnt.</para>
+    Vereinfachung und für uns unnötiger Ausführlichkeit. Es geht ja nicht
+    darum ein Ruby-Guru zu werden, sondern Rails zu verstehen. Ich gehe auf
+    die wichtigsten Sachen ein. Alles weitere liegt dann an Ihnen. Wenn Sie
+    sich später mehr für Ruby interessieren, dann empfehle ich Ihnen das Ruby
+    Buch von David Flanagan und Yukihiro Matsumoto.</para>
 
     <para>Lange habe ich den Fehler gemacht und versucht mit Rails zu arbeiten
     ohne eine Ahnung von Ruby zu haben. Ruby sah so einfach aus, und deshalb
     habe ich mir keine Gedanken darüber gemacht. Da ich aber Ruby nicht
-    verstand, konnte ich auch Rails nicht verstehen. Deshalb habe ich es immer
-    wieder in die virtuelle Ecke gelegt und weiter mit PHP gearbeitet. Erst
-    nachdem ich mir Ruby intensiv angeschaut hatte fiel der Groschen.
-    <footnote>
+    grundlegend verstand, konnte ich auch Rails nicht verstehen. Deshalb habe
+    ich es immer wieder in die virtuelle Ecke gelegt und weiter mit PHP
+    gearbeitet. Erst nachdem ich mir Ruby intensiv angeschaut hatte fiel der
+    Groschen. <footnote>
         <para>Heute bin ich ein so großer Ruby-on-Rails-Fan, dass ich mir
         sogar die Mühe mache dazu ein Buch zu schreiben, um es Ihnen
         näherzubringen. ;-)</para>
@@ -538,9 +537,10 @@ from /usr/local/bin/irb:12:in `&lt;main&gt;'
 </screen></para>
 
       <para>Das gibt eine Fehlermeldung, denn
-      <classname>Dies_und_das</classname> ist eine Klasse und kein Objekt. Es
-      funktioniert nur, wenn wir vorher ein neues Objekt (also eine neue
-      Instanz) der Klasse <classname>Dies_und_das</classname> mit der Methode
+      <classname>Dies_und_das</classname> ist eine Klasse und keine Instanz.
+      Da wir hier mit Instanz-Methoden arbeiten funktioniert es nur, wenn wir
+      vorher ein neues Objekt (also eine neue Instanz) der Klasse
+      <classname>Dies_und_das</classname> mit der Methode
       <methodname>new</methodname> erzeugt haben:<screen>irb(main):009:0&gt; <command>abc = Dies_und_das.new</command>
 =&gt; #&lt;Dies_und_das:0x9ebb3f0&gt;
 irb(main):010:0&gt; <command>abc.drei_mal</command>
@@ -550,66 +550,6 @@ Hello World!
 =&gt; nil
 irb(main):011:0&gt; <command>exit</command>
 </screen></para>
-
-      <remark>FIXME: Sollte hier irgendwo in diesem Kapitel der grobe
-      Unterschied zwischen class ... und class &lt;&lt; self erklärt werden?
-      Und der Unterschied zwischen def foo und def self.foo (class methods vs.
-      instance methods)?</remark>
-
-      <section xml:id="ruby-instance-methods">
-        <title>Liste aller Instanz-Methoden</title>
-
-        <indexterm>
-          <primary>Instanz-Methoden</primary>
-
-          <secondary>in Ruby</secondary>
-        </indexterm>
-
-        <indexterm>
-          <primary>instance_methods()</primary>
-
-          <see>Instanz-Methoden in Ruby</see>
-        </indexterm>
-
-        <para>Für eine Klasse kann man mit der Methode
-        <methodname>instance_methods</methodname> alle definierten Methoden
-        auslesen.</para>
-
-        <note>
-          <para>Lassen Sie sich hier nicht von dem Namen
-          <methodname>instance_methods</methodname> verwirren. Es geht hier im
-          Beispiel um statische Methoden einer Klasse selbst, nicht um
-          Methoden einer Instanz einer Klasse (das wäre ein Objekt). Deshalb
-          hat eine entsprechende Instanz auch keine Methode
-          <methodname>instance_methods</methodname>, sondern nur die Methode
-          <methodname>methods</methodname>.</para>
-
-          <remark>FIXME: Hier nochmal recherchieren wie sich das genau
-          verhält.</remark>
-        </note>
-
-        <para>Probieren wir das mal mit der Klasse
-        <classname>Dies_und_das</classname> aus (die legen wir dazu noch mal
-        neu im <application>irb</application> an):<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>class Dies_und_das</command>
-irb(main):002:1&gt; <command>  def drei_mal</command>
-irb(main):003:2&gt; <command>    puts 'Hello World!'</command>
-irb(main):004:2&gt; <command>    puts 'Hello World!'</command>
-irb(main):005:2&gt; <command>    puts 'Hello World!'</command>
-irb(main):006:2&gt; <command>  end</command>
-irb(main):007:1&gt; <command>end</command>
-=&gt; nil
-irb(main):008:0&gt; <command>Dies_und_das.instance_methods</command>
-=&gt; [:drei_mal, :nil?, :===, :=~, :!~, :eql?, :class, :clone, :dup, :taint, :tainted?, :untaint, :untrust, :untrusted?, :trust, :freeze, :frozen?, :to_s, :inspect, :methods, :singleton_methods, :protected_methods, :private_methods, :public_methods, :instance_variables, :instance_variable_get, :instance_variable_set, :instance_variable_defined?, :instance_of?, :kind_of?, :is_a?, :tap, :send, :public_send, :respond_to?, :extend, :display, :method, :public_method, :define_singleton_method, :hash, :__id__, :object_id, :to_enum, :enum_for, :gem, :==, :equal?, :!, :!=, :instance_eval, :instance_exec, :__send__]
-</screen></para>
-
-        <para>Das ist ja viel mehr, als wir definiert haben! Das liegt daran,
-        dass jede neue Klasse von Ruby direkt mal ein Grundgerüst an Methoden
-        mitbekommt. Wenn wir nur die von uns definierten Methoden auflisten
-        wollen, so geht das wie folgt:<screen>irb(main):009:0&gt; <command>Dies_und_das.instance_methods(false)</command>
-=&gt; [:drei_mal]
-irb(main):010:0&gt; </screen></para>
-      </section>
 
       <section xml:id="ruby-private-methods">
         <title>Private Methoden</title>
@@ -778,6 +718,150 @@ NoMethodError: undefined method `pi' for #&lt;Literatur:0x90e7098&gt;
  from /usr/local/bin/irb:12:in `&lt;main&gt;'
 irb(main):017:0&gt; <command>exit</command>
 </screen></para>
+      </section>
+
+      <section xml:id="class_methods_vs_instance_methods">
+        <title>Class Methods und Instance Methods</title>
+
+        <indexterm>
+          <primary>Class Methods und Instance Methods</primary>
+
+          <secondary>in Ruby</secondary>
+        </indexterm>
+
+        <para>Es gibt zwei wichtige Arten von Methoden: Klassen Methoden
+        (Class Methods) und Instanz Methoden (Instance Methods). Viele
+        Rails-Programmierer leben sehr glücklich ohne den Unterschied zwischen
+        beiden zu verstehen. Auf der anderen Seite kann es aber auch nicht
+        schaden.</para>
+
+        <para>Was eine Klasse ist, wissen Sie jetzt. Und eine Instanz einer
+        solchen Klasse wird mit der Methode <methodname>new</methodname>
+        erstellt. Eine Klassen Methode kann nur im Zusammenhang mit der Klasse
+        aufgerufen werden (die Methode <methodname>new</methodname> ist zum
+        Beispiel eine Klassen Methode). Eine Instanz Methode ist eine Methode
+        die nur mit einer Instanz funktioniert. So können Sie nicht die
+        Methode <methodname>new</methodname> auf eine Instanz anwenden.
+        </para>
+
+        <para>Probieren wir erst mal aus, eine Instanz Methode als Klassen
+        Methode aufzurufen:<screen>sw@debian:~/sandbox$ <command>irb</command>
+ruby-1.9.2-p0 &gt; <command>class Wohnung</command>
+ruby-1.9.2-p0 ?&gt;  <command>def putzen</command>
+ruby-1.9.2-p0 ?&gt;    <command>puts 'Wirklich?'</command>
+ruby-1.9.2-p0 ?&gt;    <command>end</command>
+ruby-1.9.2-p0 ?&gt;  <command>end</command>
+ =&gt; nil 
+ruby-1.9.2-p0 &gt; <command>Wohnung.putzen</command>
+NoMethodError: undefined method `putzen' for Wohnung:Class
+ from (irb):15
+ from /Users/stefan/.rvm/rubies/ruby-1.9.2-p0/bin/irb:17:in `&lt;main&gt;'
+ruby-1.9.2-p0 &gt; </screen></para>
+
+        <para>Das geht also nicht. Dann erstellen wir doch einmal eine neue
+        Instanz der Klasse und versuchen es dann noch mal:<screen>ruby-1.9.2-p0 &gt; <command>apfelmus = Wohnung.new</command>
+ =&gt; #&lt;Wohnung:0x00000100a06990&gt; 
+ruby-1.9.2-p0 &gt; <command>apfelmus.putzen</command>
+Wirklich?
+ =&gt; nil 
+ruby-1.9.2-p0 &gt; </screen></para>
+
+        <para>Jetzt müssen wir nur noch rausfinden wie man eine
+        Klassen-Methode definiert. Rails Hardcore Gurus würden Sie jetzt in
+        die Tiefen des Quellcodes entführen und dort in ActiveRecord Bespiele
+        raussuchen. Das erspare ich Ihnen und zeige ein abstraktes
+        Beispiel:<screen>ruby-1.9.2-p0 &gt; <command>class Apfelkuchen</command>
+ruby-1.9.2-p0 ?&gt;  <command>def self.backen</command>
+ruby-1.9.2-p0 ?&gt;    <command>puts 'sinnfreies Beispiel'</command>
+ruby-1.9.2-p0 ?&gt;    <command>end</command>
+ruby-1.9.2-p0 ?&gt;  <command>end</command>
+ =&gt; nil 
+ruby-1.9.2-p0 &gt; <command>Apfelkuchen.backen</command>
+sinnfreies Beispiel
+ =&gt; nil 
+ruby-1.9.2-p0 &gt; 
+</screen></para>
+
+        <para>Und noch der Gegenbeweis:<screen>ruby-1.9.2-p0 &gt; <command>lieblingskuchen = Apfelkuchen.new</command>
+ =&gt; #&lt;Apfelkuchen:0x0000010181a9c8&gt; 
+ruby-1.9.2-p0 &gt; <command>lieblingskuchen.backen</command>
+NoMethodError: undefined method `backen' for #&lt;Apfelkuchen:0x0000010181a9c8&gt;
+ from (irb):25
+ from /Users/stefan/.rvm/rubies/ruby-1.9.2-p0/bin/irb:17:in `&lt;main&gt;'
+ruby-1.9.2-p0 &gt;</screen></para>
+
+        <para>Es gibt verschiedene Schreibweisen, um Klassen Methoden zu
+        definieren. Die zwei häufigsten:<itemizedlist>
+            <listitem>
+              <para><code>self.xyz</code></para>
+
+              <programlisting># Variante 1
+# mit self.xyz
+#
+class Apfelmus
+  def self.backen
+    puts 'sinnfreies Beispiel'
+  end
+end</programlisting>
+            </listitem>
+
+            <listitem>
+              <para><code>class &lt;&lt; self</code></para>
+
+              <programlisting># Variante 2
+# mit class &lt;&lt; self
+#
+class Apfelmus
+  class &lt;&lt; self
+    def backen
+      puts 'sinnfreies Beispiel'
+    end
+  end
+end</programlisting>
+            </listitem>
+          </itemizedlist></para>
+
+        <para>Das Ergebnis ist immer das gleiche.</para>
+
+        <section xml:id="ruby-instance-methods">
+          <title>Liste aller Instanz-Methoden</title>
+
+          <indexterm>
+            <primary>Instanz-Methoden</primary>
+
+            <secondary>in Ruby</secondary>
+          </indexterm>
+
+          <indexterm>
+            <primary>instance_methods()</primary>
+
+            <see>Instanz-Methoden in Ruby</see>
+          </indexterm>
+
+          <para>Für eine Klasse kann man mit der Methode
+          <methodname>instance_methods</methodname> alle definierten Methoden
+          auslesen. Probieren wir das mal mit der Klasse
+          <classname>Dies_und_das</classname> aus (die legen wir dazu noch mal
+          neu im <application>irb</application> an):<screen>sw@debian:~/sandbox$ <command>irb</command>
+irb(main):001:0&gt; <command>class Dies_und_das</command>
+irb(main):002:1&gt; <command>  def drei_mal</command>
+irb(main):003:2&gt; <command>    puts 'Hello World!'</command>
+irb(main):004:2&gt; <command>    puts 'Hello World!'</command>
+irb(main):005:2&gt; <command>    puts 'Hello World!'</command>
+irb(main):006:2&gt; <command>  end</command>
+irb(main):007:1&gt; <command>end</command>
+=&gt; nil
+irb(main):008:0&gt; <command>Dies_und_das.instance_methods</command>
+=&gt; [:drei_mal, :nil?, :===, :=~, :!~, :eql?, :class, :clone, :dup, :taint, :tainted?, :untaint, :untrust, :untrusted?, :trust, :freeze, :frozen?, :to_s, :inspect, :methods, :singleton_methods, :protected_methods, :private_methods, :public_methods, :instance_variables, :instance_variable_get, :instance_variable_set, :instance_variable_defined?, :instance_of?, :kind_of?, :is_a?, :tap, :send, :public_send, :respond_to?, :extend, :display, :method, :public_method, :define_singleton_method, :hash, :__id__, :object_id, :to_enum, :enum_for, :gem, :==, :equal?, :!, :!=, :instance_eval, :instance_exec, :__send__]
+</screen></para>
+
+          <para>Das ist ja viel mehr, als wir definiert haben! Das liegt
+          daran, dass jede neue Klasse von Ruby direkt mal ein Grundgerüst an
+          Methoden mitbekommt. Wenn wir nur die von uns definierten Methoden
+          auflisten wollen, so geht das wie folgt:<screen>irb(main):009:0&gt; <command>Dies_und_das.instance_methods(false)</command>
+=&gt; [:drei_mal]
+irb(main):010:0&gt; </screen></para>
+        </section>
       </section>
     </section>
   </section>
@@ -1348,11 +1432,9 @@ puts wohnzimmer.fenster
 1
 sw@debian:~/sandbox$ </screen></para>
 
-      <para>Da dieses Szenario &#8211; dass man einfach nur einen Wert
-      identisch zurückgeben will &#8211; so häufig auftritt, gibt es dafür
-      schon eine vorgefertigte Getter-Methode<remark>FIXME: Ist attr_reader
-      selbst eine Getter-Methode oder generiert es Getter-Methoden?</remark>
-      mit dem Namen <indexterm>
+      <para>Da dieses Szenario – dass man einfach nur einen Wert identisch
+      zurückgeben will – so häufig auftritt, gibt es dafür schon eine
+      vorgefertigte Getter-Methode mit dem Namen <indexterm>
           <primary>attr_reader()</primary>
         </indexterm><methodname>attr_reader</methodname>, die wie folgt im
       Programm <filename>raum.rb</filename> angewendet werden
@@ -1579,8 +1661,8 @@ irb(main):005:0&gt; <command>exit</command>
         <secondary>in Ruby</secondary>
       </indexterm>
 
-      <para>Man sollte &#8211; und wenn es nur für das einfachere Debugging
-      ist &#8211; bei selbstdefinierten Klassen immer eine Methode
+      <para>Man sollte – und wenn es nur für das einfachere Debugging ist –
+      bei selbstdefinierten Klassen immer eine Methode
       <methodname>to_s</methodname> einbauen. Dann kann man ein entsprechendes
       Objekt einfach mit <code>puts</code> ausgeben (<code>puts</code> gibt
       ein Objekt automatisch unter Verwendung der Methode
@@ -1748,17 +1830,18 @@ end</programlisting></para>
     <para>Das Programm zwischen dem Ausdruck (<foreignphrase
     xml:lang="en">Expression</foreignphrase>) und <code>end</code> wird immer
     dann ausgeführt, wenn das Ergebnis des Ausdrucks nicht
-    <literal>false</literal> und nicht <literal>nil</literal> ist.</para>
-
-    <remark>FIXME: Erklären wann then gebraucht wird und wann nicht. Ich
-    glaube man braucht zwischen ausdruck und programm entweder einen
-    Zeilenumbruch oder ein Semikolon oder then.</remark>
+    <literal>false</literal> und nicht <literal>nil</literal> ist.<note>
+        <para>Es kann auch ein <code>then</code> nach der Expression benutzt
+        werden:<programlisting>if ausdruck then
+  programm
+end</programlisting></para>
+      </note></para>
 
     <para>Das Konstrukt für eine einfache <literal>if</literal>-Verzweigung in
     einem Ruby-Programm sieht wie folgendes Beispielprogramm
     aus:<programlisting>a = 10
 
-<emphasis role="bold">if a == 10 then</emphasis>    # a == 10 ist die Expression
+<emphasis role="bold">if a == 10     </emphasis>    # a == 10 ist die Expression
   puts 'a ist 10'  # das Programm
 <emphasis role="bold">end</emphasis>
 </programlisting></para>
@@ -1799,6 +1882,12 @@ end
     <section xml:id="ruby-if-condition-else">
       <title>else</title>
 
+      <indexterm>
+        <primary>else</primary>
+
+        <secondary>Bedingung in Ruby (Kurzform)</secondary>
+      </indexterm>
+
       <para>Man kann es sich schon denken, aber der Vollständigkeit halber
       auch hierzu noch ein kleines Beispiel:<programlisting>a = 10
 
@@ -1806,6 +1895,26 @@ if a == 10 then
   puts 'a ist 10'
 else
   puts 'a ist nicht 10'
+end
+</programlisting></para>
+    </section>
+
+    <section xml:id="ruby-if-condition-else">
+      <title>elseif</title>
+
+      <indexterm>
+        <primary>elseif</primary>
+
+        <secondary>Bedingung in Ruby (Kurzform)</secondary>
+      </indexterm>
+
+      <para>Auch hier ist den meisten Programmierern klar, worum es sich
+      handelt. Beispiel:<programlisting>a = 10
+
+if a == 10 then
+  puts 'a ist 10'
+elseif a == 20 then
+  puts 'a ist 20'
 end
 </programlisting></para>
     </section>
@@ -1859,9 +1968,12 @@ end
   programm
 end</programlisting></para>
 
-      <remark>FIXME: Braucht man immer do oder ist das optional?</remark>
-
-      <para>Und praktisch wie in folgendem
+      <para><note>
+          <para>Das <code>do</code> nach dem <code>ausdruck</code> ist
+          optional. Oft sieht man auch<programlisting>while ausdruck
+  programm
+end</programlisting></para>
+        </note>Und praktisch wie in folgendem
       <literal>irb</literal>-Beispiel:<screen>irb(main):001:0&gt; <command>i = 0</command>             # i wird auf 0 gesetzt
 =&gt; 0
 irb(main):002:0&gt; <command>while i &lt; 3 do</command>   # Schleife
@@ -1878,8 +1990,6 @@ irb(main):006:0&gt; <command>exit</command>
       <para>Until-Schleifen werden ähnlich aufgebaut:<programlisting>until ausdruck
   programm
 end</programlisting></para>
-
-      <remark>FIXME: Braucht man do oder ist das optional?</remark>
 
       <para>Auch hier das <literal>irb</literal>-Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>i = 5</command>
@@ -1920,11 +2030,6 @@ irb(main):006:0&gt; <command>exit</command>
       <para>Bei der Schleife<programlisting>5.times { |i| puts i }</programlisting>ist
       <varname>i</varname> der Iterator und <code>puts i</code> der
       Block.</para>
-
-      <remark>FIXME: Stimmt das vom Wording? Ist nicht das ganze {...} der
-      Block der als angehängtes (letztes) Argument an die Methode times
-      übergeben wird und i ein Argument des Blocks? Hm, ne kann sein daß man
-      nur in dem Fall "puts i" den Block nennt.</remark>
 
       <para>Das ganze kann aber auch in der folgenden Form ausgedrückt
       werden:<programlisting>5.times do |i|
@@ -2020,9 +2125,6 @@ irb(main):002:0&gt; <command>exit</command>
         <para>Ein Block ist nichts anderes als das von einem Iterator
         ausgelöste Programm. Im Block hat man Zugriff auf die vom Iterator
         übergebene(n) lokale(n) Variable(n).</para>
-
-        <remark>FIXME: Wird irgendwo in diesem Kapitel erklärt was Blocks,
-        Procs und Lambdas sind und wo die Unterschiede liegen?</remark>
       </section>
 
       <section xml:id="ruby-upto">
@@ -2298,9 +2400,9 @@ irb(main):003:0&gt; <command>preisliste.count</command>
 irb(main):004:0&gt; <command>exit</command>
 </screen></para>
 
-      <para>Natürlich können in Hashes nicht nur Strings, sondern &#8211; wie
-      bei Arrays &#8211; auch selbst definierte Klassen als Objekte in den
-      Werten gespeichert werden (siehe <xref linkend="ruby_array" />).</para>
+      <para>Natürlich können in Hashes nicht nur Strings, sondern – wie bei
+      Arrays – auch selbst definierte Klassen als Objekte in den Werten
+      gespeichert werden (siehe <xref linkend="ruby_array" />).</para>
 
       <para>Wie zu <classname>Array</classname> gibt es auch zu
       <classname>Hash</classname> eine sehr gute
@@ -2408,11 +2510,6 @@ irb(main):006:0&gt; <command>:white.object_id</command>
 irb(main):007:0&gt; <command>exit</command>
 </screen></para>
 
-        <remark>FIXME: Hier noch besser erklären was ein Symbol ist. Symbols
-        sind nicht leicht zu verstehen. Symbols verhalten sich in vielerlei
-        Hinsicht wie Strings. puts :Test --- puts :Test.class (.classname?)
-        --- puts :Test.to_s --- puts :"Hallo Welt" --- ...</remark>
-
         <para>Die Benutzung von Symbolen als Schlüssel ist bei Hashes sehr
         viel speicher-effizienter:<screen>sw@debian:~/sandbox$ <command>irb</command>
 irb(main):001:0&gt; <command>farben = { :black =&gt; '#000000', :white =&gt; ':FFFFFF', :green =&gt; '#00C000', :blue =&gt; '#0000FF' }
@@ -2478,10 +2575,6 @@ irb(main):005:0&gt; <command>exit</command>
         b is 200
 
 sw@debian:~/sandbox$ </screen></para>
-
-        <remark>FIXME: Wird irgendwo erklärt wie man eigene Iteratoren
-        definieren kann? Hängt mit dem Blocks-Procs-und-Lambdas-Thema
-        zusammen.</remark>
       </section>
     </section>
   </section>
