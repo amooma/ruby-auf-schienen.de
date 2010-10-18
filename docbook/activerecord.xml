@@ -3225,21 +3225,21 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 #   Mayor.create(:name =&gt; 'Daley', :city =&gt; cities.first)
 
 Person.create( :firstname =&gt; 'Fritz', :lastname =&gt; 'Meier' ).phonenumbers.create([
-  { :name =&gt; 'Mobile', :number =&gt; '0171-12345678' }, 
-  { :name =&gt; 'Office', :number =&gt; '030-7777777' }, 
-  { :name =&gt; 'Home', :number =&gt; '030-8888888' } ])
+  { :name =&gt; 'Mobile' , :number =&gt; '0171-12345678' }, 
+  { :name =&gt; 'Office' , :number =&gt; '030-7777777'   }, 
+  { :name =&gt; 'Home'   , :number =&gt; '030-8888888'   }  ])
 
 Person.create( :firstname =&gt; 'Ute', :lastname =&gt; 'Meier' ).phonenumbers.create([
-  { :name =&gt; 'Home', :number =&gt; '030-8888888' } ])
+  { :name =&gt; 'Home'   , :number =&gt; '030-8888888'   }  ])
 
 Person.create( :firstname =&gt; 'Horst', :lastname =&gt; 'Apfelmus' ).phonenumbers.create([
-  { :name =&gt; 'Mobile', :number =&gt; '0171-1188811' } ])
+  { :name =&gt; 'Mobile' , :number =&gt; '0171-1188811'  }  ])
 
 Person.create( :lastname =&gt; 'Udelhoven')
 
 Person.create( :firstname =&gt; 'Ernst', :lastname =&gt; 'Steinwurf' ).phonenumbers.create([
-  { :name =&gt; 'Mobile', :number =&gt; '0172-22225678' }, 
-  { :name =&gt; 'Home', :number =&gt; '040-8888222' } ])
+  { :name =&gt; 'Mobile' , :number =&gt; '0172-22225678' }, 
+  { :name =&gt; 'Home'   , :number =&gt; '040-8888222'   }  ])
 </programlisting></para>
 
       <para>Jetzt die Datenbank löschen und neu mit der
@@ -3258,9 +3258,9 @@ db/development.sqlite3 already exists
    -&gt; 0.0039s
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
-      <para>Das praktische an der 1:n Zuordnung in ActiveRecord ist der super
-      einfache Zugang zu den n-Instanzen. Schauen wir uns das mal für den
-      ersten Datensatz an:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+      <para>Das praktische an der 1:n-Zuordnung in ActiveRecord ist der
+      super-einfache Zugang zu den n-Instanzen. Schauen wir uns das mal für
+      den ersten Datensatz an:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
 ruby-1.9.2-p0 &gt; <command>Person.first</command>
@@ -3274,40 +3274,50 @@ ruby-1.9.2-p0 &gt; <command>Person.first.phonenumbers.class</command>
 
 ruby-1.9.2-p0 &gt; </screen></para>
 
-      <para>Ist das cool?! Daran freue ich mich jedes mal wieder aufs neue.
-      Man kann einfach durch die Pluralform des n-Models auf die Datensätze
-      zugreifen. Das Ergebnis wird als Array ausgegeben. Ob es auch andersrum
+      <para>Ist das cool?! Daran erfreue ich mich jedesmal wieder aufs Neue.
+      Man kann einfach durch die Pluralform des n-<foreignphrase
+      xml:lang="en">Model</foreignphrase> auf die Datensätze zugreifen. Die
+      Ergebnismenge wird als <foreignphrase
+      xml:lang="en">Array</foreignphrase> zurückgegeben. Ob es auch andersrum
       geht? Schauen wir uns mal die erste Telefonnummer an:<screen>ruby-1.9.2-p0 &gt; <command>Phonenumber.first</command>
  =&gt; #&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt; 
+
 ruby-1.9.2-p0 &gt; <command>Phonenumber.first.person</command>
  =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt; 
+
 ruby-1.9.2-p0 &gt; <command>Phonenumber.first.person.class</command>
  =&gt; Person(id: integer, firstname: string, lastname: string, created_at: datetime, updated_at: datetime) 
-ruby-1.9.2-p0 &gt;</screen></para>
 
-      <para>Bingo! Auch ist ist der Zugriff zur zugeordneten Person-Klasse
-      ganz einfach. Und da es sich nur um einen Datensatz handelt, wird hier
-      die Singularform genommen.</para>
-
-      <para>Und wenn ein Datensatz keine Telefonnummern hat? Schauen wir doch
-      mal bei Herrn Udelhoven rein:<screen>ruby-1.9.2-p0 &gt; <command>udelhoven = Person.where(:lastname =&gt; 'Udelhoven').first</command>
- =&gt; #&lt;Person id: 4, firstname: nil, lastname: "Udelhoven", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt; 
-ruby-1.9.2-p0 &gt; <command>udelhoven.phonenumbers</command>
- =&gt; [] 
-ruby-1.9.2-p0 &gt; <command>udelhoven.phonenumbers.count</command>
- =&gt; 0 
 ruby-1.9.2-p0 &gt; </screen></para>
 
-      <para>Da zu diesem Datensatz keine Telefonnummern zugeordnet werden
-      können, gibt <methodname>phonenumbers</methodname> ein leeres Array
-      aus.</para>
+      <para>Bingo! Auch der Zugriff zur zugeordneten
+      <classname>Person</classname>-Klasse ganz einfach. Und da es sich nur um
+      einen einzigen Datensatz handelt (<methodname>belongs_to</methodname>),
+      wird hier die Singularform genommen.</para>
+
+      <para>Und wenn ein Datensatz keine Telefonnummern hat? Schauen wir doch
+      mal bei Herrn Udelhoven rein:<screen>ruby-1.9.2-p0 &gt; <command>udelhoven = Person.where( :lastname =&gt; 'Udelhoven' ).first</command>
+ =&gt; #&lt;Person id: 4, firstname: nil, lastname: "Udelhoven", created_at: "2010-10-09 20:20:23", updated_at: "2010-10-09 20:20:23"&gt; 
+
+ruby-1.9.2-p0 &gt; <command>udelhoven.phonenumbers</command>
+ =&gt; [] 
+
+ruby-1.9.2-p0 &gt; <command>udelhoven.phonenumbers.count</command>
+ =&gt; 0 
+
+ruby-1.9.2-p0 &gt; </screen></para>
+
+      <para>Da zu diesem Datensatz keine Telefonnummern zugeordnet sind, gibt
+      <methodname>phonenumbers</methodname> ein leeres Array zurück.</para>
 
       <para>Der Vollständigkeit halber müssten wir jetzt auch schauen was
-      passiert, wenn zu einer Telefonnummer keine Person zuzuordnen
-      ist:<screen>ruby-1.9.2-p0 &gt; <command>karteileiche = Phonenumber.create(:name =&gt; 'Auskunft', :number =&gt; '11833')</command>
+      passiert, wenn zu einer Telefonnummer keine Person zugeordnet
+      ist:<screen>ruby-1.9.2-p0 &gt; <command>karteileiche = Phonenumber.create( :name =&gt; 'Auskunft', :number =&gt; '11833' )</command>
  =&gt; #&lt;Phonenumber id: 8, person_id: nil, name: "Auskunft", number: "11833", created_at: "2010-10-09 20:29:38", updated_at: "2010-10-09 20:29:38"&gt; 
+
 ruby-1.9.2-p0 &gt; <command>karteileiche.person</command>
  =&gt; nil 
+
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
@@ -3343,7 +3353,9 @@ Person.create(:lastname =&gt; 'Udelhoven')
 Person.create(:firstname =&gt; 'Ernst', :lastname =&gt; 'Steinwurf').phonenumbers.create([
              {:name =&gt; 'Mobile', :number =&gt; '0172-22225678'}, 
              {:name =&gt; 'Home', :number =&gt; '040-8888222'}])
-</programlisting></para>
+</programlisting><remark>FIXME: Ist das der gleiche Inhalt der seeds.rb wie
+      weiter oben (activerecord_1n_zugreifen)? Wenn ja, dann die schöner
+      formatierte Variante von oben übernehmen.</remark></para>
 
       <para>Jetzt die Datenbank löschen und neu mit der
       <filename>db/seeds.rb</filename> befüllen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
@@ -3857,7 +3869,9 @@ Phonenumber.all.each do |phonenumber|
   (1..(Phonenumber.count - phonenumber.id)).each do |zaehler|
     phonenumber.call_records.create(:start =&gt; Time.now, :end =&gt; Time.now + zaehler.minutes)
   end
-end</programlisting></para>
+end</programlisting><remark>FIXME: Ist das der gleiche Inhalt der seeds.rb wie
+      weiter oben (activerecord_1n_zugreifen)? Wenn ja, dann die schöner
+      formatierte Variante von oben übernehmen.</remark></para>
 
       <para>Jetzt die Datenbank löschen und neu mit der
       <filename>db/seeds.rb</filename> befüllen:<screen>stefan@swmbp 1 1.9.2-p0 phonebook$ <command>rake db:setup</command>
@@ -4028,7 +4042,9 @@ Person.create(:lastname =&gt; 'Udelhoven')
 Person.create(:firstname =&gt; 'Ernst', :lastname =&gt; 'Steinwurf').phonenumbers.create([
              {:name =&gt; 'Mobile', :number =&gt; '0172-22225678'}, 
              {:name =&gt; 'Home', :number =&gt; '040-8888222'}])
-</programlisting></para>
+</programlisting><remark>FIXME: Ist das der gleiche Inhalt der seeds.rb wie
+      weiter oben (activerecord_1n_zugreifen)? Wenn ja, dann die schöner
+      formatierte Variante von oben übernehmen.</remark></para>
 
       <para>Die Datenbank löschen und neu mit der
       <filename>db/seeds.rb</filename> befüllen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:setup</command>
@@ -4141,7 +4157,9 @@ Person.create(:lastname =&gt; 'Udelhoven')
 Person.create(:firstname =&gt; 'Ernst', :lastname =&gt; 'Steinwurf').phonenumbers.create([
              {:name =&gt; 'Mobile', :number =&gt; '0172-22225678'}, 
              {:name =&gt; 'Home', :number =&gt; '040-8888222'}])
-</programlisting></para>
+</programlisting><remark>FIXME: Ist das der gleiche Inhalt der seeds.rb wie
+      weiter oben (activerecord_1n_zugreifen)? Wenn ja, dann die schöner
+      formatierte Variante von oben übernehmen.</remark></para>
 
       <para>Die Datei <filename>app/models/person.rb</filename> ändern Sie
       bitte wie folgt ab:<programlisting>class Person &lt; ActiveRecord::Base
@@ -4302,7 +4320,9 @@ Person.create(:lastname =&gt; 'Udelhoven')
 Person.create(:firstname =&gt; 'Ernst', :lastname =&gt; 'Steinwurf').phonenumbers.create([
              {:name =&gt; 'Mobile', :number =&gt; '0172-22225678'}, 
              {:name =&gt; 'Home', :number =&gt; '040-8888222'}])
-</programlisting></para>
+</programlisting><remark>FIXME: Ist das der gleiche Inhalt der seeds.rb wie
+    weiter oben (activerecord_1n_zugreifen)? Wenn ja, dann die schöner
+    formatierte Variante von oben übernehmen.</remark></para>
 
     <para>Jetzt die Datenbank löschen und neu mit der
     <filename>db/seeds.rb</filename> befüllen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
