@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="activerecord_datenbank_anlegen"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title
+  xml:id="activerecord_datenbank_anlegen.title">Datenbank/<quote>Model</quote>
+  anlegen</title>
+
+  <indexterm>
+    <primary>Datenbank</primary>
+  </indexterm>
+
+  <indexterm>
+    <primary>Model</primary>
+  </indexterm>
+
+  <note>
+    <indexterm>
+      <primary>Model–View–Controller</primary>
+
+      <see>MVC</see>
+    </indexterm>
+
+    <indexterm>
+      <primary>MVC</primary>
+    </indexterm>
+
+    <para><foreignphrase xml:lang="en">Model</foreignphrase> bezieht sich hier
+    auf das Daten-Modell aus <foreignphrase
+    xml:lang="en">Model–View–Controller</foreignphrase>
+    (<acronym>MVC</acronym>).</para>
+  </note>
+
+  <para>Auch wenn ich mich nicht für Musik interessiere, so sind Musikalben
+  für ein Datenbank-Beispiel sehr gut geeignet. Die benutzen Daten entnehme
+  ich, um evt. Diskussionen zum Thema Musikgeschmack zu vermeiden, dabei der
+  Wikipedia-Seite <uri
+  xlink:href="http://en.wikipedia.org/wiki/The_500_Greatest_Albums_of_All_Time">http://en.wikipedia.org/wiki/The_500_Greatest_Albums_of_All_Time</uri>.</para>
+
+  <para>Legen wir erst mal ein neues Rails-Projekt an:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new jukebox</command>
+      create  
+      create  README
+      create  Rakefile
+      <replaceable>[...]</replaceable>
+      create  vendor/plugins
+      create  vendor/plugins/.gitkeep
+
+stefan@swmbp 0 1.9.2-p0 ~$ <command>cd jukebox</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$ <command>bundle install</command>
+Fetching source index for http://rubygems.org/
+Using rake (0.8.7) 
+Using abstract (1.0.0) 
+<replaceable>[...]</replaceable>
+Your bundle was installed to `/Users/stefan/.rvm/gems/ruby-1.9.2-p0`
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+
+  <para>Schauen wir uns mal die Hilfeseite von <command>rails generate
+  model</command> an:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails generate model</command></screen><screen>Usage:
+  rails generate model NAME [field:type field:type] [options]
+
+Options:
+  -o, --orm=NAME  # Orm to be invoked
+                  # Default: active_record
+
+ActiveRecord options:
+      [--migration]            # Indicates when to generate migration
+                               # Default: true
+      [--timestamps]           # Indicates when to generate timestamps
+                               # Default: true
+      [--parent=PARENT]        # The parent class for the generated model
+  -t, [--test-framework=NAME]  # Test framework to be invoked
+                               # Default: test_unit
+
+TestUnit options:
+      [--fixture]                   # Indicates when to generate fixture
+                                    # Default: true
+  -r, [--fixture-replacement=NAME]  # Fixture replacement to be invoked
+
+Runtime options:
+  -f, [--force]    # Overwrite files that already exist
+  -p, [--pretend]  # Run but do not make any changes
+  -q, [--quiet]    # Supress status output
+  -s, [--skip]     # Skip files that already exist
+
+Description:
+    Create rails files for model generator.</screen></para>
+
+  <para>Das klingt alles halbwegs logisch. Legen wir also das <foreignphrase
+  xml:lang="en">Model</foreignphrase> <literal>album</literal> an:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails generate model album position:integer name:string release_year:integer</command>
+      invoke  active_record
+      create    db/migrate/20100902194019_create_albums.rb
+      create    app/models/album.rb
+      invoke    test_unit
+      create      test/unit/album_test.rb
+      create      test/fixtures/albums.yml
+
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+
+  <indexterm>
+    <primary>Migrations</primary>
+  </indexterm>
+
+  <indexterm>
+    <primary>Datenbank</primary>
+
+    <secondary>Migrations</secondary>
+
+    <see>Migrations</see>
+  </indexterm>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>Migrations</secondary>
+
+    <see>Migrations</see>
+  </indexterm>
+
+  <para>Rails hat eine Datenbank-Migrations-Datei mit dem Namen
+  <filename>db/migrate/20100902194019_create_albums.rb</filename> angelegt. In
+  dieser Datei wird eine Klasse <classname>CreateAlbums</classname> als
+  Tochter von <classname>ActiveRecord::Migration</classname> definiert. Die
+  Klassen-Methoden <methodname>self.up</methodname> und
+  <methodname>self.down</methodname> werden benutzt, um eine Migration oder
+  den dazu gehörigen Roll-Back zu definieren.<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>cat db/migrate/20100902194019_create_albums.rb</command></screen><programlisting>class CreateAlbums &lt; ActiveRecord::Migration
+  def self.up
+    create_table :albums do |t|
+      t.integer :position
+      t.string :name
+      t.integer :release_year
+
+      t.timestamps
+    end
+  end
+
+  def self.down
+    drop_table :albums
+  end
+end</programlisting></para>
+
+  <para>Mit <command>rake db:migrate</command> können wir die Migrationen
+  ausführen, also die entsprechende Datenbank-Tabelle anlegen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake db:migrate</command>
+(in /Users/stefan/jukebox)
+==  CreateAlbums: migrating ===================================================
+-- create_table(:albums)
+   -&gt; 0.0015s
+==  CreateAlbums: migrated (0.0016s) ==========================================
+
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+
+  <para>Weitere Details zu Migrationen werden wir später in <xref
+  linkend="activerecord_migration" /> kennenlernen.</para>
+
+  <para>Schauen wir mal in die Datei
+  <filename>app/models/album.rb</filename>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>cat app/models/album.rb</command></screen><programlisting>class Album &lt; ActiveRecord::Base
+end</programlisting></para>
+
+  <para>hmmm… die Klasse <classname>Album</classname> ist also eine Tochter
+  von <classname>ActiveRecord::Base</classname>. Logisch, da wir ja in diesem
+  Kapitel ActiveRecord besprechen. ;-)</para>
+
+  <para>Die eingebaute Hilfeseite zu <classname>ActiveRecord::Base</classname>
+  ist etwas länger:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>ri -T ActiveRecord::Base | wc -l</command>
+     454
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+
+  <para>Deshalb werde ich sie hier nicht abbilden und überlasse es Ihrer
+  Neugierde, mal <command>ri ActiveRecord</command> aufzurufen.</para>
+
+  <section xml:base="activerecord-types">
+    <title xml:id="activerecord-types.title">Mögliche Datentypen in
+    ActiveRecord</title>
+
+    <para>ActiveRecord ist ein <foreignphrase
+    xml:lang="en">Layer</foreignphrase> (Schicht, Ebene) zwischen Ruby und
+    verschiedenen relationalen Datenbanken. ActiveRecord kann auch ausserhalb
+    von Rails angewendet werden.</para>
+
+    <para>Leider haben SQL-Datenbanken unterschiedliche Sichtweisen auf die
+    Definition von Spalten und deren Inhalt. Darüber müssen wir uns keine
+    Sorgen machen, da ActiveRecord dieses Problem für uns transparent
+    löst.<itemizedlist>
+        <listitem>
+          <para>Vorteil:</para>
+
+          <para>Wir können das DBMS hinter einer Rails-Applikation austauschen
+          ohne dass dafür der Programmcode angefasst werden muss.</para>
+        </listitem>
+
+        <listitem>
+          <para>Nachteil:</para>
+
+          <para>Wir können nicht alle Besonderheiten des jeweiligen DBMS
+          benutzen. Wir müssen quasi einen kleinsten gemeinsamen Nenner
+          benutzen.</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>Um ein <foreignphrase xml:lang="en">Model</foreignphrase> zu
+    generieren können Sie folgende Feldtypen benutzen:<itemizedlist>
+        <listitem>
+          <indexterm>
+            <primary>binary</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>binary</literal></para>
+
+          <para>Das ist im klassischen Sinn ein BLOB (<foreignphrase
+          xml:lang="en">Binary Large Object</foreignphrase>). Noch nie gehört?
+          Dann werden sie es wahrscheinlich nicht brauchen.</para>
+
+          <para>Siehe auch <uri
+          xlink:href="http://de.wikipedia.org/wiki/Binary_Large_Object">http://de.wikipedia.org/wiki/Binary_Large_Object</uri></para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>boolean</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>boolean</literal></para>
+
+          <para>Ein Bool'scher Wert. Kann <literal>true</literal> (wahr) oder
+          <literal>false</literal> (falsch) sein.</para>
+
+          <para>Siehe auch <uri
+          xlink:href="http://de.wikipedia.org/wiki/Boolesche_Variable">http://de.wikipedia.org/wiki/Boolesche_Variable</uri></para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>date</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>date</literal></para>
+
+          <para>Hier kann ein Datum abgespeichert werden.</para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>datetime</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>datetime</literal></para>
+
+          <para>Hier kann ein Datum inklusive Uhrzeit abgespeichert
+          werden.</para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>float</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>float</literal></para>
+
+          <para>Zum Speichern einer Gleitkommazahl.</para>
+
+          <para>Siehe auch <uri
+          xlink:href="http://de.wikipedia.org/wiki/Gleitkommazahl">http://de.wikipedia.org/wiki/Gleitkommazahl</uri></para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>integer</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>integer</literal></para>
+
+          <para>Zum Speichern einer Ganzzahl.</para>
+
+          <para>Siehe auch <uri
+          xlink:href="http://de.wikipedia.org/wiki/Integer_(Datentyp)">http://de.wikipedia.org/wiki/Integer_(Datentyp)</uri></para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>primary_key</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>primary_key</literal></para>
+
+          <para>Das ist ein Integer (Ganzzahl), der von der Datenbank
+          automatisch bei jedem neuen Eintrag um 1 hochgezählt wird. Dieser
+          Feldtyp wird häufig als Schlüssel für die Verknüpfung von
+          verschiedenen Datenbank-Tabellen bzw. <foreignphrase
+          xml:lang="en">Models</foreignphrase> genommen.</para>
+
+          <para>Siehe auch <uri
+          xlink:href="http://de.wikipedia.org/wiki/Schl%C3%BCssel_%28Datenbank%29">http://de.wikipedia.org/wiki/Schlüssel_(Datenbank)</uri></para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>string</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>string</literal></para>
+
+          <para>Ein String. Also eine beliebige Zeichenkette, bis max.
+          2<superscript>8</superscript>-1 (= 255) Zeichen.</para>
+
+          <para>Siehe auch <uri
+          xlink:href="http://de.wikipedia.org/wiki/Zeichenkette">http://de.wikipedia.org/wiki/Zeichenkette</uri></para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>text</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>text</literal></para>
+
+          <para>Auch ein String. Allerdings ein gutes Stück größer. Hier
+          können per Default bis zu 2<superscript>16</superscript> (= 65536)
+          Zeichen gespeichert werden.</para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>time</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>time</literal></para>
+
+          <para>Eine Uhrzeit.</para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>timestamp</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>timestamp</literal></para>
+
+          <para>Eine Uhrzeit mit Datum, die von der Datenbank automatisch
+          befüllt wird.</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>Wir gehen in <xref linkend="migration" /> auf die einzelnen
+    Datentypen noch näher ein und sprechen über verfügbare Optionen. Dies soll
+    im Rahmen eines Einsteigerbuches eine Kurzübersicht sein. Wer sich
+    intensiver mit den verschiedenen Datentypen beschäftigen will, sei auf
+    <xref linkend="weiterfuehrende_doku" /> verwiesen.</para>
+  </section>
+
+  <section xml:id="activerecord_namenskonvention">
+    <title xml:id="activerecord_namenskonvention.title">Namenskonventionen
+    (CallRecord vs. call_record vs. call_records)</title>
+
+    <indexterm>
+      <primary>Inflections</primary>
+
+      <secondary>ActiveRecord</secondary>
+
+      <see>Inflections</see>
+    </indexterm>
+
+    <indexterm>
+      <primary>Inflections</primary>
+
+      <secondary>ActiveSupport</secondary>
+    </indexterm>
+
+    <para>Für den Rails-Anfänger ist es oft schwer zu <quote>erfühlen</quote>,
+    wann man z.B. <literal>CallRecord</literal> oder
+    <literal>call_record</literal> benutzt (das eine ist eine Klasse und das
+    andere ein Model). Dabei geht es nicht um die Klasse an sich, sondern rein
+    um die Schreibweise oder das Wording. Es ist für den Anfänger nicht immer
+    klar <quote>erfühlbar</quote>, wann ein Begriff im Plural und wann im
+    Singular benutzt wird. So viel vorweg: Es ist alles logisch und man
+    bekommt den Dreh auch recht schnell raus. Wichtig ist nur immer bei
+    englischen Wörtern zu bleiben (siehe <xref
+    linkend="warum_english" />).</para>
+
+    <para>An dieser Stelle wollte ich ursprünglich in aller Länge und Breite
+    über die Namenskonventionen philosophieren. Dann habe ich mir gedacht:
+    <quote>Mein Gott, die Leser wollen schnell weiterkommen und nicht hier
+    Ewigkeiten mit Theorie verbringen.</quote> Deshalb stelle ich Ihnen hier
+    die Methoden vor, mit denen Sie selbst die Schreibweisen in der
+    Rails-<foreignphrase xml:lang="en">Console</foreignphrase> rausfinden
+    können:<screen>stefan@swmbp 0 1.9.2-p0 $ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+
+ruby-1.9.2-p0 &gt; <command>"album".classify</command>
+ =&gt; "Album" 
+
+ruby-1.9.2-p0 &gt; <command>"album".tableize</command>
+ =&gt; "albums" 
+
+ruby-1.9.2-p0 &gt; <command>"album".foreign_key</command>
+ =&gt; "album_id" 
+
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 $ </screen></para>
+
+    <para>Wenn Sie zusammengesetzte Begriffe verwenden funktioniert das
+    genauso:<screen>stefan@swmbp 0 1.9.2-p0 $ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+
+ruby-1.9.2-p0 &gt; <command>"call_record".classify</command>
+ =&gt; "CallRecord" 
+
+ruby-1.9.2-p0 &gt; <command>"call_record".tableize</command>
+ =&gt; "call_records" 
+
+ruby-1.9.2-p0 &gt; <command>"call_record".foreign_key</command>
+ =&gt; "call_record_id" 
+
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 $ </screen></para>
+
+    <para>Wenn Sie sich bei einem Begriff nicht sicher sind, können Sie auch
+    mit der Klasse und der Methode <methodname>name</methodname> arbeiten. Ich
+    zeige Ihnen das mal anhand der Klasse <classname>Person</classname>
+    (achten Sie einmal auf den Plural <literal>people</literal>):<screen>stefan@swmbp 0 1.9.2-p0 $ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+
+ruby-1.9.2-p0 &gt; <command>Person.name.tableize</command>
+ =&gt; "people" 
+
+ruby-1.9.2-p0 &gt; <command>Person.name.foreign_key</command>
+ =&gt; "person_id" 
+
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 $ </screen></para>
+
+    <para>Auf <uri
+    xlink:href="http://rails.rubyonrails.org/classes/ActiveSupport/CoreExtensions/String/Inflections.html"
+    xml:lang="en">http://rails.rubyonrails.org/classes/ActiveSupport/CoreExtensions/String/Inflections.html</uri>
+    finden Sie eine komplette Liste der entsprechenden Methoden. Ich empfehle
+    Ihnen aber jetzt erst mal sich in der Strömung treiben zu lassen. Falls
+    Sie mal nicht sicher sind, können Sie mit den hier gezeigten Methoden die
+    richtige Schreibweise rausfinden.</para>
+  </section>
+
+  <section>
+    <title>Datenbank-Konfiguration</title>
+
+    <indexterm>
+      <primary>database.yml</primary>
+    </indexterm>
+
+    <para>Welche Datenbank wird per Default benutzt? Schauen wir mal in die
+    Konfigurationsdatei für die Datenbank
+    (<filename>config/database.yml</filename>):<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>cat config/database.yml</command></screen><programlisting># SQLite version 3.x
+#   gem install sqlite3-ruby (not necessary on OS X Leopard)
+development:
+  adapter: sqlite3
+  database: db/development.sqlite3
+  pool: 5
+  timeout: 5000
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  adapter: sqlite3
+  database: db/test.sqlite3
+  pool: 5
+  timeout: 5000
+
+production:
+  adapter: sqlite3
+  database: db/production.sqlite3
+  pool: 5
+  timeout: 5000</programlisting></para>
+
+    <para>Da wir im <literal>development</literal>-Modus arbeiten hat Rails
+    beim <command>rake db:migrate</command> eine neue SQLite3-Datenbank
+    <filename>db/development.sqlite3</filename> angelegt und dort alle Daten
+    gespeichert.</para>
+
+    <para>Schauen wir mal mit dem Kommandozeilen-Client
+    <literal>sqlite3</literal> rein:</para>
+
+    <para><screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>sqlite3 db/development.sqlite3 </command>
+SQLite version 3.6.12
+Enter ".help" for instructions
+Enter SQL statements terminated with a ";"
+
+sqlite&gt; <command>.tables</command>
+albums             schema_migrations
+
+sqlite&gt; <command>.schema albums</command>
+CREATE TABLE "albums" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "position" integer, "name" varchar(255), "release_year" integer, "created_at" datetime, "updated_at" datetime);
+
+sqlite&gt; <command>.exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+
+    <para>Tatsächlich, da ist eine Datenbank-Tabelle mit dem Namen
+    <literal>albums</literal>. Diese wird von ActiveRecord benutzt.</para>
+  </section>
+</section>

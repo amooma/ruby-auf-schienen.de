@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="ar-first_last_all"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="ar-first_last_all.title">first, last und all</title>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>Methoden</secondary>
+
+    <tertiary>first()</tertiary>
+  </indexterm>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>Methoden</secondary>
+
+    <tertiary>last()</tertiary>
+  </indexterm>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>Methoden</secondary>
+
+    <tertiary>all()</tertiary>
+  </indexterm>
+
+  <para>In dem ein oder anderen Fall braucht man ja immer mal den ersten oder
+  den letzten oder auch alle Datensätze. Deshalb gibt es für alle drei Fälle
+  eine fertige Methode. Fangen wir mit den einfachsten
+  <methodname>first</methodname> und <methodname>last</methodname> an:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+
+ruby-1.9.2-p0 &gt; <command>Album.first</command>
+ =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt; 
+
+ruby-1.9.2-p0 &gt; <command>Album.last</command>
+ =&gt; #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt; 
+
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+
+  <para>Ein kurzer Blick in <filename>log/development.log</filename> zeigt uns
+  wie ActiveRecord das gemacht hat:<programlisting>  Album Load (0.4ms)  SELECT "albums".* FROM "albums" LIMIT 1
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY albums.id DESC LIMIT 1</programlisting></para>
+
+  <para>Und jetzt mal alle auf einemal mit
+  <methodname>all</methodname>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+
+ruby-1.9.2-p0 &gt; <command>Album.all</command>
+ =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;] 
+
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+
+  <para>Der dazu gehörige SQL-Code ist nicht überraschend:<programlisting>  Album Load (0.2ms)  SELECT "albums".* FROM "albums"</programlisting></para>
+
+  <para>Die von <methodname>first</methodname>, <methodname>last</methodname>
+  und <methodname>all</methodname> erzeugten Objekte sind aber
+  unterschiedlich. Bei <methodname>first</methodname> und
+  <methodname>all</methodname> wird ein Objekt der Klasse
+  <classname>Album</classname> ausgegeben und bei <methodname>all</methodname>
+  natürlich ein <literal>Array</literal> solcher Objekte:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+
+ruby-1.9.2-p0 &gt; <command>Album.first</command>
+ =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt; 
+
+ruby-1.9.2-p0 &gt; <command>Album.first.class</command>
+ =&gt; Album(id: integer, position: integer, name: string, release_year: integer, created_at: datetime, updated_at: datetime) 
+
+ruby-1.9.2-p0 &gt; <command>Album.all</command>
+ =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;] 
+
+ruby-1.9.2-p0 &gt; <command>Album.all.class</command>
+ =&gt; Array 
+
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+
+  <para>Wenn <methodname>Album.all</methodname> ein Array zurückgibt, dann
+  müsste man doch auch Iteratoren (siehe <xref linkend="iterator" /> und <xref
+  linkend="array_iterator" />) benutzen können, oder? Ja, natürlich! Das ist
+  ja das Schöne daran. Kleiner Versuch mit
+  <methodname>each</methodname>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+
+ruby-1.9.2-p0 &gt; <command>Album.all.each do |album|</command>
+ruby-1.9.2-p0 &gt;     <command>puts album.name</command>
+ruby-1.9.2-p0 ?&gt;  <command>end</command>
+Sgt. Pepper's Lonely Hearts Club Band
+Pet Sounds
+Revolver
+Highway 61 Revisited
+ =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;] 
+
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+
+  <para>Kann man dann auch <code>.all.first</code> als Alternative zu
+  <code>.first</code> benutzen? Ja, aber es macht keinen Sinn. Schauen wir
+  mal:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+
+ruby-1.9.2-p0 &gt; <command>Album.first</command>
+ =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt; 
+
+ruby-1.9.2-p0 &gt; <command>Album.all.first</command>
+ =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt; 
+
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+
+  <para>Sicher, das Ergebnis ist das gleiche, aber werfen wir mal einen Blick
+  ins <filename>log/development.log</filename>:<programlisting>  Album Load (0.1ms)  SELECT "albums".* FROM "albums" LIMIT 1
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums"</programlisting></para>
+
+  <para>Selbst bei unserer Mini-Datenbank sehen wir schon einen
+  Geschwindigkeitsunterschied. Bei <code>Album.first</code> wird ein
+  <code>SELECT *</code> mit einem <code>LIMIT 1</code> abgerufen (erste
+  Zeile). Bei <code>Album.all.first</code> wird erst die ganze Tabelle mit
+  <code>SELECT *</code> eingelesen und dann innerhalb von Ruby das erste
+  Element dieses Arrays rausgezogen. Bei dieser kleinen Applikation kann man
+  sich das noch leisten, aber stellen Sie sich mal vor, es würde sich um eine
+  Datenbank mit zig Millionen Einträgen handeln.</para>
+
+  <tip>
+    <para>Auch wenn ActiveRecord dem Programmierer schon sehr viel Denkarbeit
+    abnimmt, sollte man immer überlegen, ob das gleiche Ergebnis nicht auch
+    mit einem optimaleren Weg realisiert werden kann.</para>
+  </tip>
+</section>

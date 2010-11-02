@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="activerecord_datensaetze_hinzufuegen"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="activerecord_datensaetze_hinzufuegen.title">Datensätze
+  hinzufügen</title>
+
+  <para>Eigentlich würde ich Ihnen ja gerne erst zeigen wie man sich
+  Datensätze anzeigen lassen kann, aber da haben wir natürlich ein
+  Henne-Ei-Problem. Deshalb jetzt erst mal das Anlegen von neuen Datensätzen
+  mit <classname>ActiveRecord</classname>.</para>
+
+  <section xml:id="activerecord_create">
+    <title xml:id="activerecord_create.title">create</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Methoden</secondary>
+
+      <tertiary>create()</tertiary>
+    </indexterm>
+
+    <para>Die am häufigten zum Anlegen von neuen Datensätzen benutzte Methode
+    ist <methodname>create</methodname>. Wie immer gibt es dazu eine eigene
+    Hilfeseite im System:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>ri -T ActiveRecord::Base.create</command></screen><screen>ActiveRecord::Base.create
+
+(from gem activerecord-3.0.0)
+------------------------------------------------------------------------------
+  create(attributes = nil) { |object| ... }
+
+------------------------------------------------------------------------------
+
+Creates an object (or multiple objects) and saves it to the database, if
+validations pass. The resulting object is returned whether the object was
+saved successfully to the database or not.
+
+The attributes parameter can be either be a Hash or an Array of Hashes.
+ These Hashes describe the attributes on the objects that are to be created.
+
+Examples
+  # Create a single new object
+  User.create(:first_name =&gt; 'Jamie')
+
+  # Create an Array of new objects
+  User.create([{ :first_name =&gt; 'Jamie' }, { :first_name =&gt; 'Jeremy' }])
+
+  # Create a single object and pass it into a block to set other attributes.
+  User.create(:first_name =&gt; 'Jamie') do |u|
+    u.is_admin = false
+  end
+
+  # Creating an Array of new objects using a block, where the block is executed for each object:
+  User.create([{ :first_name =&gt; 'Jamie' }, { :first_name =&gt; 'Jeremy' }]) do |u|
+    u.is_admin = false
+  end</screen></para>
+
+    <para>Super, direkt mit Beispielen! Was will man mehr? Versuchen wir mal
+    so in der <foreignphrase xml:lang="en">Console</foreignphrase> die ersten
+    3 Alben für die Jukebox anzulegen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+
+ruby-1.9.2-p0 &gt; <command>Album</command>
+ =&gt; Album(id: integer, position: integer, name: string, release_year: integer, created_at: datetime, updated_at: datetime) 
+
+ruby-1.9.2-p0 &gt; <command>Album.create( :position =&gt; 1, :name =&gt; "Sgt. Pepper's Lonely Hearts Club Band", :release_year =&gt; 1967 )</command>
+ =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt; 
+
+ruby-1.9.2-p0 &gt; <command>Album.create( :position =&gt; 2, :name =&gt; "Pet Sounds", :release_year =&gt; 1966 )</command>
+ =&gt; #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt; 
+
+ruby-1.9.2-p0 &gt; <command>Album.create( :position =&gt; 3, :name =&gt; "Revolver", :release_year =&gt; 1966 )</command>
+ =&gt; #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt; 
+
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+
+    <para>Sieht ja ganz gut aus, aber sind die Daten auch wirklich gespeichert
+    worden? Schauen wir sicherheitshalber mal mit dem Kommandozeilen-Client
+    <literal>sqlite3</literal> rein:</para>
+
+    <para><screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>sqlite3 db/development.sqlite3 </command>
+SQLite version 3.6.12
+Enter ".help" for instructions
+Enter SQL statements terminated with a ";"
+
+sqlite&gt; <command>.tables</command>
+albums             schema_migrations
+
+sqlite&gt; <command>SELECT * FROM albums;</command>
+1|1|Sgt. Pepper's Lonely Hearts Club Band|1967|2010-09-02 19:48:42.744962|2010-09-02 19:48:42.744962
+2|2|Pet Sounds|1966|2010-09-02 19:49:07.513328|2010-09-02 19:49:07.513328
+3|3|Revolver|1966|2010-09-02 19:49:27.511745|2010-09-02 19:49:27.511745
+
+sqlite&gt; <command>.exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+
+    <para>Tatsächlich, da ist eine Datenbank mit dem Namen
+    <literal>albums</literal>, und in der sind die von uns eben erstellten
+    Einträge. Die dafür von ActiveRecord erstellten SQL-Befehle können Sie
+    sich in der Datei <filename>log/development.log</filename>
+    anschauen:<screen>  SQL (0.3ms)  INSERT INTO "albums" ("created_at", "name", "position", "release_year", "updated_at") VALUES ('2010-10-09 11:56:42.140062', 'Sgt. Pepper''s Lonely Hearts Club Band', 1, 1967, '2010-10-09 11:56:42.140062')
+  SQL (0.7ms)  INSERT INTO "albums" ("created_at", "name", "position", "release_year", "updated_at") VALUES ('2010-10-09 11:56:47.647848', 'Pet Sounds', 2, 1966, '2010-10-09 11:56:47.647848')
+  SQL (0.3ms)  INSERT INTO "albums" ("created_at", "name", "position", "release_year", "updated_at") VALUES ('2010-10-09 11:56:52.232803', 'Revolver', 3, 1966, '2010-10-09 11:56:52.232803')</screen></para>
+  </section>
+
+  <section xml:id="activerecord_new">
+    <title xml:id="activerecord_new.title">new</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Methoden</secondary>
+
+      <tertiary>new()</tertiary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Methoden</secondary>
+
+      <tertiary>save()</tertiary>
+    </indexterm>
+
+    <para>Neben <methodname>create</methodname> gibt es auch
+    <methodname>new</methodname>. Allerdings muss ein mit
+    <methodname>new</methodname> erzeugtes Objekt extra mit
+    <methodname>save</methodname> gespeichert werden (was Vor- und Nachteile
+    hat):<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+
+ruby-1.9.2-p0 &gt; <command>highway61 = Album.new</command>
+ =&gt; #&lt;Album id: nil, position: nil, name: nil, release_year: nil, created_at: nil, updated_at: nil&gt; 
+
+ruby-1.9.2-p0 &gt; <command>highway61.position = 4</command>
+ =&gt; 4 
+
+ruby-1.9.2-p0 &gt; <command>highway61.name = 'Highway 61 Revisited'</command>
+ =&gt; "Highway 61 Revisited" 
+
+ruby-1.9.2-p0 &gt; <command>highway61.release_year = 1965</command>
+ =&gt; 1965 
+
+ruby-1.9.2-p0 &gt; <command>highway61</command>
+ =&gt; #&lt;Album id: nil, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: nil, updated_at: nil&gt; 
+
+ruby-1.9.2-p0 &gt; <command>highway61.save</command>
+ =&gt; true 
+
+ruby-1.9.2-p0 &gt; <command>highway61</command>
+ =&gt; #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt; 
+
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+
+    <para>In der Datei <filename>log/development.log</filename> finden Sie den
+    zu erwartenden <literal>INSERT</literal>-Befehl:<programlisting>SQL (0.9ms)  INSERT INTO "albums" ("created_at", "name", "position", "release_year", "updated_at") VALUES ('2010-09-02 20:30:34.872261', 'Highway 61 Revisited', 4, 1965, '2010-09-02 20:30:34.872261')</programlisting></para>
+
+    <para>Sie können der Methode <methodname>new</methodname> wie
+    <methodname>create</methodname> auch direkt Parameter für den neuen
+    Datensatz übergeben. Hier das obige Beispiel in einer Zeile:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+
+ruby-1.9.2-p0 &gt; <command>highway61 = Album.new( :position =&gt; 4, :name =&gt; 'Highway 61 Revisited', :release_year =&gt; 1965 )</command>
+ =&gt; #&lt;Album id: nil, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: nil, updated_at: nil&gt; 
+
+ruby-1.9.2-p0 &gt; <command>highway61.save</command>
+ =&gt; true 
+
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+  </section>
+
+  <section xml:id="activerecord_new_record">
+    <title xml:id="activerecord_new_record.title">new_record?</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Methoden</secondary>
+
+      <tertiary>new_record?()</tertiary>
+    </indexterm>
+
+    <para>Mit der Methode <methodname>new_record?</methodname> können Sie sich
+    anzeigen lassen, ob ein Datensatz schon gespeichert wurde oder nicht.
+    Wurde ein neues Objekt mit <methodname>new</methodname> erstellt und noch
+    nicht abgespeichert, dann ist das Ergebnis von
+    <methodname>new_record?</methodname> <literal>true</literal>. Nach einem
+    <methodname>save</methodname> ist es <literal>false</literal>.</para>
+
+    <para>Gehen wir nochmal das Beispiel von <xref
+    linkend="activerecord_new" /> durch, um dies zu zeigen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+
+ruby-1.9.2-p0 &gt; <command>highway61 = Album.new(:position =&gt; 4, :name =&gt; 'Highway 61 Revisited', :release_year =&gt; 1965)</command>
+ =&gt; #&lt;Album id: nil, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: nil, updated_at: nil&gt; 
+
+ruby-1.9.2-p0 &gt; <command>highway61.new_record?</command>
+ =&gt; true 
+
+ruby-1.9.2-p0 &gt; <command>highway61.save</command>
+ =&gt; true 
+
+ruby-1.9.2-p0 &gt; <command>highway61.new_record?</command>
+ =&gt; false 
+
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen><tip>
+        <para>Bei bereits bestehenden Datensätzen können Sie eine Veränderung
+        auch mit der Methode <methodname>changed?</methodname> überprüfen
+        (siehe <xref linkend="activerecord_changed" />).</para>
+      </tip></para>
+  </section>
+</section>

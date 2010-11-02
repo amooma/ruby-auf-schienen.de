@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="seed_rb" xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="seed_rb.title">Mit seeds.rb die Datenbank betanken</title>
+
+  <indexterm>
+    <primary>seeds.rb</primary>
+  </indexterm>
+
+  <para>Die Rails-Götter haben mit der Datei <filename>db/seeds.rb</filename>
+  einen Weg geschaffen, eine frische Installation einfach und schnell mit
+  Default-Werten zu füttern. Es handelt sich um ein normales Ruby-Programm
+  innerhalb der Rails-Umgebung. Sie haben also vollen Zugriff auf alle Klassen
+  und Methoden aus Ihrer Applikation.</para>
+
+  <para>Um die in <xref linkend="activerecord_create" /> erstellten Datensätze
+  in einer neuen Rails-Applikation zur Verfügung zu stellen, müssen Sie so
+  nicht manuel mit <command>rails console</command> alles eingeben, sondern es
+  reicht die folgende Datei <filename>db/seeds.rb</filename>:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
+# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
+#
+# Examples:
+#
+#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
+#   Mayor.create(:name =&gt; 'Daley', :city =&gt; cities.first)
+
+Album.create( "name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "position"=&gt;1, "release_year"=&gt;1967 )
+Album.create( "name"=&gt;"Pet Sounds", "position"=&gt;2, "release_year"=&gt;1966 )
+Album.create( "name"=&gt;"Revolver", "position"=&gt;3, "release_year"=&gt;1966 )
+Album.create( "name"=&gt;"Highway 61 Revisited", "position"=&gt;4, "release_year"=&gt;1965 )</programlisting></para>
+
+  <note>
+    <para>Wie Sie sehen werden in den Default-Beispielen Symbols zum
+    definieren der Keys benutzt. In unserem Beispiel aber Strings. Es
+    funktioniert beides. Fairer weise muss man aber sagen, das Symbols einen
+    Tick eleganter und performanter sind.</para>
+  </note>
+
+  <para>Das Einspielen der Daten erfolgt dann mit <command>rake
+  db:seed</command>. Um ganz sicher zu sein, sollten Sie im Rahmen dieses
+  Buches immer mit <command>rake db:setup</command> die Datenbank neu
+  aufsetzen und dann automatisch mit der <filename>seeds.rb</filename>
+  füttern. Das sieht dann so aus:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake db:setup</command>
+(in /Users/stefan/jukebox)
+db/test.sqlite3 already exists
+db/test.sqlite3 already exists
+db/development.sqlite3 already exists
+db/development.sqlite3 already exists
+-- create_table("albums", {:force=&gt;true})
+   -&gt; 0.0159s
+-- initialize_schema_migrations_table()
+   -&gt; 0.0005s
+-- assume_migrated_upto_version(20101004085045, "db/migrate")
+   -&gt; 0.0004s
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen>Die Datei
+  <filename>db/seeds.rb</filename> bringe ich an dieser Stelle ein, weil sie
+  einen einfachen Mechanismus bietet eine leere Datenbank mit Default-Werten
+  zu fühlen. Das erleichtert uns im weiteren Verlauf des Buches das schnelle
+  Setup von Beispiel-Szenarien.</para>
+
+  <section>
+    <title>Alternative Programmierung</title>
+
+    <indexterm>
+      <primary>seeds.rb</primary>
+    </indexterm>
+
+    <para>Die <filename>seeds.rb</filename> ist ein Ruby-Programm.
+    Entsprechend können wir alternativ auch folgenen Weg
+    gehen:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
+# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
+#
+# Examples:
+#
+#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
+#   Mayor.create(:name =&gt; 'Daley', :city =&gt; cities.first)
+
+album_list = [
+  [ "Sgt. Pepper's Lonely Hearts Club Band", 1967 ],
+  [ "Pet Sounds", 1966 ],
+  [ "Revolver", 1966 ],
+  [ "Highway 61 Revisited", 1965 ]
+]
+
+position = 1
+album_list.each do |album|
+  Album.create( :name =&gt; album[0], :release_year =&gt; album[1], :position =&gt; position )
+  position = position + 1
+end</programlisting></para>
+
+    <para>Das Ergebnis ist das gleiche. Ich zeige Ihnen dieses Beispiel hier,
+    um noch mal klar rauszuarbeiten, dass Sie innerhalb der
+    <filename>seeds.rb</filename> ganz normal programmieren können.</para>
+  </section>
+
+  <section>
+    <title>seeds.rb aus bestehenden Daten erstellen</title>
+
+    <indexterm>
+      <primary>seeds.rb</primary>
+    </indexterm>
+
+    <para>Manchmal ist es praktisch den aktuellen Datenbestand einer
+    Rails-Applikation in eine <filename>seeds.rb</filename> zu exportieren.
+    Beim Schreiben dieses Buches hatte ich dieses Problem fast in jedem
+    Kapitel. Es gibt dafür leider keinen Standard-Weg. Ich zeige Ihnen wie man
+    es in diesem Fall machen kann. Komplexere Szenarien lassen sich daraus
+    ableiten.</para>
+
+    <para>Füllen Sie die Datei <filename>lib/tasks/apfelmus.rake</filename>
+    mit folgendem Inhalt:<programlisting>namespace :album do
+  desc "Prints all the Albums in a seeds.rb way."
+  task :seed_format =&gt; :environment do
+    Album.order('position').all.each do |album|
+      puts "Album.create(#{album.serializable_hash.delete_if {|key, value| ['created_at','updated_at','id'].include?(key)}.to_s.gsub(/[{}]/,'')})"
+    end
+  end
+end</programlisting></para>
+
+    <para>Danach können Sie mit dem Befehl <command>rake
+    album:seed_format</command> den entsprechenden
+    <literal>rake</literal>-<quote><foreignphrase
+    xml:lang="en">Task</foreignphrase></quote> abrufen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake album:seed_format</command>
+(in /Users/stefan/jukebox)
+Album.create("name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "position"=&gt;1, "release_year"=&gt;1967)
+Album.create("name"=&gt;"Pet Sounds", "position"=&gt;2, "release_year"=&gt;1966)
+Album.create("name"=&gt;"Revolver", "position"=&gt;3, "release_year"=&gt;1966)
+Album.create("name"=&gt;"Highway 61 Revisited", "position"=&gt;4, "release_year"=&gt;1965)
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+
+    <para>Entweder können Sie dieses Programm so erweitern, dass die Ausgabe
+    direkt in die <filename>seeds.rb</filename> geschrieben wird oder Sie
+    benutzen einfach die Shell:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake album:seed_format &gt;&gt; db/seeds.rb</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+  </section>
+</section>
