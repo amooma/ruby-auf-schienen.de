@@ -286,12 +286,10 @@ ruby-1.9.2-p0 &gt; <command>Album.where( "name like '%on%'" ) == Album.where( "n
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
-        <para>Problematisch wird das ganze beim Einsatz von Variablen.
-        Arbeiten wir nochmal mit der Variable <varname>apfelmus</varname> und
-        fügen nach dem ersten Aufruf einen abgewandelten Beispiel-Hack von
-        <uri
-        xlink:href="http://de.wikipedia.org/wiki/SQL-Injection">http://de.wikipedia.org/wiki/SQL-Injection</uri>
-        ein: <remark>FIXME: Hier fehlt was.</remark></para>
+        <para>Bitte benutzen Sie diese Variante nur, wenn Sie genau wissen was
+        Sie tun und nachdem Sie sich mit dem Thema SQL-Injections beschäftigt
+        haben (siehe <uri
+        xlink:href="http://de.wikipedia.org/wiki/SQL-Injection">http://de.wikipedia.org/wiki/SQL-Injection</uri>).</para>
       </section>
     </section>
   </section>
@@ -326,10 +324,7 @@ ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1970..1979 ).order(
  =&gt; [#&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 8, position: 8, name: "London Calling", release_year: 1979, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen><remark>FIXME: Bei all diesen
-    console-Screens bin ich mir nicht sicher ob ich die gut finde oder nicht.
-    Diese hier sind z.B. 6 Zeilen lang obwohl nur 2 Zeilen in der Mitte
-    relevant sind.</remark></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Hier noch die Ausgabe aus <filename>log/development.log</filename>
     zu den beiden Suchen:<programlisting>  Album Load (0.5ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969) ORDER BY name
@@ -360,10 +355,6 @@ ruby-1.9.2-p0 &gt; <command>Album.limit(3)</command>
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
-    <remark>FIXME: Wurde schon erklärt daß anscheinend auch "Album" alleine
-    ohne .all (oder wie auch immer die Methode heißt) alle Einträge
-    zurückgibt?</remark>
-
     <para>Die ersten 5 Alben aus den 60ern:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
@@ -380,8 +371,7 @@ ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1960..1969 ).order(
  =&gt; [#&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen><remark>FIXME: Ist hier mit Absicht
-    2-mal order() angegeben?</remark></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Die zu den drei Abfragen gehörenden Einträge in der
     <filename>log/development.log</filename> Datei:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" LIMIT 3
@@ -404,9 +394,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen><remark>FIXME: Ist hier mit Absicht
       werden.</para>
 
       <para>Als erstes geben wir die ersten beiden Datensätze zurück und
-      danach die ersten beiden Datensätze mit einem Offset<remark>FIXME: In
-      Klammern auch einen deutschen Begriff dafür angeben. Das ist 1-basiert
-      oder?</remark> von 5:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+      danach die ersten beiden Datensätze mit einem Offset von 5:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
 ruby-1.9.2-p0 &gt; <command>Album.limit(2)</command>
@@ -416,9 +404,7 @@ ruby-1.9.2-p0 &gt; <command>Album.limit(2).offset(5)</command>
  =&gt; [#&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen><remark>FIXME: Gibt es eigentlich
-      eine spezielle Reihenfolge, z.B. offset() nur nach limit() oder geht
-      offset() auch vor limit()?</remark></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Die <filename>log/development.log</filename> zeigt die
       entsprechende SQL-Abfrage:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" LIMIT 2
@@ -548,9 +534,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     </indexterm>
 
     <para>Mit der Methode <methodname>maximum</methodname> kann aus einer
-    Abfrage<remark>FIXME: Nicht schön formuliert. Mir fällt aber auch grad
-    nichts besseres ein.</remark> der Eintrag mit dem höchsten Wert ausgegeben
-    werden.</para>
+    Abfrage der Eintrag mit dem höchsten Wert ausgegeben werden.</para>
 
     <para>Als erstes suchen wir aus allen Alben das mit dem höchsten
     Veröffentlichungsjahr und dann das gleiche für alle Alben aus den
@@ -584,9 +568,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     </indexterm>
 
     <para>Mit der Methode <methodname>minimum</methodname> kann aus einer
-    Abfrage<remark>FIXME: Nicht schön formuliert. Mir fällt aber auch grad
-    nichts besseres ein.</remark> der Eintrag mit dem niedrigsten Wert
-    ausgegeben werden.</para>
+    Abfrage der Eintrag mit dem niedrigsten Wert ausgegeben werden.</para>
 
     <para>Als erstes suchen wir aus allen Alben das mit dem niedrigsten
     Veröffentlichungsjahr und dann das gleiche für alle Alben aus den
@@ -620,8 +602,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     </indexterm>
 
     <para>Mit der Methode sum kann man die Summe alle Einträge in einer
-    bestimmten Spalte<remark>Spalte gefällt mir als Begriff besser als
-    "Abfrage" wie weiter oben.</remark> der Datenbankabfrage berechnen.</para>
+    bestimmten Spalte der Datenbankabfrage berechnen.</para>
 
     <para>Als erstes ziehen wir die Summe aller Veröffentlichungsjahre und
     danach die Summe aller Veröffentlichungsjahre in den 70ern (ja, ein
@@ -655,12 +636,11 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     </indexterm>
 
     <para>Sicherlich kann man auch mit <methodname>where</methodname> einen
-    Datensatz anhand der Datensatz-ID<remark>FIXME: Ist damit der
-    Primärschlüssel der Tabelle gemeint?</remark> suchen, aber hier ist
-    <methodname>find</methodname> tatsächlich einen Tick praktischer. Wenn ich
-    die ID eines Objektes (hier: einer Datensatz-Zeile) kenne, kann ich das
-    einzelne Objekt oder mehrere Objekte gleichzeitig anhand der ID
-    suchen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+    Datensatz anhand der Datensatz-ID (des Primärschlüssels der Datenbank)
+    suchen, aber hier ist <methodname>find</methodname> tatsächlich einen Tick
+    praktischer. Wenn ich die ID eines Objektes (hier: einer Datensatz-Zeile)
+    kenne, kann ich das einzelne Objekt oder mehrere Objekte gleichzeitig
+    anhand der ID suchen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
 ruby-1.9.2-p0 &gt; <command>Album.find(2)</command>
@@ -692,11 +672,9 @@ ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Wenn man nach einer ID sucht, sollte man sich allerdings ganz sicher
-    sein, dass es diese ID auch gibt<remark>FIXME: Warum? Was passiert sonst?
-    Wird eine Exception geworfen? VIelleicht nocht ein Beispiel in dem die
-    Exception abgefangen wird. Und vielleicht noch ein Beispiel in dem
-    tatsächlich *vorher* per if mit exists?() geprüft wird.</remark>. Im
-    Zweifelsfall kann/muss man das mit der Methode <indexterm>
+    sein, dass es diese ID auch gibt (sonst wird eine Exception generiert und
+    damit haben wir uns noch nicht beschäftigt). Im Zweifelsfall kann/muss man
+    das mit der Methode <indexterm>
         <primary>ActiveRecord</primary>
 
         <secondary>Methoden</secondary>
@@ -732,8 +710,6 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <title xml:id="activerecord_find_by.title">Attribut-basierendes find_by_*,
     find_last_by_* und find_all_by_*</title>
 
-    <remark>FIXME: Gibt es auch find_first_by_*()?</remark>
-
     <indexterm>
       <primary>ActiveRecord</primary>
 
@@ -761,11 +737,9 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <para>Das Attribut-basierende
     <methodname>find_by_<replaceable>*</replaceable></methodname> ist eine
     <quote>magische</quote> Methode, denn sie kann von Ihnen dynamisch
-    erweitert werden.<remark>FIXME: Unschön formuliert. Man erweiter doch
-    nicht selbst die Methode sondern ruft sie nur unter einem erweiterten
-    Namen auf, oder?</remark> <remark>FIXME: Irgendwie noch sagen daß dies
-    auch "dynamic finders" genannt wird.</remark>Die Funktionalität ist die
-    gleiche wie die der Methode <methodname>where</methodname> (siehe <xref
+    erweitert werden (deshalb werden diese Methoden auch "dynamic finders"
+    genannt). Die Funktionalität ist die gleiche wie die der Methode
+    <methodname>where</methodname> (siehe <xref
     linkend="activerecord_where" />), aber die Lesbarkeit des Codes wird
     besser (meistens jedenfalls). Man kann treffend über den Sinn oder den
     Unsinn streiten. Probieren Sie es einmal aus, und entscheiden Sie selber
@@ -1265,8 +1239,7 @@ ruby-1.9.2-p0 &gt; <command>a.all</command>
  =&gt; [#&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-09-03 09:04:45", updated_at: "2010-09-03 09:04:45"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;] 
 
 ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen><remark>FIXME: Unübersichtliche
-    Ausgabe.</remark></para>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <section xml:id="activerecord_lazyloading_automatische_optimierung">
       <title
@@ -1279,8 +1252,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen><remark>FIXME: Unübersichtliche
 
       <para>Ziehen wir mal die Summe aller Veröffentlichungsjahre der Alben
       die in dern 70ern rausgebracht wurden. Und danach sortieren wir die
-      Alben vorher<remark>FIXME: Danach vorher?</remark> nach dem dem Namen
-      und ziehen dann die Summe.<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+      Alben nach dem dem Namen und ziehen dann die Summe.<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
 ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1970..1979 ).sum(:release_year)</command>
