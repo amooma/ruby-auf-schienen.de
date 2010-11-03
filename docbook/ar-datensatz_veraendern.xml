@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="activerecord_datensatz_veraendern"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="activerecord_datensatz_veraendern.title">Einen Datensatz
+  verändern</title>
+
+  <para>Daten hinzufügen ist ja schon ganz nett, aber hin und wieder will man
+  ja auch einen Datensatz editieren. Wir benutzen zur Beschreibung die
+  Album-Datenbank aus <xref linkend="queries" />.</para>
+
+  <section xml:id="activerecord_einfaches_editieren">
+    <title xml:id="activerecord_einfaches_editieren.title">Einfaches
+    Editieren</title>
+
+    <para>Das einfache Editieren eines Datensatzes erfolgt in folgenden
+    Schritten:<orderedlist>
+        <listitem>
+          <para>Suche des Datensatzes und erstellen einer entsprechenden
+          Instanz</para>
+        </listitem>
+
+        <listitem>
+          <para>Verändern der Werte</para>
+        </listitem>
+
+        <listitem>
+          <para>Abspeichern des Datensatzes mit der Methode <indexterm>
+              <primary>ActiveRecord</primary>
+
+              <secondary>Methoden</secondary>
+
+              <tertiary>save()</tertiary>
+            </indexterm><methodname>save</methodname></para>
+        </listitem>
+      </orderedlist></para>
+
+    <para>Wir suchen uns jetzt das Album mit dem Namen <quote>The
+    Beatles</quote> und verändern den Namen in <quote>Ein
+    Test</quote>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+
+ruby-1.9.2-p0 &gt; <command>apfelmus = Album.where( :name =&gt; 'The Beatles' ).first</command>
+ =&gt; #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 19:53:00"&gt; 
+
+ruby-1.9.2-p0 &gt; <command>apfelmus.name = 'Ein Test'</command>
+ =&gt; "Ein Test" 
+
+ruby-1.9.2-p0 &gt; <command>apfelmus</command>
+ =&gt; #&lt;Album id: 10, position: 10, name: "Ein Test", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 19:53:00"&gt; 
+
+ruby-1.9.2-p0 &gt; <command>apfelmus.save</command>
+ =&gt; true 
+
+ruby-1.9.2-p0 &gt; <command>Album.last</command>
+ =&gt; #&lt;Album id: 10, position: 10, name: "Ein Test", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 19:56:49"&gt; 
+
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+  </section>
+
+  <section xml:id="activerecord_changed">
+    <title xml:id="activerecord_changed.title">changed?</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Methoden</secondary>
+
+      <tertiary>changed?()</tertiary>
+    </indexterm>
+
+    <para>Wenn man sich nicht sicher ist, ob ein Datensatz verändert und noch
+    nicht abgespeichert wurde, dann kann man dies mit der
+    <methodname>changed?</methodname> Methode rausfinden:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+
+ruby-1.9.2-p0 &gt; <command>apfelmus = Album.last</command>
+ =&gt; #&lt;Album id: 10, position: 10, name: "Ein Test", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 19:56:49"&gt; 
+
+ruby-1.9.2-p0 &gt; <command>apfelmus.changed?</command>
+ =&gt; false 
+
+ruby-1.9.2-p0 &gt; <command>apfelmus.name = 'The Beatles'</command>
+ =&gt; "The Beatles" 
+
+ruby-1.9.2-p0 &gt; <command>apfelmus.changed?</command>
+ =&gt; true 
+
+ruby-1.9.2-p0 &gt; <command>apfelmus.save</command>
+ =&gt; true 
+
+ruby-1.9.2-p0 &gt; <command>apfelmus.changed?</command>
+ =&gt; false 
+
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+  </section>
+
+  <section xml:id="activerecord_update_attributes">
+    <title
+    xml:id="activerecord_update_attributes.title">update_attributes</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Methoden</secondary>
+
+      <tertiary>update_attributes()</tertiary>
+    </indexterm>
+
+    <para>Mit der Methode <methodname>update_attributes</methodname> kann man
+    verschiedene Attribute eines Objektes auf einmal ändern und danach
+    automatisch direkt speichern.</para>
+
+    <para>Setzen wir damit das Beispiel von <xref
+    linkend="activerecord_einfaches_editieren" /> um:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+
+ruby-1.9.2-p0 &gt; <command>apfelmus = Album.where( :name =&gt; 'The Beatles' ).first</command>
+ =&gt; #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 20:22:17"&gt; 
+
+ruby-1.9.2-p0 &gt; <command>apfelmus.changed?</command>
+ =&gt; false 
+
+ruby-1.9.2-p0 &gt; <command>apfelmus.update_attributes( :name =&gt; 'Ein Test' )</command>
+ =&gt; true 
+
+ruby-1.9.2-p0 &gt; <command>apfelmus.changed?</command>
+ =&gt; false 
+
+ruby-1.9.2-p0 &gt; <command>Album.last</command>
+ =&gt; #&lt;Album id: 10, position: 10, name: "Ein Test", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 20:22:38"&gt; 
+
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+
+    <para>Ein solches Update lässt sich auch direkt an eine
+    <methodname>where</methodname>-Methode anknüpfen und ist dann fast
+    atomar:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+Loading development environment (Rails 3.0.0)
+
+ruby-1.9.2-p0 &gt; <command>Album.where( :name =&gt; 'Ein Test' ).first</command>
+ =&gt; #&lt;Album id: 10, position: 10, name: "Ein Test", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 20:22:38"&gt; 
+
+ruby-1.9.2-p0 &gt; <command>Album.where( :name =&gt; 'Ein Test' ).first.update_attributes( :name =&gt; 'The Beatles' )</command>
+ =&gt; true 
+
+ruby-1.9.2-p0 &gt; <command>Album.where( :name =&gt; 'Ein Test' ).first</command> 
+ =&gt; nil 
+
+ruby-1.9.2-p0 &gt; <command>Album.last</command>
+ =&gt; #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 20:24:41"&gt; 
+
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+
+    <para>Dass es aber doch noch zwei SQL-Befehle sind zeigt sich in der
+    <filename>log/development.log</filename>:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."name" = 'Ein Test') LIMIT 1
+  SQL (0.3ms)  UPDATE "albums" SET "name" = 'The Beatles', "updated_at" = '2010-10-08 20:24:41.644808' WHERE ("albums"."id" = 10)</programlisting></para>
+  </section>
+
+  <section xml:id="activerecord_locking">
+    <title xml:id="activerecord_locking.title">Locking</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Locking</secondary>
+    </indexterm>
+
+    <para>Per Default benutzt Rails sogenanntes <quote>optimistisches
+    Locking</quote> (<foreignphrase xml:lang="en">optimistic
+    Locking</foreignphrase>) der Datensätze. Dies kann aber umgeschaltet
+    werden. Da für die meisten Anwender optimistisches Locking optimal ist und
+    viele vor diesem Absatz nicht mal über das Problem nachgedacht haben,
+    werde ich nicht weiter drauf eingehen, sondern auf die
+    <literal>ri</literal>-Hilfe verweisen. Wer pessimistisches Locking
+    benötigt, der findet dort die notwendigen Parameter.</para>
+
+    <para><screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>ri -T ActiveRecord::Locking::Optimistic</command>
+
+ActiveRecord::Locking::Optimistic
+
+(from gem activerecord-3.0.0)
+------------------------------------------------------------------------------
+What is Optimistic Locking
+
+Optimistic locking allows multiple users to access the same record for edits,
+and assumes a minimum of conflicts with the data.  It does this by checking
+whether another process has made changes to a record since it was opened, an
+ActiveRecord::StaleObjectError is thrown if that has occurred and the update
+is ignored.
+
+Check out ActiveRecord::Locking::Pessimistic for an alternative.
+
+Usage
+
+Active Records support optimistic locking if the field lock_version is
+present.  Each update to the record increments the lock_version column and the
+locking facilities ensure that records instantiated twice will let the last
+one saved raise a StaleObjectError if the first was also updated. Example:
+
+  p1 = Person.find(1)
+  p2 = Person.find(1)
+
+  p1.first_name = "Michael"
+  p1.save
+
+  p2.first_name = "should fail"
+  p2.save # Raises a ActiveRecord::StaleObjectError
+
+Optimistic locking will also check for stale data when objects are destroyed. 
+Example:
+
+  p1 = Person.find(1)
+  p2 = Person.find(1)
+
+  p1.first_name = "Michael"
+  p1.save
+
+  p2.destroy # Raises a ActiveRecord::StaleObjectError
+
+You're then responsible for dealing with the conflict by rescuing the
+exception and either rolling back, merging, or otherwise apply the business
+logic needed to resolve the conflict.
+
+You must ensure that your database schema defaults the lock_version column to
+0.
+
+This behavior can be turned off by setting
+ActiveRecord::Base.lock_optimistically = false. To override the name of
+the lock_version column, invoke the set_locking_column method. This
+method uses the same syntax as set_table_name
+
+------------------------------------------------------------------------------
+Instance methods:
+
+  attributes_from_column_definition</screen></para>
+  </section>
+</section>
