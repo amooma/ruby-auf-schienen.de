@@ -99,7 +99,7 @@ stefan@swmbp 0 1.9.2-p0 office-space$</screen></para>
       <uri
       xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-has_one">http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-has_one</uri>.
       Auf die Schnelle hier ein paar allgemeine Beispiele (zum Teil aus der
-      Rails Doku):<programlisting>has_one :office, :dependent =&gt; :destroy  # loescht das Office, wenn der Employee geloescht wird
+      Rails Doku):<programlisting>has_one :office, :dependent =&gt; :destroy  # loescht den Office Eintrag
 has_one :office, :dependent =&gt; :nullify  # wie :destroy, nur das der Office Datensatz nicht 
                                          # geloescht wird, sondern employee_id auf NULL gesetzt
                                          # wird
@@ -150,6 +150,47 @@ ruby-1.9.2-p0 &gt;</screen></para>
     <classname>Employee</classname> in der Datenbank halten? Legen wir mal mit
     <methodname>create_office</methodname> ein weiteres
     <classname>Office</classname> für den letzten
-    <classname>Employee</classname> an und schauen was passiert:</para>
+    <classname>Employee</classname> an und schauen was passiert:<screen>ruby-1.9.2-p0 &gt; <command>Employee.last.office</command>
+ =&gt; #&lt;Office id: 2, name: "Erdgeschoss, 3. Tuer links", employee_id: 2, created_at: "2010-11-04 13:27:46", updated_at: "2010-11-04 13:27:46"&gt; 
+ruby-1.9.2-p0 &gt; <command>Employee.last.create_office(:name =&gt; 'Zweitbuero')</command>
+ =&gt; #&lt;Office id: 3, name: "Zweitbuero", employee_id: 2, created_at: "2010-11-04 13:29:25", updated_at: "2010-11-04 13:29:25"&gt; 
+ruby-1.9.2-p0 &gt; <command>Employee.last.office</command>
+ =&gt; #&lt;Office id: 3, name: "Zweitbuero", employee_id: 2, created_at: "2010-11-04 13:29:25", updated_at: "2010-11-04 13:29:25"&gt; 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+    <para>Schauen wir uns mal im <filename>log/development.log</filename> an,
+    was in der Datenbank geschah:<programlisting>  Employee Load (0.2ms)  SELECT "employees".* FROM "employees" ORDER BY employees.id DESC LIMIT 1
+  Office Load (0.1ms)  SELECT "offices".* FROM "offices" WHERE ("offices".employee_id = 2) LIMIT 1
+  SQL (0.3ms)  INSERT INTO "offices" ("created_at", "employee_id", "name", "updated_at") VALUES ('2010-11-04 13:29:25.549367', 2, 'Zweitbuero', '2010-11-04 13:29:25.549367')
+  SQL (0.3ms)  UPDATE "offices" SET "employee_id" = NULL, "updated_at" = '2010-11-04 13:29:25.552976' WHERE ("offices"."id" = 2)
+
+
+  Employee Load (0.3ms)  SELECT "employees".* FROM "employees" ORDER BY employees.id DESC LIMIT 1
+  Office Load (0.1ms)  SELECT "offices".* FROM "offices" WHERE ("offices".employee_id = 2) LIMIT 1
+</programlisting></para>
+
+    <para>Der alte <classname>Office</classname> Datensatz wurde nicht
+    gelöscht, sondern das Feld <varname>employee_id</varname> mit NULL (nil)
+    gefüllt. Es ist weiterhin in der Datenbank:<screen>ruby-1.9.2-p0 &gt; <command>Office.where(:employee_id =&gt; nil).all</command>
+ =&gt; [#&lt;Office id: 2, name: "Erdgeschoss, 3. Tuer links", employee_id: nil, created_at: "2010-11-04 13:27:46", updated_at: "2010-11-04 13:29:25"&gt;] 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+    <para>hmmm... was passiert, wenn wir diese <varname>employee_id</varname>
+    wieder auf 2 setzen?<screen>ruby-1.9.2-p0 &gt; <command>Employee.last.office</command>
+ =&gt; #&lt;Office id: 3, name: "Zweitbuero", employee_id: 2, created_at: "2010-11-04 13:29:25", updated_at: "2010-11-04 13:29:25"&gt; 
+ruby-1.9.2-p0 &gt; <command>Office.where(:employee_id =&gt; nil).first.update_attributes(:employee_id =&gt; Employee.last.id)</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt; <command>Employee.last.office</command>
+ =&gt; #&lt;Office id: 2, name: "Erdgeschoss, 3. Tuer links", employee_id: 2, created_at: "2010-11-04 13:27:46", updated_at: "2010-11-04 13:44:44"&gt; 
+ruby-1.9.2-p0 &gt; <command>Office.where(:employee_id =&gt; Employee.last.id).count</command>
+ =&gt; 2 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 office-space$</screen></para>
+
+    <para>Logischerweise gibt es dann zweit passende Einträge in der
+    <classname>Office</classname> Tabelle und von der Datenbank wird der erste
+    als Treffer ausgegeben (da die entsprechende SQL-Anfrage immer mit einem
+    <code>LIMIT 1</code> beendet wird). Wir könnten dieses Verhalten mit der
+    <methodname>:order</methodname> Option umkehren.</para>
   </section>
 </section>
