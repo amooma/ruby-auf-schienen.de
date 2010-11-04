@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="ar-has_one"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="ar-has_one.title">has_one - 1:1 Verknüpfung</title>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>Relationen</secondary>
+
+    <tertiary>has_one()</tertiary>
+  </indexterm>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>Relationen</secondary>
+
+    <tertiary>belongs_to()</tertiary>
+  </indexterm>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>Assoziationen</secondary>
+
+    <see>ActiveRecord, Relationen</see>
+  </indexterm>
+
+  <para>Ähnlich wie bei <methodname>has_many</methodname> (siehe <xref
+  linkend="activerecord_has_many" />) wird auch bei
+  <methodname>has_one</methodname> ein Model mit einem anderen Model logisch
+  verknüpft. Im Gegensatz zu <methodname>has_many</methodname> gibt es aber
+  bei <methodname>has_one</methodname> genau jeweils nur einen Datensatz, der
+  mit genau einem anderen Datensatz verknüpft ist. In den meisten praktischen
+  Anwendungsfällen bietet es sich logischerweise an beides in das gleiche
+  Model und damit in die gleiche Datenbanktabelle zu packen, aber der
+  Vollständigkeit halber möchte ich hier auch <methodname>has_one</methodname>
+  besprechen.</para>
+
+  <para>Bei den Beispielen gehe ich davon aus, das Sie <xref
+  linkend="activerecord_has_many" /> bereits gelesen und verstanden haben. Ich
+  werde Methoden wie <methodname>build</methodname> nicht neu erklären,
+  sondern als Grundlage voraussetzen.</para>
+
+  <section>
+    <title>Vorbereitung</title>
+
+    <para>Wir greifen das Beispiel von <uri
+    xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html">http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html</uri>
+    auf und erstellen eine Applikation, in der es Angestellte und Büros gibt.
+    Jeder Angestellter hat ein Büro. Erst die Applikation:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new office-space</command>
+      create  
+      create  README
+      [...]
+stefan@swmbp 0 1.9.2-p0 ~$ <command>cd office-space</command>
+stefan@swmbp 0 1.9.2-p0 office-space$ <command>bundle install</command>
+Fetching source index for http://rubygems.org/
+Using rake (0.8.7) 
+[...]
+stefan@swmbp 0 1.9.2-p0 office-space$</screen></para>
+
+    <para>Und jetzt die beiden Modele:<screen>stefan@swmbp 0 1.9.2-p0 office-space$ <command>rails generate model employee lastname:string</command>
+      invoke  active_record
+      [...]
+stefan@swmbp 0 1.9.2-p0 office-space$ <command>rails generate model office name:string employee_id:integer</command>
+      invoke  active_record
+      [...]
+stefan@swmbp 0 1.9.2-p0 office-space$ <command>rake db:migrate</command>
+      [...]
+stefan@swmbp 0 1.9.2-p0 office-space$</screen></para>
+  </section>
+
+  <section>
+    <title>Verknüpfung</title>
+
+    <para>Die Verknüpfung in der Datei
+    <filename>app/model/employee.rb</filename><programlisting>class Employee &lt; ActiveRecord::Base
+<emphasis>  has_one :office
+</emphasis>end</programlisting></para>
+
+    <para>Und das Gegenstück in der
+    <filename>app/model/office.rb</filename><programlisting>class Office &lt; ActiveRecord::Base
+<emphasis>  belongs_to :employee
+</emphasis>end</programlisting></para>
+
+    <section>
+      <title>Optionen</title>
+
+      <para>Die Optionen von <methodname>has_one</methodname> ähneln denen von
+      <methodname>has_many</methodname>. Aus diesem Grund verweise ich an
+      dieser Stelle auf <xref linkend="activerecord_1n_optionen" /> oder auf
+      <uri
+      xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-has_one">http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-has_one</uri>.
+      Auf die Schnelle hier ein paar allgemeine Beispiele (zum Teil aus der
+      Rails Doku):<programlisting>has_one :office, :dependent =&gt; :destroy  # loescht das Office, wenn der Employee geloescht wird
+has_one :office, :dependent =&gt; :nullify  # wie :destroy, nur das der Office Datensatz nicht 
+                                         # geloescht wird, sondern employee_id auf NULL gesetzt
+                                         # wird
+has_one :last_comment, :class_name =&gt; "Comment", :order =&gt; "posted_on"
+has_one :project_manager, :class_name =&gt; "Person", :conditions =&gt; "role = 'project_manager'"
+has_one :boss, :readonly =&gt; :true
+has_one :club, :through =&gt; :membership
+has_one :primary_address, :through =&gt; :addressables, :conditions =&gt; ["addressable.primary = ?", true], :source =&gt; :addressable</programlisting></para>
+    </section>
+  </section>
+
+  <section>
+    <title>Consolen Beispiele</title>
+
+    <para>Starten wir einmal die Console und legen zwei Angestellte
+    an:<screen>stefan@swmbp 0 1.9.2-p0 office-space$ <command>rails console</command>
+Loading development environment (Rails 3.0.1)
+ruby-1.9.2-p0 &gt; <command>Employee</command>
+ =&gt; Employee(id: integer, lastname: string, created_at: datetime, updated_at: datetime) 
+ruby-1.9.2-p0 &gt; <command>Employee.create(:lastname =&gt; 'Udelhoven')</command>
+ =&gt; #&lt;Employee id: 1, lastname: "Udelhoven", created_at: "2010-11-04 10:53:35", updated_at: "2010-11-04 10:53:35"&gt; 
+ruby-1.9.2-p0 &gt; <command>Employee.create(:lastname =&gt; 'Meier')</command>
+ =&gt; #&lt;Employee id: 2, lastname: "Meier", created_at: "2010-11-04 10:53:47", updated_at: "2010-11-04 10:53:47"&gt; 
+ruby-1.9.2-p0 &gt; </screen></para>
+
+    <para>Jetzt bekommt ein Angestellter sein eigenes Büro:<screen>ruby-1.9.2-p0 &gt; <command>Office.create(:name =&gt; '1. Stock, 2. Tuer links', :employee_id =&gt; 1)</command>
+ =&gt; #&lt;Office id: 1, name: "1. Stock, 2. Tuer links", employee_id: 1, created_at: "2010-11-04 11:09:56", updated_at: "2010-11-04 11:09:56"&gt; 
+ruby-1.9.2-p0 &gt; <command>Employee.first.office</command>
+ =&gt; #&lt;Office id: 1, name: "1. Stock, 2. Tuer links", employee_id: 1, created_at: "2010-11-04 11:09:56", updated_at: "2010-11-04 11:09:56"&gt; 
+ruby-1.9.2-p0 &gt; <command>Office.first.employee</command>
+ =&gt; #&lt;Employee id: 1, lastname: "Udelhoven", created_at: "2010-11-04 10:53:35", updated_at: "2010-11-04 10:53:35"&gt; 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+    <para>Beim zweiten Angestellten benutzen wir die automatisch erzeugte
+    <methodname>create_office</methodname> Methode:<screen>ruby-1.9.2-p0 &gt; <command>Employee.last.create_office(:name =&gt; 'Erdgeschoss, 3. Tuer links')</command>
+ =&gt; #&lt;Office id: 2, name: "Erdgeschoss, 3. Tuer links", employee_id: 2, created_at: "2010-11-04 12:13:28", updated_at: "2010-11-04 12:13:28"&gt; 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+    <para>Löschen geht intuitiv mit <methodname>destroy</methodname>:<screen>ruby-1.9.2-p0 &gt; <command>Employee.first.office</command>
+ =&gt; #&lt;Office id: 1, name: "1. Stock, 2. Tuer links", employee_id: 1, created_at: "2010-11-04 11:09:56", updated_at: "2010-11-04 11:09:56"&gt; 
+ruby-1.9.2-p0 &gt; <command>Employee.first.office.destroy</command>
+ =&gt; #&lt;Office id: 1, name: "1. Stock, 2. Tuer links", employee_id: 1, created_at: "2010-11-04 11:09:56", updated_at: "2010-11-04 11:09:56"&gt; 
+ruby-1.9.2-p0 &gt; <command>Employee.first.office</command>
+ =&gt; nil 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+    <para>Kann man eigentlich nur ein <classname>Office</classname> für jeden
+    <classname>Employee</classname> in der Datenbank halten? Legen wir mal mit
+    <methodname>create_office</methodname> ein weiteres
+    <classname>Office</classname> für den letzten
+    <classname>Employee</classname> an und schauen was passiert:</para>
+  </section>
+</section>
