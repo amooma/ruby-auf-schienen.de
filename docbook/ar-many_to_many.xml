@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="ar-many_to_many"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="ar-many_to_many.title">Many-to-Many - Verknüpfung</title>
+
+  <para>Bereits in <xref linkend="activerecord_has_many_through" /> wurde ein
+  Many-to-Many Beispiel besprochen. Dieser Abschnitt geht noch mal auf die
+  gleiche Idee ein. Wenn Sie <xref linkend="activerecord_has_many_through" />
+  verstanden haben, können Sie auch zum nächsten Abschnitt springen.</para>
+
+  <para>Bis jetzt haben wir immer eine Datenbank direkt mit einer anderen
+  Datenbank verknüpft. Bei Many-to-Many werden wir zwei Datenbanken mit der
+  Hilfe einer dritten Datenbank verknüpfen. Als Beispiel für eine solche
+  Verknüpfung nehmen wir eine Bestellung in einem Online-Shop. In einem
+  solchen Shop-System, kann ein Produkt in mehreren Bestellungen auftauchen
+  und gleichzeitig kann eine Bestellung mehrere Produkte enthalten. Das nennt
+  sich dann Many-to-Many. Am besten stellen wir das mal mit Code nach.</para>
+
+  <section>
+    <title>Vorbereitung</title>
+
+    <para>Die Shop-Applikation erstellen:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new shop</command>
+[...]
+stefan@swmbp 0 1.9.2-p0 ~$ <command>cd shop</command>
+stefan@swmbp 0 1.9.2-p0 shop$ <command>bundle install</command>
+[...]
+stefan@swmbp 0 1.9.2-p0 shop$</screen></para>
+
+    <para>Ein Model für Produkte:<screen>stefan@swmbp 1 1.9.2-p0 shop$ <command>rails generate model product name:string price:decimal</command>
+      invoke  active_record
+      create    db/migrate/20101107211822_create_products.rb
+      create    app/models/product.rb
+      invoke    test_unit
+      create      test/unit/product_test.rb
+      create      test/fixtures/products.yml
+stefan@swmbp 0 1.9.2-p0 shop$</screen></para>
+
+    <para>Ein Model für eine Bestellung:<screen>stefan@swmbp 0 1.9.2-p0 shop$ <command>rails generate model order delivery_address:string shipped_at:datetime</command>
+      invoke  active_record
+      create    db/migrate/20101107212119_create_orders.rb
+      create    app/models/order.rb
+      invoke    test_unit
+      create      test/unit/order_test.rb
+      create      test/fixtures/orders.yml
+stefan@swmbp 0 1.9.2-p0 shop$ </screen></para>
+
+    <para>Und noch ein Model für die einzelnen Positionen einer
+    Bestellung:<screen>stefan@swmbp 0 1.9.2-p0 shop$ <command>rails generate model line_item order_id:integer product_id:integer quantity:integer</command>
+      invoke  active_record
+      create    db/migrate/20101107212633_create_line_items.rb
+      create    app/models/line_item.rb
+      invoke    test_unit
+      create      test/unit/line_item_test.rb
+      create      test/fixtures/line_items.yml
+stefan@swmbp 0 1.9.2-p0 shop$ </screen></para>
+
+    <para>Zum Schluss die Datenbank anlegen:<screen>stefan@swmbp 0 1.9.2-p0 shop$ <command>rake db:migrate</command>
+(in /Users/stefan/shop)
+==  CreateProducts: migrating =================================================
+-- create_table(:products)
+   -&gt; 0.0015s
+==  CreateProducts: migrated (0.0016s) ========================================
+
+==  CreateOrders: migrating ===================================================
+-- create_table(:orders)
+   -&gt; 0.0014s
+==  CreateOrders: migrated (0.0015s) ==========================================
+
+==  CreateLineItems: migrating ================================================
+-- create_table(:line_items)
+   -&gt; 0.0015s
+==  CreateLineItems: migrated (0.0016s) =======================================
+
+stefan@swmbp 0 1.9.2-p0 shop$ </screen></para>
+  </section>
+
+  <section>
+    <title>Die Verknüpfung</title>
+
+    <para>Eine Bestellung (<classname>Order</classname>) besteht aus einer
+    oder mehreren Positionen (<classname>LineItem</classname>). Eine solcher
+    LineItem besteht aus der <varname>order_id</varname>, einer
+    <varname>product_id</varname> und der Bestellmenge
+    (<varname>quantity</varname>). Das einzelne Produkt wird in der
+    Produktdatenbank (<classname>Product</classname>) definiert. </para>
+
+    <note>
+      <para>Alle Modelle sind hier in einer minimalen Art und Weise generiert
+      worden. Es geht ja nicht um ein echtes Shop-System, sondern um das
+      Verständnis.</para>
+    </note>
+
+    <para>Die Verknüpfung der Modelle geschieht wie immer im
+    <filename>app/models</filename> Verzeichnis. Als erstes in der Datei
+    <filename>app/models/order.rb</filename><programlisting>class Order &lt; ActiveRecord::Base
+  has_many :line_items
+  has_many :products, :through =&gt; :line_items
+end</programlisting></para>
+
+    <para>Und dann im Gegenstück der Datei
+    <filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
+  has_many :line_items
+  has_many :orders, :through =&gt; :line_items
+end</programlisting></para>
+
+    <para>Zum Schluss noch die Datei
+    <filename>app/models/line_item.rb</filename><programlisting>class LineItem &lt; ActiveRecord::Base
+  belongs_to :order
+  belongs_to :product
+end</programlisting></para>
+  </section>
+
+  <section>
+    <title>Funktioniert logischerweise wie has_many</title>
+
+    <para>Da wir die Verknüpfungen mit <methodname>has_many</methodname>
+    realisieren, werden Ihnen die meisten Sachen schon aus <xref
+    linkend="activerecord_has_many" /> bekannt vorkommen. Ich werde hier
+    exemplarisch ein paar Beispiele besprechen. Alle Details finden Sie in
+    <xref linkend="activerecord_has_many" />.</para>
+
+    <para>Wir füllen als erstes einmal unsere Produktdatenbank mit folgenden
+    Werten:<screen>stefan@swmbp 0 1.9.2-p0 shop$ <command>rails console</command>
+Loading development environment (Rails 3.0.1)
+ruby-1.9.2-p0 &gt; <command>Product</command>
+ =&gt; Product(id: integer, name: string, price: decimal, created_at: datetime, updated_at: datetime) 
+ruby-1.9.2-p0 &gt; <command>Product.create(:name =&gt; 'Milch (1 Liter)', :price =&gt; 0.79)</command>
+ =&gt; #&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:1029beaa8,'0.79E0',9(18)&gt;, created_at: "2010-11-28 11:24:34", updated_at: "2010-11-28 11:24:34"&gt; 
+ruby-1.9.2-p0 &gt; <command>Product.create(:name =&gt; 'Butter (500 gr)', :price =&gt; 0.49)</command>
+ =&gt; #&lt;Product id: 2, name: "Butter (500 gr)", price: #&lt;BigDecimal:10299f310,'0.49E0',9(18)&gt;, created_at: "2010-11-28 11:26:25", updated_at: "2010-11-28 11:26:25"&gt; 
+ruby-1.9.2-p0 &gt; <command>Product.create(:name =&gt; 'Mehl (1 kg)', :price =&gt; 2.64)</command>
+ =&gt; #&lt;Product id: 3, name: "Mehl (1 kg)", price: #&lt;BigDecimal:102977590,'0.264E1',18(18)&gt;, created_at: "2010-11-28 11:28:12", updated_at: "2010-11-28 11:28:12"&gt; 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+    <para>Jetzt legen wir ein neues <classname>Order</classname> Objekt
+    <varname>bestellung</varname> an:<screen>ruby-1.9.2-p0 &gt; <command>bestellung = Order.new(:delivery_address =&gt; 'Bahnhofstr. 123')</command>
+ =&gt; #&lt;Order id: nil, delivery_address: "Bahnhofstr. 123", shipped_at: nil, created_at: nil, updated_at: nil&gt; 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+    <para>Logischerweise enthält diese neue Bestellung noch keine
+    Produkte:<screen>ruby-1.9.2-p0 &gt; <command>bestellung.products</command>
+ =&gt; [] 
+ruby-1.9.2-p0 &gt; </screen></para>
+
+    <para>Es gibt - wie so oft - verschiedene Arten wie man Produkte zur
+    Bestellung hinzufügt. Der einfachste Weg: Da die Produkte als Array
+    eingebunden werden, kann man diese auch einfach als Elemente eines Arrays
+    einfügen:<screen>ruby-1.9.2-p0 &gt; <command>bestellung.products.class</command>
+ =&gt; Array 
+ruby-1.9.2-p0 &gt; <command>bestellung.products &lt;&lt; Product.first</command>
+ =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:102abff60,'0.79E0',9(18)&gt;, created_at: "2010-11-28 11:24:34", updated_at: "2010-11-28 11:24:34"&gt;] 
+ruby-1.9.2-p0 &gt; <command>bestellung.products</command>
+ =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:102a72ad0,'0.79E0',9(18)&gt;, created_at: "2010-11-28 11:24:34", updated_at: "2010-11-28 11:24:34"&gt;] 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+    <para>Wenn der Käufer jetzt aber nicht einen Liter Milch, sondern drei
+    Liter Milch kaufen möchte, so müssen wir dies im
+    <classname>LineItem</classname> (als im verknüpfenden Element) eintragen.
+    Dummerweise gibt es aber noch gar keinen <classname>LineItem</classname>
+    zu dieser Bestellung:<screen>ruby-1.9.2-p0 &gt; <command>bestellung.line_items</command>
+ =&gt; [] 
+ruby-1.9.2-p0 &gt; </screen></para>
+
+    <para>Warum? Weil wir das Objekt noch nicht in der Datenbank gespeichert
+    haben. Wenn wir dies mit <methodname>save</methodname> machen, können wir
+    auch die Menge in den <varname>line_items</varname> verändern:<screen>ruby-1.9.2-p0 &gt; <command>bestellung.line_items</command>
+ =&gt; [#&lt;LineItem id: 1, order_id: 1, product_id: 1, quantity: nil, created_at: "2010-11-28 11:51:27", updated_at: "2010-11-28 11:51:27"&gt;, #&lt;LineItem id: 1, order_id: 1, product_id: 1, quantity: nil, created_at: "2010-11-28 11:51:27", updated_at: "2010-11-28 11:51:27"&gt;] 
+ruby-1.9.2-p0 &gt; <command>bestellung.line_items.first</command>
+ =&gt; #&lt;LineItem id: 1, order_id: 1, product_id: 1, quantity: nil, created_at: "2010-11-28 11:51:27", updated_at: "2010-11-28 11:51:27"&gt; 
+ruby-1.9.2-p0 &gt; <command>bestellung.line_items.first.quantity = 3</command>
+ =&gt; 3 
+ruby-1.9.2-p0 &gt; <command>bestellung.line_items.first.save</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt; <command>LineItem.first</command>
+ =&gt; #&lt;LineItem id: 1, order_id: 1, product_id: 1, quantity: 3, created_at: "2010-11-28 11:51:27", updated_at: "2010-11-28 11:52:38"&gt; 
+ruby-1.9.2-p0 &gt; </screen></para>
+
+    <para>Alternativ können wir aber auch direkt zwei mal Butter kaufen, indem
+    wir ein <classname>LineItem</classname> hinzufügen:<screen>ruby-1.9.2-p0 &gt; <command>butter = Product.where(:name =&gt; 'Butter (500 gr)').first</command>
+ =&gt; #&lt;Product id: 2, name: "Butter (500 gr)", price: #&lt;BigDecimal:10193fba0,'0.49E0',9(18)&gt;, created_at: "2010-11-28 11:26:25", updated_at: "2010-11-28 11:26:25"&gt; 
+ruby-1.9.2-p0 &gt; <command>bestellung.line_items.create(:product =&gt; butter, :quantity =&gt; 2)</command> 
+ =&gt; #&lt;LineItem id: 2, order_id: 1, product_id: 2, quantity: 2, created_at: "2010-11-28 16:26:53", updated_at: "2010-11-28 16:26:53"&gt; 
+ruby-1.9.2-p0 &gt; </screen></para>
+
+    <para>Wir haben beim <methodname>create</methodname> den Code
+    <code>:product =&gt; butter</code> benutzt. ActiveRecord kümmert sich
+    dabei um den Rest. Also um die Benutzung vom Tabellenfeld
+    <varname>product_id</varname>.</para>
+
+    <warning>
+      <para>Zu diesem Zeitpunkt dürfen Sie nicht den Fehler machen und denken,
+      das das Objekt <varname>bestellung</varname> bereits über die die
+      bestellte Butter verfügt. Schauen wir uns mal die
+      <methodname>products</methodname> an: <screen>ruby-1.9.2-p0 &gt; <command>bestellung.products</command>
+ =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:102c52648,'0.79E0',9(18)&gt;, created_at: "2010-11-28 11:24:34", updated_at: "2010-11-28 11:24:34"&gt;] 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+      <para>Aber in der Datenbank ist es bereits richtig:<screen>ruby-1.9.2-p0 &gt; <command>Order.first.products</command>
+ =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:102c104c8,'0.79E0',9(18)&gt;, created_at: "2010-11-28 11:24:34", updated_at: "2010-11-28 11:24:34"&gt;, #&lt;Product id: 2, name: "Butter (500 gr)", price: #&lt;BigDecimal:102c0f410,'0.49E0',9(18)&gt;, created_at: "2010-11-28 11:26:25", updated_at: "2010-11-28 11:26:25"&gt;] 
+ruby-1.9.2-p0 &gt; </screen></para>
+
+      <para>Sie müssten in diesem konkreten Fall das Objekt neu aus der
+      Datenbank laden:<screen>ruby-1.9.2-p0 &gt; <command>bestellung = Order.first</command>
+ =&gt; #&lt;Order id: 1, delivery_address: "Bahnhofstr. 123", shipped_at: nil, created_at: "2010-11-28 11:51:27", updated_at: "2010-11-28 11:51:27"&gt; 
+ruby-1.9.2-p0 &gt; <command>bestellung.products</command>
+ =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:102acd048,'0.79E0',9(18)&gt;, created_at: "2010-11-28 11:24:34", updated_at: "2010-11-28 11:24:34"&gt;, #&lt;Product id: 2, name: "Butter (500 gr)", price: #&lt;BigDecimal:102acba90,'0.49E0',9(18)&gt;, created_at: "2010-11-28 11:26:25", updated_at: "2010-11-28 11:26:25"&gt;] 
+ruby-1.9.2-p0 &gt;</screen></para>
+    </warning>
+
+    <para>Geben wir eine zweite Bestellung mit allen verfügbaren Produkten ins
+    System:<screen>ruby-1.9.2-p0 &gt; <command>bestellung2 = Order.create(:delivery_address =&gt; 'Hauptstr. 15')</command>
+ =&gt; #&lt;Order id: 2, delivery_address: "Hauptstr. 15", shipped_at: nil, created_at: "2010-11-29 10:36:37", updated_at: "2010-11-29 10:36:37"&gt; 
+ruby-1.9.2-p0 &gt; <command>bestellung2.products &lt;&lt; Product.all</command>
+ =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:1029d3318,'0.79E0',9(18)&gt;, created_at: "2010-11-28 11:24:34", updated_at: "2010-11-28 11:24:34"&gt;, #&lt;Product id: 2, name: "Butter (500 gr)", price: #&lt;BigDecimal:1029cbd98,'0.49E0',9(18)&gt;, created_at: "2010-11-28 11:26:25", updated_at: "2010-11-28 11:26:25"&gt;, #&lt;Product id: 3, name: "Mehl (1 kg)", price: #&lt;BigDecimal:1029c0e48,'0.264E1',18(18)&gt;, created_at: "2010-11-28 11:28:12", updated_at: "2010-11-28 11:28:12"&gt;] 
+ruby-1.9.2-p0 &gt; <command>bestellung2.save</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+    <para>Jetzt können wir die andere Seite der Many-to-Many Verbindung
+    ausprobieren. Suchen wir mal nach allen Bestellungen, in denen das erste
+    Produkt enthalten ist:<screen>ruby-1.9.2-p0 &gt; <command>Product.first.orders</command>
+ =&gt; [#&lt;Order id: 1, delivery_address: "Bahnhofstr. 123", shipped_at: nil, created_at: "2010-11-28 11:51:27", updated_at: "2010-11-28 11:51:27"&gt;, #&lt;Order id: 2, delivery_address: "Hauptstr. 15", shipped_at: nil, created_at: "2010-11-29 10:36:37", updated_at: "2010-11-29 10:36:37"&gt;] 
+ruby-1.9.2-p0 &gt; </screen></para>
+
+    <para>Natürlich können wir auch mit einem <methodname>joins</methodname>
+    (siehe <xref linkend="activerecord_1n_joins" />) arbeiten und alle
+    Bestellungen die das Produkt "Milch (1 Liter)" enthalten suchen:<screen>ruby-1.9.2-p0 &gt; <command>Order.joins(:products).where( :products =&gt; {:name =&gt; 'Milch (1 Liter)'})</command>
+ =&gt; [#&lt;Order id: 1, delivery_address: "Bahnhofstr. 123", shipped_at: nil, created_at: "2010-11-28 11:51:27", updated_at: "2010-11-28 11:51:27"&gt;, #&lt;Order id: 2, delivery_address: "Hauptstr. 15", shipped_at: nil, created_at: "2010-11-29 10:36:37", updated_at: "2010-11-29 10:36:37"&gt;] 
+ruby-1.9.2-p0 &gt;</screen></para>
+
+    <para>Mehr Informationen zu <methodname>has_many ... :through</methodname>
+    finden Sie unter <xref linkend="activerecord_has_many_through" />.</para>
+  </section>
+</section>
