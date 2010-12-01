@@ -7,20 +7,7 @@
          xmlns:m="http://www.w3.org/1998/Math/MathML"
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
-  <title xml:id="activerecord_migration.title">Migrations
-  (Migrationen)</title>
-
-  <indexterm>
-    <primary>ActiveRecord</primary>
-
-    <secondary>Migrations</secondary>
-  </indexterm>
-
-  <indexterm>
-    <primary>Migrations</primary>
-
-    <see>ActiveRecord, Migrations</see>
-  </indexterm>
+  <title xml:id="activerecord_migration.title">Migrations</title>
 
   <para>SQL-Datenbanken werden mit Migrations generiert und sie können ebenso
   mit Migrations verändert werden. Wenn Sie mit <command>rails generate
@@ -181,6 +168,12 @@ stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
 Current version: 20101201154722
 stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
 
+  <important>
+    <para>Bitte beachten Sie, das alle Versionsnummern und Zeitstempel nur für
+    das hier abgedruckte Beispiel gelten. Wenn sie das Beispiel nacharbeiten,
+    bekommen Sie natürlich einen für Sie aktuellen Zeitstempel.</para>
+  </important>
+
   <para>Sie finden die entsprechende Version im
   <filename>db/migrate</filename> Verzeichnis wieder:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>ls db/migrate</command>
 20101201154722_create_people.rb
@@ -207,7 +200,7 @@ stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
     <para>Das wir in unserer people Datenbank zwei mal eine Telefonnummer
     haben ist nach dem was wir in <xref linkend="activerecord_has_many" />
     gelernt haben Blödsinn. Es würde mehr Sinn machen die Telefonnummern in
-    einer eigenen Datenbank zu halten. Legen wir die einmal an:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails generate model phone person_id:integer phone_type:string number:string</command>
+    einer eigenen Datenbank zu halten. Legen wir die mal an:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails generate model phone person_id:integer phone_type:string number:string</command>
       invoke  active_record
       create    db/migrate/20101201192459_create_phones.rb
       create    app/models/phone.rb
@@ -216,17 +209,270 @@ stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
       create      test/fixtures/phones.yml
 stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
 
-    <para></para>
+    <para>Wenn wir jetzt <command>rake db:migrate</command> ausführen, werden
+    alle existierenden Migrations ausgeführt:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate</command>
+(in /Users/stefan/address-book)
+==  CreatePeople: migrating ===================================================
+-- create_table(:people)
+   -&gt; 0.0014s
+==  CreatePeople: migrated (0.0015s) ==========================================
 
-    <para></para>
+==  AddMobilePhoneToPerson: migrating =========================================
+-- add_column(:people, :mobile_phone, :string)
+   -&gt; 0.0006s
+==  AddMobilePhoneToPerson: migrated (0.0007s) ================================
 
-    <para></para>
+==  CreatePhones: migrating ===================================================
+-- create_table(:phones)
+   -&gt; 0.0011s
+==  CreatePhones: migrated (0.0012s) ==========================================
 
-    <para></para>
+stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+
+    <para>Da es sich mit Beispieldaten besser erklären lässt:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:seed</command>
+(in /Users/stefan/address-book)
+stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+
+    <para>Jetzt haben wir zwar zwei getrennte Datenbanken, aber noch sind alle
+    Telefonnummern in der <varname>people</varname> Datenbank. Mit einer
+    Migration können wir dieses Problem sauber lösen. Legen wir dafür erst mal
+    eine leere Migration Datei an:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails generate migration move_phone_numbers_to_the_phone_db</command>
+      invoke  active_record
+      create    db/migrate/20101201214154_move_phone_numbers_to_the_phone_db.rb
+stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+
+    <para>Der Name der Migration ist technisch gesehen egal. Ich bemühe mich
+    sie immer für menschen logisch zu benennen. Die gerade generierte Datei
+    ist noch jungfräulich:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>cat db/migrate/20101201214154_move_phone_numbers_to_the_phone_db.rb</command>
+class MovePhoneNumbersToThePhoneDb &lt; ActiveRecord::Migration
+  def self.up
+  end
+
+  def self.down
+  end
+end
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+    <para>Wir müssen jetzt in der <methodname>self.up</methodname> Methode ein
+    kleines Programm einbauen, das durch alle Datensätze läuft und die
+    Telefonnummern in die dafür vorgesehene Datenbank
+    schreibt:<programlisting>class MovePhoneNumbersToThePhoneDb &lt; ActiveRecord::Migration
+<emphasis>  def self.up
+    # Schleife durch alle Person Datensaetze
+    #
+    Person.all.each do |person|
+      # Wenn ein Telefoneintrag vorhanden ist, wird ein
+      # neuer Datensatz in der Phone-DB angelegt.
+      #
+      if !person.phone.blank?
+        phone = Phone.new(:person_id =&gt; person.id, 
+                          :phone_type =&gt; 'Default', 
+                          :number =&gt; person.phone)
+        # Wenn das Abspeichern erfolgreich war, wird der 
+        # alte Eintrag auf nil gesetzt.
+        if phone.save
+          person.phone = nil
+          person.save
+        end
+      end
+      
+      # Wenn ein Handyeintrag vorhanden ist, wird ein
+      # neuer Datensatz in der Phone-DB angelegt.
+      #
+      if !person.mobile_phone.blank?
+        phone = Phone.new(:person_id =&gt; person.id, 
+                          :phone_type =&gt; 'Mobile', 
+                          :number =&gt; person.phone)
+        # Wenn das Abspeichern erfolgreich war, wird der 
+        # alte Eintrag auf nil gesetzt.
+        if phone.save
+          person.mobile_phone = nil
+          person.save
+        end
+      end
+      
+    end
+  end
+</emphasis>
+  def self.down
+  end
+end
+</programlisting></para>
+
+    <para>Starten wir die Migration:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate</command>
+(in /Users/stefan/address-book)
+==  MovePhoneNumbersToThePhoneDb: migrating ===================================
+==  MovePhoneNumbersToThePhoneDb: migrated (2.1447s) ==========================
+
+stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+
+    <para>In der Console können wir das Ergebnis überprüfen:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails console</command>
+Loading development environment (Rails 3.0.3)
+ruby-1.9.2-p0 &gt; <command>Person.last</command>
+ =&gt; #&lt;Person id: 1000, name: "Ute Maier", street: "Berliner Str. 1001", zip_code: "24357", city: "Dresden", phone: nil, created_at: "2010-12-01 21:55:13", updated_at: "2010-12-01 21:59:11", mobile_phone: nil&gt; 
+ruby-1.9.2-p0 &gt; <command>Phone.last</command>
+ =&gt; #&lt;Phone id: 1000, person_id: 1000, phone_type: "Default", number: "066 430817", created_at: "2010-12-01 21:59:11", updated_at: "2010-12-01 21:59:11"&gt; 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+    <para>Das sieht sehr gut aus. Allerdings müssen wir jetzt auch noch die
+    <methodname>self.down</methodname> Methode mit Leben füllen, damit wir das
+    ganze auch sauber zurückrollen können:<programlisting>class MovePhoneNumbersToThePhoneDb &lt; ActiveRecord::Migration
+  def self.up
+    # Schleife durch alle Person Datensaetze
+    #
+    Person.all.each do |person|
+      # Wenn ein Telefoneintrag vorhanden ist, wird ein
+      # neuer Datensatz in der Phone-DB angelegt.
+      #
+      if !person.phone.blank?
+        phone = Phone.new(:person_id =&gt; person.id, 
+        :phone_type =&gt; 'Default', 
+        :number =&gt; person.phone)
+        # Wenn das Abspeichern erfolgreich war, wird der 
+        # alte Eintrag auf nil gesetzt.
+        if phone.save
+          person.phone = nil
+          person.save
+        end
+      end
+
+      # Wenn ein Handyeintrag vorhanden ist, wird ein
+      # neuer Datensatz in der Phone-DB angelegt.
+      #
+      if !person.mobile_phone.blank?
+        phone = Phone.new(:person_id =&gt; person.id, 
+        :phone_type =&gt; 'Mobile', 
+        :number =&gt; person.phone)
+        # Wenn das Abspeichern erfolgreich war, wird der 
+        # alte Eintrag auf nil gesetzt.
+        if phone.save
+          person.mobile_phone = nil
+          person.save
+        end
+      end
+
+    end
+  end
+
+<emphasis>  def self.down
+    # Schleife durch alle Phone Eintraege
+    #
+    Phone.all.each do |phone|
+      person = Person.where(:id =&gt; phone.person_id).first
+      if person != nil
+        if phone.phone_type == 'Default'
+          person.phone = phone.number
+          phone.destroy if person.save
+        elsif phone.phone_type == 'Mobile'
+          person.mobile_phone = phone.number
+          phone.destroy if person.save
+        end
+      end
+    end
+  end
+</emphasis>
+end
+</programlisting></para>
+
+    <para>Jetzt können wir mit <command>rake db:rollback</command> sauber
+    zurückrollen:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:rollback</command>
+(in /Users/stefan/address-book)
+==  MovePhoneNumbersToThePhoneDb: reverting ===================================
+==  MovePhoneNumbersToThePhoneDb: reverted (0.0381s) ==========================
+
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+    <para>So weit so gut. Dummerweise habe ich aber in dieser Migration
+    vergessen auch die entsprechenden Tabellenspalten zu löschen. Noch in die
+    bereits fertige Migration einbauen? Nein, auf keinen Fall! Migrations
+    kosten nichts und man sollte nie alte Migrations "anpassen". Das lädt nur
+    zu Fehlern ein. Erstellen wir also eine neue Migration:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails generate migration delete_phone_fields</command>
+      invoke  active_record
+      create    db/migrate/20101201222624_delete_phone_fields.rb
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+    <para>Diesmal füllen wir in der Datei
+    <filename>db/migrate/20101201222624_delete_phone_fields.rb</filename>
+    direkt <methodname>self.up</methodname> und
+    <methodname>self.down</methodname> im gleichen Schritt:<programlisting>class DeletePhoneFields &lt; ActiveRecord::Migration
+  def self.up
+    remove_column :people, :phone
+    remove_column :people, :mobile_phone
+  end
+
+  def self.down
+    add_column :people, :phone, :string
+    add_column :people, :mobile_phone, :string
+  end
+end
+</programlisting></para>
+
+    <para>Beim <methodname>self.down</methodname> werden für den Fall eines
+    Rollbacks die Tabellenspalten wieder angelegt. Wenn wir jetzt ein rake
+    db:migrate ausführen werden natürlich zwei Migrations ausgeführt, weil wir
+    vorhin einen Rollback gemacht haben:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate</command>
+(in /Users/stefan/address-book)
+==  MovePhoneNumbersToThePhoneDb: migrating ===================================
+==  MovePhoneNumbersToThePhoneDb: migrated (0.0382s) ==========================
+
+==  DeletePhoneFields: migrating ==============================================
+-- remove_column(:people, :phone)
+   -&gt; 0.0540s
+-- remove_column(:people, :mobile_phone)
+   -&gt; 0.0490s
+==  DeletePhoneFields: migrated (0.1033s) =====================================
+
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+    <para>Die Tabellen sind nach der Migration sauber getrennt:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails console</command>
+Loading development environment (Rails 3.0.3)
+ruby-1.9.2-p0 &gt; <command>Person.first</command>
+ =&gt; #&lt;Person id: 1, name: "Martin Schroeder", street: "Hauptstr. 2", zip_code: "25795", city: "Beispielhausen", created_at: "2010-12-01 22:35:18", updated_at: "2010-12-01 22:35:39"&gt; 
+ruby-1.9.2-p0 &gt; <command>Phone.where(:person_id =&gt; 1)</command>
+ =&gt; [#&lt;Phone id: 1, person_id: 1, phone_type: "Default", number: "024 359178", created_at: "2010-12-01 22:35:39", updated_at: "2010-12-01 22:35:39"&gt;] 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
   </section>
 
   <section>
     <title>Index anlegen</title>
+
+    <para>Ich gehe davon aus, das Sie wissen was ein Index in einer Datenbank
+    ist. Falls nicht finden Sie auf <uri
+    xlink:href="http://de.wikipedia.org/wiki/Datenbankindex">http://de.wikipedia.org/wiki/Datenbankindex</uri>
+    eine kurze Einführung.</para>
+
+    <para>In unserem Adressbuch sollten wir das Feld <varname>name</varname>
+    in der Tabelle <varname>people</varname> indexieren. Dafür erstellen wir
+    eine neue Migration:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails generate migration create_index</command>
+      invoke  active_record
+      create    db/migrate/20101201224922_create_index.rb
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+    <para>In der Datei
+    <filename>db/migrate/20101201224922_create_index.rb</filename> legen wir
+    in der <methodname>self.up</methodname> Methode den Index an und in der
+    <methodname>self.down</methodname> Methode löschen wir den Index
+    wieder:<programlisting>class CreateIndex &lt; ActiveRecord::Migration
+  def self.up
+    add_index :people, :name
+  end
+
+  def self.down
+    remove_index :people, :name
+  end
+end</programlisting></para>
+
+    <para>Mit <command>rake db:migrate</command> wird der Index
+    angelegt:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate</command>
+(in /Users/stefan/address-book)
+==  CreateIndex: migrating ====================================================
+-- add_index(:people, :name)
+   -&gt; 0.0034s
+==  CreateIndex: migrated (0.0035s) ===========================================
+
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
 
     <para></para>
   </section>
