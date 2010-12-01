@@ -9,15 +9,22 @@
          xmlns:db="http://docbook.org/ns/docbook">
   <title xml:id="activerecord_named_scope.title">Named Scopes</title>
 
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>Named Scopes</secondary>
+  </indexterm>
+
   <para>Manchmal ist es beim Programmieren von Rails Applikationen
-  übersichtlicher und einfacher, häufig auftauchende Suchen als eigene Methode
-  zu definieren. Diese heißen in Rails-Sprech NamedScope.</para>
+  übersichtlicher und einfacher, häufig auftauchende Suchen als eigene
+  Methoden zu definieren. Diese heißen in Rails-Sprache <foreignphrase
+  xml:lang="en">NamedScope</foreignphrase>.</para>
 
   <section xml:id="named_scopes_vorbereitung">
     <title xml:id="named_scopes_vorbereitung.title">Vorbereitung</title>
 
     <para>Falls Sie noch die Rails-Applikation von <xref
-    linkend="activerecord_has_many" /> greifbereit haben, können Sie diese
+    linkend="activerecord_has_many" /> griffbereit haben, können Sie diese
     benutzen. Ansonsten bauen wir sie kurz neu auf:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new phonebook</command>
       create  
       [...]
@@ -27,21 +34,21 @@ Fetching source index for http://rubygems.org/
 [...]
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
-    <para>Jetzt legen wir die Personen Datenbank an:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails generate model person firstname:string lastname:string</command>
+    <para>Jetzt legen wir die Personen-Datenbank-Tabelle an:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails generate model person firstname:string lastname:string</command>
       invoke  active_record
       [...]
       create      test/fixtures/people.yml
 stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
 
-    <para>Und zum Schluss legen wir noch die Datenbank für die Telefonnummern
-    an:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails generate model phonenumber person_id:integer name:string number:string</command>
+    <para>Und zum Schluss legen wir noch die Datenbank-Tabelle für die
+    Telefonnummern an:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails generate model phonenumber person_id:integer name:string number:string</command>
       invoke  active_record
       [...]
       create      test/fixtures/phonenumbers.yml
 stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
 
     <para>Danach ein <command>rake db:migrate</command> ausführen, damit die
-    Datenbanken auch angelegt werden:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:migrate</command>
+    Datenbank-Tabellen auch tatsächlich angelegt werden:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:migrate</command>
 (in /Users/stefan/phonebook)
 ==  CreatePeople: migrating ===================================================
 -- create_table(:people)
@@ -49,7 +56,7 @@ stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
 [...]
 stefan@swmbp 0 1.9.2-p0 phonebook$</screen></para>
 
-    <para>Die 1:n Verknüpfung in der <filename>app/models/person.rb</filename>
+    <para>Die 1:n-Verknüpfung in der <filename>app/models/person.rb</filename>
     eintragen:<programlisting>class Person &lt; ActiveRecord::Base
   has_many :phonenumbers
 end</programlisting></para>
