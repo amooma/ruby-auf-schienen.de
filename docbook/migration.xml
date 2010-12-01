@@ -9,7 +9,208 @@
          xmlns:db="http://docbook.org/ns/docbook">
   <title xml:id="activerecord_migration.title">Migrations</title>
 
-  <para>TODO</para>
+  <para>SQL-Datenbanken werden mit Migrations generiert und sie können ebenso
+  mit Migrations verändert werden. Wenn Sie mit <command>rails generate
+  model</command> ein Model anlegen, dann wird automatisch im Verzeichnis
+  <filename>db/migrate/</filename> eine entsprechende Migration-Datei
+  angelegt. Ich zeige Ihnen das Prinzip an einer Adressbuch Applikation. Legen
+  wir die mal an:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new address-book</command>
+[...]
+stefan@swmbp 0 1.9.2-p0 ~$ <command>cd address-book</command>
+stefan@swmbp 0 1.9.2-p0 address-book$ <command>bundle install</command>
+[...]
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+  <para>Legen wir ein <classname>Person</classname> Model an:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails generate model Person name:string street:string zip_code:string city:string phone:string</command>
+      invoke  active_record
+      create    db/migrate/20101201154722_create_people.rb
+      create    app/models/person.rb
+      invoke    test_unit
+      create      test/unit/person_test.rb
+      create      test/fixtures/people.yml
+stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate</command>
+(in /Users/stefan/address-book)
+==  CreatePeople: migrating ===================================================
+-- create_table(:people)
+   -&gt; 0.0018s
+==  CreatePeople: migrated (0.0018s) ==========================================
+
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+  <para>Es wurde automatisch die Migrations-Datei
+  <filename>db/migrate/20101201154722_create_people.rb</filename> angelegt.
+  Schauen wir uns die mal genauer an:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>cat db/migrate/20101201154722_create_people.rb</command>
+class CreatePeople &lt; ActiveRecord::Migration
+  def self.up
+    create_table :people do |t|
+      t.string :name
+      t.string :street
+      t.string :zip_code
+      t.string :city
+      t.string :phone
+
+      t.timestamps
+    end
+  end
+
+  def self.down
+    drop_table :people
+  end
+end
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+  <para>Die Klassenmethoden <methodname>self.up</methodname> und
+  <methodname>self.down</methodname> erstellen oder löschen die Datenbank.
+  Eigentlich alles recht logisch. Die Migrationsdateien haben im Dateinamen
+  die aktuelle Uhrzeit eingebetet und werden bei einer Migration (also dem
+  Aufruf von <command>rake db:migrate</command>) in der chronologischen
+  Reihenfolge abgearbeitet. Dabei werden immer nur die Migrations
+  abgearbeitet, die noch nicht ausgeführt wurden. Wenn wir jetzt noch einmal
+  <command>rake db:migrate</command> aufrufen, passiert nichts, da die
+  entsprechende Migration ja schon ausgeführt wurde:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate</command>
+(in /Users/stefan/address-book)
+stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+
+  <para>Wenn wir aber die Datenbank manuell löschen und danach wieder
+  <command>rake db:migrate</command> aufrufen, wird die Migration
+  wiederholt:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rm db/development.sqlite3</command> 
+stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate</command>
+(in /Users/stefan/address-book)
+==  CreatePeople: migrating ===================================================
+-- create_table(:people)
+   -&gt; 0.0013s
+==  CreatePeople: migrated (0.0014s) ==========================================
+
+stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+
+  <para>Zum weiteren Arbeiten erstellen wir folgende
+  <filename>db/seeds.rb</filename> Datei:<programlisting>firstnames = ['Horst', 'Udo', 'Martin', 'Ute', 'Ursula', 'Martina']
+lastnames = ['Meier', 'Udelhoven', 'Schroeder', 'Maier', 'Neuner']
+streets = ['Hauptstr.', 'Bahnhofstr.', 'Molkestr.', 'Berliner Str.', 'Hamburger Str.']
+cities = ['Beispielhausen', 'Hamburg', 'Berlin', 'Dresden']
+
+anzahl_der_datensaetze = 1000
+r = Random.new(42)
+(0..anzahl_der_datensaetze).each do |i|
+  Person.create(:name =&gt; "#{firstnames[rand(firstnames.size)]} #{lastnames[rand(lastnames.size)]}",
+                :street =&gt; "#{streets[rand(streets.size)]} #{i + 1}",
+                :zip_code =&gt; "#{r.rand(89999) + 10000}",
+                :city =&gt; "#{cities[rand(cities.size)]}",
+                :phone =&gt; "0#{r.rand(89) + 10} #{r.rand(899999) + 100000}")
+end</programlisting></para>
+
+  <para>Dann die <filename>seeds.rb</filename> Datei abarbeiten:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:seed</command>
+(in /Users/stefan/address-book)
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+  <para>Jetzt haben wir eine ganze Menge zufälliger Adressen in der Datenbank.
+  Schauen wir ganz kurz in der Console nach:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails console</command>
+jLoading development environment (Rails 3.0.3)
+ruby-1.9.2-p0 &gt; <command>Person.last</command>
+ =&gt; #&lt;Person id: 1000, name: "Udo Meier", street: "Bahnhofstr. 1001", zip_code: "24357", city: "Hamburg", phone: "066 430817", created_at: "2010-12-01 18:12:19", updated_at: "2010-12-01 18:12:19"&gt; 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+  <para>Nach einiger Zeit merken wir, das wir bei vielen Personen nicht nur
+  eine normale Telefonnummer, sondern auch noch eine Handynummer abspeichern
+  wollen. Wir benötigen also ein weiteres Datenbankfeld
+  (<varname>mobile_phone</varname>). Dafür gibt es eine leicht zu merkende
+  <command>rails generate migration add_*</command> Syntax:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails generate migration add_mobile_phone_to_person mobile_phone:string</command>
+      invoke  active_record
+      create    db/migrate/20101201181710_add_mobile_phone_to_person.rb
+stefan@swmbp 0 1.9.2-p0 address-book$ <command>cat db/migrate/20101201181710_add_mobile_phone_to_person.rb</command>
+class AddMobilePhoneToPerson &lt; ActiveRecord::Migration
+  def self.up
+    add_column :people, :mobile_phone, :string
+  end
+
+  def self.down
+    remove_column :people, :mobile_phone
+  end
+end
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+  <para>Mit <command>rake db:migrate</command> können wir die neue Migration
+  einspielen:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate</command>
+(in /Users/stefan/address-book)
+==  AddMobilePhoneToPerson: migrating =========================================
+-- add_column(:people, :mobile_phone, :string)
+   -&gt; 0.0006s
+==  AddMobilePhoneToPerson: migrated (0.0007s) ================================
+
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+  <para>In der Console können wir uns das neue Feld anschauen. Es wurde nach
+  dem Feld <varname>updated_at</varname> angefügt:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails console</command>
+Loading development environment (Rails 3.0.3)
+ruby-1.9.2-p0 &gt; <command>Person.last</command>
+ =&gt; #&lt;Person id: 1000, name: "Udo Meier", street: "Bahnhofstr. 1001", zip_code: "24357", city: "Hamburg", phone: "066 430817", created_at: "2010-12-01 18:12:19", updated_at: "2010-12-01 18:12:19", mobile_phone: nil&gt; 
+ruby-1.9.2-p0 &gt; <command>exit</command>
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+  <para>Was wäre im Fall, das noch einmal den vorherigen Stand der Dinge
+  betrachten möchten? Kein Problem. Es gibt ja immer auch eine
+  <methodname>self.down</methodname> Methode. Auf die vorherige Version können
+  wir deshalb mit <command>rake db:rollback</command> leicht zurück
+  gehen:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:rollback</command>
+(in /Users/stefan/address-book)
+==  AddMobilePhoneToPerson: reverting =========================================
+-- remove_column(:people, :mobile_phone)
+   -&gt; 0.5851s
+==  AddMobilePhoneToPerson: reverted (0.5852s) ================================
+
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+  <para>Jede Migration hat eine eigene Versionsnummer. Die Versionsnummer des
+  aktuellen Status können Sie mit <command>rake db:version</command>
+  rausfinden:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:version</command>
+(in /Users/stefan/address-book)
+Current version: 20101201154722
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+  <para>Sie finden die entsprechende Version im
+  <filename>db/migrate</filename> Verzeichnis wieder:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>ls db/migrate</command>
+20101201154722_create_people.rb
+20101201181710_add_mobile_phone_to_person.rb
+stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+
+  <para>Auf eine bestimmte Migration können Sie mit <command>rake db:migrate
+  VERSION=Versionsnummer</command> gehen. Die Null steht dabei für die nullte
+  Version (also den Start). Probieren wir das mal aus:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate VERSION=0</command>
+(in /Users/stefan/address-book)
+==  CreatePeople: reverting ===================================================
+-- drop_table(:people)
+   -&gt; 0.0008s
+==  CreatePeople: reverted (0.0009s) ==========================================
+
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+  <para>Die Tabelle wurde mit allen Daten gelöscht. Wir sind wieder zurück auf
+  Los.</para>
+
+  <section>
+    <title>Datenbanken ändern</title>
+
+    <para>Das wir in unserer people Datenbank zwei mal eine Telefonnummer
+    haben ist nach dem was wir in <xref linkend="activerecord_has_many" />
+    gelernt haben Blödsinn. Es würde mehr Sinn machen die Telefonnummern in
+    einer eigenen Datenbank zu halten. Legen wir die einmal an:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails generate model phone person_id:integer phone_type:string number:string</command>
+      invoke  active_record
+      create    db/migrate/20101201192459_create_phones.rb
+      create    app/models/phone.rb
+      invoke    test_unit
+      create      test/unit/phone_test.rb
+      create      test/fixtures/phones.yml
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+    <para></para>
+
+    <para></para>
+
+    <para></para>
+
+    <para></para>
+  </section>
 
   <section>
     <title>Index anlegen</title>
