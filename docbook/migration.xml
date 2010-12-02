@@ -441,7 +441,8 @@ stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
     <para>Ich gehe davon aus, das Sie wissen was ein Index in einer Datenbank
     ist. Falls nicht finden Sie auf <uri
     xlink:href="http://de.wikipedia.org/wiki/Datenbankindex">http://de.wikipedia.org/wiki/Datenbankindex</uri>
-    eine kurze Einführung.</para>
+    eine kurze Einführung. Kurzversion: Damit werden Suchen für eine bestimmte
+    Tabellen-Spalte schneller.</para>
 
     <para>In unserem Adressbuch sollten wir das Feld <varname>name</varname>
     in der Tabelle <varname>people</varname> indexieren. Dafür erstellen wir
@@ -452,9 +453,10 @@ stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
 
     <para>In der Datei
     <filename>db/migrate/20101201224922_create_index.rb</filename> legen wir
-    in der <methodname>self.up</methodname> Methode den Index an und in der
-    <methodname>self.down</methodname> Methode löschen wir den Index
-    wieder:<programlisting>class CreateIndex &lt; ActiveRecord::Migration
+    mit <methodname>add_index</methodname> in der
+    <methodname>self.up</methodname> Methode den Index an und in der
+    <methodname>self.down</methodname> Methode löschen wir ihen mit
+    <methodname>remove_index</methodname> wieder:<programlisting>class CreateIndex &lt; ActiveRecord::Migration
   def self.up
     add_index :people, :name
   end
@@ -473,7 +475,83 @@ end</programlisting></para>
 ==  CreateIndex: migrated (0.0035s) ===========================================
 
 stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+  </section>
 
-    <para></para>
+  <section>
+    <title>Sonstiges</title>
+
+    <para>In diesem Anfängerbuch kann ich das Thema Migrations nicht sehr tief
+    behandeln. Es geht um das prinzipielle Verständnis der Mechanik. Wenn Sie
+    das haben, können Sie in weitere Informationen bekommen. Es gibt aber eine
+    Sache die ist so wichtig, das ich Sie hier zeigen möchte.</para>
+
+    <section>
+      <title>Dezimal-Stellen</title>
+
+      <para>Wenn man z.B. bei einem Preis-Feld eine Dezimal-Zahl mit zwei
+      Stellen hinter dem Komma benötigt, so muss man das nach dem Erstellen
+      des Models manuel in der Migrationsdatei ändern. An sonsten laufen Sie
+      Gefahr, das von Datenbank zu Datenbank unterschiedlich große Felder
+      angelegt werden (siehe <uri
+      xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/TableDefinition.html">http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/TableDefinition.html</uri>).
+      </para>
+
+      <para>Legen wir ein Model <classname>Produkt</classname> mit Preisen
+      an:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails generate model product name:string price:decimal</command>
+      invoke  active_record
+      create    db/migrate/20101202095315_create_products.rb
+      create    app/models/product.rb
+      invoke    test_unit
+      create      test/unit/product_test.rb
+      create      test/fixtures/products.yml
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+      <para>Die
+      <filename>db/migrate/20101202095315_create_products.rb</filename> müssen
+      wir jetzt wie folgt verändern:<screen>class CreateProducts &lt; ActiveRecord::Migration
+  def self.up
+    create_table :products do |t|
+      t.string :name
+      <emphasis>t.decimal :price, :precision =&gt; 8, :scale =&gt; 2</emphasis>
+
+      t.timestamps
+    end
+  end
+
+  def self.down
+    drop_table :products
+  end
+end
+</screen></para>
+
+      <para>Die Parameter <code>:precision =&gt; 8, :scale =&gt; 2</code>
+      sagen aus, das eine Zahl mit maximal 8 Stellen (davon 2 Stellen rechts
+      vom Komma) abgespeichert wird. Ein Beispiel für eine solche Zahl:
+      123456,78</para>
+    </section>
+  </section>
+
+  <section>
+    <title>Weitere Dokumentation</title>
+
+    <para>Folgende Webseiten geben Ihnen sehr gute weitere Informationen zum
+    Thema Migration:<itemizedlist>
+             <listitem>
+          <para><uri
+          xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Migration.html">http://api.rubyonrails.org/classes/ActiveRecord/Migration.html</uri></para>
+        </listitem>
+        <listitem>
+          <para><uri
+          xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/TableDefinition.html">http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/TableDefinition.html</uri></para>
+        </listitem>
+        <listitem>
+          <para><uri
+          xlink:href="http://railscasts.com/episodes/107-migrations-in-rails-2-1">http://railscasts.com/episodes/107-migrations-in-rails-2-1</uri></para>
+
+          <para>Dieser Screencast ist etwas veraltet (Rails-Version 2.1), aber
+          immer noch gut, um die Basics zu verstehen.</para>
+        </listitem>
+
+      </itemizedlist></para>
   </section>
 </section>
