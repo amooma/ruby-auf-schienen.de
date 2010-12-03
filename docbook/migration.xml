@@ -194,13 +194,144 @@ stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
   <para>Die Tabelle wurde mit allen Daten gelöscht. Wir sind wieder zurück auf
   Los.</para>
 
+  <section xml:id="activerecord_welche_datenbank">
+    <title>Welche Datenbank wird benutzt?</title>
+
+    <para>Die Datenbank-Tabelle <varname>people</varname> wird durch die
+    Migration angelegt. Dabei sehen wir, das Tabellen-Namen automatisch den
+    Plural der Models bekommen (<classname>Person</classname> vs.
+    <varname>people</varname>). Aber in welcher Datenbank werden die Tabellen
+    überhaupt angelegt? Das wird in der Konfigurationsdatei
+    <filename>config/database.yml</filename> definiert:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>cat config/database.yml</command> 
+# SQLite version 3.x
+#   gem install sqlite3-ruby (not necessary on OS X Leopard)
+development:
+  adapter: sqlite3
+  database: db/development.sqlite3
+  pool: 5
+  timeout: 5000
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  adapter: sqlite3
+  database: db/test.sqlite3
+  pool: 5
+  timeout: 5000
+
+production:
+  adapter: sqlite3
+  database: db/production.sqlite3
+  pool: 5
+  timeout: 5000
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+    <para>Dort werden drei verschiedene Datenbanken im YAML-Format (siehe <uri
+    xlink:href="http://www.yaml.org/">http://www.yaml.org/</uri> bzw. <uri
+    xlink:href="http://de.wikipedia.org/wiki/YAML">http://de.wikipedia.org/wiki/YAML</uri>)
+    definiert. Für uns wichtig ist erst mal nur die development-Datenbank
+    (erster Eintrag). Per default benutzt Rails dort
+    <application>SQLite3</application>. SQLite3 mag nicht die richtige Wahl
+    für die Analyse der weltweit gesammelten Wetterdaten sein, aber für die
+    schnelle und unkomplizierte Entwicklung von Rails-Anwendungen lernt man
+    sie schnell zu schätzen. In der Produktions-Umgebung kann man später immer
+    noch auf "grosse" Datenbanken wie MySQL oder PostgreSQL
+    umsteigen.<footnote>
+        <para>Einige Entwickler sind der Ansicht, das man auf jeden Fall immer
+        mit der gleichen Datenbank entwicklen soll, die man später auch in der
+        Produktion und im Testing benutzt. Andere sagen, das diese bei der
+        Verwendung von ORM Abstraktions-Layern nicht notwendig sei. Bitte
+        entscheiden Sie hier selber. Ich programmiere eine Rails Applikation
+        oft mit SQLite und verwende in der Produktion oft MySQL.</para>
+      </footnote></para>
+
+    <para>Um Ihre sicherlich vorhandene Neugierde zu befriedigen, schauen wir
+    uns kurz noch die Datenbank mit dem Command-Line-Tool
+    <application>sqlite3</application> an:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>sqlite3 db/development.sqlite3</command> 
+SQLite version 3.6.12
+Enter ".help" for instructions
+Enter SQL statements terminated with a ";"
+sqlite&gt; <command>.tables</command>
+schema_migrations
+sqlite&gt; <command>.quit</command>
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+    <para>Nichts drin. Aber klar, wir haben ja auch nicht die Migration laufen
+    lassen:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate</command>
+(in /Users/stefan/address-book)
+==  CreatePeople: migrating ===================================================
+-- create_table(:people)
+   -&gt; 0.0016s
+==  CreatePeople: migrated (0.0017s) ==========================================
+
+==  AddMobilePhoneToPerson: migrating =========================================
+-- add_column(:people, :mobile_phone, :string)
+   -&gt; 0.0007s
+==  AddMobilePhoneToPerson: migrated (0.0008s) ================================
+
+stefan@swmbp 0 1.9.2-p0 address-book$ <command>sqlite3 db/development.sqlite3</command> 
+SQLite version 3.6.12
+Enter ".help" for instructions
+Enter SQL statements terminated with a ";"
+sqlite&gt; <command>.tables</command>
+people             schema_migrations
+sqlite&gt; <command>.schema people</command>
+CREATE TABLE "people" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar(255), "street" varchar(255), "zip_code" varchar(255), "city" varchar(255), "phone" varchar(255), "created_at" datetime, "updated_at" datetime, "mobile_phone" varchar(255));
+sqlite&gt; <command>.quit</command>
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+    <para>Das Anlegen der Tabelle mit <command>rake db:migrate</command> wurde
+    natürlich auch im <filename>log/development.log</filename>
+    eingetragen:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>tail -n 21 log/development.log</command> 
+  SQL (0.1ms)   SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+  SQL (0.1ms)  SELECT "schema_migrations"."version" FROM "schema_migrations"
+Migrating to CreatePeople (20101203142738)
+  SQL (0.0ms)  select sqlite_version(*)
+  SQL (0.4ms)  CREATE TABLE "people" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar(255), "street" varchar(255), "zip_code" varchar(255), "city" varchar(255), "phone" varchar(255), "created_at" datetime, "updated_at" datetime) 
+  SQL (0.1ms)  INSERT INTO "schema_migrations" ("version") VALUES ('20101203142738')
+Migrating to AddMobilePhoneToPerson (20101203142835)
+  SQL (0.4ms)  ALTER TABLE "people" ADD "mobile_phone" varchar(255)
+  SQL (0.1ms)  INSERT INTO "schema_migrations" ("version") VALUES ('20101203142835')
+  SQL (0.2ms)   SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+
+  SQL (0.1ms)  SELECT "schema_migrations"."version" FROM "schema_migrations"
+  SQL (0.1ms)   SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+
+  SQL (0.0ms)  PRAGMA index_list("people")
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+
+    <para>Jetzt wissen Sie auch wofür die Tabelle
+    <varname>schema_migrations</varname> benutzt wird. War bei dem Namen aber
+    auch kein grosses Rätsel. Bei der ersten von Rails durchgeführten
+    Migration wird diese Tabelle angelegt, falls sie noch nicht vorhanden ist.
+    Sie dient als eine Art Buchhaltung für die Migrations-Versionen. </para>
+
+    <para>Zum Schluss setzen wir die Datenbank wieder in den ursprünglichen
+    Stand:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate VERSION=0</command>
+(in /Users/stefan/address-book)
+==  CreatePeople: reverting ===================================================
+-- drop_table(:people)
+   -&gt; 0.0008s
+==  CreatePeople: reverted (0.0009s) ==========================================
+
+stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
+  </section>
+
   <section xml:id="ar_migration_db_aendern">
     <title xml:id="ar_migration_db_aendern.title">Datenbanken ändern</title>
 
-    <para>Das wir in unserer people Datenbank zwei mal eine Telefonnummer
-    haben ist nach dem was wir in <xref linkend="activerecord_has_many" />
-    gelernt haben Blödsinn. Es würde mehr Sinn machen die Telefonnummern in
-    einer eigenen Datenbank zu halten. Legen wir die mal an:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails generate model phone person_id:integer phone_type:string number:string</command>
+    <para>Das wir in unserer <varname>people</varname> Datenbank zwei mal eine
+    Telefonnummer haben ist nach dem was wir in <xref
+    linkend="activerecord_has_many" /> gelernt haben Blödsinn. Es würde mehr
+    Sinn machen die Telefonnummern in einer eigenen Datenbank zu halten. Legen
+    wir die mal an:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails generate model phone person_id:integer phone_type:string number:string</command>
       invoke  active_record
       create    db/migrate/20101201192459_create_phones.rb
       create    app/models/phone.rb
@@ -481,9 +612,46 @@ stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
     <title>Sonstiges</title>
 
     <para>In diesem Anfängerbuch kann ich das Thema Migrations nicht sehr tief
-    behandeln. Es geht um das prinzipielle Verständnis der Mechanik. Wenn Sie
-    das haben, können Sie in weitere Informationen bekommen. Es gibt aber eine
-    Sache die ist so wichtig, das ich Sie hier zeigen möchte.</para>
+    behandeln. Es geht um das prinzipielle Verständnis der Mechanik. Es gibt
+    aber ein paar Details die sind so wichtig, das ich Sie hier besprechen
+    möchte.</para>
+
+    <section xml:id="active-record-auto-felder">
+      <title>Automatisch zugefügte Felder (id, created_at und
+      updated_at)</title>
+
+      <para>Rails ist so freundlich uns bei der Migration automatisch folgende
+      Felder hinzuzufügen:<itemizedlist>
+          <listitem>
+            <para><varname>id:integer</varname></para>
+
+            <para>Das ist die Unique-ID des Datensatzes. Das Feld wird von der
+            Datenbank automatisch hochgezählt. Für alle SQL-Fans:
+            AUTOINCREMENT NOT NULL</para>
+          </listitem>
+
+          <listitem>
+            <para><varname>created_at:datetime</varname></para>
+
+            <para>Das Feld wird von ActiveRecord automatisch beim Erstellen
+            eines Datensatzes gefüllt.</para>
+          </listitem>
+
+          <listitem>
+            <para><varname>updated_at:datetime</varname></para>
+
+            <para>Das Feld wird bei jeder Veränderung des Datensatzes
+            automatisch an die aktuelle Zeit angepasst.</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <para>Man muss diese Felder also nicht beim Generieren des Models selber
+      eintragen.</para>
+
+      <para>Am Anfang fragt man sich: "Muss das sein? Macht das wirklich
+      Sinn?". Aber mit der Zeit lernt man diese automatisch gehandelten Felder
+      schätzen. Sie weg zu lassen ist meist am falschen Ende gespart.</para>
+    </section>
 
     <section>
       <title>Dezimal-Stellen</title>
