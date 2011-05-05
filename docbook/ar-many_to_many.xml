@@ -7,8 +7,7 @@
          xmlns:m="http://www.w3.org/1998/Math/MathML"
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
-  <title xml:id="ar-many_to_many.title">Many-to-Many &#8211;
-  n:n-Verknüpfung</title>
+  <title xml:id="ar-many_to_many.title">Many-to-Many – n:n-Verknüpfung</title>
 
   <indexterm>
     <primary>ActiveRecord</primary>
@@ -47,7 +46,7 @@
   und gleichzeitig kann eine Bestellung mehrere Produkte enthalten. Das nennt
   sich dann Many-to-Many. Am besten stellen wir das mal mit Code nach.</para>
 
-  <section>
+  <section xml:id="many_to_many_vorbereitung">
     <title>Vorbereitung</title>
 
     <para>Die Shop-Applikation erstellen:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new shop</command>
@@ -105,7 +104,7 @@ stefan@swmbp 0 1.9.2-p0 shop$ </screen></para>
 stefan@swmbp 0 1.9.2-p0 shop$ </screen></para>
   </section>
 
-  <section>
+  <section xml:id="many_to_many_die_verknuepfung">
     <title>Die Verknüpfung</title>
 
     <para>Eine Bestellung (<classname>Order</classname>) besteht aus einer
@@ -141,7 +140,7 @@ end</programlisting></para>
 end</programlisting></para>
   </section>
 
-  <section>
+  <section xml:id="many_to_many_funktioniert_wie_has_many">
     <title>Funktioniert logischerweise wie has_many</title>
 
     <para>Da wir die Verknüpfungen mit <methodname>has_many</methodname>
@@ -194,7 +193,9 @@ ruby-1.9.2-p0 &gt; </screen></para>
 
     <para>Warum? Weil wir das Objekt noch nicht in der Datenbank gespeichert
     haben. Wenn wir dies mit <methodname>save</methodname> machen, können wir
-    auch die Menge in den <varname>line_items</varname> verändern:<screen>ruby-1.9.2-p0 &gt; <command>bestellung.line_items</command>
+    auch die Menge in den <varname>line_items</varname> verändern:<screen>ruby-1.9.2-p0 &gt; <command>bestellung.save</command>
+ =&gt; true 
+ruby-1.9.2-p0 &gt; <command>bestellung.line_items</command>
  =&gt; [#&lt;LineItem id: 1, order_id: 1, product_id: 1, quantity: nil, created_at: "2010-11-28 11:51:27", updated_at: "2010-11-28 11:51:27"&gt;, #&lt;LineItem id: 1, order_id: 1, product_id: 1, quantity: nil, created_at: "2010-11-28 11:51:27", updated_at: "2010-11-28 11:51:27"&gt;] 
 ruby-1.9.2-p0 &gt; <command>bestellung.line_items.first</command>
  =&gt; #&lt;LineItem id: 1, order_id: 1, product_id: 1, quantity: nil, created_at: "2010-11-28 11:51:27", updated_at: "2010-11-28 11:51:27"&gt; 
