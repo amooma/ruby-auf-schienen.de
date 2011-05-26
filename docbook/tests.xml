@@ -6,12 +6,752 @@
          xmlns:m="http://www.w3.org/1998/Math/MathML"
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
-  <title xml:id="tests.title">Tests</title>
+  <title xml:id="tests.title">Testing</title>
 
-  <section>
-    <title>Inhalt kommt noch</title>
+  <section xml:id="testing_einleitung">
+    <title xml:id="testing_einleitung.title">Einleitung</title>
 
-    <para>Ich brauchte die Sprungadresse für einen Link. Deshalb diese Datei.
-    Der Inhalt kommt noch.</para>
+    <para>Ich programmiere seit über 20 Jahren und die meiste Zeit bin ich
+    sehr gut ohne Testing zurecht gekommen. Ich bin Ihnen also nicht böse,
+    wenn Sie dieses Kapitel überspringen. Sie können Rails-Applikationen auch
+    ohne Tests erstellen und werden deshalb kein schlechtes Karma bekommen
+    (hoffentlich, sicher kann man bei der Karma-Sache ja nie sein).</para>
+
+    <para>Aber sollten Sie sich auf Test-Driven-Development (TDD) einlassen,
+    so kann ich Ihnen versprechen, das es eine kleine Erleuchtung ist. Die
+    Grundidee von TDD ist, das man für jede Programmfunktion einen Test
+    schreibt, der diese Funktion überprüft. Ja, man hat initial doppelt so
+    viel Aufwand. Aber danach kann man alle Tests durchlaufen lassen und
+    sieht, das die Applikation genau so funktioniert, wie man es sich
+    vorgestellt hat. Der Gag kommt aber erst nach ein paar Wochen oder
+    Monaten, wenn man sich das Projekt wieder mal vornimmt und eine
+    Erweiterung oder Veränderung schreibt. Dann kann man recht gefahrlos den
+    Code verändern und danach die Funktionsweise anhand der Tests überprüfen.
+    Es gibt dann kein "hmm... das ist jetzt dumm gelaufen, aber an diese
+    Besonderheit habe ich nicht gedacht." mehr.</para>
+  </section>
+
+  <section xml:id="testing_beispiel_webshop">
+    <title xml:id="testing_beispiel_webshop.title">Beispiel für einen User in
+    einem Webshop</title>
+
+    <para>Fangen wir mal mit einem User-Scaffold in einem imaginären Webshop
+    an:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new webshop</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>cd webshop</command>
+Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>bundle install</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rails generate scaffold user login_name:string firstname:string lastname:string birthday:date</command>
+      invoke  active_record
+      create    db/migrate/20110526094713_create_users.rb
+      create    app/models/user.rb
+      invoke    test_unit
+      create      test/unit/user_test.rb
+      create      test/fixtures/users.yml
+       route  resources :users
+      invoke  scaffold_controller
+      create    app/controllers/users_controller.rb
+      invoke    erb
+      create      app/views/users
+      create      app/views/users/index.html.erb
+      create      app/views/users/edit.html.erb
+      create      app/views/users/show.html.erb
+      create      app/views/users/new.html.erb
+      create      app/views/users/_form.html.erb
+      invoke    test_unit
+      create      test/functional/users_controller_test.rb
+      invoke    helper
+      create      app/helpers/users_helper.rb
+      invoke      test_unit
+      create        test/unit/helpers/users_helper_test.rb
+      create  app/assets/stylesheets/scaffold.css.scss
+      invoke  assets
+      create    app/assets/javascripts/users.js.coffee
+      create    app/assets/stylesheets/users.css.scss
+Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake db:migrate</command>
+==  CreateUsers: migrating ====================================================
+-- create_table(:users)
+   -&gt; 0.0016s
+==  CreateUsers: migrated (0.0017s) ===========================================
+Stefan-Wintermeyers-MacBook-Air:webshop stefan$ 
+</screen></para>
+
+    <para>Sie kennen sich ja mit Scaffold aus (falls nicht, bitte erst <xref
+    linkend="scaffolding" /> lesen) und wissen was die gerade erstellte
+    Applikation macht. Sie haben auch gesehen, das Scaffold einige Tests
+    angelegt hat (die sind immer leicht am Wort <code>test</code> im
+    Dateinamen zu erkennen).</para>
+
+    <para>Die komplete Test-Suite eines Rails-Projektes wird mit dem Befehl
+    <command>rake test</command> abgearbeitet. Probieren wir mal aus, was ein
+    Test an dieser Stelle der Entwicklung ausgibt:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake test</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+Finished in 0.004183 seconds.
+
+0 tests, 0 assertions, 0 failures, 0 errors, 0 skips
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+UsersControllerTest:
+     PASS should create user (0.10s) 
+     PASS should destroy user (0.01s) 
+     PASS should get edit (0.07s) 
+     PASS should get index (0.01s) 
+     PASS should get new (0.01s) 
+     PASS should show user (0.01s) 
+     PASS should update user (0.01s) 
+
+Finished in 0.216057 seconds.
+
+7 tests, 10 assertions, 0 failures, 0 errors, 0 skips
+Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+
+    <para>Die Ausgabe <code>0 failures, 0 errors, 0 skips</code> sieht gut
+    aus. Per Default läuft ein Test in einem Standard-Scaffold korrekt
+    durch.</para>
+
+    <para>Verändern wir mal die <filename>app/models/user.rb</filename> und
+    fügen ein paar Validierungen (falls nicht ganz klar bitte <xref
+    linkend="activerecord_validation" /> lesen) ein:<programlisting>class User &lt; ActiveRecord::Base
+  # Die folgenden Felder muessen immer enthalten sein
+  #
+  validates_presence_of :login_name
+  validates_presence_of :lastname
+  validates_presence_of :birthday
+  
+  # Der login_name darf nur aus den Buchstaben a-z, Zahlen und den 
+  # Sonderzeichen -._ bestehen
+  #
+  validates_format_of :login_name, :with =&gt; /[a-z0-9\-_.]+/i,
+                      :message =&gt; "only characters, numbers and the special character -_. are allowed"
+  
+  # Der login_name muss mindestens eins der folgenden Sonderzeichen 
+  # enthalten: -._
+  #
+  validates_format_of :login_name, :with =&gt; /^.*(?=.*[\-_.]).*$/,
+                      :message =&gt; "must include at least one of the special characters -_."
+  
+  # Der login_name muss mindestens 4 und maximal 16 Zeichen lang sein
+  #
+  validates_length_of :login_name, :within =&gt; 4..16
+  
+  # User des Webshops muessen volljaehrig sein
+  #
+  validate :check_the_birthday
+  
+  private
+  def check_the_birthday
+    if self.birthday.nil? or Date.today &lt; self.birthday + 18.years
+      errors.add(:birthday, "You have to be at least 18 years old.")
+    end
+  end
+end
+</programlisting></para>
+
+    <para>Jetzt führen wir noch mal alles Tests durch:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake test</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+Finished in 0.004198 seconds.
+
+0 tests, 0 assertions, 0 failures, 0 errors, 0 skips
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+UsersControllerTest:
+     FAIL should create user (0.21s) 
+          #&lt;Proc:0x00000100c87c50@/Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/activesupport-3.1.0.rc1/lib/active_support/testing/assertions.rb:49 (lambda)&gt; didn't change by 1.
+&lt;3&gt; expected but was
+&lt;2&gt;.
+          /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/activesupport-3.1.0.rc1/lib/active_support/testing/assertions.rb:58:in `block in assert_difference'
+
+     PASS should destroy user (0.01s) 
+     PASS should get edit (0.01s) 
+     PASS should get index (0.01s) 
+     PASS should get new (0.01s) 
+     PASS should show user (0.01s) 
+     FAIL should update user (0.02s) 
+          Expected response to be a &lt;:redirect&gt;, but was &lt;200&gt;
+          /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/actionpack-3.1.0.rc1/lib/action_dispatch/testing/assertions/response.rb:45:in `assert_response'
+
+
+Finished in 0.283337 seconds.
+
+7 tests, 9 assertions, 2 failures, 0 errors, 0 skips
+Errors running test:functionals!
+Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+
+    <para>Diesmal haben wir <code>2 failures</code>. Der Fehler passiert beim
+    <code>should create user</code> und beim <code>should update user</code>.
+    Scaffold muss also Beispieldaten angelegt haben, die beim ersten mal (ohne
+    Validierungen) durchgelaufen sind und beim zweiten mal (mit Validierungen)
+    nicht mehr.</para>
+
+    <para>Diese Beispieldaten werden als sogennate Fixtures im YAML Format im
+    Verzeichnis <filename>test/fixtures/</filename> angelegt. Schauen wir uns
+    mal die Beispieldaten für <classname>User</classname> in der Datei
+    <filename>test/fixtures/users.yml</filename> an:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+one:
+  login_name: MyString
+  firstname: MyString
+  lastname: MyString
+  birthday: 2011-05-26
+
+two:
+  login_name: MyString
+  firstname: MyString
+  lastname: MyString
+  birthday: 2011-05-26
+</programlisting></para>
+
+    <para>Dort sind zwei Beispieldatensätze angelegt, die unserer Validierung
+    nicht standhalten. Der <methodname>login_name</methodname> braucht
+    mindestens ein Sonderzeichen und der User muss mindestens 18 Jahre alt
+    sein. Ändern wir <code>login_name</code> und <code>birthday</code> in
+    <filename>test/fixtures/users.yml</filename> entsprechend
+    ab:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+one:
+  login_name: My-String
+  firstname: MyString
+  lastname: MyString
+  birthday: 1970-01-01
+
+two:
+  login_name: My-String
+  firstname: MyString
+  lastname: MyString
+  birthday: 1970-01-01
+</programlisting></para>
+
+    <para>Ein <command>rake test</command> läuft jetzt wieder ohne Fehler
+    durch:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake test</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+Finished in 0.004292 seconds.
+
+0 tests, 0 assertions, 0 failures, 0 errors, 0 skips
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+UsersControllerTest:
+     PASS should create user (0.11s) 
+     PASS should destroy user (0.01s) 
+     PASS should get edit (0.07s) 
+     PASS should get index (0.01s) 
+     PASS should get new (0.01s) 
+     PASS should show user (0.01s) 
+     PASS should update user (0.01s) 
+
+Finished in 0.229877 seconds.
+
+7 tests, 10 assertions, 0 failures, 0 errors, 0 skips
+Stefan-Wintermeyers-MacBook-Air:webshop stefan$ </screen></para>
+
+    <para>Wir wissen jetzt, das in der
+    <filename>test/fixtures/users.yml</filename> valide Daten stehen müssen,
+    damit der mit Scaffold erstellte Standard-Test durchläuft. Aber auch nicht
+    mehr. Ändern wir mal die <filename>test/fixtures/users.yml</filename> auf
+    ein Minimum (wir brauchen keinen <code>firstname</code>) und mit für
+    Menschen leichter lesbaren Daten ab:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+one:
+  login_name: horst_meier
+  lastname: Meier
+  birthday: 1970-01-01
+
+two:
+  login_name: emil.maier
+  lastname: Maier
+  birthday: 1950-01-01
+</programlisting></para>
+
+    <para>Sicherheitshalber nach der Veränderung noch mal ein <command>rake
+    test</command> (das kann man gar nicht oft genug machen):<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake test</command>
+[...]
+7 tests, 10 assertions, 0 failures, 0 errors, 0 skips
+Stefan-Wintermeyers-MacBook-Air:webshop stefan$ </screen></para>
+
+    <section xml:id="testing_beispiel_webshop_functional_tests">
+      <title
+      xml:id="testing_beispiel_webshop_functional_tests.title">Functional
+      Tests</title>
+
+      <para>Schauen wir uns mal genau an, an welcher Stelle die ursprünglichen
+      Fehler aufgetreten sind:<screen>UsersControllerTest:
+     FAIL should create user (0.21s) 
+          #&lt;Proc:0x00000100c87c50@/Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/activesupport-3.1.0.rc1/lib/active_support/testing/assertions.rb:49 (lambda)&gt; didn't change by 1.
+&lt;3&gt; expected but was
+&lt;2&gt;.
+          /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/activesupport-3.1.0.rc1/lib/active_support/testing/assertions.rb:58:in `block in assert_difference'
+
+     PASS should destroy user (0.01s) 
+     PASS should get edit (0.01s) 
+     PASS should get index (0.01s) 
+     PASS should get new (0.01s) 
+     PASS should show user (0.01s) 
+     FAIL should update user (0.02s) 
+          Expected response to be a &lt;:redirect&gt;, but was &lt;200&gt;
+          /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/actionpack-3.1.0.rc1/lib/action_dispatch/testing/assertions/response.rb:45:in `assert_response'
+</screen></para>
+
+      <para>Im <code>UsersControllerTest</code> konnte der User nicht angelegt
+      und nicht verändert werden. Die Controller-Tests befinden sich im
+      Verzeichnis <filename>test/functional/</filename>. Schauen wir uns mal
+      die Datei <filename>test/functional/users_controller_test.rb</filename>
+      genau an:<programlisting>require 'test_helper'
+
+class UsersControllerTest &lt; ActionController::TestCase
+  setup do
+    @user = users(:one)
+  end
+
+  test "should get index" do
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:users)
+  end
+
+  test "should get new" do
+    get :new
+    assert_response :success
+  end
+
+  test "should create user" do
+    assert_difference('User.count') do
+      post :create, user: @user.attributes
+    end
+
+    assert_redirected_to user_path(assigns(:user))
+  end
+
+  test "should show user" do
+    get :show, id: @user.to_param
+    assert_response :success
+  end
+
+  test "should get edit" do
+    get :edit, id: @user.to_param
+    assert_response :success
+  end
+
+  test "should update user" do
+    put :update, id: @user.to_param, user: @user.attributes
+    assert_redirected_to user_path(assigns(:user))
+  end
+
+  test "should destroy user" do
+    assert_difference('User.count', -1) do
+      delete :destroy, id: @user.to_param
+    end
+
+    assert_redirected_to users_path
+  end
+end
+</programlisting></para>
+
+      <para>Die verschiedenen Test-Namen kennen wir von der Bildschirmausgabe
+      von <command>rake test</command>. Am Anfang finden wir eine
+      <code>setup</code> Anweisung: <programlisting>  setup do
+    @user = users(:one)
+  end
+</programlisting></para>
+
+      <para>Diese drei Zielen Code bedeuten, das zum Start dieses Tests ein
+      Instanz <varname>@user</varname> mit den Daten des Eintrages
+      <code>one</code> aus der Datei
+      <filename>test/fixtures/users.yml</filename> angelegt werden
+      soll.</para>
+
+      <important>
+        <para>Bei jedem Test (also bei jedem Durchlauf von <command>rake
+        test</command>) wird automatisch eine frische und damit leere
+        Test-Datenbank angelegt. Das ist eine andere Datenbank als die auf die
+        Sie mit <command>rails console</command> zugreifen (das ist die
+        Development-Datenbank). Die Datenbanken werden in der
+        Konfigurationsdatei <filename>config/database.yml</filename>
+        definiert.</para>
+      </important>
+
+      <para>Danach werden in diesem Functional-Test verschiedene
+      Web-Seiten-Funktionen getestet. Als erstes der Zugriff auf die
+      Index-Seite:<programlisting>  test "should get index" do
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:users)
+  end
+</programlisting></para>
+
+      <para>Der Befehl <code>get :index</code> ruft die Seite
+      <uri>/users</uri> auf. <code>assert_response :success</code> bedeutet,
+      das die Seite ausgeliefert wurde. Die Zeile <code>assert_not_nil
+      assigns(:users)</code> stellt sicher, das die Instanz-Variable
+      <varname>@users</varname> vom Controller nicht mit dem Wert
+      <code>nil</code> zum View gegeben wird.<footnote>
+          <para>Dabei wird hier das Symbol <varname>:users</varname> genommen,
+          um sicher zu stellen, das <varname>@users</varname> in der zu
+          testenden Controller-Klasse und nicht <varname>@users</varname> in
+          der Test-Klasse genommen wird.</para>
+        </footnote></para>
+
+      <para>Schauen wir uns mal die beiden Probleme von vorhin genauer an. Als
+      erstes <code>should create user</code>:<programlisting>  test "should create user" do
+    assert_difference('User.count') do
+      post :create, user: @user.attributes
+    end
+
+    assert_redirected_to user_path(assigns(:user))
+  end
+</programlisting></para>
+
+      <para>Die <code>assert_difference('User.count') do ... end</code>
+      Schleife erwartet eine Veränderung vom Anfang bis zum Ende der Schleife.
+      <code>User.count</code> müsste am Anfang 1 ergeben und am Ende 2. Da wir
+      aber in der ersten <filename>test/fixtures/users.yml</filename> Variante
+      einen nicht gültigen Datensatz hatten ergab <code>User.count</code> am
+      Anfang und am Ende 0. 0 und nicht 1 am Anfang, weil auch das <code>setup
+      do ... end</code> nicht funktioniert haben kann.</para>
+
+      <para>Die letzte Zeile <code>assert_redirected_to
+      user_path(assigns(:user))</code> überprüft, ob nach einem neu angelegten
+      Datensatz auch auf den entsprechenden <code>show</code> View geleitet
+      wird.</para>
+
+      <para>Den zweiten Fehler gab es bei <code>should update
+      user</code>:<programlisting>  test "should update user" do
+    put :update, id: @user.to_param, user: @user.attributes
+    assert_redirected_to user_path(assigns(:user))
+  end
+</programlisting></para>
+
+      <para>Hier sollte der Datensatz mit der <code>id</code> des
+      <varname>@user</varname> Datensatzes mit den Attributen des
+      <varname>@user</varname> Datensatzes geupdatet werden. Danach soll auch
+      wieder der <code>show</code> View zu diesem Datensatz angezeigt werden.
+      Logischweise ging dieser Test auch nicht, da a) der
+      <varname>@user</varname> Datensatz gar nicht in der Datenbank existierte
+      und b) er auch nicht geupdatet werden konnte, da er nicht valide
+      war.</para>
+
+      <para>Ohne jetzt auf jeden einzelnen Functional Test Zeile für Zeile
+      einzugehen wird klar, was diese Tests machen: Sie führen echte Anfragen
+      an das Web-Interface aus und können somit dazu benutzt werden die Views
+      und die Controller zu testen.</para>
+
+      <tip>
+        <para>Mit <command>rake test:functionals</command> können Sie auch nur
+        die Functional Tests im Verzeichnis
+        <filename>test/functional/</filename> durchlaufen lassen.<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake test:functionals</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+UsersControllerTest:
+     PASS should create user (0.11s) 
+     PASS should destroy user (0.01s) 
+     PASS should get edit (0.07s) 
+     PASS should get index (0.01s) 
+     PASS should get new (0.01s) 
+     PASS should show user (0.01s) 
+     PASS should update user (0.01s) 
+
+Finished in 0.227522 seconds.
+
+7 tests, 10 assertions, 0 failures, 0 errors, 0 skips
+Stefan-Wintermeyers-MacBook-Air:webshop stefan$ </screen></para>
+      </tip>
+    </section>
+
+    <section xml:id="testing_beispiel_webshop_unit_tests">
+      <title>Unit Tests</title>
+
+      <para>Zum Testen der Validierungen, die wir in
+      <filename>app/models/user.rb</filename> eingetragen haben, sind Unit
+      Tests besser geeignet. Diese testen nicht wie die Functional Tests die
+      GUI und damit die Controller und die Views, sondern nur die
+      Models.</para>
+
+      <tip>
+        <para>Mit <command>rake test</command> werden alle im Rails-Projekt
+        vorhanden Tests ausgeführt. Mit <command>rake test:units</command>
+        werden nur die Unit Tests im Verzeichnis
+        <filename>test/unit/</filename> ausgeführt.</para>
+      </tip>
+
+      <para>Die Unit-Tests befinden sich im Verzeichnis
+      <filename>test/unit/</filename>. Ein Blick in die Datei
+      <filename>test/unit/user_test.rb</filename> ist aber
+      ernüchternd:<programlisting>require 'test_helper'
+
+class UserTest &lt; ActiveSupport::TestCase
+  # test "the truth" do
+  #   assert true
+  # end
+end
+</programlisting></para>
+
+      <para>Per Default schreibt Scaffold nur einen mit Kommentarzeichen
+      deaktivierten Dummy-Test rein. Deshalb läuft <command>rake
+      test:units</command> auch so inhaltslos durch:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake test:units</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+Finished in 0.004243 seconds.
+
+0 tests, 0 assertions, 0 failures, 0 errors, 0 skips
+Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+
+      <para>Füllen wir den ersten Test in der
+      <filename>test/unit/user_test.rb</filename> mit Leben:<programlisting>require 'test_helper'
+
+class UserTest &lt; ActiveSupport::TestCase
+<emphasis>  test "an empty user is not valid" do
+    assert !User.new.valid?
+  end</emphasis>
+end
+</programlisting></para>
+
+      <para>Dieser Test überprüft, ob eine neu angelegter
+      <classname>User</classname>, der keine Daten enthält valide ist. Da
+      <code>assert</code> nur auf <code>true</code> reagiert, habe ich vor
+      <code>User.new.valid?</code> ein <code>!</code> gesetzt, um aus dem
+      <code>false</code> ein <code>true</code> zu machen, denn ein leerer User
+      kann ja nicht valide sein.</para>
+
+      <para>Ein <command>rake test:units</command> läuft dann auch direkt
+      durch:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake test:units</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+UserTest:
+     PASS an empty user is not valid (0.07s) 
+
+Finished in 0.075614 seconds.
+
+1 tests, 1 assertions, 0 failures, 0 errors, 0 skips
+Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+
+      <para>Jetzt bauen wir zwei Asserts in einem Test ein, die überprüfen, ob
+      die beiden Fixture-Einträge in der
+      <filename>test/fixtures/users.yml</filename> auch valide
+      sind:<programlisting>require 'test_helper'
+
+class UserTest &lt; ActiveSupport::TestCase
+  test "an empty user is not valid" do
+    assert !User.new.valid?
+  end
+  
+<emphasis>  test "the two fixture users are valide" do
+    assert User.new(users(:one).attributes)
+    assert User.new(users(:two).attributes)
+  end
+</emphasis>end</programlisting></para>
+
+      <para>Danach wieder ein <command>rake test:units</command>:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake test:units</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+UserTest:
+     PASS an empty user is not valid (0.07s) 
+     PASS the two fixture users are valide (0.00s) 
+
+Finished in 0.078738 seconds.
+
+2 tests, 3 assertions, 0 failures, 0 errors, 0 skips
+Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+
+      <para>Jetzt erweitern wir <filename>test/unit/user_test.rb</filename> um
+      einem Test, ob ein 17 jähriger User der morgen 18 wird nicht valide und
+      ein User der heute 18 Jahre alt geworden ist valide ist:<programlisting>require 'test_helper'
+
+class UserTest &lt; ActiveSupport::TestCase
+  test "an empty user is not valid" do
+    assert !User.new.valid?
+  end
+  
+  test "the two fixture users are valide" do
+    assert User.new(users(:one).attributes)
+    assert User.new(users(:two).attributes)
+  end
+  
+<emphasis>  test "a user who has tomorrow his 18th birthday is not valid" do
+    user = users(:one)
+    user.birthday = Date.today - 18.years + 1.day
+    assert !User.new(user.attributes).valid?
+  end
+
+  test "a user who has today his 18th birthday is valid" do
+    user = users(:one)
+    user.birthday = Date.today - 18.years
+    assert User.new(user.attributes).valid?
+  end</emphasis>
+end
+</programlisting></para>
+
+      <para>Der Test läuft sauber durch:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake test:units</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+UserTest:
+     PASS a user who has today his 18th birthday is valid (0.04s) 
+     PASS a user who has tomorrow his 18th birthday is not valid (0.00s) 
+     PASS an empty user is not valid (0.01s) 
+     PASS the two fixture users are valide (0.00s) 
+
+Finished in 0.087012 seconds.
+
+4 tests, 5 assertions, 0 failures, 0 errors, 0 skips
+Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+
+      <para>Was müssen wir noch testen? Ob bestimmte Attribute nicht nil sind.
+      Dafür können wir einfach die folgende Schleife
+      hinzufügen:<programlisting>  ['lastname', 'login_name', 'birthday'].each do |attribute_name|
+    test "a user has to have a not nil #{attribute_name} attribute" do
+      assert !User.new(users(:one).attributes.except(attribute_name)).valid?
+    end
+  end
+</programlisting></para>
+
+      <para>Mit zwei weiteren Tests für verschiedene valide und nicht valide
+      <code>login_name</code> Werte sieht die
+      <filename>test/unit/user_test.rb</filename> dann so aus:<programlisting>require 'test_helper'
+
+class UserTest &lt; ActiveSupport::TestCase
+  test "an empty user is not valid" do
+    assert !User.new.valid?
+  end
+  
+  test "the two fixture users are valide" do
+    assert User.new(users(:one).attributes)
+    assert User.new(users(:two).attributes)
+  end
+  
+  test "a user who has tomorrow his 18th birthday is not valid" do
+    user = users(:one)
+    user.birthday = Date.today - 18.years + 1.day
+    assert !User.new(user.attributes).valid?
+  end
+
+  test "a user who has today his 18th birthday is valid" do
+    user = users(:one)
+    user.birthday = Date.today - 18.years
+    assert User.new(user.attributes).valid?
+  end
+
+  ['lastname', 'login_name', 'birthday'].each do |attribute_name|
+    test "a user has to have a not nil #{attribute_name} attribute" do
+      assert !User.new(users(:one).attributes.except(attribute_name)).valid?
+    end
+  end
+  
+  ['hans.meier', 'hans-meier', 'h-meier', 'h_meier', 'h.meier2'].each do |valid_login_name|
+    test "the login_name '#{valid_login_name}' is valid" do
+      assert User.new(users(:one).attributes.except('login_name').merge({'login_name' =&gt; valid_login_name})).valid?
+    end
+  end
+
+  ['hansmeier', 'hmeier', 'hmeier2'].each do |invalid_login_name|
+    test "the login_name '#{invalid_login_name}' is invalid" do
+      assert !User.new(users(:one).attributes.except('login_name').merge({'login_name' =&gt; invalid_login_name})).valid?
+    end
+  end
+end</programlisting></para>
+
+      <para>Der Durchlauf der Test-Suite zeigt die Ergebnisse:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake test:units</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+UserTest:
+     PASS a user has to have a not nil birthday attribute (0.07s) 
+     PASS a user has to have a not nil lastname attribute (0.00s) 
+     PASS a user has to have a not nil login name attribute (0.00s) 
+     PASS a user who has today his 18th birthday is valid (0.00s) 
+     PASS a user who has tomorrow his 18th birthday is not valid (0.00s) 
+     PASS an empty user is not valid (0.00s) 
+     PASS the login name 'h-meier' is valid (0.00s) 
+     PASS the login name 'h.meier2' is valid (0.00s) 
+     PASS the login name 'h meier' is valid (0.00s) 
+     PASS the login name 'hans-meier' is valid (0.00s) 
+     PASS the login name 'hans.meier' is valid (0.00s) 
+     PASS the login name 'hansmeier' is invalid (0.00s) 
+     PASS the login name 'hmeier' is invalid (0.00s) 
+     PASS the login name 'hmeier2' is invalid (0.00s) 
+     PASS the two fixture users are valide (0.00s) 
+
+Finished in 0.099514 seconds.
+
+15 tests, 16 assertions, 0 failures, 0 errors, 0 skips
+Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+
+      <para>Mit <command>rake test</command> könnten Sie jetzt alle Tests
+      durchlaufen lassen.</para>
+    </section>
+  </section>
+
+  <section xml:id="testing_fixtures">
+    <title xml:id="testing_fixtures.title">Fixtures</title>
+
+    <para>Man muss Fixtures nicht im YAML Format definieren, aber ich halte es
+    für die praktischste Variante. Alternativen (z.B. CSV) dazu finden Sie
+    unter <uri
+    xlink:href="http://api.rubyonrails.org/classes/Fixtures.html">http://api.rubyonrails.org/classes/Fixtures.html</uri>.</para>
+
+    <section>
+      <title>ERB in Fixtures</title>
+
+      <para>Statische YAML Fixtures sind manchmal zu unintelligent. In diesen
+      Fällen kann man mit ERB arbeiten (siehe <xref
+      linkend="erb-programmieren" />). Das in <xref
+      linkend="testing_beispiel_webshop" /> benutze Fixture sah statisch so
+      aus:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+one:
+  login_name: horst_meier
+  lastname: Meier
+  birthday: 1970-01-01
+
+two:
+  login_name: emil.maier
+  lastname: Maier
+  birthday: 1950-01-01
+</programlisting></para>
+
+      <para>Wenn wir für die Geburtstage dynamisch den heutigen Tag vor 20
+      Jahren eintragen möchten, so können wir das einfach mit ERB
+      realisieren:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+one:
+  login_name: horst_meier
+  lastname: Meier
+<emphasis>  birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;</emphasis>
+
+two:
+  login_name: emil.maier
+  lastname: Maier
+<emphasis>  birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;</emphasis></programlisting></para>
+
+      <para>Wenn wir noch zusätzliche 100 Beispiel-User bräuchten, dann könnte
+      wir das auch mit ein paar Zeilen ERB realisieren:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+one:
+  login_name: horst_meier
+  lastname: Meier
+<emphasis>  birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;</emphasis>
+
+two:
+  login_name: emil.maier
+  lastname: Maier
+<emphasis>  birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;
+
+&lt;% for i in 1..100 %&gt;
+user_&lt;%= i %&gt;:
+  login_name: person_&lt;%= 1 %&gt;
+  lastname: Meyer
+  birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;
+&lt;% end %&gt;</emphasis></programlisting></para>
+    </section>
   </section>
 </chapter>
