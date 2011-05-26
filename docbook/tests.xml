@@ -133,10 +133,6 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
   validates_format_of :login_name, :with =&gt; /^.*(?=.*[\-_.]).*$/,
                       :message =&gt; "must include at least one of the special characters -_."
   
-  # Der login_name muss mindestens 4 und maximal 16 Zeichen lang sein
-  #
-  validates_length_of :login_name, :within =&gt; 4..16
-  
   # User des Webshops muessen volljaehrig sein
   #
   validate :check_the_birthday
@@ -752,6 +748,135 @@ user_&lt;%= i %&gt;:
   lastname: Meyer
   birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;
 &lt;% end %&gt;</emphasis></programlisting></para>
+    </section>
+
+    <section xml:id="has_many_und_belongs_to_fixtures">
+      <title xml:id="has_many_und_belongs_to_fixtures.title">has_many und
+      belongs_to Fixtures</title>
+
+      <para>Nehmen wir einmal an, wir haben eine Telefonbuch Applikation mit
+      Personen die beliebig viele Telefonnummern haben:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new phonebook</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>cd phonebook</command>
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>bundle install</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rails generate scaffold person firstname:string lastname:string</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rails generate scaffold phone person_id:integer name:string number:string</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake db:migrate</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
+
+      <para>In <filename>app/models/person.rb</filename>
+      steht:<programlisting>class Person &lt; ActiveRecord::Base
+  has_many :phones
+
+  validates_presence_of :lastname
+end</programlisting></para>
+
+      <para>In <filename>app/models/phone.rb</filename> steht:<programlisting>class Phone &lt; ActiveRecord::Base
+  belongs_to :person
+
+  validates_presence_of :number
+  validates_presence_of :person_id
+  
+  validate :person_exists
+
+  private
+  def person_exists 
+    errors.add("person_id", "person is not existant") unless Person.exists?(self.person_id) 
+  end   
+end</programlisting></para>
+
+      <section xml:id="has_many_und_belongs_to_fixtures_statisch">
+        <title
+        xml:id="has_many_und_belongs_to_fixtures_statisch.title">Statische
+        Variante</title>
+
+        <para>Wir können statische IDs vergeben. Dann sieht die
+        <filename>test/fixtures/people.yml</filename> wie folgt
+        aus:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+one:
+  id: 1
+  firstname: Horst
+  lastname: Meier
+
+two:
+  id: 2
+  firstname: Emil
+  lastname: Obermeier
+</programlisting></para>
+
+        <para>Und die <filename>test/fixtures/phones.yml</filename> sieht so
+        aus:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+one:
+  person_id: 1
+  name: Handy
+  number: 0171 1234567
+
+two:
+  person_id: 1
+  name: Zu Hause
+  number: 030 1234567
+  
+three:
+  person_id: 2
+  name: Handy
+  number: 0172 9876543
+</programlisting></para>
+
+        <para>Die <filename>test/unit/person_test.rb</filename> enhält die
+        Tests für Person:<programlisting>require 'test_helper'
+
+class PersonTest &lt; ActiveSupport::TestCase
+  test "the fixture people data are valid" do
+    assert Person.new(people(:one).attributes).valid?
+    assert Person.new(people(:two).attributes).valid?
+  end
+end
+</programlisting></para>
+
+        <para>Und <filename>test/unit/phone_test.rb</filename> enthält die
+        Tests für Phone:<programlisting>require 'test_helper'
+
+class PhoneTest &lt; ActiveSupport::TestCase
+  test "the fixture phone entry data are valid" do
+    assert Phone.new(phones(:one).attributes).valid?
+    assert Phone.new(phones(:two).attributes).valid?
+    assert Phone.new(phones(:three).attributes).valid?
+  end
+end
+</programlisting></para>
+
+        <para>Ein <command>rake test:units</command> sagt, das alles OK
+        ist:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake test:units</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+PersonTest:
+     PASS the fixture people data are valid (0.08s) 
+
+PhoneTest:
+     PASS the fixture phone entry data are valid (0.04s) 
+
+Finished in 0.129876 seconds.
+
+2 tests, 5 assertions, 0 failures, 0 errors, 0 skips
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
+      </section>
+
+      <section xml:id="has_many_und_belongs_to_fixtures_label_referenz">
+        <title
+        xml:id="has_many_und_belongs_to_fixtures_label_referenz.title">Die
+        Label Referenz Variante</title>
+
+        <para>Eine etwas charmantere Alternative zu <xref
+        linkend="has_many_und_belongs_to_fixtures_statisch" /> ist die
+        Verwendung von Label Referenzen. </para>
+      </section>
     </section>
   </section>
 </chapter>
