@@ -272,6 +272,14 @@ two:
 7 tests, 10 assertions, 0 failures, 0 errors, 0 skips
 Stefan-Wintermeyers-MacBook-Air:webshop stefan$ </screen></para>
 
+    <important>
+      <para>Alle Fixtures werden beim Starten eines Tests in die Datenbank
+      geladen. Besonders wenn man
+      <methodname>validates_uniqueness_of</methodname> (siehe <xref
+      linkend="validates_uniqueness_of" />) in der Validierung benutzt, muss
+      man dies beim Test im Hinterkopf behalten.</para>
+    </important>
+
     <section xml:id="testing_beispiel_webshop_functional_tests">
       <title
       xml:id="testing_beispiel_webshop_functional_tests.title">Functional
@@ -843,10 +851,16 @@ end
         Tests für Phone:<programlisting>require 'test_helper'
 
 class PhoneTest &lt; ActiveSupport::TestCase
-  test "the fixture phone entry data are valid" do
+  test "the fixture phone entry data is valid" do
     assert Phone.new(phones(:one).attributes).valid?
     assert Phone.new(phones(:two).attributes).valid?
     assert Phone.new(phones(:three).attributes).valid?
+  end
+  
+  test "a phone without a person is not valid" do
+    phone = Phone.new(phones(:one).attributes)
+    phone.person.destroy
+    assert !phone.valid?
   end
 end
 </programlisting></para>
@@ -857,14 +871,15 @@ Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/ra
 Started
 
 PersonTest:
-     PASS the fixture people data are valid (0.08s) 
+     PASS the fixture people data are valid (0.04s) 
 
 PhoneTest:
-     PASS the fixture phone entry data are valid (0.04s) 
+     PASS a phone without a person is not valid (0.07s) 
+     PASS the fixture phone entry data is valid (0.00s) 
 
-Finished in 0.129876 seconds.
+Finished in 0.119441 seconds.
 
-2 tests, 5 assertions, 0 failures, 0 errors, 0 skips
+3 tests, 6 assertions, 0 failures, 0 errors, 0 skips
 Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
       </section>
 
@@ -885,7 +900,7 @@ Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
   firstname: Horst
   lastname: Meier
 
-<emphasis>email_meier:</emphasis>
+<emphasis>emil_meier:</emphasis>
   firstname: Emil
   lastname: Obermeier
 </programlisting></para>
@@ -905,7 +920,7 @@ two:
   number: 030 1234567
   
 three:
-<emphasis>  person: email_meier</emphasis>
+<emphasis>  person: emil_meier</emphasis>
   name: Handy
   number: 0172 9876543</programlisting></para>
 
@@ -915,7 +930,7 @@ three:
 class PersonTest &lt; ActiveSupport::TestCase
   test "the fixture people data are valid" do
     assert Person.new(people(:horst_meier).attributes).valid?
-    assert Person.new(people(:email_meier).attributes).valid?
+    assert Person.new(people(:emil_meier).attributes).valid?
   end
 end
 </programlisting></para>
@@ -924,16 +939,22 @@ end
         nicht:<programlisting>require 'test_helper'
 
 class PhoneTest &lt; ActiveSupport::TestCase
-  test "the fixture phone entry data are valid" do
+  test "the fixture phone entry data is valid" do
     assert Phone.new(phones(:one).attributes).valid?
     assert Phone.new(phones(:two).attributes).valid?
     assert Phone.new(phones(:three).attributes).valid?
+  end
+  
+  test "a phone without a person is not valid" do
+    phone = Phone.new(phones(:one).attributes)
+    phone.person.destroy
+    assert !phone.valid?
   end
 end
 </programlisting></para>
 
         <para>Mit einem <command>rake test:units</command> können wir
-        kontrollieren, ob wirklich alles zusammen läuft:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ rake test:units
+        kontrollieren, ob alles läuft:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake test:units</command>
 Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
 Started
 
@@ -941,11 +962,12 @@ PersonTest:
      PASS the fixture people data are valid (0.04s) 
 
 PhoneTest:
-     PASS the fixture phone entry data are valid (0.04s) 
+     PASS a phone without a person is not valid (0.07s) 
+     PASS the fixture phone entry data is valid (0.00s) 
 
-Finished in 0.084911 seconds.
+Finished in 0.119441 seconds.
 
-2 tests, 5 assertions, 0 failures, 0 errors, 0 skips
+3 tests, 6 assertions, 0 failures, 0 errors, 0 skips
 Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
       </section>
     </section>
