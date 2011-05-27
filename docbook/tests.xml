@@ -876,6 +876,77 @@ Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
         <para>Eine etwas charmantere Alternative zu <xref
         linkend="has_many_und_belongs_to_fixtures_statisch" /> ist die
         Verwendung von Label Referenzen. </para>
+
+        <para>Label sind Namen für einzelne Fixtures. Damit sieht die
+        <filename>test/fixtures/people.yml</filename> wie folgt
+        aus:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+<emphasis>horst_meier:</emphasis>
+  firstname: Horst
+  lastname: Meier
+
+<emphasis>email_meier:</emphasis>
+  firstname: Emil
+  lastname: Obermeier
+</programlisting></para>
+
+        <para>In der <filename>test/fixtures/phones.yml</filename> verweisen
+        wir jetzt nicht mehr auf die <varname>person_id</varname>, sondern auf
+        das Label der <varname>person</varname>:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+one:
+<emphasis>  person: horst_meier</emphasis>
+  name: Handy
+  number: 0171 1234567
+
+two:
+<emphasis>  person: horst_meier</emphasis>
+  name: Zu Hause
+  number: 030 1234567
+  
+three:
+<emphasis>  person: email_meier</emphasis>
+  name: Handy
+  number: 0172 9876543</programlisting></para>
+
+        <para>Die <filename>test/unit/person_test.rb</filename> enhält die
+        Tests für Person:<programlisting>require 'test_helper'
+
+class PersonTest &lt; ActiveSupport::TestCase
+  test "the fixture people data are valid" do
+    assert Person.new(people(:horst_meier).attributes).valid?
+    assert Person.new(people(:email_meier).attributes).valid?
+  end
+end
+</programlisting></para>
+
+        <para>Und <filename>test/unit/phone_test.rb</filename> ändert sich
+        nicht:<programlisting>require 'test_helper'
+
+class PhoneTest &lt; ActiveSupport::TestCase
+  test "the fixture phone entry data are valid" do
+    assert Phone.new(phones(:one).attributes).valid?
+    assert Phone.new(phones(:two).attributes).valid?
+    assert Phone.new(phones(:three).attributes).valid?
+  end
+end
+</programlisting></para>
+
+        <para>Mit einem <command>rake test:units</command> können wir
+        kontrollieren, ob wirklich alles zusammen läuft:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ rake test:units
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+PersonTest:
+     PASS the fixture people data are valid (0.04s) 
+
+PhoneTest:
+     PASS the fixture phone entry data are valid (0.04s) 
+
+Finished in 0.084911 seconds.
+
+2 tests, 5 assertions, 0 failures, 0 errors, 0 skips
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
       </section>
     </section>
   </section>
