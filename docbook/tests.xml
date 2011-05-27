@@ -29,6 +29,11 @@
     Code verändern und danach die Funktionsweise anhand der Tests überprüfen.
     Es gibt dann kein "hmm... das ist jetzt dumm gelaufen, aber an diese
     Besonderheit habe ich nicht gedacht." mehr.</para>
+
+    <note>
+      <para>Testen ist wie Autofahren. Autofahren kann man auch nur beim
+      Autofahren lernen.</para>
+    </note>
   </section>
 
   <section xml:id="testing_beispiel_webshop">
@@ -375,10 +380,11 @@ end
         <para>Bei jedem Test (also bei jedem Durchlauf von <command>rake
         test</command>) wird automatisch eine frische und damit leere
         Test-Datenbank angelegt. Das ist eine andere Datenbank als die auf die
-        Sie mit <command>rails console</command> zugreifen (das ist die
-        Development-Datenbank). Die Datenbanken werden in der
+        Sie per Default mit <command>rails console</command> zugreifen (das
+        ist die Development-Datenbank). Die Datenbanken werden in der
         Konfigurationsdatei <filename>config/database.yml</filename>
-        definiert.</para>
+        definiert. Auf die Test-Datenbank können Sie zu Debug-Zwecken mit
+        <command>rails console test</command> zugreifen.</para>
       </important>
 
       <para>Danach werden in diesem Functional-Test verschiedene
@@ -698,13 +704,41 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
   <section xml:id="testing_fixtures">
     <title xml:id="testing_fixtures.title">Fixtures</title>
 
-    <para>Man muss Fixtures nicht im YAML Format definieren, aber ich halte es
-    für die praktischste Variante. Alternativen (z.B. CSV) dazu finden Sie
-    unter <uri
-    xlink:href="http://api.rubyonrails.org/classes/Fixtures.html">http://api.rubyonrails.org/classes/Fixtures.html</uri>.</para>
+    <para>Mit Fixtures werden Beispieldaten für Tests generiert. Das
+    Default-Format dafür ist YAML. Die Dateien dafür finden sich im
+    Verzeichnis <filename>test/fixtures/</filename> und werden <command>rails
+    generate</command> automatisch mit erstellt. Sie können aber natürlich
+    auch eigene Dateien definieren. Alle Fixtures werden per Default bei jedem
+    Test neu in die Test-Datenbank geladen.<footnote>
+        <para>Beispiele für Alternativformate (z.B. CSV) dazu finden Sie unter
+        <uri
+        xlink:href="http://api.rubyonrails.org/classes/Fixtures.html">http://api.rubyonrails.org/classes/Fixtures.html</uri>.</para>
+      </footnote></para>
 
-    <section>
-      <title>ERB in Fixtures</title>
+    <section xml:id="statische_fixtures">
+      <title xml:id="statische_fixtures.title">Statische Fixtures</title>
+
+      <para>Die einfachste Variante für Fixtures sind statische Daten. Das in
+      <xref linkend="testing_beispiel_webshop" /> benutze Fixture für
+      <varname>person</varname> sieht statisch so aus:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+one:
+  login_name: horst_meier
+  lastname: Meier
+  birthday: 1970-01-01
+
+two:
+  login_name: emil.maier
+  lastname: Maier
+  birthday: 1950-01-01
+</programlisting></para>
+
+      <para>Man schreibt die Daten einfach im YAML-Format in die entsprechende
+      Datei.</para>
+    </section>
+
+    <section xml:id="fixtures_mit_erb">
+      <title xml:id="fixtures_mit_erb.title">Fixtures mit ERB</title>
 
       <para>Statische YAML Fixtures sind manchmal zu unintelligent. In diesen
       Fällen kann man mit ERB arbeiten (siehe <xref
@@ -762,6 +796,11 @@ user_&lt;%= i %&gt;:
       <title xml:id="has_many_und_belongs_to_fixtures.title">has_many und
       belongs_to Fixtures</title>
 
+      <para>Bei <methodname>has_many</methodname> und
+      <methodname>belongs_to</methodname> Verbindungen müssen natürlich auch
+      die Fixtures entsprechend geschrieben werden, sonst passen die Daten
+      nicht zu einander.</para>
+
       <para>Nehmen wir einmal an, wir haben eine Telefonbuch Applikation mit
       Personen die beliebig viele Telefonnummern haben:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new phonebook</command>
 [...]
@@ -802,7 +841,7 @@ end</programlisting></para>
         xml:id="has_many_und_belongs_to_fixtures_statisch.title">Statische
         Variante</title>
 
-        <para>Wir können statische IDs vergeben. Dann sieht die
+        <para>Wir können statische IDs von Hand vergeben. Dann sieht die
         <filename>test/fixtures/people.yml</filename> wie folgt
         aus:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
 
@@ -817,8 +856,9 @@ two:
   lastname: Obermeier
 </programlisting></para>
 
-        <para>Und die <filename>test/fixtures/phones.yml</filename> sieht so
-        aus:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+        <para>Und in der <filename>test/fixtures/phones.yml</filename> werden
+        die person_id Einträge passend zum Inhalt von
+        <filename>test/fixtures/people.yml</filename> gesetzt:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
 
 one:
   person_id: 1
@@ -837,7 +877,7 @@ three:
 </programlisting></para>
 
         <para>Die <filename>test/unit/person_test.rb</filename> enhält die
-        Tests für Person:<programlisting>require 'test_helper'
+        Tests für <classname>Person</classname>:<programlisting>require 'test_helper'
 
 class PersonTest &lt; ActiveSupport::TestCase
   test "the fixture people data are valid" do
@@ -848,7 +888,7 @@ end
 </programlisting></para>
 
         <para>Und <filename>test/unit/phone_test.rb</filename> enthält die
-        Tests für Phone:<programlisting>require 'test_helper'
+        Tests für <classname>Phone</classname>:<programlisting>require 'test_helper'
 
 class PhoneTest &lt; ActiveSupport::TestCase
   test "the fixture phone entry data is valid" do
@@ -890,9 +930,9 @@ Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
 
         <para>Eine etwas charmantere Alternative zu <xref
         linkend="has_many_und_belongs_to_fixtures_statisch" /> ist die
-        Verwendung von Label Referenzen. </para>
+        Verwendung von Label Referenzen.</para>
 
-        <para>Label sind Namen für einzelne Fixtures. Damit sieht die
+        <para>Label sind die Namen für einzelne Fixtures. Damit sieht die
         <filename>test/fixtures/people.yml</filename> wie folgt
         aus:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
 
@@ -954,7 +994,7 @@ end
 </programlisting></para>
 
         <para>Mit einem <command>rake test:units</command> können wir
-        kontrollieren, ob alles läuft:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake test:units</command>
+        kontrollieren, ob alles korrekt ist:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake test:units</command>
 Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
 Started
 
@@ -971,5 +1011,297 @@ Finished in 0.119441 seconds.
 Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
       </section>
     </section>
+  </section>
+
+  <section xml:id="unit_tests">
+    <title xml:id="unit_tests.title">Unit Tests</title>
+
+    <para>In <xref linkend="testing_beispiel_webshop" /> wurde die Grundidee
+    von Unit Tests erklärt. Es geht bei Unit Tests darum die Funktionsweise
+    der Model zu testen. Also unabhängig von Controllern und Views. Alle Unit
+    Tests werden im Verzeichnis <filename>test/unit/</filename> gespeichert.
+    <command>rake generate</command> generiert automatisch diese Dateien. Sie
+    können aber natürlich auch per Hand erstellt werden. Vor dem Ausführen der
+    Tests wird die Test-Datenbank mit Test-Daten gefüllt (siehe <xref
+    linkend="testing_fixtures" />).</para>
+
+    <para>In der perfekten Welt würde man im Unit-Test alles Testen, das
+    irgendwie schief gehen kann und zwar einmal mit einem Positiv- und einmal
+    mit einem Negativ-Test. Das heißt man würde beispielsweise für jede
+    Validierung mindestens ein Beispiel durchgehen, in dem jeweils ein
+    korrekter und ein inkorrekter Datensatz geprüft wird. Das gleiche gilt für
+    jede Methode des Models.</para>
+
+    <para>Schauen wir uns noch mal die Datei
+    <filename>test/unit/phone_test.rb</filename> aus <xref
+    linkend="has_many_und_belongs_to_fixtures_label_referenz" />
+    an:<programlisting>require 'test_helper'
+
+class PhoneTest &lt; ActiveSupport::TestCase
+  test "the fixture phone entry data is valid" do
+    assert Phone.new(phones(:one).attributes).valid?
+    assert Phone.new(phones(:two).attributes).valid?
+    assert Phone.new(phones(:three).attributes).valid?
+  end
+  
+  test "a phone without a person is not valid" do
+    phone = Phone.new(phones(:one).attributes)
+    phone.person.destroy
+    assert !phone.valid?
+  end
+end
+</programlisting></para>
+
+    <para>Ein Test besteht also immer aus folgender Struktur:<programlisting>test "eine Behauptung" do
+  assert etwas_ist_true_oder_false
+end</programlisting></para>
+
+    <para>Das Wort <code>assert</code> bedeutet in diesem Kontext behaupten
+    oder feststellen. Es wird also eine Behauptung aufgestellt. Wenn diese
+    Behauptung <code>true</code> ist, dann läuft der Test durch und alles ist
+    OK. Wenn diese Behauptung <code>false</code> ist, schlägt der Test fehl
+    und wir haben ein Fehler im Programm. Wenn Sie sich einmal auf <uri
+    xlink:href="http://guides.rubyonrails.org/testing.html">http://guides.rubyonrails.org/testing.html</uri>
+    umschauen, dann werden Sie sehen, das es noch ein paar andere
+    <code>assert</code>-Varianten gibt:<itemizedlist>
+        <listitem>
+          <para><code>assert( boolean, [msg] )</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_equal( obj1, obj2, [msg] )</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_not_equal( obj1, obj2, [msg] )</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_same( obj1, obj2, [msg] )</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_not_same( obj1, obj2, [msg] )</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_nil( obj, [msg] )</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_not_nil( obj, [msg] )</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_match( regexp, string, [msg] )</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_no_match( regexp, string, [msg] )</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_in_delta( expecting, actual, delta, [msg]
+          )</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_throws( symbol, [msg] ) { block }</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_raise( exception1, exception2, ... ) { block
+          }</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_nothing_raised( exception1, exception2, ... ) {
+          block }</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_instance_of( class, obj, [msg] )</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_kind_of( class, obj, [msg] )</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_respond_to( obj, symbol, [msg] )</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_operator( obj1, operator, obj2, [msg]
+          )</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_send( array, [msg] )</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_difference(expressions, difference = 1, message =
+          nil) {...}</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_no_difference(expressions, message = nil,
+          &amp;block)</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_recognizes(expected_options, path, extras={},
+          message=nil)</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_generates(expected_path, options, defaults={},
+          extras = {}, message=nil)</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_response(type, message = nil)</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_redirected_to(options = {},
+          message=nil)</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>assert_template(expected = nil,
+          message=nil)</code></para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>Leider habe ich ein schlechtes Gedächnis und kann mir diese ganzen
+    Spezialfälle nicht merken. Ist aber auch kein Problem, denn eigentlich
+    kann man auch alles mit einem <code>assert</code> abdecken. Wenn ich also
+    einen Spezialfall mit dem entsprechendem Spezial-assert abbilden will,
+    dann muss ich es auf <uri
+    xlink:href="http://guides.rubyonrails.org/testing.html">http://guides.rubyonrails.org/testing.html</uri>
+    nachschlagen. Oder ich baue mir mit einem einfachen assert die gleiche
+    Behauptung als false/true Szenario auf.</para>
+  </section>
+
+  <section xml:id="functional_tests">
+    <title xml:id="functional_tests.title">Functional Tests</title>
+
+    <para>In <xref linkend="testing_beispiel_webshop" /> wurde die Grundidee
+    für Functional Tests erklärt. Es geht bei Functional Tests darum die
+    Funktionsweise der Webseite zu testen. Dabei werden sowohl die Views wie
+    auch die Controller zu den Views getestet. Der Befehl <command>rake
+    test:functionals</command> führt dabei echte Abfragen auf die
+    Rails-Application aus, die vorher mit Test-Daten gefüllt wurden (siehe
+    <xref linkend="testing_fixtures" />) aus. Alle Functional Tests werden im
+    Verzeichnis <filename>test/functional/</filename> gespeichert.
+    <command>rake generate</command> generiert automatisch diese Dateien. Sie
+    können aber natürlich auch per Hand erstellt werden.</para>
+
+    <para>Die von rails generate scaffold automatisch erzeugten Functional
+    Tests sind eine sehr gute Ausgangsplattform um detailierter in die
+    Functional Tests einzutauchen. </para>
+
+    <para>Nehmen wir noch einmal eine Telefonbuch Applikation mit Personen die
+    beliebig viele Telefonnummern haben als Grundlage:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new phonebook</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>cd phonebook</command>
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>bundle install</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rails generate scaffold person firstname:string lastname:string</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rails generate scaffold phone person_id:integer name:string number:string</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake db:migrate</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
+
+    <para>In <filename>app/models/person.rb</filename> steht:<programlisting>class Person &lt; ActiveRecord::Base
+  has_many :phones
+
+  validates_presence_of :lastname
+end</programlisting></para>
+
+    <para>In <filename>app/models/phone.rb</filename> steht:<programlisting>class Phone &lt; ActiveRecord::Base
+  belongs_to :person
+
+  validates_presence_of :number
+  validates_presence_of :person_id
+  
+  validate :person_exists
+
+  private
+  def person_exists 
+    errors.add("person_id", "person is not existant") unless Person.exists?(self.person_id) 
+  end   
+end</programlisting></para>
+
+    <para>Für unsere Tests brauchen wir noch sinnvolle Beispieldaten. Die
+    <filename>test/fixtures/people.yml</filename> füllen wir wie
+    folgt:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+one:
+  id: 1
+  firstname: Horst
+  lastname: Meier
+
+two:
+  id: 2
+  firstname: Emil
+  lastname: Obermeier
+</programlisting></para>
+
+    <para>Und in der <filename>test/fixtures/phones.yml</filename> werden die
+    person_id Einträge passend zum Inhalt von
+    <filename>test/fixtures/people.yml</filename> gesetzt:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+one:
+  person_id: 1
+  name: Handy
+  number: 0171 1234567
+
+two:
+  person_id: 1
+  name: Zu Hause
+  number: 030 1234567
+  
+three:
+  person_id: 2
+  name: Handy
+  number: 0172 9876543
+</programlisting></para>
+
+    <note>
+      <para>Eigentlich sollten Sie jetzt noch die Unit Tests aus <xref
+      linkend="has_many_und_belongs_to_fixtures" /> übernehmen.</para>
+    </note>
+
+    <para><command>rake generate scaffold</command> hat uns die beiden
+    Functional Test Dateien <filename>people_controller_test.rb</filename> und
+    <filename>phones_controller_test.rb</filename> automatisch erstellt. Die
+    bilden eine perfekte Grundlage für uns.</para>
+
+    <para>Als erstes überprüfen wir, ob die Tests durchlaufen:</para>
+
+    <para></para>
+
+    <para></para>
+
+    <para></para>
+
+    <para></para>
+
+    <para></para>
+
+    <para></para>
+
+    <para></para>
+
+    <para></para>
+
+    <para></para>
+
+    <para></para>
   </section>
 </chapter>
