@@ -802,7 +802,8 @@ user_&lt;%= i %&gt;:
       nicht zu einander.</para>
 
       <para>Nehmen wir einmal an, wir haben eine Telefonbuch Applikation mit
-      Personen die beliebig viele Telefonnummern haben:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new phonebook</command>
+      Personen die beliebig viele Telefonnummern haben (siehe <xref
+      linkend="activerecord_has_many" />):<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new phonebook</command>
 [...]
 Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>cd phonebook</command>
 Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>bundle install</command>
@@ -1192,19 +1193,36 @@ end</programlisting></para>
     für Functional Tests erklärt. Es geht bei Functional Tests darum die
     Funktionsweise der Webseite zu testen. Dabei werden sowohl die Views wie
     auch die Controller zu den Views getestet. Der Befehl <command>rake
-    test:functionals</command> führt dabei echte Abfragen auf die
+    test:functionals</command> führt während des Tests echte Abfragen auf die
     Rails-Application aus, die vorher mit Test-Daten gefüllt wurden (siehe
     <xref linkend="testing_fixtures" />) aus. Alle Functional Tests werden im
     Verzeichnis <filename>test/functional/</filename> gespeichert.
     <command>rake generate</command> generiert automatisch diese Dateien. Sie
     können aber natürlich auch per Hand erstellt werden.</para>
 
-    <para>Die von rails generate scaffold automatisch erzeugten Functional
-    Tests sind eine sehr gute Ausgangsplattform um detailierter in die
-    Functional Tests einzutauchen. </para>
+    <para>Das Grundgerüst für einen Functional Test sieht immer so
+    aus:<programlisting>require 'test_helper'
 
-    <para>Nehmen wir noch einmal eine Telefonbuch Applikation mit Personen die
-    beliebig viele Telefonnummern haben als Grundlage:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new phonebook</command>
+class PeopleControllerTest &lt; ActionController::TestCase
+
+  test "should get something" do
+    get :something
+    assert_response :success
+  end
+
+end</programlisting></para>
+
+    <para>Die von <command>rails generate scaffold</command> automatisch
+    erzeugten Functional Tests sind meistens eine sehr gute Ausgangsplattform.
+    Diese kann man Schritt für Schritt erweitern. </para>
+
+    <section xml:id="workflow_veraenderung_mit_functional_test">
+      <title xml:id="workflow_veraenderung_mit_functional_test.title">Workflow
+      für eine Veränderung im Functional-Test und im Controller</title>
+
+      <para>Nehmen wir noch einmal eine Telefonbuch Applikation mit Personen
+      die beliebig viele Telefonnummern haben (siehe <xref
+      linkend="activerecord_has_many" />) als Grundlage:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new phonebook</command>
 [...]
 Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>cd phonebook</command>
 Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>bundle install</command>
@@ -1217,13 +1235,14 @@ Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake db:migrate</comm
 [...]
 Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
 
-    <para>In <filename>app/models/person.rb</filename> steht:<programlisting>class Person &lt; ActiveRecord::Base
+      <para>In <filename>app/models/person.rb</filename>
+      steht:<programlisting>class Person &lt; ActiveRecord::Base
   has_many :phones
 
   validates_presence_of :lastname
 end</programlisting></para>
 
-    <para>In <filename>app/models/phone.rb</filename> steht:<programlisting>class Phone &lt; ActiveRecord::Base
+      <para>In <filename>app/models/phone.rb</filename> steht:<programlisting>class Phone &lt; ActiveRecord::Base
   belongs_to :person
 
   validates_presence_of :number
@@ -1237,9 +1256,9 @@ end</programlisting></para>
   end   
 end</programlisting></para>
 
-    <para>Für unsere Tests brauchen wir noch sinnvolle Beispieldaten. Die
-    <filename>test/fixtures/people.yml</filename> füllen wir wie
-    folgt:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+      <para>Für unsere Tests brauchen wir noch sinnvolle Beispieldaten. Die
+      <filename>test/fixtures/people.yml</filename> füllen wir wie
+      folgt:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
 
 one:
   id: 1
@@ -1252,9 +1271,9 @@ two:
   lastname: Obermeier
 </programlisting></para>
 
-    <para>Und in der <filename>test/fixtures/phones.yml</filename> werden die
-    person_id Einträge passend zum Inhalt von
-    <filename>test/fixtures/people.yml</filename> gesetzt:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+      <para>Und in der <filename>test/fixtures/phones.yml</filename> werden
+      die person_id Einträge passend zum Inhalt von
+      <filename>test/fixtures/people.yml</filename> gesetzt:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
 
 one:
   person_id: 1
@@ -1272,36 +1291,412 @@ three:
   number: 0172 9876543
 </programlisting></para>
 
-    <note>
-      <para>Eigentlich sollten Sie jetzt noch die Unit Tests aus <xref
-      linkend="has_many_und_belongs_to_fixtures" /> übernehmen.</para>
-    </note>
+      <note>
+        <para>Eigentlich sollten Sie jetzt noch die Unit Tests aus <xref
+        linkend="has_many_und_belongs_to_fixtures" /> übernehmen.</para>
+      </note>
 
-    <para><command>rake generate scaffold</command> hat uns die beiden
-    Functional Test Dateien <filename>people_controller_test.rb</filename> und
-    <filename>phones_controller_test.rb</filename> automatisch erstellt. Die
-    bilden eine perfekte Grundlage für uns.</para>
+      <para><command>rake generate scaffold</command> hat uns die beiden
+      Functional Test Dateien <filename>people_controller_test.rb</filename>
+      und <filename>phones_controller_test.rb</filename> automatisch erstellt.
+      Diese Dateien bilden eine perfekte Grundlage für uns.</para>
 
-    <para>Als erstes überprüfen wir, ob die Tests durchlaufen:</para>
+      <para>Als erstes überprüfen wir, ob die Tests durchlaufen:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake test:functionals</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
 
-    <para></para>
+PeopleControllerTest:
+     PASS should create person (0.11s) 
+     PASS should destroy person (0.01s) 
+     PASS should get edit (0.07s) 
+     PASS should get index (0.01s) 
+     PASS should get new (0.01s) 
+     PASS should show person (0.01s) 
+     PASS should update person (0.01s) 
 
-    <para></para>
+PhonesControllerTest:
+     PASS should create phone (0.05s) 
+     PASS should destroy phone (0.01s) 
+     PASS should get edit (0.01s) 
+     PASS should get index (0.05s) 
+     PASS should get new (0.01s) 
+     PASS should show phone (0.01s) 
+     PASS should update phone (0.01s) 
 
-    <para></para>
+Finished in 0.357404 seconds.
 
-    <para></para>
+14 tests, 20 assertions, 0 failures, 0 errors, 0 skips
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ </screen></para>
 
-    <para></para>
+      <para>Schauen wir uns mal
+      <filename>test/functional/people_controller_test.rb</filename>
+      an:<programlisting>require 'test_helper'
 
-    <para></para>
+class PeopleControllerTest &lt; ActionController::TestCase
+  setup do
+    @person = people(:one)
+  end
 
-    <para></para>
+  test "should get index" do
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:people)
+  end
 
-    <para></para>
+  test "should get new" do
+    get :new
+    assert_response :success
+  end
 
-    <para></para>
+  test "should create person" do
+    assert_difference('Person.count') do
+      post :create, person: @person.attributes
+    end
 
-    <para></para>
+    assert_redirected_to person_path(assigns(:person))
+  end
+
+  test "should show person" do
+    get :show, id: @person.to_param
+    assert_response :success
+  end
+
+  test "should get edit" do
+    get :edit, id: @person.to_param
+    assert_response :success
+  end
+
+  test "should update person" do
+    put :update, id: @person.to_param, person: @person.attributes
+    assert_redirected_to person_path(assigns(:person))
+  end
+
+  test "should destroy person" do
+    assert_difference('Person.count', -1) do
+      delete :destroy, id: @person.to_param
+    end
+
+    assert_redirected_to people_path
+  end
+end
+</programlisting></para>
+
+      <para>Wir möchten folgende Änderung in der Applikation vornehmen:
+      Nachdem eine neue <classname>person</classname> anlegt wird, soll nicht
+      <code>person#show</code> (<code>person_path</code>), sondern
+      <code>person#index</code> (<code>people_path</code>) angesprungen
+      werden. Es soll also nicht der eben gerade angelegte Datensatz einzelnd
+      sondern alle Datensätze in einer Tabelle angezeigt werden. </para>
+
+      <para>Dazu müssen wir folgenden Test ändern:<programlisting>  test "should create person" do
+    assert_difference('Person.count') do
+      post :create, person: @person.attributes
+    end
+
+    assert_redirected_to person_path(assigns(:person))
+  end
+</programlisting></para>
+
+      <para>Und zwar muss der <code>assert_redirect_to</code> wie folgt
+      geändert werden:<programlisting>  test "should create person" do
+    assert_difference('Person.count') do
+      post :create, person: @person.attributes
+    end
+
+    <emphasis>assert_redirected_to people_path</emphasis>
+  end</programlisting></para>
+
+      <para>Der Test wird natürlich jetzt einen Fehler ausgeben:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake test:functionals</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+PeopleControllerTest:
+     FAIL should create person (0.11s) 
+          Expected response to be a redirect to &lt;http://test.host/people&gt; but was a redirect to &lt;http://test.host/people/3&gt;
+          /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/actionpack-3.1.0.rc1/lib/action_dispatch/testing/assertions/response.rb:74:in `assert_redirected_to'
+
+     PASS should destroy person (0.01s) 
+     PASS should get edit (0.07s) 
+     PASS should get index (0.01s) 
+     PASS should get new (0.01s) 
+     PASS should show person (0.01s) 
+     PASS should update person (0.01s) 
+
+PhonesControllerTest:
+     PASS should create phone (0.05s) 
+     PASS should destroy phone (0.01s) 
+     PASS should get edit (0.01s) 
+     PASS should get index (0.05s) 
+     PASS should get new (0.01s) 
+     PASS should show phone (0.01s) 
+     PASS should update phone (0.01s) 
+
+Finished in 0.357209 seconds.
+
+14 tests, 21 assertions, 1 failures, 0 errors, 0 skips
+rake aborted!
+Command failed with status (1): [/Users/stefan/.rvm/rubies/ruby-1.9.2-p180/...]
+
+Tasks: TOP =&gt; test:functionals
+(See full trace by running task with --trace)
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
+
+      <para>Die Fehlermeldung <errortext>Expected response to be a redirect to
+      &lt;http://test.host/people&gt; but was a redirect to
+      &lt;http://test.host/people/3&gt;</errortext> ist dabei selbsterklärend.
+      Wir müssen im Controller
+      <filename>app/controllers/people_controller.rb</filename> die
+      <methodname>create</methodname> Methode so verändern, das nach dem
+      Anlegen des Datensatzes ein Redirect auf die <code>people_url</code>
+      erfolgt:<programlisting>  def create
+    @person = Person.new(params[:person])
+
+    respond_to do |format|
+      if @person.save
+        <emphasis>format.html { redirect_to people_url }</emphasis>
+        format.json { render json: @person, status: :created, location: @person }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @person.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+</programlisting></para>
+
+      <para>Jetzt läuft <command>rake test:functionals</command> wieder sauber
+      durch:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake test:functionals</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+PeopleControllerTest:
+     PASS should create person (0.11s) 
+     PASS should destroy person (0.01s) 
+     PASS should get edit (0.07s) 
+     PASS should get index (0.01s) 
+     PASS should get new (0.01s) 
+     PASS should show person (0.01s) 
+     PASS should update person (0.01s) 
+
+PhonesControllerTest:
+     PASS should create phone (0.08s) 
+     PASS should destroy phone (0.01s) 
+     PASS should get edit (0.01s) 
+     PASS should get index (0.01s) 
+     PASS should get new (0.01s) 
+     PASS should show phone (0.01s) 
+     PASS should update phone (0.01s) 
+
+Finished in 0.349060 seconds.
+
+14 tests, 20 assertions, 0 failures, 0 errors, 0 skips
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
+    </section>
+
+    <section>
+      <title>Flash-Nachrichten testen</title>
+
+      <para>Mit Funktional-Tests kann man auch die Übergabe und das Anzeigen
+      von Flash-Nachrichten (siehe <xref linkend="flash" />) überprüfen. Ich
+      zeige Ihnen das mal an einer kleinen Ping-Pong
+      Rails-Applikation:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new ping-pong</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>cd ping-pong</command>
+Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$ <command>bundle install</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$ <command>rails generate controller Home ping pong</command>
+      create  app/controllers/home_controller.rb
+       route  get "home/pong"
+       route  get "home/ping"
+      invoke  erb
+      create    app/views/home
+      create    app/views/home/ping.html.erb
+      create    app/views/home/pong.html.erb
+      invoke  test_unit
+      create    test/functional/home_controller_test.rb
+      invoke  helper
+      create    app/helpers/home_helper.rb
+      invoke    test_unit
+      create      test/unit/helpers/home_helper_test.rb
+      invoke  assets
+      create    app/assets/javascripts/home.js.coffee
+      create    app/assets/stylesheets/home.css.scss
+Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$ <command>rake db:migrate</command>
+Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$</screen></para>
+
+      <para>Ziel der Applikation soll es sein, beim Aufruf der Seite
+      <uri>/home/ping</uri> auf die Seite <uri>/home/pong</uri> umgeleitet zu
+      werden und eine Flashnachricht "<code>Sie wurden von Ping nach Pong
+      umgeleitet.</code>" zu sehen. Wenn man direkt <uri>/home/pong</uri>
+      öffnet wird keine Flash-Nachricht angezeigt.</para>
+
+      <para>Der von <command>rails generate controller Home ping
+      pong</command> generiete Standardtest in der Datei
+      <filename>test/functional/home_controller_test.rb</filename> sieht so
+      aus:<programlisting>require 'test_helper'
+
+class HomeControllerTest &lt; ActionController::TestCase
+  test "should get ping" do
+    get :ping
+    assert_response :success
+  end
+
+  test "should get pong" do
+    get :pong
+    assert_response :success
+  end
+
+end
+</programlisting></para>
+
+      <para>Als erstes ändern wir den "<code>should get ping</code>" Test so
+      ab, das ein Redirect auf <uri>/home/pong</uri> erwartet
+      wird:<programlisting>require 'test_helper'
+
+class HomeControllerTest &lt; ActionController::TestCase
+<emphasis>  test "ping should be redirected to pong" do
+    get :ping
+    assert_redirected_to home_pong_url
+  end</emphasis>
+
+  test "should get pong" do
+    get :pong
+    assert_response :success
+  end
+
+end
+</programlisting></para>
+
+      <para>Ein <command>rake test:functionals</command> Lauf zeigt das
+      erwartete Ergebenis:<screen>Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$ <command>rake test:functionals</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+HomeControllerTest:
+     FAIL ping should be redirected to pong (0.09s) 
+          Expected response to be a &lt;:redirect&gt;, but was &lt;200&gt;
+          /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/actionpack-3.1.0.rc1/lib/action_dispatch/testing/assertions/response.rb:45:in `assert_response'
+
+     PASS should get pong (0.00s) 
+
+Finished in 0.096260 seconds.
+
+2 tests, 2 assertions, 1 failures, 0 errors, 0 skips
+rake aborted!
+Command failed with status (1): [/Users/stefan/.rvm/rubies/ruby-1.9.2-p180/...]
+
+Tasks: TOP =&gt; test:functionals
+(See full trace by running task with --trace)
+Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$</screen></para>
+
+      <para>Die Rails-Applikation hat die Seite <uri>/home/ping</uri> ganz
+      normal mit einem HTTP-Code 200 (erfolgreich) ausgeliefert. Da der
+      erwartete Redirect nicht stattgefunden hat, wird dies als Fehler
+      (<code>FAIL</code>) angezeigt.</para>
+
+      <para>Ändern wir mal den Controller in der Datei
+      <filename>app/controllers/home_controller.rb</filename> so ab, das ein
+      Redirect ausgeführt wird:<programlisting>class HomeController &lt; ApplicationController
+  def ping
+    redirect_to home_pong_url
+  end
+
+  def pong
+  end
+
+end
+</programlisting></para>
+
+      <para>Damit läuft der Test problemlos durch:<screen>Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$ <command>rake test:functionals</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+HomeControllerTest:
+     PASS ping should be redirected to pong (0.04s) 
+     PASS should get pong (0.05s) 
+
+Finished in 0.095929 seconds.
+
+2 tests, 2 assertions, 0 failures, 0 errors, 0 skips
+Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$ </screen></para>
+
+      <para>Es fehlt aber noch die "<code>Sie wurden von Ping nach Pong
+      umgeleitet.</code>" Flash-Meldung. Erweitern wir den Test
+      entsprechend:<programlisting>require 'test_helper'
+
+class HomeControllerTest &lt; ActionController::TestCase
+  test "ping should be redirected to pong" do
+    get :ping
+    assert_redirected_to home_pong_url
+    <emphasis>assert_equal 'Sie wurden von Ping nach Pong umgeleitet.', flash[:notice]</emphasis>
+  end
+
+  test "should get pong" do
+    get :pong
+    assert_response :success
+  end
+
+end
+</programlisting></para>
+
+      <para>Erwartungsgemäß liefert er einen Fehler:<screen>Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$ <command>rake test:functionals</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+HomeControllerTest:
+     FAIL ping should be redirected to pong (0.04s) 
+          &lt;"Sie wurden von Ping nach Pong umgeleitet."&gt; expected but was
+&lt;nil&gt;.
+          /Users/stefan/ping-pong/test/functional/home_controller_test.rb:7:in `block in &lt;class:HomeControllerTest&gt;'
+
+     PASS should get pong (0.05s) 
+
+Finished in 0.097190 seconds.
+
+2 tests, 3 assertions, 1 failures, 0 errors, 0 skips
+rake aborted!
+Command failed with status (1): [/Users/stefan/.rvm/rubies/ruby-1.9.2-p180/...]
+
+Tasks: TOP =&gt; test:functionals
+(See full trace by running task with --trace)
+Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$</screen></para>
+
+      <para>Erweitern wir den Controller:<programlisting>class HomeController &lt; ApplicationController
+  def ping
+    <emphasis>redirect_to home_pong_url, :notice =&gt; 'Sie wurden von Ping nach Pong umgeleitet.'</emphasis>
+  end
+
+  def pong
+  end
+
+end
+</programlisting></para>
+
+      <para>Der Test läuft sauber durch:<screen>Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$ <command>rake test:functionals</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+HomeControllerTest:
+     PASS ping should be redirected to pong (0.04s) 
+     PASS should get pong (0.05s) 
+
+Finished in 0.094714 seconds.
+
+2 tests, 3 assertions, 0 failures, 0 errors, 0 skips
+Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$</screen></para>
+
+      <para>Die Sache hat aber noch einen Hacken: Starten Sie einmal mit
+      <command>rails server</command> die Applikation und gehen Sie mit Ihrem
+      Browser auf <uri
+      xlink:href="http://0.0.0.0:3000/home/ping">http://0.0.0.0:3000/home/ping</uri>.
+      Sie werden korrekt auf <uri
+      xlink:href="http://0.0.0.0:3000/home/pong">http://0.0.0.0:3000/home/pong</uri>
+      umgeleitet, sehen aber keine Flash-Nachricht. Diese wird im Controller
+      <filename>app/controllers/home_controller.rb</filename> korrekt
+      definiert, aber im View
+      <filename>app/views/home/pong.html.erb</filename> nicht
+      angezeigt.</para>
+
+      <para></para>
+    </section>
   </section>
 </chapter>
