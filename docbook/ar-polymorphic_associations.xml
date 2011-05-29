@@ -16,12 +16,12 @@
     <secondary>Polymorphic Associations</secondary>
   </indexterm>
 
-  <para>Schon das Wort "polymorph" lässt einen angespannt werden. Was mag
+  <para>Schon das Wort "polymorph" lässt einen angespannt werden. Was kann
   damit gemeint sein? Auf <uri
   xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html">http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html</uri>
   steht dazu: <quote>Polymorphic associations on models are not restricted on
   what types of models they can be associated with.</quote> Na, das ist ja
-  jetzt klar wir Kloßbrühe! ;-)</para>
+  jetzt klar wie Kloßbrühe! ;-)</para>
 
   <para>Ein Beispiel! Nehmen wir an, dass wir zu den Personen und den
   Telefonnummern in unserer Applikation Kommentare einbauen wollen. Und zwar
@@ -30,15 +30,15 @@
   anlegen und jeweils eine <methodname>has_many</methodname>-Verbindung zu
   <classname>Person</classname> oder zu <classname>Phonenumber</classname>
   aufbauen. Bei zweien würde das sogar noch halbwegs praktikabel sein. Aber
-  stellen Sie sich mal vor, Sie hätten gerne bei mehr Daten solche Kommentare.
-  Dafür jedesmal ein eigenes <foreignphrase
+  stellen Sie sich mal vor, Sie hätten gerne bei mehr Daten derartige
+  Kommentare. Dafür jedes Mal ein eigenes <foreignphrase
   xml:lang="en">Model</foreignphrase> bauen? Genau da kommt die <foreignphrase
   xml:lang="en">Polymorphic Association</foreignphrase> zum Tragen. Damit
   können Sie ein <foreignphrase xml:lang="en">Model</foreignphrase>
   <classname>Comment</classname> mit beliebig vielen anderen Modellen
   verknüpfen.</para>
 
-  <para>Erstellen wir erst mal das <foreignphrase
+  <para>Erstellen wir zuerst das <foreignphrase
   xml:lang="en">Model</foreignphrase> <classname>Comment</classname>:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails generate model Comment commentable_type:string commentable_id:integer comment:string</command>
       invoke  active_record
       create    db/migrate/20101011084411_create_comments.rb
@@ -71,14 +71,14 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 end</programlisting></para>
 
   <para>Jetzt den Eintrag in
-  <filename>app/models/person.rb</filename><programlisting>class Person &lt; ActiveRecord::Base
+  <filename>app/models/person.rb:</filename><programlisting>class Person &lt; ActiveRecord::Base
   has_many :phonenumbers, :dependent =&gt; :destroy
   
   has_many :comments, :as =&gt; :commentable
 end</programlisting></para>
 
   <para>Und noch den Eintrag in
-  <filename>app/models/phonenumber.rb</filename><programlisting>class Phonenumber &lt; ActiveRecord::Base
+  <filename>app/models/phonenumber.rb:</filename><programlisting>class Phonenumber &lt; ActiveRecord::Base
   belongs_to :person
   
   has_many :comments, :as =&gt; :commentable
@@ -127,8 +127,8 @@ db/development.sqlite3 already exists
 stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
 
   <para>Gehen wir mal in die <foreignphrase
-  xml:lang="en">Console</foreignphrase> und versuchen mal zwei Kommentare zu
-  Herrn Fritz Meier anzulegen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
+  xml:lang="en">Console</foreignphrase> und versuchen zwei Kommentare zu Herrn
+  Fritz Meier anzulegen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
 ruby-1.9.2-p0 &gt; <command>fritz = Person.first</command>
@@ -148,14 +148,14 @@ ruby-1.9.2-p0 &gt; <command>fritz.comments.count</command>
 
 ruby-1.9.2-p0 &gt; </screen></para>
 
-  <para>Das funktioniert also. Schauen wir uns mal den ersten Kommentar
+  <para>Das funktioniert also. Schauen wir uns jetzt den ersten Kommentar
   an:<screen>ruby-1.9.2-p0 &gt; <command>Comment.first</command>
  =&gt; #&lt;Comment id: 1, commentable_type: "Person", commentable_id: 1, comment: "Ein Beispiel", created_at: "2010-10-11 09:07:38", updated_at: "2010-10-11 09:07:38"&gt; 
 
 ruby-1.9.2-p0 &gt; </screen></para>
 
-  <para>Alles logisch. Alles gut. Aber so wie ich Sie einschätze wollen Sie
-  jetzt auch sehen wie das mit Telefonnummern geht. Kein Problem:<screen>ruby-1.9.2-p0 &gt; <command>Phonenumber.first.comments.create( :comment =&gt; 'Und wieder ein Beispiel.' )</command>
+  <para>Alles logisch. Alles gut. Aber so wie ich Sie einschätze, wollen Sie
+  jetzt auch sehen, wie das mit Telefonnummern geht. Kein Problem:<screen>ruby-1.9.2-p0 &gt; <command>Phonenumber.first.comments.create( :comment =&gt; 'Und wieder ein Beispiel.' )</command>
  =&gt; #&lt;Comment id: 3, commentable_type: "Phonenumber", commentable_id: 1, comment: "Und wieder ein Beispiel.", created_at: "2010-10-11 09:17:29", updated_at: "2010-10-11 09:17:29"&gt; 
 
 ruby-1.9.2-p0 &gt; <command>Phonenumber.first.comments.create( :comment =&gt; 'xyz Beispiel' )</command>

@@ -10,9 +10,9 @@
 
   <para>Die Methoden <methodname>first</methodname> und
   <methodname>all</methodname> sind ja schon ganz nett, aber meistens will man
-  ja doch nach etwas ganz bestimmten suchen.</para>
+  ja doch nach etwas ganz Bestimmten suchen.</para>
 
-  <para>Für die hier verwendeten Beispiele verwenden Sie bitte die Datei
+  <para>Für die hier verwendeten Beispiele nehmen Sie bitte die Datei
   <filename>db/seeds.rb</filename> mit folgendem Inhalt:<programlisting>Album.create("name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "position"=&gt;1, "release_year"=&gt;1967)
 Album.create("name"=&gt;"Pet Sounds", "position"=&gt;2, "release_year"=&gt;1966)
 Album.create("name"=&gt;"Revolver", "position"=&gt;3, "release_year"=&gt;1966)
@@ -116,7 +116,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
   Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" = 1966)
   SQL (0.2ms)  SELECT COUNT(*) AS count_id FROM (SELECT 1 FROM "albums" WHERE ("albums"."release_year" = 1966)) AS subquery</programlisting></para>
 
-    <para>Sie können mir <methodname>where</methodname> auch nach
+    <para>Sie können mit <methodname>where</methodname> auch nach
     <foreignphrase xml:lang="en">Ranges</foreignphrase> (Bereichen, siehe
     <xref linkend="range_class" />) suchen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
@@ -163,7 +163,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     SQL-Abfrage:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" IN (1966, 1968))</programlisting></para>
 
     <important>
-      <para>Das Ergebnis von <methodname>where</methodname> is immer ein
+      <para>Das Ergebnis von <methodname>where</methodname> ist immer ein
       Array. Auch wenn nur ein Treffer drin ist oder auch wenn gar kein
       Treffer zurückgegeben wird. Wenn Sie den ersten Treffer suchen, dann
       müssen Sie <methodname>where</methodname> mit der Methode
@@ -180,9 +180,9 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <section xml:id="activerecord_sql">
       <title xml:id="activerecord_sql.title">SQL-Abfragen mit where</title>
 
-      <para>Manchmal kommt man nicht drum rum und muss tatsächlich eine
+      <para>Manchmal kommt man nicht umhin und muss tatsächlich eine
       SQL-Abfrage selber definieren und durchführen. Es gibt in ActiveRecord
-      zwei verschiedene Arten dies zu machen. Die eine <quote>reinigt</quote>
+      zwei verschiedene Arten, dies zu machen. Die eine <quote>reinigt</quote>
       (<foreignphrase xml:lang="en">sanitize</foreignphrase>) jede Abfrage vor
       dem Ausführen und die andere gibt die Abfrage 1 zu 1 so an die
       SQL-Datenbank weiter. Im Normalfall sollte man immer die sanitize
@@ -192,8 +192,8 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       xlink:href="http://de.wikipedia.org/wiki/SQL-Injection">http://de.wikipedia.org/wiki/SQL-Injection</uri>).</para>
 
       <para>Falls Sie sich mit SQL nicht auskennen, dann können Sie diesen
-      Abschnitt ruhig überspringen. Die hier benutzen SQL-Befehle werden nicht
-      gesondert erklärt.</para>
+      Abschnitt ruhig überspringen. Die hier verwendeten SQL-Befehle werden
+      nicht gesondert erklärt.</para>
 
       <section>
         <title>sanitized (gereinigte) Abfragen</title>
@@ -202,7 +202,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
         ein Fragezeichen als Platzhalter ersetzt und erst nach dem SQL-String
         als Parameter aufgelistet.</para>
 
-        <para>Suchen wir einmal alle Alben in deren Namen der String
+        <para>Nachfolgend suchen wir alle Alben, in deren Namen der String
         <quote>on</quote> enthalten ist:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
@@ -215,7 +215,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
         <para>Die SQL-Abfrage wird korrekt ausgeführt (Auszug aus
         <filename>log/development.log</filename>):<programlisting>  Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE (name like '%on%')</programlisting></para>
 
-        <para>Jetzt alle Alben die ab 1965 veröffentlicht wurden:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+        <para>Jetzt alle Alben, die ab 1965 veröffentlicht wurden:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
 ruby-1.9.2-p0 &gt; <command>Album.where( "release_year &gt; ?", 1964 )</command>
@@ -227,7 +227,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
         <para>Auszug aus
         <filename>log/development.log</filename>:<programlisting>  Album Load (0.5ms)  SELECT "albums".* FROM "albums" WHERE (release_year &gt; 1964)</programlisting></para>
 
-        <para>Alle Alben die jünger als 1970 sind und deren Namen den String
+        <para>Alle Alben, die jünger als 1970 sind und deren Namen den String
         <quote>on</quote> enthalten:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
@@ -261,12 +261,12 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       <section>
         <title><quote>Gefährliche</quote> SQL-Abfragen</title>
 
-        <para>Wenn Sie wirklich wissen was Sie tun, dann können Sie natürlich
+        <para>Wenn Sie wirklich wissen, was Sie tun, dann können Sie natürlich
         auch komplett die SQL-Abfrage definieren und auf das Reinigen
         (<foreignphrase xml:lang="en">sanitize</foreignphrase>) der Abfrage
         verzichten.</para>
 
-        <para>Suchen wir einmal alle Alben in deren Namen der String
+        <para>Suchen wir einmal alle Alben, in deren Namen der String
         <quote>on</quote> enthalten ist:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
@@ -286,9 +286,9 @@ ruby-1.9.2-p0 &gt; <command>Album.where( "name like '%on%'" ) == Album.where( "n
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
-        <para>Bitte benutzen Sie diese Variante nur, wenn Sie genau wissen was
-        Sie tun und nachdem Sie sich mit dem Thema SQL-Injections beschäftigt
-        haben (siehe <uri
+        <para>Bitte benutzen Sie diese Variante nur, wenn Sie genau wissen,
+        was Sie tun und nachdem Sie sich mit dem Thema SQL-Injections
+        beschäftigt haben (siehe <uri
         xlink:href="http://de.wikipedia.org/wiki/SQL-Injection">http://de.wikipedia.org/wiki/SQL-Injection</uri>).</para>
       </section>
     </section>
@@ -305,7 +305,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       <tertiary>order()</tertiary>
     </indexterm>
 
-    <para>Jede <methodname>where</methodname> Datenbank-Anfrage kann mit der
+    <para>Jede <methodname>where</methodname>-Datenbank-Anfrage kann mit der
     Methode <methodname>order</methodname> sortiert werden. Beispiel: Alle
     Alben aus den 60ern nach Namen sortiert:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
@@ -327,7 +327,7 @@ ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Hier noch die Ausgabe aus <filename>log/development.log</filename>
-    zu den beiden Suchen:<programlisting>  Album Load (0.5ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969) ORDER BY name
+    zu den beiden Suchläufen:<programlisting>  Album Load (0.5ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969) ORDER BY name
   Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1970 AND 1979) ORDER BY name DESC</programlisting></para>
   </section>
 
@@ -364,7 +364,7 @@ ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1960..1969 ).limit(
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
-    <para>Die ersten 5 Alben aus den 60ern nach dem Namen sortiert:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+    <para>Die ersten 5 Alben aus den 60ern nach Namen sortiert:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
 ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1960..1969 ).order(:release_year).limit(5).order(:name)</command>
@@ -374,7 +374,7 @@ ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Die zu den drei Abfragen gehörenden Einträge in der
-    <filename>log/development.log</filename> Datei:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" LIMIT 3
+    <filename>log/development.log</filename>-Datei:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" LIMIT 3
   Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969) LIMIT 5
   Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969) ORDER BY release_year, name LIMIT 5</programlisting></para>
 
@@ -393,7 +393,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       Startposition der Methode <methodname>limit</methodname> definiert
       werden.</para>
 
-      <para>Als erstes geben wir die ersten beiden Datensätze zurück und
+      <para>Als Erstes geben wir die ersten beiden Datensätze zurück und
       danach die ersten beiden Datensätze mit einem Offset von 5:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
@@ -423,12 +423,12 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       <tertiary>average()</tertiary>
     </indexterm>
 
-    <para>Mit der Methode <methodname>average</methodname> kann man den
+    <para>Mit der Methode <methodname>average</methodname> lässt sich der
     Durchschnitt der Werte in einer bestimmten Spalte in der Tabelle
-    ausrechnen. Dafür ist unser Datenmaterial nicht besonders geeignet, aber
-    versuchen wir mal zwei Beispiele aus den Fingern zu saugen. Als erstes
-    berechnen wir das Durchschnitts-Veröffentlichungsjahr aller Alben und
-    danach das gleiche für die Alben aus den 60ern:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+    ausrechnen. Dafür ist unser Datenmaterial nicht besonders gut geeignet,
+    aber wir versuchen mal, uns zwei Beispiele aus den Fingern zu saugen. Als
+    Erstes berechnen wir das Durchschnitts-Veröffentlichungsjahr aller Alben
+    und danach das Gleiche für die Alben aus den 60ern:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
 ruby-1.9.2-p0 &gt; <command>Album.average(:release_year)</command>
@@ -504,7 +504,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <para>Die Methode <methodname>count</methodname> zählt die Anzahl der
     Datensätze.</para>
 
-    <para>Als erstes geben wir die Anzahl aller Alben in der Datenbank zurück
+    <para>Als Erstes geben wir die Anzahl aller Alben in der Datenbank zurück
     und danach die Anzahl der Alben in den 60ern:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
@@ -536,8 +536,8 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <para>Mit der Methode <methodname>maximum</methodname> kann aus einer
     Abfrage der Eintrag mit dem höchsten Wert ausgegeben werden.</para>
 
-    <para>Als erstes suchen wir aus allen Alben das mit dem höchsten
-    Veröffentlichungsjahr und dann das gleiche für alle Alben aus den
+    <para>Zuerst suchen wir aus allen Alben das mit dem höchsten
+    Veröffentlichungsjahr und dann das Gleiche für alle Alben aus den
     60ern:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
@@ -570,8 +570,8 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <para>Mit der Methode <methodname>minimum</methodname> kann aus einer
     Abfrage der Eintrag mit dem niedrigsten Wert ausgegeben werden.</para>
 
-    <para>Als erstes suchen wir aus allen Alben das mit dem niedrigsten
-    Veröffentlichungsjahr und dann das gleiche für alle Alben aus den
+    <para>Als Erstes suchen wir aus allen Alben das mit dem niedrigsten
+    Veröffentlichungsjahr und dann das Gleiche für alle Alben aus den
     70ern:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
@@ -601,12 +601,12 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       <tertiary>sum()</tertiary>
     </indexterm>
 
-    <para>Mit der Methode sum kann man die Summe alle Einträge in einer
-    bestimmten Spalte der Datenbankabfrage berechnen.</para>
+    <para>Mit der Methode sum lässt sich die Summe aller Einträge in einer
+    bestimmten Spalte der Datenbank-Abfrage berechnen.</para>
 
-    <para>Als erstes ziehen wir die Summe aller Veröffentlichungsjahre und
-    danach die Summe aller Veröffentlichungsjahre in den 70ern (ja, ein
-    sinnfreies Beispiel ;-)):<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+    <para>Zuerst ziehen wir die Summe aller Veröffentlichungsjahre und danach
+    die Summe aller Veröffentlichungsjahre in den 70ern (ja, ein sinnfreies
+    Beispiel ;-)):<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
 ruby-1.9.2-p0 &gt; <command>Album.sum(:release_year)</command>
@@ -658,8 +658,8 @@ ruby-1.9.2-p0 &gt; <command>Album.find([1,3,7]).class</command>
 ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
-    <para>Wenn man immer ein Array als Ergebnis haben will muss man nur
-    einfach immer auch ein Array als Parameter übergeben:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+    <para>Wenn man immer ein Array als Ergebnis haben will, muss man immer
+    auch ein Array als Parameter übergeben:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
 ruby-1.9.2-p0 &gt; <command>Album.find(5).class</command>
@@ -742,10 +742,10 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <methodname>where</methodname> (siehe <xref
     linkend="activerecord_where" />), aber die Lesbarkeit des Codes wird
     besser (meistens jedenfalls). Man kann treffend über den Sinn oder den
-    Unsinn streiten. Probieren Sie es einmal aus, und entscheiden Sie selber
+    Unsinn streiten. Probieren Sie es einmal aus, und entscheiden Sie selber,
     welchen Weg Sie gehen wollen.</para>
 
-    <para>Eine Beispiel auf der <foreignphrase
+    <para>Ein Beispiel auf der <foreignphrase
     xml:lang="en">Console</foreignphrase> sagt mehr als tausend Worte. Ich
     verwende erst <methodname>where</methodname> und dann
     <methodname>find_by_<replaceable>*</replaceable></methodname> für die
@@ -795,7 +795,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       ein Objekt der gesuchten Klasse (hier <classname>Album</classname>) oder
       <literal>nil</literal> zurück. <methodname>where</methodname> gibt
       <emphasis>immer</emphasis> ein Array zurück! Wenn man auf diesen
-      Unterschied beim Programmieren nicht achtet bekommt man über kurz oder
+      Unterschied beim Programmieren nicht achtet, bekommt man über kurz oder
       lang einen Fehler an dieser Stelle.<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
@@ -868,11 +868,11 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
         <tertiary>find_or_create_by_*()</tertiary>
       </indexterm>
 
-      <para>Häufig hat man beim Programmieren die Aufgabenstellung einen
-      bestimmten Datensatz zu suchen und falls er nicht existiert dann diesen
+      <para>Häufig hat man beim Programmieren die Aufgabenstellung, einen
+      bestimmten Datensatz zu suchen und falls er nicht existiert, dann diesen
       anzulegen. Das lässt sich sehr schön mit
       <methodname>find_or_create_by_<replaceable>*</replaceable></methodname>
-      in einem Schritt vollziehen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+      in einem Schritt erledigen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
 ruby-1.9.2-p0 &gt; <command>beatles = Album.find_or_create_by_name( 'The Beatles' )</command>
@@ -894,9 +894,9 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       <warning>
         <para>Bei der Benutzung von
         <methodname>find_or_create_by_<replaceable>*</replaceable></methodname>
-        sollte man immer sicher sein, dass der evtl. neu anzulegende Datensatz
-        in sich selber valide ist. Dies lässt sich einfach mit der Methode
-        <indexterm>
+        sollte man immer sicher sein, dass der eventuell neu anzulegende
+        Datensatz in sich selber valide ist. Dies lässt sich einfach mit der
+        Methode <indexterm>
             <primary>ActiveRecord</primary>
 
             <secondary>Methoden</secondary>
@@ -906,7 +906,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
         linkend="activerecord_validation" />).</para>
       </warning>
 
-      <para>Wenn Sie zwar nach einem Album-Namen suchen, aber beim evtuellen
+      <para>Wenn Sie zwar nach einem Albumnamen suchen, aber beim eventuellen
       <methodname>create</methodname> auch noch andere Daten angeben wollen,
       so geht das auch mit
       <methodname>find_or_create_by_<replaceable>*</replaceable></methodname>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
@@ -1013,7 +1013,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       <methodname>where</methodname> <quote><foreignphrase xml:lang="en">Lazy
       Loading</foreignphrase></quote> (siehe <xref linkend="lazy_loading" />)
       benutzt. Auf <foreignphrase xml:lang="en">Lazy Loading</foreignphrase>
-      gehen wir später noch mal dediziert ein. Hier aber schon mal ein kleiner
+      gehen wir später noch dediziert ein. Hier aber schon mal ein kleiner
       Vorgeschmack:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
@@ -1040,18 +1040,18 @@ ruby-1.9.2-p0 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
       <para>Die Kombination der Methoden <methodname>where</methodname> und
-      <methodname>count</methodname> erstellt eine SQL-Abfrage die das
+      <methodname>count</methodname> erstellt eine SQL-Abfrage, die das
       Berechnen des Ergebnisses der SQL-Datenbank überlässt. Die Kombination
       der Methoden
       <methodname>find_all_by_<replaceable>*</replaceable></methodname> und
       <methodname>count</methodname> fragt erst alle Datensätze bei der
-      Datenbank ab, speichert diese dann in einem Array und zählt dann die
-      Einträge in diesem Array. Das macht bei unserer Mini-Datenbank kaum
+      Datenbank ab, speichert diese dann in einem Array und zählt anschließend
+      die Einträge in diesem Array. Das macht bei unserer Mini-Datenbank kaum
       einen Unterschied. Wenn Sie aber mit einer sehr großen Datenbank
       arbeiten, dann wollen Sie die maximale Performance der SQL-Datenbank
-      auszunutzen und nicht erst Daten hin und herschieben.</para>
+      ausnutzen und nicht erst Daten hin- und herschieben.</para>
 
-      <para>Wie oben schon erwähnt: Diese Thematik wird in <xref
+      <para>Wie bereits erwähnt: Diese Thematik wird in <xref
       linkend="lazy_loading" /> detailliert besprochen.</para>
     </section>
   </section>
@@ -1067,7 +1067,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       <tertiary>exists?()</tertiary>
     </indexterm>
 
-    <para>Hin und wieder muss man wissen ob es einen bestimmten Datensatz
+    <para>Hin und wieder muss man wissen, ob es einen bestimmten Datensatz
     gibt, und genau dafür gibt es die Methode
     <methodname>exists?</methodname>. Sie gibt als Ergebnis
     <literal>true</literal> oder <literal>false</literal> zurück:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
@@ -1119,7 +1119,7 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
         <tertiary>where()</tertiary>
       </indexterm><methodname>where</methodname> und damit <foreignphrase
     xml:lang="en">Lazy Loading</foreignphrase> verwendet. Dies ist ein
-    Mechanismus, der eine Datenbankabfrage erst dann stellt, wenn der weitere
+    Mechanismus, der eine Datenbank-Abfrage erst dann stellt, wenn der weitere
     Programmablauf nicht ohne das Ergebnis dieser realisiert werden kann. Bis
     dahin wird die Anfrage als <classname>ActiveRecord::Relation</classname>
     gespeichert. (Das Gegenteil von <foreignphrase xml:lang="en">Lazy
@@ -1197,8 +1197,8 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     mal eine Abfrage zusammen, in der wir mehrere Methoden verschachteln. In
     dem folgenden Beispiel wird <varname>a</varname> immer weiter definiert
     und erst ganz zum Schluss (beim Aufruf der Methode
-    <methodname>all</methodname>) wird die Datenbankabfrage wirklich getätigt.
-    Mit der Methode <indexterm>
+    <methodname>all</methodname>) wird die Datenbank-Abfrage wirklich
+    getätigt. Mit der Methode <indexterm>
         <primary>ActiveRecord</primary>
 
         <secondary>Methoden</secondary>
@@ -1250,9 +1250,9 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       Loading</foreignphrase> ist die automatische Optimierung der SQL-Abfrage
       durch ActiveRecord.</para>
 
-      <para>Ziehen wir mal die Summe aller Veröffentlichungsjahre der Alben
-      die in dern 70ern rausgebracht wurden. Und danach sortieren wir die
-      Alben nach dem dem Namen und ziehen dann die Summe.<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+      <para>Ziehen wir mal die Summe aller Veröffentlichungsjahre der Alben,
+      die in den 70ern herausgebracht wurden. Und danach sortieren wir die
+      Alben nach Namen und ziehen anschließend die Summe.<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
 ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1970..1979 ).sum(:release_year)</command>
@@ -1277,12 +1277,12 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
   <section>
     <title>Debugging in der Console</title>
 
-    <para>Manchmal ist es nervig ständig zwischen einem Terminal mit der
+    <para>Manchmal ist es nervig, ständig zwischen einem Terminal mit der
     Rails-<foreignphrase xml:lang="en">Console</foreignphrase> und einem
     anderen Terminal mit dem Logfile zu wechseln, um zu sehen, was gerade von
     ActiveRecord mit der Datenbank gemacht wurde. Es gibt mit
     <command>ActiveRecord::Base.logger = Logger.new(STDOUT)</command> einen
-    einfachen Weg diese Meldungen auch in der ogger.new anzuzeigen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
+    einfachen Weg, diese Meldungen auch in der ogger.new anzuzeigen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
 Loading development environment (Rails 3.0.0)
 
 ruby-1.9.2-p0 &gt; <command>ActiveRecord::Base.logger = Logger.new(STDOUT)</command>
