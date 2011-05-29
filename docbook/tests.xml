@@ -1218,7 +1218,7 @@ end</programlisting></para>
 
     <para>Die von <command>rails generate scaffold</command> automatisch
     erzeugten Functional Tests sind meistens eine sehr gute Ausgangsplattform.
-    Diese kann man Schritt für Schritt erweitern. </para>
+    Diese kann man Schritt für Schritt erweitern.</para>
 
     <section xml:id="workflow_veraenderung_mit_functional_test">
       <title xml:id="workflow_veraenderung_mit_functional_test.title">Workflow
@@ -1390,7 +1390,7 @@ end
       <code>person#show</code> (<code>person_path</code>), sondern
       <code>person#index</code> (<code>people_path</code>) angesprungen
       werden. Es soll also nicht der eben gerade angelegte Datensatz einzelnd
-      sondern alle Datensätze in einer Tabelle angezeigt werden. </para>
+      sondern alle Datensätze in einer Tabelle angezeigt werden.</para>
 
       <para>Dazu müssen wir folgenden Test ändern:<programlisting>  test "should create person" do
     assert_difference('Person.count') do
@@ -1496,8 +1496,9 @@ Finished in 0.349060 seconds.
 Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
     </section>
 
-    <section>
-      <title>Flash-Nachrichten testen</title>
+    <section xml:id="functional_test_flash_testen">
+      <title xml:id="functional_test_flash_testen.title">Flash-Nachrichten
+      testen</title>
 
       <para>Mit Funktional-Tests kann man auch die Übergabe und das Anzeigen
       von Flash-Nachrichten (siehe <xref linkend="flash" />) überprüfen. Ich
@@ -1688,17 +1689,110 @@ Finished in 0.094714 seconds.
 2 tests, 3 assertions, 0 failures, 0 errors, 0 skips
 Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$</screen></para>
 
-      <para>Die Sache hat aber noch einen Hacken: Starten Sie einmal mit
-      <command>rails server</command> die Applikation und gehen Sie mit Ihrem
-      Browser auf <uri
-      xlink:href="http://0.0.0.0:3000/home/ping">http://0.0.0.0:3000/home/ping</uri>.
-      Sie werden korrekt auf <uri
-      xlink:href="http://0.0.0.0:3000/home/pong">http://0.0.0.0:3000/home/pong</uri>
-      umgeleitet, sehen aber keine Flash-Nachricht. Diese wird im Controller
-      <filename>app/controllers/home_controller.rb</filename> korrekt
-      definiert, aber im View
-      <filename>app/views/home/pong.html.erb</filename> nicht
-      angezeigt.</para>
+      <para>Jetzt werden aber einige sagen "Halt! Das ist ja nur die halbe
+      Miete. Ich weiß zwar jetzt, das die Flash-Message korrekt gesetzt wird,
+      aber wie kann ich testen, ob sie auch wirklich im View dargestellt
+      wird?". Sehr gut aufgepasst! Dieses Verhalten lässt sich aber nicht
+      innerhalb eines Functional Tests überprüfen. Ein Functional Test kann
+      keinem Redirect folgen. Dies ist nur mit einem Integration Test möglich.
+      In <xref linkend="integration_testing" /> werde ich Ihnen zeigen wie Sie
+      genau das Testen können. </para>
     </section>
+  </section>
+
+  <section xml:id="integration_testing">
+    <title xml:id="integration_testing.title">Integration Testing</title>
+
+    <para>Integration Tests sind Tests die wie Functional Tests arbeiten, aber
+    über mehrere Controller gehen können. Man kann mit Ihnen deshalb komplexe
+    Workflows innerhalb der Rails-Applikation nachbilden.</para>
+
+    <para>Ich zeige Ihnen das anhand der in <xref
+    linkend="functional_test_flash_testen" /> erstellen Ping-Pong Applikation.
+    Der dort entwickelte Test konnte zwar überprüfen, ob eine Flash-Nachricht
+    im Controller gesetzt wurde aber nicht, ob diese Flash-Nachricht auch im
+    View angezeigt wird.</para>
+
+    <para>Mit <command>rake generate scaffold</command> werden zwar Unit- und
+    Functional-Tests generiert, aber keine Integration-Test. Dies können Sie
+    entweder von Hand im Verzeichnis <filename>test/integration/</filename>
+    oder bequemer mit <command>rails generate integration_test
+    test_name</command> machen. Legen wir mal einen Integration-Test
+    an:<screen>Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$ <command>rails generate integration_test ping_pong_flash_message_flow</command>
+      invoke  test_unit
+      create    test/integration/ping_pong_flash_message_flow_test.rb
+Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$</screen></para>
+
+    <para>Dies Datei
+    <filename>test/integration/ping_pong_flash_message_flow_test.rb</filename>
+    füllen wir jetzt mit folgendem Test:<programlisting>require 'test_helper'
+
+class PingPongFlashMessageFlowTest &lt; ActionDispatch::IntegrationTest
+  fixtures :all
+
+  test "browse to /home/ping and get redirected to /home/pong which displays a flash message" do
+    get '/home/ping'
+    assert_redirected_to home_pong_url
+    assert_equal 'Sie wurden von Ping nach Pong umgeleitet.', flash[:notice]
+    follow_redirect!
+    assert_select 'div#flash_notice', 'Sie wurden von Ping nach Pong umgeleitet.'
+  end
+end</programlisting></para>
+
+    <para>Der Zauber des Integration-Tests liegt unter anderem in der Methode
+    <methodname>follow_redirect!</methodname> mit der Sie im Test dem Redirect
+    folgen können. Diese Methode steht Ihnen nur innerhalb eines
+    Integration-Tests zur Verfügung.</para>
+
+    <para>Alle Integration-Tests lassen sich mit <command>rake
+    test:integration</command> ausführen. Machen wird das mal:<screen>Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$ <command>rake test:integration</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+PingPongFlashMessageFlowTest:
+     FAIL browse to /home/ping and get redirected to /home/pong which displays a flash message (0.19s) 
+          Expected at least 1 element matching "div#flash_notice", found 0.
+          /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/actionpack-3.1.0.rc1/lib/action_dispatch/testing/assertions/selector.rb:296:in `assert_select'
+
+
+Finished in 0.192592 seconds.
+
+1 tests, 3 assertions, 1 failures, 0 errors, 0 skips
+rake aborted!
+Command failed with status (1): [/Users/stefan/.rvm/rubies/ruby-1.9.2-p180/...]
+
+Tasks: TOP =&gt; test:integration
+(See full trace by running task with --trace)
+Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$</screen></para>
+
+    <para>Da wir in der View-Datei
+    <filename>app/views/home/pong.html.erb</filename> noch keine Flash-Message
+    anzeigen, bekommen wir diesen Fehler angezeigt. Ändern Sie bitte
+    <filename>app/views/home/pong.html.erb</filename> mit folgendem
+    Inhalt:<programlisting>&lt;% if flash[:notice] %&gt;
+  &lt;div id="flash_notice"&gt;&lt;%= flash[:notice] %&gt;&lt;/div&gt;
+&lt;% end %&gt;
+
+&lt;h1&gt;Home#pong&lt;/h1&gt;
+&lt;p&gt;Find me in app/views/home/pong.html.erb&lt;/p&gt;
+</programlisting></para>
+
+    <para>Jetzt sollte der Integration-Test normal durchlaufen:<screen>Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$ <command>rake test:integration</command>
+Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
+Started
+
+PingPongFlashMessageFlowTest:
+     PASS browse to /home/ping and get redirected to /home/pong which displays a flash message (0.19s) 
+
+Finished in 0.192106 seconds.
+
+1 tests, 3 assertions, 0 failures, 0 errors, 0 skips
+Stefan-Wintermeyers-MacBook-Air:ping-pong stefan$</screen></para>
+
+    <para></para>
+
+    <para></para>
+
+    <para></para>
   </section>
 </chapter>
