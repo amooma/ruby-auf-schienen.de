@@ -216,6 +216,15 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
   <section xml:id="routes_resources">
     <title xml:id="routes_resources.title">resources</title>
 
+    <para>Bauen wir uns für <code>resources</code> eine neue Rails-Applikation
+    zum Experimentieren:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new webshop</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>cd webshop</command>
+Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>bundle install</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake db:migrate</command>
+Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+
     <para>Beim Verwenden von Scaffold werden automatisch Routen für die neu
     erschaffenen Resourcen erstellt. Legen wir mal eine Resource an:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rails generate scaffold person firstname:string lastname:string login_name:string</command>
       invoke  active_record
@@ -237,16 +246,6 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
     <para>Die Datei <filename>config/routes.rb</filename> sieht damit so
     aus:<programlisting>Webshop::Application.routes.draw do
   <emphasis>resources :people</emphasis>
-
-  get "home/index"
-
-  get "home/ping"
-
-  get "home/pong"
-  
-  match 'home/ping-ping' =&gt; 'home#ping', :as =&gt; "ping_ping"
-  
-  root :to =&gt; 'home#index'
 end</programlisting></para>
 
     <note>
@@ -262,11 +261,6 @@ edit_person GET    /people/:id/edit(.:format) {:action=&gt;"edit", :controller=&
      person GET    /people/:id(.:format)      {:action=&gt;"show", :controller=&gt;"people"}
             PUT    /people/:id(.:format)      {:action=&gt;"update", :controller=&gt;"people"}
             DELETE /people/:id(.:format)      {:action=&gt;"destroy", :controller=&gt;"people"}
- home_index GET    /home/index(.:format)      {:controller=&gt;"home", :action=&gt;"index"}
-  home_ping GET    /home/ping(.:format)       {:controller=&gt;"home", :action=&gt;"ping"}
-  home_pong GET    /home/pong(.:format)       {:controller=&gt;"home", :action=&gt;"pong"}
-  ping_ping        /home/ping-ping(.:format)  {:controller=&gt;"home", :action=&gt;"ping"}
-       root        /                          {:controller=&gt;"home", :action=&gt;"index"}
 Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
 
     <para>Diese RESTful Routen sind Ihnen bereits aus <xref
@@ -350,13 +344,6 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
   end</emphasis>
 
   <emphasis>resources :phones</emphasis>
-
-  get "home/index"
-  get "home/ping"
-  get "home/pong"
-  match 'home/ping-ping' =&gt; 'home#ping', :as =&gt; "ping_ping"
-  
-  root :to =&gt; 'home#index'
 end</programlisting></para>
 
       <para>Und jetzt noch die <methodname>index</methodname> Methode in der
@@ -410,13 +397,6 @@ end</programlisting></para>
   resources :people do
     resources :phones
   end
-
-  get "home/index"
-  get "home/ping"
-  get "home/pong"
-  match 'home/ping-ping' =&gt; 'home#ping', :as =&gt; "ping_ping"
-  
-  root :to =&gt; 'home#index'
 end</programlisting></para>
 
       <para>Schauen wir uns mal die Routen an:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake routes</command>
@@ -434,24 +414,74 @@ edit_person_phone GET    /people/:person_id/phones/:id/edit(.:format) {:action=&
            person GET    /people/:id(.:format)                        {:action=&gt;"show", :controller=&gt;"people"}
                   PUT    /people/:id(.:format)                        {:action=&gt;"update", :controller=&gt;"people"}
                   DELETE /people/:id(.:format)                        {:action=&gt;"destroy", :controller=&gt;"people"}
-       home_index GET    /home/index(.:format)                        {:controller=&gt;"home", :action=&gt;"index"}
-        home_ping GET    /home/ping(.:format)                         {:controller=&gt;"home", :action=&gt;"ping"}
-        home_pong GET    /home/pong(.:format)                         {:controller=&gt;"home", :action=&gt;"pong"}
-        ping_ping        /home/ping-ping(.:format)                    {:controller=&gt;"home", :action=&gt;"ping"}
-             root        /                                            {:controller=&gt;"home", :action=&gt;"index"}
 Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
 
-      <para>Ganz oben stehen interessante neue Routen, die wir so noch nicht
-      hatten: <code>new_person_phone</code>? <code>edit_person_phone</code>?
-      Immer zwei Resourcen in einem Routen-Namen. </para>
+      <para>Ganz oben stehen interessante neue Routen-Varianten, die wir so
+      noch nicht hatten: <code>new_person_phone</code>?
+      <code>edit_person_phone</code>? Gleich zwei Resourcen in einem
+      Routen-Namen!</para>
 
-      <para></para>
+      <section xml:id="routes_nested_resources_new">
+        <title xml:id="routes_nested_resources_new.title">new</title>
 
-      <para></para>
+        <para>Um einer Person eine neue Telefonnummer zuzuordnen, benutzen wir
+        die folgenden zwei Routen:<screen>                  POST   /people/:person_id/phones(.:format)          {:action=&gt;"create", :controller=&gt;"phones"}
+ new_person_phone GET    /people/:person_id/phones/new(.:format)      {:action=&gt;"new", :controller=&gt;"phones"}
+</screen></para>
 
-      <para></para>
+        <para>Ändern wir den View
+        <filename>app/views/people/show.html.erb</filename> so ab, das man in
+        ihm alle aktuellen Telefonnummen sieht und neue Telefonnummern
+        eintragen kann:<programlisting>&lt;p id="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
 
-      <para></para>
+&lt;p&gt;
+  &lt;b&gt;Firstname:&lt;/b&gt;
+  &lt;%= @person.firstname %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;Lastname:&lt;/b&gt;
+  &lt;%= @person.lastname %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;Login name:&lt;/b&gt;
+  &lt;%= @person.login_name %&gt;
+&lt;/p&gt;
+
+
+&lt;%= link_to 'Edit', edit_person_path(@person) %&gt; |
+&lt;%= link_to 'Back', people_path %&gt;
+
+&lt;h2&gt;Listing phones&lt;/h2&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Phone number&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+
+<emphasis>&lt;% @person.phones.each do |phone| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= phone.phone_number %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Show', person_phone_path(@person, phone) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Edit', edit_person_phone_path(@person, phone) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', person_phone_path(@person, phone), confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+
+&lt;br /&gt;
+&lt;%= link_to 'New Phone', new_person_phone_path(@person) %&gt;
+</emphasis></programlisting></para>
+
+        <para>Natürlich müssen wir im Controller auch noch ein paar Sachen
+        ändern:</para>
+
+        <para></para>
+      </section>
     </section>
   </section>
 
