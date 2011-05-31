@@ -217,31 +217,26 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
     <title xml:id="routes_resources.title">resources</title>
 
     <para>Bauen wir uns für <code>resources</code> eine neue Rails-Applikation
-    zum Experimentieren:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new webshop</command>
+    zum Experimentieren:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new phonebook</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>cd webshop</command>
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>bundle install</command>
+Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>cd phonebook</command>
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>bundle install</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake db:migrate</command>
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ </screen></para>
 
     <para>Beim Verwenden von Scaffold werden automatisch Routen für die neu
-    erschaffenen Resourcen erstellt. Legen wir mal eine Resource an:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rails generate scaffold person firstname:string lastname:string login_name:string</command>
+    erschaffenen Resourcen erstellt. Legen wir mal eine Resource an:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rails generate scaffold person firstname:string lastname:string</command>
       invoke  active_record
-      create    db/migrate/20110529170801_create_people.rb
+      create    db/migrate/20110531175742_create_people.rb
       create    app/models/person.rb
       invoke    test_unit
       create      test/unit/person_test.rb
       create      test/fixtures/people.yml
        route  resources :people
 [...]
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake db:migrate</command>
-==  CreatePeople: migrating ===================================================
--- create_table(:people)
-   -&gt; 0.0018s
-==  CreatePeople: migrated (0.0019s) ==========================================
-
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake db:migrate</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
 
     <para>Die Datei <filename>config/routes.rb</filename> sieht damit so
     aus:<programlisting>Webshop::Application.routes.draw do
@@ -268,21 +263,24 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
     anzuzeigen und zu verändern.</para>
 
     <section xml:id="routes_nested_resources">
-      <title xml:id="routes_nested_resources.title">Nested resources</title>
+      <title xml:id="routes_nested_resources.title">Nested Resources</title>
 
-      <para>Nested resources bezieht sich auf Routen von Resourcen die mit
+      <para>Nested Resources bezieht sich auf Routen von Resourcen die mit
       einer <methodname>has_many</methodname> Verknüpfung (siehe <xref
       linkend="activerecord_has_many" />) arbeiten. Diese lassen sich
-      eindeutig über Routen ansprechen. Legen wir als erstes mal eine zweite
-      Resource <classname>phone</classname> an:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rails generate scaffold phone person_id:integer phone_number:string</command>
+      eindeutig über Routen ansprechen. Legen wir eine zweite Resource
+      <classname>phone</classname> an:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rails generate scaffold phone person_id:integer phone_number:string</command>
+      invoke  active_record
+      create    db/migrate/20110531180003_create_phones.rb
+      create    app/models/phone.rb
+      invoke    test_unit
+      create      test/unit/phone_test.rb
+      create      test/fixtures/phones.yml
+       route  resources :phones
 [...]
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake db:migrate</command>
-==  CreatePhones: migrating ===================================================
--- create_table(:phones)
-   -&gt; 0.0015s
-==  CreatePhones: migrated (0.0015s) ==========================================
-
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$ </screen></para>
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake db:migrate</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ </screen></para>
 
       <para>Jetzt verküpfen wir beide Resourcen miteinander. In der Datei
       <filename>app/models/person.rb</filename> fügen wir ein
@@ -302,20 +300,20 @@ end
 Person.create(:lastname =&gt; 'Stein').phones.create(:phone_number =&gt; '040 1234567')
 Person.create(:lastname =&gt; 'Oberhuber')</programlisting></para>
 
-      <para>Die spielen wir mit <command>rake db:seed</command> ein:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake db:seed</command>
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$ </screen></para>
+      <para>Die spielen wir mit <command>rake db:seed</command> ein:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake db:seed</command>
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
 
-      <para>Schauen wir uns das kurz auf der Console an:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rails console</command>
+      <para>Schauen wir uns das kurz in der Console an:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rails console</command>
 Loading development environment (Rails 3.1.0.rc1)
 ruby-1.9.2-p180 :001 &gt; <command>Person.first</command>
   Person Load (0.1ms)  SELECT "people".* FROM "people" LIMIT 1
- =&gt; #&lt;Person id: 1, firstname: nil, lastname: "Meier", login_name: nil, created_at: "2011-05-29 17:41:17", updated_at: "2011-05-29 17:41:17"&gt; 
+ =&gt; #&lt;Person id: 1, firstname: nil, lastname: "Meier", created_at: "2011-05-31 18:03:07", updated_at: "2011-05-31 18:03:07"&gt; 
 ruby-1.9.2-p180 :002 &gt; <command>Person.first.phones</command>
   Person Load (0.3ms)  SELECT "people".* FROM "people" LIMIT 1
   Phone Load (0.2ms)  SELECT "phones".* FROM "phones" WHERE "phones"."person_id" = 1
- =&gt; [#&lt;Phone id: 1, person_id: 1, phone_number: "030 1234567", created_at: "2011-05-29 17:41:17", updated_at: "2011-05-29 17:41:17"&gt;, #&lt;Phone id: 2, person_id: 1, phone_number: "0171 1234567", created_at: "2011-05-29 17:41:17", updated_at: "2011-05-29 17:41:17"&gt;] 
+ =&gt; [#&lt;Phone id: 1, person_id: 1, phone_number: "030 1234567", created_at: "2011-05-31 18:03:07", updated_at: "2011-05-31 18:03:07"&gt;, #&lt;Phone id: 2, person_id: 1, phone_number: "0171 1234567", created_at: "2011-05-31 18:03:07", updated_at: "2011-05-31 18:03:07"&gt;] 
 ruby-1.9.2-p180 :003 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
 
       <para>Wenn wir den Datensatz von <methodname>Person.first</methodname>
       im Browser anschauen wollen, so müssen wir mit <command>rails
@@ -333,10 +331,10 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
           </mediaobject>
         </screenshot></para>
 
-      <para>Wäre es nicht schön, wenn wir die Telefonnummern der Person.first
-      mit der URL <uri
+      <para>Wäre es nicht schön, wenn wir die Telefonnummern der
+      <methodname>Person.first</methodname> mit der URL <uri
       xlink:href="http://0.0.0.0:3000/people/1/phones">http://0.0.0.0:3000/people/1/phones</uri>
-      aufrufen könnten? Genau das können wir mit nested Resources realisieren!
+      aufrufen könnten? Genau das können wir mit Nested Resources realisieren!
       Bitte ändern Sie Ihre <filename>config/routes.rb</filename> wie folgt
       ab:<programlisting>Webshop::Application.routes.draw do
 <emphasis>  resources :people do
@@ -387,19 +385,10 @@ end</programlisting></para>
       xlink:href="http://0.0.0.0:3000/phones">http://0.0.0.0:3000/phones</uri>
       aufgerufen und es werden alle Phones angezeigt.</para>
 
-      <para>Aber brauchen wir überhaupt den direkten Zugang via <uri
-      xlink:href="http://0.0.0.0:3000/phones">http://0.0.0.0:3000/phones</uri>?
-      Eigentlich nein, da man nur die Nummern einer Person braucht. Also
-      können wir in der <filename>config/routes.rb</filename> die
-      entsprechende Zeile löschen und nur noch Zugriffe auf
-      <classname>phones</classname> über <classname>people</classname>
-      zulassen:<programlisting>Webshop::Application.routes.draw do
-  resources :people do
-    resources :phones
-  end
-end</programlisting></para>
-
-      <para>Schauen wir uns mal die Routen an:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake routes</command>
+      <para>Bis jetzt haben wir in der <filename>config/routes.rb</filename>
+      zwei Einträge für <code>phones</code>. Einmal als Nested Resource
+      innerhalb der <code>people</code> Resouce und einmal als eigenständige
+      Resource. <command>rake routes</command> zeigt beide Varianten:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake routes</command>
     person_phones GET    /people/:person_id/phones(.:format)          {:action=&gt;"index", :controller=&gt;"phones"}
                   POST   /people/:person_id/phones(.:format)          {:action=&gt;"create", :controller=&gt;"phones"}
  new_person_phone GET    /people/:person_id/phones/new(.:format)      {:action=&gt;"new", :controller=&gt;"phones"}
@@ -414,73 +403,230 @@ edit_person_phone GET    /people/:person_id/phones/:id/edit(.:format) {:action=&
            person GET    /people/:id(.:format)                        {:action=&gt;"show", :controller=&gt;"people"}
                   PUT    /people/:id(.:format)                        {:action=&gt;"update", :controller=&gt;"people"}
                   DELETE /people/:id(.:format)                        {:action=&gt;"destroy", :controller=&gt;"people"}
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+           phones GET    /phones(.:format)                            {:action=&gt;"index", :controller=&gt;"phones"}
+                  POST   /phones(.:format)                            {:action=&gt;"create", :controller=&gt;"phones"}
+        new_phone GET    /phones/new(.:format)                        {:action=&gt;"new", :controller=&gt;"phones"}
+       edit_phone GET    /phones/:id/edit(.:format)                   {:action=&gt;"edit", :controller=&gt;"phones"}
+            phone GET    /phones/:id(.:format)                        {:action=&gt;"show", :controller=&gt;"phones"}
+                  PUT    /phones/:id(.:format)                        {:action=&gt;"update", :controller=&gt;"phones"}
+                  DELETE /phones/:id(.:format)                        {:action=&gt;"destroy", :controller=&gt;"phones"}
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
 
       <para>Ganz oben stehen interessante neue Routen-Varianten, die wir so
       noch nicht hatten: <code>new_person_phone</code>?
       <code>edit_person_phone</code>? Gleich zwei Resourcen in einem
       Routen-Namen!</para>
 
-      <section xml:id="routes_nested_resources_new">
-        <title xml:id="routes_nested_resources_new.title">new</title>
+      <para>Aber brauchen wir überhaupt den direkten Zugang via <uri
+      xlink:href="http://0.0.0.0:3000/phones">http://0.0.0.0:3000/phones</uri>
+      auf die Resource <code>phones</code>? Eigentlich nein, da man nur die
+      Telefonnummern zu einer Person braucht. Also können wir in der
+      <filename>config/routes.rb</filename> die entsprechende Zeile löschen
+      und nur noch Zugriffe auf <classname>phones</classname> über
+      <classname>people</classname> zulassen:<programlisting>Webshop::Application.routes.draw do
+  resources :people do
+    resources :phones
+  end
+end</programlisting></para>
 
-        <para>Um einer Person eine neue Telefonnummer zuzuordnen, benutzen wir
-        die folgenden zwei Routen:<screen>                  POST   /people/:person_id/phones(.:format)          {:action=&gt;"create", :controller=&gt;"phones"}
+      <para>Schauen wir uns die Routen an:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake routes</command>
+    person_phones GET    /people/:person_id/phones(.:format)          {:action=&gt;"index", :controller=&gt;"phones"}
+                  POST   /people/:person_id/phones(.:format)          {:action=&gt;"create", :controller=&gt;"phones"}
  new_person_phone GET    /people/:person_id/phones/new(.:format)      {:action=&gt;"new", :controller=&gt;"phones"}
-</screen></para>
+edit_person_phone GET    /people/:person_id/phones/:id/edit(.:format) {:action=&gt;"edit", :controller=&gt;"phones"}
+     person_phone GET    /people/:person_id/phones/:id(.:format)      {:action=&gt;"show", :controller=&gt;"phones"}
+                  PUT    /people/:person_id/phones/:id(.:format)      {:action=&gt;"update", :controller=&gt;"phones"}
+                  DELETE /people/:person_id/phones/:id(.:format)      {:action=&gt;"destroy", :controller=&gt;"phones"}
+           people GET    /people(.:format)                            {:action=&gt;"index", :controller=&gt;"people"}
+                  POST   /people(.:format)                            {:action=&gt;"create", :controller=&gt;"people"}
+       new_person GET    /people/new(.:format)                        {:action=&gt;"new", :controller=&gt;"people"}
+      edit_person GET    /people/:id/edit(.:format)                   {:action=&gt;"edit", :controller=&gt;"people"}
+           person GET    /people/:id(.:format)                        {:action=&gt;"show", :controller=&gt;"people"}
+                  PUT    /people/:id(.:format)                        {:action=&gt;"update", :controller=&gt;"people"}
+                  DELETE /people/:id(.:format)                        {:action=&gt;"destroy", :controller=&gt;"people"}
+Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ </screen></para>
 
-        <para>Ändern wir den View
-        <filename>app/views/people/show.html.erb</filename> so ab, das man in
-        ihm alle aktuellen Telefonnummen sieht und neue Telefonnummern
-        eintragen kann:<programlisting>&lt;p id="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
+      <para>Jetzt müssen wir aber noch den Controller und alle Views an die
+      neue Situation anpassen.</para>
 
-&lt;p&gt;
-  &lt;b&gt;Firstname:&lt;/b&gt;
-  &lt;%= @person.firstname %&gt;
-&lt;/p&gt;
+      <para>Um die Übersichtlichkeit dieser Beschreibung zu maximieren, gehen
+      wir beim Controller davon aus, das nur Nested Resources und nur
+      HTML-Seiten angefragt werden.</para>
 
-&lt;p&gt;
-  &lt;b&gt;Lastname:&lt;/b&gt;
-  &lt;%= @person.lastname %&gt;
-&lt;/p&gt;
+      <para>Die Datei
+      <filename>app/controllers/phones_controller.rb</filename> sieht dann so
+      aus:<programlisting>class PhonesController &lt; ApplicationController
+  before_filter :find_person
+  
+  # GET /phones
+  def index
+    @phones = @person.phones
+  end
 
-&lt;p&gt;
-  &lt;b&gt;Login name:&lt;/b&gt;
-  &lt;%= @person.login_name %&gt;
-&lt;/p&gt;
+  # GET /phones/1
+  def show
+    @phone = @person.phones.find(params[:id])
+  end
 
+  # GET /phones/new
+  def new
+    @phone = @person.phones.build
+  end
 
-&lt;%= link_to 'Edit', edit_person_path(@person) %&gt; |
-&lt;%= link_to 'Back', people_path %&gt;
+  # GET /phones/1/edit
+  def edit
+    @phone = @person.phones.find(params[:id])
+  end
 
-&lt;h2&gt;Listing phones&lt;/h2&gt;
+  # POST /phones
+  def create
+    @phone = @person.phones.build(params[:phone])
+
+    if @phone.save
+      redirect_to person_phone_path(@person, @phone), notice: 'Phone was successfully created.'
+    else
+      render action: "new"
+    end
+  end
+
+  # PUT /phones/1
+  def update
+    @phone = @person.phones.find(params[:id])
+
+    if @phone.update_attributes(params[:phone])
+      redirect_to person_phone_path(@person, @phone), notice: 'Phone was successfully updated.'
+    else
+      render action: "edit"
+    end
+  end
+
+  # DELETE /phones/1
+  def destroy
+    @phone = @person.phones.find(params[:id])
+    @phone.destroy
+
+    redirect_to person_phones_url(@person)
+  end
+  
+  private
+  def find_person
+    @person = Person.find(params[:person_id])
+  end
+end
+</programlisting></para>
+
+      <section xml:id="routes_nested_resources_index">
+        <title xml:id="routes_nested_resources_index.title">index</title>
+
+        <para>Für den Aufruf von <uri
+        xlink:href="http://0.0.0.0:3000/people/1/phones">http://0.0.0.0:3000/people/1/phones</uri>
+        müssen wir die ganzen Routen in der View
+        <filename>app/views/phones/index.html.erb</filename>
+        ändern:<programlisting>&lt;h1&gt;Listing phones&lt;/h1&gt;
 
 &lt;table&gt;
   &lt;tr&gt;
+    &lt;th&gt;Person&lt;/th&gt;
     &lt;th&gt;Phone number&lt;/th&gt;
     &lt;th&gt;&lt;/th&gt;
     &lt;th&gt;&lt;/th&gt;
     &lt;th&gt;&lt;/th&gt;
   &lt;/tr&gt;
 
-<emphasis>&lt;% @person.phones.each do |phone| %&gt;
+&lt;% @phones.each do |phone| %&gt;
   &lt;tr&gt;
+    &lt;td&gt;&lt;%= phone.person_id %&gt;&lt;/td&gt;
     &lt;td&gt;&lt;%= phone.phone_number %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Show', person_phone_path(@person, phone) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Edit', edit_person_phone_path(@person, phone) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Destroy', person_phone_path(@person, phone), confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Show', <emphasis>person_phone_path(@person, phone)</emphasis> %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Edit', <emphasis>edit_person_phone_path(@person,phone)</emphasis> %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', <emphasis>person_phone_path(@person, phone)</emphasis>, confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
   &lt;/tr&gt;
 &lt;% end %&gt;
 &lt;/table&gt;
 
 &lt;br /&gt;
-&lt;%= link_to 'New Phone', new_person_phone_path(@person) %&gt;
-</emphasis></programlisting></para>
 
-        <para>Natürlich müssen wir im Controller auch noch ein paar Sachen
-        ändern:</para>
+&lt;%= link_to 'New Phone', <emphasis>new_person_phone_path(@person)</emphasis> %&gt;
+</programlisting></para>
+      </section>
 
-        <para></para>
+      <section xml:id="routes_nested_resources_show">
+        <title xml:id="routes_nested_resources_show.title">show</title>
+
+        <para>Um mit <uri
+        xlink:href="http://0.0.0.0:3000/people/1/phones/1">http://0.0.0.0:3000/people/1/phones/1</uri>
+        ein <methodname>show</methodname> auf ein einzelnes Telefon zu
+        bekommen, müssen wir die Routen in der Datei
+        <filename>app/views/phones/view.html.erb</filename>
+        ändern:<programlisting>&lt;p id="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;Phone number:&lt;/b&gt;
+  &lt;%= @phone.phone_number %&gt;
+&lt;/p&gt;
+
+
+&lt;%= link_to 'Edit', <emphasis>edit_person_phone_path(@person, @phone)</emphasis> %&gt; |
+&lt;%= link_to 'Back', <emphasis>person_phones_path(@person)</emphasis> %&gt;
+</programlisting></para>
+      </section>
+
+      <section xml:id="routes_nested_resources_new">
+        <title xml:id="routes_nested_resources_new.title">new</title>
+
+        <para>Um mit <uri
+        xlink:href="http://0.0.0.0:3000/person/1/phones/new">http://0.0.0.0:3000/person/1/phones/new</uri>
+        ein neues Telefon anlegen zu können müssen wir die Route in der Datei
+        <filename>app/views/phones/new.html.erb</filename>
+        ändern:<programlisting>&lt;h1&gt;New phone&lt;/h1&gt;
+
+&lt;%= render 'form' %&gt;
+
+&lt;%= link_to 'Back', <emphasis>person_phones_path(@person)</emphasis> %&gt;
+</programlisting></para>
+
+        <para>Und natürlich noch das Formular im
+        <filename>app/views/phones/_form.html.erb</filename>
+        Partial:<programlisting>&lt;%= form_for(<emphasis>[@person, @phone]</emphasis>) do |f| %&gt;
+  &lt;% if @phone.errors.any? %&gt;
+    &lt;div id="error_explanation"&gt;
+      &lt;h2&gt;&lt;%= pluralize(@phone.errors.count, "error") %&gt; prohibited this phone from being saved:&lt;/h2&gt;
+
+      &lt;ul&gt;
+      &lt;% @phone.errors.full_messages.each do |msg| %&gt;
+        &lt;li&gt;&lt;%= msg %&gt;&lt;/li&gt;
+      &lt;% end %&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;% end %&gt;
+
+  &lt;div class="field"&gt;
+    &lt;%= f.label :phone_number %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :phone_number %&gt;
+  &lt;/div&gt;
+  &lt;div class="actions"&gt;
+    &lt;%= f.submit %&gt;
+  &lt;/div&gt;
+&lt;% end %&gt;
+</programlisting></para>
+      </section>
+
+      <section>
+        <title>edit</title>
+
+        <para>Die Änderung in der Datei
+        <filename>app/views/phones/edit.html.erb</filename> für den Zugriff
+        auf http://0.0.0.0:3000/people/1/phones/1/edit ähneln denen vom
+        <methodname>new</methodname> View:<programlisting>&lt;h1&gt;Editing phone&lt;/h1&gt;
+
+&lt;%= render 'form' %&gt;
+
+&lt;%= link_to 'Show', <emphasis>person_phone_path(@person, @phone)</emphasis> %&gt; |
+&lt;%= link_to 'Back', <emphasis>person_phones_path(@person)</emphasis> %&gt;</programlisting></para>
+
+        <para>Das Formular im
+        <filename>app/views/phones/_form.html.erb</filename> Partial brauchen
+        wir natürlich nicht mehr zu ändern.</para>
       </section>
     </section>
   </section>
