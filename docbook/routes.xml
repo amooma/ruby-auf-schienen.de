@@ -175,6 +175,12 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
     <para>Sie sehen dabei, das eine URL ein Minuszeichen enthalten darf, aber
     der Routen-Name nicht (ein Unterstrich geht aber).</para>
 
+    <important>
+      <para>Die Routen in der <filename>config/routes.rb</filename> Datei
+      werden immer von oben nach unten abgearbeitet. Der erste Treffer von
+      oben gewinnt!</para>
+    </important>
+
     <section xml:id="routes_match_parameter">
       <title xml:id="routes_match_parameter.title">Parameter</title>
 
@@ -350,8 +356,139 @@ end</programlisting></para>
             </imageobject>
           </mediaobject>
         </screenshot></para>
+    </section>
 
-      <para>more to come</para>
+    <section xml:id="routes_match_contraints">
+      <title xml:id="routes_match_contraints.title">Contraints</title>
+
+      <para>In <xref linkend="routes_match_parameter" /> habe ich Ihnen
+      gezeigt, wie man Parameter aus der URL auslesen und an den Controller
+      weitergeben kann. Leider hat der <filename>config/routes.rb</filename>
+      Eintrag <programlisting>match "/:year(/:month(/:day))" =&gt; "posts#index"
+</programlisting> einen entscheidenen Nachteil. Er überprüft die einzelnen
+      Elemente nicht. Die URL <uri
+      xlink:href="http://0.0.0.0:3000/ein/beispiel/dafuer">http://0.0.0.0:3000/ein/beispiel/dafuer</uri>
+      wird genauso gemacht und führt dann natürlich direkt zu einem
+      Fehler:<screenshot>
+          <info>
+            <title>Fehlermeldung</title>
+          </info>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/ein_beispiel_dafuer_fehler.jpg"></imagedata>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
+
+      <para>In der Log-Ausgabe <filename>log/development.log</filename> sehen
+      wir dabei folgenden Eintrag:<programlisting>Started GET "/ein/beispiel/dafuer" for 127.0.0.1 at 2011-06-02 21:01:17 +0200
+  Processing by PostsController#index as HTML
+  Parameters: {"year"=&gt;"ein", "month"=&gt;"beispiel", "day"=&gt;"dafuer"}
+  Post Load (0.2ms)  SELECT "posts".* FROM "posts" 
+Completed 500 Internal Server Error in 3ms
+</programlisting></para>
+
+      <para>Es ist klar, das die Suche nach dem Datum "dafuer.beispiel.ein"
+      nicht funktionieren kann.</para>
+
+      <para>Contraints können mittels Regular Expressions den Inhalt der URL
+      besser definieren. In unserem Blog-Fall würde die
+      <filename>config/routes.rb</filename> mit Contraints so
+      aussehen:<programlisting>Blog::Application.routes.draw do
+  resources :posts
+
+  match "/:year(/:month(/:day))" =&gt; "posts#index"<emphasis>, :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{2}/, :day =&gt; /\d{2}/ }</emphasis>
+end</programlisting></para>
+
+      <warning>
+        <para>Bitte beachten Sie, das bei den Regular Expressions in einem
+        Constrain keine Regex-Anchors wie "^" benutzt werden können.</para>
+      </warning>
+
+      <para>Wenn wir mit dieser Konfiguration noch mal die URL aufrufen,
+      bekommen wir einen "No route matches" Fehler von Rails:<screenshot>
+          <info>
+            <title>Routing Error</title>
+          </info>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/ein_beispiel_dafuer_no_route_matches.jpg"></imagedata>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
+
+      <para>Wir haben aber noch nicht alle möglichen Fehleingaben abgefangen.
+      Es kann ja sein, das jemand den 30.02.2010 als Datum angibt. Das würde
+      wieder zu einer Fehlermeldung im Controller führen. Um diesen Fall
+      abzufangen müssen wir im Controller etwas mehr ausholen und noch eine
+      Methode <methodname>is_valid_date?</methodname>
+      einbauen:<programlisting>def index
+  @posts = Post.all
+
+  if params[:year] and params[:month] and params[:day] and is_valid_date?(params[:year], params[:month], params[:day])
+    @posts = Post.where(:posted_at =&gt; Date.parse("#{params[:day]}.#{params[:month]}.#{params[:year]}"))
+  elsif params[:year] and params[:month] and is_valid_date?(params[:year], params[:month], '01')
+    @posts = Post.where(:posted_at =&gt; (Date.parse("01.#{params[:month]}.#{params[:year]}")..Date.parse("01.#{params[:month]}.#{params[:year]}").end_of_month))
+  elsif params[:year] and is_valid_date?(params[:year], '01', '01')
+    @posts = Post.where(:posted_at =&gt; (Date.parse("01.01.#{params[:year]}")..Date.parse("31.12.#{params[:year]}")))
+  end
+
+  respond_to do |format|
+    format.html # index.html.erb
+    format.json { render json: @posts }
+  end
+end
+
+def is_valid_date?(year, month, day)
+  begin
+    this_date = Date.new(year.to_i, month.to_i, day.to_i)
+    return true
+  rescue ArgumentError
+    return false
+  end
+end</programlisting></para>
+
+      <note>
+        <para>Wer will kann natürlich bei einem falschen Datum nicht wie in
+        diesem Beispiel einfach alle Einträge anzeigen, sondern auf eine
+        andere Seite redirecten. Das kombiniert mit einer Flash-Fehlermeldung
+        an den User wäre wahrscheinlich der beste Weg. Man kann auch eine
+        eigene Klasse zum Überprüfen des Datums schreiben und diese im
+        contraints aufrufen.</para>
+      </note>
+    </section>
+
+    <section xml:id="routes_match_redirects">
+      <title xml:id="routes_match_redirects.title">Redirects</title>
+
+      <para>Ich kann mit einem match auch auf eine andere Seite redirecten
+      (also umleiten). Wenn ich die Eingabe der unsinnigen URL <uri
+      xlink:href="http://0.0.0.0:3000/2010/02/31">http://0.0.0.0:3000/2010/02/31</uri>
+      auf /2010/02 redirecten will, dann geht das so:<programlisting>match "/:year/02/31" =&gt; redirect("/%{year}/02")</programlisting></para>
+
+      <para>Damit könnte man auch die Eingabe eines einstelligen Monats
+      korrekt auf einen zweistelligen Monat umleiten:<programlisting>match "/:year/:month/:day" =&gt; redirect("/%{year}/0%{month}/%{day}"), :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{1}/, :day =&gt; /\d{2}/ }
+</programlisting></para>
+
+      <para>Das gleiche ginge natürlich auch für einen einstelligen Tag. Unter
+      Berücksichtigung aller Kombinationen sähe unsere
+      <filename>config/routes.rb</filename> dann so aus:<programlisting>Blog::Application.routes.draw do
+  resources :posts
+
+  match "/:year/:month/:day" =&gt; redirect("/%{year}/0%{month}/%{day}"), :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{1}/, :day =&gt; /\d{2}/ }
+  match "/:year/:month/:day" =&gt; redirect("/%{year}/0%{month}/0%{day}"), :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{1}/, :day =&gt; /\d{1}/ }
+  match "/:year/:month/:day" =&gt; redirect("/%{year}/%{month}/0%{day}"), :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{2}/, :day =&gt; /\d{1}/ }
+
+  match "/:year/:month" =&gt; redirect("/%{year}/0%{month}"), :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{1}/ }
+
+  match "/:year(/:month(/:day))" =&gt; "posts#index", :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{2}/, :day =&gt; /\d{2}/ }
+end</programlisting></para>
+
+      <para>Mit diesem Redirect-Regelwerk wäre sichergestellt, das ein
+      Benutzer der Seite auch einstellige Monate und Tage eingeben kann und
+      trotzdem an der richtigen Stelle landet. </para>
     </section>
   </section>
 
