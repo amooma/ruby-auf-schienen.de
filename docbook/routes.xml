@@ -58,7 +58,8 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
   <section xml:id="routes_get">
     <title xml:id="routes_get.title">get</title>
 
-    <para>Erstellen wir mal drei statische Seite:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rails generate controller Home index ping pong</command>
+    <para>Erstellen wir mal einen Controller mit drei einfachen
+    Seiten:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rails generate controller Home index ping pong</command>
       create  app/controllers/home_controller.rb
        route  get "home/pong"
        route  get "home/ping"
@@ -173,6 +174,194 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
 
     <para>Sie sehen dabei, das eine URL ein Minuszeichen enthalten darf, aber
     der Routen-Name nicht (ein Unterstrich geht aber).</para>
+
+    <section xml:id="routes_match_parameter">
+      <title xml:id="routes_match_parameter.title">Parameter</title>
+
+      <para>Match kann nicht nur fixe Routen zuordnen, sondern auch noch
+      Parameter übergeben. Ein typisches Beispiel dafür wären Angaben zu einem
+      Datum. Erstellen wir dazu mal eine Mini-Blog-Applikation:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new blog</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>cd blog</command>
+Stefan-Wintermeyers-MacBook-Air:blog stefan$ <command>bundle install</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:blog stefan$ <command>rails generate scaffold post subject:string content:text</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:blog stefan$ <command>rake db:migrate</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:blog stefan$</screen></para>
+
+      <para>Als Beispieldaten in der <filename>db/seeds.rb</filename> nehmen
+      wir:<programlisting>Post.create(:subject =&gt; 'Ein Test', :created_at =&gt; '01.10.2010')
+Post.create(:subject =&gt; 'Noch ein Test', :created_at =&gt; '01.10.2010')
+Post.create(:subject =&gt; 'Und wieder ein Test', :created_at =&gt; '02.10.2010')
+Post.create(:subject =&gt; 'Letzter Test', :created_at =&gt; '01.11.2010')
+Post.create(:subject =&gt; 'Allerletzter Test', :created_at =&gt; '01.11.2011')
+</programlisting></para>
+
+      <para>Mit <command>rake db:seed</command> spielen wir diese Daten in die
+      Datenbank:<screen>Stefan-Wintermeyers-MacBook-Air:blog stefan$ <command>rake db:seed</command>
+Stefan-Wintermeyers-MacBook-Air:blog stefan$</screen></para>
+
+      <para>Wenn wir jetzt mit <command>rails server</command> den Rails
+      Server starten und mit dem Browser auf die Seite <uri
+      xlink:href="http://0.0.0.0:3000/posts">http://0.0.0.0:3000/posts</uri>
+      surfen, bekommen wir folgende Anzeige:<screenshot>
+          <info>
+            <title>Index-Ansicht aller Posts</title>
+          </info>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/posts_index.jpg"></imagedata>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
+
+      <note>
+        <para>Ihnen als alten Rails-Profi brauche ich ja jetzt nicht zu
+        erklären, wie Sie das Tabellen-Feld <varname>created_at</varname> im
+        View <filename>app/views/posts/index.html.erb</filename> einbauen
+        können.</para>
+      </note>
+
+      <para>Für ein solches Blog wäre es natürlich sehr praktisch, wenn man
+      mit der URL <uri
+      xlink:href="http://0.0.0.0:3000/2010/">http://0.0.0.0:3000/2010/</uri>
+      alle Einträge für das Jahr 2010 und mit <uri
+      xlink:href="http://0.0.0.0:3000/2010/10/01">http://0.0.0.0:3000/2010/10/01</uri>
+      alle Einträge für den 01.10.2010 anzeigen könnte. Das erreichen wir mit
+      optionalen Parametern beim match-Eintrag. Bitte tragen Sie folgende
+      Konfiguration in die
+      <filename>config/routes.rb</filename>:<programlisting>Blog::Application.routes.draw do
+  resources :posts
+
+  match "/:year(/:month(/:day))" =&gt; "posts#index"
+end</programlisting></para>
+
+      <para>Die Klammern stehen für optionale Parameter. In diesem Fall muss
+      auf jeden Fall das Jahr, aber nicht unbedingt der Monat oder der Tag
+      angegeben werden.</para>
+
+      <para>Wenn wir nichts anderes ändern, bekommen wir beim Aufruf von <uri
+      xlink:href="http://0.0.0.0:3000/2010/">http://0.0.0.0:3000/2010/</uri>
+      und <uri
+      xlink:href="http://0.0.0.0:3000/2010">http://0.0.0.0:3000/2010</uri>
+      immmer noch das gleiche Ergebnis wie vom Aufruf von <uri
+      xlink:href="http://0.0.0.0:3000/posts">http://0.0.0.0:3000/posts</uri>.
+      Ist ja auch logisch. Erweitern wir aber mal die View-Datei
+      <filename>app/views/posts/index.html.erb</filename> mit einem
+      <code>&lt;%= debug params %&gt;</code> Aufruf ganz am
+      Anfang:<programlisting><emphasis>&lt;%= debug params %&gt;</emphasis>
+
+&lt;h1&gt;Listing posts&lt;/h1&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Subject&lt;/th&gt;
+    &lt;th&gt;Content&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @posts.each do |post| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= post.subject %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= post.content %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Show', post %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Edit', edit_post_path(post) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', post, confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+
+&lt;br /&gt;
+
+&lt;%= link_to 'New Post', new_post_path %&gt;
+</programlisting></para>
+
+      <para>Und jetzt rufen wir mit dem Browser noch mal <uri
+      xlink:href="http://0.0.0.0:3000/2010">http://0.0.0.0:3000/2010</uri>
+      auf:<screenshot>
+          <info>
+            <title>Index-View mit &lt;%= debug params %&gt;</title>
+          </info>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/2010_debug_index.jpg"></imagedata>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
+
+      <para>A-ha! Es wurde von der Route der Parameter
+      <varname>params[:year]</varname> mit dem Wert <code>2010</code> gesetzt.
+      Sehr praktisch, den das können wir im
+      <filename>app/controllers/posts_controller.rb</filename> Controller in
+      der Index-Methode wie folgt einbauen:<programlisting>  def index
+<emphasis>    if params[:year]
+      @posts = Post.where('created_at &gt;= :start AND created_at &lt;= :end', {:start =&gt; Date.parse("01.01.#{params[:year]}"), :end =&gt; Date.parse("31.12.#{params[:year]}")})
+    else
+      @posts = Post.all
+    end</emphasis>
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @posts }
+    end
+  end
+</programlisting></para>
+
+      <para>Damit bekommen wir das gewünschte Ergebnis (nur die 4 Postings aus
+      dem Jahr 2010):<screenshot>
+          <info>
+            <title>Posts aus dem Jahr 2010</title>
+          </info>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/2010_posts_index.jpg"></imagedata>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
+
+      <para>Die Anpassung in der Datei
+      <filename>app/controllers/posts_controller.rb</filename> für das
+      Anzeigen von Monaten und Tagen, ist nur noch eine
+      Fleißarbeit:<programlisting>  def index
+<emphasis>    @posts = Post.all
+    
+    if params[:year] and params[:month] and params[:day]
+      @posts = Post.where('created_at &gt;= :start AND created_at &lt;= :end', {:start =&gt; Date.parse("#{params[:day]}.#{params[:month]}.#{params[:year]}").beginning_of_day, :end =&gt; Date.parse("#{params[:day]}.#{params[:month]}.#{params[:year]}").end_of_day})
+    elsif params[:year] and params[:month]
+      @posts = Post.where('created_at &gt;= :start AND created_at &lt;= :end', {:start =&gt; Date.parse("01.#{params[:month]}.#{params[:year]}"), :end =&gt; Date.parse("01.#{params[:month]}.#{params[:year]}").end_of_month})
+    elsif params[:year]
+      @posts = Post.where('created_at &gt;= :start AND created_at &lt;= :end', {:start =&gt; Date.parse("01.01.#{params[:year]}"), :end =&gt; Date.parse("31.12.#{params[:year]}")})
+    end</emphasis> 
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @posts }
+    end
+  end
+</programlisting></para>
+
+      <para>Damit können wir jetzt Jahre, Monate oder auch ganz gezielt
+      einzelne Tage anzeigen:<screenshot>
+          <info>
+            <title>Ansicht eines Tages</title>
+          </info>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/2010-10-01-posts-index.jpg"></imagedata>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
+
+      <para>more to come</para>
+    </section>
   </section>
 
   <section xml:id="routes_root">
@@ -629,6 +818,12 @@ end
         wir natürlich nicht mehr zu ändern.</para>
       </section>
     </section>
+  </section>
+
+  <section>
+    <title></title>
+
+    <para></para>
   </section>
 
   <section>
