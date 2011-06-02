@@ -20,17 +20,17 @@
     werden.</para>
 
     <para>Bauen wir uns mal eine Test-Rails-Applikation zum
-    Experimentieren:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new webshop</command>
+    Experimentieren:<screen>MacBook:~ sw$ <command>rails new webshop</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>cd webshop</command>
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>bundle install</command>
+MacBook:~ sw$ <command>cd webshop</command>
+MacBook:webshop sw$ <command>bundle install</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake db:migrate</command>
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+MacBook:webshop sw$ <command>rake db:migrate</command>
+MacBook:webshop sw$</screen></para>
 
     <para>Mit rake routes können wir uns die Routen eines Projektes anzeigen
-    lassen. Probieren wir das mal im frischen Projekt aus:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake routes</command>
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+    lassen. Probieren wir das mal im frischen Projekt aus:<screen>MacBook:webshop sw$ <command>rake routes</command>
+MacBook:webshop sw$</screen></para>
 
     <para>Nichts. Es sind in einem neuen Rails-Projekt keine Routen
     eingetragen.</para>
@@ -59,7 +59,7 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
     <title xml:id="routes_get.title">get</title>
 
     <para>Erstellen wir mal einen Controller mit drei einfachen
-    Seiten:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rails generate controller Home index ping pong</command>
+    Seiten:<screen>MacBook:webshop sw$ <command>rails generate controller Home index ping pong</command>
       create  app/controllers/home_controller.rb
        route  get "home/pong"
        route  get "home/ping"
@@ -78,14 +78,14 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
       invoke  assets
       create    app/assets/javascripts/home.js.coffee
       create    app/assets/stylesheets/home.css.scss
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+MacBook:webshop sw$</screen></para>
 
     <para>Jetzt gibt <command>rake route</command> für diese drei Seiten eine
-    Route aus:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake routes</command>
+    Route aus:<screen>MacBook:webshop sw$ <command>rake routes</command>
 home_index GET /home/index(.:format) {:controller=&gt;"home", :action=&gt;"index"}
  home_ping GET /home/ping(.:format)  {:controller=&gt;"home", :action=&gt;"ping"}
  home_pong GET /home/pong(.:format)  {:controller=&gt;"home", :action=&gt;"pong"}
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+MacBook:webshop sw$</screen></para>
 
     <para>Sie sind jetzt nach dem Starten des Rails-Servers mit <command>rails
     server</command> unter<itemizedlist>
@@ -144,12 +144,12 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
   <emphasis>match 'home/ping-ping' =&gt; 'home#ping'</emphasis>
 end</programlisting></para>
 
-    <para>Damit stehen uns folgende Routen zur Verfügung:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake routes</command>
+    <para>Damit stehen uns folgende Routen zur Verfügung:<screen>MacBook:webshop sw$ <command>rake routes</command>
 home_index GET /home/index(.:format)     {:controller=&gt;"home", :action=&gt;"index"}
  home_ping GET /home/ping(.:format)      {:controller=&gt;"home", :action=&gt;"ping"}
  home_pong GET /home/pong(.:format)      {:controller=&gt;"home", :action=&gt;"pong"}
                /home/ping-ping(.:format) {:controller=&gt;"home", :action=&gt;"ping"}
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+MacBook:webshop sw$</screen></para>
 
     <para>Wenn Sie der Route <filename>/home/ping-ping</filename> einen Namen
     geben wollen, so können Sie dies mit der <code>:as =&gt; "name"</code>
@@ -165,12 +165,12 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
 </emphasis>end</programlisting></para>
 
     <para>Jetzt stehen ihnen im System folgende Routen-Namen zur
-    Verfügung:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake routes</command>
+    Verfügung:<screen>MacBook:webshop sw$ <command>rake routes</command>
 home_index GET /home/index(.:format)     {:controller=&gt;"home", :action=&gt;"index"}
  home_ping GET /home/ping(.:format)      {:controller=&gt;"home", :action=&gt;"ping"}
  home_pong GET /home/pong(.:format)      {:controller=&gt;"home", :action=&gt;"pong"}
  ping_ping     /home/ping-ping(.:format) {:controller=&gt;"home", :action=&gt;"ping"}
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+MacBook:webshop sw$</screen></para>
 
     <para>Sie sehen dabei, das eine URL ein Minuszeichen enthalten darf, aber
     der Routen-Name nicht (ein Unterstrich geht aber).</para>
@@ -186,16 +186,16 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
 
       <para>Match kann nicht nur fixe Routen zuordnen, sondern auch noch
       Parameter übergeben. Ein typisches Beispiel dafür wären Angaben zu einem
-      Datum. Erstellen wir dazu mal eine Mini-Blog-Applikation:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new blog</command>
+      Datum. Erstellen wir dazu mal eine Mini-Blog-Applikation:<screen>MacBook:~ sw$ <command>rails new blog</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>cd blog</command>
-Stefan-Wintermeyers-MacBook-Air:blog stefan$ <command>bundle install</command>
+MacBook:~ sw$ <command>cd blog</command>
+MacBook:blog sw$ <command>bundle install</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:blog stefan$ <command>rails generate scaffold Post subject:string content:text posted_at:date</command>
+MacBook:blog sw$ <command>rails generate scaffold Post subject:string content:text posted_at:date</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:blog stefan$ <command>rake db:migrate</command>
+MacBook:blog sw$ <command>rake db:migrate</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:blog stefan$</screen></para>
+MacBook:blog sw$</screen></para>
 
       <para>Als Beispieldaten in der <filename>db/seeds.rb</filename> nehmen
       wir:<programlisting>Post.create(:subject =&gt; 'Ein Test', :posted_at =&gt; '01.10.2010')
@@ -205,8 +205,8 @@ Post.create(:subject =&gt; 'Letzter Test', :posted_at =&gt; '01.11.2010')
 Post.create(:subject =&gt; 'Allerletzter Test', :posted_at =&gt; '01.11.2011')</programlisting></para>
 
       <para>Mit <command>rake db:seed</command> spielen wir diese Daten in die
-      Datenbank:<screen>Stefan-Wintermeyers-MacBook-Air:blog stefan$ <command>rake db:seed</command>
-Stefan-Wintermeyers-MacBook-Air:blog stefan$</screen></para>
+      Datenbank:<screen>MacBook:blog sw$ <command>rake db:seed</command>
+MacBook:blog sw$</screen></para>
 
       <para>Wenn wir jetzt mit <command>rails server</command> den Rails
       Server starten und mit dem Browser auf die Seite <uri
@@ -515,18 +515,18 @@ end</programlisting></para>
   <emphasis>root :to =&gt; 'home#index'</emphasis>
 end</programlisting></para>
 
-    <para>Unsere neuen Routen:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake routes</command>
+    <para>Unsere neuen Routen:<screen>MacBook:webshop sw$ <command>rake routes</command>
 home_index GET /home/index(.:format)     {:controller=&gt;"home", :action=&gt;"index"}
  home_ping GET /home/ping(.:format)      {:controller=&gt;"home", :action=&gt;"ping"}
  home_pong GET /home/pong(.:format)      {:controller=&gt;"home", :action=&gt;"pong"}
  ping_ping     /home/ping-ping(.:format) {:controller=&gt;"home", :action=&gt;"ping"}
       root     /                         {:controller=&gt;"home", :action=&gt;"index"}
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+MacBook:webshop sw$</screen></para>
 
     <important>
       <para>Nach dem setzen der <code>root</code> Route nicht das Löschen der
-      Datei <filename>/public/index.html</filename> vergessen!<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rm public/index.html</command> 
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+      Datei <filename>/public/index.html</filename> vergessen!<screen>MacBook:webshop sw$ <command>rm public/index.html</command> 
+MacBook:webshop sw$</screen></para>
     </important>
   </section>
 
@@ -534,15 +534,15 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
     <title xml:id="routes_resources.title">resources</title>
 
     <para>Bauen wir uns für <code>resources</code> eine neue Rails-Applikation
-    zum Experimentieren:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new phonebook</command>
+    zum Experimentieren:<screen>MacBook:~ sw$ <command>rails new phonebook</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>cd phonebook</command>
-Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>bundle install</command>
+MacBook:~ sw$ <command>cd phonebook</command>
+MacBook:phonebook sw$ <command>bundle install</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ </screen></para>
+MacBook:phonebook sw$ </screen></para>
 
     <para>Beim Verwenden von Scaffold werden automatisch Routen für die neu
-    erschaffenen Resourcen erstellt. Legen wir mal eine Resource an:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rails generate scaffold person firstname:string lastname:string</command>
+    erschaffenen Resourcen erstellt. Legen wir mal eine Resource an:<screen>MacBook:phonebook sw$ <command>rails generate scaffold person firstname:string lastname:string</command>
       invoke  active_record
       create    db/migrate/20110531175742_create_people.rb
       create    app/models/person.rb
@@ -551,9 +551,9 @@ Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ </screen></para>
       create      test/fixtures/people.yml
        route  resources :people
 [...]
-Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake db:migrate</command>
+MacBook:phonebook sw$ <command>rake db:migrate</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
+MacBook:phonebook sw$</screen></para>
 
     <para>Die Datei <filename>config/routes.rb</filename> sieht damit so
     aus:<programlisting>Webshop::Application.routes.draw do
@@ -565,7 +565,7 @@ end</programlisting></para>
       <filename>config/routes.rb</filename> hinzugefügt.</para>
     </note>
 
-    <para>Die daraus resultierenden Routen:<screen>Stefan-Wintermeyers-MacBook-Air:webshop stefan$ <command>rake routes</command>
+    <para>Die daraus resultierenden Routen:<screen>MacBook:webshop sw$ <command>rake routes</command>
      people GET    /people(.:format)          {:action=&gt;"index", :controller=&gt;"people"}
             POST   /people(.:format)          {:action=&gt;"create", :controller=&gt;"people"}
  new_person GET    /people/new(.:format)      {:action=&gt;"new", :controller=&gt;"people"}
@@ -573,7 +573,7 @@ edit_person GET    /people/:id/edit(.:format) {:action=&gt;"edit", :controller=&
      person GET    /people/:id(.:format)      {:action=&gt;"show", :controller=&gt;"people"}
             PUT    /people/:id(.:format)      {:action=&gt;"update", :controller=&gt;"people"}
             DELETE /people/:id(.:format)      {:action=&gt;"destroy", :controller=&gt;"people"}
-Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
+MacBook:webshop sw$</screen></para>
 
     <para>Diese RESTful Routen sind Ihnen bereits aus <xref
     linkend="scaffolding" /> bekannt. Sie werden benötigt, um die Datensätze
@@ -586,7 +586,7 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
       einer <methodname>has_many</methodname> Verknüpfung (siehe <xref
       linkend="activerecord_has_many" />) arbeiten. Diese lassen sich
       eindeutig über Routen ansprechen. Legen wir eine zweite Resource
-      <classname>phone</classname> an:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rails generate scaffold phone person_id:integer phone_number:string</command>
+      <classname>phone</classname> an:<screen>MacBook:phonebook sw$ <command>rails generate scaffold phone person_id:integer phone_number:string</command>
       invoke  active_record
       create    db/migrate/20110531180003_create_phones.rb
       create    app/models/phone.rb
@@ -595,9 +595,9 @@ Stefan-Wintermeyers-MacBook-Air:webshop stefan$</screen></para>
       create      test/fixtures/phones.yml
        route  resources :phones
 [...]
-Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake db:migrate</command>
+MacBook:phonebook sw$ <command>rake db:migrate</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ </screen></para>
+MacBook:phonebook sw$ </screen></para>
 
       <para>Jetzt verküpfen wir beide Resourcen miteinander. In der Datei
       <filename>app/models/person.rb</filename> fügen wir ein
@@ -617,10 +617,10 @@ end
 Person.create(:lastname =&gt; 'Stein').phones.create(:phone_number =&gt; '040 1234567')
 Person.create(:lastname =&gt; 'Oberhuber')</programlisting></para>
 
-      <para>Die spielen wir mit <command>rake db:seed</command> ein:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake db:seed</command>
-Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
+      <para>Die spielen wir mit <command>rake db:seed</command> ein:<screen>MacBook:phonebook sw$ <command>rake db:seed</command>
+MacBook:phonebook sw$</screen></para>
 
-      <para>Schauen wir uns das kurz in der Console an:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rails console</command>
+      <para>Schauen wir uns das kurz in der Console an:<screen>MacBook:phonebook sw$ <command>rails console</command>
 Loading development environment (Rails 3.1.0.rc1)
 ruby-1.9.2-p180 :001 &gt; <command>Person.first</command>
   Person Load (0.1ms)  SELECT "people".* FROM "people" LIMIT 1
@@ -630,7 +630,7 @@ ruby-1.9.2-p180 :002 &gt; <command>Person.first.phones</command>
   Phone Load (0.2ms)  SELECT "phones".* FROM "phones" WHERE "phones"."person_id" = 1
  =&gt; [#&lt;Phone id: 1, person_id: 1, phone_number: "030 1234567", created_at: "2011-05-31 18:03:07", updated_at: "2011-05-31 18:03:07"&gt;, #&lt;Phone id: 2, person_id: 1, phone_number: "0171 1234567", created_at: "2011-05-31 18:03:07", updated_at: "2011-05-31 18:03:07"&gt;] 
 ruby-1.9.2-p180 :003 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
+MacBook:phonebook sw$</screen></para>
 
       <para>Wenn wir den Datensatz von <methodname>Person.first</methodname>
       im Browser anschauen wollen, so müssen wir mit <command>rails
@@ -705,7 +705,7 @@ end</programlisting></para>
       <para>Bis jetzt haben wir in der <filename>config/routes.rb</filename>
       zwei Einträge für <code>phones</code>. Einmal als Nested Resource
       innerhalb der <code>people</code> Resouce und einmal als eigenständige
-      Resource. <command>rake routes</command> zeigt beide Varianten:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake routes</command>
+      Resource. <command>rake routes</command> zeigt beide Varianten:<screen>MacBook:phonebook sw$ <command>rake routes</command>
     person_phones GET    /people/:person_id/phones(.:format)          {:action=&gt;"index", :controller=&gt;"phones"}
                   POST   /people/:person_id/phones(.:format)          {:action=&gt;"create", :controller=&gt;"phones"}
  new_person_phone GET    /people/:person_id/phones/new(.:format)      {:action=&gt;"new", :controller=&gt;"phones"}
@@ -727,7 +727,7 @@ edit_person_phone GET    /people/:person_id/phones/:id/edit(.:format) {:action=&
             phone GET    /phones/:id(.:format)                        {:action=&gt;"show", :controller=&gt;"phones"}
                   PUT    /phones/:id(.:format)                        {:action=&gt;"update", :controller=&gt;"phones"}
                   DELETE /phones/:id(.:format)                        {:action=&gt;"destroy", :controller=&gt;"phones"}
-Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
+MacBook:phonebook sw$</screen></para>
 
       <para>Ganz oben stehen interessante neue Routen-Varianten, die wir so
       noch nicht hatten: <code>new_person_phone</code>?
@@ -746,7 +746,7 @@ Stefan-Wintermeyers-MacBook-Air:phonebook stefan$</screen></para>
   end
 end</programlisting></para>
 
-      <para>Schauen wir uns die Routen an:<screen>Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ <command>rake routes</command>
+      <para>Schauen wir uns die Routen an:<screen>MacBook:phonebook sw$ <command>rake routes</command>
     person_phones GET    /people/:person_id/phones(.:format)          {:action=&gt;"index", :controller=&gt;"phones"}
                   POST   /people/:person_id/phones(.:format)          {:action=&gt;"create", :controller=&gt;"phones"}
  new_person_phone GET    /people/:person_id/phones/new(.:format)      {:action=&gt;"new", :controller=&gt;"phones"}
@@ -761,7 +761,7 @@ edit_person_phone GET    /people/:person_id/phones/:id/edit(.:format) {:action=&
            person GET    /people/:id(.:format)                        {:action=&gt;"show", :controller=&gt;"people"}
                   PUT    /people/:id(.:format)                        {:action=&gt;"update", :controller=&gt;"people"}
                   DELETE /people/:id(.:format)                        {:action=&gt;"destroy", :controller=&gt;"people"}
-Stefan-Wintermeyers-MacBook-Air:phonebook stefan$ </screen></para>
+MacBook:phonebook sw$ </screen></para>
 
       <para>Jetzt müssen wir aber noch den Controller und alle Views an die
       neue Situation anpassen.</para>
