@@ -87,8 +87,9 @@ home_index GET /home/index(.:format) {:controller=&gt;"home", :action=&gt;"index
  home_pong GET /home/pong(.:format)  {:controller=&gt;"home", :action=&gt;"pong"}
 MacBook:webshop sw$</screen></para>
 
-    <para>Sie sind jetzt nach dem Starten des Rails-Servers mit <command>rails
-    server</command> unter<itemizedlist>
+    <para>Die Seiten sind nach dem Starten des Rails-Servers mit
+    <command>rails server</command> unter den folgenden URLs
+    erreichbar:<itemizedlist>
         <listitem>
           <para><uri
           xlink:href="http://0.0.0.0:300/home/index">http://0.0.0.0:300/home/index</uri></para>
@@ -114,6 +115,18 @@ MacBook:webshop sw$</screen></para>
         </listitem>
       </itemizedlist></para>
 
+    <para><screenshot>
+        <info>
+          <title>http://0.0.0.0:300/home/ping</title>
+        </info>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screenshots/home_ping.jpg"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
+
     <para>Rails sagt uns mit der Ausgabe <code>{:controller=&gt;"home",
     :action=&gt;"index"}</code> das die Route <uri>/home/index</uri> in den
     Controller <classname>home</classname> und dort zur Action/Methode
@@ -128,6 +141,54 @@ MacBook:webshop sw$</screen></para>
 </programlisting></para>
   </section>
 
+  <section xml:id="routes_root">
+    <title xml:id="routes_root.title">root :to =&gt; 'welcome#index'</title>
+
+    <para>In der default <filename>config/routes.rb</filename> Datei finden
+    Sie recht weit unten folgenden Kommentar:<programlisting>  # You can have the root of your site routed with "root"
+  # just remember to delete public/index.html.
+  # root :to =&gt; 'welcome#index'
+</programlisting></para>
+
+    <para>Wenn Sie dort die letzte Zeile auskommentieren, können Sie damit
+    Ihre <uri xlink:href="http://0.0.0.0:3000/">http://0.0.0.0:3000/</uri>
+    definieren. Legen wir die mal auf
+    <methodname>home#index</methodname>:<programlisting>Webshop::Application.routes.draw do
+  get "home/index"
+
+  get "home/ping"
+
+  get "home/pong"
+  
+  <emphasis>root :to =&gt; 'home#index'</emphasis>
+end</programlisting></para>
+
+    <para>Unsere neuen Routen:<screen>MacBook:webshop sw$ <command>rake routes</command>
+home_index GET /home/index(.:format)     {:controller=&gt;"home", :action=&gt;"index"}
+ home_ping GET /home/ping(.:format)      {:controller=&gt;"home", :action=&gt;"ping"}
+ home_pong GET /home/pong(.:format)      {:controller=&gt;"home", :action=&gt;"pong"}
+      root     /                         {:controller=&gt;"home", :action=&gt;"index"}
+MacBook:webshop sw$</screen></para>
+
+    <para><screenshot>
+        <info>
+          <title>Die / Route ruft home#index auf</title>
+        </info>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screenshots/routes_home_index.jpg"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
+
+    <important>
+      <para>Nach dem setzen der <code>root</code> Route nicht das Löschen der
+      Datei <filename>/public/index.html</filename> vergessen!<screen>MacBook:webshop sw$ <command>rm public/index.html</command> 
+MacBook:webshop sw$</screen></para>
+    </important>
+  </section>
+
   <section xlink:href="routes_match">
     <title xml:id="routes_match.title">match</title>
 
@@ -140,6 +201,8 @@ MacBook:webshop sw$</screen></para>
   get "home/ping"
 
   get "home/pong"
+
+  root :to =&gt; 'home#index'
   
   <emphasis>match 'home/ping-ping' =&gt; 'home#ping'</emphasis>
 end</programlisting></para>
@@ -148,8 +211,21 @@ end</programlisting></para>
 home_index GET /home/index(.:format)     {:controller=&gt;"home", :action=&gt;"index"}
  home_ping GET /home/ping(.:format)      {:controller=&gt;"home", :action=&gt;"ping"}
  home_pong GET /home/pong(.:format)      {:controller=&gt;"home", :action=&gt;"pong"}
+      root     /                         {:controller=&gt;"home", :action=&gt;"index"}
                /home/ping-ping(.:format) {:controller=&gt;"home", :action=&gt;"ping"}
 MacBook:webshop sw$</screen></para>
+
+    <para><screenshot>
+        <info>
+          <title>http://0.0.0.0:3000/home/ping-pong</title>
+        </info>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screenshots/home_ping-ping.jpg"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
 
     <para>Wenn Sie der Route <filename>/home/ping-ping</filename> einen Namen
     geben wollen, so können Sie dies mit der <code>:as =&gt; "name"</code>
@@ -160,6 +236,8 @@ MacBook:webshop sw$</screen></para>
   get "home/ping"
 
   get "home/pong"
+
+  root :to =&gt; 'home#index'
   
   <emphasis>match 'home/ping-ping' =&gt; 'home#ping', :as =&gt; "ping_ping"
 </emphasis>end</programlisting></para>
@@ -169,6 +247,7 @@ MacBook:webshop sw$</screen></para>
 home_index GET /home/index(.:format)     {:controller=&gt;"home", :action=&gt;"index"}
  home_ping GET /home/ping(.:format)      {:controller=&gt;"home", :action=&gt;"ping"}
  home_pong GET /home/pong(.:format)      {:controller=&gt;"home", :action=&gt;"pong"}
+      root     /                         {:controller=&gt;"home", :action=&gt;"index"}
  ping_ping     /home/ping-ping(.:format) {:controller=&gt;"home", :action=&gt;"ping"}
 MacBook:webshop sw$</screen></para>
 
@@ -347,7 +426,7 @@ end</programlisting></para>
       <para>Damit können wir jetzt Jahre, Monate oder auch ganz gezielt
       einzelne Tage anzeigen:<screenshot>
           <info>
-            <title>Ansicht eines Tages</title>
+            <title>Ansicht eines einzelnen Tages</title>
           </info>
 
           <mediaobject>
@@ -389,8 +468,9 @@ end</programlisting></para>
 Completed 500 Internal Server Error in 3ms
 </programlisting></para>
 
-      <para>Es ist klar, das die Suche nach dem Datum "dafuer.beispiel.ein"
-      nicht funktionieren kann.</para>
+      <para>Es ist klar, das die Suche nach dem Datum
+      "<code>dafuer.beispiel.ein</code>" nicht funktionieren kann. Ein Datum
+      besteht nun mal aus Zahlen und nicht aus Buchstaben.</para>
 
       <para>Contraints können mittels Regular Expressions den Inhalt der URL
       besser definieren. In unserem Blog-Fall würde die
@@ -488,46 +568,9 @@ end</programlisting></para>
 
       <para>Mit diesem Redirect-Regelwerk wäre sichergestellt, das ein
       Benutzer der Seite auch einstellige Monate und Tage eingeben kann und
-      trotzdem an der richtigen Stelle landet.</para>
+      trotzdem an der richtigen Stelle landet bzw. zum richtigen Format
+      umgeleitet wird.</para>
     </section>
-  </section>
-
-  <section xml:id="routes_root">
-    <title xml:id="routes_root.title">root :to =&gt; 'welcome#index'</title>
-
-    <para>In der Datei finden Sie folgenden Eintrag:<programlisting>  # You can have the root of your site routed with "root"
-  # just remember to delete public/index.html.
-  # root :to =&gt; 'welcome#index'
-</programlisting></para>
-
-    <para>Wenn Sie dort die letzte Zeile auskommentieren, können Sie damit
-    Ihre <uri xlink:href="http://0.0.0.0:3000/">http://0.0.0.0:3000/</uri>
-    definieren. Legen wir die mal auf
-    <methodname>home#index</methodname>:<programlisting>Webshop::Application.routes.draw do
-  get "home/index"
-
-  get "home/ping"
-
-  get "home/pong"
-  
-  match 'home/ping-ping' =&gt; 'home#ping', :as =&gt; "ping_ping"
-  
-  <emphasis>root :to =&gt; 'home#index'</emphasis>
-end</programlisting></para>
-
-    <para>Unsere neuen Routen:<screen>MacBook:webshop sw$ <command>rake routes</command>
-home_index GET /home/index(.:format)     {:controller=&gt;"home", :action=&gt;"index"}
- home_ping GET /home/ping(.:format)      {:controller=&gt;"home", :action=&gt;"ping"}
- home_pong GET /home/pong(.:format)      {:controller=&gt;"home", :action=&gt;"pong"}
- ping_ping     /home/ping-ping(.:format) {:controller=&gt;"home", :action=&gt;"ping"}
-      root     /                         {:controller=&gt;"home", :action=&gt;"index"}
-MacBook:webshop sw$</screen></para>
-
-    <important>
-      <para>Nach dem setzen der <code>root</code> Route nicht das Löschen der
-      Datei <filename>/public/index.html</filename> vergessen!<screen>MacBook:webshop sw$ <command>rm public/index.html</command> 
-MacBook:webshop sw$</screen></para>
-    </important>
   </section>
 
   <section xml:id="routes_resources">
