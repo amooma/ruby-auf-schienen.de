@@ -19,7 +19,7 @@
     geschickt. Ein Cookie wird dabei auf dem Browsersystem weder durch einen
     Neustart des Browsers noch durch einen Neustart des ganzen Systems
     gelöscht. Natürlich kann der User des Browsers den Cookie aber manuell
-    löschen. </para>
+    löschen.</para>
 
     <para><important>
         <para>Ein Browser muss keine Cookies akzeptieren und er muss sie auch
@@ -35,24 +35,176 @@
         nur zur Speicherung von kleinen Datenmengen (z.B. einer Kundennummer)
         eingesetzt werden, um den Overhead im Protokoll nicht zu gross werden
         zu lassen.</para>
-      </tip>Um die Arbeitsweise mit Cookies zu veranschaulichen, bauen wir uns
-    jetzt eine Rails-Applikation, die auf einer Seite einen Cookie setzt, auf
-    einer anderen Seite diesen Cookie ausliesst und den Inhalt anzeigt und
-    einer dritten Seite die den Cookie wieder löscht.</para>
+      </tip></para>
+
+    <para>Cookies werden gelesen und gesetzt wie wir es mit einem Hash der
+    <varname>cookies[]</varname> heißt machen würden. Um den technischen
+    Kleinkram kümmert sich dann Rails.</para>
+
+    <para>Um die Arbeitsweise mit Cookies zu veranschaulichen, bauen wir uns
+    eine Rails-Applikation, die auf einer Seite einen Cookie setzt, auf einer
+    anderen Seite diesen Cookie ausliesst und den Inhalt anzeigt und einer
+    dritten Seite die den Cookie wieder löscht.</para>
 
     <para><screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new cookie_jar</command>
 [...]
 Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>cd cookie_jar</command>
 Stefan-Wintermeyers-MacBook-Air:cookie_jar stefan$ <command>bundle install</command>
 [...]
+Stefan-Wintermeyers-MacBook-Air:cookie_jar stefan$ <command>rails generate controller Home set_cookies show_cookies delete_cookies</command>
+[...]
 Stefan-Wintermeyers-MacBook-Air:cookie_jar stefan$</screen></para>
 
-    <para></para>
+    <para>Die Controllerdatei
+    <filename>app/controllers/home_controller.rb</filename> befüllen wir wie
+    folgt:<programlisting>class HomeController &lt; ApplicationController
+  def set_cookies
+    cookies[:user_name] = "Horst Meier" 
+    cookies[:kundenummer] = "1234567890" 
+  end
 
-    <para></para>
+  def show_cookies
+    @user_name = cookies[:user_name]
+    @kundennummer = cookies[:kundenummer]
+  end
 
-    <para></para>
+  def delete_cookies
+    cookies.delete :user_name
+    cookies.delete :kundenummer
+  end
+end</programlisting></para>
 
-    <para></para>
+    <para>Und die View Datei
+    <filename>app/views/home/show_cookies.html.erb</filename>
+    so:<programlisting>&lt;h1&gt;Home#show_cookies&lt;/h1&gt;
+&lt;p&gt;Find me in app/views/home/show_cookies.html.erb&lt;/p&gt;
+
+&lt;table&gt;
+ &lt;tr&gt;&lt;td&gt;User-Name&lt;/td&gt;&lt;td&gt;&lt;%= @user_name %&gt;&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;Kundennummer&lt;/td&gt;&lt;td&gt;&lt;%= @kundennummer %&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;</programlisting></para>
+
+    <para>Starten Sie den Rails-Server mit <command>rails server</command> und
+    öffnen Sie die URL <uri
+    xlink:href="http://0.0.0.0:3000/home/show_cookies">http://0.0.0.0:3000/home/show_cookies</uri>
+    in Ihrem Browser. Sie werden keine Werte angezeigt bekommen. Öffnen Sie
+    jetzt die URL <uri
+    xlink:href="http://0.0.0.0:3000/home/set_cookies">http://0.0.0.0:3000/home/set_cookies</uri>
+    und danach wieder <uri
+    xlink:href="http://0.0.0.0:3000/home/show_cookies">http://0.0.0.0:3000/home/show_cookies</uri>.
+    Jetzt bekommen Sie die Werte, die wir in der
+    <methodname>set_cookies</methodname> Methode gesetzt haben
+    angezeigt.</para>
+
+    <para>Mit dem Aufruf der Seite <uri
+    xlink:href="http://0.0.0.0:3000/home/delete_cookies">http://0.0.0.0:3000/home/delete_cookies</uri>
+    können Sie die Cookies wieder löschen.</para>
+
+    <para>Die so gesetzten Cookies leben auf dem Browser so lange bis der
+    Browser ganz geschlossen wird.</para>
+
+    <warning>
+      <para>Der Inhalt eines normal gesetzten Cookies im Browser ist für den
+      User problemlos und einfach zu lesen. Er wird nicht verschlüsselt und
+      sollte deshalb keine Passwörter oder ähnliche Daten enthalten. Es ist
+      auch nicht ratsam einen Warenkorb in einem unsignierten (siehe <xref
+      linkend="cookies_signed" />) Cookie zu speichern, da sonst der User
+      selber Preise in diesem Warenkorb ändern könnte.</para>
+    </warning>
+
+    <section xml:id="cookies_permanent">
+      <title xml:id="cookies_permanent.title">permanent Cookies</title>
+
+      <para>Cookies werden normalerweise gesetzt, um der Applikation eine
+      Möglichkeit zu geben User bei späteren Besuchen wieder zu erkennen oder
+      Einkaufskörbe zu speichern. Zwischen diesen Besuchen der Website kann
+      viel Zeit ins Land gehen und der Browser auch mal vom User geschlossen
+      werden. Um Cookies länger als für die aktuelle Browser-Sitzung zu
+      speichern, gibt es die <methodname>permanent</methodname> Methode. Unser
+      obiges Beispiel können wir in der
+      <filename>app/controllers/home_controller.rb</filename> um diese Methode
+      erweitern:<programlisting>class HomeController &lt; ApplicationController
+  def set_cookies
+<emphasis>    cookies.permanent[:user_name] = "Horst Meier" 
+    cookies.permanent[:kundenummer] = "1234567890" </emphasis>
+  end
+
+  def show_cookies
+    @user_name = cookies[:user_name]
+    @kundennummer = cookies[:kundenummer]
+  end
+
+  def delete_cookies
+    cookies.delete :user_name
+    cookies.delete :kundenummer
+  end
+
+  def debug_cookies
+  end
+end
+</programlisting></para>
+
+      <important>
+        <para>"permanent" heißt hier nicht wirklich permanent. Man kann einen
+        Cookie nicht permanent setzen. Ein Cookie braucht beim Setzen immer
+        einen "gültig bis" Stempel, den der Browser dazu benutzen kann alte
+        Cookies automatisch zu löschen. Mit der permanent Methode wird dieser
+        Wert auf das heutige Datum in 20 Jahren gesetzt. Das ist praktisch mit
+        permanent gleich zu setzen.</para>
+      </important>
+    </section>
+
+    <section xml:id="cookies_signed">
+      <title xml:id="cookies_signed.title">signed Cookies</title>
+
+      <para>Bei normal gesetzten Cookies hat man auf Applikationsseite keine
+      Möglichkeit rauszufinden, ob der User der Applikation den Cookie
+      eigenhändig geändert hat. Das kann schnell zu einem Sicherheitsproblem
+      führen, den Inhalt eines Cookie im Browser zu ändern ist kein
+      Zauberwerk. Die Lösung ist eine Signierung der Cookies mit einem nur mir
+      bekannten Key. Dieser Key wird bei einem <command>rails new</command>
+      automatisch per Zufallsgenerator erzeugt und liegt in der Datei
+      <filename>config/initializers/secret_token.rb</filename>:<programlisting># Be sure to restart your server when you modify this file.
+
+# Your secret key for verifying the integrity of signed cookies.
+# If you change this key, all old signed cookies will become invalid!
+# Make sure the secret is at least 30 characters and all random,
+# no regular words or you'll be exposed to dictionary attacks.
+CookieJar::Application.config.secret_token = 'd06619d4de97e76be4943624afed'
+</programlisting></para>
+
+      <para><warning>
+          <para>Sollten Sie Ihre Rails-Applikation irgendwann mal neu
+          aufsetzen und wieder mit einem frischen Rails-Projekt anfangen, so
+          ist es hilfreich diesen Key in die neue Rails-Applikation zu
+          übertragen. Sonst können Sie die vorher gesetzten Cookies nicht mehr
+          benutzen!</para>
+        </warning>Um Cookies zu signieren, gibt es die
+      <methodname>signed</methodname> Methode. Diese muss beim Schreiben und
+      beim Lesen des Cookies benutzt werden. Unser obiges Beispiel können wir
+      in der <filename>app/controllers/home_controller.rb</filename> um diese
+      Methode erweitern:<programlisting>class HomeController &lt; ApplicationController
+  def set_cookies
+<emphasis>    cookies.permanent.signed[:user_name] = "Horst Meier" 
+    cookies.permanent.signed[:kundenummer] = "1234567890" </emphasis>
+  end
+
+  def show_cookies
+<emphasis>    @user_name = cookies.signed[:user_name]
+    @kundennummer = cookies.signed[:kundenummer]</emphasis>
+  end
+
+  def delete_cookies
+    cookies.delete :user_name
+    cookies.delete :kundenummer
+  end
+
+  def debug_cookies
+  end
+end
+</programlisting>Der Inhalt des Cookies wird jetzt bei jedem Setzen
+      verschlüsselt abgespeichert. Der Name des Cookies ist weiterhin im
+      Klartext für den User lesbar. Der Wert aber nicht mehr.</para>
+    </section>
   </section>
 </chapter>
