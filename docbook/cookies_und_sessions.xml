@@ -13,11 +13,11 @@
     <title xml:id="cookies.title">Cookies</title>
 
     <para>Mit einem Cookie kann man auf dem System des Webbrowsers
-    Informationen speichern, die der Webserver vorher an diesen Browser
-    geschickt hat. Die Informationen werden später im
-    Hypertext-Transfer-Protocol-Header wieder vom Browser an den Server
-    geschickt. Ein Cookie wird dabei auf dem Browsersystem weder durch einen
-    Neustart des Browsers noch durch einen Neustart des ganzen Systems
+    Informationen in Form von Strings als Key-Value-Paar speichern, die der
+    Webserver vorher an diesen Browser geschickt hat. Die Informationen werden
+    später im Hypertext-Transfer-Protocol-Header wieder vom Browser an den
+    Server geschickt. Ein Cookie wird dabei auf dem Browsersystem weder durch
+    einen Neustart des Browsers noch durch einen Neustart des ganzen Systems
     gelöscht. Natürlich kann der User des Browsers den Cookie aber manuell
     löschen.</para>
 
@@ -29,12 +29,12 @@
         finden sie auf Wikipedia unter <uri
         xlink:href="http://de.wikipedia.org/wiki/HTTP-Cookie">http://de.wikipedia.org/wiki/HTTP-Cookie</uri></para>
       </important><tip>
-        <para>Ein Cookie kann nicht beliebig lang sein. Man muss sich dabei
-        auch immer vor Augen halten, das die Informationen der gespeicherten
-        Cookies immer vom Browser an den Server geschickt werden. Er sollte
-        nur zur Speicherung von kleinen Datenmengen (z.B. einer Kundennummer)
-        eingesetzt werden, um den Overhead im Protokoll nicht zu gross werden
-        zu lassen.</para>
+        <para>Ein Cookie kann nicht beliebig lang sein (maximal 4kB). Man muss
+        sich dabei auch immer vor Augen halten, das die Informationen der
+        gespeicherten Cookies immer vom Browser an den Server geschickt
+        werden. Er sollte nur zur Speicherung von kleinen Datenmengen (z.B.
+        einer Kundennummer) eingesetzt werden, um den Overhead im Protokoll
+        nicht zu gross werden zu lassen.</para>
       </tip></para>
 
     <para>Cookies werden gelesen und gesetzt wie wir es mit einem Hash der
@@ -205,6 +205,139 @@ end
 </programlisting>Der Inhalt des Cookies wird jetzt bei jedem Setzen
       verschlüsselt abgespeichert. Der Name des Cookies ist weiterhin im
       Klartext für den User lesbar. Der Wert aber nicht mehr.</para>
+    </section>
+  </section>
+
+  <section>
+    <title>Sessions</title>
+
+    <para>Da HTTP ein state-less Protokoll ist, treffen wir auf besondere
+    Probleme bei der Entwicklung von Anwendungen. Eigentlich hat eine Webseite
+    nicht mit einer anderen Webseite zu tun und sie wissen auch nichts von
+    einander. Da man sich aber auf vielen Webseite z.B. nur einmal und nicht
+    auf jeder Seite neu Anmelden will, ist das ein Problem. Die Lösung dafür
+    heißt Session. Von Rails wird automatisch für jeden neuen Besucher der
+    Webseite eine neue Session angelegt. Diese wird per Default als Cookie
+    (siehe <xref linkend="cookies" />) gespeichert und unterliegt damit der 4
+    KB Limitation. Man kann die Sessions aber auch in der Datenbank speichern
+    (siehe <xref linkend="sessions_datenbank" />). Eine eigenständige und
+    unique Session-ID wird automatisch erstellt und der Cookie wird per
+    Default beim Schliessen des Webbrowsers gelöscht.<warning>
+        <para>Bitte beachten Sie, das nur von Rails generierte Seiten im
+        Session-Management arbeiten. Wenn Sie eine statische HTML-Seite aus
+        <filename>/public</filename> aufrufen, so läuft das ausserhalb des
+        Session-Managements.</para>
+      </warning></para>
+
+    <para>Das schöne an einer Rails-Session ist, das wir dort nicht nur wie
+    bei Cookies Strings sondern auch Hashes und Arrays abspeichern können. So
+    können wir beispielsweise bequem einen Warenkorb in einem Online-Shop
+    realisieren.</para>
+
+    <section>
+      <title>Breadcrumbs per Session</title>
+
+      <para>Als Beispiel erstellen wir eine Applikation mit einem Controller
+      und drei Views. Beim Besuch eines Views werden die vorherig besuchten
+      Views in einer kleinen Liste angezeigt.</para>
+
+      <para>Die Basisapplikation:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new breadcrumbs</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>cd breadcrumbs</command>
+Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$ <command>bundle install</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$ <command>rails generate controller Home ping pong index</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$</screen></para>
+
+      <para>Als erstes erstellen wir eine Methode, mit der wir die letzten 3
+      URLs in der Session speichern und setzen eine Instanz Variable
+      <varname>@breadcrumbs</varname> um die Werte im View sauber abrufen zu
+      können. Dazu richten wir einen <methodname>before_filter</methodname> in
+      der <filename>app/controllers/home_controller.rb</filename>
+      ein:<programlisting>class HomeController &lt; ApplicationController
+  <emphasis>before_filter :set_breadcrumbs</emphasis>
+  
+  def ping
+  end
+
+  def pong
+  end
+
+  def index
+  end
+
+<emphasis>  private  
+  def set_breadcrumbs
+    @breadcrumbs = session[:breadcrumbs]
+    @breadcrumbs ||= Array.new
+    @breadcrumbs.push(request.url)
+    @breadcrumbs.shift if @breadcrumbs.count &gt; 3
+    session[:breadcrumbs] = @breadcrumbs
+  end</emphasis>
+end
+</programlisting></para>
+
+      <para>Jetzt benutzen wir die
+      <filename>app/views/layouts/application.html.erb</filename>, um diese
+      letzten Einträge am Kopf jeder Seite anzuzeigen:<programlisting>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Breadcrumbs&lt;/title&gt;
+  &lt;%= stylesheet_link_tag    "application" %&gt;
+  &lt;%= javascript_include_tag "application" %&gt;
+  &lt;%= csrf_meta_tags %&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;% if @breadcrumbs %&gt;
+  &lt;p&gt;Letzte Seitenaufrufe:&lt;/p&gt;
+  &lt;ul&gt;
+    &lt;% @breadcrumbs.each do |breadcrumb| %&gt;
+      &lt;li&gt;&lt;%= link_to breadcrumb, breadcrumb %&gt;&lt;/li&gt;
+    &lt;% end %&gt;
+  &lt;/ul&gt;
+&lt;% end %&gt;	
+
+&lt;%= yield %&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</programlisting></para>
+
+      <para>Jetzt können sie mit <command>rails server</command> den Rails
+      Server starten und auf <uri
+      xlink:href="http://0.0.0.0:3000/home/ping">http://0.0.0.0:3000/home/ping</uri>,
+      <uri
+      xlink:href="http://0.0.0.0:3000/home/ping">http://0.0.0.0:3000/home/ping</uri>
+      oder <uri
+      xlink:href="http://0.0.0.0:3000/home/index">http://0.0.0.0:3000/home/index</uri>
+      surfen und oben immer sehen, auf welchen Seiten Sie vorher waren.
+      Natürlich geht das erst auf der zweiten Seite, weil Sie beim ersten
+      Aufruf ja noch keine Historie habe.<screenshot>
+          <info>
+            <title>Aufruf der dritten Seite in einer Session</title>
+          </info>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/breadcrumbs_session_beispiel.jpg"></imagedata>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
+    </section>
+
+    <section>
+      <title>reset_session</title>
+
+      <para></para>
+    </section>
+
+    <section xml:id="sessions_datenbank">
+      <title xml:id="sessions_datenbank.title">Sessions in der Datenbank
+      speichern</title>
+
+      <para></para>
     </section>
   </section>
 </chapter>
