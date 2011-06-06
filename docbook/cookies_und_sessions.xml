@@ -234,8 +234,9 @@ end
     können wir beispielsweise bequem einen Warenkorb in einem Online-Shop
     realisieren.</para>
 
-    <section>
-      <title>Breadcrumbs per Session</title>
+    <section xml:id="session_breadcrumbs">
+      <title xml:id="session_breadcrumbs.title">Breadcrumbs per
+      Session</title>
 
       <para>Als Beispiel erstellen wir eine Applikation mit einem Controller
       und drei Views. Beim Besuch eines Views werden die vorherig besuchten
@@ -297,7 +298,7 @@ end
       &lt;li&gt;&lt;%= link_to breadcrumb, breadcrumb %&gt;&lt;/li&gt;
     &lt;% end %&gt;
   &lt;/ul&gt;
-&lt;% end %&gt;	
+&lt;% end %&gt;
 
 &lt;%= yield %&gt;
 
@@ -330,14 +331,109 @@ end
     <section>
       <title>reset_session</title>
 
-      <para></para>
+      <para>Es gibt immer mal wieder Situationen, in denen man eine Session
+      reseten möchte (also die aktuelle Session löschen und eine neue frische
+      Session aufbauen). Bei einem Logout bei einer Webapplikation wird so
+      beispielsweise oft die Session geresetet. Das geht einfach und wir bauen
+      das kurz in unsere Breadcrumb-Applikation (siehe <xref
+      linkend="session_breadcrumb" />) ein:<screen>Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$ <command>rails generate controller Home reset -s</command>
+        skip  app/controllers/home_controller.rb
+       route  get "home/reset"
+      invoke  erb
+       exist    app/views/home
+      create    app/views/home/reset.html.erb
+      invoke  test_unit
+        skip    test/functional/home_controller_test.rb
+      invoke  helper
+   identical    app/helpers/home_helper.rb
+      invoke    test_unit
+   identical      test/unit/helpers/home_helper_test.rb
+      invoke  assets
+   identical    app/assets/javascripts/home.js.coffee
+   identical    app/assets/stylesheets/home.css.scss
+Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$</screen></para>
+
+      <para>Der entsprechend erweiterte Controller
+      <filename>app/controllers/home_controller.rb</filename> sieht dann so
+      aus:<programlisting>class HomeController &lt; ApplicationController
+  before_filter :set_breadcrumbs
+  
+  def ping
+  end
+
+  def pong
+  end
+
+  def index
+  end
+
+  def reset
+    reset_session
+    @breadcrumbs = nil
+  end
+
+  private  
+  def set_breadcrumbs
+    @breadcrumbs = session[:breadcrumbs]
+    @breadcrumbs ||= Array.new
+    @breadcrumbs.push(request.url)
+    @breadcrumbs.shift if @breadcrumbs.count &gt; 3
+    session[:breadcrumbs] = @breadcrumbs
+  end
+end
+</programlisting></para>
+
+      <para>Wichtig ist es nicht nur <methodname>reset_session</methodname>
+      aufzurufen, sondern auch noch die Instanz Variable
+      <varname>@breadcrumbs</varname> auf <code>nil</code> zu setzen. Sonst
+      würden im View doch noch die alten Breadcrumbs erscheinen.</para>
     </section>
 
     <section xml:id="sessions_datenbank">
       <title xml:id="sessions_datenbank.title">Sessions in der Datenbank
       speichern</title>
 
-      <para></para>
+      <para>Die ganzen Session-Daten in einem Cookie auf dem Browser des Users
+      zu speichern, ist nicht immer optimal. Alleine das 4KB Limit kommt einem
+      manchmal in die Quere. Es ist aber kein Problem, denn wir können das
+      Speichern der Session vom Cookie in die Datenbank umstellen. Dann wird
+      natürlich immer noch die Session-ID in einem Cookie gespeichert, aber
+      die ganzen restlichen Session-Daten in der Datenbank auf dem
+      Server.</para>
+
+      <para>Als erstes verändern wir die Konfiguration des Session Stores in
+      der Datei <filename>config/initializers/session_store.rb</filename>. Wie
+      kommentieren den <code>:cookie_store</code> aus und nehmen das
+      Kommentarzeichen vor dem <code>:active_record_store</code>
+      raus.<programlisting># Be sure to restart your server when you modify this file.
+
+# Breadcrumbs::Application.config.session_store :cookie_store, key: '_breadcrumbs_session'
+
+# Use the database for sessions instead of the cookie-based default,
+# which shouldn't be used to store highly confidential information
+# (create the session table with "rails generate session_migration")
+<emphasis>Breadcrumbs::Application.config.session_store :active_record_store</emphasis>
+</programlisting></para>
+
+      <para>Jetzt müssen wir noch die entsprechende Tabelle anlegen. Das geht
+      mit <command>rails generate session_migration</command> und
+      <command>rake db:migrate</command>:<screen>Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$ <command>rails generate session_migration</command>
+      invoke  active_record
+      create    db/migrate/20110606095336_add_sessions_table.rb
+Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$ <command>rake db:migrate</command>
+==  AddSessionsTable: migrating ===============================================
+-- create_table(:sessions)
+   -&gt; 0.0022s
+-- add_index(:sessions, :session_id)
+   -&gt; 0.0006s
+-- add_index(:sessions, :updated_at)
+   -&gt; 0.0006s
+==  AddSessionsTable: migrated (0.0038s) ======================================
+
+Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$</screen></para>
+
+      <para>Logischerweise muss der Webserver dafür runtergefahren
+      werden.</para>
     </section>
   </section>
 </chapter>
