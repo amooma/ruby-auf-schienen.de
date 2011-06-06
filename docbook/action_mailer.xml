@@ -253,8 +253,141 @@ Have a great day!
   <section xml:id="html_emails">
     <title xml:id="html_emails.title">HTML E-Mails</title>
 
-    <para>More to come.</para>
+    <para>HTML E-Mails zu erstellen ist denkbar einfach. Erstellen Sie bitte
+    die Datei
+    <filename>app/views/user_mailer/new_account_email.html.erb</filename> mit
+    folgendem Inhalt:<programlisting>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta content="text/html; charset=UTF-8" http-equiv="Content-Type" /&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Hello &lt;%= @user.firstname %&gt; &lt;%= @user.lastname %&gt;!&lt;/h1&gt;
+    &lt;p&gt;Your new account is active.&lt;/p&gt;
+    &lt;p&gt;&lt;i&gt;Have a great day!&lt;br /&gt;
+    A Robot&lt;/i&gt;&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</programlisting></para>
 
-    <para></para>
+    <para>Wenn Sie jetzt einen User anlegen, sehen Sie im
+    <filename>log/development.log</filename> Logfile was gerendert wurde und
+    die versendete E-Mail:<programlisting>Rendered user_mailer/new_account_email.html.erb (11.8ms)
+Rendered user_mailer/new_account_email.text.erb (0.3ms)
+
+Sent mail to stefan.wintermeyer@amooma.de (120ms)
+Date: Mon, 06 Jun 2011 18:49:58 +0200
+From: from@example.com
+To: stefan.wintermeyer@amooma.de
+Message-ID: &lt;4ded05368f251_150ad80443b3c559cf@Stefan-Wintermeyers-MacBook-Air.local.mail&gt;
+Subject: Your new account is active.
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_4ded05367e14d_150ad80443b3c55679";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+
+
+----==_mimepart_4ded05367e14d_150ad80443b3c55679
+Date: Mon, 06 Jun 2011 18:49:58 +0200
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Content-ID: &lt;4ded053687321_150ad80443b3c55770@Stefan-Wintermeyers-MacBook-Air.local.mail&gt;
+
+Hello Stefan Wintermeyer,
+
+your new account is active.
+
+Have a great day!
+  A Robot
+
+----==_mimepart_4ded05367e14d_150ad80443b3c55679
+Date: Mon, 06 Jun 2011 18:49:58 +0200
+Mime-Version: 1.0
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Content-ID: &lt;4ded05368c1bc_150ad80443b3c5584c@Stefan-Wintermeyers-MacBook-Air.local.mail&gt;
+
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta content="text/html; charset=UTF-8" http-equiv="Content-Type" /&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Hello Stefan Wintermeyer!&lt;/h1&gt;
+    &lt;p&gt;Your new account is active.&lt;/p&gt;
+    &lt;p&gt;&lt;i&gt;Have a great day!&lt;br /&gt;
+    A Robot&lt;/i&gt;&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+
+----==_mimepart_4ded05367e14d_150ad80443b3c55679--
+
+</programlisting></para>
+
+    <para>Rails hat automatisch eine <code>multipart/alternative</code> E-Mail
+    generiert, da der View sowohl in der <filename>html.erb</filename> wie
+    auch in der <filename>text.erb</filename> Version vorhanden war.</para>
+  </section>
+
+  <section xml:id="email_attachments">
+    <title xml:id="email_attachments.title">Anhänge (Attachments)</title>
+
+    <para>Anhänge an E-Mails werden auch im Controller definiert. </para>
+
+    <para>Als Beispiel fügen wir in
+    <filename>app/mailers/user_mailer.rb</filename> die Rails Grafik
+    <filename>app/assets/images/rails.png</filename> einer E-Mail als
+    Attachment bei:<programlisting>class UserMailer &lt; ActionMailer::Base
+  default from: "from@example.com"
+  
+  def new_account_email(user)
+    @user = user
+    <emphasis>attachments['rails.png'] = File.read("#{Rails.root}/app/assets/images/rails.png")</emphasis>
+    mail(:to =&gt; user.email_address,
+         :subject =&gt; "Your new account is active.")
+  end
+end</programlisting></para>
+
+    <section xml:id="email_inline_attachments">
+      <title xlink:href="email_inline_attachments.title">Inline
+      Attachments</title>
+
+      <para>Für Inline Attachments in HTML E-Mails muss man die Methode
+      <methodname>inline</methodname> beim Aufruf von <code>attachments</code>
+      benutzen. In unserem Beispielcontroller
+      <filename>app/mailers/user_mailer.rb</filename>:<programlisting>class UserMailer &lt; ActionMailer::Base
+  default from: "from@example.com"
+  
+  def new_account_email(user)
+    @user = user
+    <emphasis>attachments.inline['rails.png'] = File.read("#{Rails.root}/app/assets/images/rails.png")</emphasis>
+    mail(:to =&gt; user.email_address,
+         :subject =&gt; "Your new account is active.")
+  end
+end
+</programlisting></para>
+
+      <para>In der HTML E-Mail kann auf den Hash <code>attachments[]</code>
+      per <methodname>image_tag</methodname> zugegriffen werden. In unserem
+      Beispiel sähe die
+      <filename>app/views/user_mailer/new_account_email.html.erb</filename> so
+      aus:<programlisting>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta content="text/html; charset=UTF-8" http-equiv="Content-Type" /&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Hello &lt;%= @user.firstname %&gt; &lt;%= @user.lastname %&gt;!&lt;/h1&gt;
+    <emphasis>&lt;%= image_tag attachments['rails.png'].url, :alt =&gt; 'Rails Logo' %&gt;</emphasis>
+    &lt;p&gt;Your new account is active.&lt;/p&gt;
+    &lt;p&gt;&lt;i&gt;Have a great day!&lt;br /&gt;
+    A Robot&lt;/i&gt;&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</programlisting></para>
+    </section>
   </section>
 </chapter>
