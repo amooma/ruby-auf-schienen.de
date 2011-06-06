@@ -9,15 +9,12 @@
          xmlns:db="http://docbook.org/ns/docbook">
   <title xml:id="action_mailer.title">Action Mailer</title>
 
-  <section xml:id="emails_verschicken">
-    <title>E-Mails verschicken</title>
+  <para>Auch wenn wir mit Rails hauptsächlich Webseiten generieren, so ist es
+  doch hin und wieder ganz praktisch auch mal eine E-Mail verschicken zu
+  können.</para>
 
-    <para>Auch wenn wir mit Rails hauptsächlich Webseiten generieren, so ist
-    es doch hin und wieder ganz praktisch auch mal eine E-Mail verschicken zu
-    können.</para>
-
-    <para>Bauen wir uns mal ein Beispiel mit einer minimalen Userverwaltung,
-    die beim Anlegen eines neuen Users diesem eine E-Mail schickt:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new usermanagement</command>
+  <para>Bauen wir uns mal ein Beispiel mit einer minimalen Userverwaltung, die
+  beim Anlegen eines neuen Users diesem eine E-Mail schickt:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new usermanagement</command>
 [...]
 Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>cd usermanagement</command>
 Stefan-Wintermeyers-MacBook-Air:usermanagement stefan$ <command>bundle install</command>
@@ -28,20 +25,20 @@ Stefan-Wintermeyers-MacBook-Air:usermanagement stefan$ <command>rake db:migrate<
 [...]
 Stefan-Wintermeyers-MacBook-Air:usermanagement stefan$</screen></para>
 
-    <para>Für das User-Model erstellen wir in der
-    <filename>app/models/user.rb</filename> noch eine minimale Validierung,
-    damit wir sicher gehen können das jeder User einen vollständigen Namen und
-    eine syntaktisch korrekte E-Mail Adresse hat.<programlisting>class User &lt; ActiveRecord::Base
+  <para>Für das User-Model erstellen wir in der
+  <filename>app/models/user.rb</filename> noch eine minimale Validierung,
+  damit wir sicher gehen können das jeder User einen vollständigen Namen und
+  eine syntaktisch korrekte E-Mail Adresse hat.<programlisting>class User &lt; ActiveRecord::Base
   validates_presence_of :firstname
   validates_presence_of :lastname
   validates_presence_of :email_address
   validates_format_of :email_address, :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
 end</programlisting></para>
 
-    <para>Es gibt einen Generator mit dem Namen <code>mailer</code> der für
-    uns die fürs mailen notwendigen Dateien anlegt. Als erstes schauen wir uns
-    die Ausgabe des <command>rails generate mailer</command> an, ohne das wir
-    weitere Argumente übergeben:<screen>Stefan-Wintermeyers-MacBook-Air:usermanagement stefan$ <command>rails generate mailer</command>
+  <para>Es gibt einen Generator mit dem Namen <code>mailer</code> der für uns
+  die fürs mailen notwendigen Dateien anlegt. Als erstes schauen wir uns die
+  Ausgabe des <command>rails generate mailer</command> an, ohne das wir
+  weitere Argumente übergeben:<screen>Stefan-Wintermeyers-MacBook-Air:usermanagement stefan$ <command>rails generate mailer</command>
 Usage:
   rails generate mailer NAME [method method] [options]
 
@@ -79,8 +76,8 @@ Example:
 
 Stefan-Wintermeyers-MacBook-Air:usermanagement stefan$</screen></para>
 
-    <para>Das ist alles so wie wir es erwarten. Legen wir also den Mailer
-    <classname>UserMailer</classname> an:<screen>Stefan-Wintermeyers-MacBook-Air:usermanagement stefan$ <command>rails generate mailer UserMailer</command>
+  <para>Das ist alles so wie wir es erwarten. Legen wir also den Mailer
+  <classname>UserMailer</classname> an:<screen>Stefan-Wintermeyers-MacBook-Air:usermanagement stefan$ <command>rails generate mailer UserMailer</command>
       create  app/mailers/user_mailer.rb
       invoke  erb
       create    app/views/user_mailer
@@ -88,12 +85,12 @@ Stefan-Wintermeyers-MacBook-Air:usermanagement stefan$</screen></para>
       create    test/functional/user_mailer_test.rb
 Stefan-Wintermeyers-MacBook-Air:usermanagement stefan$</screen></para>
 
-    <para>In der Datei <filename>app/mailers/user_mailer.rb</filename> finden
-    Sie den Controller:<programlisting>class UserMailer &lt; ActionMailer::Base
+  <para>In der Datei <filename>app/mailers/user_mailer.rb</filename> finden
+  Sie den Controller:<programlisting>class UserMailer &lt; ActionMailer::Base
   default from: "from@example.com"
 end
 </programlisting>Legen wir darin mal eine Methode an, mit der wir die
-    Bestätigungs E-Mail für einen neuen Account verschicken:<programlisting>class UserMailer &lt; ActionMailer::Base
+  Bestätigungs E-Mail für einen neuen Account verschicken:<programlisting>class UserMailer &lt; ActionMailer::Base
   default from: "from@example.com"
   
   def new_account_email(user)
@@ -104,19 +101,19 @@ end
 end
 </programlisting></para>
 
-    <para>Jetzt legen wir den View zu dieser Methode an. Der Dateiname
-    <filename>app/views/user_mailer/new_account_email.text.erb</filename>
-    setzt sich dabei aus dem Methodennamen und der Endung
-    <filename>text.erb</filename> zusammen.<programlisting>Hello &lt;%= @user.firstname %&gt; &lt;%= @user.lastname %&gt;,
+  <para>Jetzt legen wir den View zu dieser Methode an. Der Dateiname
+  <filename>app/views/user_mailer/new_account_email.text.erb</filename> setzt
+  sich dabei aus dem Methodennamen und der Endung
+  <filename>text.erb</filename> zusammen.<programlisting>Hello &lt;%= @user.firstname %&gt; &lt;%= @user.lastname %&gt;,
 
 your new account is active.
 
 Have a great day!
   A Robot</programlisting></para>
 
-    <para>Da wir diese E-Mail nach dem create eines
-    <classname>Users</classname> verschicken wollen, müssen wir noch die
-    <filename>app/models/user.rb</filename> Datei anpassen:<programlisting>class User &lt; ActiveRecord::Base
+  <para>Da wir diese E-Mail nach dem create eines <classname>Users</classname>
+  verschicken wollen, müssen wir noch die
+  <filename>app/models/user.rb</filename> Datei anpassen:<programlisting>class User &lt; ActiveRecord::Base
   validates_presence_of :firstname
   validates_presence_of :lastname
   validates_presence_of :email_address
@@ -131,8 +128,8 @@ Have a great day!
 end
 </programlisting></para>
 
-    <para>Legen wir mal in der Console einen neuen <classname>User</classname>
-    an:<screen>Stefan-Wintermeyers-MacBook-Air:usermanagement stefan$ <command>rails console</command>
+  <para>Legen wir mal in der Console einen neuen <classname>User</classname>
+  an:<screen>Stefan-Wintermeyers-MacBook-Air:usermanagement stefan$ <command>rails console</command>
 Loading development environment (Rails 3.1.0.rc1)
 ruby-1.9.2-p180 :001 &gt; <command>User.create(:firstname =&gt; 'Stefan', :lastname =&gt; 'Wintermeyer', :email_address =&gt; 'stefan.wintermeyer@amooma.de')</command>
   SQL (16.3ms)  INSERT INTO "users" ("created_at", "email_address", "firstname", "lastname", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Mon, 06 Jun 2011 14:15:53 UTC +00:00], ["email_address", "stefan.wintermeyer@amooma.de"], ["firstname", "Stefan"], ["lastname", "Wintermeyer"], ["updated_at", Mon, 06 Jun 2011 14:15:53 UTC +00:00]]
@@ -140,8 +137,8 @@ ruby-1.9.2-p180 :001 &gt; <command>User.create(:firstname =&gt; 'Stefan', :lastn
 ruby-1.9.2-p180 :002 &gt; exit
 Stefan-Wintermeyers-MacBook-Air:usermanagement stefan$</screen></para>
 
-    <para>Das war unspektakulär. Werfen wir mal einen Blick in die
-    <filename>log/development.log</filename> Log-Datei:<programlisting>Rendered user_mailer/new_account_email.text.erb (11.6ms)
+  <para>Das war unspektakulär. Werfen wir mal einen Blick in die
+  <filename>log/development.log</filename> Log-Datei:<programlisting>Rendered user_mailer/new_account_email.text.erb (11.6ms)
 
 Sent mail to stefan.wintermeyer@amooma.de (58ms)
 Date: Mon, 06 Jun 2011 16:15:55 +0200
@@ -162,43 +159,43 @@ Have a great day!
   A Robot
 </programlisting></para>
 
-    <para>Da wir im Development-Mode arbeiten, hat Rails die E-Mail nicht
-    verschickt, sondern nur in die <filename>log/development.log</filename>
-    den Inhalt reingeschrieben.</para>
+  <para>Da wir im Development-Mode arbeiten, hat Rails die E-Mail nicht
+  verschickt, sondern nur in die <filename>log/development.log</filename> den
+  Inhalt reingeschrieben.</para>
 
-    <section xml:id="konfiguration_email_server">
-      <title xml:id="konfiguration_email_server.title">Konfiguration des
-      E-Mail Servers</title>
+  <section xml:id="konfiguration_email_server">
+    <title xml:id="konfiguration_email_server.title">Konfiguration des E-Mail
+    Servers</title>
 
-      <para>Prinzipiel lässt sich von Rails ein lokaler sendmail und ein
-      externer SMTP-Server zum Ausliefern der E-Mails benutzen.</para>
+    <para>Prinzipiel lässt sich von Rails ein lokaler sendmail und ein
+    externer SMTP-Server zum Ausliefern der E-Mails benutzen.</para>
 
-      <section xml:id="action_mailer_sendmail">
-        <title xml:id="action_mailer_sendmail.title">Versand per lokalem
-        sendmail</title>
+    <section xml:id="action_mailer_sendmail">
+      <title xml:id="action_mailer_sendmail.title">Versand per lokalem
+      sendmail</title>
 
-        <para>Wenn Sie klassisch per lokalem <code>sendmail</code> die E-Mails
-        verschicken wollen, so müssen Sie die folgenden Zeilen in Ihrer
-        Konfigurationsdatei
-        <filename>config/environments/development.rb</filename> (für die
-        Entwicklungsumgebung) oder
-        <filename>config/environments/production.rb</filename> (für Ihre
-        Produktivumgebung) einfügen:<programlisting>config.action_mailer.delivery_method = :sendmail
+      <para>Wenn Sie klassisch per lokalem <code>sendmail</code> die E-Mails
+      verschicken wollen, so müssen Sie die folgenden Zeilen in Ihrer
+      Konfigurationsdatei
+      <filename>config/environments/development.rb</filename> (für die
+      Entwicklungsumgebung) oder
+      <filename>config/environments/production.rb</filename> (für Ihre
+      Produktivumgebung) einfügen:<programlisting>config.action_mailer.delivery_method = :sendmail
 config.action_mailer.perform_deliveries = true
 config.action_mailer.raise_delivery_errors = true
 </programlisting></para>
-      </section>
+    </section>
 
-      <section>
-        <title>Versand per SMTP</title>
+    <section>
+      <title>Versand per SMTP</title>
 
-        <para>Wenn Sie die E-Mail über einen SMTP-Server verschicken wollen
-        (z.B. Google Mail), dann müssen Sie die folgenden Zeilen in Ihrer
-        Konfigurationsdatei
-        <filename>config/environments/development.rb</filename> (für die
-        Entwicklungsumgebung) oder
-        <filename>config/environments/production.rb</filename> (für Ihre
-        Produktivumgebung) einfügen:<programlisting>config.action_mailer.delivery_method = :smtp
+      <para>Wenn Sie die E-Mail über einen SMTP-Server verschicken wollen
+      (z.B. Google Mail), dann müssen Sie die folgenden Zeilen in Ihrer
+      Konfigurationsdatei
+      <filename>config/environments/development.rb</filename> (für die
+      Entwicklungsumgebung) oder
+      <filename>config/environments/production.rb</filename> (für Ihre
+      Produktivumgebung) einfügen:<programlisting>config.action_mailer.delivery_method = :smtp
 config.action_mailer.smtp_settings = {
   :address              =&gt; "smtp.gmail.com",
   :port                 =&gt; 587,
@@ -208,19 +205,19 @@ config.action_mailer.smtp_settings = {
   :authentication       =&gt; 'plain',
   :enable_starttls_auto =&gt; true  }</programlisting></para>
 
-        <para>Natürlich müssen Sie die Werte für <code>:domain</code>,
-        <code>:user_name</code> und <code>:password</code> Ihrer Konfiguration
-        entsprechend anpassen.</para>
-      </section>
+      <para>Natürlich müssen Sie die Werte für <code>:domain</code>,
+      <code>:user_name</code> und <code>:password</code> Ihrer Konfiguration
+      entsprechend anpassen.</para>
     </section>
+  </section>
 
-    <section xml:id="x_header">
-      <title xml:id="x_header.title">Eigene X-Header</title>
+  <section xml:id="x_header">
+    <title xml:id="x_header.title">Eigene X-Header</title>
 
-      <para>Sollten Sie das Bedürfnis verspüren einen zusätzlichen X-Header
-      einzubauen, dann ist das kein echtes Problem. Hier ein Beispiel für die
-      Erweiterung der <filename>app/mailers/user_mailer.rb</filename>
-      Datei:<programlisting>class UserMailer &lt; ActionMailer::Base
+    <para>Sollten Sie das Bedürfnis verspüren einen zusätzlichen X-Header
+    einzubauen, dann ist das kein echtes Problem. Hier ein Beispiel für die
+    Erweiterung der <filename>app/mailers/user_mailer.rb</filename>
+    Datei:<programlisting>class UserMailer &lt; ActionMailer::Base
   default from: "from@example.com"
   
   def new_account_email(user)
@@ -232,7 +229,7 @@ config.action_mailer.smtp_settings = {
 end
 </programlisting></para>
 
-      <para>Damit würde die versendete E-Mail so aussehen:<programlisting>Sent mail to stefan.wintermeyer@amooma.de (58ms)
+    <para>Damit würde die versendete E-Mail so aussehen:<programlisting>Sent mail to stefan.wintermeyer@amooma.de (58ms)
 Date: Mon, 06 Jun 2011 16:59:49 +0200
 From: from@example.com
 To: stefan.wintermeyer@amooma.de
@@ -251,14 +248,13 @@ your new account is active.
 Have a great day!
   A Robot
 </programlisting></para>
-    </section>
+  </section>
 
-    <section xml:id="html_emails">
-      <title xml:id="html_emails.title">HTML E-Mails</title>
+  <section xml:id="html_emails">
+    <title xml:id="html_emails.title">HTML E-Mails</title>
 
-      <para>More to come.</para>
+    <para>More to come.</para>
 
-      <para></para>
-    </section>
+    <para></para>
   </section>
 </chapter>
