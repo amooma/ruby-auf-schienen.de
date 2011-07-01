@@ -6,12 +6,26 @@
          xmlns:m="http://www.w3.org/1998/Math/MathML"
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
-  <title xml:id="testing.title">Testing</title>
+  <title xml:id="testing.title">Tests</title>
 
   <indexterm>
-    <primary>Testing</primary>
+    <primary>Tests</primary>
+  </indexterm>
 
-    <secondary>Test-Driven-Development</secondary>
+  <indexterm>
+    <primary>Test-Driven-Development (TDD)</primary>
+  </indexterm>
+
+  <indexterm>
+    <primary>TDD</primary>
+
+    <see>Test-Driven-Development</see>
+  </indexterm>
+
+  <indexterm>
+    <primary>rake test</primary>
+
+    <see>Tests</see>
   </indexterm>
 
   <section xml:id="testing_einleitung">
@@ -33,8 +47,8 @@
     ein, wenn man sich das Projekt wieder mal vornimmt und eine Erweiterung
     oder Veränderung schreibt. Dann kann man recht gefahrlos den Code
     verändern und danach die Funktionsweise anhand der Tests überprüfen. Es
-    gibt dann kein "hmm ... das ist jetzt dumm gelaufen, aber an diese
-    Besonderheit habe ich nicht gedacht" mehr.</para>
+    gibt dann kein „hmm … das ist jetzt dumm gelaufen, aber an diese
+    Besonderheit habe ich nicht gedacht“ mehr.</para>
 
     <para>Dieses Kapitel ist ein Einstieg ins Thema Test-Driven-Development.
     Wenn Sie Blut geleckt haben, werden Sie sicher noch tiefer einsteigen
@@ -48,7 +62,7 @@
 
   <section xml:id="testing_beispiel_webshop">
     <title xml:id="testing_beispiel_webshop.title">Beispiel für einen User in
-    einem Webshop</title>
+    einem Web-Shop</title>
 
     <para>Fangen wir mit einem User-Scaffold in einem imaginären Webshop
     an:<screen>MacBook:~ sw$ <command>rails new webshop</command>
@@ -83,6 +97,7 @@ MacBook:webshop sw$ <command>rails generate scaffold user login_name:string firs
       invoke  assets
       create    app/assets/javascripts/users.js.coffee
       create    app/assets/stylesheets/users.css.scss
+
 MacBook:webshop sw$ <command>rake db:migrate</command>
 ==  CreateUsers: migrating ====================================================
 -- create_table(:users)
@@ -123,13 +138,14 @@ Finished in 0.216057 seconds.
 7 tests, 10 assertions, 0 failures, 0 errors, 0 skips
 MacBook:webshop sw$</screen></para>
 
-    <para>Die Ausgabe <code>0 failures, 0 errors, 0 skips</code> sieht gut
-    aus. Per Default läuft ein Test in einem Standard-Scaffold korrekt
+    <para>Die Ausgabe „<literal>0 failures, 0 errors, 0 skips</literal>“ sieht
+    gut aus. Per Default läuft ein Test in einem Standard-Scaffold korrekt
     durch.</para>
 
     <para>Verändern wir jetzt die <filename>app/models/user.rb</filename> und
     fügen ein paar Validierungen (falls das nicht ganz klar ist, bitte <xref
     linkend="activerecord_validation" /> lesen) ein:<programlisting>class User &lt; ActiveRecord::Base
+  
   # Die folgenden Felder muessen immer enthalten sein
   #
   validates_presence_of :login_name
@@ -140,13 +156,13 @@ MacBook:webshop sw$</screen></para>
   # Sonderzeichen -._ bestehen
   #
   validates_format_of :login_name, :with =&gt; /[a-z0-9\-_.]+/i,
-                      :message =&gt; "only characters, numbers and the special character -_. are allowed"
+    :message =&gt; "only characters, numbers and the special character -_. are allowed"
   
   # Der login_name muss mindestens eins der folgenden Sonderzeichen 
   # enthalten: -._
   #
   validates_format_of :login_name, :with =&gt; /^.*(?=.*[\-_.]).*$/,
-                      :message =&gt; "must include at least one of the special characters -_."
+    :message =&gt; "must include at least one of the special characters -_."
   
   # User des Webshops muessen volljaehrig sein
   #
@@ -158,8 +174,8 @@ MacBook:webshop sw$</screen></para>
       errors.add(:birthday, "You have to be at least 18 years old.")
     end
   end
-end
-</programlisting></para>
+  
+end</programlisting></para>
 
     <para>Nachfolgend führen wir noch mal alle Tests durch:<screen>MacBook:webshop sw$ <command>rake test</command>
 Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
@@ -194,15 +210,24 @@ Finished in 0.283337 seconds.
 Errors running test:functionals!
 MacBook:webshop sw$</screen></para>
 
-    <para>Dieses Mal haben wir <code>2 failures</code>. Der Fehler passiert
-    beim <code>should create user</code> und beim <code>should update
-    user</code>. Scaffold muss also Beispieldaten angelegt haben, die beim
-    ersten Mal (ohne Validierungen) durchgelaufen sind und beim zweiten Mal
-    (mit Validierungen) nicht mehr.</para>
+    <para>Dieses Mal haben wir „<literal>2 failures</literal>“. Der Fehler
+    passiert beim „<literal>should create user</literal>“ und beim
+    „<literal>should update user</literal>“. Scaffold muss also Beispieldaten
+    angelegt haben, die beim ersten Mal (ohne Validierungen) durchgelaufen
+    sind und beim zweiten Mal (mit Validierungen) nicht mehr.</para>
 
-    <para>Diese Beispieldaten werden als sogennate Fixtures im YAML-Format im
-    Verzeichnis <filename>test/fixtures/</filename> angelegt. Schauen wir uns
-    die Beispieldaten für <classname>User</classname> in der Datei
+    <para>Diese Beispieldaten werden als sogenannte <foreignphrase
+    xml:lang="en">Fixtures</foreignphrase><indexterm>
+        <primary>Tests</primary>
+
+        <secondary>fixtures</secondary>
+      </indexterm><indexterm>
+        <primary>Fixtures</primary>
+
+        <see>Tests</see>
+      </indexterm> im YAML-Format im Verzeichnis
+    <filename>test/fixtures/</filename> angelegt. Schauen wir uns die
+    Beispieldaten für <classname>User</classname> in der Datei
     <filename>test/fixtures/users.yml</filename> an:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
 
 one:
@@ -302,9 +327,15 @@ MacBook:webshop sw$ </screen></para>
       Tests</title>
 
       <indexterm>
-        <primary>Testing</primary>
+        <primary>Tests</primary>
 
-        <secondary>Functional Tests</secondary>
+        <secondary>Functional</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>Functional Tests</primary>
+
+        <see>Tests</see>
       </indexterm>
 
       <para>Schauen wir uns mal genau an, an welcher Stelle die ursprünglichen
@@ -397,13 +428,17 @@ end
       <methodname>teardown</methodname>. Ein <methodname>teardown</methodname>
       wird - falls vorhanden - nach jedem Test automatisch
       aufgerufen.<indexterm>
-          <primary>Functional Test Callbacks</primary>
+          <primary>Tests</primary>
 
-          <secondary>setup</secondary>
+          <secondary>Functional</secondary>
+
+          <tertiary>setup</tertiary>
         </indexterm><indexterm>
-          <primary>Functional Test Callbacks</primary>
+          <primary>Tests</primary>
 
-          <secondary>teardown</secondary>
+          <secondary>Functional</secondary>
+
+          <tertiary>teardown</tertiary>
         </indexterm></para>
 
       <important>
@@ -435,7 +470,7 @@ end
           <para>Dabei wird hier das Symbol <varname>:users</varname> genommen,
           um sicherzustellen, dass <varname>@users</varname> in der zu
           testenden Controller-Klasse und nicht <varname>@users</varname> in
-          der Test-Klasse genommen wird.</para>
+          der Test-Klasse selbst genommen wird.</para>
         </footnote></para>
 
       <para>Schauen wir uns mal die beiden Probleme von vorhin genauer an. Als
@@ -448,18 +483,17 @@ end
   end
 </programlisting></para>
 
-      <para>Die <code>assert_difference('User.count') do ...
-      end</code>-Schleife erwartet eine Veränderung vom Anfang bis zum Ende
-      der Schleife. <code>User.count</code> müsste am Anfang 1 ergeben und am
-      Ende 2. Da wir aber in der ersten
-      <filename>test/fixtures/users.yml</filename>-Variante einen nicht
-      gültigen Datensatz hatten, ergab <code>User.count</code> am Anfang und
-      am Ende 0. 0 und nicht 1 am Anfang, weil auch das <code>setup do ...
-      end</code> nicht funktioniert haben kann.</para>
+      <para>Der Block <code>assert_difference('User.count') do ... end</code>
+      erwartet eine Veränderung durch den darin enthaltenen Code.
+      <code>User.count</code> müsste am Anfang 1 ergeben und am Ende 2. Da wir
+      aber in der ersten <filename>test/fixtures/users.yml</filename>-Variante
+      einen ungültigen Datensatz hatten, ergab <code>User.count</code> vorher
+      und hinterher 0. 0 und nicht 1 am Anfang, weil auch das <code>setup do
+      ... end</code> nicht funktioniert haben kann.</para>
 
       <para>Die letzte Zeile <code>assert_redirected_to
       user_path(assigns(:user))</code> überprüft, ob nach einem neu angelegten
-      Datensatz auch auf den entsprechenden <code>show</code> View geleitet
+      Datensatz auch auf den entsprechenden View <code>show</code> geleitet
       wird.</para>
 
       <para>Den zweiten Fehler gab es bei <code>should update
@@ -472,7 +506,7 @@ end
       <para>Hier sollte der Datensatz mit der <code>id</code> des
       <varname>@user</varname>-Datensatzes mit den Attributen des
       <varname>@user</varname>-Datensatzes geupdatet werden. Danach soll auch
-      wieder der <code>show</code> View zu diesem Datensatz angezeigt werden.
+      wieder der <code>show</code>-View zu diesem Datensatz angezeigt werden.
       Logischerweise ging dieser Test auch nicht, da a) der
       <varname>@user</varname>-Datensatz gar nicht in der Datenbank existierte
       und b) er auch nicht geupdatet werden konnte, da er nicht valide
@@ -480,8 +514,8 @@ end
 
       <para>Ohne jetzt auf jeden einzelnen Functional Test Zeile für Zeile
       einzugehen, wird klar, was diese Tests machen: Sie führen echte Anfragen
-      an das Web-Interface aus und können somit dazu benutzt werden, die Views
-      und die Controller zu testen.</para>
+      an das Web-Interface aus (bzw. eigentlich an die Controller) und können
+      somit dazu benutzt werden, die Controller zu testen.</para>
 
       <tip>
         <para>Mit <command>rake test:functionals</command> können Sie auch nur
@@ -510,22 +544,27 @@ MacBook:webshop sw$ </screen></para>
       <title>Unit Tests</title>
 
       <indexterm>
-        <primary>Testing</primary>
+        <primary>Tests</primary>
 
-        <secondary>Unit Tests</secondary>
+        <secondary>Unit</secondary>
       </indexterm>
 
       <indexterm>
         <primary>Unit Tests</primary>
 
-        <secondary>assert</secondary>
+        <see>Tests</see>
+      </indexterm>
+
+      <indexterm>
+        <primary>assert</primary>
+
+        <see>Tests</see>
       </indexterm>
 
       <para>Zum Testen der Validierungen, die wir in
       <filename>app/models/user.rb</filename> eingetragen haben, sind Unit
       Tests besser geeignet. Diese testen nicht wie die Functional Tests die
-      GUI und damit die Controller und die Views, sondern nur die
-      Models.</para>
+      die Controller, sondern nur die Models.</para>
 
       <tip>
         <para>Mit <command>rake test</command> werden alle im Rails-Projekt
@@ -540,15 +579,17 @@ MacBook:webshop sw$ </screen></para>
       ernüchternd:<programlisting>require 'test_helper'
 
 class UserTest &lt; ActiveSupport::TestCase
+  
   # test "the truth" do
   #   assert true
   # end
+  
 end
 </programlisting></para>
 
-      <para>Per Default schreibt Scaffold nur einen mit Kommentarzeichen
-      deaktivierten Dummy-Test rein. Deshalb läuft <command>rake
-      test:units</command> auch so inhaltslos durch:<screen>MacBook:webshop sw$ <command>rake test:units</command>
+      <para>Per Default schreibt Scaffold nur einen mit auskommentierten
+      Dummy-Test rein. Deshalb läuft <command>rake test:units</command> auch
+      so inhaltslos durch:<screen>MacBook:webshop sw$ <command>rake test:units</command>
 Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
 Started
 
@@ -561,16 +602,18 @@ MacBook:webshop sw$</screen></para>
       <filename>test/unit/user_test.rb</filename> mit Leben:<programlisting>require 'test_helper'
 
 class UserTest &lt; ActiveSupport::TestCase
-<emphasis>  test "an empty user is not valid" do
-    assert !User.new.valid?
+  
+<emphasis role="bold">  test "an empty user is not valid" do
+    assert ! User.new.valid?
   end</emphasis>
+
 end
 </programlisting></para>
 
       <para>Dieser Test überprüft, ob ein neu angelegter
       <classname>User</classname>, der keine Daten enthält, valide ist. Da
       <code>assert</code> nur auf <code>true</code> reagiert, habe ich vor
-      <code>User.new.valid?</code> ein <code>!</code> gesetzt, um aus dem
+      <code>User.new.valid?</code> ein „<code>!</code>“ gesetzt, um aus dem
       <code>false</code> ein <code>true</code> zu machen, denn ein leerer User
       kann ja nicht valide sein.</para>
 
@@ -593,14 +636,16 @@ MacBook:webshop sw$</screen></para>
       sind:<programlisting>require 'test_helper'
 
 class UserTest &lt; ActiveSupport::TestCase
+  
   test "an empty user is not valid" do
-    assert !User.new.valid?
+    assert ! User.new.valid?
   end
   
-<emphasis>  test "the two fixture users are valide" do
+<emphasis role="bold">  test "the two fixture users are valid" do
     assert User.new(users(:one).attributes)
     assert User.new(users(:two).attributes)
   end
+  
 </emphasis>end</programlisting></para>
 
       <para>Danach wieder ein <command>rake test:units</command>:<screen>MacBook:webshop sw$ <command>rake test:units</command>
@@ -609,7 +654,7 @@ Started
 
 UserTest:
      PASS an empty user is not valid (0.07s) 
-     PASS the two fixture users are valide (0.00s) 
+     PASS the two fixture users are valid (0.00s) 
 
 Finished in 0.078738 seconds.
 
@@ -622,26 +667,28 @@ MacBook:webshop sw$</screen></para>
       ist:<programlisting>require 'test_helper'
 
 class UserTest &lt; ActiveSupport::TestCase
+  
   test "an empty user is not valid" do
-    assert !User.new.valid?
+    assert ! User.new.valid?
   end
   
-  test "the two fixture users are valide" do
+  test "the two fixture users are valid" do
     assert User.new(users(:one).attributes)
     assert User.new(users(:two).attributes)
   end
   
-<emphasis>  test "a user who has tomorrow his 18th birthday is not valid" do
+<emphasis role="bold">  test "a user who has his 18th birthday tomorrow is not valid" do
     user = users(:one)
     user.birthday = Date.today - 18.years + 1.day
-    assert !User.new(user.attributes).valid?
+    assert ! User.new(user.attributes).valid?
   end
-
-  test "a user who has today his 18th birthday is valid" do
+  
+  test "a user who has his 18th birthday today is valid" do
     user = users(:one)
     user.birthday = Date.today - 18.years
     assert User.new(user.attributes).valid?
   end</emphasis>
+  
 end
 </programlisting></para>
 
@@ -650,21 +697,25 @@ Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/ra
 Started
 
 UserTest:
-     PASS a user who has today his 18th birthday is valid (0.04s) 
-     PASS a user who has tomorrow his 18th birthday is not valid (0.00s) 
+     PASS a user who has his 18th birthday today is valid (0.04s) 
+     PASS a user who has his 18th birthday tomorrow is not valid (0.00s) 
      PASS an empty user is not valid (0.01s) 
-     PASS the two fixture users are valide (0.00s) 
+     PASS the two fixture users are valid (0.00s) 
 
 Finished in 0.087012 seconds.
 
 4 tests, 5 assertions, 0 failures, 0 errors, 0 skips
 MacBook:webshop sw$</screen></para>
 
-      <para>Was müssen wir noch testen? Ob bestimmte Attribute nicht nil sind.
-      Dafür können wir einfach die folgende Schleife
-      hinzufügen:<programlisting>  ['lastname', 'login_name', 'birthday'].each do |attribute_name|
-    test "a user has to have a not nil #{attribute_name} attribute" do
-      assert !User.new(users(:one).attributes.except(attribute_name)).valid?
+      <para>Was müssen wir noch testen? Ob bestimmte Attribute nicht
+      <code>nil</code> sind. Dafür können wir einfach die folgende Schleife
+      hinzufügen:<programlisting>  [
+    'lastname',
+    'login_name',
+    'birthday',
+  ].each do |attribute_name|
+    test "a user has to have a non-nil #{attribute_name} attribute" do
+      assert ! User.new(users(:one).attributes.except(attribute_name)).valid?
     end
   end
 </programlisting></para>
@@ -674,44 +725,60 @@ MacBook:webshop sw$</screen></para>
       <filename>test/unit/user_test.rb</filename> dann so aus:<programlisting>require 'test_helper'
 
 class UserTest &lt; ActiveSupport::TestCase
+  
   test "an empty user is not valid" do
-    assert !User.new.valid?
+    assert ! User.new.valid?
   end
   
-  test "the two fixture users are valide" do
+  test "the two fixture users are valid" do
     assert User.new(users(:one).attributes)
     assert User.new(users(:two).attributes)
   end
   
-  test "a user who has tomorrow his 18th birthday is not valid" do
+  test "a user who has his 18th birthday tomorrow is not valid" do
     user = users(:one)
     user.birthday = Date.today - 18.years + 1.day
-    assert !User.new(user.attributes).valid?
+    assert ! User.new(user.attributes).valid?
   end
 
-  test "a user who has today his 18th birthday is valid" do
+  test "a user who has his 18th birthday today is valid" do
     user = users(:one)
     user.birthday = Date.today - 18.years
     assert User.new(user.attributes).valid?
   end
 
-  ['lastname', 'login_name', 'birthday'].each do |attribute_name|
-    test "a user has to have a not nil #{attribute_name} attribute" do
+  [
+    'lastname',
+    'login_name',
+    'birthday',
+  ].each do |attribute_name|
+    test "a user has to have a non-nil #{attribute_name} attribute" do
       assert !User.new(users(:one).attributes.except(attribute_name)).valid?
     end
   end
   
-  ['hans.meier', 'hans-meier', 'h-meier', 'h_meier', 'h.meier2'].each do |valid_login_name|
+  [
+    'hans.meier',
+    'hans-meier',
+    'h-meier',
+    'h_meier',
+    'h.meier2',
+  ].each do |valid_login_name|
     test "the login_name '#{valid_login_name}' is valid" do
       assert User.new(users(:one).attributes.except('login_name').merge({'login_name' =&gt; valid_login_name})).valid?
     end
   end
 
-  ['hansmeier', 'hmeier', 'hmeier2'].each do |invalid_login_name|
+  [
+    'hansmeier',
+    'hmeier',
+    'hmeier2',
+  ].each do |invalid_login_name|
     test "the login_name '#{invalid_login_name}' is invalid" do
-      assert !User.new(users(:one).attributes.except('login_name').merge({'login_name' =&gt; invalid_login_name})).valid?
+      assert ! User.new(users(:one).attributes.except('login_name').merge({'login_name' =&gt; invalid_login_name})).valid?
     end
   end
+  
 end</programlisting></para>
 
       <para>Der Durchlauf der Test-Suite zeigt die Ergebnisse:<screen>MacBook:webshop sw$ <command>rake test:units</command>
@@ -719,11 +786,11 @@ Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/ra
 Started
 
 UserTest:
-     PASS a user has to have a not nil birthday attribute (0.07s) 
-     PASS a user has to have a not nil lastname attribute (0.00s) 
-     PASS a user has to have a not nil login name attribute (0.00s) 
-     PASS a user who has today his 18th birthday is valid (0.00s) 
-     PASS a user who has tomorrow his 18th birthday is not valid (0.00s) 
+     PASS a user has to have a non-nil birthday attribute (0.07s) 
+     PASS a user has to have a non-nil lastname attribute (0.00s) 
+     PASS a user has to have a non-nil login name attribute (0.00s) 
+     PASS a user who has his 18th birthday today is valid (0.00s) 
+     PASS a user who has his 18th birthday tomorrow is not valid (0.00s) 
      PASS an empty user is not valid (0.00s) 
      PASS the login name 'h-meier' is valid (0.00s) 
      PASS the login name 'h.meier2' is valid (0.00s) 
@@ -733,7 +800,7 @@ UserTest:
      PASS the login name 'hansmeier' is invalid (0.00s) 
      PASS the login name 'hmeier' is invalid (0.00s) 
      PASS the login name 'hmeier2' is invalid (0.00s) 
-     PASS the two fixture users are valide (0.00s) 
+     PASS the two fixture users are valid (0.00s) 
 
 Finished in 0.099514 seconds.
 
@@ -749,20 +816,27 @@ MacBook:webshop sw$</screen></para>
     <title xml:id="testing_fixtures.title">Fixtures</title>
 
     <indexterm>
-      <primary>Testing Fixtures</primary>
+      <primary>Tests</primary>
 
-      <secondary>Fixtures</secondary>
+      <secondary>fixtures</secondary>
     </indexterm>
 
-    <para>Mit Fixtures werden Beispieldaten für Tests generiert. Das
-    Default-Format dafür ist YAML. Die Dateien dafür finden sich im
-    Verzeichnis <filename>test/fixtures/</filename> und werden mit
-    <command>rails generate</command> automatisch mit erstellt. Sie können
-    aber natürlich auch eigene Dateien definieren. Alle Fixtures werden per
-    Default bei jedem Test neu in die Test-Datenbank geladen.<footnote>
+    <indexterm>
+      <primary>Fixtures</primary>
+
+      <see>Tests</see>
+    </indexterm>
+
+    <para>Mit <foreignphrase xml:lang="en">Fixtures</foreignphrase> werden
+    Beispieldaten für Tests generiert. Das Default-Format dafür ist YAML. Die
+    Dateien dafür finden sich im Verzeichnis
+    <filename>test/fixtures/</filename> und werden mit <command>rails
+    generate</command> automatisch mit erstellt. Sie können aber natürlich
+    auch eigene Dateien definieren. Alle Fixtures werden per Default bei jedem
+    Test neu in die Test-Datenbank geladen.<footnote>
         <para>Beispiele für Alternativformate (z. B. CSV) dazu finden Sie
-        unter <uri
-        xlink:href="http://api.rubyonrails.org/classes/Fixtures.html">http://api.rubyonrails.org/classes/Fixtures.html</uri>.</para>
+        unter <link
+        xlink:href="http://api.rubyonrails.org/classes/Fixtures.html">http://api.rubyonrails.org/classes/Fixtures.html</link>.</para>
       </footnote></para>
 
     <section xml:id="statische_fixtures">
@@ -771,7 +845,7 @@ MacBook:webshop sw$</screen></para>
       <indexterm>
         <primary>Fixtures</primary>
 
-        <secondary>Statische Fixtures</secondary>
+        <secondary>statisch</secondary>
       </indexterm>
 
       <para>Die einfachste Variante für Fixtures sind statische Daten. Das in
@@ -799,10 +873,10 @@ two:
       <indexterm>
         <primary>Fixtures</primary>
 
-        <secondary>Fixtures mit ERB</secondary>
+        <secondary>mit ERB</secondary>
       </indexterm>
 
-      <para>Statische YAML Fixtures sind manchmal zu unintelligent. In diesen
+      <para>Statische YAML-Fixtures sind manchmal zu unintelligent. In diesen
       Fällen kann man mit ERB arbeiten (siehe <xref
       linkend="erb-programmieren" />). Das in <xref
       linkend="testing_beispiel_webshop" /> benutzte Fixture sah statisch so
@@ -826,12 +900,12 @@ two:
 one:
   login_name: horst_meier
   lastname: Meier
-<emphasis>  birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;</emphasis>
+<emphasis role="bold">  birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;</emphasis>
 
 two:
   login_name: emil.maier
   lastname: Maier
-<emphasis>  birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;</emphasis></programlisting></para>
+<emphasis role="bold">  birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;</emphasis></programlisting></para>
 
       <para>Wenn wir noch zusätzliche 100 Beispiel-User bräuchten, dann könnte
       wir das auch mit ein paar Zeilen ERB erledigen:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
@@ -839,14 +913,14 @@ two:
 one:
   login_name: horst_meier
   lastname: Meier
-<emphasis>  birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;</emphasis>
+  birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;
 
 two:
   login_name: emil.maier
   lastname: Maier
-<emphasis>  birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;
+  birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;
 
-&lt;% for i in 1..100 %&gt;
+<emphasis role="bold">&lt;% for i in 1..100 %&gt;
 user_&lt;%= i %&gt;:
   login_name: person_&lt;%= 1 %&gt;
   lastname: Meyer
@@ -855,8 +929,14 @@ user_&lt;%= i %&gt;:
     </section>
 
     <section xml:id="has_many_und_belongs_to_fixtures">
-      <title xml:id="has_many_und_belongs_to_fixtures.title">has_many und
-      belongs_to Fixtures</title>
+      <title xml:id="has_many_und_belongs_to_fixtures.title">Fixtures mit
+      has_many und belongs_to</title>
+
+      <indexterm>
+        <primary>Fixtures</primary>
+
+        <secondary>mit Relationen</secondary>
+      </indexterm>
 
       <para>Bei <methodname>has_many</methodname>- und
       <methodname>belongs_to</methodname>-Verbindungen müssen natürlich auch
@@ -895,7 +975,7 @@ end</programlisting></para>
 
   private
   def person_exists 
-    errors.add("person_id", "person is not existant") unless Person.exists?(self.person_id) 
+    errors.add(:person_id, "does not exist") if ! Person.exists?(self.person_id) 
   end   
 end</programlisting></para>
 
@@ -920,7 +1000,7 @@ two:
 </programlisting></para>
 
         <para>Und in der <filename>test/fixtures/phones.yml</filename> werden
-        die person_id-Einträge passend zum Inhalt von
+        die <literal>person.id</literal>-Einträge passend zum Inhalt von
         <filename>test/fixtures/people.yml</filename> gesetzt:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
 
 one:
@@ -943,10 +1023,12 @@ three:
         Tests für <classname>Person</classname>:<programlisting>require 'test_helper'
 
 class PersonTest &lt; ActiveSupport::TestCase
+  
   test "the fixture people data are valid" do
     assert Person.new(people(:one).attributes).valid?
     assert Person.new(people(:two).attributes).valid?
   end
+  
 end
 </programlisting></para>
 
@@ -954,17 +1036,19 @@ end
         Tests für <classname>Phone</classname>:<programlisting>require 'test_helper'
 
 class PhoneTest &lt; ActiveSupport::TestCase
+  
   test "the fixture phone entry data is valid" do
-    assert Phone.new(phones(:one).attributes).valid?
-    assert Phone.new(phones(:two).attributes).valid?
+    assert Phone.new(phones(:one  ).attributes).valid?
+    assert Phone.new(phones(:two  ).attributes).valid?
     assert Phone.new(phones(:three).attributes).valid?
   end
   
   test "a phone without a person is not valid" do
     phone = Phone.new(phones(:one).attributes)
     phone.person.destroy
-    assert !phone.valid?
+    assert ! phone.valid?
   end
+  
 end
 </programlisting></para>
 
@@ -989,27 +1073,27 @@ MacBook:phonebook sw$</screen></para>
       <section xml:id="has_many_und_belongs_to_fixtures_label_referenz">
         <title
         xml:id="has_many_und_belongs_to_fixtures_label_referenz.title">Die
-        Label Referenz-Variante</title>
+        Label-Referenz-Variante</title>
 
         <indexterm>
           <primary>Fixtures</primary>
 
-          <secondary>Label Referenz</secondary>
+          <secondary>Label Reference</secondary>
         </indexterm>
 
         <para>Eine etwas charmantere Alternative zu <xref
         linkend="has_many_und_belongs_to_fixtures_statisch" /> ist die
-        Verwendung von Label Referenzen.</para>
+        Verwendung von Label-Referenzen.</para>
 
         <para>Label sind die Namen für einzelne Fixtures. Damit sieht die
         <filename>test/fixtures/people.yml</filename> wie folgt
         aus:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
 
-<emphasis>horst_meier:</emphasis>
+<emphasis role="bold">horst_meier:</emphasis>
   firstname: Horst
   lastname: Meier
 
-<emphasis>emil_meier:</emphasis>
+<emphasis role="bold">emil_meier:</emphasis>
   firstname: Emil
   lastname: Obermeier
 </programlisting></para>
@@ -1019,17 +1103,17 @@ MacBook:phonebook sw$</screen></para>
         das Label der <varname>person</varname>:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
 
 one:
-<emphasis>  person: horst_meier</emphasis>
+<emphasis role="bold">  person: horst_meier</emphasis>
   name: Handy
   number: 0171 1234567
 
 two:
-<emphasis>  person: horst_meier</emphasis>
+<emphasis role="bold">  person: horst_meier</emphasis>
   name: Zu Hause
   number: 030 1234567
   
 three:
-<emphasis>  person: emil_meier</emphasis>
+<emphasis role="bold">  person: emil_meier</emphasis>
   name: Handy
   number: 0172 9876543</programlisting></para>
 
@@ -1037,10 +1121,12 @@ three:
         Tests für Person:<programlisting>require 'test_helper'
 
 class PersonTest &lt; ActiveSupport::TestCase
+  
   test "the fixture people data are valid" do
     assert Person.new(people(:horst_meier).attributes).valid?
-    assert Person.new(people(:emil_meier).attributes).valid?
+    assert Person.new(people(:emil_meier ).attributes).valid?
   end
+  
 end
 </programlisting></para>
 
@@ -1048,17 +1134,19 @@ end
         nicht:<programlisting>require 'test_helper'
 
 class PhoneTest &lt; ActiveSupport::TestCase
+  
   test "the fixture phone entry data is valid" do
-    assert Phone.new(phones(:one).attributes).valid?
-    assert Phone.new(phones(:two).attributes).valid?
+    assert Phone.new(phones(:one  ).attributes).valid?
+    assert Phone.new(phones(:two  ).attributes).valid?
     assert Phone.new(phones(:three).attributes).valid?
   end
   
   test "a phone without a person is not valid" do
     phone = Phone.new(phones(:one).attributes)
     phone.person.destroy
-    assert !phone.valid?
+    assert ! phone.valid?
   end
+  
 end
 </programlisting></para>
 
@@ -1086,9 +1174,15 @@ MacBook:phonebook sw$</screen></para>
     <title xml:id="unit_tests.title">Unit Tests</title>
 
     <indexterm>
-      <primary>Testing</primary>
+      <primary>Tests</primary>
 
-      <secondary>Unit Tests</secondary>
+      <secondary>Unit</secondary>
+    </indexterm>
+
+    <indexterm>
+      <primary>Unit Tests</primary>
+
+      <see>Tests</see>
     </indexterm>
 
     <para>In <xref linkend="testing_beispiel_webshop" /> wurde die Grundidee
@@ -1101,11 +1195,11 @@ MacBook:phonebook sw$</screen></para>
     linkend="testing_fixtures" />).</para>
 
     <para>In der perfekten Welt würde man im Unit Test alles testen, was
-    irgendwie schief gehen kann und zwar einmal mit einem Positiv- und einmal
-    mit einem Negativ-Test. Das heißt, man würde beispielsweise für jede
-    Validierung mindestens ein Beispiel durchgehen, in dem jeweils ein
-    korrekter und ein inkorrekter Datensatz geprüft wird. Das Gleiche gilt für
-    jede Methode des Models.</para>
+    irgendwie schief gehen kann und zwar mit Positiv- und mit Negativ-Tests.
+    Das heißt, man würde beispielsweise für jede Validierung mindestens ein
+    Beispiel durchgehen, in dem jeweils ein korrekter und ein inkorrekter
+    Datensatz geprüft wird. Das gleiche gilt für jede Methode des
+    Models.</para>
 
     <para>Schauen wir uns noch mal die Datei
     <filename>test/unit/phone_test.rb</filename> aus <xref
@@ -1113,95 +1207,122 @@ MacBook:phonebook sw$</screen></para>
     an:<programlisting>require 'test_helper'
 
 class PhoneTest &lt; ActiveSupport::TestCase
+  
   test "the fixture phone entry data is valid" do
-    assert Phone.new(phones(:one).attributes).valid?
-    assert Phone.new(phones(:two).attributes).valid?
+    assert Phone.new(phones(:one  ).attributes).valid?
+    assert Phone.new(phones(:two  ).attributes).valid?
     assert Phone.new(phones(:three).attributes).valid?
   end
   
   test "a phone without a person is not valid" do
     phone = Phone.new(phones(:one).attributes)
     phone.person.destroy
-    assert !phone.valid?
+    assert ! phone.valid?
   end
+  
 end
 </programlisting></para>
 
-    <para>Ein Test besteht also immer aus folgender Struktur:<programlisting>test "eine Behauptung" do
-  assert etwas_ist_true_oder_false
-end</programlisting></para>
+    <para>Ein Test besteht also immer aus folgender Struktur:<programlisting>  test "<replaceable>eine Behauptung</replaceable>" do
+    assert <replaceable>etwas_ist_true_oder_false</replaceable>
+  end</programlisting></para>
 
-    <para>Das Wort <code>assert</code> bedeutet in diesem Kontext behaupten
-    oder feststellen. Es wird also eine Behauptung aufgestellt. Wenn diese
-    Behauptung <code>true</code> ist, dann läuft der Test durch und alles ist
-    okay. Wenn diese Behauptung <code>false</code> ist, schlägt der Test fehl
-    und wir haben einen Fehler im Programm. Wenn Sie sich einmal auf <uri
-    xlink:href="http://guides.rubyonrails.org/testing.html">http://guides.rubyonrails.org/testing.html</uri>
+    <para>Das Wort <code>assert</code><indexterm>
+        <primary>assert</primary>
+      </indexterm> bedeutet in diesem Kontext behaupten oder feststellen. Es
+    wird also eine Behauptung aufgestellt. Wenn diese Behauptung
+    <code>true</code> (wahr) ist, dann läuft der Test durch und alles ist
+    okay. Wenn diese Behauptung <code>false</code> (falsch) ist, schlägt der
+    Test fehl und wir haben einen Fehler im Programm. Wenn Sie sich einmal auf
+    <link
+    xlink:href="http://guides.rubyonrails.org/testing.html">http://guides.rubyonrails.org/testing.html</link>
     umschauen, dann werden Sie sehen, dass es noch ein paar andere
     <code>assert</code>-Varianten gibt. Hier einige Beispiele:<itemizedlist>
         <listitem>
-          <para><code>assert( boolean, [msg] )</code></para>
+          <para><code>assert( <replaceable>boolean</replaceable>,
+          <replaceable>[msg]</replaceable> )</code></para>
         </listitem>
 
         <listitem>
-          <para><code>assert_equal( obj1, obj2, [msg] )</code></para>
+          <para><code>assert_equal( <replaceable>obj1</replaceable>,
+          <replaceable>obj2</replaceable>, <replaceable>[msg]</replaceable>
+          )</code></para>
         </listitem>
 
         <listitem>
-          <para><code>assert_not_equal( obj1, obj2, [msg] )</code></para>
+          <para><code>assert_not_equal( <replaceable>obj1</replaceable>,
+          <replaceable>obj2</replaceable>, <replaceable>[msg]</replaceable>
+          )</code></para>
         </listitem>
 
         <listitem>
-          <para><code>assert_same( obj1, obj2, [msg] )</code></para>
+          <para><code>assert_same( <replaceable>obj1</replaceable>,
+          <replaceable>obj2</replaceable>, <replaceable>[msg]</replaceable>
+          )</code></para>
         </listitem>
 
         <listitem>
-          <para><code>assert_not_same( obj1, obj2, [msg] )</code></para>
+          <para><code>assert_not_same( <replaceable>obj1</replaceable>,
+          <replaceable>obj2</replaceable>, <replaceable>[msg]</replaceable>
+          )</code></para>
         </listitem>
 
         <listitem>
-          <para><code>assert_nil( obj, [msg] )</code></para>
+          <para><code>assert_nil( <replaceable>obj</replaceable>,
+          <replaceable>[msg]</replaceable> )</code></para>
         </listitem>
 
         <listitem>
-          <para><code>assert_not_nil( obj, [msg] )</code></para>
+          <para><code>assert_not_nil( <replaceable>obj</replaceable>,
+          <replaceable>[msg]</replaceable> )</code></para>
         </listitem>
 
         <listitem>
-          <para><code>assert_match( regexp, string, [msg] )</code></para>
+          <para><code>assert_match( <replaceable>regexp</replaceable>,
+          <replaceable>string</replaceable>, <replaceable>[msg]</replaceable>
+          )</code></para>
         </listitem>
 
         <listitem>
-          <para><code>assert_no_match( regexp, string, [msg] )</code></para>
+          <para><code>assert_no_match( <replaceable>regexp</replaceable>,
+          <replaceable>string</replaceable>, <replaceable>[msg]</replaceable>
+          )</code></para>
         </listitem>
       </itemizedlist></para>
 
     <para>Leider habe ich ein schlechtes Gedächtnis und kann mir diese ganzen
     Spezialfälle nicht alle merken. Ist aber auch kein Problem, denn
     eigentlich kann man auch alles mit einem <code>assert</code> abdecken.
-    Wenn ich also einen Spezialfall mit dem entsprechenden Spezial-assert
-    abbilden will, dann muss ich es auf <uri
-    xlink:href="http://guides.rubyonrails.org/testing.html">http://guides.rubyonrails.org/testing.html</uri>
-    nachschlagen. Oder ich baue mir mit einem einfachen assert die gleiche
-    Behauptung als false/true-Szenario auf.</para>
+    Wenn ich also einen Spezialfall mit dem entsprechenden
+    Spezial-<code>assert</code> abbilden will, dann muss ich es auf <link
+    xlink:href="http://guides.rubyonrails.org/testing.html">http://guides.rubyonrails.org/testing.html</link>
+    nachschlagen. Oder ich baue mir mit einem einfachen <code>assert</code>
+    die gleiche Behauptung als <code>true</code>/<code>false</code>-Szenario
+    auf.</para>
   </section>
 
   <section xml:id="functional_tests">
     <title xml:id="functional_tests.title">Functional Tests</title>
 
     <indexterm>
-      <primary>Testing</primary>
+      <primary>Tests</primary>
 
-      <secondary>Functional Tests</secondary>
+      <secondary>Functional</secondary>
+    </indexterm>
+
+    <indexterm>
+      <primary>Functional Tests</primary>
+
+      <see>Tests</see>
     </indexterm>
 
     <para>In <xref linkend="testing_beispiel_webshop" /> wurde die Grundidee
     für Functional Tests erklärt. Es geht bei Functional Tests darum, die
-    Funktionsweise der Webseite zu testen. Dabei werden sowohl die Views als
-    auch die Controller zu den Views getestet. Der Befehl <command>rake
-    test:functionals</command> führt während des Tests echte Abfragen auf die
-    Rails-Application aus, die vorher mit Test-Daten gefüllt wurden (siehe
-    <xref linkend="testing_fixtures" />). Alle Functional Tests werden im
+    Funktionsweise der Webseite zu testen. Dabei werden die Controller
+    getestet. Der Befehl <command>rake test:functionals</command> führt
+    während des Tests (fast) echte Abfragen auf die Rails-Applikation aus, die
+    vorher mit Test-Daten gefüllt wurde (siehe <xref
+    linkend="testing_fixtures" />). Alle Functional Tests werden im
     Verzeichnis <filename>test/functional/</filename> gespeichert.
     <command>rake generate</command> generiert automatisch diese Dateien. Sie
     können aber natürlich auch per Hand erstellt werden.</para>
@@ -1210,12 +1331,12 @@ end</programlisting></para>
     aus:<programlisting>require 'test_helper'
 
 class PeopleControllerTest &lt; ActionController::TestCase
-
-  test "should get something" do
-    get :something
-    assert_response :success
+  
+  test "<replaceable>should get something</replaceable>" do
+    <replaceable>get :something
+    assert_response :success</replaceable>
   end
-
+  
 end</programlisting></para>
 
     <para>Die von <command>rails generate scaffold</command> automatisch
@@ -1258,7 +1379,7 @@ end</programlisting></para>
 
   private
   def person_exists 
-    errors.add("person_id", "person is not existant") unless Person.exists?(self.person_id) 
+    errors.add(:person_id, "does not exist") if ! Person.exists?(self.person_id) 
   end   
 end</programlisting></para>
 
@@ -1278,7 +1399,7 @@ two:
 </programlisting></para>
 
       <para>Und in der <filename>test/fixtures/phones.yml</filename> werden
-      die person_id-Einträge passend zum Inhalt von
+      die <code>person.id</code>-Einträge passend zum Inhalt von
       <filename>test/fixtures/people.yml</filename> gesetzt:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
 
 one:
@@ -1303,7 +1424,7 @@ three:
       </note>
 
       <para><command>rake generate scaffold</command> hat uns die beiden
-      Functional Test-Dateien <filename>people_controller_test.rb</filename>
+      Functional-Test-Dateien <filename>people_controller_test.rb</filename>
       und <filename>phones_controller_test.rb</filename> automatisch erstellt.
       Diese Dateien bilden eine perfekte Grundlage für uns.</para>
 
@@ -1339,6 +1460,7 @@ MacBook:phonebook sw$ </screen></para>
       an:<programlisting>require 'test_helper'
 
 class PeopleControllerTest &lt; ActionController::TestCase
+
   setup do
     @person = people(:one)
   end
@@ -1358,7 +1480,6 @@ class PeopleControllerTest &lt; ActionController::TestCase
     assert_difference('Person.count') do
       post :create, person: @person.attributes
     end
-
     assert_redirected_to person_path(assigns(:person))
   end
 
@@ -1381,9 +1502,9 @@ class PeopleControllerTest &lt; ActionController::TestCase
     assert_difference('Person.count', -1) do
       delete :destroy, id: @person.to_param
     end
-
     assert_redirected_to people_path
   end
+  
 end
 </programlisting></para>
 
@@ -1398,18 +1519,16 @@ end
     assert_difference('Person.count') do
       post :create, person: @person.attributes
     end
-
     assert_redirected_to person_path(assigns(:person))
   end
 </programlisting></para>
 
-      <para>Und zwar muss der <code>assert_redirect_to</code> wie folgt
-      geändert werden:<programlisting>  test "should create person" do
+      <para>Und zwar muss <code>assert_redirect_to</code> wie folgt geändert
+      werden:<programlisting>  test "should create person" do
     assert_difference('Person.count') do
       post :create, person: @person.attributes
     end
-
-    <emphasis>assert_redirected_to people_path</emphasis>
+    <emphasis role="bold">assert_redirected_to people_path</emphasis>
   end</programlisting></para>
 
       <para>Der Test wird natürlich jetzt einen Fehler ausgeben:<screen>MacBook:phonebook sw$ <command>rake test:functionals</command>
@@ -1447,10 +1566,10 @@ Tasks: TOP =&gt; test:functionals
 (See full trace by running task with --trace)
 MacBook:phonebook sw$</screen></para>
 
-      <para>Die Fehlermeldung <errortext>Expected response to be a redirect to
-      &lt;http://test.host/people&gt; but was a redirect to
-      &lt;http://test.host/people/3&gt;</errortext> ist dabei selbsterklärend.
-      Wir müssen im Controller
+      <para>Die Fehlermeldung „<errortext>Expected response to be a redirect
+      to &lt;http://test.host/people&gt; but was a redirect to
+      &lt;http://test.host/people/3&gt;</errortext>“ ist dabei
+      selbsterklärend. Wir müssen im Controller
       <filename>app/controllers/people_controller.rb</filename> die
       <methodname>create</methodname>-Methode so verändern, dass nach dem
       Anlegen des Datensatzes ein Redirect auf die <code>people_url</code>
@@ -1459,7 +1578,7 @@ MacBook:phonebook sw$</screen></para>
 
     respond_to do |format|
       if @person.save
-        <emphasis>format.html { redirect_to people_url }</emphasis>
+        <emphasis role="bold">format.html { redirect_to people_url }</emphasis>
         format.json { render json: @person, status: :created, location: @person }
       else
         format.html { render action: "new" }
@@ -1503,7 +1622,15 @@ MacBook:phonebook sw$</screen></para>
       testen</title>
 
       <indexterm>
-        <primary>Flash-Nachricht testen</primary>
+        <primary>Flash messages</primary>
+
+        <secondary>testen</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>Tests</primary>
+
+        <secondary>Flash messages</secondary>
       </indexterm>
 
       <para>Mit Functional Tests kann man auch die Übergabe und das Anzeigen
@@ -1535,9 +1662,9 @@ MacBook:ping-pong sw$</screen></para>
 
       <para>Ziel der Applikation soll es sein, beim Aufruf der Seite
       <uri>/home/ping</uri> auf die Seite <uri>/home/pong</uri> umgeleitet zu
-      werden und eine Flash-Nachricht "<code>Sie wurden von Ping nach Pong
-      umgeleitet.</code>" zu sehen. Wenn man direkt <uri>/home/pong</uri>
-      öffnet, wird keine Flash-Nachricht angezeigt.</para>
+      werden und eine Flash-Nachricht „Sie wurden von Ping nach Pong
+      umgeleitet.“ zu sehen. Wenn man direkt <uri>/home/pong</uri> öffnet,
+      wird keine Flash-Nachricht angezeigt.</para>
 
       <para>Der von <command>rails generate controller Home ping
       pong</command> generierte Standardtest in der Datei
@@ -1545,39 +1672,41 @@ MacBook:ping-pong sw$</screen></para>
       aus:<programlisting>require 'test_helper'
 
 class HomeControllerTest &lt; ActionController::TestCase
+  
   test "should get ping" do
     get :ping
     assert_response :success
   end
-
+  
   test "should get pong" do
     get :pong
     assert_response :success
   end
-
+  
 end
 </programlisting></para>
 
-      <para>Als Erstes ändern wir den "<code>should get ping</code>"-Test so
+      <para>Als Erstes ändern wir den Test „<code>should get ping</code>“ so
       ab, dass ein Redirect auf <uri>/home/pong</uri> erwartet
       wird:<programlisting>require 'test_helper'
 
 class HomeControllerTest &lt; ActionController::TestCase
-<emphasis>  test "ping should be redirected to pong" do
+<emphasis role="bold">  
+  test "ping should be redirected to pong" do
     get :ping
     assert_redirected_to home_pong_url
   end</emphasis>
-
+  
   test "should get pong" do
     get :pong
     assert_response :success
   end
-
+  
 end
 </programlisting></para>
 
-      <para>Ein <command>rake test:functionals</command>-Lauf zeigt das
-      erwartete Ergebnis:<screen>MacBook:ping-pong sw$ <command>rake test:functionals</command>
+      <para>Ein Durchlauf von <command>rake test:functionals</command> zeigt
+      das erwartete Ergebnis:<screen>MacBook:ping-pong sw$ <command>rake test:functionals</command>
 Loaded suite /Users/stefan/.rvm/gems/ruby-1.9.2-p180/gems/rake-0.9.0/lib/rake/rake_test_loader
 Started
 
@@ -1606,13 +1735,14 @@ MacBook:ping-pong sw$</screen></para>
       <para>Ändern wir mal den Controller in der Datei
       <filename>app/controllers/home_controller.rb</filename> so ab, dass ein
       Redirect ausgeführt wird:<programlisting>class HomeController &lt; ApplicationController
+  
   def ping
     redirect_to home_pong_url
   end
-
+  
   def pong
   end
-
+  
 end
 </programlisting></para>
 
@@ -1629,22 +1759,22 @@ Finished in 0.095929 seconds.
 2 tests, 2 assertions, 0 failures, 0 errors, 0 skips
 MacBook:ping-pong sw$ </screen></para>
 
-      <para>Es fehlt aber noch die Flash-Meldung "<code>Sie wurden von Ping
-      nach Pong umgeleitet.</code>". Erweitern wir den Test
-      entsprechend:<programlisting>require 'test_helper'
+      <para>Es fehlt aber noch die Flash-Meldung „Sie wurden von Ping nach
+      Pong umgeleitet.“ Erweitern wir den Test entsprechend:<programlisting>require 'test_helper'
 
 class HomeControllerTest &lt; ActionController::TestCase
+  
   test "ping should be redirected to pong" do
     get :ping
     assert_redirected_to home_pong_url
-    <emphasis>assert_equal 'Sie wurden von Ping nach Pong umgeleitet.', flash[:notice]</emphasis>
+    <emphasis role="bold">assert_equal 'Sie wurden von Ping nach Pong umgeleitet.', flash[:notice]</emphasis>
   end
-
+  
   test "should get pong" do
     get :pong
     assert_response :success
   end
-
+  
 end
 </programlisting></para>
 
@@ -1671,13 +1801,14 @@ Tasks: TOP =&gt; test:functionals
 MacBook:ping-pong sw$</screen></para>
 
       <para>Erweitern wir den Controller:<programlisting>class HomeController &lt; ApplicationController
+  
   def ping
-    <emphasis>redirect_to home_pong_url, :notice =&gt; 'Sie wurden von Ping nach Pong umgeleitet.'</emphasis>
+    <emphasis role="bold">redirect_to home_pong_url, :notice =&gt; 'Sie wurden von Ping nach Pong umgeleitet.'</emphasis>
   end
-
+  
   def pong
   end
-
+  
 end
 </programlisting></para>
 
@@ -1694,10 +1825,10 @@ Finished in 0.094714 seconds.
 2 tests, 3 assertions, 0 failures, 0 errors, 0 skips
 MacBook:ping-pong sw$</screen></para>
 
-      <para>Jetzt werden aber einige sagen "Halt! Das ist ja nur die halbe
+      <para>Jetzt werden aber einige sagen „Halt! Das ist ja nur die halbe
       Miete. Ich weiß zwar jetzt, dass die Flash-Message korrekt gesetzt wird,
       aber wie kann ich testen, ob sie auch wirklich im View dargestellt
-      wird?". Sehr gut aufgepasst! Dieses Verhalten lässt sich aber nicht
+      wird?“. Sehr gut aufgepasst! Dieses Verhalten lässt sich aber nicht
       innerhalb eines Functional Tests überprüfen. Ein Functional Test kann
       keinem Redirect folgen. Dies ist nur mit einem Integration Test möglich.
       In <xref linkend="integration_testing" /> werde ich Ihnen zeigen, wie
@@ -1706,12 +1837,18 @@ MacBook:ping-pong sw$</screen></para>
   </section>
 
   <section xml:id="integration_testing">
-    <title xml:id="integration_testing.title">Integration Testing</title>
+    <title xml:id="integration_testing.title">Integration Tests</title>
 
     <indexterm>
-      <primary>Testing</primary>
+      <primary>Tests</primary>
 
-      <secondary>Integration Tests</secondary>
+      <secondary>Integration</secondary>
+    </indexterm>
+
+    <indexterm>
+      <primary>Integration Tests</primary>
+
+      <see>Tests</see>
     </indexterm>
 
     <para>Integration Tests sind Tests, die wie Functional Tests arbeiten,
@@ -1811,16 +1948,16 @@ MacBook:ping-pong sw$</screen></para>
     <title xml:id="mehr_zum_thema_testing.title">Mehr zum Thema
     Testing</title>
 
-    <para>Der wichtigste Link zum Thema Testing ist sicherlich die URL <uri
-    xlink:href="http://guides.rubyonrails.org/testing.html">http://guides.rubyonrails.org/testing.html</uri>.
+    <para>Der wichtigste Link zum Thema Testing ist sicherlich die URL <link
+    xlink:href="http://guides.rubyonrails.org/testing.html">http://guides.rubyonrails.org/testing.html</link>.
     Dort finden Sie auch einige gute Beispiele zum Thema.</para>
 
     <para>Bei keinem anderen Thema gibt es in der Rails-Community so viel
     Diskussion wie beim Thema Testing. Es gibt sehr viele alternative
-    Test-Tools. Ein sehr populäres ist RSpec (siehe <uri
-    xlink:href="http://rspec.info/">http://rspec.info/</uri>). Ich bespreche
+    Test-Tools. Ein sehr populäres ist RSpec (siehe <link
+    xlink:href="http://rspec.info/">http://rspec.info/</link>). Ich bespreche
     an dieser Stelle mit Absicht diese Alternativen nicht, da es mir in diesem
-    Buch um das Verständnis von Rails geht und nicht um die abertausenden
+    Buch um das Verständnis von Rails geht und nicht um die Abertausend
     Extra-Tools, mit denen man sich seine persönliche
     Rails-Entwicklungsumgebung bauen kann.</para>
   </section>
