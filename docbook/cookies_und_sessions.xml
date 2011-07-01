@@ -12,24 +12,28 @@
   <section xml:id="cookies">
     <title xml:id="cookies.title">Cookies</title>
 
-    <para>Mit einem Cookie kann man auf dem System des Webbrowsers
-    Informationen in Form von Strings als Key-Value-Paar speichern, die der
-    Webserver vorher an diesen Browser geschickt hat. Die Informationen werden
-    später im Hypertext-Transfer-Protocol-Header wieder vom Browser an den
-    Server geschickt. Ein Cookie wird dabei auf dem Browsersystem weder durch
-    einen Neustart des Browsers noch durch einen Neustart des ganzen Systems
-    gelöscht. Natürlich kann der User des Browsers den Cookie manuell
-    löschen.</para>
+    <indexterm>
+      <primary>Cookies</primary>
+    </indexterm>
+
+    <para>Mit einem Cookie kann man auf dem System des Web-Browsers
+    Informationen in Form von Strings als Key-Value-Pair (Schlüssel-Wert-Paar)
+    speichern, die der Webserver vorher an diesen Browser geschickt hat. Die
+    Informationen werden später im HyperText-Transfer-Protocol-Header wieder
+    vom Browser an den Server geschickt. Ein Cookie wird dabei auf dem
+    Browsersystem weder durch einen Neustart des Browsers noch durch einen
+    Neustart des ganzen Systems gelöscht. Natürlich kann der Benutzer des
+    Browsers den Cookie manuell löschen.</para>
 
     <para><important>
         <para>Ein Browser muss keine Cookies akzeptieren und er muss sie auch
         nicht speichern. Allerdings leben wir in einer Welt, in der fast jede
         Seite Cookies benutzt. Deshalb haben die meisten User die
-        Cookiefunktionalität aktiviert. Mehr Informationen zum Thema Cookie
+        Cookie-Funktionalität aktiviert. Mehr Informationen zum Thema Cookie
         finden Sie auf Wikipedia unter <uri
         xlink:href="http://de.wikipedia.org/wiki/HTTP-Cookie">http://de.wikipedia.org/wiki/HTTP-Cookie.</uri></para>
       </important><tip>
-        <para>Ein Cookie kann nicht beliebig lang sein (maximal 4 KB). Man
+        <para>Ein Cookie kann nicht beliebig lang sein (maximal 4 kB). Man
         muss sich dabei auch immer vor Augen halten, dass die Informationen
         der gespeicherten Cookies immer vom Browser an den Server geschickt
         werden. Er sollte nur zur Speicherung von kleinen Datenmengen (z. B.
@@ -37,8 +41,8 @@
         nicht zu groß werden zu lassen.</para>
       </tip></para>
 
-    <para>Cookies werden gelesen und gesetzt wie wir es mit einem Hash. der
-    <varname>cookies[]</varname> heißt, machen würden. Um den technischen
+    <para>Cookies werden gelesen und gesetzt wie wir es mit einem Hash der
+    <varname>cookies[]</varname> heißt machen würden. Um den technischen
     Kleinkram kümmert sich dann Rails.</para>
 
     <para>Um die Arbeitsweise mit Cookies zu veranschaulichen, bauen wir uns
@@ -58,20 +62,22 @@ Stefan-Wintermeyers-MacBook-Air:cookie_jar stefan$</screen></para>
     <para>Die Controller-Datei
     <filename>app/controllers/home_controller.rb</filename> befüllen wir wie
     folgt:<programlisting>class HomeController &lt; ApplicationController
+  
   def set_cookies
-    cookies[:user_name] = "Horst Meier" 
+    cookies[:user_name]   = "Horst Meier" 
     cookies[:kundenummer] = "1234567890" 
   end
-
+  
   def show_cookies
-    @user_name = cookies[:user_name]
+    @user_name    = cookies[:user_name]
     @kundennummer = cookies[:kundenummer]
   end
-
+  
   def delete_cookies
     cookies.delete :user_name
     cookies.delete :kundenummer
   end
+  
 end</programlisting></para>
 
     <para>Und die View-Datei
@@ -92,8 +98,8 @@ end</programlisting></para>
     xlink:href="http://0.0.0.0:3000/home/set_cookies">http://0.0.0.0:3000/home/set_cookies</uri>
     und danach wieder <uri
     xlink:href="http://0.0.0.0:3000/home/show_cookies">http://0.0.0.0:3000/home/show_cookies</uri>.
-    Jetzt bekommen Sie die Werte angezeigt, die wir in der
-    <methodname>set_cookies</methodname>-Methode gesetzt haben.</para>
+    Jetzt bekommen Sie die Werte angezeigt, die wir in der Methode
+    <methodname>set_cookies</methodname> gesetzt haben.</para>
 
     <para>Mit dem Aufruf der Seite <uri
     xlink:href="http://0.0.0.0:3000/home/delete_cookies">http://0.0.0.0:3000/home/delete_cookies</uri>
@@ -112,7 +118,14 @@ end</programlisting></para>
     </warning>
 
     <section xml:id="cookies_permanent">
-      <title xml:id="cookies_permanent.title">permanent Cookies</title>
+      <title xml:id="cookies_permanent.title">Permanente Cookies (permanent
+      cookies)</title>
+
+      <indexterm>
+        <primary>Cookies</primary>
+
+        <secondary>permanent</secondary>
+      </indexterm>
 
       <para>Cookies werden normalerweise gesetzt, um der Applikation eine
       Möglichkeit zu geben, User bei späteren Besuchen wiederzuerkennen oder
@@ -123,30 +136,31 @@ end</programlisting></para>
       obiges Beispiel können wir in der
       <filename>app/controllers/home_controller.rb</filename> um diese Methode
       erweitern:<programlisting>class HomeController &lt; ApplicationController
+  
   def set_cookies
-<emphasis>    cookies.permanent[:user_name] = "Horst Meier" 
+<emphasis role="bold">    cookies.permanent[:user_name]   = "Horst Meier" 
     cookies.permanent[:kundenummer] = "1234567890" </emphasis>
   end
-
+  
   def show_cookies
-    @user_name = cookies[:user_name]
+    @user_name    = cookies[:user_name]
     @kundennummer = cookies[:kundenummer]
   end
-
+  
   def delete_cookies
     cookies.delete :user_name
     cookies.delete :kundenummer
   end
-
+  
   def debug_cookies
   end
-end
-</programlisting></para>
+  
+end</programlisting></para>
 
       <important>
-        <para>"permanent" heißt hier nicht wirklich permanent. Man kann einen
+        <para>„permanent“ heißt hier nicht wirklich permanent. Man kann einen
         Cookie nicht permanent setzen. Ein Cookie braucht beim Setzen immer
-        einen "gültig bis" Stempel, den der Browser dazu benutzen kann, alte
+        einen „gültig-bis“-Stempel, den der Browser dazu benutzen kann, alte
         Cookies automatisch zu löschen. Mit der permanent-Methode wird dieser
         Wert auf das heutige Datum in 20 Jahren gesetzt. Das ist praktisch mit
         permanent gleichzusetzen.</para>
@@ -154,13 +168,20 @@ end
     </section>
 
     <section xml:id="cookies_signed">
-      <title xml:id="cookies_signed.title">signed Cookies</title>
+      <title xml:id="cookies_signed.title">Signierte Cookies (signed
+      cookies)</title>
+
+      <indexterm>
+        <primary>Cookies</primary>
+
+        <secondary>signiert</secondary>
+      </indexterm>
 
       <para>Bei normal gesetzten Cookies hat man auf Applikationsseite keine
       Möglichkeit herauszufinden, ob der User der Applikation den Cookie
       eigenhändig geändert hat. Das kann schnell zu einem Sicherheitsproblem
-      führen, den Inhalt eines Cookie im Browser zu ändern, ist kein
-      Zauberwerk. Die Lösung ist eine Signierung der Cookies mit einem nur mir
+      führen, den Inhalt eines Cookies im Browser zu ändern, ist kein
+      Zauberwerk. Die Lösung ist eine Signierung der Cookies mit einem nur uns
       bekannten Key. Dieser Key wird bei einem <command>rails new</command>
       automatisch per Zufallsgenerator erzeugt und liegt in der Datei
       <filename>config/initializers/secret_token.rb</filename>:<programlisting># Be sure to restart your server when you modify this file.
@@ -169,6 +190,7 @@ end
 # If you change this key, all old signed cookies will become invalid!
 # Make sure the secret is at least 30 characters and all random,
 # no regular words or you'll be exposed to dictionary attacks.
+
 CookieJar::Application.config.secret_token = 'd06619d4de97e76be4943624afed'
 </programlisting></para>
 
@@ -178,18 +200,19 @@ CookieJar::Application.config.secret_token = 'd06619d4de97e76be4943624afed'
           ist es hilfreich, diesen Key in die neue Rails-Applikation zu
           übertragen. Sonst können Sie die vorher gesetzten Cookies nicht mehr
           benutzen!</para>
-        </warning>Um Cookies zu signieren, gibt es die
-      <methodname>signed</methodname>-Methode. Diese muss beim Schreiben und
-      beim Lesen des Cookies benutzt werden. Unser obiges Beispiel können wir
-      in der <filename>app/controllers/home_controller.rb</filename> um diese
+        </warning>Um Cookies zu signieren, gibt es die Methode
+      <methodname>signed</methodname>. Diese muss beim Schreiben und beim
+      Lesen des Cookies benutzt werden. Unser obiges Beispiel können wir in
+      der <filename>app/controllers/home_controller.rb</filename> um diese
       Methode erweitern:<programlisting>class HomeController &lt; ApplicationController
+  
   def set_cookies
-<emphasis>    cookies.permanent.signed[:user_name] = "Horst Meier" 
+<emphasis role="bold">    cookies.permanent.signed[:user_name]   = "Horst Meier" 
     cookies.permanent.signed[:kundenummer] = "1234567890" </emphasis>
   end
 
   def show_cookies
-<emphasis>    @user_name = cookies.signed[:user_name]
+<emphasis role="bold">    @user_name    = cookies.signed[:user_name]
     @kundennummer = cookies.signed[:kundenummer]</emphasis>
   end
 
@@ -200,8 +223,8 @@ CookieJar::Application.config.secret_token = 'd06619d4de97e76be4943624afed'
 
   def debug_cookies
   end
-end
-</programlisting>Der Inhalt des Cookies wird jetzt bei jedem Setzen
+  
+end</programlisting>Der Inhalt des Cookies wird jetzt bei jedem Setzen
       verschlüsselt abgespeichert. Der Name des Cookies ist weiterhin im
       Klartext für den User lesbar. Der Wert aber nicht mehr.</para>
     </section>
@@ -210,18 +233,23 @@ end
   <section xml:id="sessions">
     <title xml:id="sessions.title">Sessions</title>
 
-    <para>Da HTTP ein state-less-Protokoll ist, treffen wir auf besondere
-    Probleme bei der Entwicklung von Anwendungen. Eigentlich hat eine Webseite
-    nicht mit einer anderen Webseite zu tun und sie wissen auch nichts
-    voneinander. Da man sich aber auf vielen Webseite z. B. nur einmal und
-    nicht auf jeder Seite neu anmelden will, ist das ein Problem. Die Lösung
-    dafür heißt Session. Von Rails wird automatisch für jeden neuen Besucher
-    der Webseite eine neue Session angelegt. Diese wird per Default als Cookie
-    (siehe <xref linkend="cookies" />) gespeichert und unterliegt damit der 4
-    KB Limitation. Man kann die Sessions aber auch in der Datenbank speichern
-    (siehe <xref linkend="sessions_datenbank" />). Eine eigenständige und
-    unique Session-ID wird automatisch erstellt und der Cookie wird per
-    Default beim Schließen des Webbrowsers gelöscht.<warning>
+    <indexterm>
+      <primary>Sessions</primary>
+    </indexterm>
+
+    <para>Da HTTP ein zustandsloses (stateless) Protokoll ist, treffen wir auf
+    besondere Probleme bei der Entwicklung von Anwendungen. Eigentlich hat
+    eine Webseite nicht mit einer anderen Webseite zu tun und sie wissen auch
+    nichts voneinander. Da man sich aber auf vielen Webseite z. B. nur einmal
+    und nicht auf jeder Seite neu anmelden will, ist das ein Problem. Die
+    Lösung dafür heißt Session. Von Rails wird automatisch für jeden neuen
+    Besucher der Webseite eine neue Session angelegt. Diese wird per Default
+    als Cookie (siehe <xref linkend="cookies" />) gespeichert und unterliegt
+    damit der Begrenzung auf 4 kB. Man kann die Sessions aber auch in der
+    Datenbank speichern (siehe <xref linkend="sessions_datenbank" />). Eine
+    eigenständige und eindeutige (unique) Session-ID wird automatisch erstellt
+    und der Cookie wird per Default beim Schließen des Webbrowsers
+    gelöscht.<warning>
         <para>Bitte beachten Sie, dass nur von Rails generierte Seiten im
         Session-Management arbeiten. Wenn Sie eine statische HTML-Seite aus
         <filename>/public</filename> aufrufen, so läuft das außerhalb des
@@ -256,18 +284,20 @@ Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$</screen></para>
       können. Dazu richten wir einen <methodname>before_filter</methodname> in
       der <filename>app/controllers/home_controller.rb</filename>
       ein:<programlisting>class HomeController &lt; ApplicationController
-  <emphasis>before_filter :set_breadcrumbs</emphasis>
+  
+  <emphasis role="bold">before_filter :set_breadcrumbs</emphasis>
   
   def ping
   end
-
+  
   def pong
   end
-
+  
   def index
   end
-
-<emphasis>  private  
+  
+<emphasis role="bold">  private
+  
   def set_breadcrumbs
     @breadcrumbs = session[:breadcrumbs]
     @breadcrumbs ||= Array.new
@@ -275,8 +305,8 @@ Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$</screen></para>
     @breadcrumbs.shift if @breadcrumbs.count &gt; 3
     session[:breadcrumbs] = @breadcrumbs
   end</emphasis>
-end
-</programlisting></para>
+  
+end</programlisting></para>
 
       <para>Jetzt benutzen wir die
       <filename>app/views/layouts/application.html.erb</filename>, um diese
@@ -305,8 +335,8 @@ end
 &lt;/html&gt;
 </programlisting></para>
 
-      <para>Jetzt können Sie mit <command>rails server</command> den Rails
-      Server starten und auf <uri
+      <para>Jetzt können Sie mit <command>rails server</command> den
+      Rails-Server starten und auf <uri
       xlink:href="http://0.0.0.0:3000/home/ping">http://0.0.0.0:3000/home/ping</uri>,
       <uri
       xlink:href="http://0.0.0.0:3000/home/ping">http://0.0.0.0:3000/home/ping</uri>
@@ -331,10 +361,10 @@ end
       <title xml:id="reset_session.title">reset_session</title>
 
       <para>Es gibt immer mal wieder Situationen, in denen man eine Session
-      reseten möchte (also die aktuelle Session löschen und eine neue, frische
-      Session aufbauen). Bei einem Logout einer Webapplikation wird so
-      beispielsweise oft die Session geresetet. Das geht einfach und wir bauen
-      das kurz in unsere Breadcrumb-Applikation (siehe <xref
+      zurücksetzen möchte (also die aktuelle Session löschen und eine neue,
+      frische Session aufbauen). Bei einem Logout einer Web-Applikation wird
+      so beispielsweise oft die Session zurückgesetzt. Das geht einfach und
+      wir bauen das kurz in unsere Breadcrumb-Applikation (siehe <xref
       linkend="session_breadcrumbs" />) ein:<screen>Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$ <command>rails generate controller Home reset -s</command>
         skip  app/controllers/home_controller.rb
        route  get "home/reset"
@@ -355,23 +385,25 @@ Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$</screen></para>
       <para>Der entsprechend erweiterte Controller
       <filename>app/controllers/home_controller.rb</filename> sieht dann so
       aus:<programlisting>class HomeController &lt; ApplicationController
+  
   before_filter :set_breadcrumbs
   
   def ping
   end
-
+  
   def pong
   end
-
+  
   def index
   end
-
-  def reset
+  
+  <emphasis role="bold">def reset
     reset_session
     @breadcrumbs = nil
-  end
-
-  private  
+  end</emphasis>
+  
+  private
+  
   def set_breadcrumbs
     @breadcrumbs = session[:breadcrumbs]
     @breadcrumbs ||= Array.new
@@ -379,8 +411,8 @@ Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$</screen></para>
     @breadcrumbs.shift if @breadcrumbs.count &gt; 3
     session[:breadcrumbs] = @breadcrumbs
   end
-end
-</programlisting></para>
+  
+end</programlisting></para>
 
       <para>Wichtig ist es nicht nur <methodname>reset_session</methodname>
       aufzurufen, sondern auch noch die Instanz-Variable
@@ -393,7 +425,7 @@ end
       speichern</title>
 
       <para>Die ganzen Session-Daten in einem Cookie auf dem Browser des Users
-      zu speichern, ist nicht immer optimal. Alleine das 4 KB Limit kommt
+      zu speichern, ist nicht immer optimal. Alleine das Limit von 4 kB kommt
       einem manchmal in die Quere. Es ist aber kein Problem, denn wir können
       das Speichern der Session vom Cookie in die Datenbank umstellen. Dann
       wird natürlich immer noch die Session-ID in einem Cookie gespeichert,
@@ -411,8 +443,8 @@ end
 # Use the database for sessions instead of the cookie-based default,
 # which shouldn't be used to store highly confidential information
 # (create the session table with "rails generate session_migration")
-<emphasis>Breadcrumbs::Application.config.session_store :active_record_store</emphasis>
-</programlisting></para>
+
+<emphasis role="bold">Breadcrumbs::Application.config.session_store :active_record_store</emphasis></programlisting></para>
 
       <para>Jetzt müssen wir noch die entsprechende Tabelle anlegen. Das geht
       mit <command>rails generate session_migration</command> und
@@ -431,7 +463,7 @@ Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$ <command>rake db:migrate</co
 
 Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$</screen></para>
 
-      <para>Logischerweise muss der Webserver dafür heruntergefahren
+      <para>Logischerweise muss der Web-Server dafür heruntergefahren
       werden.</para>
     </section>
   </section>
