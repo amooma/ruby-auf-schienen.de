@@ -9,24 +9,31 @@
          xmlns:db="http://docbook.org/ns/docbook">
   <title xml:id="scaffolding.title">Scaffolding</title>
 
+  <indexterm>
+    <primary>Scaffolding</primary>
+  </indexterm>
+
   <section xml:base="scaffolding_einleitung">
     <title>Einleitung</title>
 
     <para>Sie haben viel gelesen und mussten lange auf diesen Moment warten.
     Scaffolding ist Fluch und Segen gleichermaßen. Scaffolding heißt nicht
-    mehr, als dass ein Grundgerüst für eine Applikation erstellt wird. Dieses
-    Grundgerüst enthält nicht nur das Model, sondern auch eine einfache
-    Web-GUI (also Views) und natürlich einen Controller. Der meiner Meinung
-    nach größte Teil des Frustes mit Rails entsteht regelmäßig dadurch, dass
-    Anfänger ohne Ruby-Grundkenntnisse und ohne zu wissen, was ActiveRecord
-    ist, mit Scaffolding schnell zu einem Ergebnis kommen, aber dann nicht
-    weiterwissen. Da Sie aber <xref linkend="ruby-grundlagen" />, <xref
-    linkend="erste_schritte_mit_rails" /> und <xref
+    mehr, als dass ein Grundgerüst (<foreignphrase
+    xml:lang="en">scaffold</foreignphrase>) für eine Applikation erstellt
+    wird. Dieses Grundgerüst enthält nicht nur das <foreignphrase
+    xml:lang="en">Model</foreignphrase>, sondern auch eine einfache Web-GUI
+    (also <foreignphrase xml:lang="en">Views</foreignphrase>) und natürlich
+    einen <foreignphrase xml:lang="en">Controller</foreignphrase>. Der meiner
+    Meinung nach größte Teil des Frustes mit Rails entsteht regelmäßig
+    dadurch, dass Anfänger ohne Ruby-Grundkenntnisse und ohne zu wissen, was
+    ActiveRecord ist, mit Scaffolding schnell zu einem Ergebnis kommen, aber
+    dann nicht weiterwissen. Da Sie aber <xref linkend="ruby-grundlagen" />,
+    <xref linkend="erste_schritte_mit_rails" /> und <xref
     linkend="activerecord_chapter" /> durchgearbeitet haben, werden Sie
     Scaffolding direkt verstehen und nutzen können.</para>
 
     <para>Zwischen Rails 3.0 und 3.1 gibt es im Scaffolding einige
-    Unterschiede - auch wenn die Grundidee die gleiche ist.</para>
+    Unterschiede &#8211; auch wenn die Grundidee die gleiche ist.</para>
 
     <note>
       <para>Dieses Kapitel ist ein Einstieg in Scaffolding und keine alle
@@ -36,8 +43,7 @@
   </section>
 
   <section xml:id="scaffold_anlegen">
-    <title>Anlegen von einer neuen Rails-Applikation und einem
-    Scaffold</title>
+    <title>Generieren eines Scaffolds</title>
 
     <para>Legen wir zuerst mit Scaffolding eine Liste von Bundeskanzlern an.
     Dazu müssen Sie erst mal eine neue Rails-Applikation anlegen:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new politics</command>
@@ -50,7 +56,13 @@ stefan@swmbp 0 1.9.2-p0 politics$ </screen></para>
     <section xml:id="scaffold_anlegen_rails_30">
       <title>Scaffolding mit Rails 3.0</title>
 
-      <para>Am Anfang schauen wir uns die Rails 3.0-Optionen von Scaffolding
+      <indexterm>
+        <primary>Scaffolding</primary>
+
+        <secondary>Rails 3.0</secondary>
+      </indexterm>
+
+      <para>Am Anfang schauen wir uns die Rails-3.0-Optionen von Scaffolding
       an:<screen>stefan@swmbp 0 1.9.2-p0 politics$ <command>rails generate scaffold</command>
 Usage:
   rails generate scaffold NAME [field:type field:type] [options]
@@ -92,10 +104,12 @@ Runtime options:
 
 Description:
     Create rails files for scaffold generator.
+
 stefan@swmbp 0 1.9.2-p0 politics$</screen></para>
 
       <para>Ich mache es kurz: Für unseren jetzigen Kenntnisstand können wir
-      <code>scaffold</code> wie <code>model</code> benutzen (siehe <xref
+      <command>rails generate scaffold</command> wie <command>rails generate
+      model</command> benutzen (siehe <xref
       linkend="activerecord_datenbank_anlegen" />). Legen wir jetzt das
       Scaffold für Bundeskanzler an:<screen>stefan@swmbp 0 1.9.2-p0 politics$ <command>rails generate scaffold chancellor firstname:string lastname:string birthday:date day_of_death:date inauguration:date</command>
       invoke  active_record
@@ -123,24 +137,19 @@ stefan@swmbp 0 1.9.2-p0 politics$</screen></para>
       invoke  stylesheets
       create    public/stylesheets/scaffold.css
 stefan@swmbp 0 1.9.2-p0 politics$ </screen></para>
-
-      <para>Wie Sie sehen, wurde von <command>rails generate
-      scaffold</command> schon das Model mit angelegt. Wir können entsprechend
-      direkt <command>rake db:migrate</command> aufrufen:<screen>stefan@swmbp 0 1.9.2-p0 politics$ <command>rake db:migrate</command>
-(in /Users/stefan/politics)
-==  CreateChancellors: migrating ==============================================
--- create_table(:chancellors)
-   -&gt; 0.0015s
-==  CreateChancellors: migrated (0.0016s) =====================================
-
-stefan@swmbp 0 1.9.2-p0 politics$</screen></para>
     </section>
 
     <section xml:id="scaffold_anlegen_rails_31">
       <title>Scaffolding mit Rails 3.1</title>
 
-      <para>Am Anfang schauen wir uns die Rails 3.1-Optionen von Scaffolding
-      an:<screen>stefan@swmbp 0 1.9.2-p0:politics$<command>rails generate scaffold</command>
+      <indexterm>
+        <primary>Scaffolding</primary>
+
+        <secondary>Rails 3.1</secondary>
+      </indexterm>
+
+      <para>Am Anfang schauen wir uns die Rails-3.1-Optionen von Scaffolding
+      an:<screen>stefan@swmbp 0 1.9.2-p0:politics$ <command>rails generate scaffold</command>
 Usage:
   rails generate scaffold NAME [field:type field:type] [options]
 
@@ -216,10 +225,11 @@ Examples:
     `rails generate scaffold post`
     `rails generate scaffold post title:string body:text published:boolean`
     `rails generate scaffold purchase order_id:integer amount:decimal`
+
 stefan@swmbp 0 1.9.2-p0:politics$</screen></para>
 
       <para>Diese Hilfe ist tatsächlich gut. Legen wir anhand des Beispieles
-      ein Scaffold für Bundeskanzler an:<screen>stefan@swmbp 0 1.9.2-p0:politics$<command>rails generate scaffold chancellor firstname:string lastname:string birthday:date day_of_death:date inauguration:date</command>
+      ein Scaffold für Bundeskanzler an:<screen>stefan@swmbp 0 1.9.2-p0:politics$ <command>rails generate scaffold chancellor firstname:string lastname:string birthday:date day_of_death:date inauguration:date</command>
       invoke  active_record
       create    db/migrate/20110524100537_create_chancellors.rb
       create    app/models/chancellor.rb
@@ -251,7 +261,7 @@ stefan@swmbp 0 1.9.2-p0:politics stefan$</screen></para>
   </section>
 
   <section xml:id="scaffold_migrate_und_seed">
-    <title>Anlegen der Datenbank und Einspielen der Beispieldaten</title>
+    <title>Anlegen der Datenbank mit Beispieldaten</title>
 
     <para>Wie Sie sehen, wurde von <command>rails generate scaffold</command>
     schon das Model mit angelegt. Wir können entsprechend direkt <command>rake
@@ -291,8 +301,8 @@ stefan@swmbp 0 1.9.2-p0 politics$</screen></para>
     Dem liegt die Annahme zugrunde, dass man immer Datensätze ansehen, anlegen
     und löschen möchte.</para>
 
-    <para>Ohne uns zu intensiv mit Routes zu beschäftigen, schauen wir gerade
-    mal die verfügbaren Routes an. Dazu müssen Sie <command>rake
+    <para>Ohne uns zu intensiv mit Routen zu beschäftigen, schauen wir gerade
+    mal die verfügbaren Routen an. Dazu müssen Sie <command>rake
     routes</command> eingeben:<screen>stefan@swmbp 0 1.9.2-p0 politics$ <command>rake routes</command>
 (in /Users/stefan/politics)
     chancellors GET    /chancellors(.:format)          {:action=&gt;"index", :controller=&gt;"chancellors"}
@@ -306,7 +316,7 @@ stefan@swmbp 0 1.9.2-p0 politics$</screen></para>
 
     <para>Das sind alle in dieser Rails-Applikation zur Verfügung stehenden
     Routen und damit URLs. Alle Routes rufen Actions (also Methoden) im
-    Controller <varname>chancellors</varname> auf.</para>
+    <classname>ChancellorsController</classname> auf.</para>
   </section>
 
   <section xml:id="scaffold_controller">
@@ -323,13 +333,14 @@ stefan@swmbp 0 1.9.2-p0 politics$</screen></para>
     <para>So viel vorweg: Sie müssen jetzt nicht Zeile für Zeile den
     Controller durcharbeiten. Es ist nur wichtig, dass Sie wissen, wo die
     Datei liegt und dass dort die einzelnen Methoden für die Aufrufe durch die
-    Routen liegen. Dann können Sie später - bei Unklarheiten - dort
-    nachschauen.</para>
+    Routen liegen. Dann können Sie später &#8211; bei Unklarheiten &#8211;
+    dort nachschauen.</para>
 
     <section xml:id="scaffold_controller_rails30">
       <title>Rails 3.0</title>
 
       <para><programlisting>class ChancellorsController &lt; ApplicationController
+
   # GET /chancellors
   # GET /chancellors.xml
   def index
@@ -411,6 +422,7 @@ stefan@swmbp 0 1.9.2-p0 politics$</screen></para>
       format.xml  { head :ok }
     end
   end
+
 end
 </programlisting></para>
     </section>
@@ -419,6 +431,7 @@ end
       <title>Rails 3.1</title>
 
       <para><programlisting>class ChancellorsController &lt; ApplicationController
+
   # GET /chancellors
   # GET /chancellors.json
   def index
@@ -500,6 +513,7 @@ end
       format.json { head :ok }
     end
   end
+
 end
 </programlisting></para>
     </section>
@@ -524,8 +538,8 @@ end
       durchgearbeitet haben. ;-)</para>
     </note>
 
-    <para>Jetzt ein kleiner Trommelwirbel ... Spannung ... den Webbrowser
-    starten und die URL <uri
+    <para>Jetzt ein kleiner Trommelwirbel … Spannung … den Webbrowser starten
+    und die URL <uri
     xlink:href="http://0.0.0.0:3000/chancellors">http://0.0.0.0:3000/chancellors</uri>
     aufrufen. Sie sehen die Liste der Bundeskanzler als einfache
     Webseite.<screenshot>
@@ -540,7 +554,7 @@ end
         </mediaobject>
       </screenshot></para>
 
-    <para>Wenn Sie jetzt auf den Link "New Chancellor" klicken, dann bekommen
+    <para>Wenn Sie jetzt auf den Link „New Chancellor“ klicken, dann bekommen
     Sie ein Eingabeformular für einen neuen Datensatz angezeigt:<screenshot>
         <info>
           <title>Eingabeformular für einen neuen Datensatz</title>
@@ -553,8 +567,8 @@ end
         </mediaobject>
       </screenshot></para>
 
-    <para>Gehen Sie mit der Back-Taste Ihres Browsers wieder zurück und
-    klicken Sie auf den "Show"-Link in der Zeile von Konrad Adenauer. Sie
+    <para>Gehen Sie mit dem Back-Button Ihres Browsers wieder zurück und
+    klicken Sie auf den „Show“-Link in der Zeile von Konrad Adenauer. Sie
     sehen daraufhin folgende Seite:<screenshot>
         <info>
           <title>Anzeige eines einzelnen Datensatzes</title>
@@ -567,7 +581,7 @@ end
         </mediaobject>
       </screenshot></para>
 
-    <para>Wenn Sie jetzt auf "Edit" klicken, bekommen Sie die Editieransicht
+    <para>Wenn Sie jetzt auf „Edit“ klicken, bekommen Sie die Editieransicht
     zu diesem Datensatz:<screenshot>
         <info>
           <title>Editier-Formular für einen bestehenden Datensatz</title>
@@ -580,18 +594,24 @@ end
         </mediaobject>
       </screenshot></para>
 
-    <para>Und wenn Sie auf der Index-Seite auf "Destroy" klicken, können Sie
-    nach einer Sicherheitsabfrage einen Datensatz löschen. Ist das cool?! Sie
-    haben innerhalb von nicht mal 10 Minuten eine Webapplikation geschrieben,
-    mit der Sie Datensätze auflisten, anschauen, editieren, löschen und neu
-    anlegen können. Das ist der Zauber von Scaffolding.</para>
+    <para>Und wenn Sie auf der Index-Seite auf „Destroy“ klicken, können Sie
+    nach einer Bestätigungsabfrage einen Datensatz löschen. Ist das cool?! Sie
+    haben innerhalb von nicht mal 10 Minuten eine Web-Applikation geschrieben,
+    mit der Sie Datensätze anlegen (<emphasis role="bold">c</emphasis>reate),
+    auflisten und anschauen (<emphasis role="bold">r</emphasis>ead/<emphasis
+    role="bold">r</emphasis>etrieve), bearbeiten (<emphasis
+    role="bold">u</emphasis>pdate) und löschen (<emphasis
+    role="bold">d</emphasis>elete/<emphasis role="bold">d</emphasis>estroy)
+    können (CRUD)<indexterm>
+        <primary>CRUD</primary>
+      </indexterm>. Das ist der Zauber von Scaffolding.</para>
 
     <section xml:id="scaffold_wo_liegen_die_views">
       <title>Wo liegen die Views?</title>
 
       <para>Sie werden es sich schon denken können, aber schauen wir uns
       trotzdem das Verzeichnis <filename>app/views/chancellors</filename>
-      an:<screen>stefan@swmbp 0 1.9.2-p0:politics$<command>ls app/views/chancellors</command>
+      an:<screen>stefan@swmbp 0 1.9.2-p0:politics$ <command>ls app/views/chancellors</command>
 _form.html.erb
 edit.html.erb
 index.html.erb
@@ -602,8 +622,10 @@ show.html.erb</screen></para>
       <methodname>new</methodname> und <methodname>show</methodname> liegen
       dort die entsprechenden Views. Da <methodname>new</methodname> und
       <methodname>edit</methodname> beide ein Formular zum Bearbeiten der
-      Daten benötigen, wird dieses im Sinne von DRY (Don't Repeat Yourself) im
-      Partial <filename>_form.html.erb</filename> abgelegt (siehe <xref
+      Daten benötigen, wird dieses im Sinne von DRY (<emphasis
+      role="bold">D</emphasis>on't <emphasis role="bold">R</emphasis>epeat
+      <emphasis role="bold">Y</emphasis>ourself) im Partial
+      <filename>_form.html.erb</filename> abgelegt (siehe <xref
       linkend="partials" />) und in <filename>new.html.erb</filename> und
       <filename>edit.html.erb</filename> mit einem <code>&lt;%= render 'form'
       %&gt;</code> eingebunden.</para>
@@ -650,41 +672,79 @@ show.html.erb</screen></para>
     <section xml:id="scaffold_json_und_xml">
       <title>Zugriff per XML oder JSON</title>
 
-      <para>Rails Scaffold bietet per Default nicht nur den Zugriff per HTML
-      und ist damit für einen menschlichen User gedacht, sondern hat auch
-      direkt noch eine Schnittstelle für Automaten eingebaut. Damit lassen
-      sich die gleichen Methoden <methodname>index</methodname>,
-      <methodname>show</methodname>, <methodname>new</methodname>,
-      <methodname>create</methodname>, <methodname>update</methodname> und
-      <methodname>destroy</methodname> aufrufen. Eben nur in einem für eine
-      Maschine einfacheren Format. Beispielhaft besprechen wir hier die
+      <indexterm>
+        <primary>Web-API</primary>
+
+        <secondary>XML-Format</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>Web-API</primary>
+
+        <secondary>JSON-Format</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>XML</primary>
+
+        <see>Web-API</see>
+      </indexterm>
+
+      <indexterm>
+        <primary>JSON</primary>
+
+        <see>Web-API</see>
+      </indexterm>
+
+      <indexterm>
+        <primary>API</primary>
+
+        <see>Web-API</see>
+      </indexterm>
+
+      <para>Rails' Scaffolding generiert per Default nicht nur den Zugriff per
+      HTML für „menschliche“ Benutzer, sondern auch direkt noch eine
+      Schnittstelle für Automaten. Damit lassen sich die gleichen Methoden
+      <methodname>index</methodname>, <methodname>show</methodname>,
+      <methodname>new</methodname>, <methodname>create</methodname>,
+      <methodname>update</methodname> und <methodname>destroy</methodname>
+      aufrufen. Eben nur in einem für eine Maschine einfacheren Format.
+      Beispielhaft besprechen wir hier die
       <methodname>index</methodname>-Action, mit der alle Daten auf einmal
       ausgelesen werden. Über die gleiche Idee können aber auch Daten gelöscht
-      (<methodname>destroy</methodname>) oder geupdatet
+      (<methodname>destroy</methodname>) oder geändert
       (<methodname>update</methodname>) werden.</para>
 
-      <para>Aktuell populäre Formate sind XML (siehe <uri
-      xlink:href="http://de.wikipedia.org/wiki/Extensible_Markup_Language">http://de.wikipedia.org/wiki/Extensible_Markup_Language</uri>)
-      und JSON (siehe <uri
-      xlink:href="http://de.wikipedia.org/wiki/JavaScript_Object_Notation">http://de.wikipedia.org/wiki/JavaScript_Object_Notation</uri>).</para>
+      <para>Aktuell populäre Formate sind XML (siehe <link
+      xlink:href="http://de.wikipedia.org/wiki/Extensible_Markup_Language">http://de.wikipedia.org/wiki/Extensible_Markup_Language</link>)
+      und JSON (siehe <link
+      xlink:href="http://de.wikipedia.org/wiki/JavaScript_Object_Notation">http://de.wikipedia.org/wiki/JavaScript_Object_Notation</link>).</para>
 
       <para>Wenn Sie keinen maschinellen Zugriff auf Daten benötigen, können
       Sie diese Beispiele überspringen. Sie sollten dann aber auch
       sicherheitshalber alle Zeilen mit <code>format.xml</code> bzw.
-      <code>format.json</code> in Ihrem Controller löschen. Ansonsten haben
-      Sie eine Schnittstelle zu den Daten, die Sie vielleicht irgendwann mal
-      vergessen und die eine potenzielle Sicherheitslücke darstellen.</para>
+      <code>format.json</code> in den <code>respond_to</code>-Blöcken in Ihren
+      Controllern löschen. Ansonsten haben Sie eine Schnittstelle zu den
+      Daten, die Sie vielleicht irgendwann mal vergessen und die eine
+      potenzielle Sicherheitslücke darstellen.</para>
 
       <section xml:id="scaffold_xml_in_rails30">
         <title>XML als Default in Rails 3.0</title>
+
+        <indexterm>
+          <primary>Web-API</primary>
+
+          <secondary>XML-Format</secondary>
+        </indexterm>
 
         <para>Ganz am Anfang von
         <filename>app/controllers/chancellors_controller.rb</filename> finden
         Sie den Eintrag für die
         <methodname>index</methodname>-Action:<programlisting>class ChancellorsController &lt; ApplicationController
-<emphasis>  # GET /chancellors
+
+<emphasis role="bold">  # GET /chancellors
   # GET /chancellors.xml
-</emphasis><emphasis>  def index
+</emphasis><emphasis role="bold">  def index
     @chancellors = Chancellor.all
 
     respond_to do |format|
@@ -692,18 +752,19 @@ show.html.erb</screen></para>
       format.xml  { render :xml =&gt; @chancellors }
     end
   end
-</emphasis></programlisting></para>
+</emphasis>
+<replaceable>[...]</replaceable></programlisting></para>
 
         <para>Der Code ist übersichtlich. In der Instanz-Variable
         <varname>@chancellors</varname> werden alle Bundeskanzler
-        abgespeichert. Danach wird irgendetwas mit einem Format gemacht. Hmmm
-        ... da steht was von XML. Probieren wir mal Folgendes aus. Bitte
-        starten Sie mit <command>rails server</command> wieder den
-        Rails-Server und gehen Sie mit Ihrem Webbrowser auf die URL <uri
+        abgespeichert. Danach wird irgendetwas mit einem Format gemacht. Hmmm…
+        da steht was von <code>xml</code>. Probieren wir mal Folgendes aus:
+        Bitte starten Sie mit <command>rails server</command> wieder den
+        Rails-Server und gehen Sie mit Ihrem Web-Browser auf die URL <uri
         xlink:href="http://0.0.0.0:3000/chancellors.xml">http://0.0.0.0:3000/chancellors.xml</uri>.
         Heureka! Sie bekommen folgende Ansicht:<screenshot>
             <info>
-              <title>Index XML-Anzeige</title>
+              <title>Index-XML-Anzeige</title>
             </info>
 
             <mediaobject>
@@ -714,10 +775,10 @@ show.html.erb</screen></para>
           </screenshot></para>
 
         <para>Das bringt uns auch nicht richtig weiter. Es werden also
-        irgendwie alle Datensätze angezeigt. Vielleicht sollten wir uns den
-        Source-Code dieser Seite anschauen:<screenshot>
+        irgendwie alle Datensätze zurückgegeben. Vielleicht sollten wir uns
+        den Source-Code dieser Seite anschauen:<screenshot>
             <info>
-              <title>Index XML-Anzeige im Source-Code</title>
+              <title>Index-XML-Anzeige im Source-Code</title>
             </info>
 
             <mediaobject>
@@ -728,8 +789,8 @@ show.html.erb</screen></para>
           </screenshot></para>
 
         <para>A-ha! Der Browser hat XML vom Rails-Webserver bekommen und
-        versucht es irgendwie darzustellen. Das Rendern der XML-Seite wird von
-        der Zeile<programlisting>format.xml  { render :xml =&gt; @chancellors }</programlisting>realisiert.
+        versucht es irgendwie darzustellen. Das Ausgeben der XML-Liste wird
+        von der Zeile<programlisting>      format.xml  { render :xml =&gt; @chancellors }</programlisting>realisiert.
         Wenn Sie keine XML-Ausgabe wünschen, müssen Sie diese Zeile in der
         <filename>app/controllers/chancellors_controller.rb</filename>
         löschen.</para>
@@ -745,11 +806,18 @@ show.html.erb</screen></para>
       <section xml:id="scaffold_json_in_rails31">
         <title>JSON als Default in Rails 3.1</title>
 
+        <indexterm>
+          <primary>Web-API</primary>
+
+          <secondary>JSON-Format</secondary>
+        </indexterm>
+
         <para>Ganz am Anfang von
         <filename>app/controllers/chancellors_controller.rb</filename> finden
         Sie den Eintrag für die
         <methodname>index</methodname>-Action:<programlisting>class ChancellorsController &lt; ApplicationController
-<emphasis>  # GET /chancellors
+
+<emphasis role="bold">  # GET /chancellors
   # GET /chancellors.json
   def index
     @chancellors = Chancellor.all
@@ -759,18 +827,19 @@ show.html.erb</screen></para>
       format.json { render json: @chancellors }
     end
   end
-</emphasis></programlisting></para>
+</emphasis>
+<replaceable>[...]</replaceable></programlisting></para>
 
         <para>Der Code ist übersichtlich. In der Instanz-Variable
         <varname>@chancellors</varname> werden alle Bundeskanzler
-        abgespeichert. Danach wird irgendetwas mit einem Format gemacht. Hmmm
-        ... da steht was von <code>json</code>. Probieren wir mal Folgendes
-        aus. Bitte starten Sie mit <command>rails server</command> wieder den
-        Rails-Server und gehen Sie mit Ihrem Webbrowser auf die URL <uri
+        abgespeichert. Danach wird irgendetwas mit einem Format gemacht. Hmmm…
+        da steht was von <code>json</code>. Probieren wir mal Folgendes aus:
+        Bitte starten Sie mit <command>rails server</command> wieder den
+        Rails-Server und gehen Sie mit Ihrem Web-Browser auf die URL <uri
         xlink:href="http://0.0.0.0:3000/chancellors.json">http://0.0.0.0:3000/chancellors.json</uri>.
         Heureka! Sie bekommen folgende Ansicht:<screenshot>
             <info>
-              <title>Index JSON-Anzeige</title>
+              <title>Index-JSON-Anzeige</title>
             </info>
 
             <mediaobject>
@@ -803,12 +872,14 @@ show.html.erb</screen></para>
       <section xml:id="scaffold_json_und_xml_zusammen">
         <title>JSON und XML zusammen</title>
 
-        <para>Wenn Sie in einer Rails-Application einmal eine JSON- und eine
+        <para>Wenn Sie in einer Rails-Applikation einmal eine JSON- und eine
         XML-Schnittstelle benötigen, so müssen Sie im Controller einfach nur
-        beide Variaten im Format-Bereich angeben. Hier ein Beispiel mit der
+        beide Variaten im <code>respond_to</code>-Block angeben. Hier ein
+        Beispiel mit der
         <filename>app/controllers/chancellors_controller.rb</filename> in der
         <methodname>index</methodname>-Action:<programlisting>class ChancellorsController &lt; ApplicationController
-<emphasis>  # GET /chancellors
+
+<emphasis role="bold">  # GET /chancellors
   # GET /chancellors.json
   def index
     @chancellors = Chancellor.all
@@ -819,25 +890,26 @@ show.html.erb</screen></para>
       format.json { render json: @chancellors }
     end
   end
-</emphasis></programlisting></para>
+</emphasis>
+<replaceable>[...]</replaceable></programlisting></para>
       </section>
     </section>
   </section>
 
   <section xml:id="wann_sollte_man_scaffold_benutzen">
-    <title>Wann sollte man Scaffold benutzen?</title>
+    <title>Wann sollte man Scaffolding benutzen?</title>
 
-    <para>Die Verwendung von Scaffold sollte nie Selbstzweck sein. Es gibt
-    sehr viele Rails-Entwickler, die nie Scaffold benutzen und immer alles
-    selber von Hand aufbauen. Ich finde Scaffold für einen schnellen Einstieg
+    <para>Die Verwendung von Scaffolding sollte nie Selbstzweck sein. Es gibt
+    sehr viele Rails-Entwickler, die nie Scaffolding benutzen und immer alles
+    selber von Hand aufbauen. Ich finde Scaffolds für einen schnellen Einstieg
     in ein neues Projekt ganz praktisch. Aber es ist immer nur der
-    Start.</para>
+    Anfang.</para>
 
     <section xml:id="scaffold_minimal_beispiel_read_only">
       <title>Beispiel für ein Minimal-Projekt</title>
 
       <para>Nehmen wir einmal an, wir bräuchten auf die Schnelle eine
-      Webseite, mit der man Kanzler auflisten und einzeln darstellen kann.
+      Web-Seite, mit der man Kanzler auflisten und einzeln darstellen kann.
       Aber es würde keine Editier- oder Löschfunktion benötigt werden. In
       diesem Fall wäre ein Großteil des mit Scaffold angelegten Codes unnütz
       und müsste gelöscht werden. Probieren wir es nachfolgend aus:</para>
@@ -867,10 +939,10 @@ stefan@swmbp 0 1.9.2-p0 politics$</screen></para>
 
       <para>Da wir nur <methodname>index</methodname> und
       <methodname>show</methodname> benötigen, müssen wir einige Views
-      löschen:<screen>stefan@swmbp 0 1.9.2-p0:politics-read-only$<command>rm app/views/chancellors/_form.html.erb</command> 
-stefan@swmbp 0 1.9.2-p0:politics-read-only$<command>rm app/views/chancellors/new.html.erb</command> 
-stefan@swmbp 0 1.9.2-p0:politics-read-only$<command>rm app/views/chancellors/edit.html.erb</command> 
-stefan@swmbp 0 1.9.2-p0:politics-read-only$<command>ls app/views/chancellors/</command>
+      löschen:<screen>stefan@swmbp 0 1.9.2-p0:politics-read-only$ <command>rm app/views/chancellors/_form.html.erb</command> 
+stefan@swmbp 0 1.9.2-p0:politics-read-only$ <command>rm app/views/chancellors/new.html.erb</command> 
+stefan@swmbp 0 1.9.2-p0:politics-read-only$ <command>rm app/views/chancellors/edit.html.erb</command> 
+stefan@swmbp 0 1.9.2-p0:politics-read-only$ <command>ls app/views/chancellors/</command>
 index.html.erb
 show.html.erb
 stefan@swmbp 0 1.9.2-p0:politics-read-only$</screen></para>
@@ -878,6 +950,7 @@ stefan@swmbp 0 1.9.2-p0:politics-read-only$</screen></para>
       <para>Die Datei
       <filename>app/controllers/chancellors_controller.rb</filename> können
       wir mit einem Editor vereinfachen. Sie muss so aussehen:<programlisting>class ChancellorsController &lt; ApplicationController
+
   # GET /chancellors
   # GET /chancellors.json
   def index
@@ -899,12 +972,13 @@ stefan@swmbp 0 1.9.2-p0:politics-read-only$</screen></para>
       format.json { render json: @chancellor }
     end
   end
+
 end
 </programlisting></para>
 
       <para>Eigentlich sind wir jetzt schon fertig. Allerdings sollten wir
       noch die Routen anpassen. Bis jetzt zeigt uns <command>rake
-      routes</command> folgendes Ergebnis an:<screen>stefan@swmbp 0 1.9.2-p0:politics-read-only$<command>rake routes</command>
+      routes</command> folgendes Ergebnis an:<screen>stefan@swmbp 0 1.9.2-p0:politics-read-only$ <command>rake routes</command>
     chancellors GET    /chancellors(.:format)          {:action=&gt;"index", :controller=&gt;"chancellors"}
                 POST   /chancellors(.:format)          {:action=&gt;"create", :controller=&gt;"chancellors"}
  new_chancellor GET    /chancellors/new(.:format)      {:action=&gt;"new", :controller=&gt;"chancellors"}
@@ -918,13 +992,15 @@ stefan@swmbp 0 1.9.2-p0:politics-read-only stefan$</screen></para>
       <methodname>index</methodname> und <methodname>show</methodname>. Bitte
       öffnen Sie die Datei <filename>config/routes.rb</filename> und ändern
       Sie sie wie folgt ab:<programlisting>PoliticsReadOnly::Application.routes.draw do
+  
   resources :chancellors, :only =&gt; [:index, :show]
+  
 end
 </programlisting></para>
 
       <para>Ein wiederholtes <command>rake routes</command> zeigt uns, dass
       wirklich nur noch <methodname>index</methodname> und
-      <methodname>show</methodname> geroutet werden:<screen>stefan@swmbp 0 1.9.2-p0:politics-read-only$<command>rake routes</command>
+      <methodname>show</methodname> geroutet werden:<screen>stefan@swmbp 0 1.9.2-p0:politics-read-only$ <command>rake routes</command>
 chancellors GET /chancellors(.:format)     {:action=&gt;"index", :controller=&gt;"chancellors"}
  chancellor GET /chancellors/:id(.:format) {:action=&gt;"show", :controller=&gt;"chancellors"}
 stefan@swmbp 0 1.9.2-p0:politics-read-only$</screen></para>
@@ -932,7 +1008,7 @@ stefan@swmbp 0 1.9.2-p0:politics-read-only$</screen></para>
       <para>Wenn wir jetzt mit <command>rails server</command> den Server
       starten und die URL <uri
       xlink:href="http://0.0.0.0:3000/chancellors">http://0.0.0.0:3000/chancellors</uri>
-      aufrufen, bekommen wir eine Fehlermeldung:<screen>stefan@swmbp 0 1.9.2-p0:politics-read-only$<command>rails server</command>
+      aufrufen, bekommen wir eine Fehlermeldung:<screen>stefan@swmbp 0 1.9.2-p0:politics-read-only$ <command>rails server</command>
 =&gt; Booting WEBrick
 =&gt; Rails 3.1.0.rc1 application starting in development on http://0.0.0.0:3000
 =&gt; Call with -d to detach
@@ -1037,18 +1113,18 @@ ActionView::Template::Error (undefined method `edit_chancellor_path' for #&lt;#&
       <note>
         <para>Bei diesem Beispiel gehe ich nicht auf notwendige Veränderungen
         in den Tests ein, da dies keine Übung zum Test-Driven-Development ist,
-        sondern eine Arbeitsweise mit Scaffold aufzeigen soll. TDD-Entwickler
-        werden schnell die Tests angepasst bekommen.</para>
+        sondern eine Arbeitsweise mit Scaffolding aufzeigen soll.
+        TDD-Entwickler werden schnell die Tests angepasst bekommen.</para>
       </note>
     </section>
 
     <section xml:id="scaffold_fazit">
       <title>Fazit</title>
 
-      <para>Probieren Sie es aus. Arbeiten Sie einmal mit Scaffold und einmal
+      <para>Probieren Sie es aus. Arbeiten Sie einmal mit Scaffolds und einmal
       ohne. Dann werden Sie schnell ein Gefühl dafür bekommen, ob es in Ihre
-      Arbeitsweise passt oder nicht. Ich empfinde Scaffold als
-      Arbeitserleichterung für Standardapplikationen.</para>
+      Arbeitsweise passt oder nicht. Ich empfinde Scaffolding als
+      Arbeitserleichterung für Standard-Applikationen.</para>
     </section>
   </section>
 </chapter>
