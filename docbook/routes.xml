@@ -6,15 +6,26 @@
          xmlns:m="http://www.w3.org/1998/Math/MathML"
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
-  <title xml:id="routes.title">Routes</title>
+  <title xml:id="routes.title">Routen (routes)</title>
+
+  <indexterm>
+    <primary>Routen</primary>
+  </indexterm>
+
+  <indexterm>
+    <primary>routes.rb</primary>
+
+    <see>Routen</see>
+  </indexterm>
 
   <section xml:id="routes_einstieg">
     <title xml:id="routes_einstieg.title">Einstieg</title>
 
     <para>In <xref linkend="dynamische_webseiten" /> und <xref
-    linkend="scaffolding" /> hatten wir schon mal kurz Kontakt mit Routes (zu
-    Deutsch Routen). In diesem Kapitel werden wir einen intensiveren Blick in
-    die Routing-Möglichkeit werfen. Mit Routen werden abgerufene URLs zu
+    linkend="scaffolding" /> hatten wir schon mal kurz Kontakt mit
+    <foreignphrase xml:lang="en">Routes</foreignphrase> (zu Deutsch: Routen).
+    In diesem Kapitel werden wir einen intensiveren Blick in die
+    Routing-Möglichkeit werfen. Mit Routen werden abgerufene URLs zu
     bestimmtem Code in der Rails-Applikation geleitet. Weiterhin können damit
     Variablen definiert werden, die aus der Applikation aufgerufen
     werden.</para>
@@ -28,8 +39,9 @@ MacBook:webshop sw$ <command>bundle install</command>
 MacBook:webshop sw$ <command>rake db:migrate</command>
 MacBook:webshop sw$</screen></para>
 
-    <para>Mit rake routes können wir uns die Routen eines Projektes anzeigen
-    lassen. Probieren wir das direkt im frischen Projekt aus:<screen>MacBook:webshop sw$ <command>rake routes</command>
+    <para>Mit <command>rake routes</command> können wir uns die Routen eines
+    Projektes anzeigen lassen. Probieren wir das direkt im frischen Projekt
+    aus:<screen>MacBook:webshop sw$ <command>rake routes</command>
 MacBook:webshop sw$</screen></para>
 
     <para>Nichts. Es sind in einem neuen Rails-Projekt keine Routen
@@ -41,14 +53,14 @@ MacBook:webshop sw$</screen></para>
       xlink:href="http://0.0.0.0:3000/">http://0.0.0.0:3000/</uri> zugreifen.
       Wie kann dies ohne eine eingetragene Route funktionieren? Die Lösung
       liegt im Verzeichnis <filename>/public</filename>. Dort liegt die Datei
-      <filename>public/index.html</filename> und immer wenn im Verzeichnis
+      <filename>public/index.html</filename>, und immer wenn im Verzeichnis
       <filename>/public</filename> eine Datei liegt, die zur angegebenen URL
       passt, bekommt diese eine höhere Priorität als eine Rails-Route. Das
       Gleiche gilt auch für den Fall, dass es keine Rails-Route gibt.</para>
     </important>
 
-    <para>Bei einem neuen Rails-Projekt ist die
-    <filename>config/routes.rb</filename>-Datei mit vielen auskommentierten
+    <para>Bei einem neuen Rails-Projekt ist die Datei
+    <filename>config/routes.rb</filename> mit vielen auskommentierten
     Beispielen bestückt. Für den Verlauf dieses Kapitels tun wir so, als wenn
     diese Beispiele nicht drin wären und zeigen immer nur die neu
     eingetragenen Routen an (alles andere wäre eine grobe Verschwendung von
@@ -134,9 +146,9 @@ MacBook:webshop sw$</screen></para>
     Datei <filename>config/routes.rb</filename>. <command>rails generate
     controller Home index ping pong</command> hat dort automatisch folgende
     Zeilen eingefügt:<programlisting>  get "home/index"
-
+  
   get "home/ping"
-
+  
   get "home/pong"
 </programlisting></para>
   </section>
@@ -154,13 +166,15 @@ MacBook:webshop sw$</screen></para>
     Ihre <uri xlink:href="http://0.0.0.0:3000/">http://0.0.0.0:3000/</uri>
     definieren. Legen wir sie mal auf
     <methodname>home#index</methodname>:<programlisting>Webshop::Application.routes.draw do
+  
   get "home/index"
-
+  
   get "home/ping"
-
+  
   get "home/pong"
   
-  <emphasis>root :to =&gt; 'home#index'</emphasis>
+  <emphasis role="bold">root :to =&gt; 'home#index'</emphasis>
+  
 end</programlisting></para>
 
     <para>Unsere neuen Routen:<screen>MacBook:webshop sw$ <command>rake routes</command>
@@ -172,7 +186,7 @@ MacBook:webshop sw$</screen></para>
 
     <para><screenshot>
         <info>
-          <title>Die / Route ruft home#index auf</title>
+          <title>Die Route „/“ ruft home#index auf</title>
         </info>
 
         <mediaobject>
@@ -193,19 +207,27 @@ MacBook:webshop sw$</screen></para>
   <section xlink:href="routes_match">
     <title xml:id="routes_match.title">match</title>
 
+    <indexterm>
+      <primary>Routen</primary>
+
+      <secondary>match</secondary>
+    </indexterm>
+
     <para>Wenn wir zusätzlich zur URL <uri>/home/ping</uri> noch mit
     <uri>/home/ping-ping</uri> auf die gleiche Action im gleichen Controller
     zugreifen, so müssen wir die Datei <filename>config/routes.rb</filename>
     wie folgt verändern:<programlisting>Webshop::Application.routes.draw do
+  
   get "home/index"
-
+  
   get "home/ping"
-
+  
   get "home/pong"
-
+  
   root :to =&gt; 'home#index'
   
-  <emphasis>match 'home/ping-ping' =&gt; 'home#ping'</emphasis>
+  <emphasis role="bold">match 'home/ping-ping' =&gt; 'home#ping'</emphasis>
+  
 end</programlisting></para>
 
     <para>Damit stehen uns folgende Routen zur Verfügung:<screen>MacBook:webshop sw$ <command>rake routes</command>
@@ -229,19 +251,21 @@ MacBook:webshop sw$</screen></para>
       </screenshot></para>
 
     <para>Wenn Sie der Route <filename>/home/ping-ping</filename> einen Namen
-    geben wollen, so können Sie dies mit der <code>:as =&gt;
-    "name"</code>-Einstellung in der <filename>config/routes.rb</filename>
-    realisieren:<programlisting>Webshop::Application.routes.draw do
+    geben wollen, so können Sie dies mit der Einstellung <code>:as =&gt;
+    "<replaceable>name</replaceable>"</code> in der
+    <filename>config/routes.rb</filename> realisieren:<programlisting>Webshop::Application.routes.draw do
+  
   get "home/index"
-
+  
   get "home/ping"
-
+  
   get "home/pong"
-
+  
   root :to =&gt; 'home#index'
   
-  <emphasis>match 'home/ping-ping' =&gt; 'home#ping', :as =&gt; "ping_ping"
-</emphasis>end</programlisting></para>
+  <emphasis role="bold">match 'home/ping-ping' =&gt; 'home#ping', :as =&gt; "ping_ping"</emphasis>
+  
+end</programlisting></para>
 
     <para>Jetzt stehen Ihnen im System folgende Routen-Namen zur
     Verfügung:<screen>MacBook:webshop sw$ <command>rake routes</command>
@@ -256,13 +280,19 @@ MacBook:webshop sw$</screen></para>
     der Routen-Name nicht (ein Unterstrich geht aber).</para>
 
     <important>
-      <para>Die Routen in der <filename>config/routes.rb</filename>-Datei
+      <para>Die Routen in der Datei <filename>config/routes.rb</filename>
       werden immer von oben nach unten abgearbeitet. Der erste Treffer von
       oben gewinnt!</para>
     </important>
 
     <section xml:id="routes_match_parameter">
       <title xml:id="routes_match_parameter.title">Parameter</title>
+
+      <indexterm>
+        <primary>Routen</primary>
+
+        <secondary>Parameter</secondary>
+      </indexterm>
 
       <para>Match kann nicht nur fixe Routen zuordnen, sondern auch noch
       Parameter übergeben. Ein typisches Beispiel dafür wären Angaben zu einem
@@ -279,11 +309,11 @@ MacBook:blog sw$ <command>rake db:migrate</command>
 MacBook:blog sw$</screen></para>
 
       <para>Als Beispieldaten in der <filename>db/seeds.rb</filename> nehmen
-      wir:<programlisting>Post.create(:subject =&gt; 'Ein Test', :posted_at =&gt; '01.10.2010')
-Post.create(:subject =&gt; 'Noch ein Test', :posted_at =&gt; '01.10.2010')
+      wir:<programlisting>Post.create(:subject =&gt; 'Ein Test',            :posted_at =&gt; '01.10.2010')
+Post.create(:subject =&gt; 'Noch ein Test',       :posted_at =&gt; '01.10.2010')
 Post.create(:subject =&gt; 'Und wieder ein Test', :posted_at =&gt; '02.10.2010')
-Post.create(:subject =&gt; 'Letzter Test', :posted_at =&gt; '01.11.2010')
-Post.create(:subject =&gt; 'Allerletzter Test', :posted_at =&gt; '01.11.2011')</programlisting></para>
+Post.create(:subject =&gt; 'Letzter Test',        :posted_at =&gt; '01.11.2010')
+Post.create(:subject =&gt; 'Allerletzter Test',   :posted_at =&gt; '01.11.2011')</programlisting></para>
 
       <para>Mit <command>rake db:seed</command> spielen wir diese Daten in die
       Datenbank:<screen>MacBook:blog sw$ <command>rake db:seed</command>
@@ -310,17 +340,19 @@ MacBook:blog sw$</screen></para>
       alle Einträge für das Jahr 2010 und mit <uri
       xlink:href="http://0.0.0.0:3000/2010/10/01">http://0.0.0.0:3000/2010/10/01</uri>
       alle Einträge für den 01.10.2010 anzeigen könnte. Das erreichen wir mit
-      optionalen Parametern beim match-Eintrag. Bitte tragen Sie folgende
-      Konfiguration in die
-      <filename>config/routes.rb</filename>:<programlisting>Blog::Application.routes.draw do
+      optionalen Parametern beim <code>match</code>-Eintrag. Bitte tragen Sie
+      folgende Konfiguration in die <filename>config/routes.rb</filename>
+      ein:<programlisting>Blog::Application.routes.draw do
+  
   resources :posts
-
+  
   match "/:year(/:month(/:day))" =&gt; "posts#index"
+  
 end</programlisting></para>
 
-      <para>Die Klammern stehen für optionale Parameter. In diesem Fall muss
-      unbedingt das Jahr, aber nicht zwingend der Monat oder der Tag angegeben
-      werden.</para>
+      <para>Die runden Klammern stehen für optionale Parameter. In diesem Fall
+      muss unbedingt das Jahr, aber nicht zwingend der Monat oder der Tag
+      angegeben werden.</para>
 
       <para>Wenn wir nichts anderes ändern, bekommen wir beim Aufruf von <uri
       xlink:href="http://0.0.0.0:3000/2010/">http://0.0.0.0:3000/2010/</uri>
@@ -331,7 +363,7 @@ end</programlisting></para>
       Das ist ja auch logisch. Erweitern wir aber mal die View-Datei
       <filename>app/views/posts/index.html.erb</filename> mit einem
       <code>&lt;%= debug params %&gt;</code> Aufruf ganz am
-      Anfang:<programlisting><emphasis>&lt;%= debug params %&gt;</emphasis>
+      Anfang:<programlisting><emphasis role="bold">&lt;%= debug params %&gt;</emphasis>
 
 &lt;h1&gt;Listing posts&lt;/h1&gt;
 
@@ -376,12 +408,12 @@ end</programlisting></para>
 
       <para>A-ha! Es wurde von der Route der Parameter
       <varname>params[:year]</varname> mit dem Wert <code>2010</code> gesetzt.
-      Sehr praktisch, denn das können wir im
-      <filename>app/controllers/posts_controller.rb</filename>-Controller in
-      der Index-Methode wie folgt einbauen:<programlisting>def index
+      Sehr praktisch, denn das können wir im Controller
+      <filename>app/controllers/posts_controller.rb</filename> in der
+      Index-Methode wie folgt einbauen:<programlisting>def index
   @posts = Post.all
   
-<emphasis>  if params[:year]
+<emphasis role="bold">  if params[:year]
     @posts = Post.where(:posted_at =&gt; (Date.parse("01.01.#{params[:year]}")..Date.parse("31.12.#{params[:year]}")))
   end</emphasis>
 
@@ -411,7 +443,7 @@ end
       Fleißarbeit:<programlisting>def index
   @posts = Post.all
 
-<emphasis>  if params[:year] and params[:month] and params[:day]
+<emphasis role="bold">  if params[:year] &amp;&amp; params[:month] &amp;&amp; params[:day]
     @posts = Post.where(:posted_at =&gt; Date.parse("#{params[:day]}.#{params[:month]}.#{params[:year]}"))
   elsif params[:year] and params[:month]
     @posts = Post.where(:posted_at =&gt; (Date.parse("01.#{params[:month]}.#{params[:year]}")..Date.parse("01.#{params[:month]}.#{params[:year]}").end_of_month))
@@ -440,16 +472,23 @@ end</programlisting></para>
     </section>
 
     <section xml:id="routes_match_contraints">
-      <title xml:id="routes_match_contraints.title">Contraints</title>
+      <title xml:id="routes_match_contraints.title">Constraints
+      (Einschränkungen)</title>
+
+      <indexterm>
+        <primary>Routen</primary>
+
+        <secondary>Constraints</secondary>
+      </indexterm>
 
       <para>In <xref linkend="routes_match_parameter" /> habe ich Ihnen
       gezeigt, wie man Parameter aus der URL auslesen und an den Controller
-      weitergeben kann. Leider hat der
-      <filename>config/routes.rb</filename>-Eintrag <programlisting>match "/:year(/:month(/:day))" =&gt; "posts#index"
-</programlisting>einen entscheidenen Nachteil: Er überprüft die einzelnen
-      Elemente nicht. Die URL <uri
+      weitergeben kann. Leider hat der Eintrag in der
+      <filename>config/routes.rb</filename> <programlisting>match "/:year(/:month(/:day))" =&gt; "posts#index"</programlisting>einen
+      entscheidenen Nachteil: Er überprüft die einzelnen Elemente nicht. Die
+      URL <uri
       xlink:href="http://0.0.0.0:3000/ein/beispiel/dafuer">http://0.0.0.0:3000/ein/beispiel/dafuer</uri>
-      wird genauso gemacht und führt dann natürlich direkt zu einem
+      wird genauso gematcht und führt dann natürlich direkt zu einem
       Fehler:<screenshot>
           <info>
             <title>Fehlermeldung</title>
@@ -462,8 +501,8 @@ end</programlisting></para>
           </mediaobject>
         </screenshot></para>
 
-      <para>In der Log-Ausgabe <filename>log/development.log</filename> sehen
-      wir dabei folgenden Eintrag:<programlisting>Started GET "/ein/beispiel/dafuer" for 127.0.0.1 at 2011-06-02 21:01:17 +0200
+      <para>In der Log-Ausgabe in <filename>log/development.log</filename>
+      sehen wir dabei folgenden Eintrag:<programlisting>Started GET "/ein/beispiel/dafuer" for 127.0.0.1 at 2011-06-02 21:01:17 +0200
   Processing by PostsController#index as HTML
   Parameters: {"year"=&gt;"ein", "month"=&gt;"beispiel", "day"=&gt;"dafuer"}
   Post Load (0.2ms)  SELECT "posts".* FROM "posts" 
@@ -474,22 +513,22 @@ Completed 500 Internal Server Error in 3ms
       "<code>dafuer.beispiel.ein</code>" nicht funktionieren kann. Ein Datum
       besteht nun mal aus Zahlen und nicht aus Buchstaben.</para>
 
-      <para>Contraints können mittels Regular Expressions den Inhalt der URL
+      <para>Constraints können mittels Regular Expressions den Inhalt der URL
       besser definieren. In unserem Blog-Fall würde die
-      <filename>config/routes.rb</filename> mit Contraints so
+      <filename>config/routes.rb</filename> mit Constraints so
       aussehen:<programlisting>Blog::Application.routes.draw do
   resources :posts
 
-  match "/:year(/:month(/:day))" =&gt; "posts#index"<emphasis>, :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{2}/, :day =&gt; /\d{2}/ }</emphasis>
+  match "/:year(/:month(/:day))" =&gt; "posts#index"<emphasis role="bold">, :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{2}/, :day =&gt; /\d{2}/ }</emphasis>
 end</programlisting></para>
 
       <warning>
         <para>Bitte beachten Sie, dass bei den Regular Expressions in einem
-        Constrain keine Regex-Anchors wie "^" benutzt werden können.</para>
+        Constraint keine Regex-Anchors wie "^" benutzt werden können.</para>
       </warning>
 
       <para>Wenn wir mit dieser Konfiguration noch mal die URL aufrufen,
-      bekommen wir einen "No route matches"-Fehler von Rails:<screenshot>
+      bekommen wir einen Fehler „No route matches“ von Rails:<screenshot>
           <info>
             <title>Routing Error</title>
           </info>
@@ -534,25 +573,38 @@ end</programlisting></para>
 
       <note>
         <para>Wer will, kann natürlich bei einem falschen Datum nicht wie in
-        diesem Beispiel einfach alle Einträge anzeigen, sondern auf eine
-        andere Seite redirecten. Das kombiniert mit einer Flash-Fehlermeldung
-        an den User wäre wahrscheinlich der beste Weg. Man kann auch eine
-        eigene Klasse zum Überprüfen des Datums schreiben und diese im
-        Contraints aufrufen.</para>
+        diesem Beispiel einfach alle Einträge anzeigen, sondern mit einem
+        Redirect auf eine andere Seite umleiten. Das kombiniert mit einer
+        Fehlermeldung an den User wäre wahrscheinlich der beste Weg. Man kann
+        auch eine eigene Klasse zum Überprüfen des Datums schreiben und diese
+        im Constraint aufrufen.</para>
       </note>
     </section>
 
     <section xml:id="routes_match_redirects">
       <title xml:id="routes_match_redirects.title">Redirects</title>
 
-      <para>Ich kann mit einem match auch auf eine andere Seite redirecten
-      (also umleiten). Wenn ich die Eingabe der unsinnigen URL <uri
+      <indexterm>
+        <primary>Routen</primary>
+
+        <secondary>Redirect (Umleitung)</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>Redirect</primary>
+
+        <secondary>per Routen</secondary>
+      </indexterm>
+
+      <para>Ich kann mit einem <code>match</code> auch auf eine andere Seite
+      umleiten (<foreignphrase xml:lang="en">redirect</foreignphrase>). Wenn
+      ich die Eingabe der unsinnigen URL <uri
       xlink:href="http://0.0.0.0:3000/2010/02/31">http://0.0.0.0:3000/2010/02/31</uri>
       auf /2010/02 redirecten will, dann geht das
       folgendermaßen:<programlisting>match "/:year/02/31" =&gt; redirect("/%{year}/02")</programlisting></para>
 
-      <para>Damit könnte man auch die Eingabe eines einstelligen Monats
-      korrekt auf einen zweistelligen Monat umleiten:<programlisting>match "/:year/:month/:day" =&gt; redirect("/%{year}/0%{month}/%{day}"), :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{1}/, :day =&gt; /\d{2}/ }
+      <para>Damit könnte man auch die Eingabe eines einstelligen Monats auf
+      einen zweistelligen Monat umleiten:<programlisting>match "/:year/:month/:day" =&gt; redirect("/%{year}/0%{month}/%{day}"), :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{1}/, :day =&gt; /\d{2}/ }
 </programlisting></para>
 
       <para>Das Gleiche ginge natürlich auch für einen einstelligen Tag. Unter
@@ -560,9 +612,9 @@ end</programlisting></para>
       <filename>config/routes.rb</filename> dann so aus:<programlisting>Blog::Application.routes.draw do
   resources :posts
 
-  match "/:year/:month/:day" =&gt; redirect("/%{year}/0%{month}/%{day}"), :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{1}/, :day =&gt; /\d{2}/ }
+  match "/:year/:month/:day" =&gt; redirect("/%{year}/0%{month}/%{day}" ), :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{1}/, :day =&gt; /\d{2}/ }
   match "/:year/:month/:day" =&gt; redirect("/%{year}/0%{month}/0%{day}"), :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{1}/, :day =&gt; /\d{1}/ }
-  match "/:year/:month/:day" =&gt; redirect("/%{year}/%{month}/0%{day}"), :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{2}/, :day =&gt; /\d{1}/ }
+  match "/:year/:month/:day" =&gt; redirect("/%{year}/%{month}/0%{day}" ), :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{2}/, :day =&gt; /\d{1}/ }
 
   match "/:year/:month" =&gt; redirect("/%{year}/0%{month}"), :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{1}/ }
 
@@ -579,6 +631,12 @@ end</programlisting></para>
   <section xml:id="routes_resources">
     <title xml:id="routes_resources.title">resources</title>
 
+    <indexterm>
+      <primary>Routen</primary>
+
+      <secondary>resources</secondary>
+    </indexterm>
+
     <para>Bauen wir uns für <code>resources</code> eine neue Rails-Applikation
     zum Experimentieren:<screen>MacBook:~ sw$ <command>rails new phonebook</command>
 [...]
@@ -588,7 +646,7 @@ MacBook:phonebook sw$ <command>bundle install</command>
 MacBook:phonebook sw$ </screen></para>
 
     <para>Beim Verwenden von Scaffold werden automatisch Routen für die neu
-    erschaffenen Resourcen erstellt. Legen wir mal eine Resource an:<screen>MacBook:phonebook sw$ <command>rails generate scaffold person firstname:string lastname:string</command>
+    erschaffenen Ressourcen erstellt. Legen wir mal eine Ressource an:<screen>MacBook:phonebook sw$ <command>rails generate scaffold person firstname:string lastname:string</command>
       invoke  active_record
       create    db/migrate/20110531175742_create_people.rb
       create    app/models/person.rb
@@ -603,7 +661,7 @@ MacBook:phonebook sw$</screen></para>
 
     <para>Die Datei <filename>config/routes.rb</filename> sieht damit so
     aus:<programlisting>Webshop::Application.routes.draw do
-  <emphasis>resources :people</emphasis>
+  <emphasis role="bold">resources :people</emphasis>
 end</programlisting></para>
 
     <note>
@@ -628,10 +686,25 @@ MacBook:webshop sw$</screen></para>
     <section xml:id="routes_nested_resources">
       <title xml:id="routes_nested_resources.title">Nested Resources</title>
 
-      <para>Nested Resources bezieht sich auf Routen von Resourcen, die mit
-      einer <methodname>has_many</methodname>-Verknüpfung (siehe <xref
+      <indexterm>
+        <primary>Routen</primary>
+
+        <secondary>resources</secondary>
+
+        <tertiary>nested</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>Nested Routes</primary>
+
+        <see>Routen</see>
+      </indexterm>
+
+      <para>Verschachtelte Ressourcen (nested resources) bezieht sich auf
+      Routen von Ressourcen, die mit einer
+      <methodname>has_many</methodname>-Verknüpfung (siehe <xref
       linkend="activerecord_has_many" />) arbeiten. Diese lassen sich
-      eindeutig über Routen ansprechen. Legen wir eine zweite Resource
+      eindeutig über Routen ansprechen. Legen wir eine zweite Ressource
       <classname>phone</classname> an:<screen>MacBook:phonebook sw$ <command>rails generate scaffold phone person_id:integer phone_number:string</command>
       invoke  active_record
       create    db/migrate/20110531180003_create_phones.rb
@@ -645,19 +718,19 @@ MacBook:phonebook sw$ <command>rake db:migrate</command>
 [...]
 MacBook:phonebook sw$ </screen></para>
 
-      <para>Jetzt verküpfen wir beide Resourcen miteinander. In der Datei
+      <para>Jetzt verküpfen wir beide Ressourcen miteinander. In der Datei
       <filename>app/models/person.rb</filename> fügen wir ein
       <methodname>has_many</methodname> hinzu:<programlisting>class Person &lt; ActiveRecord::Base
   has_many :phones
 end</programlisting></para>
 
       <para>Und in der Datei <filename>app/models/phone.rb</filename> das
-      <methodname>belongs_to</methodname> Gegenstück:<programlisting>class Phone &lt; ActiveRecord::Base
+      Gegenstück <methodname>belongs_to</methodname>:<programlisting>class Phone &lt; ActiveRecord::Base
   belongs_to :person
 end
 </programlisting></para>
 
-      <para>Jetzt füllen wir die <filename>db/seeds.rb</filename>-Datei (siehe
+      <para>Jetzt füllen wir die Datei <filename>db/seeds.rb</filename> (siehe
       <xref linkend="seed_rb" />) noch mit ein paar
       Beispieldatensätzen:<programlisting>Person.create(:lastname =&gt; 'Meier').phones.create([{:phone_number =&gt; '030 1234567'}, {:phone_number =&gt; '0171 1234567'}])
 Person.create(:lastname =&gt; 'Stein').phones.create(:phone_number =&gt; '040 1234567')
@@ -700,18 +773,20 @@ MacBook:phonebook sw$</screen></para>
       aufrufen könnten? Genau das können wir mit Nested Resources realisieren!
       Bitte ändern Sie Ihre <filename>config/routes.rb</filename> wie folgt
       ab:<programlisting>Webshop::Application.routes.draw do
-<emphasis>  resources :people do
+  
+<emphasis role="bold">  resources :people do
     resources :phones
   end</emphasis>
-
-  <emphasis>resources :phones</emphasis>
+  
+  <emphasis role="bold">resources :phones</emphasis>
+  
 end</programlisting></para>
 
       <para>Und jetzt müssen wir noch die
       <methodname>index</methodname>-Methode in der
       <filename>app/controllers/phones_controller.rb</filename>
       ändern:<programlisting>  def index
-<emphasis>    if params[:person_id]
+<emphasis role="bold">    if params[:person_id]
       @person = Person.find(params[:person_id])
       @phones = @person.phones
     else 
@@ -725,7 +800,7 @@ end</programlisting></para>
   end
 </programlisting></para>
 
-      <para>Jetzt noch den Rails-Server mit <keycap>CTRL-C</keycap> stoppen
+      <para>Jetzt noch den Rails-Server mit <keycap>Ctrl-C</keycap> stoppen
       und mit <command>rails server</command> wieder neu starten und mit dem
       Browser <uri
       xlink:href="http://0.0.0.0:3000/people/1/phones">http://0.0.0.0:3000/people/1/phones</uri>
@@ -751,8 +826,8 @@ end</programlisting></para>
 
       <para>Bis jetzt haben wir in der <filename>config/routes.rb</filename>
       zwei Einträge für <code>phones</code>. Einmal als Nested Resource
-      innerhalb der <code>people</code> Resource und einmal als eigenständige
-      Resource. <command>rake routes</command> zeigt beide Varianten:<screen>MacBook:phonebook sw$ <command>rake routes</command>
+      innerhalb der Ressource <code>people</code> und einmal als eigenständige
+      Ressource. <command>rake routes</command> zeigt beide Varianten:<screen>MacBook:phonebook sw$ <command>rake routes</command>
     person_phones GET    /people/:person_id/phones(.:format)          {:action=&gt;"index", :controller=&gt;"phones"}
                   POST   /people/:person_id/phones(.:format)          {:action=&gt;"create", :controller=&gt;"phones"}
  new_person_phone GET    /people/:person_id/phones/new(.:format)      {:action=&gt;"new", :controller=&gt;"phones"}
@@ -778,15 +853,15 @@ MacBook:phonebook sw$</screen></para>
 
       <para>Ganz oben stehen interessante neue Routen-Varianten, die wir so
       noch nicht hatten: <code>new_person_phone</code>?
-      <code>edit_person_phone</code>? Gleich zwei Resourcen in einem
+      <code>edit_person_phone</code>? Gleich zwei Ressourcen in einem
       Routen-Namen!</para>
 
       <para>Aber brauchen wir überhaupt den direkten Zugang via <uri
       xlink:href="http://0.0.0.0:3000/phones">http://0.0.0.0:3000/phones</uri>
-      auf die Resource <code>phones</code>? Eigentlich nein, da man nur die
+      auf die Ressource <code>phones</code>? Eigentlich nein, da man nur die
       Telefonnummern zu einer Person braucht. Also können wir in der
       <filename>config/routes.rb</filename> die entsprechende Zeile löschen
-      und nur noch Zugriffe auf <classname>phones</classname> über
+      und Zugriffe auf <classname>phones</classname> nur noch über
       <classname>people</classname> zulassen:<programlisting>Webshop::Application.routes.draw do
   resources :people do
     resources :phones
@@ -820,6 +895,7 @@ MacBook:phonebook sw$ </screen></para>
       <para>Die Datei
       <filename>app/controllers/phones_controller.rb</filename> sieht dann so
       aus:<programlisting>class PhonesController &lt; ApplicationController
+  
   before_filter :find_person
   
   # GET /phones
@@ -873,9 +949,11 @@ MacBook:phonebook sw$ </screen></para>
   end
   
   private
+  
   def find_person
     @person = Person.find(params[:person_id])
   end
+  
 end
 </programlisting></para>
 
@@ -901,16 +979,16 @@ end
   &lt;tr&gt;
     &lt;td&gt;&lt;%= phone.person_id %&gt;&lt;/td&gt;
     &lt;td&gt;&lt;%= phone.phone_number %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Show', <emphasis>person_phone_path(@person, phone)</emphasis> %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Edit', <emphasis>edit_person_phone_path(@person,phone)</emphasis> %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Destroy', <emphasis>person_phone_path(@person, phone)</emphasis>, confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Show', <emphasis role="bold">person_phone_path(@person, phone)</emphasis> %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Edit', <emphasis role="bold">edit_person_phone_path(@person,phone)</emphasis> %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', <emphasis role="bold">person_phone_path(@person, phone)</emphasis>, confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
   &lt;/tr&gt;
 &lt;% end %&gt;
 &lt;/table&gt;
 
 &lt;br /&gt;
 
-&lt;%= link_to 'New Phone', <emphasis>new_person_phone_path(@person)</emphasis> %&gt;
+&lt;%= link_to 'New Phone', <emphasis role="bold">new_person_phone_path(@person)</emphasis> %&gt;
 </programlisting></para>
       </section>
 
@@ -930,8 +1008,8 @@ end
 &lt;/p&gt;
 
 
-&lt;%= link_to 'Edit', <emphasis>edit_person_phone_path(@person, @phone)</emphasis> %&gt; |
-&lt;%= link_to 'Back', <emphasis>person_phones_path(@person)</emphasis> %&gt;
+&lt;%= link_to 'Edit', <emphasis role="bold">edit_person_phone_path(@person, @phone)</emphasis> %&gt; |
+&lt;%= link_to 'Back', <emphasis role="bold">person_phones_path(@person)</emphasis> %&gt;
 </programlisting></para>
       </section>
 
@@ -946,12 +1024,12 @@ end
 
 &lt;%= render 'form' %&gt;
 
-&lt;%= link_to 'Back', <emphasis>person_phones_path(@person)</emphasis> %&gt;
+&lt;%= link_to 'Back', <emphasis role="bold">person_phones_path(@person)</emphasis> %&gt;
 </programlisting></para>
 
-        <para>Und natürlich noch das Formular im
-        <filename>app/views/phones/_form.html.erb</filename>
-        Partial:<programlisting>&lt;%= form_for(<emphasis>[@person, @phone]</emphasis>) do |f| %&gt;
+        <para>Und natürlich noch das Formular im Partial
+        <filename>app/views/phones/_form.html.erb</filename>:<programlisting>&lt;%= form_for(<emphasis
+              role="bold">[@person, @phone]</emphasis>) do |f| %&gt;
   &lt;% if @phone.errors.any? %&gt;
     &lt;div id="error_explanation"&gt;
       &lt;h2&gt;&lt;%= pluralize(@phone.errors.count, "error") %&gt; prohibited this phone from being saved:&lt;/h2&gt;
@@ -981,16 +1059,16 @@ end
         <para>Die Änderungen in der Datei
         <filename>app/views/phones/edit.html.erb</filename> für den Zugriff
         auf <uri>http://0.0.0.0:3000/people/1/phones/1/edit</uri> ähneln denen
-        vom <methodname>new</methodname> View:<programlisting>&lt;h1&gt;Editing phone&lt;/h1&gt;
+        vom View für <methodname>new</methodname>:<programlisting>&lt;h1&gt;Editing phone&lt;/h1&gt;
 
 &lt;%= render 'form' %&gt;
 
-&lt;%= link_to 'Show', <emphasis>person_phone_path(@person, @phone)</emphasis> %&gt; |
-&lt;%= link_to 'Back', <emphasis>person_phones_path(@person)</emphasis> %&gt;</programlisting></para>
+&lt;%= link_to 'Show', <emphasis role="bold">person_phone_path(@person, @phone)</emphasis> %&gt; |
+&lt;%= link_to 'Back', <emphasis role="bold">person_phones_path(@person)</emphasis> %&gt;</programlisting></para>
 
-        <para>Das Formular im
-        <filename>app/views/phones/_form.html.erb</filename> Partial brauchen
-        wir natürlich nicht mehr zu ändern.</para>
+        <para>Das Formular im Partial
+        <filename>app/views/phones/_form.html.erb</filename> brauchen wir
+        natürlich nichts mehr zu ändern.</para>
       </section>
     </section>
   </section>
@@ -1000,26 +1078,26 @@ end
     zum Thema Routes</title>
 
     <para>Das Thema Routes ist weit komplexer als hier vorgestellt. So kann
-    man z. B. auch die HTTP-Verben mit einbeziehen. Folgende Webseiten geben
+    man z. B. auch die HTTP-Methoden mit einbeziehen. Folgende Webseiten geben
     Ihnen einen tieferen Einblick in das Thema Routes:<itemizedlist>
         <listitem>
-          <para><uri
-          xlink:href="http://guides.rubyonrails.org/routing.html">http://guides.rubyonrails.org/routing.html</uri></para>
+          <para><link
+          xlink:href="http://guides.rubyonrails.org/routing.html">http://guides.rubyonrails.org/routing.html</link></para>
         </listitem>
 
         <listitem>
-          <para><uri
-          xlink:href="http://railscasts.com/episodes/203-routing-in-rails-3">http://railscasts.com/episodes/203-routing-in-rails-3</uri></para>
+          <para><link
+          xlink:href="http://railscasts.com/episodes/203-routing-in-rails-3">http://railscasts.com/episodes/203-routing-in-rails-3</link></para>
         </listitem>
 
         <listitem>
-          <para><uri
-          xlink:href="http://yehudakatz.com/2009/12/26/the-rails-3-router-rack-it-up/">http://yehudakatz.com/2009/12/26/the-rails-3-router-rack-it-up/</uri></para>
+          <para><link
+          xlink:href="http://yehudakatz.com/2009/12/26/the-rails-3-router-rack-it-up/">http://yehudakatz.com/2009/12/26/the-rails-3-router-rack-it-up/</link></para>
         </listitem>
 
         <listitem>
-          <para><uri
-          xlink:href="http://rizwanreza.com/2009/12/20/revamped-routes-in-rails-3">http://rizwanreza.com/2009/12/20/revamped-routes-in-rails-3</uri></para>
+          <para><link
+          xlink:href="http://rizwanreza.com/2009/12/20/revamped-routes-in-rails-3">http://rizwanreza.com/2009/12/20/revamped-routes-in-rails-3</link></para>
         </listitem>
       </itemizedlist></para>
   </section>
