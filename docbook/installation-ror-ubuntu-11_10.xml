@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<section version="5.0" xml:id="rails3-install-debian" xml:lang="de"
+<section version="5.0" xml:id="rails3-install-ubuntu" xml:lang="de"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -7,27 +7,19 @@
          xmlns:m="http://www.w3.org/1998/Math/MathML"
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
-  <title xml:id="rails3-install-debian.title">Installation von Ruby on Rails
-  3.0 oder 3.1 mit RVM auf Debian 6.0 (Squeeze)</title>
-
-  <info>
-    <collab>
-      <person>
-        <personname><firstname>Philipp</firstname><surname>Kempgen</surname></personname>
-      </person>
-    </collab>
-  </info>
+  <title xml:id="rails3-install-ubuntu.title">Installation von Ruby on Rails
+  3.0 oder 3.1 mit RVM auf Ubuntu 11.10</title>
 
   <indexterm>
     <primary>Installation</primary>
 
     <secondary>von Ruby on Rails</secondary>
 
-    <tertiary>auf Debian 6.0</tertiary>
+    <tertiary>auf Ubuntu 11.10</tertiary>
   </indexterm>
 
   <indexterm>
-    <primary>Debian 6.0</primary>
+    <primary>Ubuntu 11.10</primary>
 
     <secondary>Installation von Ruby on Rails</secondary>
   </indexterm>
@@ -80,88 +72,53 @@
     xlink:href="http://rvm.beginrescueend.com/">http://rvm.beginrescueend.com/</uri>.</para>
   </note>
 
-  <para>Diese Beschreibung setzt ein frisch installiertes Debian GNU/Linux 6.0
-  (<quote>Squeeze</quote>) voraus. Ein ISO-Image für die Installation finden
-  Sie auf <uri
-  xlink:href="http://www.debian.org/releases/squeeze/debian-installer/">http://www.debian.org/releases/squeeze/debian-installer/</uri>.
-  Ich empfehle das etwa 160 MByte große Netzinstallations-CD-Image. Eine
-  Debian-GNU/Linux-Installationsanleitung findet sich unter <uri
-  xlink:href="http://www.debian.org/releases/squeeze/i386/">http://www.debian.org/releases/squeeze/i386/</uri>;
-  ein allgemeines Anwenderhandbuch unter <uri
-  xlink:href="http://debiananwenderhandbuch.de">http://debiananwenderhandbuch.de</uri>.</para>
+  <para>Diese Beschreibung setzt ein frisch installiertes Ubuntu 11.10 voraus.
+  Ein ISO-Image für die Installation finden Sie auf <uri
+  xlink:href="http://www.ubuntu.com/download/ubuntu/download">http://www.ubuntu.com/download/ubuntu/download</uri>.</para>
 
   <section xml:id="rails3-debian5-install-vorbereitung">
     <title
     xml:id="rails3-debian5-install-vorbereitung.title">Vorbereitungen</title>
 
-    <para>Wenn Sie auf dem Zielsystem Root-Rechte besitzen, dann können Sie
-    mit folgendem Befehl sichergehen, dass alle notwendigen Programme für eine
-    erfolgreiche Installation von RVM bereitstehen. Falls Sie keine
-    Root-Rechte haben, müssen Sie entweder hoffen, dass Ihr Admin bereits
-    alles so installiert hat oder ihm die entsprechende Zeile kurz
+    <para>Wenn Sie auf dem Zielsystem Root- bzw. sudo-Rechte besitzen, dann
+    können Sie mit folgendem Befehl sichergehen, dass alle notwendigen
+    Programme für eine erfolgreiche Installation von RVM bereitstehen. Falls
+    Sie keine Root-Rechte haben, müssen Sie entweder hoffen, dass Ihr Admin
+    bereits alles so installiert hat oder ihm die entsprechende Zeile kurz
     mailen.</para>
 
-    <para>Als Erstes ein Update der Paketlisten:<screen>root@debian:~# <command>aptitude update</command>
-<replaceable>[...]</replaceable>
-Hole:1 http://ftp.de.debian.org lenny/main Translation-de [1820kB]
-<replaceable>[...]</replaceable>
-1820kB wurden in 12s heruntergeladen (150kB/s)
-Paketlisten werden gelesen... Fertig</screen></para>
+    <para>Als Erstes ein Update der Paketlisten:<screen>stefan@ubuntu:~$ <command>sudo apt-get update</command>
+[sudo] password for stefan: 
+Ign http://security.ubuntu.com oneiric-security InRelease
+Ign http://extras.ubuntu.com oneiric InRelease                                 
+OK   http://security.ubuntu.com oneiric-security Release.gpg
+
+[...]
+</screen></para>
 
     <note>
       <para>Natürlich können Sie optional auf dem System einen SSH-Server
       installieren, um dann auf dem System per SSH statt auf der Konsole zu
-      arbeiten:<screen>root@debian:~# <command>aptitude -y install openssh-server</command></screen></para>
+      arbeiten:<screen>stefan@ubuntu:~$ <command>sudo apt-get install ssh</command></screen></para>
     </note>
 
-    <para>Und jetzt die Installation der zur Installation von RVM benötigten
-    Pakete:<screen>root@debian:~# <command>aptitude -y install curl git-core patch file</command>
-<replaceable>[...]</replaceable>
-Die folgenden NEUEN Pakete werden zusätzlich installiert:
-  ca-certificates{a} curl file git-core less{a} libcurl3{a} 
-  libcurl3-gnutls{a} libdigest-sha1-perl{a} liberror-perl{a} 
-  libexpat1{a} libidn11{a} libldap-2.4-2{a} libmagic1{a} 
-  libssh2-1{a} openssl{a} patch rsync{a} 
-0 Pakete aktualisiert, 17 zusätzlich installiert, 0 werden entfernt und 0 nicht aktualisiert.
-Muss 6501kB an Archiven herunterladen. Nach dem Entpacken werden 16,1MB zusätzlich belegt sein.
-<replaceable>[...]</replaceable>
-Richte curl ein (7.18.2-8lenny4) ...
-<replaceable>[...]</replaceable>
-Richte git-core ein (1:1.5.6.5-3+lenny3.2) ...
-<replaceable>[...]</replaceable></screen></para>
+    <para>Und jetzt die Installation der zur Installation von RVM und später
+    Ruby on Rails benötigten Pakete:<screen>stefan@ubuntu:~$ <command>sudo apt-get -y install curl git-core patch</command> \
+<command>  build-essential bison zlib1g-dev libssl-dev libxml2-dev \
+  libxml2-dev sqlite3 libsqlite3-dev autotools-dev \
+  libxslt1-dev libyaml-0-2 autoconf automake libreadline6-dev \
+  libyaml-dev libtool</command>
+Paketlisten werden gelesen... Fertig
+Abhängigkeitsbaum wird aufgebaut       
+Status-Informationen einlesen... Fertig
+Die folgenden zusätzlichen Pakete werden installiert:
 
-    <para>Damit wir uns nicht später nochmal als <literal>root</literal>
-    einloggen müssen, installieren wir nachfolgend auch direkt die
-    Abhängigkeiten für und zum Bauen von Ruby und Rails:<screen>root@debian:~# <command>aptitude -y install build-essential bison  \
-  openssl zlib1g-dev libssl-dev libreadline5-dev libxml2-dev \
-  libxml2-dev sqlite3 libsqlite3-dev autotools-dev automake \
-  libxslt1-dev libxslt1.1 libyaml-0-2 autoconf libyaml-dev\
-  libreadline6-dev </command>
-<replaceable>[...]</replaceable>
-Die folgenden NEUEN Pakete werden zusätzlich installiert:
-  binutils{a} bison build-essential bzip2{a} cpp{a} cpp-4.3{a} 
-  dpkg-dev{a} g++{a} g++-4.3{a} gcc{a} gcc-4.3{a} libc6-dev{a} 
-  libgmp3c2{a} libgomp1{a} libmpfr1ldbl{a} libncurses5-dev{a} 
-  libreadline5-dev libssl-dev libstdc++6-4.3-dev{a} 
-  libtimedate-perl{a} libxml2{a} libxml2-dev linux-libc-dev{a} 
-  m4{a} make{a} sgml-base{a} xml-core{a} zlib1g-dev 
-0 Pakete aktualisiert, 28 zusätzlich installiert, 0 werden entfernt und 0 nicht aktualisiert.
-Muss 25,5MB an Archiven herunterladen. Nach dem Entpacken werden 80,1MB zusätzlich belegt sein.
-<replaceable>[...]</replaceable>
-Richte g++ ein (4:4.3.2-2) ...
-Richte build-essential ein (11.4) ...
-<replaceable>[...]</replaceable></screen></para>
-
-    <para>Jetzt ist ein guter Zeitpunkt sich als root abzumelden:<screen>root@debian:~# <command>exit</command>
-Abgemeldet</screen></para>
+[...]</screen></para>
   </section>
 
   <section xml:id="ruby-1.9.2-mit-rvm-debian5">
     <title xml:id="ruby-1.9.2-mit-rvm-debian5.title">Ruby 1.9.2 mit RVM
     installieren</title>
-
-    <para>Loggen Sie sich mit Ihrem normalen Benutzer-Account ein (in unserem
-    Fall ist das der User <literal>xyz</literal>).</para>
 
     <para>RVM lässt sich auf verschiedene Wege installieren. Ich empfehle das
     folgende Monsterkommando (bitte exakt kopieren), mit dem das aktuellste
