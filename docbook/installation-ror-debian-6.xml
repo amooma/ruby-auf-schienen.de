@@ -8,15 +8,7 @@
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
   <title xml:id="rails3-install-debian.title">Installation von Ruby on Rails
-  3.0 oder 3.1 mit RVM auf Debian 6.0 (Squeeze)</title>
-
-  <info>
-    <collab>
-      <person>
-        <personname><firstname>Philipp</firstname><surname>Kempgen</surname></personname>
-      </person>
-    </collab>
-  </info>
+  3.2 mit RVM auf Debian 6.0 (Squeeze)</title>
 
   <indexterm>
     <primary>Installation</primary>
@@ -66,18 +58,14 @@
         Rails-Systeme und damit vielleicht Rails-Versionen betreiben. Das
         lässt sich mit RVM und verschiedenen Accounts auf dem Linux-System
         sehr gut realisieren. So können Sie auf einem Rechner ein Ruby 1.8.7
-        mit einem Rails 2.3.8 und parallel ein Ruby 1.9.2 mit einem Rails 3.0
+        mit einem Rails 2.3.8 und parallel ein Ruby 1.9.3 mit einem Rails 3.0
         betreiben.</para>
-      </listitem>
-
-      <listitem>
-        <para>RVM ist einfach super praktisch!</para>
       </listitem>
     </itemizedlist></para>
 
   <note>
     <para>Detaillierte Infos zu RVM finden Sie auf der RVM-Homepage unter <uri
-    xlink:href="http://rvm.beginrescueend.com/">http://rvm.beginrescueend.com/</uri>.</para>
+    xlink:href="https://rvm.io/">https://rvm.io/</uri>.</para>
   </note>
 
   <para>Diese Beschreibung setzt ein frisch installiertes Debian GNU/Linux 6.0
@@ -102,9 +90,12 @@
     mailen.</para>
 
     <para>Als Erstes ein Update der Paketlisten:<screen>root@debian:~# <command>aptitude update</command>
+Treffer http://ftp.de.debian.org squeeze Release.gpg                            
+Hole:1 http://ftp.de.debian.org/debian/ squeeze/main Translation-de [1.514 kB]
+Hole:2 http://security.debian.org squeeze/updates Release.gpg [836 B]
+
 <replaceable>[...]</replaceable>
-Hole:1 http://ftp.de.debian.org lenny/main Translation-de [1820kB]
-<replaceable>[...]</replaceable>
+
 1820kB wurden in 12s heruntergeladen (150kB/s)
 Paketlisten werden gelesen... Fertig</screen></para>
 
@@ -116,48 +107,59 @@ Paketlisten werden gelesen... Fertig</screen></para>
 
     <para>Und jetzt die Installation der zur Installation von RVM benötigten
     Pakete:<screen>root@debian:~# <command>aptitude -y install curl git-core patch file</command>
-<replaceable>[...]</replaceable>
 Die folgenden NEUEN Pakete werden zusätzlich installiert:
-  ca-certificates{a} curl file git-core less{a} libcurl3{a} 
-  libcurl3-gnutls{a} libdigest-sha1-perl{a} liberror-perl{a} 
-  libexpat1{a} libidn11{a} libldap-2.4-2{a} libmagic1{a} 
-  libssh2-1{a} openssl{a} patch rsync{a} 
-0 Pakete aktualisiert, 17 zusätzlich installiert, 0 werden entfernt und 0 nicht aktualisiert.
-Muss 6501kB an Archiven herunterladen. Nach dem Entpacken werden 16,1MB zusätzlich belegt sein.
-<replaceable>[...]</replaceable>
-Richte curl ein (7.18.2-8lenny4) ...
-<replaceable>[...]</replaceable>
-Richte git-core ein (1:1.5.6.5-3+lenny3.2) ...
-<replaceable>[...]</replaceable></screen></para>
+  ca-certificates{a} curl file git{a} git-core less{a} libcurl3{a} 
+  libcurl3-gnutls{a} libdb4.7{a} liberror-perl{a} libgcrypt11{a} 
+  libgnutls26{a} libgpg-error0{a} libidn11{a} libldap-2.4-2{a} libmagic1{a} 
+  libsasl2-2{a} libsasl2-modules{a} libssh2-1{a} libtasn1-3{a} openssl{a} 
+  patch perl{a} perl-modules{a} rsync{a} 
+0 Pakete aktualisiert, 25 zusätzlich installiert, 0 werden entfernt und 0 nicht aktualisiert.
+Muss 17,2 MB an Archiven herunterladen. Nach dem Entpacken werden 53,4 MB zusätzlich belegt sein.
+Hole:1 http://ftp.de.debian.org/debian/ squeeze/main libgpg-error0 i386 1.6-1 [43,1 kB]
+<replaceable>
+[...]</replaceable>
+
+liberror-perl (0.17-1) wird eingerichtet ...
+git (1:1.7.2.5-3) wird eingerichtet ...
+git-core (1:1.7.2.5-3) wird eingerichtet ...
+                                              
+root@debian:~#</screen></para>
 
     <para>Damit wir uns nicht später nochmal als <literal>root</literal>
     einloggen müssen, installieren wir nachfolgend auch direkt die
-    Abhängigkeiten für und zum Bauen von Ruby und Rails:<screen>root@debian:~# <command>aptitude -y install build-essential bison  \
-  openssl zlib1g-dev libssl-dev libreadline5-dev libxml2-dev \
+    Abhängigkeiten für und zum Bauen von Ruby und Rails:<screen>root@debian:~# <command>aptitude -y install build-essential bison \
+  openssl zlib1g-dev libssl-dev libreadline6-dev libxml2-dev \
   libxml2-dev sqlite3 libsqlite3-dev autotools-dev automake \
-  libxslt1-dev libxslt1.1 libyaml-0-2 autoconf libyaml-dev\
+  libxslt1-dev libxslt1.1 libyaml-0-2 autoconf libyaml-dev \
   libreadline6-dev </command>
-<replaceable>[...]</replaceable>
 Die folgenden NEUEN Pakete werden zusätzlich installiert:
-  binutils{a} bison build-essential bzip2{a} cpp{a} cpp-4.3{a} 
-  dpkg-dev{a} g++{a} g++-4.3{a} gcc{a} gcc-4.3{a} libc6-dev{a} 
-  libgmp3c2{a} libgomp1{a} libmpfr1ldbl{a} libncurses5-dev{a} 
-  libreadline5-dev libssl-dev libstdc++6-4.3-dev{a} 
-  libtimedate-perl{a} libxml2{a} libxml2-dev linux-libc-dev{a} 
-  m4{a} make{a} sgml-base{a} xml-core{a} zlib1g-dev 
-0 Pakete aktualisiert, 28 zusätzlich installiert, 0 werden entfernt und 0 nicht aktualisiert.
-Muss 25,5MB an Archiven herunterladen. Nach dem Entpacken werden 80,1MB zusätzlich belegt sein.
+  autoconf automake autotools-dev binutils{a} bison build-essential 
+  bzip2{a} dpkg-dev{a} fakeroot{a} g++{a} g++-4.4{a} gcc{a} gcc-4.4{a} 
+  libalgorithm-diff-perl{a} libalgorithm-diff-xs-perl{a} 
+  libalgorithm-merge-perl{a} libc-dev-bin{a} libc6-dev{a} libdpkg-perl{a} 
+  libgomp1{a} libncurses5-dev{a} libreadline6-dev libsqlite3-dev libssl-dev 
+  libstdc++6-4.4-dev{a} libtimedate-perl{a} libxml2{a} libxml2-dev 
+  libxslt1-dev libxslt1.1 libyaml-0-2 libyaml-dev linux-libc-dev{a} m4{a} 
+  make{a} manpages-dev{a} sgml-base{a} sqlite3 xml-core{a} zlib1g-dev 
+0 Pakete aktualisiert, 40 zusätzlich installiert, 0 werden entfernt und 0 nicht aktualisiert.
+Muss 32,7 MB an Archiven herunterladen. Nach dem Entpacken werden 99,4 MB zusätzlich belegt sein.
+Hole:1 http://ftp.de.debian.org/debian/ squeeze/main m4 i386 1.4.14-3 [277 kB]  
+
 <replaceable>[...]</replaceable>
-Richte g++ ein (4:4.3.2-2) ...
-Richte build-essential ein (11.4) ...
-<replaceable>[...]</replaceable></screen></para>
+
+g++-4.4 (4.4.5-8) wird eingerichtet ...
+g++ (4:4.4.5-1) wird eingerichtet ...
+update-alternatives: /usr/bin/g++ wird verwendet, um /usr/bin/c++ (c++) im Auto-Modus bereitzustellen.
+build-essential (11.5) wird eingerichtet ...
+                                              
+root@debian:~#</screen></para>
 
     <para>Jetzt ist ein guter Zeitpunkt sich als root abzumelden:<screen>root@debian:~# <command>exit</command>
 Abgemeldet</screen></para>
   </section>
 
-  <section xml:id="ruby-1.9.2-mit-rvm-debian5">
-    <title xml:id="ruby-1.9.2-mit-rvm-debian5.title">Ruby 1.9.2 mit RVM
+  <section xml:id="ruby-1.9.3-mit-rvm-debian5">
+    <title xml:id="ruby-1.9.2-mit-rvm-debian5.title">Ruby 1.9.3 mit RVM
     installieren</title>
 
     <para>Loggen Sie sich mit Ihrem normalen Benutzer-Account ein (in unserem
@@ -165,122 +167,55 @@ Abgemeldet</screen></para>
 
     <para>RVM lässt sich auf verschiedene Wege installieren. Ich empfehle das
     folgende Monsterkommando (bitte exakt kopieren), mit dem das aktuellste
-    RVM installiert wird:<screen>xyz@debian:~$ <command>bash &lt; &lt;(curl -s https://rvm.beginrescueend.com/install/rvm)</command>
-Cloning into rvm...
-remote: Counting objects: 5439, done.
-remote: Compressing objects: 100% (2567/2567), done.
-remote: Total 5439 (delta 3539), reused 3901 (delta 2150)
-Receiving objects: 100% (5439/5439), 1.85 MiB | 447 KiB/s, done.
-Resolving deltas: 100% (3539/3539), done.
+    RVM installiert wird:<screen>xyz@debian:~$ <command>curl -L get.rvm.io | bash -s stable</command>
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  8545  100  8545    0     0   2089      0  0:00:04  0:00:04 --:--:-- 13628
+Downloading RVM from wayneeseguin branch stable
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  994k  100  994k    0     0  68488      0  0:00:14  0:00:14 --:--:--  144k
 
-  RVM:  Shell scripts enabling management of multiple ruby environments.
-  RTFM: https://rvm.beginrescueend.com/
-  HELP: http://webchat.freenode.net/?channels=rvm (#rvm on irc.freenode.net)
-  
 Installing RVM to /home/xyz/.rvm/
-    Correct permissions for base binaries in /home/xyz/.rvm/bin...
-    Copying manpages into place.
-cat: /etc/*-release: Datei oder Verzeichnis nicht gefunden
+    Adding rvm PATH line to /home/xyz/.bashrc /home/xyz/.zshrc.
+    Adding rvm loading line to /home/xyz/.bash_login /home/xyz/.zlogin.
+
+# RVM:  Shell scripts enabling management of multiple ruby environments.
+# RTFM: https://rvm.io/
+# HELP: http://webchat.freenode.net/?channels=rvm (#rvm on irc.freenode.net)
+# Cheatsheet: http://cheat.errtheblog.com/s/rvm/
+# Screencast: http://screencasts.org/episodes/how-to-use-rvm
+
+# In case of any issues read output of 'rvm requirements' and/or 'rvm notes'
+
+Installation of RVM in /home/xyz/.rvm/ is almost complete:
+
+  * To start using RVM you need to run `source /home/xyz/.rvm/scripts/rvm`
+    in all your open shell windows, in rare cases you need to reopen all shell windows.
+
+# xyz,
+#
+#   Thank you for using RVM!
+#   I sincerely hope that RVM helps to make your life easier and more enjoyable!!!
+#
+# ~Wayne
 
 
-Notes for Linux (  )
-
-NOTE: 'ruby' represents Matz's Ruby Interpreter (MRI) (1.8.X, 1.9.X)
-             This is the *original* / standard Ruby Language Interpreter
-      'ree'  represents Ruby Enterprise Edition
-      'rbx'  represents Rubinius
-
-bash &gt;= 3.2 is required
-curl is required
-git is required (&gt;= 1.7 recommended)
-patch is required (for ree and some ruby-head's).
-
-If you wish to install rbx and/or Ruby 1.9 head (MRI) (eg. 1.9.2-head),
-then you must install and use rvm 1.8.7 first.
-
-If you wish to have the 'pretty colors' again,
-  set 'export rvm_pretty_print_flag=1' in ~/.rvmrc.
-
-dependencies:
-# For RVM
-  rvm: bash curl git
-
-# For Ruby (MRI, Rubinius, &amp; REE)  you should install the following OS dependencies:
-  ruby: /usr/bin/apt-get install build-essential bison openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-0 libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake
-
-# For JRuby (if you wish to use it) you will need:
-  jruby: /usr/bin/apt-get install curl g++ openjdk-6-jre-headless
-  jruby-head: /usr/bin/apt-get install ant openjdk-6-jdk
-
-# In addition to ruby: dependencies,
-  ruby-head: subversion
-
-# For IronRuby (if you wish to use it) you will need:
-  ironruby: /usr/bin/apt-get install curl mono-2.0-devel
-
-For rbx (Rubinius) more than 600MB of free RAM is required.
-
-NOTE:
-As of 1.8.0 RVM once again loads .rvmrc files, by default, after asking your
-permission to trust it of course.  If you do not wish to be enabled, simply set:
-    export rvm_project_rvmrc=0
-Within either your /etc/rvmrc or $HOME/.rvmrc file. This will turn off the
-cd/pushd hooks when sourcing the rvm() function into your shell.
-
-
- Example: echo 'export rvm_project_rvmrc=0' &gt;&gt; $HOME/.rvmrc;
- (Then close the current shel and open a new one.)
-
-
-  You must now complete the install by loading RVM in new shells.
-
-  If you wish to use RVM in an interactive fashion in your shells then
-  Place the following line at the end of your shell's loading files
-  (.bashrc or .bash_profile for bash and .zshrc for zsh),
-  after all PATH/variable settings:
-
-  [[ -s "/home/xyz/.rvm/scripts/rvm" ]] &amp;&amp; source "/home/xyz/.rvm/scripts/rvm"  # This loads RVM into a shell session.
-
-  You only need to add this line the first time you install RVM.
-
-  If you are choosing to source RVM into your environment to switch current
-  shell environments, be sure to close this shell and open a new one so that
-  the RVM functions load.
-
-
-Installation of RVM to /home/xyz/.rvm/ is complete.
-
-
-xyz,
-
-If you have any questions, issues and/or ideas for improvement please
-fork the project and issue a pull request.
-
-If you wish to disable the project .rvmrc file functionality, set
-rvm_project_rvmrc=0 in either /etc/rvmrc or ~/.rvmrc.
-
-Thank you for using RVM!
-
-I sincerely hoped that RVM helped to make your life easier and more enjoyable!!!
-
-  ~Wayne
-
+rvm 1.12.5 (stable) by Wayne E. Seguin &lt;wayneeseguin@gmail.com&gt;, Michal Papis &lt;mpapis@gmail.com&gt; [https://rvm.io/]
 
 xyz@debian:~$</screen></para>
 
-    <para>RVM ist jetzt fertig installiert.</para>
-
-    <important>
-      <para>Jetzt müssen Sie das Terminal schließen und ein neues Terminal
-      öffnen, denn ansonsten wird die vom Install-Skript angepasste
-      <filename>.bashrc</filename> nicht neu geladen.</para>
-    </important>
+    <para>RVM ist jetzt fertig installiert. Sie müssen jetzt entweder Ihr
+    Terminal und damit Ihre Shell schliessen und danach neu starten oder das
+    rvm Skript wie folgt source:<screen>xyz@debian:~$ <command>source ~/.rvm/scripts/'rvm'</command>
+xyz@debian:~$</screen></para>
 
     <para>Um zu testen, ob <literal>rvm</literal> richtig installiert ist,
     rufen wir es einmal mit <literal>-v</literal> auf:<screen>xyz@debian:~$ <command>rvm -v</command>
 
-rvm 1.8.0 by Wayne E. Seguin (wayneeseguin@gmail.com) [https://rvm.beginrescueend.com/]
-</screen></para>
+rvm 1.12.5 (stable) by Wayne E. Seguin &lt;wayneeseguin@gmail.com&gt;, Michal Papis &lt;mpapis@gmail.com&gt; [https://rvm.io/]
+
+xyz@debian:~$</screen></para>
 
     <para>Sollte hierbei als Antwort der Bash <quote><literal>command not
     found</literal></quote> ausgegeben werden, müssen Sie die obigen Schritte
@@ -294,16 +229,19 @@ rvm 1.8.0 by Wayne E. Seguin (wayneeseguin@gmail.com) [https://rvm.beginrescueen
       </footnote>:<screen>xyz@debian:~$ <command>rvm list known</command>
 # MRI Rubies
 [ruby-]1.8.6[-p420]
-[ruby-]1.8.6-head
-[ruby-]1.8.7[-p352]
+[ruby-]1.8.7[-p358]
 [ruby-]1.8.7-head
-[ruby-]1.9.1-p378
 [ruby-]1.9.1[-p431]
-[ruby-]1.9.1-head
 [ruby-]1.9.2-p180
-[ruby-]1.9.2[-p290]
+[ruby-]1.9.2-p290
+[ruby-]1.9.2-p318
+[ruby-]1.9.2[-p320]
 [ruby-]1.9.2-head
-[ruby-]1.9.3[-preview1]
+[ruby-]1.9.3-preview1
+[ruby-]1.9.3-rc1
+[ruby-]1.9.3-p0
+[ruby-]1.9.3-p125
+[ruby-]1.9.3-[p194]
 [ruby-]1.9.3-head
 ruby-head
 
@@ -342,66 +280,27 @@ ruby-head
         </footnote> bildet.</para>
     </note>
 
-    <para>Jetzt können Sie mit RVM Ruby 1.9.2 installieren:<screen>xyz@debian:~$ <command>rvm install ruby-1.9.2</command>
-
-Installing Ruby from source to: /home/xyz/.rvm/rubies/ruby-1.9.2-p290, this may take a while depending on your cpu(s)...
-
-ruby-1.9.2-p290 - #fetching 
-ruby-1.9.2-p290 - #downloading ruby-1.9.2-p290, this may take a while depending on your connection...
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100 8604k  100 8604k    0     0   405k      0  0:00:21  0:00:21 --:--:--  467k
-ruby-1.9.2-p290 - #extracting ruby-1.9.2-p290 to /home/xyz/.rvm/src/ruby-1.9.2-p290
-ruby-1.9.2-p290 - #extracted to /home/xyz/.rvm/src/ruby-1.9.2-p290
+    <para>Jetzt können Sie mit RVM Ruby 1.9.3 installieren:<screen>xyz@debian:~$ <command>rvm install 1.9.3</command>
 Fetching yaml-0.1.4.tar.gz to /home/xyz/.rvm/archives
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
-100  460k  100  460k    0     0   143k      0  0:00:03  0:00:03 --:--:--  164k
+100  460k  100  460k    0     0  42775      0  0:00:11  0:00:11 --:--:-- 85978
 Extracting yaml-0.1.4.tar.gz to /home/xyz/.rvm/src
 Configuring yaml in /home/xyz/.rvm/src/yaml-0.1.4.
-Compiling yaml in /home/xyz/.rvm/src/yaml-0.1.4.
-Installing yaml to /home/xyz/.rvm/usr
-ruby-1.9.2-p290 - #configuring 
-ruby-1.9.2-p290 - #compiling 
-ruby-1.9.2-p290 - #installing 
-Retrieving rubygems-1.8.6
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100  244k  100  244k    0     0   318k      0 --:--:-- --:--:-- --:--:--  415k
-Extracting rubygems-1.8.6 ...
-Removing old Rubygems files...
-Installing rubygems-1.8.6 for ruby-1.9.2-p290 ...
+Compiling yaml in /home/xyz/.rvm/src/yaml-0.1.4. 
+
+[...]
+
 Installation of rubygems completed successfully.
-ruby-1.9.2-p290 - adjusting #shebangs for (gem irb erb ri rdoc testrb rake).
-ruby-1.9.2-p290 - #importing default gemsets (/home/xyz/.rvm/gemsets/)
-Install of ruby-1.9.2-p290 - #complete  
+ruby-1.9.3-p194 - adjusting #shebangs for (gem irb erb ri rdoc testrb rake).
+ruby-1.9.3-p194 - #importing default gemsets (/home/xyz/.rvm/gemsets/)
+Install of ruby-1.9.3-p194 - #complete 
+xyz@debian:~$  </screen></para>
 
+    <para>RVM stellt per Default direkt die gerade installierte Ruby Version
+    zur Verfügung:<screen>xyz@debian:~$ ruby -v
+ruby 1.9.3p194 (2012-04-20 revision 35410) [i686-linux]
 xyz@debian:~$ </screen></para>
-
-    <para>Noch haben Sie per Default auf Ihrer Debian Minimalinstallation kein
-    <command>ruby</command> . Deshalb bekommt ein <command>ruby -v</command>
-    eine Fehlermeldung:<screen>xyz@debian:~$ <command>ruby -v</command>
-bash: ruby: command not found
-xyz@debian:~$ </screen></para>
-
-    <para>Mit dem Befehl <command>rvm ruby-1.9.2</command> oder kurz
-    <command>rvm 1.9.2</command> können Sie aber ein Ruby 1.9.2 aktivieren
-    <footnote>
-        <para>Dieses wird dann in den sogenannten <varname>PATH</varname>
-        (also den Such-Pfad für ausführbare Programme) des aktuellen Benutzers
-        eingetragen.</para>
-
-        <para>Weitere Informationen zum <varname>PATH</varname>: <uri
-        xlink:href="http://en.wikipedia.org/wiki/PATH_%28variable%29"
-        xml:lang="en">http://en.wikipedia.org/wiki/PATH_(variable)</uri></para>
-      </footnote>.<screen>xyz@debian:~$ <command>rvm 1.9.2</command>
-xyz@debian:~$ <command>ruby -v</command>
-ruby 1.9.2p290 (2011-07-09 revision 32553) [i686-linux]
-xyz@debian:~$ </screen></para>
-
-    <para>Dummerweise müssten Sie jetzt in jeder neuen Shell <command>rvm
-    1.9.2</command> eingeben. Sie können für diesen User aber auch die
-    Ruby-Version 1.9.2 als Default einstellen:<screen>xyz@debian:~$ <command>rvm --default 1.9.2</command></screen></para>
 
     <note>
       <para>Sollten Sie vorher bereits eine System-Ruby-Version 1.8.x
@@ -422,52 +321,27 @@ xyz@debian:~$ </screen></para>
 
     <para>Zuerst überprüfen wir, ob ein Ruby in der Version 1.9.2 aufgerufen
     wird. Sollte das nicht der Fall sein, lesen Sie sich bitte <xref
-    linkend="ruby-1.9.2-mit-rvm-debian5" /> durch.<screen>xyz@debian:~$ <command>ruby -v</command>
-ruby 1.9.2p290 (2011-07-09 revision 32553) [i686-linux]</screen></para>
-
-    <para>Anschließend stellen wir sicher, dass das
-    <literal>gem</literal>-Paketmanagement aktuell ist:<screen>xyz@debian:~$ <command>rvm rubygems current</command>
-Removing old Rubygems files...
-Installing rubygems-1.8.6 for ruby-1.9.2-p290 ...
-Installation of rubygems completed successfully.
-xyz@debian:~$ <command>gem update</command>
-Updating installed gems
-Nothing to update
+    linkend="ruby-1.9.3-mit-rvm-debian5" /> durch.<screen>xyz@debian:~$ <command>ruby -v</command>
+ruby 1.9.3p194 (2012-04-20 revision 35410) [i686-linux]
 xyz@debian:~$</screen></para>
-
-    <section xml:id="debian-rails30-installieren">
-      <title xml:id="debian-rails30-installieren.title">Rails 3.0
-      installieren</title>
-
-      <para>Der Rest ist einfach:<screen>xyz@debian:~$ <command>gem install rails --version '~&gt; 3.0.0'</command>
-Fetching: activesupport-3.0.10.gem (100%)
-Fetching: builder-2.1.2.gem (100%)
-
-[...]
-
-Installing RDoc documentation for railties-3.0.10...
-Installing RDoc documentation for bundler-1.0.18...
-Installing RDoc documentation for rails-3.0.10...
-xyz@debian:~$</screen></para>
-
-      <para>Perfekt. Jetzt haben Sie Rails 3.0 installiert. <screen>xyz@debian:~$ <command>rails -v</command>
-Rails 3.0.10
-xyz@debian:~$</screen></para>
-    </section>
 
     <section xml:id="debian-rails31-installieren">
-      <title xml:id="debian-rails31-installieren.title">Rails 3.1
+      <title xml:id="debian-rails31-installieren.title">Rails 3.2
       installieren</title>
 
-      <para>Der Rest ist einfach:<screen>xyz@debian:~$ <command>gem install rails --version '~&gt; 3.1.0'</command>
+      <para>Der Rest ist einfach:<screen>xyz@debian:~$ <command>gem install rails --version '~&gt; 3.2.0'</command>
+Fetching: i18n-0.6.0.gem (100%)
+Fetching: multi_json-1.3.2.gem (100%)
 
 [...]
 
-Installing RDoc documentation for rails-3.1.0...
+Installing RDoc documentation for rdoc-3.12...
+Installing RDoc documentation for railties-3.2.3...
+Installing RDoc documentation for rails-3.2.3...
 xyz@debian:~$</screen></para>
 
-      <para>Perfekt. Jetzt haben Sie Rails 3.1 installiert. <screen>xyz@debian:~$ <command>rails -v</command>
-Rails 3.1.0
+      <para>Perfekt. Jetzt haben Sie Rails 3.2 installiert. <screen>xyz@debian:~$ <command>rails -v</command>
+Rails 3.2.3
 xyz@debian:~$</screen></para>
     </section>
   </section>
