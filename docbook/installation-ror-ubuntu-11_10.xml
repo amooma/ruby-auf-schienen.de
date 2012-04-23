@@ -8,18 +8,18 @@
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
   <title xml:id="rails3-install-ubuntu.title">Installation von Ruby on Rails
-  3.0 oder 3.1 mit RVM auf Ubuntu 11.10</title>
+  3.2 mit RVM auf Ubuntu 12.04 LTS</title>
 
   <indexterm>
     <primary>Installation</primary>
 
     <secondary>von Ruby on Rails</secondary>
 
-    <tertiary>auf Ubuntu 11.10</tertiary>
+    <tertiary>auf Ubuntu 12.04 LTS</tertiary>
   </indexterm>
 
   <indexterm>
-    <primary>Ubuntu 11.10</primary>
+    <primary>Ubuntu 12.04 LTS</primary>
 
     <secondary>Installation von Ruby on Rails</secondary>
   </indexterm>
@@ -58,23 +58,19 @@
         Rails-Systeme und damit vielleicht Rails-Versionen betreiben. Das
         lässt sich mit RVM und verschiedenen Accounts auf dem Linux-System
         sehr gut realisieren. So können Sie auf einem Rechner ein Ruby 1.8.7
-        mit einem Rails 2.3.8 und parallel ein Ruby 1.9.2 mit einem Rails 3.0
+        mit einem Rails 2.3.8 und parallel ein Ruby 1.9.3 mit einem Rails 3.2
         betreiben.</para>
-      </listitem>
-
-      <listitem>
-        <para>RVM ist einfach super praktisch!</para>
       </listitem>
     </itemizedlist></para>
 
   <note>
     <para>Detaillierte Infos zu RVM finden Sie auf der RVM-Homepage unter <uri
-    xlink:href="http://rvm.beginrescueend.com/">http://rvm.beginrescueend.com/</uri>.</para>
+    xlink:href="https://rvm.io/">https://rvm.io/</uri>.</para>
   </note>
 
-  <para>Diese Beschreibung setzt ein frisch installiertes Ubuntu 11.10 voraus.
-  Ein ISO-Image für die Installation finden Sie auf <uri
-  xlink:href="http://www.ubuntu.com/download/ubuntu/download">http://www.ubuntu.com/download/ubuntu/download</uri>.</para>
+  <para>Diese Beschreibung setzt ein frisch installiertes Ubuntu 12.04 LTS
+  voraus. Ein ISO-Image für die Installation finden Sie auf <uri
+  xlink:href="http://www.ubuntu.com/">http://www.ubuntu.com/</uri>.</para>
 
   <section xml:id="rails3-ubuntu1110-install-vorbereitung">
     <title
@@ -89,161 +85,101 @@
 
     <para>Als Erstes ein Update der Paketlisten:<screen>xyz@ubuntu:~$ <command>sudo apt-get update</command>
 [sudo] password for xyz: 
-Ign http://security.ubuntu.com oneiric-security InRelease
-Ign http://extras.ubuntu.com oneiric InRelease                                 
-OK   http://security.ubuntu.com oneiric-security Release.gpg
+Ign http://de.archive.ubuntu.com precise InRelease
+Ign http://de.archive.ubuntu.com precise-updates InRelease
+Ign http://de.archive.ubuntu.com precise-backports InRelease
+Ign http://security.ubuntu.com precise-security InRelease
+OK   http://de.archive.ubuntu.com precise Release.gpg
+
 
 [...]
-</screen></para>
+
+OK   http://security.ubuntu.com precise-security/restricted Translation-en
+OK   http://security.ubuntu.com precise-security/universe Translation-en
+Paketlisten werden gelesen... Fertig
+xyz@ubuntu:~$ </screen></para>
 
     <note>
       <para>Natürlich können Sie optional auf dem System einen SSH-Server
       installieren, um dann auf dem System per SSH statt auf der Konsole zu
-      arbeiten:<screen>xyz@ubuntu:~$ <command>sudo apt-get install ssh</command></screen></para>
+      arbeiten:<screen>xyz@ubuntu:~$ <command>sudo apt-get install openssh-server</command></screen></para>
     </note>
 
     <para>Und jetzt die Installation der zur Installation von RVM und später
-    Ruby on Rails benötigten Pakete:<screen>xyz@ubuntu:~$ <command>sudo apt-get -y install curl git-core patch</command> \
-<command>  build-essential bison zlib1g-dev libssl-dev libxml2-dev \
-  libxml2-dev sqlite3 libsqlite3-dev autotools-dev \
-  libxslt1-dev libyaml-0-2 autoconf automake libreadline6-dev \
-  libyaml-dev libtool</command>
+    Ruby on Rails benötigten Pakete:<screen>xyz@ubuntu:~$ <command>sudo apt-get install curl git-core patch \
+   build-essential bison zlib1g-dev libssl-dev libxml2-dev \
+   libxml2-dev sqlite3 libsqlite3-dev autotools-dev \
+   libxslt1-dev libyaml-0-2 autoconf automake libreadline6-dev \
+   libyaml-dev libtool</command>
 Paketlisten werden gelesen... Fertig
 Abhängigkeitsbaum wird aufgebaut       
-Status-Informationen einlesen... Fertig
-Die folgenden zusätzlichen Pakete werden installiert:
+Statusinformationen werden eingelesen... Fertig
 
-[...]</screen></para>
+[...]
+
+g++ (4:4.6.3-1ubuntu5) wird eingerichtet ...
+update-alternatives: /usr/bin/g++ wird verwendet, um /usr/bin/c++ (c++) im Auto-Modus bereitzustellen.
+build-essential (11.5ubuntu2) wird eingerichtet ...
+Trigger für libc-bin werden verarbeitet ...
+ldconfig deferred processing now taking place
+xyz@ubuntu:~$</screen></para>
   </section>
 
-  <section xml:id="ruby-1.9.2-mit-rvm-ubuntu1110">
-    <title xml:id="ruby-1.9.2-mit-rvm-ubuntu1110.title">Ruby 1.9.2 mit RVM
+  <section xml:id="ruby-1.9.3-mit-rvm-ubuntu1110">
+    <title xml:id="ruby-1.9.2-mit-rvm-ubuntu1110.title">Ruby 1.9.3 mit RVM
     installieren</title>
 
     <para>RVM lässt sich auf verschiedene Wege installieren. Ich empfehle das
     folgende Monsterkommando (bitte exakt kopieren), mit dem das aktuellste
-    RVM installiert wird:<screen>xyz@ubuntu:~$ <command>bash &lt; &lt;(curl -s https://rvm.beginrescueend.com/install/rvm)</command>
-Cloning into rvm...
-remote: Counting objects: 5931, done.
-remote: Compressing objects: 100% (2851/2851), done.
-Receiving objects: 100% (5931/5931), 1.96 MiB | 247 KiB/s, done.
-remote: Total 5931 (delta 3894), reused 4165 (delta 2313)
-Resolving deltas: 100% (3894/3894), done.
+    RVM installiert wird:<screen>xyz@ubuntu:~$ <command>curl -L get.rvm.io | bash -s stable</command>
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   185  100   185    0     0    336      0 --:--:-- --:--:-- --:--:--  1016
+100  8545  100  8545    0     0   6895      0  0:00:01  0:00:01 --:--:--  6895
+Downloading RVM from wayneeseguin branch stable
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   125  100   125    0     0    192      0 --:--:-- --:--:-- --:--:--   262
+100  994k  100  994k    0     0   248k      0  0:00:04  0:00:04 --:--:--  362k
 
-  RVM:  Shell scripts enabling management of multiple ruby environments.
-  RTFM: https://rvm.beginrescueend.com/
-  HELP: http://webchat.freenode.net/?channels=rvm (#rvm on irc.freenode.net)
-  
 Installing RVM to /home/xyz/.rvm/
-    Correct permissions for base binaries in /home/xyz/.rvm/bin...
-    Copying manpages into place.
-    Recording config files for rubies.
+    Adding rvm PATH line to /home/xyz/.bashrc /home/xyz/.zshrc.
+    Adding rvm loading line to /home/xyz/.bash_login /home/xyz/.zlogin.
 
-xyz,
+# RVM:  Shell scripts enabling management of multiple ruby environments.
+# RTFM: https://rvm.io/
+# HELP: http://webchat.freenode.net/?channels=rvm (#rvm on irc.freenode.net)
+# Cheatsheet: http://cheat.errtheblog.com/s/rvm/
+# Screencast: http://screencasts.org/episodes/how-to-use-rvm
 
-If you have any questions, issues and/or ideas for improvement please
-fork the project and issue a pull request.
+# In case of any issues read output of 'rvm requirements' and/or 'rvm notes'
 
-If you wish to disable the project .rvmrc file functionality, set
-rvm_project_rvmrc=0 in either /etc/rvmrc or ~/.rvmrc.
+Installation of RVM in /home/xyz/.rvm/ is almost complete:
 
-NOTE: To Multi-User installers, please do NOT forget to add your users to the 'rvm' group.
-  The installer no longer auto-adds root or users to the rvm group. Admins must do this.
-  Also, please note that group memberships are ONLY evaluated at login time.
-  This means that users must log out then back in before group membership takes effect!
+  * To start using RVM you need to run `source /home/xyz/.rvm/scripts/rvm`
+    in all your open shell windows, in rare cases you need to reopen all shell windows.
 
-Thank you for using RVM!
-
-I sincerely hope that RVM helps to make your life easier and more enjoyable!!!
-
-  ~Wayne
-
-
-SYSTEM NOTES:
-
-If you do not wish to enable reading of per-project .rvmrc files, simply set:
-        export rvm_project_rvmrc=0
-within either your /etc/rvmrc or $HOME/.rvmrc file, then log out and back in.
+# xyz,
+#
+#   Thank you for using RVM!
+#   I sincerely hope that RVM helps to make your life easier and more enjoyable!!!
+#
+# ~Wayne
 
 
-In case your shell exits on entering directory with freshly checked out sources
-you should update .rvmrc file, and replace any `exit ` with `return `.
+rvm 1.12.5 (stable) by Wayne E. Seguin &lt;wayneeseguin@gmail.com&gt;, Michal Papis &lt;mpapis@gmail.com&gt; [https://rvm.io/]
 
-
-You _must_ read 'rvm requirements' for additional OS specific requirements for
-various rubies, and native-extension gems. Expect failures until those are met!
-
-
-For screen users, please do not forget to read https://rvm.beginrescueend.com/workflow/screen/.
-You will need to add 'shell -/bin/bash' to your $HOME/.screenrc to properly load RVM.
-
-
-  You must now complete the install by loading RVM in new shells.
-
-  If you wish to use RVM in an interactive fashion in your shells then
-  Place the following line at the end of your shell's loading files
-  (.bashrc or .bash_profile for bash and .zshrc for zsh),
-  after all PATH/variable settings:
-
-  [[ -s "/home/xyz/.rvm/scripts/rvm" ]] &amp;&amp; source "/home/xyz/.rvm/scripts/rvm"  # This loads RVM into a shell session.
-
-  You only need to add this line the first time you install RVM.
-
-  If you are choosing to source RVM into your environment to switch current
-  shell environments, be sure to close this shell and open a new one so that
-  the RVM functions load.
-
-
-Installation of RVM to /home/xyz/.rvm/ is complete.
-
-
-
-Requirements for Linux ( DISTRIB_ID=Ubuntu
-DISTRIB_RELEASE=11.10
-DISTRIB_CODENAME=oneiric
-DISTRIB_DESCRIPTION="Ubuntu 11.10" )
-
-NOTE: 'ruby' represents Matz's Ruby Interpreter (MRI) (1.8.X, 1.9.X)
-             This is the *original* / standard Ruby Language Interpreter
-      'ree'  represents Ruby Enterprise Edition
-      'rbx'  represents Rubinius
-
-bash &gt;= 4.1 required
-curl is required
-git is required (&gt;= 1.7 recommended)
-patch is required (for ree and some ruby-head's).
-
-To install rbx and/or Ruby 1.9 head (MRI) (eg. 1.9.2-head),
-then you must install and use rvm 1.8.7 first.
-
-NOTE: To all Multi-User installers - DO NOT forget to add your users to the 'rvm' group.
-      The installer does not auto-add any users to the rvm group. Admins must do this.
-      Group memberships are ONLY evaluated at login time. Log them out, then back in.
-
-Additional Dependencies:
-# For Ruby / Ruby HEAD (MRI, Rubinius, &amp; REE), install the following:
-  ruby: /usr/bin/apt-get install build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-0 libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion
-
-# For JRuby, install the following:
-  jruby: /usr/bin/apt-get install curl g++ openjdk-6-jre-headless
-  jruby-head: /usr/bin/apt-get install ant openjdk-6-jdk
-
-# For IronRuby, install the following:
-  ironruby: /usr/bin/apt-get install curl mono-2.0-devel
 xyz@ubuntu:~$</screen></para>
 
-    <para>RVM ist jetzt fertig installiert.</para>
-
-    <important>
-      <para>Jetzt müssen Sie das Terminal schließen und ein neues Terminal
-      öffnen, denn ansonsten wird die vom Install-Skript angepasste
-      <filename>.bashrc</filename> nicht neu geladen.</para>
-    </important>
+    <para>RVM ist jetzt fertig installiert. Sie müssen jetzt entweder Ihr
+    Terminal und damit Ihre Shell schliessen und danach neu starten oder das
+    rvm Skript wie folgt source:<screen>xyz@ubuntu:~$ <command>source ~/.rvm/scripts/'rvm'</command>
+xyz@ubuntu:~$ </screen></para>
 
     <para>Um zu testen, ob <literal>rvm</literal> richtig installiert ist,
     rufen wir es einmal mit <literal>-v</literal> auf:<screen>xyz@ubuntu:~$ <command>rvm -v</command>
 
-rvm 1.10.0-pre by Wayne E. Seguin (wayneeseguin@gmail.com) [https://rvm.beginrescueend.com/]
+rvm 1.12.5 (stable) by Wayne E. Seguin &lt;wayneeseguin@gmail.com&gt;, Michal Papis &lt;mpapis@gmail.com&gt; [https://rvm.io/]
 
 xyz@ubuntu:~$</screen></para>
 
@@ -259,18 +195,19 @@ xyz@ubuntu:~$</screen></para>
       </footnote>:<screen>xyz@ubuntu:~$ <command>rvm list known</command>
 # MRI Rubies
 [ruby-]1.8.6[-p420]
-[ruby-]1.8.6-head
-[ruby-]1.8.7[-p352]
+[ruby-]1.8.7[-p358]
 [ruby-]1.8.7-head
-[ruby-]1.9.1-p378
 [ruby-]1.9.1[-p431]
-[ruby-]1.9.1-head
 [ruby-]1.9.2-p180
-[ruby-]1.9.2[-p290]
+[ruby-]1.9.2-p290
+[ruby-]1.9.2-p318
+[ruby-]1.9.2[-p320]
 [ruby-]1.9.2-head
 [ruby-]1.9.3-preview1
 [ruby-]1.9.3-rc1
-[ruby-]1.9.3[-p0]
+[ruby-]1.9.3-p0
+[ruby-]1.9.3-p125
+[ruby-]1.9.3-[p194]
 [ruby-]1.9.3-head
 ruby-head
 
@@ -309,68 +246,26 @@ ruby-head
         </footnote> bildet.</para>
     </note>
 
-    <para>Jetzt können Sie mit RVM Ruby 1.9.2 installieren:<screen>xyz@ubuntu:~$ <command>rvm install ruby-1.9.2</command>
-Installing Ruby from source to: /home/xyz/.rvm/rubies/ruby-1.9.2-p290, this may take a while depending on your cpu(s)...
-
-ruby-1.9.2-p290 - #fetching 
-ruby-1.9.2-p290 - #downloading ruby-1.9.2-p290, this may take a while depending on your connection...
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100 8604k  100 8604k    0     0  77602      0  0:01:53  0:01:53 --:--:-- 84726
-100 8604k  100 8604k    0     0  77378      0  0:01:53  0:01:53 --:--:-- 77378ruby-1.9.2-p290 - #extracting ruby-1.9.2-p290 to /home/xyz/.rvm/src/ruby-1.9.2-p290
-ruby-1.9.2-p290 - #extracted to /home/xyz/.rvm/src/ruby-1.9.2-p290
+    <para>Jetzt können Sie mit RVM Ruby 1.9.3 installieren:<screen>xyz@ubuntu:~$ <command>rvm install 1.9.3</command>
 Fetching yaml-0.1.4.tar.gz to /home/xyz/.rvm/archives
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
-100  460k  100  460k    0     0  99324      0  0:00:04  0:00:04 --:--:--  163k
+100  460k  100  460k    0     0   148k      0  0:00:03  0:00:03 --:--:--  170k
 Extracting yaml-0.1.4.tar.gz to /home/xyz/.rvm/src
 Prepare yaml in /home/xyz/.rvm/src/yaml-0.1.4.
 Configuring yaml in /home/xyz/.rvm/src/yaml-0.1.4.
-Compiling yaml in /home/xyz/.rvm/src/yaml-0.1.4.
-Installing yaml to /home/xyz/.rvm/usr
-ruby-1.9.2-p290 - #configuring 
-ruby-1.9.2-p290 - #compiling 
-ruby-1.9.2-p290 - #installing 
-Retrieving rubygems-1.8.10
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100  243k  100  243k    0     0   198k      0  0:00:01  0:00:01 --:--:--  343k
-Extracting rubygems-1.8.10 ...
-Removing old Rubygems files...
-Installing rubygems-1.8.10 for ruby-1.9.2-p290 ...
-Installation of rubygems completed successfully.
-ruby-1.9.2-p290 - adjusting #shebangs for (gem irb erb ri rdoc testrb rake).
-ruby-1.9.2-p290 - #importing default gemsets (/home/xyz/.rvm/gemsets/)
-Install of ruby-1.9.2-p290 - #complete 
+
+[...]
+
+ruby-1.9.3-p194 - adjusting #shebangs for (gem irb erb ri rdoc testrb rake).
+ruby-1.9.3-p194 - #importing default gemsets (/home/xyz/.rvm/gemsets/)
+Install of ruby-1.9.3-p194 - #complete 
 xyz@ubuntu:~$</screen></para>
 
-    <para>Noch haben Sie per Default auf Ihrer Ubuntu Installation kein
-    <command>ruby</command> . Deshalb bekommt ein <command>ruby -v</command>
-    eine Meldung:<screen>xyz@ubuntu:~$ <command>ruby -v</command>
-Das Programm »ruby« ist in folgenden Paketen enthalten:
- * ruby1.8
- * ruby1.9.1
-Versuchen Sie: sudo apt-get install &lt;ausgewähltes Paket&gt;
+    <para>RVM stellt per Default direkt die gerade installierte Ruby Version
+    zur Verfügung:<screen>xyz@ubuntu:~$ <command>ruby -v</command>
+ruby 1.9.3p194 (2012-04-20 revision 35410) [i686-linux]
 xyz@ubuntu:~$</screen></para>
-
-    <para>Mit dem Befehl <command>rvm ruby-1.9.2</command> oder kurz
-    <command>rvm 1.9.2</command> können Sie aber ein Ruby 1.9.2 aktivieren
-    <footnote>
-        <para>Dieses wird dann in den sogenannten <varname>PATH</varname>
-        (also den Such-Pfad für ausführbare Programme) des aktuellen Benutzers
-        eingetragen.</para>
-
-        <para>Weitere Informationen zum <varname>PATH</varname>: <uri
-        xlink:href="http://en.wikipedia.org/wiki/PATH_%28variable%29"
-        xml:lang="en">http://en.wikipedia.org/wiki/PATH_(variable)</uri></para>
-      </footnote>.<screen>xyz@ubuntu:~$ <command>rvm 1.9.2</command>
-xyz@ubuntu:~$ <command>ruby -v</command>
-ruby 1.9.2p290 (2011-07-09 revision 32553) [i686-linux]
-xyz@ubuntu:~$</screen></para>
-
-    <para>Dummerweise müssten Sie jetzt in jeder neuen Shell <command>rvm
-    1.9.2</command> eingeben. Sie können für diesen User aber auch die
-    Ruby-Version 1.9.2 als Default einstellen:<screen>xyz@debian:~$ <command>rvm --default 1.9.2</command></screen></para>
 
     <note>
       <para>Sollten Sie vorher bereits eine System-Ruby-Version 1.8.x
@@ -389,65 +284,42 @@ xyz@ubuntu:~$</screen></para>
     <title xml:id="ubuntu-rails30-oder-31-installieren.title">Rails
     installieren</title>
 
-    <para>Zuerst überprüfen wir, ob ein Ruby in der Version 1.9.2 aufgerufen
+    <para>Zuerst überprüfen wir, ob ein Ruby in der Version 1.9.3 aufgerufen
     wird. Sollte das nicht der Fall sein, lesen Sie sich bitte <xref
-    linkend="ruby-1.9.2-mit-rvm-ubuntu1110" /> durch.<screen>xyz@ubuntu:~$ <command>ruby -v</command>
-ruby 1.9.2p290 (2011-07-09 revision 32553) [i686-linux]
+    linkend="ruby-1.9.3-mit-rvm-ubuntu1110" /> durch.<screen>xyz@ubuntu:~$ <command>ruby -v</command>
+ruby 1.9.3p194 (2012-04-20 revision 35410) [i686-linux]
 xyz@ubuntu:~$</screen></para>
 
     <para>Anschließend stellen wir sicher, dass das
-    <literal>gem</literal>-Paketmanagement aktuell ist:<screen>xyz@ubuntu:~$ <command>rvm rubygems current</command>
-Removing old Rubygems files...
-Installing rubygems-1.8.10 for ruby-1.9.2-p290 ...
-Installation of rubygems completed successfully.
-xyz@ubuntu:~$ <command>gem update</command>
+    <literal>gem</literal>-Paketmanagement aktuell ist:<screen>xyz@ubuntu:~$ <command>gem update</command>
 Updating installed gems
-Updating rake
-Fetching: rake-0.9.2.2.gem (100%)
-Successfully installed rake-0.9.2.2
-Gems updated: rake
-Installing ri documentation for rake-0.9.2.2...
-Installing RDoc documentation for rake-0.9.2.2...
+Nothing to update
 xyz@ubuntu:~$</screen></para>
 
-    <section xml:id="ubuntu-rails30-installieren">
-      <title xml:id="ubuntu-rails30-installieren.title">Rails 3.0
+    <section xml:id="ubuntu-rails32-installieren">
+      <title xml:id="ubuntu-rails31-installieren.title">Rails 3.2
       installieren</title>
 
-      <para>Der Rest ist einfach:<screen>xyz@ubuntu:~$ <command>gem install rails --version '~&gt; 3.0.0'</command>
-Fetching: activesupport-3.0.11.gem (100%)
-Fetching: builder-2.1.2.gem (100%)
+      <para>Der Rest ist einfach:<screen>xyz@ubuntu:~$ <command>gem install rails --version '~&gt; 3.2.0'</command>
+Fetching: i18n-0.6.0.gem (100%)
+Fetching: multi_json-1.3.2.gem (100%)
 
 [...]
 
-Installing RDoc documentation for railties-3.0.11...
-Installing RDoc documentation for rails-3.0.11...
+Installing RDoc documentation for railties-3.2.3...
+Installing RDoc documentation for rails-3.2.3...
 xyz@ubuntu:~$</screen></para>
 
-      <para>Perfekt. Jetzt haben Sie Rails 3.0 installiert. <screen>xyz@ubuntu:~$ <command>rails -v</command>
-Rails 3.0.11
-xyz@ubuntu:~$</screen></para>
-    </section>
-
-    <section xml:id="ubuntu-rails31-installieren">
-      <title xml:id="ubuntu-rails31-installieren.title">Rails 3.1
-      installieren</title>
-
-      <para>Der Rest ist einfach:<screen>xyz@ubuntu:~$ <command>gem install rails --version '~&gt; 3.1.0'</command>
-Fetching: multi_json-1.0.4.gem (100%)
-Fetching: activesupport-3.1.3.gem (100%)
-Fetching: builder-3.0.0.gem (100%)
-
-[...]
-
-Installing RDoc documentation for rack-ssl-1.3.2...
-Installing RDoc documentation for railties-3.1.3...
-Installing RDoc documentation for rails-3.1.3...
+      <para>Perfekt. Jetzt haben Sie Rails 3.2 installiert. <screen>xyz@ubuntu:~$ <command>rails -v</command>
+Rails 3.2.3
 xyz@ubuntu:~$</screen></para>
 
-      <para>Perfekt. Jetzt haben Sie Rails 3.1 installiert. <screen>xyz@ubuntu:~$ <command>rails -v</command>
-Rails 3.1.3
-xyz@ubuntu:~$</screen></para>
+      <note>
+        <para>Falls Sie einmal eine ältere Rails-Version installieren wollen,
+        so können Sie den <code>--version</code> Parameter mit der
+        entsprechenden älteren Versionsnummer anpassen (z.B. <code>--version
+        '-&gt; 3.1.0'</code> für die aktuellste Rails 3.1 Version).</para>
+      </note>
     </section>
   </section>
 
