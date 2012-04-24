@@ -196,14 +196,14 @@
       </indexterm>
 
       <para>Bevor wir hier überhaupt mit dem Allereinfachsten beginnen,
-      überprüfen Sie bitte, ob Sie eine Ruby-Version 1.9.2 einsetzen:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>ruby -v</command>
-ruby 1.9.2p0 (2010-08-18 revision 29036) [x86_64-darwin10.4.0]
-</screen></para>
+      überprüfen Sie bitte, ob Sie eine Ruby-Version 1.9.3 einsetzen:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>ruby -v</command>
+ruby 1.9.3p194 (2012-04-20 revision 35410) [x86_64-darwin11.3.0]
+Stefan-Wintermeyers-MacBook-Air:~ xyz$</screen></para>
 
-      <para>Und als Nächstes überprüfen wir, ob auch Rails 3.0 oder höher
-      installiert ist:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails -v</command>
-Rails 3.0.0
-</screen></para>
+      <para>Und als Nächstes überprüfen wir, ob auch Rails 3.2 installiert
+      ist:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails -v</command>
+Rails 3.2.3
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ </screen></para>
 
       <para>Das sieht gut aus. Falls Sie eine ältere Ruby- oder Rails-Version
       installiert haben, dann installieren Sie vor dem Weiterlesen die
@@ -214,84 +214,26 @@ Rails 3.0.0
       <literal>testproject</literal>. Da Ruby on Rails ein Framework ist,
       müssen wir als Erstes die entsprechende Verzeichnisstruktur und die
       Grundkonfiguration inkl. einiger Skripte einrichten. Das geht mit dem
-      Befehl <command>rails new testproject</command> ratzfatz:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new testproject</command>
+      Befehl <command>rails new testproject</command> ratzfatz:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new testproject</command>
       create  
-      create  README
+      create  README.rdoc
       create  Rakefile
       create  config.ru
       create  .gitignore
       create  Gemfile
       create  app
-      create  app/controllers/application_controller.rb
-      create  app/helpers/application_helper.rb
-      create  app/views/layouts/application.html.erb
-      create  app/mailers
-      create  app/models
-      create  config
-      create  config/routes.rb
-      create  config/application.rb
-      create  config/environment.rb
-      create  config/environments
-      create  config/environments/development.rb
-      create  config/environments/production.rb
-      create  config/environments/test.rb
-      create  config/initializers
-      create  config/initializers/backtrace_silencers.rb
-      create  config/initializers/inflections.rb
-      create  config/initializers/mime_types.rb
-      create  config/initializers/secret_token.rb
-      create  config/initializers/session_store.rb
-      create  config/locales
-      create  config/locales/en.yml
-      create  config/boot.rb
-      create  config/database.yml
-      create  db
-      create  db/seeds.rb
-      create  doc
-      create  doc/README_FOR_APP
-      create  lib
-      create  lib/tasks
-      create  lib/tasks/.gitkeep
-      create  log
-      create  log/server.log
-      create  log/production.log
-      create  log/development.log
-      create  log/test.log
-      create  public
-      create  public/404.html
-      create  public/422.html
-      create  public/500.html
-      create  public/favicon.ico
-      create  public/index.html
-      create  public/robots.txt
-      create  public/images
-      create  public/images/rails.png
-      create  public/stylesheets
-      create  public/stylesheets/.gitkeep
-      create  public/javascripts
-      create  public/javascripts/application.js
-      create  public/javascripts/controls.js
-      create  public/javascripts/dragdrop.js
-      create  public/javascripts/effects.js
-      create  public/javascripts/prototype.js
-      create  public/javascripts/rails.js
-      create  script
-      create  script/rails
-      create  test
-      create  test/performance/browsing_test.rb
-      create  test/test_helper.rb
-      create  test/fixtures
-      create  test/functional
-      create  test/integration
-      create  test/unit
-      create  tmp
-      create  tmp/sessions
-      create  tmp/sockets
-      create  tmp/cache
-      create  tmp/pids
-      create  vendor/plugins
-      create  vendor/plugins/.gitkeep
-stefan@swmbp 0 1.9.2-p0 ~$ </screen></para>
+      create  app/assets/images/rails.png
+      create  app/assets/javascripts/application.js
+
+[...]
+
+Using rails (3.2.3) 
+Installing sass (3.1.16) 
+Installing sass-rails (3.2.5) 
+Installing sqlite3 (1.3.6) with native extensions 
+Installing uglifier (1.2.4) 
+Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
+Stefan-Wintermeyers-MacBook-Air:~ xyz$</screen></para>
 
       <para><indexterm>
           <primary>bundle</primary>
@@ -299,52 +241,14 @@ stefan@swmbp 0 1.9.2-p0 ~$ </screen></para>
           <primary>bundler</primary>
         </indexterm><indexterm>
           <primary>Gems</primary>
-        </indexterm>Zuerst führen wir jetzt <command>bundle install</command>
-      aus und stellen damit dem Rails-Projekt alle benötigten <foreignphrase
+        </indexterm>Bei früheren Rails-Versionen musste als erstes ein
+      <command>bundle install</command> ausgeführt werden. Ab Rails 3.2 wird
+      dies aber automatisch beim Erstellen eines neuen Rails-Projektes
+      gemacht. Damit stehen dem Rails-Projekt alle benötigten <foreignphrase
       xml:lang="en">Gems</foreignphrase> zur Verfügung. Ein <foreignphrase
       xml:lang="en">Gem</foreignphrase> ist eine Art Softwarebibliothek. Man
       kann damit bestimmte Funktionalitäten fix und fertig einbinden, ohne das
-      Rad neu erfinden zu müssen.<important>
-          <para>Es ist völlig egal, ob Sie die entsprechenden Gems schon auf
-          Ihrem System installiert haben oder nicht. Sie müssen
-          <emphasis>immer</emphasis> <command>bundle install</command> in
-          Ihrem jeweiligen Rails-Projekt ausführen! Am besten direkt ins Hirn
-          brennen: Nach <command>rails new
-          <replaceable>projectname</replaceable></command> kommt immer
-          <command>cd <replaceable>projectname</replaceable> &amp;&amp; bundle
-          install</command>!</para>
-        </important><screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>cd testproject</command>
-stefan@swmbp 0 1.9.2-p0 testproject$ <command>bundle install</command>
-Fetching source index for http://rubygems.org/
-Using rake (0.8.7) 
-Using abstract (1.0.0) 
-Using activesupport (3.0.0) 
-Using builder (2.1.2) 
-Using i18n (0.4.1) 
-Using activemodel (3.0.0) 
-Using erubis (2.6.6) 
-Using rack (1.2.1) 
-Installing rack-mount (0.6.13) 
-Using rack-test (0.5.4) 
-Using tzinfo (0.3.23) 
-Using actionpack (3.0.0) 
-Using mime-types (1.16) 
-Using polyglot (0.3.1) 
-Using treetop (1.4.8) 
-Using mail (2.2.5) 
-Using actionmailer (3.0.0) 
-Using arel (1.0.1) 
-Using activerecord (3.0.0) 
-Using activeresource (3.0.0) 
-Using bundler (1.0.0) 
-Using thor (0.14.0) 
-Using railties (3.0.0) 
-Using rails (3.0.0) 
-Using sqlite3-ruby (1.3.1) 
-Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
-
-Your bundle was installed to `/Users/stefan/.rvm/gems/ruby-1.9.2-p0`
-stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
+      Rad neu erfinden zu müssen.</para>
 
       <para><indexterm>
           <primary>Webrick</primary>
@@ -363,19 +267,18 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
           Firewall-Einstellung – ein Fenster, das Sie fragt, ob die Firewall
           die entsprechende Verbindung erlauben soll. Da wir lokal arbeiten,
           können Sie das ruhigen Gewissens bejahen.</para>
-        </note><screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rails server</command>
+        </note><screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd testproject</command> 
+Stefan-Wintermeyers-MacBook-Air:testproject xyz$ <command>rails server</command>
 =&gt; Booting WEBrick
-=&gt; Rails 3.0.0 application starting in development on http://0.0.0.0:3000
+=&gt; Rails 3.2.3 application starting in development on http://0.0.0.0:3000
 =&gt; Call with -d to detach
 =&gt; Ctrl-C to shutdown server
-[2010-09-01 09:39:58] INFO  WEBrick 1.3.1
-[2010-09-01 09:39:58] INFO  ruby 1.9.2 (2010-08-18) [x86_64-darwin10.4.0]
-[2010-09-01 09:39:58] INFO  WEBrick::HTTPServer#start: pid=40688 port=3000
-
-</screen></para>
+[2012-04-24 09:52:21] INFO  WEBrick 1.3.1
+[2012-04-24 09:52:21] INFO  ruby 1.9.3 (2012-04-20) [x86_64-darwin11.3.0]
+[2012-04-24 09:52:21] INFO  WEBrick::HTTPServer#start: pid=57749 port=3000</screen></para>
 
       <para>Der Start der Rails-Applikation sieht gut aus. Er sagt
-      uns:<screen>=&gt; Rails 3.0.0 application starting in development on http://0.0.0.0:3000</screen></para>
+      uns:<screen>=&gt; Rails 3.2.3 application starting in development on http://0.0.0.0:3000</screen></para>
 
       <para>Dann rufen wir doch mal genau diese URL (<uri
       xlink:href="http://0.0.0.0:3000">http://0.0.0.0:3000</uri>) im
@@ -417,15 +320,10 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
         </screenshot></para>
 
       <para>Gleichzeitig wird im Log des Web-Servers Folgendes
-      angezeigt:<screen>Started GET "/rails/info/properties" for 127.0.0.1 at 2010-09-01 09:44:41 +0200
-  Processing by Rails::InfoController#properties as */*
-  SQL (0.3ms)   SELECT name
- FROM sqlite_master
- WHERE type = 'table' AND NOT name = 'sqlite_sequence'
-
-Rendered inline template (0.4ms)
-Completed 200 OK in 60ms (Views: 1.2ms | ActiveRecord: 0.3ms)
-</screen></para>
+      angezeigt:<screen>Started GET "/rails/info/properties" for 127.0.0.1 at 2012-04-24 09:59:53 +0200
+Processing by Rails::InfoController#properties as */*
+  Rendered inline template (2.5ms)
+Completed 200 OK in 37ms (Views: 36.9ms | ActiveRecord: 0.0ms)</screen></para>
 
       <para>Da beim Aufruf der ersten Startseite kein entsprechender Eintrag
       erschien, muss es sich um zwei verschiedenartige Seiten handeln. Die
@@ -456,11 +354,13 @@ Completed 200 OK in 60ms (Views: 1.2ms | ActiveRecord: 0.3ms)
       </indexterm>
 
       <para>Wie eben gesehen, gibt es bestimmte statische Seiten, Bilder und
-      JavaScript-Dateien, die von Rails automatisch und per Default sogar ohne
-      Logging ausgeliefert werden. Erinnern wir uns noch mal an eine
-      Teilausgabe vom Befehl <command>rails new testproject</command>:
-      <screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new testproject</command>
-      <replaceable>[...]</replaceable>
+      JavaScript-Dateien, die von Rails automatisch ausgeliefert werden.
+      Erinnern wir uns noch mal an eine Teilausgabe vom Befehl <command>rails
+      new testproject</command>: <screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new testproject</command>
+      create  
+
+      [...]
+
       create  public
       create  public/404.html
       create  public/422.html
@@ -468,18 +368,8 @@ Completed 200 OK in 60ms (Views: 1.2ms | ActiveRecord: 0.3ms)
       create  public/favicon.ico
       create  public/index.html
       create  public/robots.txt
-      create  public/images
-      create  public/images/rails.png
-      create  public/stylesheets
-      create  public/stylesheets/.gitkeep
-      create  public/javascripts
-      create  public/javascripts/application.js
-      create  public/javascripts/controls.js
-      create  public/javascripts/dragdrop.js
-      create  public/javascripts/effects.js
-      create  public/javascripts/prototype.js
-      create  public/javascripts/rails.js
-      <replaceable>[...]</replaceable>
+
+      [...]
 </screen></para>
 
       <para>Der Verzeichnisname <filename>public</filename> und die darin
@@ -507,16 +397,14 @@ Completed 200 OK in 60ms (Views: 1.2ms | ActiveRecord: 0.3ms)
         für viel mehr reicht mein HTML-Wissen auch nicht ;-).</para>
       </note>
 
-      <para>Jetzt noch den Rails-Web-Server starten:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rails server</command>
+      <para>Jetzt noch den Rails-Web-Server starten:<screen>Stefan-Wintermeyers-MacBook-Air:testproject xyz$ <command>rails server</command>
 =&gt; Booting WEBrick
-=&gt; Rails 3.0.0 application starting in development on http://0.0.0.0:3000
+=&gt; Rails 3.2.3 application starting in development on http://0.0.0.0:3000
 =&gt; Call with -d to detach
 =&gt; Ctrl-C to shutdown server
-[2010-09-01 09:49:58] INFO  WEBrick 1.3.1
-[2010-09-01 09:49:58] INFO  ruby 1.9.2 (2010-08-18) [x86_64-darwin10.4.0]
-[2010-09-01 09:49:58] INFO  WEBrick::HTTPServer#start: pid=40688 port=3000
-
-</screen></para>
+[2012-04-24 10:04:59] INFO  WEBrick 1.3.1
+[2012-04-24 10:04:59] INFO  ruby 1.9.3 (2012-04-20) [x86_64-darwin11.3.0]
+[2012-04-24 10:04:59] INFO  WEBrick::HTTPServer#start: pid=57880 port=3000</screen></para>
 
       <para>Diese Webseite können wir uns unter der URL <uri
       xlink:href="http://0.0.0.0:3000/hello-world">http://0.0.0.0:3000/hello-world</uri>
@@ -544,38 +432,19 @@ Completed 200 OK in 60ms (Views: 1.2ms | ActiveRecord: 0.3ms)
       sparen.</para>
 
       <para>So, jetzt wissen Sie bereits, wie man gänzlich statische Seiten in
-      Rails integrieren kann. Das ist manchmal für Seiten praktisch, die sich
-      nie ändern. Natürlich gilt dies für jegliche Art von Datei. Typische
-      Beispiele sind die <indexterm>
-          <primary>Favicon</primary>
-        </indexterm>Favicon-Datei (normalerweise
-      <filename>favicon.ico</filename>) <footnote>
-          <para>weitere Informationen zu Favicons: <uri
-          xlink:href="http://de.wikipedia.org/wiki/Favicon">http://de.wikipedia.org/wiki/Favicon</uri></para>
-        </footnote> und die Datei <indexterm>
-          <primary>robots.txt</primary>
-        </indexterm><filename>robots.txt</filename> <footnote>
-          <para>weitere Informationen zur Datei
-          <filename>robots.txt</filename>: <uri
-          xlink:href="http://de.wikipedia.org/wiki/Robots_Exclusion_Standard">http://de.wikipedia.org/wiki/Robots_Exclusion_Standard</uri></para>
-        </footnote>. Beide legt man einfach in das Verzeichnis
-      <filename>public/</filename>.</para>
+      Rails integrieren kann. Das ist für Seiten praktisch, die sich nie
+      ändern und die auch dann funktionieren sollen, wenn Rails gerade z.B.
+      wegen eines Updates nicht läuft. Im Produktivbetrieb wird meistens vor
+      dem Rails-Server noch ein klassischer Webserver wie Apache oder Nginx
+      geschaltet. Dieser ist dann in der Lage statische Dateien aus dem
+      <filename>public</filename> Verzeichnis selbstständig
+      auszuliefern.</para>
 
-      <para><qandaset>
-          <qandadiv>
-            <qandaentry>
-              <question>
-                <para>Wo speichern Sie Ihr Firmenlogo (z. B.
-                <filename>logo.png</filename>)?</para>
-              </question>
+      <para>Mit <keycombo>
+          <keycap function="control">Ctrl</keycap>
 
-              <answer>
-                <para>Natürlich im <filename>public/</filename>-Verzeichnis,
-                denn es ist eine statische Datei.</para>
-              </answer>
-            </qandaentry>
-          </qandadiv>
-        </qandaset></para>
+          <keycap>C</keycap>
+        </keycombo> können Sie den Rails-Server wieder stoppen.</para>
     </section>
   </section>
 
@@ -626,16 +495,20 @@ Completed 200 OK in 60ms (Views: 1.2ms | ActiveRecord: 0.3ms)
         <primary>Controller</primary>
       </indexterm>Controller. Den können wir mit dem Befehl <command>rails
     generate controller</command> anlegen. Schauen wir uns mal die Hilfe
-    an:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rails generate controller</command>
+    an:<screen>Stefan-Wintermeyers-MacBook-Air:testproject xyz$ <command>rails generate controller</command>
 Usage:
   rails generate controller NAME [action action] [options]
 
 Options:
+      [--skip-namespace]        # Skip namespace (affects only isolated applications)
+      [--old-style-hash]        # Force using old style hash (:foo =&gt; 'bar') on Ruby &gt;= 1.9
   -e, [--template-engine=NAME]  # Template engine to be invoked
                                 # Default: erb
   -t, [--test-framework=NAME]   # Test framework to be invoked
                                 # Default: test_unit
       [--helper]                # Indicates when to generate helper
+                                # Default: true
+      [--assets]                # Indicates when to generate assets
                                 # Default: true
 
 Runtime options:
@@ -662,15 +535,14 @@ Example:
         Functional Test: test/functional/credit_card_controller_test.rb
         Views:           app/views/credit_card/debit.html.erb [...]
         Helper:          app/helpers/credit_card_helper.rb
-
-stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
+Stefan-Wintermeyers-MacBook-Air:testproject xyz$</screen></para>
 
     <para>Aha! Unten ist freundlicherweise direkt ein Beispiel
     angegeben:<programlisting>rails generate controller CreditCard open debit credit close</programlisting>Passt
     aber nicht direkt für unseren Fall.</para>
 
     <para>Ich bin mutig und schlage vor, dass wir einfach Folgendes
-    ausprobieren:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rails generate controller Example test</command>
+    ausprobieren:<screen>Stefan-Wintermeyers-MacBook-Air:testproject xyz$ <command>rails generate controller Example test</command>
       create  app/controllers/example_controller.rb
        route  get "example/test"
       invoke  erb
@@ -682,26 +554,31 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
       create    app/helpers/example_helper.rb
       invoke    test_unit
       create      test/unit/helpers/example_helper_test.rb
-
-stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
+      invoke  assets
+      invoke    coffee
+      create      app/assets/javascripts/example.js.coffee
+      invoke    scss
+      create      app/assets/stylesheets/example.css.scss
+Stefan-Wintermeyers-MacBook-Air:testproject xyz$</screen></para>
 
     <para>Puhhh …, da wird ja direkt 'ne ganze Menge erstellt. Unter anderem
     eine Datei <filename>app/views/example/test.html.erb</filename>. Schauen
-    wir uns diese nachfolgend an:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>cat app/views/example/test.html.erb </command>
-</screen><programlisting>&lt;h1&gt;Example#test&lt;/h1&gt;
-&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt;</programlisting></para>
+    wir uns diese nachfolgend an:<screen>Stefan-Wintermeyers-MacBook-Air:testproject xyz$ <command>cat app/views/example/test.html.erb</command> 
+&lt;h1&gt;Example#test&lt;/h1&gt;
+&lt;p&gt;Find me in app/views/example/test.html.erb&lt;/p&gt;
+Stefan-Wintermeyers-MacBook-Air:testproject xyz$</screen></para>
 
-    <para>Ist also auch HTML. Da <quote>fehlt</quote> anscheinend oben und
-    unten etwas, aber prinzipiell sieht das stark nach HTML aus. Zum Testen
-    starten wir den Web-Server<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rails server</command>
+    <para>Ist HTML, aber für eine valide HTML-Seite <quote>fehlt</quote> oben
+    und unten etwas (der fehlende HTML-"Rest" wird in <xref
+    linkend="erb_layouts" /> erklärt). Zum Testen starten wir den
+    Web-Server<screen>Stefan-Wintermeyers-MacBook-Air:testproject xyz$ <command>rails server</command>
 =&gt; Booting WEBrick
-=&gt; Rails 3.0.0 application starting in development on http://0.0.0.0:3000
+=&gt; Rails 3.2.3 application starting in development on http://0.0.0.0:3000
 =&gt; Call with -d to detach
 =&gt; Ctrl-C to shutdown server
-[2010-09-01 10:30:50] INFO  WEBrick 1.3.1
-[2010-09-01 10:30:50] INFO  ruby 1.9.2 (2010-08-18) [x86_64-darwin10.4.0]
-[2010-09-01 10:30:50] INFO  WEBrick::HTTPServer#start: pid=40964 port=3000
-</screen></para>
+[2012-04-24 10:13:48] INFO  WEBrick 1.3.1
+[2012-04-24 10:13:48] INFO  ruby 1.9.3 (2012-04-20) [x86_64-darwin11.3.0]
+[2012-04-24 10:13:48] INFO  WEBrick::HTTPServer#start: pid=57898 port=3000</screen></para>
 
     <para>und schauen uns die Webseite unter der URL <uri
     xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
@@ -720,40 +597,46 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
     <para>Im <indexterm>
         <primary>Log</primary>
       </indexterm>Log <filename>log/development.log</filename> finden wir den
-    folgenden Eintrag:<programlisting>Started GET "/example/test" for 127.0.0.1 at 2010-09-01 10:31:24 +0200
-  Processing by ExampleController#test as HTML
-Rendered example/test.html.erb within layouts/application (2.1ms)
-Completed 200 OK in 21ms (Views: 20.7ms | ActiveRecord: 0.0ms)
-</programlisting></para>
+    folgenden Eintrag:<programlisting>Started GET "/example/test" for 127.0.0.1 at 2012-04-24 10:14:18 +0200
+Processing by ExampleController#test as HTML
+  Rendered example/test.html.erb within layouts/application (1.9ms)
+Compiled example.css  (9ms)  (pid 57898)
+Compiled application.css  (18ms)  (pid 57898)
+Compiled jquery.js  (4ms)  (pid 57898)
+Compiled jquery_ujs.js  (0ms)  (pid 57898)
+Compiled example.js  (160ms)  (pid 57898)
+Compiled application.js  (198ms)  (pid 57898)
+Completed 200 OK in 305ms (Views: 304.2ms | ActiveRecord: 0.0ms)</programlisting></para>
 
     <para>Das ist fast schon verständlich geschrieben. Es kam also vom
     <literal>localhost</literal> (127.0.0.1) ein HTTP-GET-Request für die URI
     <quote><literal>/example/test</literal></quote> rein. Die wurde dann
     anscheinend vom Controller <code>ExampleController</code> mit der Methode
-    <methodname>test</methodname> als HTML gerendert. Das Ganze hat hier
-    ungefähr 21 ms gedauert.</para>
+    <methodname>test</methodname> als HTML gerendert. Zusätzlich wurde noch
+    ein Satz von CSS und JavaScript Dateien kompiliert (darauf gehen wir
+    später im Buch ein). Das Ganze hat hier ungefähr 305 ms gedauert.</para>
 
     <para>Jetzt müssen wir nur noch den Controller finden. Aber Sie haben
     Glück … ich weiß es nämlich. ;-) Alle Controller befinden sich im
     Verzeichnis <filename>app/controllers</filename>, und siehe da, dort ist
     auch tatsächlich die entsprechende Datei
-    <filename>app/controllers/example_controller.rb</filename>. Schauen wir
-    mal rein:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>ls -l app/controllers/</command>
+    <filename>app/controllers/example_controller.rb</filename><screen>Stefan-Wintermeyers-MacBook-Air:testproject xyz$ <command>ls -l app/controllers/</command>
 total 16
--rw-r--r--  1 stefan  staff  80  1 Sep 09:29 application_controller.rb
--rw-r--r--  1 stefan  staff  70  1 Sep 10:29 example_controller.rb
-stefan@swmbp 0 1.9.2-p0 testproject$ <command>cat app/controllers/example_controller.rb</command> 
-</screen><programlisting>class ExampleController &lt; ApplicationController
+-rw-r--r--  1 xyz  staff  80 Apr 24 09:43 application_controller.rb
+-rw-r--r--  1 xyz  staff  69 Apr 24 10:11 example_controller.rb
+Stefan-Wintermeyers-MacBook-Air:testproject xyz$</screen></para>
+
+    <para>Öffnen Sie die Datei bitte mit Ihrem
+    Lieblingseditor:<programlisting>class ExampleController &lt; ApplicationController
   def test
   end
-
 end</programlisting></para>
 
-    <para>Das ist jetzt sehr übersichtlich. Der Controller
+    <para>Das ist sehr übersichtlich. Der Controller
     <code>ExampleController</code> stammt vom
     <code>ApplicationController</code> ab und enthält aktuell genau eine
-    Methode namens <methodname>test</methodname>. Und diese Methode macht
-    nichts.</para>
+    Methode namens <methodname>test</methodname>. Und diese Methode hat keinen
+    Inhalt.</para>
 
     <para><indexterm>
         <primary>Routing</primary>
@@ -768,21 +651,22 @@ end</programlisting></para>
     sondern durch eine einfache <foreignphrase
     xml:lang="en">Routing</foreignphrase>-Konfiguration gesteuert. Diese
     finden Sie in der Datei <filename>config/routes.rb</filename> in der
-    zweiten Zeile:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>cat config/routes.rb | grep example</command>
-</screen><programlisting>  get "example/test"</programlisting></para>
+    zweiten Zeile:<screen>Stefan-Wintermeyers-MacBook-Air:testproject xyz$ <command>cat config/routes.rb | grep example</command>
+  get "example/test"
+Stefan-Wintermeyers-MacBook-Air:testproject xyz$ </screen></para>
 
     <para>Diese Zeile wurde vom Befehl <command>rails generate
     controller</command> automatisch eingefügt. In der Routing-Datei können
     Sie auch beliebiges <foreignphrase xml:lang="en">Mapping</foreignphrase>
     vornehmen. Aber dazu später mehr. Aktuell sehen unsere Routen sehr einfach
     aus. Mit dem Befehl <command>rake routes</command> können wir diese
-    abfragen:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rake routes</command>
-(in /Users/stefan/testproject)
-example_test GET /example/test(.:format) {:controller=&gt;"example", :action=&gt;"test"}
-stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
+    abfragen:<screen>Stefan-Wintermeyers-MacBook-Air:testproject xyz$ <command>rake routes</command>
+example_test GET /example/test(.:format) example#test
+Stefan-Wintermeyers-MacBook-Air:testproject xyz$</screen></para>
 
-    <para>Wir kümmern uns später noch genauer um die Routen. Ich wollte es an
-    dieser Stelle nur nicht gänzlich überspringen.</para>
+    <para>Wir kümmern uns später noch genauer um die Routen (<xref
+    linkend="routes" />). Ich wollte es an dieser Stelle nur nicht gänzlich
+    überspringen.</para>
 
     <important>
       <para>Eine statische Datei im Verzeichnis <filename>public</filename>
@@ -804,11 +688,11 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
       Inhalt bekommen.</para>
 
       <para>Fangen wir mit etwas ganz Einfachem an: der Addition von 1 und 1.
-      Als Erstes probieren wir den Code im <literal>irb</literal> aus:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>irb</command>
-ruby-1.9.2-p0 &gt; <command>1 + 1</command>
+      Als Erstes probieren wir den Code im <literal>irb</literal> aus:<screen>Stefan-Wintermeyers-MacBook-Air:testproject xyz$ <command>irb</command>
+1.9.3p194 :001 &gt; <command>1 + 1</command>
  =&gt; 2 
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:testproject xyz$</screen></para>
 
       <para>Das war einfach. Die <literal>erb</literal>-Datei
       <filename>app/views/example/test.html.erb</filename> füllen wir wie
@@ -838,13 +722,13 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
       <para>Jetzt werden Sie sich vielleicht fragen: Wie kann denn das
       Ergebnis einer Addition von zwei Fixnums als Text angezeigt werden?
       Schauen wir erst mal im <literal>irb</literal> nach, ob es wirklich ein
-      Fixnum ist:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>irb</command>
-ruby-1.9.2-p0 &gt; <command>1.class</command>
+      Fixnum ist:<screen>Stefan-Wintermeyers-MacBook-Air:testproject xyz$ <command>irb</command>
+1.9.3p194 :001 &gt; <command>1.class</command>
  =&gt; Fixnum 
-ruby-1.9.2-p0 &gt; <command>(1 + 1).class</command>
+1.9.3p194 :002 &gt; <command>(1 + 1).class</command>
  =&gt; Fixnum 
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:testproject xyz$</screen></para>
 
       <para>Ja, sowohl die Zahl 1 also auch das Ergebnis von 1 + 1 ist ein
       Fixnum. Was ist passiert? Rails ist so intelligent, alle Objekte in
@@ -854,14 +738,19 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
       <filename>test.html.erb</filename>), die nicht bereits ein String sind,
       automatisch mit der Methode <indexterm>
           <primary>to_s()</primary>
-        </indexterm><methodname>.to_s</methodname> aufzurufen. Noch mal kurz
-      ins <literal>irb</literal>:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>irb</command>
-ruby-1.9.2-p0 &gt; <command>(1 + 1).class</command>
+        </indexterm><methodname>.to_s</methodname> aufzurufen, welche per
+      Konvention immer den Inhalt des Objektes in einen String konvertiert.
+      Noch mal kurz ins <literal>irb</literal>:<screen>Stefan-Wintermeyers-MacBook-Air:testproject xyz$ <command>irb</command>
+1.9.3p194 :001 &gt; <command>(1 + 1)</command>
+ =&gt; 2 
+1.9.3p194 :002 &gt; <command>(1 + 1).class</command>
  =&gt; Fixnum 
-ruby-1.9.2-p0 &gt; <command>(1 + 1).to_s.class</command>
+1.9.3p194 :003 &gt; <command>(1 + 1).to_s</command>
+ =&gt; "2" 
+1.9.3p194 :004 &gt; <command>(1 + 1).to_s.class</command>
  =&gt; String 
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
+1.9.3p194 :005 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:testproject xyz$</screen></para>
 
       <para>Das mit dem Ruby-Code schauen wir uns jetzt genauer an. In einer
       <filename>.html.erb</filename>-Datei gibt es zusätzlich zu den
@@ -880,9 +769,9 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
             <replaceable>…</replaceable> %&gt;</code></emphasis></para>
 
             <para>Führt den enthaltenen Ruby-Code aus und gibt das Ergebnis
-            als Text aus. Dabei werden seit Rails 3.0 automatisch
-            problematische Zeichen <quote>escapt</quote>. Falls Sie einmal
-            nicht escapten Text ausgeben möchten, so müssen Sie das mit
+            als Text aus. Dabei werden seit Rails 3.0 automatisch bestimmte
+            Zeichen <quote>escapt</quote>. Falls Sie einmal nicht escapten
+            Text ausgeben möchten, so müssen Sie das mit
             <code>raw(string)</code> realisieren.</para>
 
             <para>Sofern also ein Objekt eine Methode
@@ -913,22 +802,21 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
         </screenshot></para>
 
       <para>Schauen wir uns nachfolgend den HTML-Source-Code (-Quelltext) im
-      Browser an:<programlisting>&lt;!DOCTYPE html&gt; 
-&lt;html&gt; 
-&lt;head&gt; 
-  &lt;title&gt;Testproject&lt;/title&gt; 
-  
-  &lt;script src="/javascripts/prototype.js?1283326173" type="text/javascript"&gt;&lt;/script&gt; 
-&lt;script src="/javascripts/effects.js?1283326173" type="text/javascript"&gt;&lt;/script&gt; 
-&lt;script src="/javascripts/dragdrop.js?1283326173" type="text/javascript"&gt;&lt;/script&gt; 
-&lt;script src="/javascripts/controls.js?1283326173" type="text/javascript"&gt;&lt;/script&gt; 
-&lt;script src="/javascripts/rails.js?1283326173" type="text/javascript"&gt;&lt;/script&gt; 
-&lt;script src="/javascripts/application.js?1283326173" type="text/javascript"&gt;&lt;/script&gt; 
-  &lt;meta name="csrf-param" content="authenticity_token"/&gt; 
-&lt;meta name="csrf-token" content="7vy1+iQpYWFUhvXS2UHPXZOFjkpePZj/gBOkUASWoyY="/&gt; 
-&lt;/head&gt; 
-&lt;body&gt; 
- 
+      Browser an:<programlisting>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Testproject&lt;/title&gt;
+  &lt;link href="/assets/application.css?body=1" media="all" rel="stylesheet" type="text/css" /&gt;
+&lt;link href="/assets/example.css?body=1" media="all" rel="stylesheet" type="text/css" /&gt;
+  &lt;script src="/assets/jquery.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/assets/jquery_ujs.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/assets/example.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/assets/application.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+  &lt;meta content="authenticity_token" name="csrf-param" /&gt;
+&lt;meta content="TDIallkBmGrMzsL6TC8Chet4r/X1yLK0tthFmIig4+E=" name="csrf-token" /&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
 &lt;p&gt;Schleife von 0 bis 5:
 0, 
 1, 
@@ -936,10 +824,10 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 3, 
 4, 
 5, 
-&lt;/p&gt; 
- 
- 
-&lt;/body&gt; 
+&lt;/p&gt;
+
+
+&lt;/body&gt;
 &lt;/html&gt;</programlisting></para>
 
       <para>Alles klar? Es gibt zwei mögliche offene Fragen:<qandaset>
@@ -1001,21 +889,22 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
       <filename>app/views/example/</filename> bildet nur den Kern der späteren
       HTML-Seite. Per Default wird immer eine automatisch generierte
       <filename>app/views/layouts/application.html.erb</filename> drum herum
-      gerendert. Schauen wir uns die mal an:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>cat app/views/layouts/application.html.erb</command>
-</screen><programlisting>&lt;!DOCTYPE html&gt;
+      gerendert. Schauen wir uns die mal an:<screen>Stefan-Wintermeyers-MacBook-Air:testproject xyz$ <command>cat app/views/layouts/application.html.erb</command> 
+&lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
   &lt;title&gt;Testproject&lt;/title&gt;
-  &lt;%= stylesheet_link_tag :all %&gt;
-  &lt;%= javascript_include_tag :defaults %&gt;
-  &lt;%= csrf_meta_tag %&gt;
+  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
+  &lt;%= javascript_include_tag "application" %&gt;
+  &lt;%= csrf_meta_tags %&gt;
 &lt;/head&gt;
 &lt;body&gt;
 
 &lt;%= yield %&gt;
 
 &lt;/body&gt;
-&lt;/html&gt;</programlisting></para>
+&lt;/html&gt;
+Stefan-Wintermeyers-MacBook-Air:testproject xyz$</screen></para>
 
       <para><indexterm>
           <primary>yield()</primary>
@@ -1024,17 +913,38 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
 
       <para>Mit <code>&lt;%= yield %&gt;</code> wird hier die View-Datei
       inkludiert. Die drei Zeilen mit den Stylesheets und dem JavaScript
-      lassen wir erst mal so, wie sie sind. Darum kümmern wir uns
-      später.</para>
+      lassen wir erst mal so, wie sie sind. Damit werden default CSS und
+      JavaScript Dateien eingebaut.</para>
 
       <para>Die Datei
       <filename>app/views/layouts/application.html.erb</filename> bietet Ihnen
-      die Möglichkeit, das Grund-Layout über die gesamte Rails-Applikation
-      festzulegen. Sie können aber auch im Verzeichnis
+      die Möglichkeit, das Grund-Layout für die gesamte Rails-Applikation
+      festzulegen. Wenn Sie als Header für jede Seite ein
+      <code>&lt;hr&gt;</code> und darüber einen Text eintragen wollen, dann
+      können Sie das zwischen dem <code>&lt;%= yield %&gt;</code> und dem
+      <code>&lt;body&gt;</code> Tag machen:<programlisting>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Testproject&lt;/title&gt;
+  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
+  &lt;%= javascript_include_tag "application" %&gt;
+  &lt;%= csrf_meta_tags %&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+<emphasis>&lt;p&gt;</emphasis>Ein Test.&lt;/p&gt;
+&lt;hr&gt;
+
+&lt;%= yield %&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+Stefan-Wintermeyers-MacBook-Air:testproject xyz$</programlisting></para>
+
+      <para>Sie können aber auch im Verzeichnis
       <filename>app/views/layouts/</filename> noch andere Layouts anlegen und
-      diese je nach Situation anwenden. Ich bin hin- und hergerissen, dieses
-      Thema jetzt zu vertiefen, aber lassen wir das erst mal. Wichtig ist,
-      dass Sie die Grundidee verstehen.</para>
+      diese je nach Situation anwenden, aber lassen wir das erst mal. Wichtig
+      ist, dass Sie die Grundidee verstehen.</para>
     </section>
 
     <section xml:id="erb_mit_programmierlogik">
@@ -1073,13 +983,13 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
       das mal gedanklich weiter: Wenn ich im Controller einen Wert habe, den
       ich im View anzeigen will, so benötige ich dafür einen Mechanismus.
       Dieser heißt Instanz-Variable (<foreignphrase xml:lang="en">instance
-      variable</foreignphrase>). Wer sich nicht mehr 100 % sicher ist, welche
-      Variable welchen Geltungsbereich (<indexterm>
+      variable</foreignphrase>) und fängt immer mit einem <code>@</code> an.
+      Wer sich nicht mehr 100 % sicher ist, welche Variable welchen
+      Geltungsbereich (<indexterm>
           <primary>Scope</primary>
         </indexterm><foreignphrase xml:lang="en">Scope</foreignphrase>) hat,
       der sollte ganz fix noch mal einen Blick in <xref
-      linkend="scope_von_variablen" /> werfen (geht schnell und lohnt
-      sich).</para>
+      linkend="scope_von_variablen" /> werfen.</para>
 
       <para>Im folgenden Beispiel fügen wir im Controller eine
       Instance-Variable für die aktuelle Uhrzeit ein und fügen diese dann im
@@ -1107,15 +1017,15 @@ Die aktuelle Uhrzeit ist
       <para>Wir haben jetzt eine klare Trennung von Programmierlogik und
       Darstellungslogik mit dem Controller und dem View. So können wir im
       Controller die Uhrzeit je nach Zeitzone des Anwenders automatisch
-      anpassen, ohne dass sich der Designer der Seite darum kümmern
-      muss.</para>
+      anpassen, ohne dass sich der Designer der Seite darum kümmern muss. Wie
+      immer wird im View automatisch die Methode <methodname>to_s</methodname>
+      angewendet.</para>
 
       <para>Mir ist klar, dass jetzt keiner aufspringen und schreien wird:
       <quote>Danke für die Erleuchtung! Ich werde nur noch sauber nach MVC
       programmieren.</quote> Das obige Beispiel ist der erste kleine Schritt
-      in die Richtung und zeigt, wie wir einfach mit Instance-Variablen (das
-      sind die mit dem <code>@</code>-Zeichen davor) Werte aus dem Controller
-      in den View bringen können.</para>
+      in die Richtung und zeigt, wie wir einfach mit Instance-Variablen Werte
+      aus dem Controller in den View bringen können.</para>
     </section>
 
     <section xml:id="partials">
@@ -1152,8 +1062,8 @@ Die aktuelle Uhrzeit ist
         Stückchen oder Vorlagen-Schnipsel.</para>
       </note>
 
-      <para>Als Beispiel fügen wir unserer Seite jetzt einen Mini-Footer
-      hinzu. Dafür schreiben wir in die neue Datei
+      <para>Als Beispiel fügen wir unserer Seite jetzt einen Mini-Footer in
+      einem eigenen Partial hinzu. Dafür schreiben wir in die neue Datei
       <filename>app/views/example/_footer.html.erb</filename> den folgenden
       Inhalt:<programlisting>&lt;hr /&gt;
 &lt;p&gt;
@@ -1173,11 +1083,11 @@ Copyright 2009 - &lt;%= Date.today.year %&gt; beim Osterhasen
 <emphasis>&lt;%= render "footer" %&gt;</emphasis></programlisting></para>
 
       <para>Es sind also jetzt folgende Dateien im Verzeichnis
-      <filename>app/views/example</filename>:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>ls -l app/views/example</command>
-total 16
--rw-r--r--  1 stefan  staff   63  1 Sep 20:12 _footer.html.erb
--rw-r--r--  1 stefan  staff  105  1 Sep 20:14 test.html.erb
-stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
+      <filename>app/views/example</filename>:<screen>Stefan-Wintermeyers-MacBook-Air:testproject xyz$ <command>ls -l app/views/example</command> 
+total 8
+-rw-r--r--  1 xyz  staff   0 Apr 24 11:03 _footer.html.erb
+-rw-r--r--  1 xyz  staff  81 Apr 24 10:33 test.html.erb
+Stefan-Wintermeyers-MacBook-Air:testproject xyz$</screen></para>
 
       <para>Die neue Webseite sieht nun so aus:<screenshot>
           <info>
@@ -1236,18 +1146,55 @@ stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
         role="bold">D</emphasis>on't <emphasis role="bold">R</emphasis>epeat
         <emphasis role="bold">Y</emphasis>ourself</foreignphrase>)-Gedanken
         sehr gut. Aber was sie erst richtig praktisch macht, ist die
-        Möglichkeit, Variablen zu übergeben. Erweitern wir einmal die Datei
-        <filename>app/views/example/_footer.html.erb</filename> wie
-        folgt:<programlisting>&lt;hr /&gt;
+        Möglichkeit, Variablen zu übergeben. Bleiben wir bei unserem
+        Copyright-Beispiel. Wenn wir das Startjahr als Wert übergeben möchten,
+        so können wir das mit folgender Erweiterung in der Datei
+        <filename>app/views/example/_footer.html.erb</filename>
+        einbauen:<programlisting>&lt;hr /&gt;
 &lt;p&gt;
-Copyright 2009 - &lt;%= Date.today.year %&gt; beim Osterhasen
-&lt;/p&gt;
-&lt;% if (defined? additional_info) != nil %&gt;
-&lt;p&gt;
-&lt;%= additional_info %&gt;
-&lt;/p&gt;
+Copyright <emphasis>&lt;%= start_year %&gt;</emphasis> - &lt;%= Date.today.year %&gt; beim Osterhasen
+&lt;/p&gt;</programlisting></para>
+
+        <para>Ändern wir dazu die
+        <filename>app/views/example/test.html.erb</filename> wie
+        folgt:<indexterm>
+            <primary>render()</primary>
+          </indexterm><programlisting>&lt;p&gt;Schleife von 0 bis 5:
+&lt;% (0..5).each do |i| %&gt;
+&lt;%= "#{i}, " %&gt;
 &lt;% end %&gt;
-</programlisting></para>
+&lt;/p&gt;
+
+&lt;%= render 'footer', :start_year =&gt; '2000' %&gt;</programlisting></para>
+
+        <para>Wenn wir jetzt die URL <uri
+        xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
+        aufrufen, so sehen wir die 2000:<screenshot>
+            <info>
+              <title>Partial mit local start_year</title>
+            </info>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/partial_start_year_2000.jpg"></imagedata>
+              </imageobject>
+            </mediaobject>
+          </screenshot></para>
+
+        <para>Manchmal braucht man ein Partial, das teilweise eine Local
+        Variable benutzt wird und an anderer Stelle braucht man das gleiche
+        Partial, aber ohne Local Variable. Das können wir im Partial selber
+        mit einer if-Abfrage abfangen:</para>
+
+        <para><programlisting>&lt;hr /&gt;
+&lt;p&gt;
+Copyright 
+&lt;% if defined? start_year %&gt;
+&lt;%= start_year %&gt;
+ - 
+&lt;% end %&gt;
+&lt;%= Date.today.year %&gt; beim Osterhasen
+&lt;/p&gt;</programlisting></para>
 
         <note>
           <para><indexterm>
@@ -1258,40 +1205,21 @@ Copyright 2009 - &lt;%= Date.today.year %&gt; beim Osterhasen
           überprüft, ob eine Expression definiert ist.</para>
         </note>
 
-        <para>Wenn wir jetzt die URL <uri
-        xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
-        aufrufen, so sehen wir die gleiche Seite wie vorhin. Das liegt daran,
-        dass <varname>additional_info</varname> nicht als lokale Variable
-        übergeben wurde. Ändern wir dazu die
-        <filename>app/views/example/test.html.erb</filename> wie
-        folgt:<indexterm>
-            <primary>render()</primary>
-          </indexterm><programlisting>&lt;p&gt;Schleife von 0 bis 5:
-&lt;% (0..5).each do |i| %&gt;
-&lt;%= "#{i}, " %&gt;
-&lt;% end %&gt;
-&lt;/p&gt;
-
-&lt;%= render :partial =&gt; 'footer', :locals =&gt; {:additional_info =&gt; "abcdef"} %&gt;
-</programlisting></para>
-
-        <para>Der Aufruf von <uri
-        xlink:href="http://0.0.0.0:3000/example/test">http://0.0.0.0:3000/example/test</uri>
-        erzeugt erwartungsgemäß folgende Seite:<screenshot>
-            <info>
-              <title>Partial mit Locals</title>
-            </info>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="screenshots/footer_partial_mit_locals.jpg"></imagedata>
-              </imageobject>
-            </mediaobject>
-          </screenshot></para>
+        <para>Diese Partial könnte man mit <code>&lt;%= render 'footer',
+        :start_year =&gt; '2000' %&gt;</code> und mit <code>&lt;%= render
+        'footer' %&gt;</code> aufrufen.</para>
 
         <para>Sie sehen ebenfalls, dass ich beim Einbinden eines einfaches
         Partials eine kürzere Schreibweise benutzen kann, als bei der Version
         mit <literal>locals</literal>.</para>
+      </section>
+
+      <section xml:id="partials_lange_schreibweise">
+        <title>Andere Schreibweise</title>
+
+        <para>In <xref linkend="partials_locale_variables" /> benutzen wir nur
+        die Kurzform, um Partials zu rendern. Oft sehen Sie auch diese
+        Langform:<programlisting>&lt;%= render :partial =&gt; "footer", :locals =&gt; { :start_year =&gt; '2000' } %&gt;</programlisting></para>
       </section>
 
       <section xml:id="weitere_doku_zu_partials">
