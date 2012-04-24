@@ -1274,7 +1274,7 @@ Copyright
 Using sqlite3 (1.3.6) 
 Using uglifier (1.2.4) 
 Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
-Stefan-Wintermeyers-MacBook-Air:~ xyz$ cd redirect_example 
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd redirect_example</command> 
 Stefan-Wintermeyers-MacBook-Air:redirect_example xyz$</screen></para>
 
     <para>Um zu springen, brauchen wir einen Controller mit mindestens zwei
@@ -1403,34 +1403,6 @@ Stefan-Wintermeyers-MacBook-Air:redirect_example xyz$</screen></para>
     später im jeweils konkreten Fall ein. Nur schon so viel vorweg: Man kann
     nicht nur auf eine andere Methode, sondern auch auf einen anderen
     Controller oder eine ganz andere Webseite redirecten.</para>
-
-    <section xml:id="warum-redirects">
-      <title>Warum Redirects?</title>
-
-      <indexterm>
-        <primary>Redirects</primary>
-      </indexterm>
-
-      <indexterm>
-        <primary>Routing</primary>
-      </indexterm>
-
-      <para>Beim obigen Beispiel fragt man sich natürlich, warum man denn im
-      Controller einen Redirect einbaut und nicht direkt die Routen ändert.
-      Das ist der Nachteil der Methode <quote>wir benutzen nur bisheriges
-      Wissen</quote>. Bereits in <xref linkend="scaffolding" /> werden Sie
-      verstehen, warum Redirects so praktisch sind. Sie können z. B. in einem
-      Controller überprüfen, ob bestimmte Eingabedaten valide sind oder nicht,
-      und wenn etwas fehlt, zur ursprünglichen Eingabeseite redirecten. Das
-      wäre mit einer statischen Route nicht lösbar.</para>
-
-      <para>Allerdings muss man beim Programmieren auch darauf achten, nicht
-      beliebig viele Redirects einzubauen. Wenn man tatsächlich mal in die
-      Versuchung kommen sollte, zwei oder mehr Redirects hintereinander zu
-      setzen (also in verschiedene Methoden), dann sollte man einen Schritt
-      zurückgehen und sich Gedanken über die Gesamtidee machen. Meist geht es
-      dann anders einfacher und sauberer.</para>
-    </section>
   </section>
 
   <section xml:id="flash">
@@ -1475,104 +1447,46 @@ Stefan-Wintermeyers-MacBook-Air:redirect_example xyz$</screen></para>
     </note>
 
     <para>Wir bauen als Beispiel noch mal das Ping-Pong-Szenario aus <xref
-    linkend="redirects" /> auf:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new pingpong</command>
-      create  
-      create  README
-      <replaceable>[...]</replaceable>
-      create  vendor/plugins/.gitkeep
+    linkend="redirects" /> auf:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new pingpong</command>
 
-stefan@swmbp 0 1.9.2-p0 ~$ <command>cd pingpong</command>
-stefan@swmbp 0 1.9.2-p0 pingpong$ <command>bundle install</command>
-Fetching source index for http://rubygems.org/
-Using rake (0.8.7) 
-<replaceable>[...]</replaceable>
-Your bundle was installed to `/Users/stefan/.rvm/gems/ruby-1.9.2-p0`
+      [...]
 
-stefan@swmbp 0 1.9.2-p0 pingpong$ <command>rails generate controller Game ping pong</command>
-      create  app/controllers/game_controller.rb
-      <replaceable>[...]</replaceable>
-      create      test/unit/helpers/game_helper_test.rb
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd pingpong</command> 
+Stefan-Wintermeyers-MacBook-Air:pingpong xyz$ <command>rails generate controller Game ping pong</command>
 
-stefan@swmbp 0 1.9.2-p0 pingpong$ </screen></para>
+      [...]
+
+Stefan-Wintermeyers-MacBook-Air:pingpong xyz$</screen></para>
 
     <para>Die <filename>app/controllers/game_controller.rb</filename> füllen
     wir mit folgendem Inhalt:<programlisting>class GameController &lt; ApplicationController
   def ping
-    <emphasis role="bold">redirect_to game_pong_path</emphasis>
+   <emphasis>redirect_to game_pong_path, :notice =&gt; 'Ping-Pong!'</emphasis>
   end
 
   def pong
   end
-
-end
-</programlisting></para>
-
-    <para>Jetzt starten wir den Rails-Web-Server und gehen per Browser auf
-    <uri
-    xlink:href="http://0.0.0.0:3000/game/pong">http://0.0.0.0:3000/game/pong</uri>
-    und auf <uri
-    xlink:href="http://0.0.0.0:3000/game/ping">http://0.0.0.0:3000/game/ping</uri>:<screen>stefan@swmbp 0 1.9.2-p0 pingpong$ <command>rails server</command>
-=&gt; Booting WEBrick
-=&gt; Rails 3.0.0 application starting in development on http://0.0.0.0:3000
-=&gt; Call with -d to detach
-=&gt; Ctrl-C to shutdown server
-[2010-09-02 14:30:31] INFO  WEBrick 1.3.1
-[2010-09-02 14:30:31] INFO  ruby 1.9.2 (2010-08-18) [x86_64-darwin10.4.0]
-[2010-09-02 14:30:31] INFO  WEBrick::HTTPServer#start: pid=49354 port=3000
-
-
-Started GET "/game/pong" for 127.0.0.1 at 2010-09-02 14:31:04 +0200
-  Processing by GameController#pong as HTML
-Rendered game/pong.html.erb within layouts/application (1.6ms)
-Completed 200 OK in 5ms (Views: 4.8ms | ActiveRecord: 0.0ms)
-
-
-Started GET "/game/ping" for 127.0.0.1 at 2010-09-02 14:31:08 +0200
-  Processing by GameController#ping as HTML
-Redirected to http://0.0.0.0:3000/game/pong
-Completed 302 Found in 1ms
-
-
-Started GET "/game/pong" for 127.0.0.1 at 2010-09-02 14:31:08 +0200
-  Processing by GameController#pong as HTML
-Rendered game/pong.html.erb within layouts/application (1.4ms)
-Completed 200 OK in 5ms (Views: 4.5ms | ActiveRecord: 0.0ms)
-</screen></para>
-
-    <para>Wie nicht anders zu erwarten war: Egal, welche der beiden URLs wir
-    aufrufen, am Ende wird immer <uri
-    xlink:href="http://0.0.0.0:3000/game/pong">http://0.0.0.0:3000/game/pong</uri>
-    angezeigt. Wäre es nicht schön, wenn wir beim Redirect von
-    <literal>ping</literal> auf <literal>pong</literal> dem Anwender eine
-    Nachricht anzeigen könnten? Jetzt raten Sie mal, wie so eine Nachricht bei
-    Rails genannt wird? Ja, genau! Eine Flash-Nachricht!</para>
-
-    <para>Bitte erweitern Sie die Datei
-    <filename>app/controllers/game_controller.rb</filename> wie
-    folgt:<programlisting>class GameController &lt; ApplicationController
-  def ping
-    <emphasis role="bold">redirect_to game_pong_path, :notice =&gt; 'Ich wurde von Ping redirected.'</emphasis>
-  end
-
-  def pong
-  end
-
 end</programlisting></para>
 
-    <para>Und in der
-    <filename>app/views/layouts/application.html.erb</filename> müssen wir
-    auch noch eine Kleinigkeit einbauen:<programlisting>&lt;!DOCTYPE html&gt;
+    <para>Jetzt starten wir den Rails-Web-Server mit <command>rails
+    server</command> und gehen per Browser auf <uri
+    xlink:href="http://0.0.0.0:3000/game/ping">http://0.0.0.0:3000/game/ping</uri>.
+    Wir werden von <methodname>ping</methodname> auf
+    <methodname>pong</methodname> umgeleitet. Von der Flash-Nachricht
+    "Ping-Pong!" ist aber nichts zu sehen. Dazu müssen wir
+    <filename>app/views/layouts/application.html.erb</filename>
+    erweitern:<programlisting>&lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
   &lt;title&gt;Pingpong&lt;/title&gt;
-  &lt;%= stylesheet_link_tag :all %&gt;
-  &lt;%= javascript_include_tag :defaults %&gt;
-  &lt;%= csrf_meta_tag %&gt;
+  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
+  &lt;%= javascript_include_tag "application" %&gt;
+  &lt;%= csrf_meta_tags %&gt;
 &lt;/head&gt;
 &lt;body&gt;
 
-<emphasis role="bold">&lt;% if (defined? notice) != nil and ! notice.blank? %&gt;
-&lt;p class="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
+<emphasis>&lt;%- flash.each do |name, message| %&gt;
+&lt;p&gt;&lt;i&gt;&lt;%= "#{name}: #{message}" %&gt;&lt;/i&gt;&lt;/p&gt;
 &lt;% end %&gt;</emphasis>
 
 &lt;%= yield %&gt;
@@ -1581,13 +1495,9 @@ end</programlisting></para>
 &lt;/html&gt;
 </programlisting></para>
 
-    <para>Beim Aufruf von <uri
-    xlink:href="http://0.0.0.0:3000/game/pong">http://0.0.0.0:3000/game/pong</uri>
-    bekommen wir weiterhin normal die Pong-Seite angezeigt. Beim Aufruf von
-    <uri
-    xlink:href="http://0.0.0.0:3000/game/pong">http://0.0.0.0:3000/game/ping</uri>
-    werden wir aber zur Pong-Seite redirectet und bekommen oben die
-    Flash-Nachricht angezeigt:<screenshot>
+    <para>Jetzt erst sehen wir beim Aufruf von <uri
+    xlink:href="http://0.0.0.0:3000/game/ping">http://0.0.0.0:3000/game/ping</uri>
+    im Browser die Flash-Nachricht am Kopf der Seite:<screenshot>
         <info>
           <title>Pong-Seite mit Flash-Meldung</title>
         </info>
@@ -1599,10 +1509,18 @@ end</programlisting></para>
         </mediaobject>
       </screenshot></para>
 
+    <para>Beim Aufruf von <uri
+    xlink:href="http://0.0.0.0:3000/game/pong">http://0.0.0.0:3000/game/pong</uri>
+    bekommen wir weiterhin normal die Pong-Seite angezeigt. Beim Aufruf von
+    <uri
+    xlink:href="http://0.0.0.0:3000/game/pong">http://0.0.0.0:3000/game/ping</uri>
+    werden wir aber zur Pong-Seite redirectet und bekommen oben die
+    Flash-Nachricht angezeigt:</para>
+
     <tip>
       <para>Wenn Sie später mal eine Flash-Nachricht nicht angezeigt bekommen,
-      dann überprüfen Sie im View, ob dort die Flash-Nachricht überhaupt
-      ausgegeben wird.</para>
+      dann überprüfen Sie als erstes im View, ob dort die Flash-Nachricht
+      überhaupt ausgegeben wird.</para>
     </tip>
 
     <section xml:id="verschiedene_arten_von_flash_nachrichten">
@@ -1614,12 +1532,12 @@ end</programlisting></para>
         <primary>Flash-Meldungen</primary>
       </indexterm>
 
-      <para>Per Default werden die Arten <literal>error</literal> (Fehler),
-      <literal>warning</literal> (Warnung) und <literal>notice</literal>
-      (Notiz, Hinweis) unterschieden. Allerdings kann man auch selber eine
-      Kategorie erfinden und diese später im View abfragen. Beim Arbeiten mit
-      <xref linkend="scaffolding" /> werden Sie Beispiele für die
-      verschiedenen Arten finden.</para>
+      <para>Flash-Nachrichten werden automagisch in einem Hash an den View
+      übergeben. Per Default gibt es dabei die Arten <literal>error</literal>
+      (Fehler), <literal>warning</literal> (Warnung) und
+      <literal>notice</literal> (Notiz, Hinweis). Allerdings kann man auch
+      selber eine Kategorie erfinden und diese später im View abfragen.
+      </para>
     </section>
 
     <section xml:id="neue_flash_redirect_schreibweise">
@@ -1630,17 +1548,16 @@ end</programlisting></para>
         <primary>Flash-Meldungen</primary>
       </indexterm>
 
-      <para>Je nach Wissen und Vorliebe eines Programmierers, werden Sie in
-      der Praxis auf verschiedene Syntaxen von Flash-Nachrichten treffen. Ich
-      will mich nicht an der Diskussion über die beste Syntax beteiligen
-      (dafür finde ich es einfach zu unwichtig), aber ich möchte Ihnen kurz
-      die zwei häufigsten Möglichkeiten vorstellen:<itemizedlist>
+      <para>Je nach Vorliebe eines Programmierers, werden Sie in der Praxis
+      auf verschiedene Syntaxen von Flash-Nachrichten treffen. Ich will mich
+      nicht an der Diskussion über die beste Syntax beteiligen, aber ich
+      möchte Ihnen kurz die zwei häufigsten Varianten vorstellen:<itemizedlist>
           <listitem>
-            <para><programlisting>redirect_to game_pong_path, :notice =&gt; 'Ich wurde von Ping redirectet.'</programlisting></para>
+            <para><programlisting>redirect_to game_pong_path, :notice =&gt; 'Ping-Pong!'</programlisting></para>
           </listitem>
 
           <listitem>
-            <para><programlisting>flash[:notice] = 'Ich wurde von Ping redirectet.'
+            <para><programlisting>flash[:notice] = 'Ping-Pong!'
 redirect_to :action =&gt; :pong</programlisting></para>
           </listitem>
         </itemizedlist></para>
@@ -1683,73 +1600,60 @@ redirect_to :action =&gt; :pong</programlisting></para>
     </indexterm>
 
     <para>Die <foreignphrase xml:lang="en">Console</foreignphrase> in Rails
-    ist nichts weiter als ein aufgebohrtes <literal>irb</literal> (siehe <xref
-    linkend="irb" />). Sowohl beim Entwickeln als auch bei der Administration
-    ist die Console sehr praktisch, da die komplette Rails-Umgebung abgebildet
-    wird und zur Verfügung steht. So kann man leicht mal eine Methode
-    ausprobieren, ohne dafür direkt ein eigenes Programm zu schreiben.</para>
+    ist nichts weiter als ein um die Rails-Umgebung aufgebohrtes
+    <literal>irb</literal> (siehe <xref linkend="irb" />). Sowohl beim
+    Entwickeln als auch bei der Administration ist die Console sehr praktisch,
+    da die komplette Rails-Umgebung abgebildet wird und zur Verfügung steht.
+    So kann man leicht mal eine Methode ausprobieren, ohne dafür direkt ein
+    eigenes Programm zu schreiben.</para>
 
-    <para>Erzeugen wir kurz ein Rails-Projekt mit einem Controller, um mit der
-    Console zu arbeiten:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new pingpong</command>
-      create  
-      create  README
-      create  Rakefile
-      <replaceable>[...]</replaceable>
-      create  vendor/plugins
-      create  vendor/plugins/.gitkeep
+    <para>Wir bauen als Arbeitsumgebung wieder das Ping-Pong-Szenario aus
+    <xref linkend="redirects" /> auf:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new pingpong</command>
 
-stefan@swmbp 0 1.9.2-p0 ~$ <command>cd pingpong</command>
-stefan@swmbp 0 1.9.2-p0 pingpong$ <command>bundle install</command>
-Fetching source index for http://rubygems.org/
-Using rake (0.8.7) 
-<replaceable>[...]</replaceable>
-Your bundle was installed to `/Users/stefan/.rvm/gems/ruby-1.9.2-p0`
+      [...]
 
-stefan@swmbp 0 1.9.2-p0 pingpong$ <command>rails generate controller Game ping pong</command>
-      create  app/controllers/game_controller.rb
-       route  get "game/pong"
-      <replaceable>[...]</replaceable>
-      invoke    test_unit
-      create      test/unit/helpers/game_helper_test.rb
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd pingpong</command> 
+Stefan-Wintermeyers-MacBook-Air:pingpong xyz$ <command>rails generate controller Game ping pong</command>
 
-stefan@swmbp 0 1.9.2-p0 pingpong$ </screen></para>
+      [...]
+
+Stefan-Wintermeyers-MacBook-Air:pingpong xyz$</screen></para>
 
     <para>Die Rails-Console wird mit dem Befehl <command>rails
-    console</command> gestartet:<screen>stefan@swmbp 0 1.9.2-p0 testproject$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-ruby-1.9.2-p0 &gt; </screen></para>
+    console</command> gestartet:<screen>Stefan-Wintermeyers-MacBook-Air:pingpong xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt;</screen></para>
 
-    <para>Und mit <command>exit</command> kommt man wieder raus:<screen>ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
+    <para>Und mit <command>exit</command> kommt man wieder raus:<screen>1.9.3p194 :001 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:pingpong xyz$ </screen></para>
 
     <para>In der Console hat man Zugriff auf alle Variablen, die man auch
-    später in der richtigen Applikation hat:<screen>stefan@swmbp 0 1.9.2-p0 pingpong$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-ruby-1.9.2-p0 &gt; <command>RAILS_ENV</command>
+    später in der richtigen Applikation hat:<screen>Stefan-Wintermeyers-MacBook-Air:pingpong xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Rails.env</command>
  =&gt; "development" 
-ruby-1.9.2-p0 &gt; <command>RAILS_ROOT</command>
- =&gt; "/Users/stefan/pingpong" 
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 testproject$ </screen></para>
+1.9.3p194 :002 &gt; <command>Rails.root</command>
+ =&gt; #&lt;Pathname:/Users/xyz/pingpong&gt; 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:pingpong xyz$</screen></para>
 
     <para><indexterm>
         <primary>app</primary>
       </indexterm><indexterm>
         <primary>Routing</primary>
       </indexterm>Ganz praktisch ist auch <command>app</command>, um
-    verschiedene Routing-Sachen zu analysieren:<screen>stefan@swmbp 0 1.9.2-p0 pingpong$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-ruby-1.9.2-p0 &gt; <command>app.url_for(:controller =&gt; 'game', :action =&gt; 'ping')</command>
+    verschiedene Routing-Sachen zu analysieren:<screen>Stefan-Wintermeyers-MacBook-Air:pingpong xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>app.url_for(:controller =&gt; 'game', :action =&gt; 'ping')</command>
  =&gt; "http://www.example.com/game/ping" 
-ruby-1.9.2-p0 &gt; <command>app.get 'game/ping'</command>
+1.9.3p194 :002 &gt; <command>app.get 'game/ping'</command>
  =&gt; 200 
-ruby-1.9.2-p0 &gt; <command>app.get 'game/nicht_existente_action'</command>
+1.9.3p194 :003 &gt; <command>app.get 'game/gibt_es_nicht'</command>
  =&gt; 404 
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 pingpong$</screen></para>
+1.9.3p194 :004 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:pingpong xyz$</screen></para>
 
-    <para>Die Console ist in der Theorie schwer zu erklären. Schon in <xref
-    linkend="activerecord_chapter" /> werden Sie mehr mit der Console arbeiten
-    und die Vorteile schätzen lernen.</para>
+    <para>Schon in <xref linkend="activerecord_chapter" /> werden Sie viel mit
+    der Console arbeiten und die Möglichkeiten schätzen lernen.</para>
   </section>
 </chapter>
