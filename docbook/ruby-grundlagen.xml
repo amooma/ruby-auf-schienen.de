@@ -9,14 +9,6 @@
          xmlns:db="http://docbook.org/ns/docbook">
   <title xml:id="ruby-grundlagen.title">Ruby-Grundlagen</title>
 
-  <info>
-    <collab>
-      <person>
-        <personname><firstname>Philipp</firstname><surname>Kempgen</surname></personname>
-      </person>
-    </collab>
-  </info>
-
   <section xml:id="ruby-grundlagen-einleitung">
     <title>Einleitung</title>
 
@@ -208,107 +200,85 @@ sw@debian:~/sandbox$ </screen></para>
 
       <para>Man hat ja beim Programmieren nicht immer ein Ruby-Buch zur Hand.
       Aber daran haben die Ruby-Entwickler gedacht und mit dem Programm
-      <literal>ri</literal> eine eigene Hilfe eingebaut. <acronym>ri</acronym>
-      steht übrigens für <quote><emphasis role="bold">R</emphasis>uby
-      <emphasis role="bold">I</emphasis>ndex</quote>.</para>
+      <literal>ri</literal> eine eigene Hilfe eingebaut (natürlich nur, wenn
+      Sie diese auch mit installiert haben). <acronym>ri</acronym> steht für
+      <quote><emphasis role="bold">R</emphasis>uby <emphasis
+      role="bold">I</emphasis>ndex</quote>.</para>
 
       <para>Jetzt haben wir eine typische Henne-Ei-Situation. Wie kann ich
       Ihnen die Hilfe zu Ruby erklären, wenn wir gerade erst mit Ruby
       anfangen? Ich greife also voraus und zeige Ihnen, wie Sie Informationen
       zur Klasse <classname>String</classname> suchen können:<screen>sw@debian:~/sandbox$ <command>ri String</command>
-------------------------------------------------- Class: String &lt; Object
-     A +String+ object holds and manipulates an arbitrary sequence of
-     bytes, typically representing characters. String objects may be
-     created using +String::new+ or as literals.
+= String &lt; Object
 
-     Because of aliasing issues, users of strings should be aware of the
-     methods that modify the contents of a +String+ object. Typically,
-     methods with names ending in ``!'' modify their receiver, while
-     those without a ``!'' return a new +String+. However, there are
-     exceptions, such as +String#[]=+.
+------------------------------------------------------------------------------
+= Includes:
+Comparable (from ruby site)
 
-     Enhance the String class with a XML escaped character version of
-     to_s.
+(from ruby site)
+------------------------------------------------------------------------------
+A String object holds and manipulates an arbitrary sequence of bytes,
+typically representing characters. String objects may be created using
+String::new or as literals.
 
-     User defined methods to be added to String.
-
-------------------------------------------------------------------------
-
-
-Includes:
----------
-
-     Comparable
+Because of aliasing issues, users of strings should be aware of the methods
+that modify the contents of a String object.  Typically, methods with names
+ending in ``!'' modify their receiver, while those without a ``!'' return a
+new String.  However, there are exceptions, such as String#[]=.
 
 
-Class methods:
---------------
+Rake extension methods for String. 
 
-     new, try_convert, yaml_new
-
-
-Instance methods:
------------------
-
-     %, *, +, &lt;&lt;, &lt;=&gt;, ==, ===, =~, [], []=, ascii_only?, block_scanf,
-     bytes, bytesize, capitalize, capitalize!, casecmp, center, chars,
-     chomp, chomp!, chop, chop!, chr, clear, codepoints, concat, count,
-     crypt, delete, delete!, downcase, downcase!, dump, each_byte,
-     each_char, each_codepoint, each_line, empty?, encode, encode!,
-     encoding, end_with?, eql?, ext, force_encoding, getbyte, gsub,
-     gsub!, hash, hex, include?, index, initialize_copy, insert,
-     inspect, intern, is_binary_data?, is_complex_yaml?, iseuc, isjis,
-     issjis, isutf8, kconv, length, lines, ljust, lstrip, lstrip!,
-     match, next, next!, oct, ord, parse_csv, partition, pathmap,
-     pathmap_explode, pathmap_partial, pathmap_replace, replace,
-     reverse, reverse!, rindex, rjust, rpartition, rstrip, rstrip!,
-     scan, scanf, setbyte, shellescape, shellsplit, size, slice, slice!,
-     split, squeeze, squeeze!, start_with?, strip, strip!, sub, sub!,
-     succ, succ!, sum, swapcase, swapcase!, to_blob, to_d, to_f, to_i,
-     to_s, to_str, to_sym, to_yaml, toeuc, tojis, tolocale, tosjis,
-     toutf16, toutf32, toutf8, tr, tr!, tr_s, tr_s!, unpack, upcase,
-     upcase!, upto, valid_encoding?
-
-sw@debian:~/sandbox$ </screen></para>
+[...]</screen></para>
 
       <para>Suchen wir jetzt Informationen zu einer bestimmten Methode
       (Henne-Ei!), dann geht das auch mit <literal>ri</literal>. Als Beispiel
       nehmen wir mal <methodname>gsub</methodname>. Das ist eine Methode, mit
       der sich Teile in einem <classname>String</classname> austauschen lassen
       (immer wieder praktisch).<screen>sw@debian:~/sandbox$ <command>ri String.gsub</command>
------------------------------------------------------------- String#gsub
-     str.gsub(pattern, replacement)       =&gt; new_str
-     str.gsub(pattern) {|match| block }   =&gt; new_str
+= String.gsub
 
-     From Ruby 1.9.1
-------------------------------------------------------------------------
-     Returns a copy of _str_ with _all_ occurrences of _pattern_
-     replaced with either _replacement_ or the value of the block. The
-     _pattern_ will typically be a +Regexp+; if it is a +String+ then no
-     regular expression metacharacters will be interpreted (that is
-     +/\d/+ will match a digit, but +'\d'+ will match a backslash
-     followed by a 'd').
+(from ruby site)
+------------------------------------------------------------------------------
+  str.gsub(pattern, replacement)       -&gt; new_str
+  str.gsub(pattern, hash)              -&gt; new_str
+  str.gsub(pattern) {|match| block }   -&gt; new_str
+  str.gsub(pattern)                    -&gt; enumerator
 
-     If a string is used as the replacement, special variables from the
-     match (such as +$&amp;+ and +$1+) cannot be substituted into it, as
-     substitution into the string occurs before the pattern match
-     starts. However, the sequences +\1+, +\2+, +\k&lt;group_name&gt;+, and so
-     on may be used to interpolate successive groups in the match.
+------------------------------------------------------------------------------
 
-     In the block form, the current match string is passed in as a
-     parameter, and variables such as +$1+, +$2+, +$`+, +$&amp;+, and +$'+
-     will be set appropriately. The value returned by the block will be
-     substituted for the match on each call.
+Returns a copy of str with the all occurrences of
+pattern substituted for the second argument. The
+pattern is typically a Regexp; if given as a String, any regular
+expression metacharacters it contains will be interpreted literally, e.g.
+'\\\d' will match a backlash followed by 'd', instead of a digit.
 
-     The result inherits any tainting in the original string or any
-     supplied replacement string.
+If replacement is a String it will be substituted for
+the matched text. It may contain back-references to the pattern's capture
+groups of the form \\\d, where d is a group number, or \\\k&lt;n&gt;, where n is
+a group name. If it is a double-quoted string, both back-references must be
+preceded by an additional backslash. However, within
+replacement the special match variables, such as &amp;$,
+will not refer to the current match.
 
-        "hello".gsub(/[aeiou]/, '*')                  #=&gt; "h*ll*"
-        "hello".gsub(/([aeiou])/, '&lt;\1&gt;')             #=&gt; "h&lt;e&gt;ll&lt;o&gt;"
-        "hello".gsub(/./) {|s| s[0].ord.to_s + ' '}   #=&gt; "104 101 108 108 111 "
-        "hello".gsub(/(?&lt;foo&gt;[aeiou])/, '{\k&lt;foo&gt;}')  #=&gt; "h{e}ll{o}"
+If the second argument is a Hash, and the matched text is one of its keys, the
+corresponding value is the replacement string.
 
-sw@debian:~/sandbox$ </screen></para>
+In the block form, the current match string is passed in as a parameter, and
+variables such as $1, $2, $`, $&amp;, and $' will be set appropriately. The value
+returned by the block will be substituted for the match on each call.
+
+The result inherits any tainting in the original string or any supplied
+replacement string.
+
+When neither a block nor a second argument is supplied, an Enumerator is
+returned.
+
+  "hello".gsub(/[aeiou]/, '*')                  #=&gt; "h*ll*"
+  "hello".gsub(/([aeiou])/, '&lt;\1&gt;')             #=&gt; "h&lt;e&gt;ll&lt;o&gt;"
+  "hello".gsub(/./) {|s| s.ord.to_s + ' '}      #=&gt; "104 101 108 108 111 "
+  "hello".gsub(/(?&lt;foo&gt;[aeiou])/, '{\k&lt;foo&gt;}')  #=&gt; "h{e}ll{o}"
+  'hello'.gsub(/[eo]/, 'e' =&gt; 3, 'o' =&gt; '*')    #=&gt; "h3ll*"</screen></para>
 
       <para>Das Programm <command>ri</command> gibt die Ausgabe immer in dem
       von der Shell definierten Pager-Programm aus (z.B.
@@ -349,10 +319,10 @@ sw@debian:~/sandbox$ </screen></para>
     beendet.</para>
 
     <para>Ein Beispiel sagt mehr als tausend Worte:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>puts 'Hello World!'</command>
+1.9.3p194 :001:0&gt; <command>puts 'Hello World!'</command>
 Hello World!
 =&gt; nil
-irb(main):003:0&gt; <command>exit</command>
+1.9.3p194 :003:0&gt; <command>exit</command>
 sw@debian:~/sandbox$ </screen></para>
 
     <para>In diesem Kapitel werden viele Beispiele innerhalb von
@@ -424,16 +394,16 @@ sw@debian:~/sandbox$ </screen></para>
 
       <para>Nehmen wir also an, dass wir folgenden Code-Ablauf - aus welchem
       Grund auch immer - häufig verwenden:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>puts 'Hello World!'</command>
+1.9.3p194 :001:0&gt; <command>puts 'Hello World!'</command>
 Hello World!
 =&gt; nil
-irb(main):002:0&gt; <command>puts 'Hello World!'</command>
+1.9.3p194 :002:0&gt; <command>puts 'Hello World!'</command>
 Hello World!
 =&gt; nil
-irb(main):003:0&gt; <command>puts 'Hello World!'</command>
+1.9.3p194 :003:0&gt; <command>puts 'Hello World!'</command>
 Hello World!
 =&gt; nil
-irb(main):004:0&gt; <command>exit</command>
+1.9.3p194 :004:0&gt; <command>exit</command>
 </screen></para>
 
       <para>Wir möchten also dreimal hintereinander den String <quote>Hello
@@ -443,38 +413,38 @@ irb(main):004:0&gt; <command>exit</command>
       alles auf einmal erledigen lässt.<important>
           <para>Namen von Methoden werden immer kleingeschrieben.</para>
         </important><screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>def drei_mal</command>  # Start der Definition
-irb(main):002:1&gt; <command>  puts 'Hello World!'</command>
-irb(main):003:1&gt; <command>  puts 'Hello World!'</command>
-irb(main):004:1&gt; <command>  puts 'Hello World!'</command>
-irb(main):005:1&gt; <command>end</command>           # Ende der Definition
+1.9.3p194 :001:0&gt; <command>def drei_mal</command>  # Start der Definition
+1.9.3p194 :002:1&gt; <command>  puts 'Hello World!'</command>
+1.9.3p194 :003:1&gt; <command>  puts 'Hello World!'</command>
+1.9.3p194 :004:1&gt; <command>  puts 'Hello World!'</command>
+1.9.3p194 :005:1&gt; <command>end</command>           # Ende der Definition
 =&gt; nil
-irb(main):006:0&gt; <command>drei_mal</command>      # Aufruf der Methode
+1.9.3p194 :006:0&gt; <command>drei_mal</command>      # Aufruf der Methode
 Hello World!
 Hello World!
 Hello World!
 =&gt; nil
-irb(main):007:0&gt; <command>exit</command>
+1.9.3p194 :007:0&gt; <command>exit</command>
 </screen></para>
 
       <para>Bei der Definition einer Methode kann man benötigte Parameter
       definieren und diese innerhalb der Methode benutzen. Damit können wir
       eine Methode erstellen, der wir einen String als Parameter übergeben,
       und diesen dann dreimal ausgeben lassen.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>def drei_mal(apfelmus)</command>
-irb(main):002:1&gt; <command>  puts apfelmus</command>
-irb(main):003:1&gt; <command>  puts apfelmus</command>
-irb(main):004:1&gt; <command>  puts apfelmus</command>
-irb(main):005:1&gt; <command>end</command>
+1.9.3p194 :001:0&gt; <command>def drei_mal(apfelmus)</command>
+1.9.3p194 :002:1&gt; <command>  puts apfelmus</command>
+1.9.3p194 :003:1&gt; <command>  puts apfelmus</command>
+1.9.3p194 :004:1&gt; <command>  puts apfelmus</command>
+1.9.3p194 :005:1&gt; <command>end</command>
 =&gt; nil
-irb(main):006:0&gt; <command>drei_mal('Hello World!')</command>
+1.9.3p194 :006:0&gt; <command>drei_mal('Hello World!')</command>
 Hello World!
 Hello World!
 Hello World!
 =&gt; nil
 </screen></para>
 
-      <para>Die Klammern beim Aufruf können Sie übrigens weglassen.<screen>irb(main):007:0&gt; <command>drei_mal 'Hello World!'</command>
+      <para>Die Klammern beim Aufruf können Sie übrigens weglassen.<screen>1.9.3p194 :007:0&gt; <command>drei_mal 'Hello World!'</command>
 Hello World!
 Hello World!
 Hello World!
@@ -496,33 +466,33 @@ Hello World!
 
       <para>Wenn man bei der obigen Methode keinen Parameter angibt, erscheint
       die Fehlermeldung: <quote><literal>wrong number of
-      arguments</literal></quote>:<screen>irb(main):008:0&gt; <command>drei_mal</command>
+      arguments</literal></quote>:<screen>1.9.3p194 :008:0&gt; <command>drei_mal</command>
 ArgumentError: wrong number of arguments (0 for 1)
  from (irb):8
  from /usr/local/bin/irb:12:in `&lt;main&gt;'
-irb(main):009:0&gt; <command>exit</command>
+1.9.3p194 :009:0&gt; <command>exit</command>
 </screen></para>
 
       <para>Sie können der Variable <varname>apfelmus</varname> einen Default
       Wert geben und können dann die Methode auch ohne Parameter
       aufrufen:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>def drei_mal(apfelmus = 'blau')</command>
-irb(main):002:1&gt; <command>  puts apfelmus</command>
-irb(main):003:1&gt; <command>  puts apfelmus</command>
-irb(main):004:1&gt; <command>  puts apfelmus</command>
-irb(main):005:1&gt; <command>end</command>
+1.9.3p194 :001:0&gt; <command>def drei_mal(apfelmus = 'blau')</command>
+1.9.3p194 :002:1&gt; <command>  puts apfelmus</command>
+1.9.3p194 :003:1&gt; <command>  puts apfelmus</command>
+1.9.3p194 :004:1&gt; <command>  puts apfelmus</command>
+1.9.3p194 :005:1&gt; <command>end</command>
 =&gt; nil
-irb(main):006:1 &gt; <command>drei_mal('Hello World!')</command>
+1.9.3p194 :006:1 &gt; <command>drei_mal('Hello World!')</command>
 Hello World!
 Hello World!
 Hello World!
  =&gt; nil 
-irb(main):007:1 &gt; <command>drei_mal</command>
+1.9.3p194 :007:1 &gt; <command>drei_mal</command>
 blau
 blau
 blau
  =&gt; nil 
-irb(main):008:1 &gt; <command>exit</command></screen></para>
+1.9.3p194 :008:1 &gt; <command>exit</command></screen></para>
     </section>
 
     <section xml:id="ruby-class">
@@ -553,18 +523,18 @@ irb(main):008:1 &gt; <command>exit</command></screen></para>
 end                      # Ende der Klassendefinition</programlisting></para>
 
       <para>Spielen wir das mal im <literal>irb</literal> durch:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>class Dies_und_das</command>
-irb(main):002:1&gt; <command>  def drei_mal</command>
-irb(main):003:2&gt; <command>    puts 'Hello World!'</command>
-irb(main):004:2&gt; <command>    puts 'Hello World!'</command>
-irb(main):005:2&gt; <command>    puts 'Hello World!'</command>
-irb(main):006:2&gt; <command>  end</command>
-irb(main):007:1&gt; <command>end</command>
+1.9.3p194 :001:0&gt; <command>class Dies_und_das</command>
+1.9.3p194 :002:1&gt; <command>  def drei_mal</command>
+1.9.3p194 :003:2&gt; <command>    puts 'Hello World!'</command>
+1.9.3p194 :004:2&gt; <command>    puts 'Hello World!'</command>
+1.9.3p194 :005:2&gt; <command>    puts 'Hello World!'</command>
+1.9.3p194 :006:2&gt; <command>  end</command>
+1.9.3p194 :007:1&gt; <command>end</command>
 =&gt; nil
 </screen></para>
 
       <para>Jetzt probieren wir aus, die Methode
-      <methodname>drei_mal</methodname> aufzurufen:<screen>irb(main):008:0&gt; <command>Dies_und_das.drei_mal</command>
+      <methodname>drei_mal</methodname> aufzurufen:<screen>1.9.3p194 :008:0&gt; <command>Dies_und_das.drei_mal</command>
 NoMethodError: undefined method `drei_mal' for Dies_und_das:Class
  from (irb):8
 from /usr/local/bin/irb:12:in `&lt;main&gt;'
@@ -575,14 +545,14 @@ from /usr/local/bin/irb:12:in `&lt;main&gt;'
       Da wir hier mit Instanz-Methoden arbeiten, funktioniert es nur, wenn wir
       vorher ein neues Objekt (also eine neue Instanz) der Klasse
       <classname>Dies_und_das</classname> mit der Methode
-      <methodname>new</methodname> erzeugt haben:<screen>irb(main):009:0&gt; <command>abc = Dies_und_das.new</command>
+      <methodname>new</methodname> erzeugt haben:<screen>1.9.3p194 :009:0&gt; <command>abc = Dies_und_das.new</command>
 =&gt; #&lt;Dies_und_das:0x9ebb3f0&gt;
-irb(main):010:0&gt; <command>abc.drei_mal</command>
+1.9.3p194 :010:0&gt; <command>abc.drei_mal</command>
 Hello World!
 Hello World!
 Hello World!
 =&gt; nil
-irb(main):011:0&gt; <command>exit</command>
+1.9.3p194 :011:0&gt; <command>exit</command>
 </screen></para>
 
       <section xml:id="ruby-private-methods">
@@ -601,34 +571,34 @@ irb(main):011:0&gt; <command>exit</command>
         <literal>private</literal> aufgeführt.</para>
 
         <para>irb-Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>class Beispiel</command>         # Klasse Beispiel
-irb(main):002:1&gt; <command>  def mach_was</command>         # Methode mach_was
-irb(main):003:2&gt; <command>    puts 'Was.'</command>           
-irb(main):004:2&gt; <command>  end</command>
-irb(main):005:1&gt; <command>  def mach_noch_was</command>    # Methode mach_noch_was
-irb(main):006:2&gt; <command>    puts 'Noch was.'</command>
-irb(main):007:2&gt; <command>  end</command>
-irb(main):008:1&gt;   
-irb(main):009:1* <command>  private</command>              # Beginn der privaten Methoden
-irb(main):010:1&gt; <command>  def noch_mehr</command>        # Methode noch_mehr
-irb(main):011:2&gt; <command>    puts 'Noch was.'</command>
-irb(main):012:2&gt; <command>  end</command>
-irb(main):013:1&gt; <command>end</command>
+1.9.3p194 :001:0&gt; <command>class Beispiel</command>         # Klasse Beispiel
+1.9.3p194 :002:1&gt; <command>  def mach_was</command>         # Methode mach_was
+1.9.3p194 :003:2&gt; <command>    puts 'Was.'</command>           
+1.9.3p194 :004:2&gt; <command>  end</command>
+1.9.3p194 :005:1&gt; <command>  def mach_noch_was</command>    # Methode mach_noch_was
+1.9.3p194 :006:2&gt; <command>    puts 'Noch was.'</command>
+1.9.3p194 :007:2&gt; <command>  end</command>
+1.9.3p194 :008:1&gt;   
+1.9.3p194 :009:1* <command>  private</command>              # Beginn der privaten Methoden
+1.9.3p194 :010:1&gt; <command>  def noch_mehr</command>        # Methode noch_mehr
+1.9.3p194 :011:2&gt; <command>    puts 'Noch was.'</command>
+1.9.3p194 :012:2&gt; <command>  end</command>
+1.9.3p194 :013:1&gt; <command>end</command>
 =&gt; nil
-irb(main):014:0&gt; <command>test = Beispiel.new</command>    # Neue Instanz von Beispiel
+1.9.3p194 :014:0&gt; <command>test = Beispiel.new</command>    # Neue Instanz von Beispiel
 =&gt; #&lt;Beispiel:0x8bb6ffc&gt;
-irb(main):015:0&gt; <command>test.mach_was</command>          # Methode .mach_was aufrufen
+1.9.3p194 :015:0&gt; <command>test.mach_was</command>          # Methode .mach_was aufrufen
 Was.
 =&gt; nil
-irb(main):016:0&gt; <command>test.mach_noch_was</command>     # Methode .mach_noch_was aufrufen
+1.9.3p194 :016:0&gt; <command>test.mach_noch_was</command>     # Methode .mach_noch_was aufrufen
 Noch was.
 
 =&gt; nil
-irb(main):017:0&gt; <command>test.noch_mehr</command>   # Kann nicht von außen aufgerufen werden.
+1.9.3p194 :017:0&gt; <command>test.noch_mehr</command>   # Kann nicht von außen aufgerufen werden.
 NoMethodError: private method `noch_mehr' called for #&lt;Beispiel:0x8bb6ffc&gt;
  from (irb):17
  from /usr/local/bin/irb:12:in `&lt;main&gt;'
-irb(main):018:0&gt; <command>exit</command>
+1.9.3p194 :018:0&gt; <command>exit</command>
 </screen></para>
       </section>
 
@@ -665,16 +635,16 @@ irb(main):018:0&gt; <command>exit</command>
         aufgeführt wird.</para>
 
         <para>irb-Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>class Beispiel</command>
-irb(main):002:1&gt; <command>  def initialize</command>
-irb(main):003:2&gt; <command>    puts 'Hello World!'</command>
-irb(main):004:2&gt; <command>  end</command>
-irb(main):005:1&gt; <command>end</command>
+1.9.3p194 :001:0&gt; <command>class Beispiel</command>
+1.9.3p194 :002:1&gt; <command>  def initialize</command>
+1.9.3p194 :003:2&gt; <command>    puts 'Hello World!'</command>
+1.9.3p194 :004:2&gt; <command>  end</command>
+1.9.3p194 :005:1&gt; <command>end</command>
 =&gt; nil
-irb(main):006:0&gt; <command>test = Beispiel.new</command>
+1.9.3p194 :006:0&gt; <command>test = Beispiel.new</command>
 Hello World!
 =&gt; #&lt;Beispiel:0x99f1e24&gt;
-irb(main):007:0&gt; <command>exit</command>
+1.9.3p194 :007:0&gt; <command>exit</command>
 </screen></para>
 
         <para>Die Instanz <code>test</code> wird mit <code>Beispiel.new</code>
@@ -685,16 +655,16 @@ irb(main):007:0&gt; <command>exit</command>
         <para>Die Methode <methodname>new</methodname> akzeptiert die bei der
         Methode <methodname>initialize</methodname> angegebenen
         Parameter:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>class Beispiel</command>
-irb(main):002:1&gt; <command>  def initialize(aaa)</command>   # Definition Parameter aaa
-irb(main):003:2&gt; <command>    puts aaa</command>            # Ausgabe von aaa
-irb(main):004:2&gt; <command>  end</command>
-irb(main):005:1&gt; <command>end</command>
+1.9.3p194 :001:0&gt; <command>class Beispiel</command>
+1.9.3p194 :002:1&gt; <command>  def initialize(aaa)</command>   # Definition Parameter aaa
+1.9.3p194 :003:2&gt; <command>    puts aaa</command>            # Ausgabe von aaa
+1.9.3p194 :004:2&gt; <command>  end</command>
+1.9.3p194 :005:1&gt; <command>end</command>
 =&gt; nil
-irb(main):006:0&gt; <command>test = Beispiel.new('Hello World!')</command>
+1.9.3p194 :006:0&gt; <command>test = Beispiel.new('Hello World!')</command>
 Hello World!
 =&gt; #&lt;Beispiel:0x86bed84&gt;
-irb(main):007:0&gt; <command>exit</command>
+1.9.3p194 :007:0&gt; <command>exit</command>
 </screen></para>
       </section>
 
@@ -724,33 +694,33 @@ irb(main):007:0&gt; <command>exit</command>
         die der Klasse <classname>Literatur</classname>.<footnote>
             <para>Bei dem Satz wird einem ja schwindelig. ;-)</para>
           </footnote><screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>class Literatur</command>
-irb(main):002:1&gt; <command>  def antwort_auf_alle_fragen_des_universums</command>
-irb(main):003:2&gt; <command>    42</command>
-irb(main):004:2&gt; <command>  end</command>
-irb(main):005:1&gt; <command>end</command>
+1.9.3p194 :001:0&gt; <command>class Literatur</command>
+1.9.3p194 :002:1&gt; <command>  def antwort_auf_alle_fragen_des_universums</command>
+1.9.3p194 :003:2&gt; <command>    42</command>
+1.9.3p194 :004:2&gt; <command>  end</command>
+1.9.3p194 :005:1&gt; <command>end</command>
 =&gt; nil
-irb(main):006:0&gt; <command>class Allgemeinwissen &lt; Literatur</command>     
-irb(main):007:1&gt; <command>  def pi</command>
-irb(main):008:2&gt; <command>    3.14</command>
-irb(main):009:2&gt; <command>  end</command>
-irb(main):010:1&gt; <command>end</command>
+1.9.3p194 :006:0&gt; <command>class Allgemeinwissen &lt; Literatur</command>     
+1.9.3p194 :007:1&gt; <command>  def pi</command>
+1.9.3p194 :008:2&gt; <command>    3.14</command>
+1.9.3p194 :009:2&gt; <command>  end</command>
+1.9.3p194 :010:1&gt; <command>end</command>
 =&gt; nil
-irb(main):011:0&gt; <command>fritz = Literatur.new</command>
+1.9.3p194 :011:0&gt; <command>fritz = Literatur.new</command>
 =&gt; #&lt;Literatur:0x90e7098&gt;
-irb(main):012:0&gt; <command>egon = Allgemeinwissen.new</command>
+1.9.3p194 :012:0&gt; <command>egon = Allgemeinwissen.new</command>
 =&gt; #&lt;Allgemeinwissen:0x90da0ac&gt;
-irb(main):013:0&gt; <command>egon.antwort_auf_alle_fragen_des_universums</command>
+1.9.3p194 :013:0&gt; <command>egon.antwort_auf_alle_fragen_des_universums</command>
 =&gt; 42
-irb(main):014:0&gt; <command>egon.pi</command>
+1.9.3p194 :014:0&gt; <command>egon.pi</command>
 =&gt; 3.14
-irb(main):015:0&gt; <command>fritz.antwort_auf_alle_fragen_des_universums</command>
+1.9.3p194 :015:0&gt; <command>fritz.antwort_auf_alle_fragen_des_universums</command>
 =&gt; 42
-irb(main):016:0&gt; <command>fritz.pi</command>
+1.9.3p194 :016:0&gt; <command>fritz.pi</command>
 NoMethodError: undefined method `pi' for #&lt;Literatur:0x90e7098&gt;
  from (irb):21
  from /usr/local/bin/irb:12:in `&lt;main&gt;'
-irb(main):017:0&gt; <command>exit</command>
+1.9.3p194 :017:0&gt; <command>exit</command>
 </screen></para>
       </section>
 
@@ -876,24 +846,24 @@ end</programlisting>
           auslesen. Wir probieren das mit der Klasse
           <classname>Dies_und_das</classname> aus (diese legen wir dazu noch
           mal neu im <application>irb</application> an):<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>class Dies_und_das</command>
-irb(main):002:1&gt; <command>  def drei_mal</command>
-irb(main):003:2&gt; <command>    puts 'Hello World!'</command>
-irb(main):004:2&gt; <command>    puts 'Hello World!'</command>
-irb(main):005:2&gt; <command>    puts 'Hello World!'</command>
-irb(main):006:2&gt; <command>  end</command>
-irb(main):007:1&gt; <command>end</command>
+1.9.3p194 :001:0&gt; <command>class Dies_und_das</command>
+1.9.3p194 :002:1&gt; <command>  def drei_mal</command>
+1.9.3p194 :003:2&gt; <command>    puts 'Hello World!'</command>
+1.9.3p194 :004:2&gt; <command>    puts 'Hello World!'</command>
+1.9.3p194 :005:2&gt; <command>    puts 'Hello World!'</command>
+1.9.3p194 :006:2&gt; <command>  end</command>
+1.9.3p194 :007:1&gt; <command>end</command>
 =&gt; nil
-irb(main):008:0&gt; <command>Dies_und_das.instance_methods</command>
+1.9.3p194 :008:0&gt; <command>Dies_und_das.instance_methods</command>
 =&gt; [:drei_mal, :nil?, :===, :=~, :!~, :eql?, :class, :clone, :dup, :taint, :tainted?, :untaint, :untrust, :untrusted?, :trust, :freeze, :frozen?, :to_s, :inspect, :methods, :singleton_methods, :protected_methods, :private_methods, :public_methods, :instance_variables, :instance_variable_get, :instance_variable_set, :instance_variable_defined?, :instance_of?, :kind_of?, :is_a?, :tap, :send, :public_send, :respond_to?, :extend, :display, :method, :public_method, :define_singleton_method, :hash, :__id__, :object_id, :to_enum, :enum_for, :gem, :==, :equal?, :!, :!=, :instance_eval, :instance_exec, :__send__]
 </screen></para>
 
           <para>Das ist ja viel mehr, als wir definiert haben! Das liegt
           daran, dass jede neue Klasse von Ruby standardmäßig ein Grundgerüst
           an Methoden mitbekommt. Wenn wir nur die von uns definierten
-          Methoden auflisten wollen, so geht das wie folgt:<screen>irb(main):009:0&gt; <command>Dies_und_das.instance_methods(false)</command>
+          Methoden auflisten wollen, so geht das wie folgt:<screen>1.9.3p194 :009:0&gt; <command>Dies_und_das.instance_methods(false)</command>
 =&gt; [:drei_mal]
-irb(main):010:0&gt; </screen></para>
+1.9.3p194 :010:0&gt; </screen></para>
         </section>
       </section>
     </section>
@@ -947,28 +917,28 @@ irb(main):010:0&gt; </screen></para>
       <para>Probieren wir mal ein wenig im <literal>irb</literal> aus. Die
       Methode <methodname>.class</methodname> gibt uns dabei an, um welche
       Klasse es sich handelt.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = 'Ein Test.'</command>
+1.9.3p194 :001:0&gt; <command>a = 'Ein Test.'</command>
 =&gt; "Ein Test."
-irb(main):002:0&gt; <command>a.class</command>
+1.9.3p194 :002:0&gt; <command>a.class</command>
 =&gt; String
 </screen></para>
 
       <para>Das war einfach. Ruby erschafft also <quote>automagisch</quote>
       ein Objekt der Klasse <classname>String</classname>. Das ginge auch mit
       einem expliziten Aufruf der Methode
-      <methodname>new</methodname>:<screen>irb(main):003:0&gt; <command>b = String.new('Noch ein Test.')</command>
+      <methodname>new</methodname>:<screen>1.9.3p194 :003:0&gt; <command>b = String.new('Noch ein Test.')</command>
 =&gt; "Noch ein Test."
-irb(main):004:0&gt; <command>b.class</command>
+1.9.3p194 :004:0&gt; <command>b.class</command>
 =&gt; String
 </screen></para>
 
       <para>Wenn wir <code>String.new</code> ohne einen Parameter aufrufen,
       dann wird ebenfalls ein Objekt der Klasse <classname>String</classname>
-      erstellt. Nur ist das dann ein leerer String:<screen>irb(main):005:0&gt; <command>c = String.new</command>
+      erstellt. Nur ist das dann ein leerer String:<screen>1.9.3p194 :005:0&gt; <command>c = String.new</command>
 =&gt; ""
-irb(main):006:0&gt; <command>c.class</command>
+1.9.3p194 :006:0&gt; <command>c.class</command>
 =&gt; String
-irb(main):007:0&gt; <command>exit</command>
+1.9.3p194 :007:0&gt; <command>exit</command>
 </screen></para>
 
       <section xml:id="ruby-strings-quotes">
@@ -1007,13 +977,13 @@ irb(main):007:0&gt; <command>exit</command>
         automatisch an die entsprechende Stelle im String eingesetzt.</para>
 
         <para>Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = 'blau'</command>
+1.9.3p194 :001:0&gt; <command>a = 'blau'</command>
 =&gt; blau
-irb(main):002:0&gt; <command>b = "Farbe: #{a}"</command>
+1.9.3p194 :002:0&gt; <command>b = "Farbe: #{a}"</command>
 =&gt; "Farbe: blau"
-irb(main):003:0&gt; <command>b.class</command>
+1.9.3p194 :003:0&gt; <command>b.class</command>
 =&gt; String
-irb(main):004:0&gt; <command>exit</command>
+1.9.3p194 :004:0&gt; <command>exit</command>
 </screen></para>
 
         <para>Ist das Ergebnis des Ausdrucks kein String, versucht Ruby die
@@ -1054,17 +1024,17 @@ irb(main):004:0&gt; <command>exit</command>
             egal.</para>
           </footnote> Wird ein <classname>Fixnum</classname> größer, wandelt
         es sich automatisch in ein <classname>Bignum</classname> um.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>20.class</command>
+1.9.3p194 :001:0&gt; <command>20.class</command>
 =&gt; Fixnum
-irb(main):002:0&gt; <command>a = 20</command>
+1.9.3p194 :002:0&gt; <command>a = 20</command>
 =&gt; 20
-irb(main):003:0&gt; <command>a.class</command>
+1.9.3p194 :003:0&gt; <command>a.class</command>
 =&gt; Fixnum
-irb(main):004:0&gt; <command>a = a * 555555555</command>  # Ergebnis wird automatisch ein Bignum.
+1.9.3p194 :004:0&gt; <command>a = a * 555555555</command>  # Ergebnis wird automatisch ein Bignum.
 =&gt; 11111111100
-irb(main):005:0&gt; <command>a.class</command>
+1.9.3p194 :005:0&gt; <command>a.class</command>
 =&gt; Bignum
-irb(main):006:0&gt; <command>exit</command>
+1.9.3p194 :006:0&gt; <command>exit</command>
 </screen></para>
       </section>
 
@@ -1080,13 +1050,13 @@ irb(main):006:0&gt; <command>exit</command>
         <para><classname>Float</classname> ist eine Klasse für reelle Zahlen
         (<quote>Fließkomma-Zahlen</quote>). Dabei wird die englische
         Schreibweise für das Komma (also ein Punkt) benutzt.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = 20.424</command>
+1.9.3p194 :001:0&gt; <command>a = 20.424</command>
 =&gt; 20.424
-irb(main):002:0&gt; <command>a.class</command>
+1.9.3p194 :002:0&gt; <command>a.class</command>
 =&gt; Float
-irb(main):003:0&gt; <command>42.2.class</command>
+1.9.3p194 :003:0&gt; <command>42.2.class</command>
 =&gt; Float
-irb(main):004:0&gt; <command>exit</command>
+1.9.3p194 :004:0&gt; <command>exit</command>
 </screen></para>
       </section>
 
@@ -1096,35 +1066,35 @@ irb(main):004:0&gt; <command>exit</command>
         <para>Rechnen mit Integers und Floats ist so einfach, dass man alles
         anhand von ein paar Zeilen Code im <literal>irb</literal> beschreiben
         kann:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = 10</command>
+1.9.3p194 :001:0&gt; <command>a = 10</command>
 =&gt; 10
-irb(main):002:0&gt; <command>b = 23</command>
+1.9.3p194 :002:0&gt; <command>b = 23</command>
 =&gt; 23
-irb(main):003:0&gt; <command>a + b</command>          # Addition von zwei Fixnums
+1.9.3p194 :003:0&gt; <command>a + b</command>          # Addition von zwei Fixnums
 =&gt; 33
-irb(main):004:0&gt; <command>(a + b).class</command>  # Das Ergebnis ist ein Fixnum.
+1.9.3p194 :004:0&gt; <command>(a + b).class</command>  # Das Ergebnis ist ein Fixnum.
 =&gt; Fixnum
-irb(main):005:0&gt; <command>c = a + b</command>
+1.9.3p194 :005:0&gt; <command>c = a + b</command>
 =&gt; 33
-irb(main):006:0&gt; <command>c.class</command>
+1.9.3p194 :006:0&gt; <command>c.class</command>
 =&gt; Fixnum
-irb(main):007:0&gt; <command>d = 3.14</command>
+1.9.3p194 :007:0&gt; <command>d = 3.14</command>
 =&gt; 3.14
-irb(main):008:0&gt; <command>e = a + d</command>      # Addition Fixnum und Float
+1.9.3p194 :008:0&gt; <command>e = a + d</command>      # Addition Fixnum und Float
 =&gt; 13.14
-irb(main):009:0&gt; <command>e.class</command>        # Das Ergebnis ist ein Float.
+1.9.3p194 :009:0&gt; <command>e.class</command>        # Das Ergebnis ist ein Float.
 =&gt; Float
-irb(main):010:0&gt; <command>a * b</command>
+1.9.3p194 :010:0&gt; <command>a * b</command>
 =&gt; 230
-irb(main):011:0&gt; <command>(a * b).class</command>
+1.9.3p194 :011:0&gt; <command>(a * b).class</command>
 =&gt; Fixnum
-irb(main):012:0&gt; <command>(a * b * d).class</command>
+1.9.3p194 :012:0&gt; <command>(a * b * d).class</command>
 =&gt; Float
-irb(main):013:0&gt; <command>b - a</command>
+1.9.3p194 :013:0&gt; <command>b - a</command>
 =&gt; 13
-irb(main):014:0&gt; <command>a += 1</command>         # a = a + 1
+1.9.3p194 :014:0&gt; <command>a += 1</command>         # a = a + 1
 =&gt; 11
-irb(main):015:0&gt; <command>exit</command>
+1.9.3p194 :015:0&gt; <command>exit</command>
 </screen></para>
       </section>
     </section>
@@ -1167,13 +1137,13 @@ irb(main):015:0&gt; <command>exit</command>
 
       <para>Für bool'sche Werte (<code>true</code> und <code>false</code>) und
       für <code>nil</code> (kein Wert) gibt es jeweils eigene Klassen:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>true.class</command>
+1.9.3p194 :001:0&gt; <command>true.class</command>
 =&gt; TrueClass
-irb(main):002:0&gt; <command>false.class</command>
+1.9.3p194 :002:0&gt; <command>false.class</command>
 =&gt; FalseClass
-irb(main):003:0&gt; <command>nil.class</command>
+1.9.3p194 :003:0&gt; <command>nil.class</command>
 =&gt; NilClass
-irb(main):004:0&gt; <command>exit</command>
+1.9.3p194 :004:0&gt; <command>exit</command>
 </screen></para>
 
       <para><literal>nil</literal> (kein Wert <footnote>
@@ -1240,40 +1210,40 @@ irb(main):004:0&gt; <command>exit</command>
         oder mit einem Unterstrich (<literal>_</literal>) an. Ihr
         Gültigkeitsbereich beschränkt sich auf die aktuelle Umgebung (z. B.
         auf die aktuelle Methode). Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>aaa = 10</command>    # Lokale Variable aaa
+1.9.3p194 :001:0&gt; <command>aaa = 10</command>    # Lokale Variable aaa
 =&gt; 10
-irb(main):002:0&gt; <command>_bbb = 20</command>   # Lokale Variable _bbb
+1.9.3p194 :002:0&gt; <command>_bbb = 20</command>   # Lokale Variable _bbb
 =&gt; 20
-irb(main):003:0&gt; <command>puts aaa</command>
+1.9.3p194 :003:0&gt; <command>puts aaa</command>
 10
 =&gt; nil
-irb(main):004:0&gt; <command>puts _bbb</command>
+1.9.3p194 :004:0&gt; <command>puts _bbb</command>
 20
 =&gt; nil
-irb(main):005:0&gt; <command>def test</command>       # Definition der Methode test
-irb(main):006:1&gt; <command>  aaa = 1000</command>   # Lokale Variable aaa
-irb(main):007:1&gt; <command>  _bbb = 2000</command>  # Lokale Variable _bbb
-irb(main):008:1&gt; <command>  puts aaa</command>     # Ausgabe von aaa
-irb(main):009:1&gt; <command>  puts _bbb</command>    # Ausgabe von _bbb
-irb(main):010:1&gt; <command>end</command>            # Ende der Methode test
+1.9.3p194 :005:0&gt; <command>def test</command>       # Definition der Methode test
+1.9.3p194 :006:1&gt; <command>  aaa = 1000</command>   # Lokale Variable aaa
+1.9.3p194 :007:1&gt; <command>  _bbb = 2000</command>  # Lokale Variable _bbb
+1.9.3p194 :008:1&gt; <command>  puts aaa</command>     # Ausgabe von aaa
+1.9.3p194 :009:1&gt; <command>  puts _bbb</command>    # Ausgabe von _bbb
+1.9.3p194 :010:1&gt; <command>end</command>            # Ende der Methode test
 =&gt; nil
-irb(main):011:0&gt; <command>puts aaa</command>
+1.9.3p194 :011:0&gt; <command>puts aaa</command>
 10
 =&gt; nil
-irb(main):012:0&gt; <command>puts _bbb</command>
+1.9.3p194 :012:0&gt; <command>puts _bbb</command>
 20
 =&gt; nil
-irb(main):013:0&gt; <command>test</command>        # Aufruf der Methode test
+1.9.3p194 :013:0&gt; <command>test</command>        # Aufruf der Methode test
 1000                         # siehe irb-Zeile 8
 2000                         # siehe irb-Ziele 9
 =&gt; nil
-irb(main):014:0&gt; <command>puts aaa</command>
+1.9.3p194 :014:0&gt; <command>puts aaa</command>
 10
 =&gt; nil
-irb(main):015:0&gt; <command>puts _bbb</command>
+1.9.3p194 :015:0&gt; <command>puts _bbb</command>
 20
 =&gt; nil
-irb(main):016:0&gt; <command>exit</command>
+1.9.3p194 :016:0&gt; <command>exit</command>
 </screen></para>
       </section>
 
@@ -1297,26 +1267,26 @@ irb(main):016:0&gt; <command>exit</command>
         <para>Eine globale Variable fängt mit einem
         <literal>$</literal>-Zeichen an und ist im gesamten Programm
         erreichbar. Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>$aaa = 10</command>
+1.9.3p194 :001:0&gt; <command>$aaa = 10</command>
 =&gt; 10
-irb(main):002:0&gt; <command>puts $aaa</command>
+1.9.3p194 :002:0&gt; <command>puts $aaa</command>
 10
 =&gt; nil
-irb(main):003:0&gt; <command>def test</command>    # Definition der Methode test
-irb(main):004:1&gt; <command>  $aaa = 20</command>
-irb(main):005:1&gt; <command>end</command>
+1.9.3p194 :003:0&gt; <command>def test</command>    # Definition der Methode test
+1.9.3p194 :004:1&gt; <command>  $aaa = 20</command>
+1.9.3p194 :005:1&gt; <command>end</command>
 =&gt; nil
-irb(main):006:0&gt; <command>puts $aaa</command>   # Ausgabe von $aaa
+1.9.3p194 :006:0&gt; <command>puts $aaa</command>   # Ausgabe von $aaa
 10
 =&gt; nil
-irb(main):007:0&gt; <command>test</command>        # Aufruf der Methode test
+1.9.3p194 :007:0&gt; <command>test</command>        # Aufruf der Methode test
 =&gt; 20
-irb(main):008:0&gt; <command>puts $aaa</command>   # Ausgabe von $aaa
+1.9.3p194 :008:0&gt; <command>puts $aaa</command>   # Ausgabe von $aaa
 20
 =&gt; nil
-irb(main):009:0&gt; <command>$aaa.class</command>
+1.9.3p194 :009:0&gt; <command>$aaa.class</command>
 =&gt; Fixnum
-irb(main):010:0&gt; <command>exit</command>
+1.9.3p194 :010:0&gt; <command>exit</command>
 </screen></para>
 
         <para>Globale Variablen werden recht selten benutzt.</para>
@@ -1588,19 +1558,19 @@ puts wohnzimmer.fenster
 
       <para>Hier ein paar Beispiele für Methoden der Klasse
       <classname>String</classname>.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = 'Das Haus.'</command>
+1.9.3p194 :001:0&gt; <command>a = 'Das Haus.'</command>
 =&gt; "Das Haus."
-irb(main):002:0&gt; <command>a.class</command>     # .class gibt die Klasse des Objektes aus
+1.9.3p194 :002:0&gt; <command>a.class</command>     # .class gibt die Klasse des Objektes aus
 =&gt; String
-irb(main):003:0&gt; <command>a.size</command>      # Länge des Strings
+1.9.3p194 :003:0&gt; <command>a.size</command>      # Länge des Strings
 =&gt; 9
-irb(main):004:0&gt; <command>a.downcase</command>  # Umwandlung in Kleinbuchstaben
+1.9.3p194 :004:0&gt; <command>a.downcase</command>  # Umwandlung in Kleinbuchstaben
 =&gt; "das haus."
-irb(main):005:0&gt; <command>a.upcase</command>    # Umwandlung in Großbuchstaben
+1.9.3p194 :005:0&gt; <command>a.upcase</command>    # Umwandlung in Großbuchstaben
 =&gt; "DAS HAUS."
-irb(main):006:0&gt; <command>a.reverse</command>   # Buchstabenreihenfolge umdrehen
+1.9.3p194 :006:0&gt; <command>a.reverse</command>   # Buchstabenreihenfolge umdrehen
 =&gt; ".suaH saD"
-irb(main):007:0&gt; <command>exit</command>
+1.9.3p194 :007:0&gt; <command>exit</command>
 </screen></para>
     </section>
 
@@ -1622,13 +1592,13 @@ irb(main):007:0&gt; <command>exit</command>
       <para>Man kommt nicht direkt darauf, aber wenn man sich an das Arbeiten
       mit Ruby gewöhnt hat, dann ist es auch völlig selbstverständlich (weil
       logisch), verschiedene Methoden zu verketten.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = 'Das Haus.'</command>
+1.9.3p194 :001:0&gt; <command>a = 'Das Haus.'</command>
 =&gt; "Das Haus."
-irb(main):002:0&gt; <command>a.class</command>
+1.9.3p194 :002:0&gt; <command>a.class</command>
 =&gt; String
-irb(main):003:0&gt; <command>a.upcase.reverse</command>  # Großbuchstaben umgedreht
+1.9.3p194 :003:0&gt; <command>a.upcase.reverse</command>  # Großbuchstaben umgedreht
 =&gt; ".SUAH SAD"
-irb(main):004:0&gt; <command>exit</command>
+1.9.3p194 :004:0&gt; <command>exit</command>
 </screen></para>
     </section>
 
@@ -1651,15 +1621,15 @@ irb(main):004:0&gt; <command>exit</command>
         </indexterm><methodname>.to_s</methodname> ein
       <classname>Fixnum</classname> in einen
       <classname>String</classname>.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = 10</command>
+1.9.3p194 :001:0&gt; <command>a = 10</command>
 =&gt; 10
-irb(main):002:0&gt; <command>a.class</command>
+1.9.3p194 :002:0&gt; <command>a.class</command>
 =&gt; Fixnum
-irb(main):003:0&gt; <command>b = a.to_s</command>
+1.9.3p194 :003:0&gt; <command>b = a.to_s</command>
 =&gt; "10"
-irb(main):004:0&gt; <command>b.class</command>
+1.9.3p194 :004:0&gt; <command>b.class</command>
  =&gt; String 
-irb(main):005:0&gt; <command>exit</command>
+1.9.3p194 :005:0&gt; <command>exit</command>
 </screen></para>
 
       <para>Nichts anderes macht übrigens <code>puts</code>, wenn man mit
@@ -1675,15 +1645,15 @@ irb(main):005:0&gt; <command>exit</command>
         </indexterm><methodname>.to_i</methodname> ein
       <classname>Float</classname> in ein <classname>Fixnum</classname>
       um.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>c = 10.0</command>
+1.9.3p194 :001:0&gt; <command>c = 10.0</command>
 =&gt; 10.0
-irb(main):002:0&gt; <command>c.class</command>
+1.9.3p194 :002:0&gt; <command>c.class</command>
 =&gt; Float
-irb(main):003:0&gt; <command>d = c.to_i</command>
+1.9.3p194 :003:0&gt; <command>d = c.to_i</command>
 =&gt; 10
-irb(main):004:0&gt; <command>d.class</command>
+1.9.3p194 :004:0&gt; <command>d.class</command>
 =&gt; Fixnum
-irb(main):005:0&gt; <command>exit</command>
+1.9.3p194 :005:0&gt; <command>exit</command>
 </screen></para>
     </section>
 
@@ -1704,27 +1674,27 @@ irb(main):005:0&gt; <command>exit</command>
       <methodname>to_s</methodname> aus).</para>
 
       <para>Ein Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>class Tier</command>
-irb(main):002:1&gt; <command>  def initialize(de_name,en_name)</command>
-irb(main):003:2&gt; <command>    @de_name = de_name</command>
-irb(main):004:2&gt; <command>    @en_name = en_name</command>
-irb(main):005:2&gt; <command>  end</command>
-irb(main):006:1&gt; <command>  def to_s</command>
-irb(main):007:2&gt; <command>    @de_name + ' (' + @en_name + ')'</command>
-irb(main):008:2&gt; <command>  end</command>
-irb(main):009:1&gt; <command>end</command>
+1.9.3p194 :001:0&gt; <command>class Tier</command>
+1.9.3p194 :002:1&gt; <command>  def initialize(de_name,en_name)</command>
+1.9.3p194 :003:2&gt; <command>    @de_name = de_name</command>
+1.9.3p194 :004:2&gt; <command>    @en_name = en_name</command>
+1.9.3p194 :005:2&gt; <command>  end</command>
+1.9.3p194 :006:1&gt; <command>  def to_s</command>
+1.9.3p194 :007:2&gt; <command>    @de_name + ' (' + @en_name + ')'</command>
+1.9.3p194 :008:2&gt; <command>  end</command>
+1.9.3p194 :009:1&gt; <command>end</command>
 =&gt; nil
-irb(main):010:0&gt; <command>lumpi = Tier.new('Hund', 'Dog')</command>
+1.9.3p194 :010:0&gt; <command>lumpi = Tier.new('Hund', 'Dog')</command>
 =&gt; #&lt;Tier:0x873b5c8 @de_name="Hund", @en_name="Dog"&gt;
-irb(main):011:0&gt; <command>hansi = Tier.new('Wellensittich', 'Budgerigar')</command>           
+1.9.3p194 :011:0&gt; <command>hansi = Tier.new('Wellensittich', 'Budgerigar')</command>           
 =&gt; #&lt;Tier:0x86b60f8 @de_name="Wellensittich", @en_name="Budgerigar"&gt;
-irb(main):012:0&gt; <command>puts lumpi</command>
+1.9.3p194 :012:0&gt; <command>puts lumpi</command>
 Hund (Dog)
 =&gt; nil
-irb(main):013:0&gt; <command>puts hansi</command>
+1.9.3p194 :013:0&gt; <command>puts hansi</command>
 Wellensittich (Budgerigar)
 =&gt; nil
-irb(main):014:0&gt; <command>exit</command>
+1.9.3p194 :014:0&gt; <command>exit</command>
 </screen></para>
     </section>
 
@@ -1766,15 +1736,15 @@ sw@debian:~/sandbox$</screen></para>
       dann das <methodname>+</methodname> genauso wie jede andere Methode mit
       einem Punkt an das Objekt hängen können und die zweite Zahl in einer
       Klammer als Parameter anfügen:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>10 + 10</command>
+1.9.3p194 :001:0&gt; <command>10 + 10</command>
 =&gt; 20
-irb(main):002:0&gt; <command>10+10</command>
+1.9.3p194 :002:0&gt; <command>10+10</command>
 =&gt; 20
-irb(main):003:0&gt; <command>10.+10</command>
+1.9.3p194 :003:0&gt; <command>10.+10</command>
 =&gt; 20
-irb(main):004:0&gt; <command>10.+(10)</command>
+1.9.3p194 :004:0&gt; <command>10.+(10)</command>
 =&gt; 20
-irb(main):005:0&gt; <command>exit</command>
+1.9.3p194 :005:0&gt; <command>exit</command>
 </screen></para>
 
       <para>Aha! Das Pluszeichen ist tatsächlich eine Methode, und diese
@@ -1794,21 +1764,21 @@ irb(main):005:0&gt; <command>exit</command>
         <para>Das Ziel ist es, die Methode <methodname>+</methodname> für
         <classname>Fixnum</classname> zu überschreiben. Als Ergebnis jeder
         Addition soll die Zahl 42 herauskommen.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>10 + 10</command>
+1.9.3p194 :001:0&gt; <command>10 + 10</command>
 =&gt; 20
-irb(main):002:0&gt; <command>10 + 5555</command>
+1.9.3p194 :002:0&gt; <command>10 + 5555</command>
 =&gt; 5565
-irb(main):003:0&gt; <command>class Fixnum</command> 
-irb(main):004:1&gt; <command>  def +(name, *args, &amp;blk)</command>
-irb(main):005:2&gt; <command>    42</command>
-irb(main):006:2&gt; <command>  end</command>
-irb(main):007:1&gt; <command>end</command>
+1.9.3p194 :003:0&gt; <command>class Fixnum</command> 
+1.9.3p194 :004:1&gt; <command>  def +(name, *args, &amp;blk)</command>
+1.9.3p194 :005:2&gt; <command>    42</command>
+1.9.3p194 :006:2&gt; <command>  end</command>
+1.9.3p194 :007:1&gt; <command>end</command>
 =&gt; nil
-irb(main):008:0&gt; <command>10 + 10</command>
+1.9.3p194 :008:0&gt; <command>10 + 10</command>
 =&gt; 42
-irb(main):042:0&gt; <command>10 + 5555</command>
+1.9.3p194 :042:0&gt; <command>10 + 5555</command>
 =&gt; 42
-irb(main):042:0&gt; <command>exit</command>
+1.9.3p194 :042:0&gt; <command>exit</command>
 </screen></para>
 
         <para>In den Zeilen 1 und 2 führen wir die normale Addition durch. In
@@ -1835,11 +1805,11 @@ irb(main):042:0&gt; <command>exit</command>
             </indexterm><methodname>methods</methodname> kann man die zur
           Verfügung stehenden Methoden anzeigen. Allerdings weiß man dann
           nicht unbedingt, was diese genau machen.<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = 'Das blaue Haus.'</command>
+1.9.3p194 :001:0&gt; <command>a = 'Das blaue Haus.'</command>
 =&gt; "Das blaue Haus."
-irb(main):002:0&gt; <command>a.methods</command>
+1.9.3p194 :002:0&gt; <command>a.methods</command>
 =&gt; [:&lt;=&gt;, :==, :===, :eql?, :hash, :casecmp, :+, :*, :%, :[], :[]=, :insert, :length, :size, :bytesize, :empty?, :=~, :match, :succ, :succ!, :next, :next!, :upto, :index, :rindex, :replace, :clear, :chr, :getbyte, :setbyte, :to_i, :to_f, :to_s, :to_str, :inspect, :dump, :upcase, :downcase, :capitalize, :swapcase, :upcase!, :downcase!, :capitalize!, :swapcase!, :hex, :oct, :split, :lines, :bytes, :chars, :codepoints, :reverse, :reverse!, :concat, :&lt;&lt;, :crypt, :intern, :to_sym, :ord, :include?, :start_with?, :end_with?, :scan, :ljust, :rjust, :center, :sub, :gsub, :chop, :chomp, :strip, :lstrip, :rstrip, :sub!, :gsub!, :chop!, :chomp!, :strip!, :lstrip!, :rstrip!, :tr, :tr_s, :delete, :squeeze, :count, :tr!, :tr_s!, :delete!, :squeeze!, :each_line, :each_byte, :each_char, :each_codepoint, :sum, :slice, :slice!, :partition, :rpartition, :encoding, :force_encoding, :valid_encoding?, :ascii_only?, :unpack, :encode, :encode!, :to_r, :to_c, :&gt;, :&gt;=, :&lt;, :&lt;=, :between?, :nil?, :!~, :class, :clone, :dup, :taint, :tainted?, :untaint, :untrust, :untrusted?, :trust, :freeze, :frozen?, :methods, :singleton_methods, :protected_methods, :private_methods, :public_methods, :instance_variables, :instance_variable_get, :instance_variable_set, :instance_variable_defined?, :instance_of?, :kind_of?, :is_a?, :tap, :send, :public_send, :respond_to?, :extend, :display, :method, :public_method, :define_singleton_method, :__id__, :object_id, :to_enum, :enum_for, :gem, :equal?, :!, :!=, :instance_eval, :instance_exec, :__send__]
-irb(main):003:0&gt; <command>exit</command>
+1.9.3p194 :003:0&gt; <command>exit</command>
 </screen></para>
         </section>
       </section>
@@ -1887,11 +1857,11 @@ end</programlisting></para>
 
     <para>Eine <foreignphrase xml:lang="en">Expression</foreignphrase> kann
     man sehr gut im <literal>irb</literal> ausprobieren:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = 10</command>
+1.9.3p194 :001:0&gt; <command>a = 10</command>
 =&gt; 10
-irb(main):002:0&gt; <command>a == 10</command>
+1.9.3p194 :002:0&gt; <command>a == 10</command>
 =&gt; true
-irb(main):003:0&gt; <command>exit</command>
+1.9.3p194 :003:0&gt; <command>exit</command>
 </screen></para>
 
     <section xml:id="ruby-if-condition-short">
@@ -1910,7 +1880,7 @@ irb(main):003:0&gt; <command>exit</command>
 # Langversion
 #
 if a == 10 then
-  puts 'a ist 10'           # Die Programmzeile ist von if und end eingeschlossen.
+  puts 'a ist 10'
 end
 
 # Kurzversion
@@ -2013,17 +1983,17 @@ end</programlisting></para>
   programm
 end</programlisting></para>
         </note>Und praktisch wie in folgendem
-      <literal>irb</literal>-Beispiel:<screen>irb(main):001:0&gt; <command>i = 0</command>             # i wird auf 0 gesetzt
+      <literal>irb</literal>-Beispiel:<screen>1.9.3p194 :001:0&gt; <command>i = 0</command>             # i wird auf 0 gesetzt
 =&gt; 0
-irb(main):002:0&gt; <command>while i &lt; 3 do</command>   # Schleife
-irb(main):003:1&gt; <command>  puts i</command>          # i wird ausgegeben
-irb(main):004:1&gt; <command>  i = i + 1</command>       # i wird um 1 erhöht
-irb(main):005:1&gt; <command>end</command>               # Ende der Schleife
+1.9.3p194 :002:0&gt; <command>while i &lt; 3 do</command>   # Schleife
+1.9.3p194 :003:1&gt; <command>  puts i</command>          # i wird ausgegeben
+1.9.3p194 :004:1&gt; <command>  i = i + 1</command>       # i wird um 1 erhöht
+1.9.3p194 :005:1&gt; <command>end</command>               # Ende der Schleife
 0
 1
 2
 =&gt; nil
-irb(main):006:0&gt; <command>exit</command>
+1.9.3p194 :006:0&gt; <command>exit</command>
 </screen></para>
 
       <para>Until-Schleifen werden ähnlich aufgebaut:<programlisting>until ausdruck
@@ -2031,19 +2001,19 @@ irb(main):006:0&gt; <command>exit</command>
 end</programlisting></para>
 
       <para>Auch hier das <literal>irb</literal>-Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>i = 5</command>
+1.9.3p194 :001:0&gt; <command>i = 5</command>
 =&gt; 5
-irb(main):002:0&gt; <command>until i == 0</command>
-irb(main):003:1&gt; <command>i = i - 1</command>
-irb(main):004:1&gt; <command>puts i</command>
-irb(main):005:1&gt; <command>end</command>
+1.9.3p194 :002:0&gt; <command>until i == 0</command>
+1.9.3p194 :003:1&gt; <command>i = i - 1</command>
+1.9.3p194 :004:1&gt; <command>puts i</command>
+1.9.3p194 :005:1&gt; <command>end</command>
 4
 3
 2
 1
 0
 =&gt; nil
-irb(main):006:0&gt; <command>exit</command>
+1.9.3p194 :006:0&gt; <command>exit</command>
 </screen></para>
     </section>
 
@@ -2121,40 +2091,40 @@ sw@debian:~/sandbox$ </screen></para>
 
         <para>Und dort steht auch direkt ein schönes Beispiel, das wir im
         <application>irb</application> ausprobieren:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>5.times do |i|</command>
-irb(main):002:1* <command>puts i</command>
-irb(main):003:1&gt; <command>end</command>
+1.9.3p194 :001:0&gt; <command>5.times do |i|</command>
+1.9.3p194 :002:1* <command>puts i</command>
+1.9.3p194 :003:1&gt; <command>end</command>
 0
 1
 2
 3
 4
 =&gt; 5
-irb(main):004:0&gt; <command>exit</command>
+1.9.3p194 :004:0&gt; <command>exit</command>
 </screen></para>
 
         <para>Und es gibt auch noch eine Einzeilen-Schreibweise für kleine
         Blöcke:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>5.times { |i| puts i }</command>
+1.9.3p194 :001:0&gt; <command>5.times { |i| puts i }</command>
 0
 1
 2
 3
 4
 =&gt; 5
-irb(main):002:0&gt; <command>exit</command>
+1.9.3p194 :002:0&gt; <command>exit</command>
 </screen></para>
 
         <para>Ein Iterator muss übrigens dem Block nicht zwangsläufig eine
         Variable übergeben:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>5.times { puts 'Das blaue Haus.' }</command>
+1.9.3p194 :001:0&gt; <command>5.times { puts 'Das blaue Haus.' }</command>
 Das blaue Haus.
 Das blaue Haus.
 Das blaue Haus.
 Das blaue Haus.
 Das blaue Haus.
 =&gt; 5
-irb(main):002:0&gt; <command>exit</command>
+1.9.3p194 :002:0&gt; <command>exit</command>
 </screen></para>
       </section>
 
@@ -2240,26 +2210,26 @@ sw@debian:~/sandbox$ </screen></para>
 
       <para>Eine Array ist eine Liste von Objekten. Spielen wir doch einmal
       ein wenig im <literal>irb:</literal><screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = [1,2,3,4,5]</command>
+1.9.3p194 :001:0&gt; <command>a = [1,2,3,4,5]</command>
 =&gt; [1, 2, 3, 4, 5]
-irb(main):002:0&gt; <command>a.class</command>
+1.9.3p194 :002:0&gt; <command>a.class</command>
 =&gt; Array
-irb(main):003:0&gt; <command>exit</command>
+1.9.3p194 :003:0&gt; <command>exit</command>
 </screen></para>
 
       <para>Das ist einfach und verständlich.</para>
 
       <para>Mal schauen, ob das so auch mit Strings im Array
       funktioniert:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = ['Test', 'Apfelbaum', 'blau']</command>
+1.9.3p194 :001:0&gt; <command>a = ['Test', 'Apfelbaum', 'blau']</command>
 =&gt; ["Test", "Apfelbaum", "blau"]
-irb(main):002:0&gt; <command>a.class</command>
+1.9.3p194 :002:0&gt; <command>a.class</command>
 =&gt; Array
-irb(main):003:0&gt; <command>a[1]</command>
+1.9.3p194 :003:0&gt; <command>a[1]</command>
 =&gt; "Apfelbaum"
-irb(main):004:0&gt; <command>a[1].class</command>
+1.9.3p194 :004:0&gt; <command>a[1].class</command>
 =&gt; String
-irb(main):005:0&gt; <command>exit</command>
+1.9.3p194 :005:0&gt; <command>exit</command>
 </screen></para>
 
       <para>Das geht auch.</para>
@@ -2269,61 +2239,55 @@ irb(main):005:0&gt; <command>exit</command>
       welche Art von Objekten (sprich <classname>String</classname>,
       <classname>Fixnum</classname>, <classname>Float</classname>, …) das
       sind. Aber ein Versuch schadet ja nicht:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = [1, 2, 'Haus', 'Baum', 4]</command>
+1.9.3p194 :001:0&gt; <command>a = [1, 2, 'Haus', 'Baum', 4]</command>
 =&gt; [1, 2, "Haus", "Baum", 4]
-irb(main):002:0&gt; <command>a.class</command>
+1.9.3p194 :002:0&gt; <command>a.class</command>
 =&gt; Array
-irb(main):003:0&gt; <command>a[0]</command>
+1.9.3p194 :003:0&gt; <command>a[0]</command>
 =&gt; 1
-irb(main):004:0&gt; <command>a[0].class</command>
+1.9.3p194 :004:0&gt; <command>a[0].class</command>
 =&gt; Fixnum
-irb(main):005:0&gt; <command>a[2]</command>
+1.9.3p194 :005:0&gt; <command>a[2]</command>
 =&gt; "Haus"
-irb(main):006:0&gt; <command>a[2].class</command>
+1.9.3p194 :006:0&gt; <command>a[2].class</command>
 =&gt; String
-irb(main):007:0&gt; <command>exit</command>
+1.9.3p194 :007:0&gt; <command>exit</command>
 </screen></para>
 
       <para>Sehen wir uns als Nächstes mal die
       <literal>ri</literal>-Hilfeseite zu <classname>Array</classname>
       an:<screen>sw@debian:~/sandbox$ <command>ri Array</command>
--------------------------------------------------- Class: Array &lt; Object
-     Arrays are ordered, integer-indexed collections of any object.
-     Array indexing starts at 0, as in C or Java. A negative index is
-     assumed to be relative to the end of the array---that is, an index
-     of -1 indicates the last element of the array, -2 is the next to
-     last element in the array, and so on.
+= Array &lt; Object
 
-------------------------------------------------------------------------
+------------------------------------------------------------------------------
+= Includes:
+Enumerable (from ruby site)
 
+(from ruby site)
+------------------------------------------------------------------------------
+Arrays are ordered, integer-indexed collections of any object. Array indexing
+starts at 0, as in C or Java.  A negative index is assumed to be relative to
+the end of the array---that is, an index of -1 indicates the last element of
+the array, -2 is the next to last element in the array, and so on.
 
-Includes:
----------
+------------------------------------------------------------------------------
+= Class methods:
 
-     Enumerable
+  [], new, try_convert
 
-
-Class methods:
---------------
-
-     [], new, try_convert
-
-
-Instance methods:
------------------
-
-     &amp;, *, +, -, &lt;&lt;, &lt;=&gt;, ==, [], []=, abbrev, assoc, at, clear,
-     collect, collect!, combination, compact, compact!, concat, count,
-     cycle, dclone, delete, delete_at, delete_if, drop, drop_while,
-     each, each_index, empty?, eql?, fetch, fill, find_index, first,
-     flatten, flatten!, frozen?, hash, include?, index, initialize_copy,
-     insert, inspect, join, last, length, map, map!, pack, permutation,
-     pop, pretty_print, pretty_print_cycle, product, push, rassoc,
-     reject, reject!, replace, reverse, reverse!, reverse_each, rindex,
-     sample, select, shelljoin, shift, shuffle, shuffle!, size, slice,
-     slice!, sort, sort!, take, take_while, to_a, to_ary, to_csv, to_s,
-     to_yaml, transpose, uniq, uniq!, unshift, values_at,
-     yaml_initialize, zip, |
+= Instance methods:
+  &amp;, *, +, -, &lt;&lt;, &lt;=&gt;, ==, [], []=, abbrev, assoc, at, clear, collect,
+  collect!, combination, compact, compact!, concat, count, cycle, dclone,
+  delete, delete_at, delete_if, drop, drop_while, each, each_index, empty?,
+  eql?, fetch, fill, find_index, first, flatten, flatten!, frozen?, hash,
+  include?, index, initialize_copy, insert, inspect, join, keep_if, last,
+  length, map, map!, pack, permutation, pop, pretty_print, pretty_print_cycle,
+  product, push, rassoc, reject, reject!, repeated_combination,
+  repeated_permutation, replace, reverse, reverse!, reverse_each, rindex,
+  rotate, rotate!, sample, select, select!, shelljoin, shift, shuffle,
+  shuffle!, size, slice, slice!, sort, sort!, sort_by!, take, take_while,
+  to_a, to_ary, to_csv, to_s, transpose, uniq, uniq!, unshift, values_at, zip,
+  |
 
 sw@debian:~/sandbox$ </screen></para>
 
@@ -2331,52 +2295,52 @@ sw@debian:~/sandbox$ </screen></para>
       <methodname>new</methodname> erstellt werden. Einzelne neue Elemente
       lassen sich dann mit der Methode <methodname>&lt;&lt;</methodname>
       hinzufügen. Auch hierzu ein Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = Array.new</command>
+1.9.3p194 :001:0&gt; <command>a = Array.new</command>
 =&gt; []
-irb(main):002:0&gt; <command>a.class</command>
+1.9.3p194 :002:0&gt; <command>a.class</command>
 =&gt; Array
-irb(main):003:0&gt; <command>a &lt;&lt; 'erster Eintrag'</command>
+1.9.3p194 :003:0&gt; <command>a &lt;&lt; 'erster Eintrag'</command>
 =&gt; ["erster Eintrag"]
-irb(main):004:0&gt; <command>a &lt;&lt; 'zweiter Eintrag'</command>
+1.9.3p194 :004:0&gt; <command>a &lt;&lt; 'zweiter Eintrag'</command>
 =&gt; ["erster Eintrag", "zweiter Eintrag"]
-irb(main):005:0&gt; <command>a &lt;&lt; 'dritter Eintrag'</command>
+1.9.3p194 :005:0&gt; <command>a &lt;&lt; 'dritter Eintrag'</command>
 =&gt; ["erster Eintrag", "zweiter Eintrag", "dritter Eintrag"]
-irb(main):006:0&gt; <command>a.size</command>
+1.9.3p194 :006:0&gt; <command>a.size</command>
 =&gt; 3
-irb(main):007:0&gt; <command>exit</command>
+1.9.3p194 :007:0&gt; <command>exit</command>
 </screen></para>
 
       <para>Aber versuchen wir doch mal, ein Array mit Einträgen aus einer
       selbstdefinierten Klasse zu erstellen:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>class Tier</command>              # Definition einer Klasse Tier
-irb(main):002:1&gt; <command>  def initialize(de_name,en_name)</command>
-irb(main):003:2&gt;     <command>@de_name = de_name</command>
-irb(main):004:2&gt; <command>    @en_name = en_name</command>
-irb(main):005:2&gt; <command>  end</command>
-irb(main):006:1&gt;   <command>def to_s</command>
-irb(main):007:2&gt; <command>    @de_name + ' (' + @en_name + ')'</command>
-irb(main):008:2&gt; <command>  end</command>
-irb(main):009:1&gt; <command>end</command>
+1.9.3p194 :001:0&gt; <command>class Tier</command>              # Definition einer Klasse Tier
+1.9.3p194 :002:1&gt; <command>  def initialize(de_name,en_name)</command>
+1.9.3p194 :003:2&gt;     <command>@de_name = de_name</command>
+1.9.3p194 :004:2&gt; <command>    @en_name = en_name</command>
+1.9.3p194 :005:2&gt; <command>  end</command>
+1.9.3p194 :006:1&gt;   <command>def to_s</command>
+1.9.3p194 :007:2&gt; <command>    @de_name + ' (' + @en_name + ')'</command>
+1.9.3p194 :008:2&gt; <command>  end</command>
+1.9.3p194 :009:1&gt; <command>end</command>
 =&gt; nil
-irb(main):010:0&gt; <command>lumpi = Tier.new('Hund', 'Dog')</command>
+1.9.3p194 :010:0&gt; <command>lumpi = Tier.new('Hund', 'Dog')</command>
 =&gt; #&lt;Tier:0x873b5c8 @de_name="Hund", @en_name="Dog"&gt;
-irb(main):011:0&gt; <command>hansi = Tier.new('Wellensittich', 'Budgerigar')</command>           
+1.9.3p194 :011:0&gt; <command>hansi = Tier.new('Wellensittich', 'Budgerigar')</command>           
 =&gt; #&lt;Tier:0x86b60f8 @de_name="Wellensittich", @en_name="Budgerigar"&gt;
-irb(main):012:0&gt; <command>haustiere = Array.new</command>   # haustiere ist ein Array
+1.9.3p194 :012:0&gt; <command>haustiere = Array.new</command>   # haustiere ist ein Array
 =&gt; []
-irb(main):013:0&gt; <command>haustiere &lt;&lt; hansi</command>      # hansi wird hinzugefuegt
+1.9.3p194 :013:0&gt; <command>haustiere &lt;&lt; hansi</command>      # hansi wird hinzugefuegt
 =&gt; [#&lt;Tier:0x8d11f18 @de_name="Wellensittich", @en_name="Budgerigar"&gt;]
-irb(main):014:0&gt; <command>haustiere &lt;&lt; lumpi</command>      # lumpi wird hinzugefuegt
+1.9.3p194 :014:0&gt; <command>haustiere &lt;&lt; lumpi</command>      # lumpi wird hinzugefuegt
 =&gt; [#&lt;Tier:0x8d11f18 @de_name="Wellensittich", @en_name="Budgerigar"&gt;, #&lt;Tier:0x8d9751c @de_name="Hund", @en_name="Dog"&gt;]
-irb(main):015:0&gt; <command>haustiere.count</command>
+1.9.3p194 :015:0&gt; <command>haustiere.count</command>
 =&gt; 2
-irb(main):016:0&gt; <command>puts haustiere[1]</command>       # Ausgabe der Position 1
+1.9.3p194 :016:0&gt; <command>puts haustiere[1]</command>       # Ausgabe der Position 1
 Hund (Dog)
 =&gt; nil
-irb(main):017:0&gt; <command>puts haustiere[0]</command>       # Ausgabe der Position 0
+1.9.3p194 :017:0&gt; <command>puts haustiere[0]</command>       # Ausgabe der Position 0
 Wellensittich (Budgerigar)
 =&gt; nil
-irb(main):018:0&gt; <command>exit</command>
+1.9.3p194 :018:0&gt; <command>exit</command>
 </screen></para>
 
       <section xml:id="array_iterator">
@@ -2396,35 +2360,41 @@ irb(main):018:0&gt; <command>exit</command>
             <secondary>in Ruby</secondary>
           </indexterm><methodname>each</methodname> kann man sich Stück für
         Stück durch ein Array arbeiten. Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>einkaufsliste = ['Eier', 'Butter', 'Mehl']</command>
+1.9.3p194 :001:0&gt; <command>einkaufsliste = ['Eier', 'Butter', 'Mehl']</command>
 =&gt; ["Eier", "Butter", "Mehl"]
-irb(main):002:0&gt; <command>einkaufsliste.each do |produkt|</command>
-irb(main):003:1* <command>  puts produkt</command>
-irb(main):004:1&gt; <command>end</command>
+1.9.3p194 :002:0&gt; <command>einkaufsliste.each do |produkt|</command>
+1.9.3p194 :003:1* <command>  puts produkt</command>
+1.9.3p194 :004:1&gt; <command>end</command>
 Eier
 Butter
 Mehl
 =&gt; ["Eier", "Butter", "Mehl"]
-irb(main):005:0&gt; <command>exit</command>
+1.9.3p194 :005:0&gt; <command>exit</command>
 </screen></para>
 
         <para>Auch hier gibt Ihnen <literal>ri</literal> Hilfe und ein
         Beispiel, falls Sie mal vergessen haben sollten, wie
         <methodname>each</methodname> anzuwenden ist:<screen>sw@debian:~/sandbox$ <command>ri Array.each</command>
-------------------------------------------------------------- Array#each
-     array.each {|item| block }   -&gt;   array
+= Array.each
 
-     From Ruby 1.9.1
-------------------------------------------------------------------------
-     Calls _block_ once for each element in _self_, passing that element
-     as a parameter.
+(from ruby site)
+------------------------------------------------------------------------------
+  ary.each {|item| block }   -&gt; ary
+  ary.each                   -&gt; an_enumerator
 
-        a = [ "a", "b", "c" ]
-        a.each {|x| print x, " -- " }
+------------------------------------------------------------------------------
 
-     produces:
+Calls block once for each element in self, passing that element as a
+parameter.
 
-        a -- b -- c --
+If no block is given, an enumerator is returned instead.
+
+  a = [ "a", "b", "c" ]
+  a.each {|x| print x, " -- " }
+
+produces:
+
+  a -- b -- c --
 
 sw@debian:~/sandbox$ </screen></para>
       </section>
@@ -2443,13 +2413,13 @@ sw@debian:~/sandbox$ </screen></para>
       xml:lang="en">Hash</foreignphrase></quote> ist eine Liste aus
       Schlüssel-/Wert-Paaren (<foreignphrase xml:lang="en">key/value
       pairs</foreignphrase>). Ein Beispiel mit Strings als Schlüssel:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>preisliste = { '6 Eier' =&gt; 1.2, '12 Eier' =&gt; 2, '500 gr Butter' =&gt; 0.99 }</command>
+1.9.3p194 :001:0&gt; <command>preisliste = { '6 Eier' =&gt; 1.2, '12 Eier' =&gt; 2, '500 gr Butter' =&gt; 0.99 }</command>
 =&gt; {"6 Eier"=&gt;1.2, "12 Eier"=&gt;2, "500 gr Butter"=&gt;0.99}
-irb(main):002:0&gt; <command>preisliste['12 Eier']</command>
+1.9.3p194 :002:0&gt; <command>preisliste['12 Eier']</command>
 =&gt; 2
-irb(main):003:0&gt; <command>preisliste.count</command>
+1.9.3p194 :003:0&gt; <command>preisliste.count</command>
 =&gt; 3
-irb(main):004:0&gt; <command>exit</command>
+1.9.3p194 :004:0&gt; <command>exit</command>
 </screen></para>
 
       <para>Natürlich können in Hashes nicht nur Strings, sondern – wie bei
@@ -2459,43 +2429,36 @@ irb(main):004:0&gt; <command>exit</command>
       <para>Wie zu <classname>Array</classname> gibt es auch zu
       <classname>Hash</classname> eine sehr gute
       <literal>ri</literal>-Hilfeseite:<screen>sw@debian:~/sandbox$ <command>ri Hash</command>
---------------------------------------------------- Class: Hash &lt; Object
-     A +Hash+ is a collection of key-value pairs. It is similar to an
-     +Array+, except that indexing is done via arbitrary keys of any
-     object type, not an integer index. The order in which you traverse
-     a hash by either key or value may seem arbitrary, and will
-     generally not be in the insertion order.
+= Hash &lt; Object
 
-     Hashes have a _default value_ that is returned when accessing keys
-     that do not exist in the hash. By default, that value is +nil+.
+------------------------------------------------------------------------------
+= Includes:
+Enumerable (from ruby site)
 
-------------------------------------------------------------------------
+(from ruby site)
+------------------------------------------------------------------------------
+A Hash is a collection of key-value pairs. It is similar to an Array, except
+that indexing is done via arbitrary keys of any object type, not an integer
+index. Hashes enumerate their values in the order that the corresponding keys
+were inserted.
 
+Hashes have a default value that is returned when
+accessing keys that do not exist in the hash. By default, that value is nil.
 
-Includes:
----------
+------------------------------------------------------------------------------
+= Class methods:
 
-     Enumerable
+  [], new, try_convert
 
-
-Class methods:
---------------
-
-     [], new, try_convert
-
-
-Instance methods:
------------------
-
-     ==, [], []=, assoc, clear, compare_by_identity,
-     compare_by_identity?, default, default=, default_proc,
-     default_proc=, delete, delete_if, each, each_key, each_pair,
-     each_value, empty?, eql?, fetch, flatten, has_key?, has_value?,
-     hash, include?, initialize_copy, inspect, invert, key, key?, keys,
-     length, member?, merge, merge!, pretty_print, pretty_print_cycle,
-     rassoc, rehash, reject, reject!, replace, select, shift, size,
-     store, to_a, to_hash, to_s, to_yaml, update, value?, values,
-     values_at, yaml_initialize
+= Instance methods:
+  ==, [], []=, assoc, clear, compare_by_identity, compare_by_identity?,
+  default, default=, default_proc, default_proc=, delete, delete_if, each,
+  each_key, each_pair, each_value, empty?, eql?, fetch, flatten, has_key?,
+  has_value?, hash, include?, initialize_copy, inspect, invert, keep_if, key,
+  key?, keys, length, member?, merge, merge!, pretty_print,
+  pretty_print_cycle, rassoc, rehash, reject, reject!, replace, select,
+  select!, shift, size, store, to_a, to_hash, to_s, update, value?, values,
+  values_at
 
 sw@debian:~/sandbox$ </screen></para>
 
@@ -2513,32 +2476,32 @@ sw@debian:~/sandbox$ </screen></para>
         sind sie auch sehr praktisch und werden unter anderem bei Hashes
         häufig benutzt. Normalerweise werden bei Variablen immer neue Objekte
         angelegt:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>a = 'Beispiel 1'</command>
+1.9.3p194 :001:0&gt; <command>a = 'Beispiel 1'</command>
  =&gt; "Beispiel 1" 
-irb(main):002:0&gt; <command>a.object_id</command>
+1.9.3p194 :002:0&gt; <command>a.object_id</command>
  =&gt; 2156685080 
-irb(main):003:0&gt; <command>a = 'Beispiel 2'</command>
+1.9.3p194 :003:0&gt; <command>a = 'Beispiel 2'</command>
  =&gt; "Beispiel 2" 
-irb(main):004:0&gt; <command>a.object_id</command>
+1.9.3p194 :004:0&gt; <command>a.object_id</command>
  =&gt; 2151901180 
-irb(main):005:0&gt; <command>exit</command>
+1.9.3p194 :005:0&gt; <command>exit</command>
 </screen></para>
 
         <para>Wir haben zweimal die Variable <varname>a</varname>, aber einmal
-        hat sie die Objekt-ID 2156685080 und dann die Objekt-ID 2151901180.
-        Wir könnten das immer so weitermachen. Es würde jedes Mal eine andere
-        Objekt-ID und damit ein neues Objekt herauskommen. Das ist prinzipiell
-        nicht weiter schlimm und im Sinne der Objektorientierung auch logisch.
-        Allerdings ist es auch ein recht verschwenderischer Umgang mit
-        Speicherplatz.</para>
+        hat sie die Objekt-ID <code>2156685080</code> und dann die Objekt-ID
+        <code>2151901180</code>. Wir könnten das immer so weitermachen. Es
+        würde jedes Mal eine andere Objekt-ID und damit ein neues Objekt
+        herauskommen. Das ist prinzipiell nicht weiter schlimm und im Sinne
+        der Objektorientierung auch logisch. Allerdings ist es auch ein recht
+        verschwenderischer Umgang mit Speicherplatz.</para>
 
         <para>Ein Symbol wird durch einen Doppelpunkt vor dem Namen definiert
         und kann selber keine Werte speichern, aber hat immer die gleiche
         Objekt-ID und ist deshalb sehr gut als Schlüssel (<foreignphrase
         xml:lang="en">key</foreignphrase>) geeignet:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>:a.object_id</command>
+1.9.3p194 :001:0&gt; <command>:a.object_id</command>
  =&gt; 373448 
-irb(main):002:0&gt; <command>exit</command>
+1.9.3p194 :002:0&gt; <command>exit</command>
 </screen></para>
 
         <para>Machen wir noch mal einen kleinen Versuch, um den Unterschied
@@ -2547,29 +2510,29 @@ irb(main):002:0&gt; <command>exit</command>
         und dann 3-mal hintereinander das Symbol <literal>:white</literal>.
         Bei <literal>"white"</literal> wird immer ein neues Objekt angelegt.
         Beim Symbol <literal>:white</literal> nur beim ersten Mal:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>'white'.object_id</command>
+1.9.3p194 :001:0&gt; <command>'white'.object_id</command>
  =&gt; 2152156400 
-irb(main):002:0&gt; <command>'white'.object_id</command>
+1.9.3p194 :002:0&gt; <command>'white'.object_id</command>
  =&gt; 2152152240 
-irb(main):003:0&gt; <command>'white'.object_id</command>
+1.9.3p194 :003:0&gt; <command>'white'.object_id</command>
  =&gt; 2152164440 
-irb(main):004:0&gt; <command>:white.object_id</command>
+1.9.3p194 :004:0&gt; <command>:white.object_id</command>
  =&gt; 373448 
-irb(main):005:0&gt; <command>:white.object_id</command>
+1.9.3p194 :005:0&gt; <command>:white.object_id</command>
  =&gt; 373448 
-irb(main):006:0&gt; <command>:white.object_id</command>
+1.9.3p194 :006:0&gt; <command>:white.object_id</command>
  =&gt; 373448 
-irb(main):007:0&gt; <command>exit</command>
+1.9.3p194 :007:0&gt; <command>exit</command>
 </screen></para>
 
         <para>Die Benutzung von Symbolen als Schlüssel ist bei Hashes sehr
         viel speichereffizienter:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>farben = { :black =&gt; '#000000', :white =&gt; ':FFFFFF', :green =&gt; '#00C000', :blue =&gt; '#0000FF' }
+1.9.3p194 :001:0&gt; <command>farben = { :black =&gt; '#000000', :white =&gt; ':FFFFFF', :green =&gt; '#00C000', :blue =&gt; '#0000FF' }
 =&gt; {:black=&gt;"#000000", :white=&gt;":FFFFFF", :green=&gt;"#00C000", :blue=&gt;"#0000FF"}</command>
-irb(main):002:0&gt; <command>puts farben[:green]</command>
+1.9.3p194 :002:0&gt; <command>puts farben[:green]</command>
 #00C000
 =&gt; nil
-irb(main):003:0&gt; <command>exit</command>
+1.9.3p194 :003:0&gt; <command>exit</command>
 </screen></para>
 
         <para>Symbole werden Sie in Rails noch oft sehen. Wenn Sie weitere
@@ -2595,36 +2558,43 @@ irb(main):003:0&gt; <command>exit</command>
             <secondary>in Ruby</secondary>
           </indexterm><methodname>each</methodname> kann man sich Stück für
         Stück durch einen Hash arbeiten. Beispiel:<screen>sw@debian:~/sandbox$ <command>irb</command>
-irb(main):001:0&gt; <command>einkaufsliste = { 'Eier' =&gt; 6, 'Butter' =&gt; '500 gr' }</command>
+1.9.3p194 :001:0&gt; <command>einkaufsliste = { 'Eier' =&gt; 6, 'Butter' =&gt; '500 gr' }</command>
 =&gt; {"Eier"=&gt;6, "Butter"=&gt;"500 gr"}
-irb(main):002:0&gt; <command>einkaufsliste.each do |key,value|</command>
-irb(main):003:1* <command>  puts "Produkt: #{key} - Menge: #{value}"</command>
-irb(main):004:1&gt; <command>end</command>
+1.9.3p194 :002:0&gt; <command>einkaufsliste.each do |key,value|</command>
+1.9.3p194 :003:1* <command>  puts "Produkt: #{key} - Menge: #{value}"</command>
+1.9.3p194 :004:1&gt; <command>end</command>
 Produkt: Eier - Menge: 6
 Produkt: Butter - Menge: 500 gr
 =&gt; {"Eier"=&gt;6, "Butter"=&gt;"500 gr"}
-irb(main):005:0&gt; <command>exit</command>
+1.9.3p194 :005:0&gt; <command>exit</command>
 </screen></para>
 
         <para>Auch hier gibt Ihnen <literal>ri</literal> Hilfe und ein
         Beispiel, falls Sie mal vergessen haben sollten, wie
         <methodname>each</methodname> anzuwenden ist:<screen>sw@debian:~/sandbox$ <command>ri Hash.each</command>
--------------------------------------------------------------- Hash#each
-     hsh.each {| key, value | block } -&gt; hsh
-     hsh.each_pair {| key, value | block } -&gt; hsh
+= Hash.each
 
-     From Ruby 1.9.1
-------------------------------------------------------------------------
-     Calls _block_ once for each key in _hsh_, passing the key-value
-     pair as parameters.
+(from ruby site)
+------------------------------------------------------------------------------
+  hsh.each      {| key, value | block } -&gt; hsh
+  hsh.each_pair {| key, value | block } -&gt; hsh
+  hsh.each                              -&gt; an_enumerator
+  hsh.each_pair                         -&gt; an_enumerator
 
-        h = { "a" =&gt; 100, "b" =&gt; 200 }
-        h.each {|key, value| puts "#{key} is #{value}" }
+------------------------------------------------------------------------------
 
-     _produces:_
+Calls block once for each key in hsh, passing the key-value
+pair as parameters.
 
-        a is 100
-        b is 200
+If no block is given, an enumerator is returned instead.
+
+  h = { "a" =&gt; 100, "b" =&gt; 200 }
+  h.each {|key, value| puts "#{key} is #{value}" }
+
+produces:
+
+  a is 100
+  b is 200
 
 sw@debian:~/sandbox$ </screen></para>
       </section>
@@ -2648,41 +2618,41 @@ sw@debian:~/sandbox$ </screen></para>
       Klammern mit zwei Punkten in der Mitte definiert. Ein Beispiel in dem
       wir einen Range wie einen Iterator mit <methodname>each</methodname>
       benutzen:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>irb</command>
-ruby-1.9.2-p0 &gt; <command>(0..3)</command>
+1.9.3p194 &gt; <command>(0..3)</command>
  =&gt; 0..3 
-ruby-1.9.2-p0 &gt; <command>(0..3).class</command>
+1.9.3p194 &gt; <command>(0..3).class</command>
  =&gt; Range 
-ruby-1.9.2-p0 &gt; <command>(0..3).each do |i|</command>
-ruby-1.9.2-p0 &gt;     <command>puts i</command>
-ruby-1.9.2-p0 ?&gt;  <command>end</command>
+1.9.3p194 &gt; <command>(0..3).each do |i|</command>
+1.9.3p194 &gt;     <command>puts i</command>
+1.9.3p194 ?&gt;  <command>end</command>
 0
 1
 2
 3
  =&gt; 0..3 
-ruby-1.9.2-p0 &gt; </screen></para>
+1.9.3p194 &gt; </screen></para>
 
       <para>Mit der Methode <methodname>to_a</methodname> kann aus einem
       <classname>Range</classname> ein <classname>Array</classname> generiert
-      werden:<screen>ruby-1.9.2-p0 &gt; <command>(0..3).to_a</command>
+      werden:<screen>1.9.3p194 &gt; <command>(0..3).to_a</command>
  =&gt; [0, 1, 2, 3] 
-ruby-1.9.2-p0 &gt;</screen></para>
+1.9.3p194 &gt;</screen></para>
 
       <para>Ein Range kann man aus Objekten jeden Types generieren. Wichtig
       ist nur, das die Objekte mit <methodname>&lt;=&gt;</methodname>
       vergleichbar sind und die Methode <methodname>succ</methodname> zum
       Hochzählen auf den nächsten Wert benutzen. So können Sie mit Range auch
-      Buchstaben repräsentieren:<screen>ruby-1.9.2-p0 &gt; <command>('a'..'h').to_a</command>
+      Buchstaben repräsentieren:<screen>1.9.3p194 &gt; <command>('a'..'h').to_a</command>
  =&gt; ["a", "b", "c", "d", "e", "f", "g", "h"] 
-ruby-1.9.2-p0 &gt; 
+1.9.3p194 &gt; 
 </screen></para>
 
       <para>Als alternative Schreibweise werden Sie manchmal auf auf
       <methodname>Range.new()</methodname> stossen. Dann wird der Start- und
       Endpunkt nicht mit zwei Punkten, sondern mit einem Komma abgetrennt. Das
-      sieht dann so aus:<screen>ruby-1.9.2-p0 &gt; <command>(0..3) == Range.new(0,3)</command>
+      sieht dann so aus:<screen>1.9.3p194 &gt; <command>(0..3) == Range.new(0,3)</command>
  =&gt; true 
-ruby-1.9.2-p0 &gt; <command>exit</command>
+1.9.3p194 &gt; <command>exit</command>
 stefan@swmbp 0 1.9.2-p0 ~$ </screen></para>
     </section>
   </section>
