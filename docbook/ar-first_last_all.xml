@@ -36,106 +36,120 @@
   <para>In dem ein oder anderen Fall braucht man immer mal den ersten oder den
   letzten oder auch alle Datensätze. Deshalb gibt es für alle drei Fälle eine
   fertige Methode. Fangen wir mit den einfachsten an:
-  <methodname>first</methodname> und <methodname>last</methodname>.<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.first</command>
- =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Album.last</command>
- =&gt; #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-  <para>Ein kurzer Blick in <filename>log/development.log</filename> zeigt
-  uns, wie ActiveRecord das gemacht hat:<programlisting>  Album Load (0.4ms)  SELECT "albums".* FROM "albums" LIMIT 1
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY albums.id DESC LIMIT 1</programlisting></para>
+  <methodname>first</methodname> und <methodname>last</methodname>.<screen>Stefan-Wintermeyers-MacBook-Air:europe xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Country.first</command>
+  Country Load (0.2ms)  SELECT "countries".* FROM "countries" LIMIT 1
+ =&gt; #&lt;Country id: 1, name: "Deutschland", population: 81831000, created_at: "2012-04-26 10:26:38", updated_at: "2012-04-26 10:26:38"&gt; 
+1.9.3p194 :002 &gt; <command>Country.last</command>
+  Country Load (0.3ms)  SELECT "countries".* FROM "countries" ORDER BY "countries"."id" DESC LIMIT 1
+ =&gt; #&lt;Country id: 4, name: "Niederlande", population: 16680000, created_at: "2012-04-26 10:47:23", updated_at: "2012-04-26 10:47:23"&gt; 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:europe xyz$ </screen></para>
 
   <para>Und jetzt mal alle auf einmal mit
-  <methodname>all</methodname>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.all</command>
- =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-  <para>Der dazugehörige SQL-Code ist nicht überraschend:<programlisting>  Album Load (0.2ms)  SELECT "albums".* FROM "albums"</programlisting></para>
+  <methodname>all</methodname>:<screen>Stefan-Wintermeyers-MacBook-Air:europe xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Country.all</command>
+  Country Load (0.2ms)  SELECT "countries".* FROM "countries" 
+ =&gt; [#&lt;Country id: 1, name: "Deutschland", population: 81831000, created_at: "2012-04-26 10:26:38", updated_at: "2012-04-26 10:26:38"&gt;, #&lt;Country id: 2, name: "Frankreich", population: 65447374, created_at: "2012-04-26 10:41:54", updated_at: "2012-04-26 10:41:54"&gt;, #&lt;Country id: 3, name: "Belgien", population: 10839905, created_at: "2012-04-26 10:44:49", updated_at: "2012-04-26 10:44:49"&gt;, #&lt;Country id: 4, name: "Niederlande", population: 16680000, created_at: "2012-04-26 10:47:23", updated_at: "2012-04-26 10:47:23"&gt;] 
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:europe xyz$ </screen></para>
 
   <para>Die von <methodname>first</methodname>, <methodname>last</methodname>
   und <methodname>all</methodname> erzeugten Objekte sind aber
   unterschiedlich. Bei <methodname>first</methodname> und
   <methodname>last</methodname> wird ein Objekt der Klasse
-  <classname>Album</classname> ausgegeben und bei <methodname>all</methodname>
-  natürlich ein <literal>Array</literal> solcher Objekte:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.first</command>
- =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Album.first.class</command>
- =&gt; Album(id: integer, position: integer, name: string, release_year: integer, created_at: datetime, updated_at: datetime) 
-
-ruby-1.9.2-p0 &gt; <command>Album.all</command>
- =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>Album.all.class</command>
+  <classname>Country</classname> ausgegeben und bei
+  <methodname>all</methodname> natürlich ein <literal>Array</literal> solcher
+  Objekte:<screen>Stefan-Wintermeyers-MacBook-Air:europe xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Country.first</command>
+  Country Load (0.1ms)  SELECT "countries".* FROM "countries" LIMIT 1
+ =&gt; #&lt;Country id: 1, name: "Deutschland", population: 81831000, created_at: "2012-04-26 10:26:38", updated_at: "2012-04-26 10:26:38"&gt; 
+1.9.3p194 :002 &gt; <command>Country.first.class</command>
+  Country Load (0.3ms)  SELECT "countries".* FROM "countries" LIMIT 1
+ =&gt; Country(id: integer, name: string, population: integer, created_at: datetime, updated_at: datetime) 
+1.9.3p194 :003 &gt; <command>Country.all</command>
+  Country Load (0.3ms)  SELECT "countries".* FROM "countries" 
+ =&gt; [#&lt;Country id: 1, name: "Deutschland", population: 81831000, created_at: "2012-04-26 10:26:38", updated_at: "2012-04-26 10:26:38"&gt;, #&lt;Country id: 2, name: "Frankreich", population: 65447374, created_at: "2012-04-26 10:41:54", updated_at: "2012-04-26 10:41:54"&gt;, #&lt;Country id: 3, name: "Belgien", population: 10839905, created_at: "2012-04-26 10:44:49", updated_at: "2012-04-26 10:44:49"&gt;, #&lt;Country id: 4, name: "Niederlande", population: 16680000, created_at: "2012-04-26 10:47:23", updated_at: "2012-04-26 10:47:23"&gt;] 
+1.9.3p194 :004 &gt; <command>Country.all.class</command>
+  Country Load (0.3ms)  SELECT "countries".* FROM "countries" 
  =&gt; Array 
+1.9.3p194 :005 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:europe xyz$</screen></para>
 
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-  <para>Wenn <methodname>Album.all</methodname> ein Array zurückgibt, dann
+  <para>Wenn <methodname>County.all</methodname> ein Array zurückgibt, dann
   müsste man doch auch Iteratoren (siehe <xref linkend="iterator" /> und <xref
   linkend="array_iterator" />) benutzen können, oder? Ja, natürlich! Das ist
   ja das Schöne daran. Kleiner Versuch mit
-  <methodname>each</methodname>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.all.each do |album|</command>
-ruby-1.9.2-p0 &gt;     <command>puts album.name</command>
-ruby-1.9.2-p0 ?&gt;  <command>end</command>
-Sgt. Pepper's Lonely Hearts Club Band
-Pet Sounds
-Revolver
-Highway 61 Revisited
- =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+  <methodname>each</methodname>:<screen>Stefan-Wintermeyers-MacBook-Air:europe xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Country.all.each do |country|</command>
+1.9.3p194 :002 &gt;     <command>puts country.name</command>
+1.9.3p194 :003?&gt;   <command>end</command>
+  Country Load (0.1ms)  SELECT "countries".* FROM "countries" 
+Deutschland
+Frankreich
+Belgien
+Niederlande
+ =&gt; [#&lt;Country id: 1, name: "Deutschland", population: 81831000, created_at: "2012-04-26 10:26:38", updated_at: "2012-04-26 10:26:38"&gt;, #&lt;Country id: 2, name: "Frankreich", population: 65447374, created_at: "2012-04-26 10:41:54", updated_at: "2012-04-26 10:41:54"&gt;, #&lt;Country id: 3, name: "Belgien", population: 10839905, created_at: "2012-04-26 10:44:49", updated_at: "2012-04-26 10:44:49"&gt;, #&lt;Country id: 4, name: "Niederlande", population: 16680000, created_at: "2012-04-26 10:47:23", updated_at: "2012-04-26 10:47:23"&gt;] 
+1.9.3p194 :004 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:europe xyz$ </screen></para>
 
   <para>Kann man dann auch <code>.all.first</code> als Alternative zu
-  <code>.first</code> benutzen? Ja, aber es macht keinen Sinn. Sehen Sie
-  selbst:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.first</command>
- =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Album.all.first</command>
- =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-  <para>Sicher, das Ergebnis ist das gleiche, aber werfen wir nachfolgend
-  einen Blick ins <filename>log/development.log</filename>:<programlisting>  Album Load (0.1ms)  SELECT "albums".* FROM "albums" LIMIT 1
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums"</programlisting></para>
+  <code>.first</code> benutzen? Ja, aber es macht wenig Sinn. Sehen Sie
+  selbst:<screen>Stefan-Wintermeyers-MacBook-Air:europe xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Country.first</command>
+  Country Load (0.2ms)  SELECT "countries".* FROM "countries" LIMIT 1
+ =&gt; #&lt;Country id: 1, name: "Deutschland", population: 81831000, created_at: "2012-04-26 10:26:38", updated_at: "2012-04-26 10:26:38"&gt; 
+1.9.3p194 :002 &gt; <command>Country.all.first</command>
+  Country Load (0.3ms)  SELECT "countries".* FROM "countries" 
+ =&gt; #&lt;Country id: 1, name: "Deutschland", population: 81831000, created_at: "2012-04-26 10:26:38", updated_at: "2012-04-26 10:26:38"&gt; 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:europe xyz$</screen></para>
 
   <para>Selbst bei unserer Mini-Datenbank sehen wir schon einen
-  Geschwindigkeitsunterschied. Bei <code>Album.first</code> wird ein
-  <code>SELECT *</code> mit einem <code>LIMIT 1</code> abgerufen (erste
-  Zeile). Bei <code>Album.all.first</code> wird erst die ganze Tabelle mit
-  <code>SELECT *</code> eingelesen und dann innerhalb von Ruby das erste
+  Geschwindigkeitsunterschied von 0.1 Millisekunden. Bei
+  <code>Country.first</code> wird per SQL in der Datenbank mit einem
+  <code>LIMIT 1</code> der erste Datensatz rausgesucht und von ActiveRecord
+  als einzelnes Objekt der Country-Klasse ausgegeben. Bei
+  <code>Country.all.first</code> wird erst die ganze Tabelle mit <code>SELECT
+  "countries".* FROM "countries"</code> als Array eingelesen und das erste
   Element dieses Arrays rausgezogen. Bei dieser kleinen Applikation kann man
   sich das noch leisten, aber stellen Sie sich mal vor, es würde sich um eine
   Datenbank mit vielen Millionen Einträgen handeln.</para>
 
-  <tip>
-    <para>Auch wenn ActiveRecord dem Programmierer schon sehr viel Denkarbeit
-    abnimmt, sollte man immer überlegen, ob das gleiche Ergebnis nicht auch
-    mit einem besseren Weg realisiert werden kann.</para>
-  </tip>
+  <warning>
+    <para>SQL-Datenbanken haben normalerweise keine automatische Sortierung
+    der Ergebnisse eines <code>SELECT * FROM xyz</code>. Die Datenbank kann
+    die Reihenfolge der Datensätze selber bestimmen. Entsprechend können wir
+    bei einem <code>LIMIT 1</code> aus einer solchen Menge auch nicht 100%ig
+    sicher sein, das der für uns Menschen logisch erste Datensatz rauskommt.
+    Faktisch heißt das, das wir mit einem <code>Country.first</code> nicht
+    zwingend den ersten Datensatz bekommen müssen. Der SQL-Datenbank steht es
+    frei z.B. aus Performance-Gründen eine andere Sortierung vorzunehmen. Wenn
+    wir absolut sicher gehen wollen, das wir den für uns logisch ersten
+    Datensatz bekommen, so müssen wir mit der <methodname>order</methodname>
+    Methode (siehe <xref linkend="activerecord_order" />) arbeiten:<screen>Stefan-Wintermeyers-MacBook-Air:europe xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Country.order(:id).first</command>
+  Country Load (0.6ms)  SELECT "countries".* FROM "countries" ORDER BY id LIMIT 1
+ =&gt; #&lt;Country id: 1, name: "Deutschland", population: 81831000, created_at: "2012-04-26 10:26:38", updated_at: "2012-04-26 10:26:38"&gt; 
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:europe xyz$</screen></para>
+
+    <para>Sie sehen im SQL, das mit <code>SELECT "countries".* FROM
+    "countries" ORDER BY id LIMIT 1</code> erst die Tabelle nach der
+    <varname>id</varname> sortiert wird und dann die erste Zeile ausgegeben
+    wird.</para>
+
+    <para>Meistens arbeitet die SQL-Datenbank genau so wie man es erwartet und
+    man bekommt mit <code>Country.first</code> den ersten Datensatz geliefert.
+    Wenn man aber ganz sicher sein will, dann sollte man immer mit einem
+    <methodname>order</methodname> arbeiten. </para>
+
+    <para>Am einfachsten geht dies mit einem default_scope.</para>
+  </warning>
 </section>
