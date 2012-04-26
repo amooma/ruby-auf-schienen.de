@@ -37,7 +37,7 @@ Country.create({"name"=&gt;"Niederlande", "population"=&gt;16680000})</programli
   <para>Das Einspielen der Daten erfolgt dann mit <command>rake
   db:seed</command>. Um ganz sicher zu sein, sollten Sie im Rahmen dieses
   Buches immer mit <command>rake db:setup</command> die Datenbank neu
-  aufsetzen und dann automatisch mit der <filename>seeds.rb</filename>
+  aufsetzen und dann automatisch mit der <filename>db/seeds.rb</filename>
   füttern. Das sieht dann so aus:<screen>Stefan-Wintermeyers-MacBook-Air:europe xyz$ <command>rake db:setup</command>
 db/development.sqlite3 already exists
 -- create_table("countries", {:force=&gt;true})
@@ -59,7 +59,7 @@ Stefan-Wintermeyers-MacBook-Air:europe xyz$</screen>Die Datei
       <primary>seeds.rb</primary>
     </indexterm>
 
-    <para>Die <filename>seeds.rb</filename> ist ein Ruby-Programm.
+    <para>Die <filename>db/seeds.rb</filename> ist ein Ruby-Programm.
     Entsprechend können wir alternativ auch folgenden Weg
     gehen:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
@@ -82,47 +82,46 @@ end</programlisting></para>
 
     <para>Das Ergebnis ist das gleiche. Ich zeige Ihnen dieses Beispiel hier,
     um noch mal klar herauszuarbeiten, dass Sie innerhalb der
-    <filename>seeds.rb</filename> ganz normal programmieren können.</para>
+    <filename>db/seeds.rb</filename> ganz normal programmieren können.</para>
   </section>
 
   <section>
-    <title>seeds.rb aus bestehenden Daten erstellen</title>
+    <title>seeds.rb aus bestehenden Daten generieren</title>
 
     <indexterm>
-      <primary>seeds.rb</primary>
+      <primary>seeds.rb aus bestehenden Daten generieren</primary>
     </indexterm>
 
     <para>Manchmal ist es praktisch, den aktuellen Datenbestand einer
-    Rails-Applikation in eine <filename>seeds.rb</filename> zu exportieren.
+    Rails-Applikation in eine <filename>db/seeds.rb</filename> zu exportieren.
     Beim Schreiben dieses Buches hatte ich dieses Problem fast in jedem
     Kapitel. Es gibt dafür leider keinen Standardweg. Ich zeige Ihnen, wie man
     es in diesem Fall machen kann. Komplexere Szenarien lassen sich daraus
     ableiten.</para>
 
-    <para>Füllen Sie die Datei <filename>lib/tasks/apfelmus.rake</filename>
-    mit folgendem Inhalt:<programlisting>namespace :album do
-  desc "Prints all the Albums in a seeds.rb way."
-  task :seed_format =&gt; :environment do
-    Album.order('position').all.each do |album|
-      puts "Album.create(#{album.serializable_hash.delete_if {|key, value| ['created_at','updated_at','id'].include?(key)}.to_s.gsub(/[{}]/,'')})"
+    <para>Füllen Sie die Datei <filename>lib/tasks/export.rake</filename> mit
+    folgendem Inhalt:<programlisting>namespace :export do
+  desc "Prints Country.all in a seeds.rb way."
+  task :seeds_format =&gt; :environment do
+    Country.order(:id).all.each do |country|
+      puts "Country.create(#{country.serializable_hash.delete_if {|key, value| ['created_at','updated_at','id'].include?(key)}.to_s.gsub(/[{}]/,'')})"
     end
   end
 end</programlisting></para>
 
     <para>Danach können Sie mit dem Befehl <command>rake
-    album:seed_format</command> den entsprechenden
+    export:seeds_format</command> den entsprechenden
     <literal>rake</literal>-<quote><foreignphrase
-    xml:lang="en">Task</foreignphrase></quote> abrufen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake album:seed_format</command>
-(in /Users/stefan/jukebox)
-Album.create("name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "position"=&gt;1, "release_year"=&gt;1967)
-Album.create("name"=&gt;"Pet Sounds", "position"=&gt;2, "release_year"=&gt;1966)
-Album.create("name"=&gt;"Revolver", "position"=&gt;3, "release_year"=&gt;1966)
-Album.create("name"=&gt;"Highway 61 Revisited", "position"=&gt;4, "release_year"=&gt;1965)
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+    xml:lang="en">Task</foreignphrase></quote> abrufen:<screen>Stefan-Wintermeyers-MacBook-Air:europe xyz$ <command>rake export:seeds_format</command>
+Country.create("name"=&gt;"Deutschland", "population"=&gt;81831000)
+Country.create("name"=&gt;"Frankreich", "population"=&gt;65447374)
+Country.create("name"=&gt;"Belgien", "population"=&gt;10839905)
+Country.create("name"=&gt;"Niederlande", "population"=&gt;16680000)
+Stefan-Wintermeyers-MacBook-Air:europe xyz$</screen></para>
 
     <para>Entweder können Sie dieses Programm so erweitern, dass die Ausgabe
-    direkt in die <filename>seeds.rb</filename> geschrieben wird oder Sie
-    benutzen einfach die Shell:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake album:seed_format &gt;&gt; db/seeds.rb</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+    direkt in die <filename>db/seeds.rb</filename> geschrieben wird oder Sie
+    benutzen einfach die Shell:<screen>Stefan-Wintermeyers-MacBook-Air:europe xyz$ <command>rake album:seeds_format &gt;&gt; db/seeds.rb</command>
+Stefan-Wintermeyers-MacBook-Air:europe xyz$ </screen></para>
   </section>
 </section>
