@@ -165,7 +165,7 @@ end
       veröffentlicht.</para>
     </footnote> mit Werten gefüllt werden können. Stark vereinfacht
   beschrieben sind das die Attribute, die wir später per Web-Interface
-  befüllen oder verändern können. </para>
+  befüllen oder verändern können.</para>
 
   <note>
     <para>Die eingebaute Hilfeseite zu
@@ -212,8 +212,8 @@ Stefan-Wintermeyers-MacBook-Air:europe xyz$ </screen></para>
     Updates auf diesen Datensatz wieder.</para>
 
     <para><methodname>id</methodname> wird als zentrale Identifikation des
-    Datensatzes benutzt. Die <methodname>id</methodname> wird automatisch bei
-    jedem Datensatz um 1 hochgezählt.</para>
+    Datensatzes benutzt (Primärschlüssel). Die <methodname>id</methodname>
+    wird automatisch bei jedem Datensatz um 1 hochgezählt.</para>
   </section>
 
   <section xml:base="activerecord-types">
@@ -341,6 +341,42 @@ Stefan-Wintermeyers-MacBook-Air:europe xyz$ </screen></para>
 
         <listitem>
           <indexterm>
+            <primary>decimal</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>decimal</literal></para>
+
+          <para>Zum Speichern einer Dezimalzahl.</para>
+
+          <tip>
+            <para>Sie können auch mit dem model Generator direkt ein decimal
+            eintragen. Dafür müssen Sie aber die besondere Syntax beachten.
+            Beispiel:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails generate model product name 'price:decimal{7,2}'</command>
+      invoke  active_record
+      create    db/migrate/20120430150913_create_products.rb
+      create    app/models/product.rb
+      invoke    test_unit
+      create      test/unit/product_test.rb
+      create      test/fixtures/products.yml
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>cat db/migrate/20120430150913_create_products.rb</command>
+class CreateProducts &lt; ActiveRecord::Migration
+  def change
+    create_table :products do |t|
+      t.string :name
+      t.decimal :price, :precision =&gt; 7, :scale =&gt; 2
+
+      t.timestamps
+    end
+  end
+end
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+          </tip>
+        </listitem>
+
+        <listitem>
+          <indexterm>
             <primary>primary_key</primary>
 
             <secondary>ActiveRecord</secondary>
@@ -445,7 +481,7 @@ Stefan-Wintermeyers-MacBook-Air:europe xyz$ </screen></para>
     nicht um die Klasse an sich, sondern ausschließlich um die Schreibweise
     oder das Wording. So viel vorweg: Es ist alles logisch und man bekommt den
     Dreh auch recht schnell heraus. Wichtig ist nur, immer bei englischen
-    Wörtern zu bleiben (siehe <xref linkend="warum_english" />). </para>
+    Wörtern zu bleiben (siehe <xref linkend="warum_english" />).</para>
 
     <para>An dieser Stelle wollte ich ursprünglich in aller Länge und Breite
     über die Namenskonventionen philosophieren. Dann habe ich mir gedacht:
