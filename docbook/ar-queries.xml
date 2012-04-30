@@ -10,34 +10,41 @@
 
   <para>Die Methoden <methodname>first</methodname> und
   <methodname>all</methodname> sind ja schon ganz nett, aber meistens will man
-  ja doch nach etwas ganz Bestimmten suchen.</para>
+  ja doch nach etwas ganz Bestimmten mit einem Suchbegriff suchen
+  (Query).</para>
 
-  <para>Für die hier verwendeten Beispiele nehmen Sie bitte die Datei
-  <filename>db/seeds.rb</filename> mit folgendem Inhalt:<programlisting>Album.create("name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "position"=&gt;1, "release_year"=&gt;1967)
-Album.create("name"=&gt;"Pet Sounds", "position"=&gt;2, "release_year"=&gt;1966)
-Album.create("name"=&gt;"Revolver", "position"=&gt;3, "release_year"=&gt;1966)
-Album.create("name"=&gt;"Highway 61 Revisited", "position"=&gt;4, "release_year"=&gt;1965)
-Album.create("name"=&gt;"Rubber Soul", "position"=&gt;5, "release_year"=&gt;1965)
-Album.create("name"=&gt;"What's Going On", "position"=&gt;6, "release_year"=&gt;1971)
-Album.create("name"=&gt;"Exile on Main St.", "position"=&gt;7, "release_year"=&gt;1972)
-Album.create("name"=&gt;"London Calling", "position"=&gt;8, "release_year"=&gt;1979)
-Album.create("name"=&gt;"Blonde on Blonde", "position"=&gt;9, "release_year"=&gt;1966)
-Album.create("name"=&gt;"The Beatles", "position"=&gt;10, "release_year"=&gt;1968)</programlisting></para>
+  <para>Für die Beschreibung von Abfragen mit Queries erstellen wir ein neues
+  Railsprojekt:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new jukebox</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd jukebox</command> 
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails generate model album name release_year:integer</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rake db:migrate</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+
+  <para>Für die hier verwendeten Beispiele nehmen Sie eine
+  <filename>db/seeds.rb</filename> mit folgendem Inhalt:<programlisting>Album.create("name"=&gt;"Sgt. Pepper's Lonely Hearts Club Band", "release_year"=&gt;1967)
+Album.create("name"=&gt;"Pet Sounds", "release_year"=&gt;1966)
+Album.create("name"=&gt;"Revolver", "release_year"=&gt;1966)
+Album.create("name"=&gt;"Highway 61 Revisited", "release_year"=&gt;1965)
+Album.create("name"=&gt;"Rubber Soul", "release_year"=&gt;1965)
+Album.create("name"=&gt;"What's Going On", "release_year"=&gt;1971)
+Album.create("name"=&gt;"Exile on Main St.", "release_year"=&gt;1972)
+Album.create("name"=&gt;"London Calling", "release_year"=&gt;1979)
+Album.create("name"=&gt;"Blonde on Blonde", "release_year"=&gt;1966)
+Album.create("name"=&gt;"The Beatles", "release_year"=&gt;1968)</programlisting></para>
 
   <para>Danach die Datenbank mit <command>rake db:setup</command> neu
-  aufsetzen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rake db:setup</command>
-(in /Users/stefan/jukebox)
-db/test.sqlite3 already exists
-db/test.sqlite3 already exists
-db/development.sqlite3 already exists
+  aufsetzen:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rake db:setup</command>
 db/development.sqlite3 already exists
 -- create_table("albums", {:force=&gt;true})
-   -&gt; 0.0183s
+   -&gt; 0.0308s
 -- initialize_schema_migrations_table()
-   -&gt; 0.0004s
--- assume_migrated_upto_version(20101004085045, "db/migrate")
-   -&gt; 0.0004s
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+   -&gt; 0.0003s
+-- assume_migrated_upto_version(20120426133607, ["/Users/xyz/jukebox/db/migrate"])
+   -&gt; 0.0005s
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
 
   <section xml:id="find_vs_where">
     <title xml:id="find_vs_where.title">find vs. where</title>
@@ -64,22 +71,423 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
       <secondary>Lazy Loading</secondary>
     </indexterm>
 
-    <para>Jahrelang war die Methode <methodname>find</methodname> die erste
-    Wahl für Datenbankabfragen in Rails. Mit Rails 3.0 wurde
-    <methodname>where</methodname> und <quote><foreignphrase
-    xml:lang="en">Lazy Loading</foreignphrase></quote> (siehe <xref
-    linkend="lazy_loading" />) eingeführt. Die Methode
-    <methodname>find</methodname> gibt es weiterhin und es wird sie
-    wahrscheinlich aus historischen Gründen auch noch eine ganze Zeit geben.
-    Meiner Meinung nach macht die Benutzung von <methodname>find</methodname>
-    keinen Sinn, wenn ich die gleiche Abfrage auch performanter mit
-    <methodname>where</methodname> realisieren kann. Deshalb werde ich auf
-    <methodname>find</methodname> in diesem Buch nicht intensiv eingehen und
-    nur die Suche nach einer Datenbank-ID und
-    <methodname>find_by_<replaceable>*</replaceable></methodname> vorstellen.
-    Alle Freunde von <methodname>find</methodname> verweise ich auf
-    <command>ri ActiveRecord::FinderMethods.find</command> und auf <xref
-    linkend="weiterfuehrende_doku" />.</para>
+    <para>Es gibt in ActiveRecord zwei prinzipielle Suchmethoden:
+    <methodname>find</methodname> und <methodname>where</methodname>.
+    Logischerweise stellt sich dem Rails-Anfänger direkt die Frage "Welche
+    Methode soll ich eher benutzten?". Eine Schwarz/Weiß-Antwort auf diese
+    Frage fällt mir schwer. Ich selber benutze zu 80%
+    <methodname>where</methodname> und bei den restlichen 20% könnte ich auch
+    <methodname>where</methodname> benutzen, aber
+    <methodname>find</methodname> ist dann einen Tick praktischer und der Code
+    ist besser lesbar. Probieren Sie am besten beide Methoden einmal aus und
+    entscheiden Sie dann aus dem Bauch raus.</para>
+
+    <tip>
+      <para>Bitte lesen Sie <xref linkend="activerecord_where" /> und <xref
+      linkend="activerecord_find" />. Besonders empfehlen möchte ich <xref
+      linkend="lazy_loading" />, um die Optimierungen und ein wichtiges
+      Konzept von <methodname>where</methodname> zu verstehen.</para>
+    </tip>
+  </section>
+
+  <section xml:id="activerecord_find">
+    <title xml:id="activerecord_find.title">find</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Methoden</secondary>
+
+      <tertiary>find()</tertiary>
+    </indexterm>
+
+    <para>Der einfachste Fall ist die Suche eines Datensatzes anhand eines
+    Primary Key (also per Default dem id Feld in der Datenbanktabelle). Wenn
+    ich die ID eines Objektes (hier: einer Datensatz-Zeile) kenne, kann ich
+    das einzelne Objekt oder mehrere Objekte gleichzeitig anhand der ID
+    suchen:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.find(2)</command>
+  Album Load (4.0ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = ? LIMIT 1  [["id", 2]]
+ =&gt; #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt; 
+1.9.3p194 :002 &gt; <command>Album.find([1,3,7])</command>
+  Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" IN (1, 3, 7)
+ =&gt; [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;, #&lt;Album id: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;] 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+
+    <para>Wenn man immer ein Array als Ergebnis haben will, muss man immer
+    auch ein Array als Parameter übergeben:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.find(5).class</command>
+  Album Load (4.0ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = ? LIMIT 1  [["id", 5]]
+ =&gt; Album(id: integer, name: string, release_year: integer, created_at: datetime, updated_at: datetime) 
+1.9.3p194 :002 &gt; <command>Album.find([5]).class</command>
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = ? LIMIT 1  [["id", 5]]
+ =&gt; Array 
+1.9.3p194 :003 &gt; <command>Album.find([1,3,7]).class</command>
+  Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" IN (1, 3, 7)
+ =&gt; Array 
+1.9.3p194 :004 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+
+    <warning>
+      <para>Die Methode find generiert eine Exception, wenn die gesuchte ID
+      keinen Datensatz in der Datenbank hat. Im Zweifelsfall kann/muss man
+      <methodname>where</methodname> (siehe <xref
+      linkend="activerecord_where" />) benutzen,
+      <methodname>find_by_*</methodname> (siehe <xref
+      linkend="activerecord_find_by" />) oder mit der Methode <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Methoden</secondary>
+
+          <tertiary>exists?()</tertiary>
+        </indexterm><methodname>exists?</methodname> (siehe <xref
+      linkend="activerecord_exists" />) vorher prüfen, ob der Datensatz
+      existiert:<footnote>
+          <para>Sie können eine Exception auch mit
+          <methodname>rescue</methodname> abfangen, aber darauf gehe ich in
+          diesem Anfängerbuch nicht weiter ein.</para>
+        </footnote><screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.last</command>
+  Album Load (0.1ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
+ =&gt; #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt; 
+1.9.3p194 :002 &gt; <command>Album.find(50)</command>
+  Album Load (33.6ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = ? LIMIT 1  [["id", 50]]
+ActiveRecord::RecordNotFound: Couldn't find Album with id=50
+ from /Users/xyz/.rvm/gems/ruby-1.9.3-p194/gems/activerecord-3.2.3/lib/active_record/relation/finder_methods.rb:340:in `find_one'
+ from /Users/xyz/.rvm/gems/ruby-1.9.3-p194/gems/activerecord-3.2.3/lib/active_record/relation/finder_methods.rb:311:in `find_with_ids'
+ from /Users/xyz/.rvm/gems/ruby-1.9.3-p194/gems/activerecord-3.2.3/lib/active_record/relation/finder_methods.rb:107:in `find'
+ from /Users/xyz/.rvm/gems/ruby-1.9.3-p194/gems/activerecord-3.2.3/lib/active_record/querying.rb:5:in `find'
+ from (irb):2
+ from /Users/xyz/.rvm/gems/ruby-1.9.3-p194/gems/railties-3.2.3/lib/rails/commands/console.rb:47:in `start'
+ from /Users/xyz/.rvm/gems/ruby-1.9.3-p194/gems/railties-3.2.3/lib/rails/commands/console.rb:8:in `start'
+ from /Users/xyz/.rvm/gems/ruby-1.9.3-p194/gems/railties-3.2.3/lib/rails/commands.rb:41:in `&lt;top (required)&gt;'
+ from script/rails:6:in `require'
+ from script/rails:6:in `&lt;main&gt;'
+1.9.3p194 :003 &gt; <command>Album.exists?(50)</command>
+  Album Exists (0.2ms)  SELECT 1 FROM "albums" WHERE "albums"."id" = 50 LIMIT 1
+ =&gt; false 
+1.9.3p194 :004 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+    </warning>
+
+    <section xml:id="activerecord_find_by">
+      <title xml:id="activerecord_find_by.title">Attribut-basierendes
+      find_by_*, find_last_by_* und find_all_by_* (find_by_attributes)</title>
+
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Methoden</secondary>
+
+        <tertiary>find_by_*()</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Methoden</secondary>
+
+        <tertiary>find_last_by_*()</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Methoden</secondary>
+
+        <tertiary>find_all_by_*()</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Methoden</secondary>
+
+        <tertiary>find_by_attributes</tertiary>
+      </indexterm>
+
+      <para>Das Attribut-basierende
+      <methodname>find_by_<replaceable>*</replaceable></methodname> ist eine
+      <quote>magische</quote> Methode, denn sie kann von Ihnen dynamisch
+      erweitert werden (deshalb werden diese Methoden auch "dynamic finders"
+      genannt). Die Funktionalität ist die gleiche wie die der Methode
+      <methodname>where</methodname> (siehe <xref
+      linkend="activerecord_where" />), aber die Lesbarkeit des Codes wird
+      besser (jedenfalls bei wenigen Parametern). Man kann treffend über den
+      Sinn oder den Unsinn streiten. Probieren Sie es einmal aus, und
+      entscheiden Sie selber, welchen Weg Sie gehen wollen.</para>
+
+      <para>Ein Beispiel auf der <foreignphrase
+      xml:lang="en">Console</foreignphrase> sagt mehr als tausend Worte. Ich
+      verwende erst <methodname>where</methodname> und dann
+      <methodname>find_by_<replaceable>*</replaceable></methodname> und
+      <methodname>find_last_by_*</methodname> für gleiche Abfagen:</para>
+
+      <para><screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where( :release_year =&gt; 1966).first</command>
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1966 LIMIT 1
+ =&gt; #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt; 
+1.9.3p194 :002 &gt; <command>Album.find_by_release_year(1966)</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1966 LIMIT 1
+ =&gt; #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt; 
+1.9.3p194 :003 &gt; <command>Album.where( :release_year =&gt; 1966 ).last</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1966 ORDER BY "albums"."id" DESC LIMIT 1
+ =&gt; #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt; 
+1.9.3p194 :004 &gt; <command>Album.find_last_by_release_year(1966)</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1966 ORDER BY "albums"."id" DESC LIMIT 1
+ =&gt; #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt; 
+1.9.3p194 :005 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+
+      <important>
+        <para>Im Gegensatz zu <methodname>where</methodname> gibt
+        <methodname>find_by_<replaceable>*</replaceable></methodname> entweder
+        ein Objekt der gesuchten Klasse (hier <classname>Album</classname>)
+        oder <literal>nil</literal> zurück. <methodname>where</methodname>
+        gibt <emphasis>immer</emphasis> ein Array zurück! Wenn man auf diesen
+        Unterschied beim Programmieren nicht achtet, bekommt man über kurz
+        oder lang einen Fehler an dieser Stelle.<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.find_by_release_year(1972)</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1972 LIMIT 1
+ =&gt; #&lt;Album id: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt; 
+1.9.3p194 :002 &gt; <command>Album.find_by_release_year(1972).class</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1972 LIMIT 1
+ =&gt; Album(id: integer, name: string, release_year: integer, created_at: datetime, updated_at: datetime) 
+1.9.3p194 :003 &gt; <command>Album.find_by_release_year(2010)</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 2010 LIMIT 1
+ =&gt; nil 
+1.9.3p194 :004 &gt; <command>Album.find_by_release_year(2010).class</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 2010 LIMIT 1
+ =&gt; NilClass 
+1.9.3p194 :005 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+      </important>
+
+      <para>Die Methode
+      <methodname>find_all_by_<replaceable>*</replaceable></methodname> gibt
+      wie <methodname>where</methodname> immer ein Array zurück:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.find_all_by_release_year(2020).class</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 2020
+ =&gt; Array 
+1.9.3p194 :002 &gt; <command>Album.find_all_by_release_year(1966).class</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1966
+ =&gt; Array 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+
+      <section xml:id="activerecord_find_by_and_verkettung">
+        <title xml:id="activerecord_find_by_and_verkettung.title">Verkettung
+        von mehreren Attributen</title>
+
+        <para>Mit den Methoden
+        <methodname>find_by_<replaceable>*</replaceable></methodname>,
+        <methodname>find_last_by_<replaceable>*</replaceable></methodname> und
+        <methodname>find_all_by_<replaceable>*</replaceable></methodname>
+        lassen sich auch mehrere Such-Attribute mit <literal>and</literal>
+        verketten. Unsere aktuellen Datensätze lassen keine richtig guten
+        Beispiele dafür zu. Deshalb ein paar wenig sinnvolle, aber die Methode
+        beschreibende Abfragen, in der mit <literal>and</literal> Attribute
+        verkettet werden:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.find_by_id_and_release_year(1, 1967)</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = 1 AND "albums"."release_year" = 1967 LIMIT 1
+ =&gt; #&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt; 
+1.9.3p194 :002 &gt; <command>Album.find_all_by_id_and_release_year(1, 1967)</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = 1 AND "albums"."release_year" = 1967
+ =&gt; [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;] 
+1.9.3p194 :003 &gt; <command>Album.find_by_id_and_name(5, 'The Beatles')</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = 5 AND "albums"."name" = 'The Beatles' LIMIT 1
+ =&gt; nil 
+1.9.3p194 :004 &gt; <command>Album.find_all_by_id_and_name(5, 'The Beatles')</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = 5 AND "albums"."name" = 'The Beatles'
+ =&gt; [] 
+1.9.3p194 :005 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+      </section>
+
+      <section>
+        <title>find_or_create_by_*</title>
+
+        <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Methoden</secondary>
+
+          <tertiary>find_or_create_by_*()</tertiary>
+        </indexterm>
+
+        <para>Häufig hat man beim Programmieren die Aufgabenstellung, einen
+        bestimmten Datensatz zu suchen und falls er nicht existiert, dann
+        diesen anzulegen. Das lässt sich sehr schön mit
+        <methodname>find_or_create_by_<replaceable>*</replaceable></methodname>
+        in einem Schritt erledigen (achten Sie auf den SQL-Code):<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>beatles = Album.find_or_create_by_name('The Beatles')</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."name" = 'The Beatles' LIMIT 1
+ =&gt; #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt; 
+1.9.3p194 :002 &gt; <command>ray_charles = Album.find_or_create_by_name('Crying Time')</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."name" = 'Crying Time' LIMIT 1
+   (0.1ms)  begin transaction
+  SQL (8.5ms)  INSERT INTO "albums" ("created_at", "name", "release_year", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Mon, 30 Apr 2012 14:17:14 UTC +00:00], ["name", "Crying Time"], ["release_year", nil], ["updated_at", Mon, 30 Apr 2012 14:17:14 UTC +00:00]]
+   (1.4ms)  commit transaction
+ =&gt; #&lt;Album id: 11, name: "Crying Time", release_year: nil, created_at: "2012-04-30 14:17:14", updated_at: "2012-04-30 14:17:14"&gt; 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ </screen></para>
+
+        <warning>
+          <para>Bei der Benutzung von
+          <methodname>find_or_create_by_<replaceable>*</replaceable></methodname>
+          sollte man immer sicher sein, dass der eventuell neu anzulegende
+          Datensatz in sich selber valide ist. Dies lässt sich einfach mit der
+          Methode <indexterm>
+              <primary>ActiveRecord</primary>
+
+              <secondary>Methoden</secondary>
+
+              <tertiary>valid?()</tertiary>
+            </indexterm><methodname>valid?</methodname> realisieren (siehe
+          <xref linkend="activerecord_validation" />). Ein nicht valider
+          Datensatz wird von <methodname>find_or_create_by_*</methodname>
+          nicht abgespeichert!</para>
+        </warning>
+
+        <para>Wenn Sie zwar nach einem Albumnamen suchen, aber beim
+        eventuellen <methodname>create</methodname> auch noch das
+        <varname>release_year</varname> angeben wollen, so geht das auch mit
+        <methodname>find_or_create_by_<replaceable>*</replaceable></methodname>:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>crying_time = Album.find_or_create_by_name('Genius Loves Company', :release_year =&gt; 2004)</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."name" = 'Genius Loves Company' LIMIT 1
+   (0.1ms)  begin transaction
+  SQL (5.2ms)  INSERT INTO "albums" ("created_at", "name", "release_year", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Mon, 30 Apr 2012 14:21:03 UTC +00:00], ["name", "Genius Loves Company"], ["release_year", 2004], ["updated_at", Mon, 30 Apr 2012 14:21:03 UTC +00:00]]
+   (3.5ms)  commit transaction
+ =&gt; #&lt;Album id: 12, name: "Genius Loves Company", release_year: 2004, created_at: "2012-04-30 14:21:03", updated_at: "2012-04-30 14:21:03"&gt; 
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ </screen></para>
+      </section>
+
+      <section>
+        <title>find_or_initialize_*</title>
+
+        <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Methoden</secondary>
+
+          <tertiary>find_or_initialize_*()</tertiary>
+        </indexterm>
+
+        <para>Die Methode
+        <methodname>find_or_initialize_<replaceable>*</replaceable></methodname>
+        arbeitet wie
+        <methodname>find_or_create_by_<replaceable>*</replaceable></methodname>.
+        Allerdings gibt es einen entscheidenden Unterschied:
+        <methodname>find_or_initialize_<replaceable>*</replaceable></methodname>
+        speichert einen neuen Datensatz nicht ab. Das muss später per
+        <methodname>save</methodname> erfolgen. Beispiel:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>i_got_a_woman = Album.find_or_initialize_by_name('I Got a Woman', :release_year =&gt; 1955)</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."name" = 'I Got a Woman' LIMIT 1
+ =&gt; #&lt;Album id: nil, name: "I Got a Woman", release_year: 1955, created_at: nil, updated_at: nil&gt; 
+1.9.3p194 :002 &gt; <command>Album.last</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
+ =&gt; #&lt;Album id: 12, name: "Genius Loves Company", release_year: 2004, created_at: "2012-04-30 14:21:03", updated_at: "2012-04-30 14:21:03"&gt; 
+1.9.3p194 :003 &gt; <command>i_got_a_woman.save</command>
+   (0.1ms)  begin transaction
+  SQL (6.8ms)  INSERT INTO "albums" ("created_at", "name", "release_year", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Mon, 30 Apr 2012 14:23:25 UTC +00:00], ["name", "I Got a Woman"], ["release_year", 1955], ["updated_at", Mon, 30 Apr 2012 14:23:25 UTC +00:00]]
+   (3.5ms)  commit transaction
+ =&gt; true 
+1.9.3p194 :004 &gt; <command>Album.last</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
+ =&gt; #&lt;Album id: 13, name: "I Got a Woman", release_year: 1955, created_at: "2012-04-30 14:23:25", updated_at: "2012-04-30 14:23:25"&gt; 
+1.9.3p194 :005 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+      </section>
+
+      <section xml:id="activerecord_find_by_all_performance">
+        <title
+        xml:id="activerecord_find_by_all_performance.title">Performance</title>
+
+        <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Methoden</secondary>
+
+          <tertiary>where()</tertiary>
+        </indexterm>
+
+        <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Methoden</secondary>
+
+          <tertiary>find_all_by_*()</tertiary>
+        </indexterm>
+
+        <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Methoden</secondary>
+
+          <tertiary>count()</tertiary>
+        </indexterm>
+
+        <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Lazy Loading</secondary>
+        </indexterm>
+
+        <indexterm>
+          <primary>Lazy Loading</primary>
+
+          <see>ActiveRecord, Lazy Loading</see>
+        </indexterm>
+
+        <para>Auch wenn die Methoden <methodname>where</methodname> und
+        <methodname>find_all_by_<replaceable>*</replaceable></methodname> sich
+        oft gleich anfühlen, so gibt es bei einigen Szenarien deutliche
+        Performance-Unterschiede. Vereinfacht gesagt: Mit
+        <methodname>where</methodname> machen Sie nie einen Fehler, da
+        <methodname>where</methodname> <quote><foreignphrase
+        xml:lang="en">Lazy Loading</foreignphrase></quote> benutzt. Auf
+        <foreignphrase xml:lang="en">Lazy Loading</foreignphrase> gehen wir in
+        <xref linkend="lazy_loading" /> dediziert ein. Hier aber schon mal ein
+        kleiner Vorgeschmack:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where(:release_year =&gt; 1966).count</command>
+   <emphasis>(0.2ms)</emphasis>  SELECT COUNT(*) FROM "albums" WHERE "albums"."release_year" = 1966
+ =&gt; 3 
+1.9.3p194 :002 &gt; <command>Album.find_all_by_release_year(1966).count</command>
+  Album Load <emphasis>(0.3ms)</emphasis>  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1966
+ =&gt; 3 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+
+        <para>Die Kombination der Methoden <methodname>where</methodname> und
+        <methodname>count</methodname> erstellt eine SQL-Abfrage, die das
+        Berechnen des Ergebnisses der SQL-Datenbank überlässt. Die Kombination
+        der Methoden
+        <methodname>find_all_by_<replaceable>*</replaceable></methodname> und
+        <methodname>count</methodname> fragt erst alle Datensätze bei der
+        Datenbank ab, speichert diese dann in einem Array und zählt
+        anschließend die Einträge in diesem Array. Das macht bei unserer
+        Mini-Datenbank kaum einen Unterschied (0.1ms). Wenn Sie aber mit einer
+        sehr großen Datenbank arbeiten, dann wollen Sie die maximale
+        Performance der SQL-Datenbank ausnutzen und nicht erst Daten hin- und
+        herschieben.</para>
+
+        <para>Wie bereits erwähnt: Diese Thematik wird in <xref
+        linkend="lazy_loading" /> detailliert besprochen.</para>
+      </section>
+    </section>
   </section>
 
   <section xml:id="activerecord_where">
@@ -95,86 +503,68 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Mit der Methode <methodname>where</methodname> kann man nach
     bestimmten Werten in der Datenbank suchen. Suchen wir mal alle Alben aus
-    dem Jahr 1966:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1966 )</command>
- =&gt; [#&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-09-03 09:06:28", updated_at: "2010-09-03 09:06:28"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1966 ).count</command>
+    dem Jahr 1966:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where( :release_year =&gt; 1966 )</command>
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1966
+ =&gt; [#&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;] 
+1.9.3p194 :002 &gt; <command>Album.where( :release_year =&gt; 1966 ).count</command>
+   (0.3ms)  SELECT COUNT(*) FROM "albums" WHERE "albums"."release_year" = 1966
  =&gt; 3 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Ein Blick in die Datei <filename>log/development.log</filename>
-    zeigt uns die an die Datenbank gerichtete SQL-Abfrage
-    dazu:<programlisting>  SQL (0.5ms)   SELECT name
- FROM sqlite_master
- WHERE type = 'table' AND NOT name = 'sqlite_sequence'
-
-  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" = 1966)
-  SQL (0.2ms)  SELECT COUNT(*) AS count_id FROM (SELECT 1 FROM "albums" WHERE ("albums"."release_year" = 1966)) AS subquery</programlisting></para>
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ </screen></para>
 
     <para>Sie können mit <methodname>where</methodname> auch nach
     <foreignphrase xml:lang="en">Ranges</foreignphrase> (Bereichen, siehe
-    <xref linkend="range_class" />) suchen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1960..1966 )</command>
- =&gt; [#&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-09-03 09:04:45", updated_at: "2010-09-03 09:04:45"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-09-03 09:06:28", updated_at: "2010-09-03 09:06:28"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1960..1966 ).count</command>
+    <xref linkend="range_class" />) suchen:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where( :release_year =&gt; 1960..1966 )</command>
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1966)
+ =&gt; [#&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;] 
+1.9.3p194 :002 &gt; <command>Album.where( :release_year =&gt; 1960..1966 ).count</command>
+   (0.3ms)  SELECT COUNT(*) FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1966)
  =&gt; 5 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Auch hier der kurze Blick in das
-    <filename>log/development.log</filename>:<programlisting>  Album Load (0.6ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1966)
-  SQL (0.2ms)  SELECT COUNT(*) AS count_id FROM (SELECT 1 FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1966)) AS subquery</programlisting></para>
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
 
     <para>Und Sie können auch mehrere Suchfaktoren mit Komma abgetrennt
-    gleichzeitig angeben:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1960..1966, :position =&gt; 1..5 )</command>
- =&gt; [#&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-09-03 09:04:45", updated_at: "2010-09-03 09:04:45"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1960..1966, :position =&gt; 1..5 ).count</command>
+    gleichzeitig angeben:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where( :release_year =&gt; 1960..1966, :id =&gt; 1..5 )</command>
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1966) AND ("albums"."id" BETWEEN 1 AND 5)
+ =&gt; [#&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;] 
+1.9.3p194 :002 &gt; <command>Album.where( :release_year =&gt; 1960..1966, :id =&gt; 1..5 ).count</command>
+   (0.3ms)  SELECT COUNT(*) FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1966) AND ("albums"."id" BETWEEN 1 AND 5)
  =&gt; 4 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ </screen></para>
 
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Das erzeugte SQL wird entsprechend komplexer:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1966) AND ("albums"."position" BETWEEN 1 AND 5)
-  SQL (0.3ms)  SELECT COUNT(*) AS count_id FROM (SELECT 1 FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1966) AND ("albums"."position" BETWEEN 1 AND 5)) AS subquery</programlisting></para>
-
-    <para>Oder auch ein Array von Parametern:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; [1966,1968] )</command>
- =&gt; [#&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-09-03 09:06:28", updated_at: "2010-09-03 09:06:28"&gt;, #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-09-03 09:06:45", updated_at: "2010-09-03 09:06:45"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Der Vollständigkeit halber auch hier noch die
-    SQL-Abfrage:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" IN (1966, 1968))</programlisting></para>
+    <para>Oder auch ein Array von Parametern:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where( :release_year =&gt; [1966, 1968] )</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" IN (1966, 1968)
+ =&gt; [#&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;] 
+1.9.3p194 :002 &gt; <command>Album.where( :release_year =&gt; [1966, 1968] ).count</command>
+   (0.3ms)  SELECT COUNT(*) FROM "albums" WHERE "albums"."release_year" IN (1966, 1968)
+ =&gt; 4 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ </screen></para>
 
     <important>
       <para>Das Ergebnis von <methodname>where</methodname> ist immer ein
       Array. Auch wenn nur ein Treffer drin ist oder auch wenn gar kein
       Treffer zurückgegeben wird. Wenn Sie den ersten Treffer suchen, dann
       müssen Sie <methodname>where</methodname> mit der Methode
-      <methodname>first</methodname> verketten:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; [1966,1968] ).first</command>
- =&gt; #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 19:53:00"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+      <methodname>first</methodname> verketten:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where( :release_year =&gt; [1966, 1968] ).first</command>
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" IN (1966, 1968) LIMIT 1
+ =&gt; #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt; 
+1.9.3p194 :002 &gt; <command>Album.where( :release_year =&gt; [1966, 1968] ).first.class</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" IN (1966, 1968) LIMIT 1
+ =&gt; Album(id: integer, name: string, release_year: integer, created_at: datetime, updated_at: datetime) 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
     </important>
 
     <section xml:id="activerecord_sql">
@@ -203,59 +593,45 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
         als Parameter aufgelistet.</para>
 
         <para>Nachfolgend suchen wir alle Alben, in deren Namen der String
-        <quote>on</quote> enthalten ist:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
+        <quote>on</quote> enthalten ist:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where( 'name like ?', '%on%' )</command>
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE (name like '%on%')
+ =&gt; [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 6, name: "What's Going On", release_year: 1971, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 8, name: "London Calling", release_year: 1979, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;] 
+1.9.3p194 :002 &gt; <command>Album.where( 'name like ?', '%on%' ).count</command>
+   (0.2ms)  SELECT COUNT(*) FROM "albums" WHERE (name like '%on%')
+ =&gt; 5 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
 
-ruby-1.9.2-p0 &gt; <command>Album.where( "name like ?", '%on%' )</command>
- =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 8, position: 8, name: "London Calling", release_year: 1979, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-        <para>Die SQL-Abfrage wird korrekt ausgeführt (Auszug aus
-        <filename>log/development.log</filename>):<programlisting>  Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE (name like '%on%')</programlisting></para>
-
-        <para>Jetzt alle Alben, die ab 1965 veröffentlicht wurden:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.where( "release_year &gt; ?", 1964 )</command>
- =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 8, position: 8, name: "London Calling", release_year: 1979, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;]
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-        <para>Auszug aus
-        <filename>log/development.log</filename>:<programlisting>  Album Load (0.5ms)  SELECT "albums".* FROM "albums" WHERE (release_year &gt; 1964)</programlisting></para>
+        <para>Jetzt alle Alben, die ab 1965 veröffentlicht wurden:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where( 'release_year &gt; ?', 1964 ).count</command>
+   (0.1ms)  SELECT COUNT(*) FROM "albums" WHERE (release_year &gt; 1964)
+ =&gt; 10 
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ </screen></para>
 
         <para>Alle Alben, die jünger als 1970 sind und deren Namen den String
-        <quote>on</quote> enthalten:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.where( "name like ? AND release_year &gt; ?", '%on%', 1970 )</command>
- =&gt; [#&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 8, position: 8, name: "London Calling", release_year: 1979, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-        <para>Auszug aus
-        <filename>log/development.log</filename>:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE (name like '%on%' AND release_year &gt; 1970)</programlisting></para>
+        <quote>on</quote> enthalten:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where( 'name like ? AND release_year &gt; ?', '%on%', 1970 ).count</command>
+   (0.2ms)  SELECT COUNT(*) FROM "albums" WHERE (name like '%on%' AND release_year &gt; 1970)
+ =&gt; 3 
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
 
         <para>Wenn in der Variable <varname>apfelmus</varname> der gesuchte
         String enthalten ist, dann kann folgendermaßen danach gesucht
-        werden:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>apfelmus = 'ing'</command>
+        werden:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>apfelmus = 'ing'</command>
  =&gt; "ing" 
-
-ruby-1.9.2-p0 &gt; <command>Album.where( "name like ?", "%#{apfelmus}%") </command>
- =&gt; [#&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 8, position: 8, name: "London Calling", release_year: 1979, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-        <para>Auszug aus
-        <filename>log/development.log</filename>:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE (name like '%ing%')</programlisting></para>
+1.9.3p194 :002 &gt; <command>Album.where( 'name like ?', "%#{apfelmus}%").count</command>
+   (0.1ms)  SELECT COUNT(*) FROM "albums" WHERE (name like '%ing%')
+ =&gt; 2 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
       </section>
 
       <section>
@@ -266,25 +642,13 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
         (<foreignphrase xml:lang="en">sanitize</foreignphrase>) der Abfrage
         verzichten.</para>
 
-        <para>Suchen wir einmal alle Alben, in deren Namen der String
-        <quote>on</quote> enthalten ist:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.where( "name like '%on%'" )</command>
- =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 8, position: 8, name: "London Calling", release_year: 1979, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-        <para>Natürlich sind die Ergebnisse dieser einfachen Abfrage identisch
-        mit der gesanitizten Variante:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.where( "name like '%on%'" ) == Album.where( "name like ?", "%on%" )</command>
- =&gt; true 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+        <para>Zählen wir einmal alle Alben, in deren Namen der String
+        <quote>on</quote> enthalten ist:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where( "name like '%on%'" ).count</command>
+   (0.5ms)  SELECT COUNT(*) FROM "albums" WHERE (name like '%on%')
+ =&gt; 5 
+1.9.3p194 :002 &gt; <command>exit</command></screen></para>
 
         <para>Bitte benutzen Sie diese Variante nur, wenn Sie genau wissen,
         was Sie tun und nachdem Sie sich mit dem Thema SQL-Injections
@@ -292,706 +656,9 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
         xlink:href="http://de.wikipedia.org/wiki/SQL-Injection">http://de.wikipedia.org/wiki/SQL-Injection</uri>).</para>
       </section>
     </section>
-  </section>
 
-  <section xml:id="activerecord_order">
-    <title xml:id="activerecord_order.title">order</title>
-
-    <indexterm>
-      <primary>ActiveRecord</primary>
-
-      <secondary>Methoden</secondary>
-
-      <tertiary>order()</tertiary>
-    </indexterm>
-
-    <para>Jede <methodname>where</methodname>-Datenbank-Anfrage kann mit der
-    Methode <methodname>order</methodname> sortiert werden. Beispiel: Alle
-    Alben aus den 60ern nach Namen sortiert:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1960..1969 ).order( :name )</command>
- =&gt; [#&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Natürlich können wir auch alle Alben aus den 70ern in umgekehrter
-    Reihenfolge sortieren:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1970..1979 ).order( 'name DESC' )</command>
- =&gt; [#&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 8, position: 8, name: "London Calling", release_year: 1979, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Hier noch die Ausgabe aus <filename>log/development.log</filename>
-    zu den beiden Suchläufen:<programlisting>  Album Load (0.5ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969) ORDER BY name
-  Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1970 AND 1979) ORDER BY name DESC</programlisting></para>
-  </section>
-
-  <section xml:id="activerecord_limit">
-    <title xml:id="activerecord_limit.title">limit</title>
-
-    <indexterm>
-      <primary>ActiveRecord</primary>
-
-      <secondary>Methoden</secondary>
-
-      <tertiary>limit()</tertiary>
-    </indexterm>
-
-    <para>Das Ergebnis jeder Suche kann mit der Methode
-    <methodname>limit</methodname> auf einen bestimmten Bereich eingegrenzt
-    werden.</para>
-
-    <para>Die ersten drei Datensätze in der Alben-Datenbank-Tabelle:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.limit(3)</command>
- =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Die ersten 5 Alben aus den 60ern:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1960..1969 ).limit(5)</command>
- =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Die ersten 5 Alben aus den 60ern nach Namen sortiert:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1960..1969 ).order(:release_year).limit(5).order(:name)</command>
- =&gt; [#&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Die zu den drei Abfragen gehörenden Einträge in der
-    <filename>log/development.log</filename>-Datei:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" LIMIT 3
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969) LIMIT 5
-  Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969) ORDER BY release_year, name LIMIT 5</programlisting></para>
-
-    <section xml:id="activerecord_offset">
-      <title xml:id="activerecord_offset.title">offset</title>
-
-      <indexterm>
-        <primary>ActiveRecord</primary>
-
-        <secondary>Methoden</secondary>
-
-        <tertiary>offset()</tertiary>
-      </indexterm>
-
-      <para>Mit der Methode <methodname>offset</methodname> kann die
-      Startposition der Methode <methodname>limit</methodname> definiert
-      werden.</para>
-
-      <para>Als Erstes geben wir die ersten beiden Datensätze zurück und
-      danach die ersten beiden Datensätze mit einem Offset von 5:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.limit(2)</command>
- =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>Album.limit(2).offset(5)</command>
- =&gt; [#&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-      <para>Die <filename>log/development.log</filename> zeigt die
-      entsprechende SQL-Abfrage:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" LIMIT 2
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" LIMIT 2 OFFSET 5</programlisting></para>
-    </section>
-  </section>
-
-  <section xml:id="activerecord_average">
-    <title xml:id="activerecord_average.title">average</title>
-
-    <indexterm>
-      <primary>ActiveRecord</primary>
-
-      <secondary>Methoden</secondary>
-
-      <tertiary>average()</tertiary>
-    </indexterm>
-
-    <para>Mit der Methode <methodname>average</methodname> lässt sich der
-    Durchschnitt der Werte in einer bestimmten Spalte in der Tabelle
-    ausrechnen. Dafür ist unser Datenmaterial nicht besonders gut geeignet,
-    aber wir versuchen mal, uns zwei Beispiele aus den Fingern zu saugen. Als
-    Erstes berechnen wir das Durchschnitts-Veröffentlichungsjahr aller Alben
-    und danach das Gleiche für die Alben aus den 60ern:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.average(:release_year)</command>
- =&gt; 1968.5 
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1960..1969 ).average(:release_year)</command>
- =&gt; 1966.142857142857 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Die <filename>log/development.log</filename> zeigt die entsprechende
-    SQL-Abfrage:<programlisting>  SQL (0.2ms)  SELECT AVG("albums"."release_year") AS avg_id FROM "albums"
-  SQL (0.2ms)  SELECT AVG("albums"."release_year") AS avg_id FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)</programlisting></para>
-  </section>
-
-  <section xml:id="activerecord_group">
-    <title xml:id="activerecord_group.title">group</title>
-
-    <indexterm>
-      <primary>ActiveRecord</primary>
-
-      <secondary>Methoden</secondary>
-
-      <tertiary>group()</tertiary>
-    </indexterm>
-
-    <para>Mit der Methode <methodname>group</methodname> kann das Ergebnis
-    einer Abfrage gruppiert zurückgegeben werden.</para>
-
-    <para>Geben wir erst mal alle Alben nach dem Erscheinungsjahr gruppiert
-    zurück und dann alle nach Namen sortierten Alben nach dem Erscheinungsjahr
-    gruppiert:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.group(:release_year)</command>
- =&gt; [#&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 8, position: 8, name: "London Calling", release_year: 1979, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>Album.order(:name).group(:release_year)</command>
- =&gt; [#&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 8, position: 8, name: "London Calling", release_year: 1979, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;, #&lt;Album id: 6, position: 6, name: "What's Going On", release_year: 1971, created_at: "2010-10-08 09:07:21", updated_at: "2010-10-08 09:07:21"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Die <filename>log/development.log</filename> zeigt die entsprechende
-    SQL-Abfrage:<programlisting>  Album Load (0.5ms)  SELECT "albums".* FROM "albums" GROUP BY release_year
-  Album Load (0.5ms)  SELECT "albums".* FROM "albums" GROUP BY release_year ORDER BY name</programlisting></para>
-
-    <note>
-      <para>Natürlich können Sie mit <code>==</code> überprüfen, ob die beiden
-      letzten Abfragen identisch sind:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.group(:release_year) == Album.order(:name).group(:release_year)</command>
- =&gt; false 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-    </note>
-  </section>
-
-  <section xml:id="activerecord_count">
-    <title xml:id="activerecord_count.title">count</title>
-
-    <indexterm>
-      <primary>ActiveRecord</primary>
-
-      <secondary>Methoden</secondary>
-
-      <tertiary>count()</tertiary>
-    </indexterm>
-
-    <para>Die Methode <methodname>count</methodname> zählt die Anzahl der
-    Datensätze.</para>
-
-    <para>Als Erstes geben wir die Anzahl aller Alben in der Datenbank zurück
-    und danach die Anzahl der Alben in den 60ern:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.count</command>
- =&gt; 10 
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1960..1969 ).count</command>
- =&gt; 7 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Die <filename>log/development.log</filename> zeigt die entsprechende
-    SQL-Abfrage:<programlisting>  SQL (0.2ms)  SELECT COUNT(*) AS count_id FROM "albums"
-  SQL (0.2ms)  SELECT COUNT(*) AS count_id FROM (SELECT 1 FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)) AS subquery</programlisting></para>
-  </section>
-
-  <section xml:id="activerecord_maximum">
-    <title xml:id="activerecord_maximum.title">maximum</title>
-
-    <indexterm>
-      <primary>ActiveRecord</primary>
-
-      <secondary>Methoden</secondary>
-
-      <tertiary>maximum()</tertiary>
-    </indexterm>
-
-    <para>Mit der Methode <methodname>maximum</methodname> kann aus einer
-    Abfrage der Eintrag mit dem höchsten Wert ausgegeben werden.</para>
-
-    <para>Zuerst suchen wir aus allen Alben das mit dem höchsten
-    Veröffentlichungsjahr und dann das Gleiche für alle Alben aus den
-    60ern:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.maximum(:release_year)</command>
- =&gt; 1979 
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1960..1969 ).maximum(:release_year)</command>
- =&gt; 1968 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Die <filename>log/development.log</filename> zeigt die entsprechende
-    SQL-Abfrage:<programlisting>  SQL (0.2ms)  SELECT MAX("albums"."release_year") AS max_id FROM "albums"
-  SQL (0.2ms)  SELECT MAX("albums"."release_year") AS max_id FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
-</programlisting></para>
-  </section>
-
-  <section xml:id="activerecord_minimum">
-    <title xml:id="activerecord_minimum.title">minimum</title>
-
-    <indexterm>
-      <primary>ActiveRecord</primary>
-
-      <secondary>Methoden</secondary>
-
-      <tertiary>minimum()</tertiary>
-    </indexterm>
-
-    <para>Mit der Methode <methodname>minimum</methodname> kann aus einer
-    Abfrage der Eintrag mit dem niedrigsten Wert ausgegeben werden.</para>
-
-    <para>Als Erstes suchen wir aus allen Alben das mit dem niedrigsten
-    Veröffentlichungsjahr und dann das Gleiche für alle Alben aus den
-    70ern:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.minimum(:release_year)</command>
- =&gt; 1965 
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1970..1979 ).minimum(:release_year)</command>
- =&gt; 1971 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Die <filename>log/development.log</filename> zeigt die entsprechende
-    SQL-Abfrage:<programlisting>  SQL (0.2ms)  SELECT MIN("albums"."release_year") AS min_id FROM "albums"
-  SQL (0.2ms)  SELECT MIN("albums"."release_year") AS min_id FROM "albums" WHERE ("albums"."release_year" BETWEEN 1970 AND 1979)
-</programlisting></para>
-  </section>
-
-  <section xml:id="activerecord_sum">
-    <title xml:id="activerecord_sum.title">sum</title>
-
-    <indexterm>
-      <primary>ActiveRecord</primary>
-
-      <secondary>Methoden</secondary>
-
-      <tertiary>sum()</tertiary>
-    </indexterm>
-
-    <para>Mit der Methode sum lässt sich die Summe aller Einträge in einer
-    bestimmten Spalte der Datenbank-Abfrage berechnen.</para>
-
-    <para>Zuerst ziehen wir die Summe aller Veröffentlichungsjahre und danach
-    die Summe aller Veröffentlichungsjahre in den 70ern (ja, ein sinnfreies
-    Beispiel ;-)):<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.sum(:release_year)</command>
- =&gt; 19685 
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1970..1979 ).sum(:release_year)</command>
- =&gt; 5922 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Die <filename>log/development.log</filename> zeigt die entsprechende
-    SQL-Abfrage:<programlisting>  SQL (0.2ms)  SELECT SUM("albums"."release_year") AS sum_id FROM "albums"
-  SQL (0.2ms)  SELECT SUM("albums"."release_year") AS sum_id FROM "albums" WHERE ("albums"."release_year" BETWEEN 1970 AND 1979)</programlisting></para>
-  </section>
-
-  <section xml:id="activerecord_find_id">
-    <title xml:id="activerecord_find_id.title">Mit
-    <methodname>find</methodname> nach Datensatz-IDs suchen</title>
-
-    <indexterm>
-      <primary>ActiveRecord</primary>
-
-      <secondary>Methoden</secondary>
-
-      <tertiary>find()</tertiary>
-    </indexterm>
-
-    <para>Sicherlich kann man auch mit <methodname>where</methodname> einen
-    Datensatz anhand der Datensatz-ID (des Primärschlüssels der Datenbank)
-    suchen, aber hier ist <methodname>find</methodname> tatsächlich einen Tick
-    praktischer. Wenn ich die ID eines Objektes (hier: einer Datensatz-Zeile)
-    kenne, kann ich das einzelne Objekt oder mehrere Objekte gleichzeitig
-    anhand der ID suchen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.find(2)</command>
- =&gt; #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Album.find(2).class</command>
- =&gt; Album(id: integer, position: integer, name: string, release_year: integer, created_at: datetime, updated_at: datetime) 
-
-ruby-1.9.2-p0 &gt; <command>Album.find([1,3,7])</command>
- =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-09-03 09:05:28", updated_at: "2010-09-03 09:05:28"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>Album.find([1,3,7]).class</command>
- =&gt; Array 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Wenn man immer ein Array als Ergebnis haben will, muss man immer
-    auch ein Array als Parameter übergeben:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.find(5).class</command>
- =&gt; Album(id: integer, position: integer, name: string, release_year: integer, created_at: datetime, updated_at: datetime) 
-
-ruby-1.9.2-p0 &gt; <command>Album.find([5]).class</command>
- =&gt; Array 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Wenn man nach einer ID sucht, sollte man sich allerdings ganz sicher
-    sein, dass es diese ID auch gibt (sonst wird eine Exception generiert und
-    damit haben wir uns noch nicht beschäftigt). Im Zweifelsfall kann/muss man
-    das mit der Methode <indexterm>
-        <primary>ActiveRecord</primary>
-
-        <secondary>Methoden</secondary>
-
-        <tertiary>exists?()</tertiary>
-      </indexterm><methodname>exists?</methodname> vorher prüfen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.last</command>
- =&gt; #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-09-03 09:06:45", updated_at: "2010-09-03 09:06:45"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Album.find(50)</command>
-ActiveRecord::RecordNotFound: Couldn't find Album with ID=50
- from <replaceable>[...]</replaceable>/gems/activerecord-3.0.0/lib/active_record/relation/finder_methods.rb:296:in `find_one'
- from <replaceable>[...]</replaceable>/gems/activerecord-3.0.0/lib/active_record/relation/finder_methods.rb:281:in `find_with_ids'
- from <replaceable>[...]</replaceable>/gems/activerecord-3.0.0/lib/active_record/relation/finder_methods.rb:107:in `find'
- from <replaceable>[...]</replaceable>/gems/activerecord-3.0.0/lib/active_record/base.rb:439:in `find'
- from (irb):2
- from <replaceable>[...]</replaceable>/gems/railties-3.0.0/lib/rails/commands/console.rb:44:in `start'
- from <replaceable>[...]</replaceable>/gems/railties-3.0.0/lib/rails/commands/console.rb:8:in `start'
- from <replaceable>[...]</replaceable>/gems/railties-3.0.0/lib/rails/commands.rb:23:in `&lt;top (required)&gt;'
- from script/rails:6:in `require'
- from script/rails:6:in `&lt;main&gt;'
-
-ruby-1.9.2-p0 &gt; <command>Album.exists?(50)</command>
- =&gt; false 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-  </section>
-
-  <section xml:id="activerecord_find_by">
-    <title xml:id="activerecord_find_by.title">Attribut-basierendes find_by_*,
-    find_last_by_* und find_all_by_*</title>
-
-    <indexterm>
-      <primary>ActiveRecord</primary>
-
-      <secondary>Methoden</secondary>
-
-      <tertiary>find_by_*()</tertiary>
-    </indexterm>
-
-    <indexterm>
-      <primary>ActiveRecord</primary>
-
-      <secondary>Methoden</secondary>
-
-      <tertiary>find_last_by_*()</tertiary>
-    </indexterm>
-
-    <indexterm>
-      <primary>ActiveRecord</primary>
-
-      <secondary>Methoden</secondary>
-
-      <tertiary>find_all_by_*()</tertiary>
-    </indexterm>
-
-    <para>Das Attribut-basierende
-    <methodname>find_by_<replaceable>*</replaceable></methodname> ist eine
-    <quote>magische</quote> Methode, denn sie kann von Ihnen dynamisch
-    erweitert werden (deshalb werden diese Methoden auch "dynamic finders"
-    genannt). Die Funktionalität ist die gleiche wie die der Methode
-    <methodname>where</methodname> (siehe <xref
-    linkend="activerecord_where" />), aber die Lesbarkeit des Codes wird
-    besser (meistens jedenfalls). Man kann treffend über den Sinn oder den
-    Unsinn streiten. Probieren Sie es einmal aus, und entscheiden Sie selber,
-    welchen Weg Sie gehen wollen.</para>
-
-    <para>Ein Beispiel auf der <foreignphrase
-    xml:lang="en">Console</foreignphrase> sagt mehr als tausend Worte. Ich
-    verwende erst <methodname>where</methodname> und dann
-    <methodname>find_by_<replaceable>*</replaceable></methodname> für die
-    gleiche Abfage.</para>
-
-    <tip>
-      <para>Sie können sich mit dem Befehl <command>ActiveRecord::Base.logger
-      = Logger.new(STDOUT)</command> die normalerweise nur in
-      <filename>log/development.log</filename> aufgezeichneten SQL-Abfragen
-      auch direkt auf der <foreignphrase xml:lang="en">Console</foreignphrase>
-      ausgeben lassen.</para>
-    </tip>
-
-    <para><screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-ruby-1.9.2-p0 &gt; <command>ActiveRecord::Base.logger = Logger.new(STDOUT)</command>
- =&gt; #&lt;Logger:0x00000100f2e1c0 @progname=nil, @level=0, @default_formatter=#&lt;Logger::Formatter:0x00000100f2e198 @datetime_format=nil&gt;, @formatter=nil, @logdev=#&lt;Logger::LogDevice:0x00000100f2e148 @shift_size=nil, @shift_age=nil, @filename=nil, @dev=#&lt;IO:&lt;STDOUT&gt;&gt;, @mutex=#&lt;Logger::LogDevice::LogDeviceMutex:0x00000100f2e120 @mon_owner=nil, @mon_count=0, @mon_mutex=#&lt;Mutex:0x00000100f2e0d0&gt;&gt;&gt;&gt; 
-
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1966 ).first</command>
-<emphasis>  SQL (0.4ms)   SELECT name
- FROM sqlite_master
- WHERE type = 'table' AND NOT name = 'sqlite_sequence'
-
-  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" = 1966) LIMIT 1
-</emphasis> =&gt; #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-10-06 10:16:18", updated_at: "2010-10-06 10:16:18"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Album.find_by_release_year(1966)</command>
-<emphasis>  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" = 1966) LIMIT 1
-</emphasis> =&gt; #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-10-06 10:16:18", updated_at: "2010-10-06 10:16:18"&gt; 
-
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1966 ).last</command>
-<emphasis>  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" = 1966) ORDER BY albums.id DESC LIMIT 1
-</emphasis> =&gt; #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-10-06 10:16:18", updated_at: "2010-10-06 10:16:18"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Album.find_last_by_release_year(1966)</command>
-<emphasis>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" = 1966) ORDER BY albums.id DESC LIMIT 1
-</emphasis> =&gt; #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-10-06 10:16:18", updated_at: "2010-10-06 10:16:18"&gt; 
-
-ruby-1.9.2-p0 &gt; exit
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <important>
-      <para>Im Gegensatz zu <methodname>where</methodname> gibt
-      <methodname>find_by_<replaceable>*</replaceable></methodname> entweder
-      ein Objekt der gesuchten Klasse (hier <classname>Album</classname>) oder
-      <literal>nil</literal> zurück. <methodname>where</methodname> gibt
-      <emphasis>immer</emphasis> ein Array zurück! Wenn man auf diesen
-      Unterschied beim Programmieren nicht achtet, bekommt man über kurz oder
-      lang einen Fehler an dieser Stelle.<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.find_by_release_year(1972)</command>
- =&gt; #&lt;Album id: 7, position: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2010-09-03 09:05:28", updated_at: "2010-09-03 09:05:28"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Album.find_by_release_year(1972).class</command>
- =&gt; Album(id: integer, position: integer, name: string, release_year: integer, created_at: datetime, updated_at: datetime) 
-
-ruby-1.9.2-p0 &gt; <command>Album.find_by_release_year(2010)</command>
- =&gt; nil 
-
-ruby-1.9.2-p0 &gt; <command>Album.find_by_release_year(2010).class</command>
- =&gt; NilClass 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-    </important>
-
-    <para>Die Methode
-    <methodname>find_all_by_<replaceable>*</replaceable></methodname> gibt wie
-    <methodname>where</methodname> immer ein Array zurück:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.find_all_by_release_year(2020).class</command>
- =&gt; Array 
-
-ruby-1.9.2-p0 &gt; <command>Album.find_all_by_release_year(1966).class</command>
- =&gt; Array 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <section xml:id="activerecord_find_by_and_verkettung">
-      <title xml:id="activerecord_find_by_and_verkettung.title">Verkettung von
-      mehreren Attributen</title>
-
-      <para>Mit den Methoden
-      <methodname>find_by_<replaceable>*</replaceable></methodname>,
-      <methodname>find_last_by_<replaceable>*</replaceable></methodname> und
-      <methodname>find_all_by_<replaceable>*</replaceable></methodname> lassen
-      sich auch mehrere Such-Attribute mit <literal>and</literal> verketten.
-      Unsere aktuellen Datensätze lassen keine richtig guten Beispiele dafür
-      zu. Deshalb ein paar wenig sinnvolle, aber die Methode beschreibende
-      Abfragen, in der mit <literal>and</literal> Attribute verkettet
-      werden:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.find_by_position_and_release_year( 1, 1967 )</command>
- =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-06 10:16:18", updated_at: "2010-10-06 10:16:18"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Album.find_all_by_position_and_release_year( 1, 1967 )</command>
- =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-06 10:16:18", updated_at: "2010-10-06 10:16:18"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>Album.find_by_position_and_name( 5,'The Beatles' )</command>
- =&gt; nil 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-    </section>
-
-    <section>
-      <title>find_or_create_by_*</title>
-
-      <indexterm>
-        <primary>ActiveRecord</primary>
-
-        <secondary>Methoden</secondary>
-
-        <tertiary>find_or_create_by_*()</tertiary>
-      </indexterm>
-
-      <para>Häufig hat man beim Programmieren die Aufgabenstellung, einen
-      bestimmten Datensatz zu suchen und falls er nicht existiert, dann diesen
-      anzulegen. Das lässt sich sehr schön mit
-      <methodname>find_or_create_by_<replaceable>*</replaceable></methodname>
-      in einem Schritt erledigen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>beatles = Album.find_or_create_by_name( 'The Beatles' )</command>
- =&gt; #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-10-06 10:16:18", updated_at: "2010-10-06 10:16:18"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>ray_charles = Album.find_or_create_by_name( 'Crying Time' )</command>
- =&gt; #&lt;Album id: 11, position: nil, name: "Crying Time", release_year: nil, created_at: "2010-10-06 12:15:26", updated_at: "2010-10-06 12:15:26"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-      <para>In der <filename>log/development.log</filename> lässt sich
-      nachvollziehen, dass nach der zweiten Anfrage direkt ein
-      <literal>INSERT</literal> ausgeführt wurde, weil dieser Datensatz nicht
-      existierte.<programlisting>  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."name" = 'The Beatles') LIMIT 1
-  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."name" = 'Crying Time') LIMIT 1
-  SQL (0.5ms)  INSERT INTO "albums" ("created_at", "name", "position", "release_year", "updated_at") VALUES ('2010-10-06 12:15:26.603938', 'Crying Time', NULL, NULL, '2010-10-06 12:15:26.603938')</programlisting></para>
-
-      <warning>
-        <para>Bei der Benutzung von
-        <methodname>find_or_create_by_<replaceable>*</replaceable></methodname>
-        sollte man immer sicher sein, dass der eventuell neu anzulegende
-        Datensatz in sich selber valide ist. Dies lässt sich einfach mit der
-        Methode <indexterm>
-            <primary>ActiveRecord</primary>
-
-            <secondary>Methoden</secondary>
-
-            <tertiary>valid?()</tertiary>
-          </indexterm><methodname>valid?</methodname> realisieren (siehe <xref
-        linkend="activerecord_validation" />).</para>
-      </warning>
-
-      <para>Wenn Sie zwar nach einem Albumnamen suchen, aber beim eventuellen
-      <methodname>create</methodname> auch noch andere Daten angeben wollen,
-      so geht das auch mit
-      <methodname>find_or_create_by_<replaceable>*</replaceable></methodname>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>crying_time = Album.find_or_create_by_name( 'Genius Loves Company', :release_year =&gt; 2004 )</command>
- =&gt; #&lt;Album id: 12, position: nil, name: "Genius Loves Company", release_year: 2004, created_at: "2010-10-07 13:23:58", updated_at: "2010-10-07 13:23:58"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>crying_time</command>
- =&gt; #&lt;Album id: 12, position: nil, name: "Genius Loves Company", release_year: 2004, created_at: "2010-10-07 13:23:58", updated_at: "2010-10-07 13:23:58"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-      <para>Ein Blick in die <filename>log/development.log</filename> zeigt,
-      dass zwar nur nach <quote>Genius Loves Company</quote> gesucht wurde,
-      aber der neue Datensatz inklusive dem <literal>release_year</literal>
-      angelegt wurde:<programlisting>  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."name" = 'Genius Loves Company') LIMIT 1
-  SQL (0.4ms)  INSERT INTO "albums" ("created_at", "name", "position", "release_year", "updated_at") VALUES ('2010-10-07 13:23:58.446037', 'Genius Loves Company', NULL, 2004, '2010-10-07 13:23:58.446037')</programlisting></para>
-    </section>
-
-    <section>
-      <title>find_or_initialize_*</title>
-
-      <indexterm>
-        <primary>ActiveRecord</primary>
-
-        <secondary>Methoden</secondary>
-
-        <tertiary>find_or_initialize_*()</tertiary>
-      </indexterm>
-
-      <para>Die Methode
-      <methodname>find_or_initialize_<replaceable>*</replaceable></methodname>
-      arbeitet wie
-      <methodname>find_or_create_by_<replaceable>*</replaceable></methodname>.
-      Allerdings gibt es einen entscheidenden Unterschied:
-      <methodname>find_or_initialize_<replaceable>*</replaceable></methodname>
-      speichert einen neuen Datensatz nicht ab. Das muss später per
-      <methodname>save</methodname> erfolgen. Kleines Beispiel:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>i_got_a_woman = Album.find_or_initialize_by_name('I Got a Woman', :release_year =&gt; 1955)</command>
- =&gt; #&lt;Album id: nil, position: nil, name: "I Got a Woman", release_year: 1955, created_at: nil, updated_at: nil&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Album.last</command>
- =&gt; #&lt;Album id: 12, position: nil, name: "Genius Loves Company", release_year: 2004, created_at: "2010-10-07 13:23:58", updated_at: "2010-10-07 13:23:58"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>i_got_a_woman.save</command>
- =&gt; true 
-
-ruby-1.9.2-p0 &gt; <command>Album.last</command>
- =&gt; #&lt;Album id: 13, position: nil, name: "I Got a Woman", release_year: 1955, created_at: "2010-10-07 16:05:59", updated_at: "2010-10-07 16:05:59"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-    </section>
-
-    <section xml:id="activerecord_find_by_all_performance">
-      <title
-      xml:id="activerecord_find_by_all_performance.title">Performance</title>
-
-      <indexterm>
-        <primary>ActiveRecord</primary>
-
-        <secondary>Methoden</secondary>
-
-        <tertiary>where()</tertiary>
-      </indexterm>
-
-      <indexterm>
-        <primary>ActiveRecord</primary>
-
-        <secondary>Methoden</secondary>
-
-        <tertiary>find_all_by_*()</tertiary>
-      </indexterm>
-
-      <indexterm>
-        <primary>ActiveRecord</primary>
-
-        <secondary>Methoden</secondary>
-
-        <tertiary>count()</tertiary>
-      </indexterm>
+    <section xml:id="lazy_loading">
+      <title xml:id="lazy_loading.title">Lazy Loading</title>
 
       <indexterm>
         <primary>ActiveRecord</primary>
@@ -1005,54 +672,120 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
         <see>ActiveRecord, Lazy Loading</see>
       </indexterm>
 
-      <para>Auch wenn die Methoden <methodname>where</methodname> und
-      <methodname>find_all_by_<replaceable>*</replaceable></methodname> sich
-      oft gleich anfühlen, so gibt es bei einigen Szenarien deutliche
-      Performance-Unterschiede. Vereinfacht gesagt: Mit
-      <methodname>where</methodname> machen Sie nie einen Fehler, da
-      <methodname>where</methodname> <quote><foreignphrase xml:lang="en">Lazy
-      Loading</foreignphrase></quote> (siehe <xref linkend="lazy_loading" />)
-      benutzt. Auf <foreignphrase xml:lang="en">Lazy Loading</foreignphrase>
-      gehen wir später noch dediziert ein. Hier aber schon mal ein kleiner
-      Vorgeschmack:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
+      <para>Seit Rails 3.0 wird bei ActiveRecords die Methode <indexterm>
+          <primary>ActiveRecord</primary>
 
-ruby-1.9.2-p0 &gt; <command>ActiveRecord::Base.logger = Logger.new(STDOUT)</command>
- =&gt; #&lt;Logger:0x00000101255970 @progname=nil, @level=0, @default_formatter=#&lt;Logger::Formatter:0x00000101255948 @datetime_format=nil&gt;, @formatter=nil, @logdev=#&lt;Logger::LogDevice:0x000001012558f8 @shift_size=nil, @shift_age=nil, @filename=nil, @dev=#&lt;IO:&lt;STDOUT&gt;&gt;, @mutex=#&lt;Logger::LogDevice::LogDeviceMutex:0x000001012558d0 @mon_owner=nil, @mon_count=0, @mon_mutex=#&lt;Mutex:0x00000101255880&gt;&gt;&gt;&gt; 
+          <secondary>Methoden</secondary>
 
-ruby-1.9.2-p0 &gt; <command>Album.first</command>
-<emphasis>  SQL (0.5ms)   SELECT name
- FROM sqlite_master
- WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+          <tertiary>where()</tertiary>
+        </indexterm><methodname>where</methodname> und damit <foreignphrase
+      xml:lang="en">Lazy Loading</foreignphrase> verwendet. Dies ist ein
+      Mechanismus, der eine Datenbank-Abfrage erst dann stellt, wenn der
+      weitere Programmablauf nicht ohne das Ergebnis dieser Abfrage realisiert
+      werden kann. Bis dahin wird die Anfrage als
+      <classname>ActiveRecord::Relation</classname> gespeichert. (Das
+      Gegenteil von <foreignphrase xml:lang="en">Lazy Loading</foreignphrase>
+      nennt man übrigens <foreignphrase xml:lang="en">Eager
+      Loading</foreignphrase>.)</para>
 
-  Album Load (0.1ms)  SELECT "albums".* FROM "albums" LIMIT 1
-</emphasis> =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-10-06 10:16:18", updated_at: "2010-10-06 10:16:18"&gt; 
+      <para>Schauen wir uns die Abfrage nach allen Alben aus dem Jahr 1966
+      an.</para>
 
+      <para><screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where(:release_year =&gt; 1966)</command>
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1966
+ =&gt; [#&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;] 
+1.9.3p194 :002 &gt; <command>Album.where(:release_year =&gt; 1966).class</command>
+ =&gt; ActiveRecord::Relation 
+1.9.3p194 :003 &gt; <command>Album.where(:release_year =&gt; 1966).to_sql</command>
+ =&gt; "SELECT \"albums\".* FROM \"albums\"  WHERE \"albums\".\"release_year\" = 1966" 
+1.9.3p194 :004 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
 
-ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1966).count</command>
-<emphasis>  SQL (0.2ms)  SELECT COUNT(*) AS count_id FROM (SELECT 1 FROM "albums" WHERE ("albums"."release_year" = 1966)) AS subquery
-</emphasis> =&gt; 3 
-ruby-1.9.2-p0 &gt; <command>Album.find_all_by_release_year(1966).count</command>
-<emphasis>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" = 1966)
-</emphasis> =&gt; 3 
+      <para>Wenn aber <code>Album.where(:release_year =&gt; 1966)</code> eine
+      <classname>ActiveRecord::Relation</classname> ist, warum bekommen wir
+      dann in der <foreignphrase xml:lang="en">Console</foreignphrase> ein
+      Array ausgegeben? Rails will uns das Entwicklerleben etwas einfacher
+      machen und zeigt uns quasi automatisch das Ergebnis der Methode
+      <indexterm>
+          <primary>ActiveRecord</primary>
 
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+          <secondary>Methoden</secondary>
 
-      <para>Die Kombination der Methoden <methodname>where</methodname> und
-      <methodname>count</methodname> erstellt eine SQL-Abfrage, die das
-      Berechnen des Ergebnisses der SQL-Datenbank überlässt. Die Kombination
-      der Methoden
-      <methodname>find_all_by_<replaceable>*</replaceable></methodname> und
-      <methodname>count</methodname> fragt erst alle Datensätze bei der
-      Datenbank ab, speichert diese dann in einem Array und zählt anschließend
-      die Einträge in diesem Array. Das macht bei unserer Mini-Datenbank kaum
-      einen Unterschied. Wenn Sie aber mit einer sehr großen Datenbank
-      arbeiten, dann wollen Sie die maximale Performance der SQL-Datenbank
-      ausnutzen und nicht erst Daten hin- und herschieben.</para>
+          <tertiary>all()</tertiary>
+        </indexterm><methodname>all</methodname> an:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where(:release_year =&gt; 1966).class</command>
+ =&gt; ActiveRecord::Relation 
+1.9.3p194 :002 &gt; <command>Album.where(:release_year =&gt; 1966).all.class</command>
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1966
+ =&gt; Array 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ </screen></para>
 
-      <para>Wie bereits erwähnt: Diese Thematik wird in <xref
-      linkend="lazy_loading" /> detailliert besprochen.</para>
+      <para>Prinzipiell klar, aber der Sinn noch nicht ganz? Dann bauen wir
+      uns mal eine Abfrage zusammen, in der wir mehrere Methoden
+      verschachteln. In dem folgenden Beispiel wird <varname>a</varname> immer
+      weiter definiert und erst ganz zum Schluss (beim Aufruf der Methode
+      <methodname>all</methodname>) würde bei einem Produktivsystem die
+      Datenbank-Abfrage wirklich getätigt. Mit der Methode <indexterm>
+          <primary>ActiveRecord</primary>
+
+          <secondary>Methoden</secondary>
+
+          <tertiary>to_sql()</tertiary>
+        </indexterm><methodname>to_sql</methodname> kann man sich immer das
+      aktuelle SQL-Query ausgeben lassen.<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>a = Album.where(:release_year =&gt; 1965..1968)</command>
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1965 AND 1968)
+ =&gt; [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;, #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;] 
+1.9.3p194 :002 &gt; <command>a.class</command>
+ =&gt; ActiveRecord::Relation 
+1.9.3p194 :003 &gt; <command>a = a.order(:release_year)</command>
+  Album Load (0.5ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1965 AND 1968) ORDER BY release_year
+ =&gt; [#&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;, #&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;, #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;] 
+1.9.3p194 :004 &gt; <command>a = a.limit(3)</command>
+  Album Load (0.5ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1965 AND 1968) ORDER BY release_year LIMIT 3
+ =&gt; [#&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt;] 
+1.9.3p194 :005 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$  </screen></para>
+
+      <section xml:id="activerecord_lazyloading_automatische_optimierung">
+        <title
+        xml:id="activerecord_lazyloading_automatische_optimierung.title">Automatische
+        Optimierung</title>
+
+        <para>Einer der großen Vorteile von <foreignphrase xml:lang="en">Lazy
+        Loading</foreignphrase> ist die automatische Optimierung der
+        SQL-Abfrage durch ActiveRecord.</para>
+
+        <para>Ziehen wir mal die Summe aller Veröffentlichungsjahre der Alben,
+        die in den 70ern herausgebracht wurden. Und danach sortieren wir die
+        Alben nach Namen und ziehen anschließend die Summe.<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where(:release_year =&gt; 1970..1979).sum(:release_year)</command>
+   (3.1ms)  SELECT SUM("albums"."release_year") AS sum_id FROM "albums" WHERE ("albums"."release_year" BETWEEN 1970 AND 1979)
+ =&gt; 5922 
+1.9.3p194 :002 &gt; <command>Album.where(:release_year =&gt; 1970..1979).order(:name).sum(:release_year)</command>
+   (0.3ms)  SELECT SUM("albums"."release_year") AS sum_id FROM "albums" WHERE ("albums"."release_year" BETWEEN 1970 AND 1979)
+ =&gt; 5922 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+
+        <para>Das Ergebnis ist bei beiden Abfragen logischerweise identisch.
+        Interessant ist aber, das ActiveRecord bei beiden Anfragen den
+        gleichen SQL-Code benutzt hat. Es hat erkannt, das
+        <methodname>order</methodname> bei <methodname>sum</methodname> völlig
+        irrelevant ist und es deshalb direkt raus genommen.</para>
+
+        <note>
+          <para>Falls Sie sich fragen, warum die erste Abfrage 3.1ms und die
+          zweite 0.3ms gedauert hat: ActiveRecord cached die Ergebnisse einer
+          SQL-Abfrage innerhalb eines Webseitenaufrufes.</para>
+        </note>
+      </section>
     </section>
   </section>
 
@@ -1070,233 +803,341 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <para>Hin und wieder muss man wissen, ob es einen bestimmten Datensatz
     gibt, und genau dafür gibt es die Methode
     <methodname>exists?</methodname>. Sie gibt als Ergebnis
-    <literal>true</literal> oder <literal>false</literal> zurück:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.last</command>
- =&gt; #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-09-03 09:06:45", updated_at: "2010-09-03 09:06:45"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Album.exists?(10)</command>
+    <literal>true</literal> oder <literal>false</literal> zurück:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.first</command>
+  Album Load (0.1ms)  SELECT "albums".* FROM "albums" LIMIT 1
+ =&gt; #&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-04-30 13:45:04", updated_at: "2012-04-30 13:45:04"&gt; 
+1.9.3p194 :002 &gt; <command>Album.exists?(1)</command>
+  Album Exists (0.2ms)  SELECT 1 FROM "albums" WHERE "albums"."id" = 1 LIMIT 1
  =&gt; true 
-
-ruby-1.9.2-p0 &gt; <command>Album.exists?(11)</command>
+1.9.3p194 :003 &gt; <command>Album.exists?(10000)</command>
+  Album Exists (0.2ms)  SELECT 1 FROM "albums" WHERE "albums"."id" = 10000 LIMIT 1
  =&gt; false 
-
-ruby-1.9.2-p0 &gt; <command>Album.exists?( :name =&gt; 'The Beatles' )</command>
- =&gt; true 
-
-ruby-1.9.2-p0 &gt; <command>Album.exists?( ['name LIKE ?', '%Beatles%'] )</command>
- =&gt; true 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+1.9.3p194 :004 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ </screen></para>
 
     <para>Die komplette Hilfe zur Methode <methodname>exists?</methodname>
     können Sie sich mit <command>ri
     ActiveRecord::FinderMethods.exists?</command> anzeigen lassen.</para>
   </section>
 
-  <section xml:id="lazy_loading">
-    <title xml:id="lazy_loading.title">Lazy Loading</title>
+  <section xml:id="activerecord_order">
+    <title xml:id="activerecord_order.title">order und reverse_order</title>
 
     <indexterm>
       <primary>ActiveRecord</primary>
 
-      <secondary>Lazy Loading</secondary>
+      <secondary>Methoden</secondary>
+
+      <tertiary>order()</tertiary>
     </indexterm>
 
     <indexterm>
-      <primary>Lazy Loading</primary>
+      <primary>ActiveRecord</primary>
 
-      <see>ActiveRecord, Lazy Loading</see>
+      <secondary>Methoden</secondary>
+
+      <tertiary>reverse_order</tertiary>
     </indexterm>
 
-    <para>Seit Rails 3.0 wird bei ActiveRecords die Methode <indexterm>
+    <para>Jede Datenbank-Anfrage kann mit der Methode
+    <methodname>order</methodname> sortiert werden. Beispiel: Alle Alben aus
+    den 60ern nach Namen sortiert:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where( :release_year =&gt; 1960..1969 ).order(:name)</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969) ORDER BY name
+ =&gt; [#&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;] 
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ </screen></para>
+
+    <para>Mit der Methode reverse_order können wir eine mit
+    <methodname>order</methodname> definierte Reihenfolge umkehren:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where(:release_year =&gt; 1960..1969).order(:name).reverse_order</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969) ORDER BY name DESC
+ =&gt; [#&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-04-30 14:51:03", updated_at: "2012-04-30 14:51:03"&gt;, #&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-04-30 14:51:03", updated_at: "2012-04-30 14:51:03"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-04-30 14:51:03", updated_at: "2012-04-30 14:51:03"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-04-30 14:51:03", updated_at: "2012-04-30 14:51:03"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-04-30 14:51:03", updated_at: "2012-04-30 14:51:03"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-04-30 14:51:03", updated_at: "2012-04-30 14:51:03"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-04-30 14:51:03", updated_at: "2012-04-30 14:51:03"&gt;] 
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+  </section>
+
+  <section xml:id="activerecord_limit">
+    <title xml:id="activerecord_limit.title">limit</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Methoden</secondary>
+
+      <tertiary>limit()</tertiary>
+    </indexterm>
+
+    <para>Das Ergebnis jeder Suche kann mit der Methode
+    <methodname>limit</methodname> auf einen bestimmten Bereich eingegrenzt
+    werden.</para>
+
+    <para>Die ersten 5 Alben aus den 60ern:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where( :release_year =&gt; 1960..1969).limit(5)</command>
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969) LIMIT 5
+ =&gt; [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;] 
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+
+    <para>Alle Alben nach Namen sortieren und davon die ersten 5:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.order(:name).limit(5)</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY name LIMIT 5
+ =&gt; [#&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 8, name: "London Calling", release_year: 1979, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;] 
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ </screen></para>
+
+    <section xml:id="activerecord_offset">
+      <title xml:id="activerecord_offset.title">offset</title>
+
+      <indexterm>
         <primary>ActiveRecord</primary>
 
         <secondary>Methoden</secondary>
 
-        <tertiary>where()</tertiary>
-      </indexterm><methodname>where</methodname> und damit <foreignphrase
-    xml:lang="en">Lazy Loading</foreignphrase> verwendet. Dies ist ein
-    Mechanismus, der eine Datenbank-Abfrage erst dann stellt, wenn der weitere
-    Programmablauf nicht ohne das Ergebnis dieser realisiert werden kann. Bis
-    dahin wird die Anfrage als <classname>ActiveRecord::Relation</classname>
-    gespeichert. (Das Gegenteil von <foreignphrase xml:lang="en">Lazy
-    Loading</foreignphrase> nennt man übrigens <foreignphrase
-    xml:lang="en">Eager Loading</foreignphrase>.)</para>
+        <tertiary>offset()</tertiary>
+      </indexterm>
 
-    <para>Schauen wir uns die Abfrage nach allen Alben aus dem Jahr 1966
-    an.</para>
+      <para>Mit der Methode <methodname>offset</methodname> kann die
+      Startposition der Methode <methodname>limit</methodname> definiert
+      werden.</para>
 
-    <para><screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1966 )</command>
- =&gt; [#&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-09-03 09:06:28", updated_at: "2010-09-03 09:06:28"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1966 ).class</command>
- =&gt; ActiveRecord::Relation 
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1966 ).to_sql</command>
- =&gt; "SELECT     \"albums\".* FROM       \"albums\"  WHERE     (\"albums\".\"release_year\" = 1966)" 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Wenn aber <code>Album.where( :release_year =&gt; 1966 )</code> eine
-    <classname>ActiveRecord::Relation</classname> ist, warum bekommen wir dann
-    in der <foreignphrase xml:lang="en">Console</foreignphrase> ein Array
-    ausgegeben? Die <foreignphrase xml:lang="en">Lazy Loading</foreignphrase>
-    will uns das Entwicklerleben etwas einfacher machen und zeigt uns quasi
-    automatisch das Ergebnis der Methode <indexterm>
-        <primary>ActiveRecord</primary>
-
-        <secondary>Methoden</secondary>
-
-        <tertiary>all()</tertiary>
-      </indexterm><methodname>all</methodname> an:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1966 ).class</command>
- =&gt; ActiveRecord::Relation 
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1966 ).all.class</command>
- =&gt; Array 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Noch nicht ganz klar? Dann machen wir einen anderen Versuch. Hier
-    schauen wir uns die Klassen von einem <methodname>find</methodname> und
-    einem <methodname>where</methodname> an. Beide sind unterschiedlich
-    (<methodname>where</methodname> liefert eine
-    <classname>ActiveRecord::Relation</classname>). Wenn wir aber beide mit
-    einem <code>==</code> vergleichen, dann ist das Ergebnis
-    <literal>true</literal>. Wenn ActiveRecord das <code>==</code> sieht,
-    denkt es sich <quote>so, jetzt geht es nicht mehr anders, ich muss die
-    Abfrage durchführen</quote>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.find_all_by_release_year(1966).class</command>
- =&gt; Array 
-
-ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1966).class</command>
- =&gt; ActiveRecord::Relation 
-
-ruby-1.9.2-p0 &gt; <command>Album.where(:release_year =&gt; 1966).class == Album.find_all_by_release_year(1966).class</command>
- =&gt; false 
-
-ruby-1.9.2-p0 &gt; <command>Album.find_all_by_release_year(1966) == Album.where(:release_year =&gt; 1966)</command>
- =&gt; true 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Prinzipiell klar, aber der Sinn noch nicht ganz? Dann bauen wir uns
-    mal eine Abfrage zusammen, in der wir mehrere Methoden verschachteln. In
-    dem folgenden Beispiel wird <varname>a</varname> immer weiter definiert
-    und erst ganz zum Schluss (beim Aufruf der Methode
-    <methodname>all</methodname>) wird die Datenbank-Abfrage wirklich
-    getätigt. Mit der Methode <indexterm>
-        <primary>ActiveRecord</primary>
-
-        <secondary>Methoden</secondary>
-
-        <tertiary>to_sql()</tertiary>
-      </indexterm><methodname>to_sql</methodname> kann man sich immer das
-    aktuelle SQL-Query ausgeben lassen.<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>a = Album.where( :release_year =&gt; 1965..1968 )</command>
- =&gt; [#&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-05 21:29:19"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-09-03 09:04:45", updated_at: "2010-09-03 09:04:45"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-09-03 09:06:28", updated_at: "2010-09-03 09:06:28"&gt;, #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-09-03 09:06:45", updated_at: "2010-09-03 09:06:45"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>a.class</command>
- =&gt; ActiveRecord::Relation 
-
-ruby-1.9.2-p0 &gt; <command>a.to_sql</command>
- =&gt; "SELECT     \"albums\".* FROM       \"albums\"  WHERE     (\"albums\".\"release_year\" BETWEEN 1965 AND 1968)" 
-
-ruby-1.9.2-p0 &gt; <command>a = a.order( :release_year )</command>
- =&gt; [#&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-09-03 09:04:45", updated_at: "2010-09-03 09:04:45"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;, #&lt;Album id: 3, position: 3, name: "Revolver", release_year: 1966, created_at: "2010-09-02 19:49:27", updated_at: "2010-09-02 19:49:27"&gt;, #&lt;Album id: 9, position: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2010-09-03 09:06:28", updated_at: "2010-09-03 09:06:28"&gt;, #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-05 21:29:19"&gt;, #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-09-03 09:06:45", updated_at: "2010-09-03 09:06:45"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>a.class</command>
- =&gt; ActiveRecord::Relation 
-
-ruby-1.9.2-p0 &gt; <command>a.to_sql</command>
- =&gt; "SELECT     \"albums\".* FROM       \"albums\"  WHERE     (\"albums\".\"release_year\" BETWEEN 1965 AND 1968) ORDER BY  release_year" 
-
-ruby-1.9.2-p0 &gt; <command>a = a.limit(3)</command>
- =&gt; [#&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-09-03 09:04:45", updated_at: "2010-09-03 09:04:45"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>a.class</command>
- =&gt; ActiveRecord::Relation 
-
-ruby-1.9.2-p0 &gt; <command>a.to_sql</command>
- =&gt; "SELECT     \"albums\".* FROM       \"albums\"  WHERE     (\"albums\".\"release_year\" BETWEEN 1965 AND 1968) ORDER BY  release_year LIMIT 3" 
-
-ruby-1.9.2-p0 &gt; <command>a.all</command>
- =&gt; [#&lt;Album id: 4, position: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2010-09-02 20:30:34", updated_at: "2010-09-02 20:30:34"&gt;, #&lt;Album id: 5, position: 5, name: "Rubber Soul", release_year: 1965, created_at: "2010-09-03 09:04:45", updated_at: "2010-09-03 09:04:45"&gt;, #&lt;Album id: 2, position: 2, name: "Pet Sounds", release_year: 1966, created_at: "2010-09-02 19:49:07", updated_at: "2010-09-02 19:49:07"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <section xml:id="activerecord_lazyloading_automatische_optimierung">
-      <title
-      xml:id="activerecord_lazyloading_automatische_optimierung.title">Automatische
-      Optimierung</title>
-
-      <para>Einer der großen Vorteile von <foreignphrase xml:lang="en">Lazy
-      Loading</foreignphrase> ist die automatische Optimierung der SQL-Abfrage
-      durch ActiveRecord.</para>
-
-      <para>Ziehen wir mal die Summe aller Veröffentlichungsjahre der Alben,
-      die in den 70ern herausgebracht wurden. Und danach sortieren wir die
-      Alben nach Namen und ziehen anschließend die Summe.<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1970..1979 ).sum(:release_year)</command>
- =&gt; 5922 
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :release_year =&gt; 1970..1979 ).order(:name).sum(:release_year)</command>
- =&gt; 5922 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-      <para>Das Ergebnis ist bei beiden Abfragen logischerweise identisch. Und
-      ein Blick in die <filename>log/development.log</filename> zeigt auch,
-      dass ActiveRecord selbstständig die SQL-Abfrage optimiert hat. Bei
-      beiden Anfragen wird der gleiche SQL-Code benutzt, weil die Sortierung
-      nach Namen für das Ziehen der Summe völlig unerheblich
-      ist:<programlisting>  SQL (0.2ms)  SELECT SUM("albums"."release_year") AS sum_id FROM "albums" WHERE ("albums"."release_year" BETWEEN 1970 AND 1979)
-  SQL (0.2ms)  SELECT SUM("albums"."release_year") AS sum_id FROM "albums" WHERE ("albums"."release_year" BETWEEN 1970 AND 1979)</programlisting></para>
+      <para>Als Erstes geben wir die ersten beiden Datensätze zurück und
+      danach die ersten beiden Datensätze mit einem Offset von 5:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.limit(2)</command>
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" LIMIT 2
+ =&gt; [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;] 
+1.9.3p194 :002 &gt; <command>Album.limit(2).offset(5)</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" LIMIT 2 OFFSET 5
+ =&gt; [#&lt;Album id: 6, name: "What's Going On", release_year: 1971, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;] 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
     </section>
   </section>
 
-  <section>
-    <title>Debugging in der Console</title>
+  <section xml:id="activerecord_group">
+    <title xml:id="activerecord_group.title">group</title>
 
-    <para>Manchmal ist es nervig, ständig zwischen einem Terminal mit der
-    Rails-<foreignphrase xml:lang="en">Console</foreignphrase> und einem
-    anderen Terminal mit dem Logfile zu wechseln, um zu sehen, was gerade von
-    ActiveRecord mit der Datenbank gemacht wurde. Es gibt mit
-    <command>ActiveRecord::Base.logger = Logger.new(STDOUT)</command> einen
-    einfachen Weg, diese Meldungen auch in der ogger.new anzuzeigen:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
+    <indexterm>
+      <primary>ActiveRecord</primary>
 
-ruby-1.9.2-p0 &gt; <command>ActiveRecord::Base.logger = Logger.new(STDOUT)</command>
- =&gt; #&lt;Logger:0x00000100a6e6d0 @progname=nil, @level=0, @default_formatter=#&lt;Logger::Formatter:0x00000100a6e6a8 @datetime_format=nil&gt;, @formatter=nil, @logdev=#&lt;Logger::LogDevice:0x00000100a6e658 @shift_size=nil, @shift_age=nil, @filename=nil, @dev=#&lt;IO:&lt;STDOUT&gt;&gt;, @mutex=#&lt;Logger::LogDevice::LogDeviceMutex:0x00000100a6e630 @mon_owner=nil, @mon_count=0, @mon_mutex=#&lt;Mutex:0x00000100a6e5e0&gt;&gt;&gt;&gt; 
+      <secondary>Methoden</secondary>
 
-ruby-1.9.2-p0 &gt; <command>Album.first</command>
-  SQL (0.4ms)   SELECT name
- FROM sqlite_master
- WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+      <tertiary>group()</tertiary>
+    </indexterm>
 
-  Album Load (0.1ms)  SELECT "albums".* FROM "albums" LIMIT 1
- =&gt; #&lt;Album id: 1, position: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2010-09-02 19:48:42", updated_at: "2010-09-02 19:48:42"&gt; 
+    <para>Mit der Methode <methodname>group</methodname> kann das Ergebnis
+    einer Abfrage gruppiert zurückgegeben werden.</para>
 
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+    <para>Geben wir erst mal alle Alben nach dem Erscheinungsjahr gruppiert
+    zurück:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.group(:release_year)</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" GROUP BY release_year
+ =&gt; [#&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 6, name: "What's Going On", release_year: 1971, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;, #&lt;Album id: 8, name: "London Calling", release_year: 1979, created_at: "2012-04-26 13:40:13", updated_at: "2012-04-26 13:40:13"&gt;] 
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+  </section>
+
+  <section xml:id="activerecord_pluck">
+    <title xml:id="activerecord_pluck.title">pluck</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Methoden</secondary>
+
+      <tertiary>pluck()</tertiary>
+    </indexterm>
+
+    <para>Normalerweise zieht ActiveRecord immer alle Tabellenspalten aus der
+    Datenbank und überlässt es dem Programmierer später die für ihn
+    interessanten Komponenten rauszuholen. Bei grossen Datenmengen kann es
+    aber praktisch und vor allen Dingen sehr viel schneller sein, direkt bei
+    der Abfrage ein bestimmtes Datenbankfeld für die Abfrage zu definieren.
+    Das kann mit der Methode <methodname>pluck</methodname> gemacht werden.
+    Wollen Sie alle name Einträge für alle Alben aus den 1960ern?<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where(:release_year =&gt; 1960..1969).pluck(:name)</command>
+   (0.2ms)  SELECT name FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
+ =&gt; ["Sgt. Pepper's Lonely Hearts Club Band", "Pet Sounds", "Revolver", "Highway 61 Revisited", "Rubber Soul", "Blonde on Blonde", "The Beatles"] 
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+
+    <para>Als Ergebnis liefert <methodname>pluck</methodname> ein
+    Array.</para>
+  </section>
+
+  <section xml:id="activerecord_berechnungen">
+    <title xml:id="activerecord_berechnungen.title">Berechnungen</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Berechnungen</secondary>
+    </indexterm>
+
+    <section xml:id="activerecord_average">
+      <title xml:id="activerecord_average.title">average</title>
+
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Methoden</secondary>
+
+        <tertiary>average()</tertiary>
+      </indexterm>
+
+      <para>Mit der Methode <methodname>average</methodname> lässt sich der
+      Durchschnitt der Werte in einer bestimmten Spalte in der Tabelle
+      ausrechnen. Dafür ist unser Datenmaterial natürlich schlecht geeignet.
+      Als Erstes berechnen wir das Durchschnitts-Veröffentlichungsjahr aller
+      Alben und danach das Gleiche für die Alben aus den 60ern:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.average(:release_year)</command>
+   (3.7ms)  SELECT AVG("albums"."release_year") AS avg_id FROM "albums" 
+ =&gt; #&lt;BigDecimal:7fbdd1f01ef0,'0.19685E4',18(45)&gt; 
+1.9.3p194 :002 &gt; <command>Album.average(:release_year).to_s</command>
+   (0.3ms)  SELECT AVG("albums"."release_year") AS avg_id FROM "albums" 
+ =&gt; "1968.5" 
+1.9.3p194 :003 &gt; <command>Album.where( :release_year =&gt; 1960..1969 ).average(:release_year)</command>
+   (0.3ms)  SELECT AVG("albums"."release_year") AS avg_id FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
+ =&gt; #&lt;BigDecimal:7fbdd1b07980,'0.1966142857 142857E4',27(45)&gt; 
+1.9.3p194 :004 &gt; <command>Album.where( :release_year =&gt; 1960..1969 ).average(:release_year).to_s</command>
+   (0.2ms)  SELECT AVG("albums"."release_year") AS avg_id FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
+ =&gt; "1966.142857142857" 
+1.9.3p194 :005 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+    </section>
+
+    <section xml:id="activerecord_count">
+      <title xml:id="activerecord_count.title">count</title>
+
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Methoden</secondary>
+
+        <tertiary>count()</tertiary>
+      </indexterm>
+
+      <para>Die Methode <methodname>count</methodname> zählt die Anzahl der
+      Datensätze.</para>
+
+      <para>Als Erstes geben wir die Anzahl aller Alben in der Datenbank
+      zurück und danach die Anzahl der Alben in den 60ern:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.count</command>
+   (0.1ms)  SELECT COUNT(*) FROM "albums" 
+ =&gt; 10 
+1.9.3p194 :002 &gt; <command>Album.where( :release_year =&gt; 1960..1969 ).count</command>
+   (0.2ms)  SELECT COUNT(*) FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
+ =&gt; 7 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ </screen></para>
+    </section>
+
+    <section xml:id="activerecord_maximum">
+      <title xml:id="activerecord_maximum.title">maximum</title>
+
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Methoden</secondary>
+
+        <tertiary>maximum()</tertiary>
+      </indexterm>
+
+      <para>Mit der Methode <methodname>maximum</methodname> kann aus einer
+      Abfrage der Eintrag mit dem höchsten Wert ausgegeben werden.</para>
+
+      <para>Suchen wir das höchste Veröffentlichungsjahr:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.maximum(:release_year)</command>
+   (0.2ms)  SELECT MAX("albums"."release_year") AS max_id FROM "albums" 
+ =&gt; 1979 
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+    </section>
+
+    <section xml:id="activerecord_minimum">
+      <title xml:id="activerecord_minimum.title">minimum</title>
+
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Methoden</secondary>
+
+        <tertiary>minimum()</tertiary>
+      </indexterm>
+
+      <para>Mit der Methode <methodname>minimum</methodname> kann aus einer
+      Abfrage der Eintrag mit dem niedrigsten Wert ausgegeben werden.</para>
+
+      <para>Suchen wir das niedrigste Veröffentlichungsjahr:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.minimum(:release_year)</command>
+   (0.1ms)  SELECT MIN("albums"."release_year") AS min_id FROM "albums" 
+ =&gt; 1965 
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+    </section>
+
+    <section xml:id="activerecord_sum">
+      <title xml:id="activerecord_sum.title">sum</title>
+
+      <indexterm>
+        <primary>ActiveRecord</primary>
+
+        <secondary>Methoden</secondary>
+
+        <tertiary>sum()</tertiary>
+      </indexterm>
+
+      <para>Mit der Methode sum lässt sich die Summe aller Einträge in einer
+      bestimmten Spalte der Datenbank-Abfrage berechnen.</para>
+
+      <para>Ziehen wir die Summe aller Veröffentlichungsjahre:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.sum(:release_year)</command>
+   (3.2ms)  SELECT SUM("albums"."release_year") AS sum_id FROM "albums" 
+ =&gt; 19685 
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
+    </section>
+  </section>
+
+  <section xml:id="activerecord_explain">
+    <title xml:id="activerecord_explain.title">SQL EXPLAIN</title>
+
+    <para>Die meisten SQL-Datenbanken können mit dem Befehl EXPLAIN
+    detailierte Informationen zu einer SQL-Abfrage liefert. Dies macht bei
+    unserer Mini-Applikation wenig Sinn, aber wenn Sie einmal mit einer
+    grossen Datenbank arbeiten, dann ist EXPLAIN eine gute Debugging-Methode,
+    um z.B. rauszufinden, an welcher Stelle ein Index gesetzt werden sollte.
+    SQL EXPLAIN kann mit der <methodname>explain</methodname> Methode
+    abgerufen werden (mit einem <code>puts</code> kann man sich die Ausgabe
+    schöner anzeigen lassen):<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where(:release_year =&gt; 1960..1969)  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)</command>
+ =&gt; [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-04-30 14:51:03", updated_at: "2012-04-30 14:51:03"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-04-30 14:51:03", updated_at: "2012-04-30 14:51:03"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-04-30 14:51:03", updated_at: "2012-04-30 14:51:03"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-04-30 14:51:03", updated_at: "2012-04-30 14:51:03"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-04-30 14:51:03", updated_at: "2012-04-30 14:51:03"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-04-30 14:51:03", updated_at: "2012-04-30 14:51:03"&gt;, #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-04-30 14:51:03", updated_at: "2012-04-30 14:51:03"&gt;] 
+1.9.3p194 :002 &gt; <command>Album.where(:release_year =&gt; 1960..1969).explain</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
+  EXPLAIN (0.1ms)  EXPLAIN QUERY PLAN SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
+ =&gt; "EXPLAIN for: SELECT \"albums\".* FROM \"albums\"  WHERE (\"albums\".\"release_year\" BETWEEN 1960 AND 1969)\n0|0|0|SCAN TABLE albums (~500000 rows)\n" 
+1.9.3p194 :003 &gt; <command>puts Album.where(:release_year =&gt; 1960..1969).explain</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
+  EXPLAIN (0.1ms)  EXPLAIN QUERY PLAN SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
+EXPLAIN for: SELECT "albums".* FROM "albums"  WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
+0|0|0|SCAN TABLE albums (~500000 rows)
+ =&gt; nil 
+1.9.3p194 :004 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$  </screen></para>
   </section>
 </section>
