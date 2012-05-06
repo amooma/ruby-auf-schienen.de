@@ -41,26 +41,25 @@
       </orderedlist></para>
 
     <para>Wir suchen uns jetzt das Album namens <quote>The Beatles</quote> und
-    verändern den Namen in <quote>Ein Test</quote>:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>apfelmus = Album.where( :name =&gt; 'The Beatles' ).first</command>
- =&gt; #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 19:53:00"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>apfelmus.name = 'Ein Test'</command>
+    verändern den Namen in <quote>Ein Test</quote>:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>album = Album.where(:name =&gt; 'The Beatles').first</command>
+  Album Load (0.6ms)  SELECT "albums".* FROM "albums" WHERE "albums"."name" = 'The Beatles' LIMIT 1
+ =&gt; #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-04-30 14:51:03", updated_at: "2012-04-30 14:51:03"&gt; 
+1.9.3p194 :002 &gt; <command>album.name</command>
+ =&gt; "The Beatles" 
+1.9.3p194 :003 &gt; <command>album.name = 'Ein Test'</command>
  =&gt; "Ein Test" 
-
-ruby-1.9.2-p0 &gt; <command>apfelmus</command>
- =&gt; #&lt;Album id: 10, position: 10, name: "Ein Test", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 19:53:00"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>apfelmus.save</command>
+1.9.3p194 :004 &gt; <command>album.save</command>
+   (0.1ms)  begin transaction
+   (0.5ms)  UPDATE "albums" SET "name" = 'Ein Test', "updated_at" = '2012-05-06 13:04:54.261940' WHERE "albums"."id" = 10
+   (1.7ms)  commit transaction
  =&gt; true 
-
-ruby-1.9.2-p0 &gt; <command>Album.last</command>
- =&gt; #&lt;Album id: 10, position: 10, name: "Ein Test", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 19:56:49"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+1.9.3p194 :005 &gt; <command>Album.last</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
+ =&gt; #&lt;Album id: 10, name: "Ein Test", release_year: 1968, created_at: "2012-04-30 14:51:03", updated_at: "2012-05-06 13:04:54"&gt; 
+1.9.3p194 :006 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$  </screen></para>
   </section>
 
   <section xml:id="activerecord_changed">
@@ -76,29 +75,26 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
 
     <para>Wenn man sich nicht sicher ist, ob ein Datensatz verändert und noch
     nicht abgespeichert wurde, dann kann man dies mit der
-    <methodname>changed?</methodname>-Methode herausfinden:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>apfelmus = Album.last</command>
- =&gt; #&lt;Album id: 10, position: 10, name: "Ein Test", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 19:56:49"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>apfelmus.changed?</command>
+    <methodname>changed?</methodname>-Methode herausfinden:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>album = Album.last</command>
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
+ =&gt; #&lt;Album id: 10, name: "Ein Test", release_year: 1968, created_at: "2012-04-30 14:51:03", updated_at: "2012-05-06 13:04:54"&gt; 
+1.9.3p194 :002 &gt; <command>album.changed?</command>
  =&gt; false 
-
-ruby-1.9.2-p0 &gt; <command>apfelmus.name = 'The Beatles'</command>
+1.9.3p194 :003 &gt; <command>album.name = 'The Beatles'</command>
  =&gt; "The Beatles" 
-
-ruby-1.9.2-p0 &gt; <command>apfelmus.changed?</command>
+1.9.3p194 :004 &gt; <command>album.changed?</command>
  =&gt; true 
-
-ruby-1.9.2-p0 &gt; <command>apfelmus.save</command>
+1.9.3p194 :005 &gt; <command>album.save</command>
+   (0.1ms)  begin transaction
+   (0.5ms)  UPDATE "albums" SET "name" = 'The Beatles', "updated_at" = '2012-05-06 13:06:24.359737' WHERE "albums"."id" = 10
+   (3.5ms)  commit transaction
  =&gt; true 
-
-ruby-1.9.2-p0 &gt; <command>apfelmus.changed?</command>
+1.9.3p194 :006 &gt; <command>album.changed?</command>
  =&gt; false 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+1.9.3p194 :007 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
   </section>
 
   <section xml:id="activerecord_update_attributes">
@@ -118,50 +114,41 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     automatisch direkt speichern.</para>
 
     <para>Setzen wir damit das Beispiel von <xref
-    linkend="activerecord_einfaches_editieren" /> um:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>apfelmus = Album.where( :name =&gt; 'The Beatles' ).first</command>
- =&gt; #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 20:22:17"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>apfelmus.changed?</command>
+    linkend="activerecord_einfaches_editieren" /> um:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>album = Album.last</command>
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
+ =&gt; #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-04-30 14:51:03", updated_at: "2012-05-06 13:06:24"&gt; 
+1.9.3p194 :002 &gt; <command>album.changed?</command>
  =&gt; false 
-
-ruby-1.9.2-p0 &gt; <command>apfelmus.update_attributes( :name =&gt; 'Ein Test' )</command>
+1.9.3p194 :003 &gt; <command>album.update_attributes(:name =&gt; 'Noch ein Test')</command>
+   (0.1ms)  begin transaction
+   (0.5ms)  UPDATE "albums" SET "name" = 'Noch ein Test', "updated_at" = '2012-05-06 13:08:21.064466' WHERE "albums"."id" = 10
+   (3.8ms)  commit transaction
  =&gt; true 
-
-ruby-1.9.2-p0 &gt; <command>apfelmus.changed?</command>
+1.9.3p194 :004 &gt; <command>album.changed?</command>
  =&gt; false 
-
-ruby-1.9.2-p0 &gt; <command>Album.last</command>
- =&gt; #&lt;Album id: 10, position: 10, name: "Ein Test", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 20:22:38"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
+1.9.3p194 :005 &gt; <command>Album.last</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
+ =&gt; #&lt;Album id: 10, name: "Noch ein Test", release_year: 1968, created_at: "2012-04-30 14:51:03", updated_at: "2012-05-06 13:08:21"&gt; 
+1.9.3p194 :006 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
 
     <para>Ein solches Update lässt sich auch direkt an eine
     <methodname>where</methodname>-Methode anknüpfen und ist dann fast
-    atomar:<screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :name =&gt; 'Ein Test' ).first</command>
- =&gt; #&lt;Album id: 10, position: 10, name: "Ein Test", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 20:22:38"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :name =&gt; 'Ein Test' ).first.update_attributes( :name =&gt; 'The Beatles' )</command>
+    atomar:<screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Album.where(:name =&gt; 'Noch ein Test').first.update_attributes(:name =&gt; 'The Beatles')</command>
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE "albums"."name" = 'Noch ein Test' LIMIT 1
+   (0.1ms)  begin transaction
+   (0.4ms)  UPDATE "albums" SET "name" = 'The Beatles', "updated_at" = '2012-05-06 13:13:11.870462' WHERE "albums"."id" = 10
+   (3.8ms)  commit transaction
  =&gt; true 
-
-ruby-1.9.2-p0 &gt; <command>Album.where( :name =&gt; 'Ein Test' ).first</command> 
- =&gt; nil 
-
-ruby-1.9.2-p0 &gt; <command>Album.last</command>
- =&gt; #&lt;Album id: 10, position: 10, name: "The Beatles", release_year: 1968, created_at: "2010-10-08 19:53:00", updated_at: "2010-10-08 20:24:41"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
-
-    <para>Dass es aber doch noch zwei SQL-Befehle sind, zeigt sich in der
-    <filename>log/development.log</filename>:<programlisting>  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."name" = 'Ein Test') LIMIT 1
-  SQL (0.3ms)  UPDATE "albums" SET "name" = 'The Beatles', "updated_at" = '2010-10-08 20:24:41.644808' WHERE ("albums"."id" = 10)</programlisting></para>
+1.9.3p194 :002 &gt; <command>Album.last</command>
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
+ =&gt; #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-04-30 14:51:03", updated_at: "2012-05-06 13:13:11"&gt; 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
   </section>
 
   <section xml:id="activerecord_locking">
@@ -182,28 +169,28 @@ stefan@swmbp 0 1.9.2-p0 jukebox$ </screen></para>
     <literal>ri</literal>-Hilfe verweisen. Wer pessimistisches Locking
     benötigt, der findet dort die notwendigen Parameter.</para>
 
-    <para><screen>stefan@swmbp 0 1.9.2-p0 jukebox$ <command>ri -T ActiveRecord::Locking::Optimistic</command>
-
+    <para><screen>Stefan-Wintermeyers-MacBook-Air:jukebox xyz$ <command>ri -T ActiveRecord::Locking::Optimistic</command>
 ActiveRecord::Locking::Optimistic
 
-(from gem activerecord-3.0.0)
+(from gem activerecord-3.2.3)
 ------------------------------------------------------------------------------
 What is Optimistic Locking
 
 Optimistic locking allows multiple users to access the same record for edits,
-and assumes a minimum of conflicts with the data.  It does this by checking
+and assumes a minimum of conflicts with the data. It does this by checking
 whether another process has made changes to a record since it was opened, an
-ActiveRecord::StaleObjectError is thrown if that has occurred and the update
-is ignored.
+ActiveRecord::StaleObjectError exception is thrown if that has occurred
+and the update is ignored.
 
 Check out ActiveRecord::Locking::Pessimistic for an alternative.
 
 Usage
 
 Active Records support optimistic locking if the field lock_version is
-present.  Each update to the record increments the lock_version column and the
-locking facilities ensure that records instantiated twice will let the last
-one saved raise a StaleObjectError if the first was also updated. Example:
+present. Each update to the record increments the lock_version column
+and the locking facilities ensure that records instantiated twice will let the
+last one saved raise a StaleObjectError if the first was also updated.
+Example:
 
   p1 = Person.find(1)
   p2 = Person.find(1)
@@ -214,7 +201,7 @@ one saved raise a StaleObjectError if the first was also updated. Example:
   p2.first_name = "should fail"
   p2.save # Raises a ActiveRecord::StaleObjectError
 
-Optimistic locking will also check for stale data when objects are destroyed. 
+Optimistic locking will also check for stale data when objects are destroyed.
 Example:
 
   p1 = Person.find(1)
@@ -229,17 +216,18 @@ You're then responsible for dealing with the conflict by rescuing the
 exception and either rolling back, merging, or otherwise apply the business
 logic needed to resolve the conflict.
 
-You must ensure that your database schema defaults the lock_version column to
-0.
+This locking mechanism will function inside a single Ruby process. To make it
+work across all web requests, the recommended approach is to add
+lock_version as a hidden field to your form.
+
+You must ensure that your database schema defaults the lock_version
+column to 0.
 
 This behavior can be turned off by setting
 ActiveRecord::Base.lock_optimistically = false. To override the name of
-the lock_version column, invoke the set_locking_column method. This
-method uses the same syntax as set_table_name
-
+the lock_version column, invoke the set_locking_column method.
+This method uses the same syntax as set_table_name
 ------------------------------------------------------------------------------
-Instance methods:
-
-  attributes_from_column_definition</screen></para>
+Stefan-Wintermeyers-MacBook-Air:jukebox xyz$</screen></para>
   </section>
 </section>
