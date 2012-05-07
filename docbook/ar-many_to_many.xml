@@ -34,7 +34,7 @@
   </indexterm>
 
   <para>Bereits in <xref linkend="activerecord_has_many_through" /> wurde ein
-  Many-to-Many-Beispiel besprochen. Dieser Abschnitt geht nochmals auf die
+  Many-to-Many-Beispiel besprochen. Dieser Abschnitt geht intenviever auf die
   gleiche Idee ein. Wenn Sie <xref linkend="activerecord_has_many_through" />
   verstanden haben, können Sie auch zum nächsten Abschnitt springen.</para>
 
@@ -42,66 +42,50 @@
   Datenbank verknüpft. Bei Many-to-Many werden wir zwei Datenbanken mithilfe
   einer dritten Datenbank verknüpfen. Als Beispiel für eine solche Verknüpfung
   nehmen wir eine Bestellung in einem Online-Shop. In einem solchen
-  Shop-System kann ein Produkt in mehreren Bestellungen auftauchen und
-  gleichzeitig kann eine Bestellung mehrere Produkte enthalten. Das nennt sich
-  dann Many-to-Many. Am besten stellen wir das mal mit Code nach.</para>
+  Shop-System kann ein Produkt (<classname>Product</classname>) in mehreren
+  Bestellungen (<classname>Order</classname>) auftauchen und gleichzeitig kann
+  eine Bestellung mehrere Produkte enthalten. Das nennt sich dann
+  Many-to-Many. Am besten stellen wir das mal mit Code nach.</para>
 
   <section xml:id="many_to_many_vorbereitung">
     <title>Vorbereitung</title>
 
-    <para>Die Shop-Applikation erstellen:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new shop</command>
+    <para>Die Shop-Applikation erstellen:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new shop</command>
 [...]
-stefan@swmbp 0 1.9.2-p0 ~$ <command>cd shop</command>
-stefan@swmbp 0 1.9.2-p0 shop$ <command>bundle install</command>
-[...]
-stefan@swmbp 0 1.9.2-p0 shop$</screen></para>
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd shop</command>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
-    <para>Ein Model für Produkte:<screen>stefan@swmbp 1 1.9.2-p0 shop$ <command>rails generate model product name:string price:decimal</command>
+    <para>Ein Model für Produkte:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails generate model product name 'price:decimal{7,2}'</command>
       invoke  active_record
-      create    db/migrate/20101107211822_create_products.rb
+      create    db/migrate/20120507135639_create_products.rb
       create    app/models/product.rb
       invoke    test_unit
       create      test/unit/product_test.rb
       create      test/fixtures/products.yml
-stefan@swmbp 0 1.9.2-p0 shop$</screen></para>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
-    <para>Ein Model für eine Bestellung:<screen>stefan@swmbp 0 1.9.2-p0 shop$ <command>rails generate model order delivery_address:string shipped_at:datetime</command>
+    <para>Ein Model für eine Bestellung:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails generate model order delivery_address</command>
       invoke  active_record
-      create    db/migrate/20101107212119_create_orders.rb
+      create    db/migrate/20120507135744_create_orders.rb
       create    app/models/order.rb
       invoke    test_unit
       create      test/unit/order_test.rb
       create      test/fixtures/orders.yml
-stefan@swmbp 0 1.9.2-p0 shop$ </screen></para>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
     <para>Und noch ein Model für die einzelnen Positionen einer
-    Bestellung:<screen>stefan@swmbp 0 1.9.2-p0 shop$ <command>rails generate model line_item order_id:integer product_id:integer quantity:integer</command>
+    Bestellung:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails generate model line_item order_id:integer product_id:integer quantity:integer</command>
       invoke  active_record
-      create    db/migrate/20101107212633_create_line_items.rb
+      create    db/migrate/20120507141437_create_line_items.rb
       create    app/models/line_item.rb
       invoke    test_unit
       create      test/unit/line_item_test.rb
       create      test/fixtures/line_items.yml
-stefan@swmbp 0 1.9.2-p0 shop$ </screen></para>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
-    <para>Zum Schluss die Datenbank anlegen:<screen>stefan@swmbp 0 1.9.2-p0 shop$ <command>rake db:migrate</command>
-(in /Users/stefan/shop)
-==  CreateProducts: migrating =================================================
--- create_table(:products)
-   -&gt; 0.0015s
-==  CreateProducts: migrated (0.0016s) ========================================
-
-==  CreateOrders: migrating ===================================================
--- create_table(:orders)
-   -&gt; 0.0014s
-==  CreateOrders: migrated (0.0015s) ==========================================
-
-==  CreateLineItems: migrating ================================================
--- create_table(:line_items)
-   -&gt; 0.0015s
-==  CreateLineItems: migrated (0.0016s) =======================================
-
-stefan@swmbp 0 1.9.2-p0 shop$ </screen></para>
+    <para>Zum Schluss die Datenbank anlegen:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
   </section>
 
   <section xml:id="many_to_many_die_verknuepfung">
@@ -109,10 +93,10 @@ stefan@swmbp 0 1.9.2-p0 shop$ </screen></para>
 
     <para>Eine Bestellung (<classname>Order</classname>) besteht aus einer
     oder mehreren Positionen (<classname>LineItem</classname>). Ein solcher
-    LineItem besteht aus der <varname>order_id</varname>, einer
-    <varname>product_id</varname> und der Bestellmenge
-    (<varname>quantity</varname>). Das einzelne Produkt wird in der
-    Produktdatenbank (<classname>Product</classname>) definiert.</para>
+    <classname>LineItem</classname> besteht aus der
+    <varname>order_id</varname>, einer <varname>product_id</varname> und der
+    Bestellmenge (<varname>quantity</varname>). Das einzelne Produkt wird in
+    der Produktdatenbank (<classname>Product</classname>) definiert.</para>
 
     <note>
       <para>Alle Modelle sind hier in einer minimalen Art und Weise generiert
@@ -123,18 +107,24 @@ stefan@swmbp 0 1.9.2-p0 shop$ </screen></para>
     <para>Die Verknüpfung der Modelle geschieht wie immer im
     <filename>app/models</filename>-Verzeichnis. Als Erstes in der Datei
     <filename>app/models/order.rb:</filename><programlisting>class Order &lt; ActiveRecord::Base
+  attr_accessible :delivery_address
+
   has_many :line_items
   has_many :products, :through =&gt; :line_items
 end</programlisting></para>
 
     <para>Und dann im Gegenstück der Datei
     <filename>app/models/product.rb:</filename><programlisting>class Product &lt; ActiveRecord::Base
+  attr_accessible :name, :price
+
   has_many :line_items
   has_many :orders, :through =&gt; :line_items
 end</programlisting></para>
 
     <para>Zum Schluss noch die Datei
     <filename>app/models/line_item.rb:</filename><programlisting>class LineItem &lt; ActiveRecord::Base
+  attr_accessible :order_id, :product_id, :quantitiy
+
   belongs_to :order
   belongs_to :product
 end</programlisting></para>
@@ -150,115 +140,139 @@ end</programlisting></para>
     <xref linkend="activerecord_has_many" />.</para>
 
     <para>Wir füllen als Erstes einmal unsere Produktdatenbank mit folgenden
-    Werten:<screen>stefan@swmbp 0 1.9.2-p0 shop$ <command>rails console</command>
-Loading development environment (Rails 3.0.1)
-ruby-1.9.2-p0 &gt; <command>Product</command>
- =&gt; Product(id: integer, name: string, price: decimal, created_at: datetime, updated_at: datetime) 
-ruby-1.9.2-p0 &gt; <command>Product.create(:name =&gt; 'Milch (1 Liter)', :price =&gt; 0.79)</command>
- =&gt; #&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:1029beaa8,'0.79E0',9(18)&gt;, created_at: "2010-11-28 11:24:34", updated_at: "2010-11-28 11:24:34"&gt; 
-ruby-1.9.2-p0 &gt; <command>Product.create(:name =&gt; 'Butter (500 gr)', :price =&gt; 0.49)</command>
- =&gt; #&lt;Product id: 2, name: "Butter (500 gr)", price: #&lt;BigDecimal:10299f310,'0.49E0',9(18)&gt;, created_at: "2010-11-28 11:26:25", updated_at: "2010-11-28 11:26:25"&gt; 
-ruby-1.9.2-p0 &gt; <command>Product.create(:name =&gt; 'Mehl (1 kg)', :price =&gt; 2.64)</command>
- =&gt; #&lt;Product id: 3, name: "Mehl (1 kg)", price: #&lt;BigDecimal:102977590,'0.264E1',18(18)&gt;, created_at: "2010-11-28 11:28:12", updated_at: "2010-11-28 11:28:12"&gt; 
-ruby-1.9.2-p0 &gt;</screen></para>
+    Werten:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>milch = Product.create(:name =&gt; 'Milch (1 Liter)', :price =&gt; 0.45)</command>
+   (0.1ms)  begin transaction
+  SQL (6.8ms)  INSERT INTO "products" ("created_at", "name", "price", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Mon, 07 May 2012 14:03:43 UTC +00:00], ["name", "Milch (1 Liter)"], ["price", #&lt;BigDecimal:7fbbd4613db0,'0.45E0',9(45)&gt;], ["updated_at", Mon, 07 May 2012 14:03:43 UTC +00:00]]
+   (1.1ms)  commit transaction
+ =&gt; #&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:7fbbd3fe71d0,'0.45E0',9(45)&gt;, created_at: "2012-05-07 14:03:43", updated_at: "2012-05-07 14:03:43"&gt; 
+1.9.3p194 :002 &gt; <command>butter = Product.create(:name =&gt; 'Butter (250 gr)', :price =&gt; 0.75)</command>
+   (0.1ms)  begin transaction
+  SQL (0.6ms)  INSERT INTO "products" ("created_at", "name", "price", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Mon, 07 May 2012 14:04:45 UTC +00:00], ["name", "Butter (250 gr)"], ["price", #&lt;BigDecimal:7fbbd461d8d8,'0.75E0',9(45)&gt;], ["updated_at", Mon, 07 May 2012 14:04:45 UTC +00:00]]
+   (2.5ms)  commit transaction
+ =&gt; #&lt;Product id: 2, name: "Butter (250 gr)", price: #&lt;BigDecimal:7fbbd4628b70,'0.75E0',9(45)&gt;, created_at: "2012-05-07 14:04:45", updated_at: "2012-05-07 14:04:45"&gt; 
+1.9.3p194 :003 &gt; <command>mehl = Product.create(:name =&gt; 'Mehl (1 kg)', :price =&gt; 0.45)</command>
+   (0.1ms)  begin transaction
+  SQL (0.5ms)  INSERT INTO "products" ("created_at", "name", "price", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Mon, 07 May 2012 14:05:26 UTC +00:00], ["name", "Mehl (1 kg)"], ["price", #&lt;BigDecimal:7fbbd3ef3260,'0.45E0',9(45)&gt;], ["updated_at", Mon, 07 May 2012 14:05:26 UTC +00:00]]
+   (5.7ms)  commit transaction
+ =&gt; #&lt;Product id: 3, name: "Mehl (1 kg)", price: #&lt;BigDecimal:7fbbd3ef6438,'0.45E0',9(45)&gt;, created_at: "2012-05-07 14:05:26", updated_at: "2012-05-07 14:05:26"&gt; 
+1.9.3p194 :004 &gt; </screen></para>
 
     <para>Jetzt legen wir ein neues <classname>Order</classname>-Objekt
-    <varname>bestellung</varname> an:<screen>ruby-1.9.2-p0 &gt; <command>bestellung = Order.new(:delivery_address =&gt; 'Bahnhofstr. 123')</command>
- =&gt; #&lt;Order id: nil, delivery_address: "Bahnhofstr. 123", shipped_at: nil, created_at: nil, updated_at: nil&gt; 
-ruby-1.9.2-p0 &gt;</screen></para>
+    <varname>bestellung</varname> an:<screen>1.9.3p194 :004 &gt; <command>bestellung = Order.new(:delivery_address =&gt; 'Bahnhofstr. 123, 12345 Beispielhausen')</command>
+ =&gt; #&lt;Order id: nil, delivery_address: "Bahnhofstr. 123, 12345 Beispielhausen", created_at: nil, updated_at: nil&gt; 
+1.9.3p194 :005 &gt;</screen></para>
 
     <para>Logischerweise enthält diese neue Bestellung noch keine
-    Produkte:<screen>ruby-1.9.2-p0 &gt; <command>bestellung.products</command>
+    Produkte:<screen>1.9.3p194 :005 &gt; <command>bestellung.products</command>
  =&gt; [] 
-ruby-1.9.2-p0 &gt; </screen></para>
+1.9.3p194 :006 &gt;</screen></para>
 
     <para>Es gibt - wie so oft - verschiedene Arten, wie man Produkte zur
     Bestellung hinzufügt. Der einfachste Weg: Da die Produkte als Array
     eingebunden werden, kann man diese auch einfach als Elemente eines Arrays
-    einfügen:<screen>ruby-1.9.2-p0 &gt; <command>bestellung.products.class</command>
- =&gt; Array 
-ruby-1.9.2-p0 &gt; <command>bestellung.products &lt;&lt; Product.first</command>
- =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:102abff60,'0.79E0',9(18)&gt;, created_at: "2010-11-28 11:24:34", updated_at: "2010-11-28 11:24:34"&gt;] 
-ruby-1.9.2-p0 &gt; <command>bestellung.products</command>
- =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:102a72ad0,'0.79E0',9(18)&gt;, created_at: "2010-11-28 11:24:34", updated_at: "2010-11-28 11:24:34"&gt;] 
-ruby-1.9.2-p0 &gt;</screen></para>
+    einfügen:<screen>1.9.3p194 :006 &gt; <command>bestellung.products &lt;&lt; milch</command>
+ =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:7fbbd3f3b5d8,'0.45E0',9(45)&gt;, created_at: "2012-05-07 14:03:43", updated_at: "2012-05-07 14:03:43"&gt;] 
+1.9.3p194 :007 &gt; <command>bestellung.products</command>
+ =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:7fbbd475c7d0,'0.45E0',9(45)&gt;, created_at: "2012-05-07 14:03:43", updated_at: "2012-05-07 14:03:43"&gt;] 
+1.9.3p194 :008 &gt; </screen></para>
 
     <para>Wenn der Käufer jetzt aber nicht einen Liter Milch, sondern drei
     Liter Milch kaufen möchte, so müssen wir dies im
     <classname>LineItem</classname> (also im verknüpfenden Element) eintragen.
     Dummerweise gibt es aber noch gar keinen <classname>LineItem</classname>
-    zu dieser Bestellung:<screen>ruby-1.9.2-p0 &gt; <command>bestellung.line_items</command>
+    zu dieser Bestellung:<screen>1.9.3p194 :008 &gt; <command>bestellung.line_items</command>
  =&gt; [] 
-ruby-1.9.2-p0 &gt; </screen></para>
+1.9.3p194 :009 &gt;</screen></para>
 
     <para>Warum? Weil wir das Objekt noch nicht in der Datenbank gespeichert
     haben. Wenn wir dies mit <methodname>save</methodname> machen, können wir
-    auch die Menge in den <varname>line_items</varname> verändern:<screen>ruby-1.9.2-p0 &gt; <command>bestellung.save</command>
+    auch die Menge in den <varname>line_items</varname> verändern:<screen>1.9.3p194 :009 &gt; <command>bestellung.save</command>
+   (0.1ms)  begin transaction
+  SQL (0.6ms)  INSERT INTO "orders" ("created_at", "delivery_address", "updated_at") VALUES (?, ?, ?)  [["created_at", Mon, 07 May 2012 14:21:59 UTC +00:00], ["delivery_address", "Bahnhofstr. 123, 12345 Beispielhausen"], ["updated_at", Mon, 07 May 2012 14:21:59 UTC +00:00]]
+  SQL (0.5ms)  INSERT INTO "line_items" ("created_at", "order_id", "product_id", "quantity", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Mon, 07 May 2012 14:21:59 UTC +00:00], ["order_id", 1], ["product_id", 1], ["quantity", nil], ["updated_at", Mon, 07 May 2012 14:21:59 UTC +00:00]]
+   (3.6ms)  commit transaction
  =&gt; true 
-ruby-1.9.2-p0 &gt; <command>bestellung.line_items</command>
- =&gt; [#&lt;LineItem id: 1, order_id: 1, product_id: 1, quantity: nil, created_at: "2010-11-28 11:51:27", updated_at: "2010-11-28 11:51:27"&gt;, #&lt;LineItem id: 1, order_id: 1, product_id: 1, quantity: nil, created_at: "2010-11-28 11:51:27", updated_at: "2010-11-28 11:51:27"&gt;] 
-ruby-1.9.2-p0 &gt; <command>bestellung.line_items.first</command>
- =&gt; #&lt;LineItem id: 1, order_id: 1, product_id: 1, quantity: nil, created_at: "2010-11-28 11:51:27", updated_at: "2010-11-28 11:51:27"&gt; 
-ruby-1.9.2-p0 &gt; <command>bestellung.line_items.first.quantity = 3</command>
- =&gt; 3 
-ruby-1.9.2-p0 &gt; <command>bestellung.line_items.first.save</command>
+1.9.3p194 :010 &gt; <command>bestellung.line_items</command>
+ =&gt; [#&lt;LineItem id: 1, order_id: 1, product_id: 1, quantity: nil, created_at: "2012-05-07 14:21:59", updated_at: "2012-05-07 14:21:59"&gt;] 
+1.9.3p194 :011 &gt; <command>bestellung.line_items.first.update_attributes(:quantity =&gt; 3)</command>
+   (0.1ms)  begin transaction
+   (0.4ms)  UPDATE "line_items" SET "quantity" = 3, "updated_at" = '2012-05-07 14:22:22.480585' WHERE "line_items"."id" = 1
+   (3.4ms)  commit transaction
  =&gt; true 
-ruby-1.9.2-p0 &gt; <command>LineItem.first</command>
- =&gt; #&lt;LineItem id: 1, order_id: 1, product_id: 1, quantity: 3, created_at: "2010-11-28 11:51:27", updated_at: "2010-11-28 11:52:38"&gt; 
-ruby-1.9.2-p0 &gt; </screen></para>
+1.9.3p194 :012 &gt; <command>LineItem.first</command>
+  LineItem Load (0.3ms)  SELECT "line_items".* FROM "line_items" LIMIT 1
+ =&gt; #&lt;LineItem id: 1, order_id: 1, product_id: 1, quantity: 3, created_at: "2012-05-07 14:21:59", updated_at: "2012-05-07 14:22:22"&gt; 
+1.9.3p194 :013 &gt; </screen></para>
 
     <para>Alternativ können wir aber auch direkt zweimal Butter kaufen, indem
-    wir ein <classname>LineItem</classname> hinzufügen:<screen>ruby-1.9.2-p0 &gt; <command>butter = Product.where(:name =&gt; 'Butter (500 gr)').first</command>
- =&gt; #&lt;Product id: 2, name: "Butter (500 gr)", price: #&lt;BigDecimal:10193fba0,'0.49E0',9(18)&gt;, created_at: "2010-11-28 11:26:25", updated_at: "2010-11-28 11:26:25"&gt; 
-ruby-1.9.2-p0 &gt; <command>bestellung.line_items.create(:product =&gt; butter, :quantity =&gt; 2)</command> 
- =&gt; #&lt;LineItem id: 2, order_id: 1, product_id: 2, quantity: 2, created_at: "2010-11-28 16:26:53", updated_at: "2010-11-28 16:26:53"&gt; 
-ruby-1.9.2-p0 &gt; </screen></para>
-
-    <para>Wir haben beim <methodname>create</methodname> den Code
-    <code>:product =&gt; butter</code> benutzt. ActiveRecord kümmert sich
-    dabei um den Rest. Also um die Benutzung vom Tabellenfeld
-    <varname>product_id</varname>.</para>
+    wir ein <classname>LineItem</classname> hinzufügen:<screen>1.9.3p194 :015 &gt; <command>bestellung.line_items.create(:product_id =&gt; butter.id, :quantity =&gt; 2)</command>
+   (0.1ms)  begin transaction
+  SQL (0.7ms)  INSERT INTO "line_items" ("created_at", "order_id", "product_id", "quantity", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Mon, 07 May 2012 14:24:28 UTC +00:00], ["order_id", 1], ["product_id", 2], ["quantity", 2], ["updated_at", Mon, 07 May 2012 14:24:28 UTC +00:00]]
+   (3.5ms)  commit transaction
+ =&gt; #&lt;LineItem id: 2, order_id: 1, product_id: 2, quantity: 2, created_at: "2012-05-07 14:24:28", updated_at: "2012-05-07 14:24:28"&gt; 
+1.9.3p194 :016 &gt; </screen></para>
 
     <warning>
       <para>Zu diesem Zeitpunkt dürfen Sie nicht den Fehler machen und denken,
       dass das Objekt <varname>bestellung</varname> bereits über die bestellte
       Butter verfügt. Schauen wir uns mal die
-      <methodname>products</methodname> an: <screen>ruby-1.9.2-p0 &gt; <command>bestellung.products</command>
- =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:102c52648,'0.79E0',9(18)&gt;, created_at: "2010-11-28 11:24:34", updated_at: "2010-11-28 11:24:34"&gt;] 
-ruby-1.9.2-p0 &gt;</screen></para>
+      <methodname>products</methodname> an: <screen>1.9.3p194 :016 &gt; <command>bestellung.products</command>
+ =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:7f820bf6b190,'0.45E0',9(45)&gt;, created_at: "2012-05-07 14:20:05", updated_at: "2012-05-07 14:20:05"&gt;] 
+1.9.3p194 :017 &gt;</screen></para>
 
-      <para>Aber in der Datenbank ist es bereits richtig:<screen>ruby-1.9.2-p0 &gt; <command>Order.first.products</command>
- =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:102c104c8,'0.79E0',9(18)&gt;, created_at: "2010-11-28 11:24:34", updated_at: "2010-11-28 11:24:34"&gt;, #&lt;Product id: 2, name: "Butter (500 gr)", price: #&lt;BigDecimal:102c0f410,'0.49E0',9(18)&gt;, created_at: "2010-11-28 11:26:25", updated_at: "2010-11-28 11:26:25"&gt;] 
-ruby-1.9.2-p0 &gt; </screen></para>
+      <para>Aber in der Datenbank ist es bereits richtig:<screen>1.9.3p194 :017 &gt; <command>Order.first.products</command>
+  Order Load (0.3ms)  SELECT "orders".* FROM "orders" LIMIT 1
+  Product Load (0.3ms)  SELECT "products".* FROM "products" INNER JOIN "line_items" ON "products"."id" = "line_items"."product_id" WHERE "line_items"."order_id" = 1
+ =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:7f820ba849d8,'0.45E0',9(45)&gt;, created_at: "2012-05-07 14:20:05", updated_at: "2012-05-07 14:20:05"&gt;, #&lt;Product id: 2, name: "Butter (250 gr)", price: #&lt;BigDecimal:7f820ba83a60,'0.75E0',9(45)&gt;, created_at: "2012-05-07 14:20:31", updated_at: "2012-05-07 14:20:31"&gt;] 
+1.9.3p194 :018 &gt; </screen></para>
 
-      <para>Sie müssten in diesem konkreten Fall das Objekt neu aus der
-      Datenbank laden:<screen>ruby-1.9.2-p0 &gt; <command>bestellung = Order.first</command>
- =&gt; #&lt;Order id: 1, delivery_address: "Bahnhofstr. 123", shipped_at: nil, created_at: "2010-11-28 11:51:27", updated_at: "2010-11-28 11:51:27"&gt; 
-ruby-1.9.2-p0 &gt; <command>bestellung.products</command>
- =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:102acd048,'0.79E0',9(18)&gt;, created_at: "2010-11-28 11:24:34", updated_at: "2010-11-28 11:24:34"&gt;, #&lt;Product id: 2, name: "Butter (500 gr)", price: #&lt;BigDecimal:102acba90,'0.49E0',9(18)&gt;, created_at: "2010-11-28 11:26:25", updated_at: "2010-11-28 11:26:25"&gt;] 
-ruby-1.9.2-p0 &gt;</screen></para>
+      <para>Sie müssten in diesem konkreten Fall das Objekt mit der Methode
+      <methodname>reload</methodname> neu aus der Datenbank laden:<screen>1.9.3p194 :020 &gt; <command>bestellung.reload</command>
+  Order Load (0.3ms)  SELECT "orders".* FROM "orders" WHERE "orders"."id" = ? LIMIT 1  [["id", 1]]
+ =&gt; #&lt;Order id: 1, delivery_address: "Bahnhofstr. 123, 12345 Beispielhausen", created_at: "2012-05-07 14:21:59", updated_at: "2012-05-07 14:21:59"&gt; 
+1.9.3p194 :021 &gt; <command>bestellung.products</command>
+  Product Load (0.3ms)  SELECT "products".* FROM "products" INNER JOIN "line_items" ON "products"."id" = "line_items"."product_id" WHERE "line_items"."order_id" = 1
+ =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:7f820bd4a410,'0.45E0',9(45)&gt;, created_at: "2012-05-07 14:20:05", updated_at: "2012-05-07 14:20:05"&gt;, #&lt;Product id: 2, name: "Butter (250 gr)", price: #&lt;BigDecimal:7f820bd51468,'0.75E0',9(45)&gt;, created_at: "2012-05-07 14:20:31", updated_at: "2012-05-07 14:20:31"&gt;] 
+1.9.3p194 :022 &gt;</screen></para>
     </warning>
 
     <para>Geben wir eine zweite Bestellung mit allen verfügbaren Produkten ins
-    System:<screen>ruby-1.9.2-p0 &gt; <command>bestellung2 = Order.create(:delivery_address =&gt; 'Hauptstr. 15')</command>
- =&gt; #&lt;Order id: 2, delivery_address: "Hauptstr. 15", shipped_at: nil, created_at: "2010-11-29 10:36:37", updated_at: "2010-11-29 10:36:37"&gt; 
-ruby-1.9.2-p0 &gt; <command>bestellung2.products &lt;&lt; Product.all</command>
- =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:1029d3318,'0.79E0',9(18)&gt;, created_at: "2010-11-28 11:24:34", updated_at: "2010-11-28 11:24:34"&gt;, #&lt;Product id: 2, name: "Butter (500 gr)", price: #&lt;BigDecimal:1029cbd98,'0.49E0',9(18)&gt;, created_at: "2010-11-28 11:26:25", updated_at: "2010-11-28 11:26:25"&gt;, #&lt;Product id: 3, name: "Mehl (1 kg)", price: #&lt;BigDecimal:1029c0e48,'0.264E1',18(18)&gt;, created_at: "2010-11-28 11:28:12", updated_at: "2010-11-28 11:28:12"&gt;] 
-ruby-1.9.2-p0 &gt; <command>bestellung2.save</command>
+    System:<screen>1.9.3p194 :022 &gt; <command>bestellung2 = Order.create(:delivery_address =&gt; 'Teststr. 2')</command>
+   (0.1ms)  begin transaction
+  SQL (0.6ms)  INSERT INTO "orders" ("created_at", "delivery_address", "updated_at") VALUES (?, ?, ?)  [["created_at", Mon, 07 May 2012 14:27:52 UTC +00:00], ["delivery_address", "Teststr. 2"], ["updated_at", Mon, 07 May 2012 14:27:52 UTC +00:00]]
+   (3.5ms)  commit transaction
+ =&gt; #&lt;Order id: 2, delivery_address: "Teststr. 2", created_at: "2012-05-07 14:27:52", updated_at: "2012-05-07 14:27:52"&gt; 
+1.9.3p194 :023 &gt; <command>bestellung2.products &lt;&lt; Product.all</command>
+  Product Load (0.3ms)  SELECT "products".* FROM "products" 
+   (0.1ms)  begin transaction
+  SQL (0.6ms)  INSERT INTO "line_items" ("created_at", "order_id", "product_id", "quantity", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Mon, 07 May 2012 14:28:01 UTC +00:00], ["order_id", 2], ["product_id", 1], ["quantity", nil], ["updated_at", Mon, 07 May 2012 14:28:01 UTC +00:00]]
+  SQL (0.3ms)  INSERT INTO "line_items" ("created_at", "order_id", "product_id", "quantity", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Mon, 07 May 2012 14:28:01 UTC +00:00], ["order_id", 2], ["product_id", 2], ["quantity", nil], ["updated_at", Mon, 07 May 2012 14:28:01 UTC +00:00]]
+  SQL (0.2ms)  INSERT INTO "line_items" ("created_at", "order_id", "product_id", "quantity", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Mon, 07 May 2012 14:28:01 UTC +00:00], ["order_id", 2], ["product_id", 3], ["quantity", nil], ["updated_at", Mon, 07 May 2012 14:28:01 UTC +00:00]]
+   (2.5ms)  commit transaction
+  Product Load (0.2ms)  SELECT "products".* FROM "products" INNER JOIN "line_items" ON "products"."id" = "line_items"."product_id" WHERE "line_items"."order_id" = 2
+ =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:7f820a1d6760,'0.45E0',9(45)&gt;, created_at: "2012-05-07 14:20:05", updated_at: "2012-05-07 14:20:05"&gt;, #&lt;Product id: 2, name: "Butter (250 gr)", price: #&lt;BigDecimal:7f820a31ad10,'0.75E0',9(45)&gt;, created_at: "2012-05-07 14:20:31", updated_at: "2012-05-07 14:20:31"&gt;, #&lt;Product id: 3, name: "Mehl (1 kg)", price: #&lt;BigDecimal:7f820a408e70,'0.45E0',9(45)&gt;, created_at: "2012-05-07 14:20:48", updated_at: "2012-05-07 14:20:48"&gt;] 
+1.9.3p194 :024 &gt; <command>bestellung2.save</command>
+   (0.1ms)  begin transaction
+   (0.1ms)  commit transaction
  =&gt; true 
-ruby-1.9.2-p0 &gt;</screen></para>
+1.9.3p194 :025 &gt;</screen></para>
 
     <para>Jetzt können wir die andere Seite der Many-to-Many-Verbindung
     ausprobieren. Suchen wir mal nach allen Bestellungen, in denen das erste
-    Produkt enthalten ist:<screen>ruby-1.9.2-p0 &gt; <command>Product.first.orders</command>
- =&gt; [#&lt;Order id: 1, delivery_address: "Bahnhofstr. 123", shipped_at: nil, created_at: "2010-11-28 11:51:27", updated_at: "2010-11-28 11:51:27"&gt;, #&lt;Order id: 2, delivery_address: "Hauptstr. 15", shipped_at: nil, created_at: "2010-11-29 10:36:37", updated_at: "2010-11-29 10:36:37"&gt;] 
-ruby-1.9.2-p0 &gt; </screen></para>
+    Produkt enthalten ist:<screen>1.9.3p194 :027 &gt; <command>Product.first.orders</command>
+  Product Load (0.1ms)  SELECT "products".* FROM "products" LIMIT 1
+  Order Load (0.2ms)  SELECT "orders".* FROM "orders" INNER JOIN "line_items" ON "orders"."id" = "line_items"."order_id" WHERE "line_items"."product_id" = 1
+ =&gt; [#&lt;Order id: 1, delivery_address: "Bahnhofstr. 123, 12345 Beispielhausen", created_at: "2012-05-07 14:21:59", updated_at: "2012-05-07 14:21:59"&gt;, #&lt;Order id: 2, delivery_address: "Teststr. 2", created_at: "2012-05-07 14:27:52", updated_at: "2012-05-07 14:27:52"&gt;] 
+1.9.3p194 :028 &gt; </screen></para>
 
     <para>Natürlich können wir auch mit einem <methodname>joins</methodname>
     (siehe <xref linkend="activerecord_1n_joins" />) arbeiten und alle
-    Bestellungen, die das Produkt "Milch (1 Liter)" enthalten suchen:<screen>ruby-1.9.2-p0 &gt; <command>Order.joins(:products).where( :products =&gt; {:name =&gt; 'Milch (1 Liter)'})</command>
- =&gt; [#&lt;Order id: 1, delivery_address: "Bahnhofstr. 123", shipped_at: nil, created_at: "2010-11-28 11:51:27", updated_at: "2010-11-28 11:51:27"&gt;, #&lt;Order id: 2, delivery_address: "Hauptstr. 15", shipped_at: nil, created_at: "2010-11-29 10:36:37", updated_at: "2010-11-29 10:36:37"&gt;] 
-ruby-1.9.2-p0 &gt;</screen></para>
+    Bestellungen, die das Produkt "Milch (1 Liter)" enthalten suchen:<screen>1.9.3p194 :028 &gt; <command>Order.joins(:products).where(:products =&gt; {:name =&gt; 'Milch (1 Liter)'})</command>
+  Order Load (0.3ms)  SELECT "orders".* FROM "orders" INNER JOIN "line_items" ON "line_items"."order_id" = "orders"."id" INNER JOIN "products" ON "products"."id" = "line_items"."product_id" WHERE "products"."name" = 'Milch (1 Liter)'
+ =&gt; [#&lt;Order id: 1, delivery_address: "Bahnhofstr. 123, 12345 Beispielhausen", created_at: "2012-05-07 14:21:59", updated_at: "2012-05-07 14:21:59"&gt;, #&lt;Order id: 2, delivery_address: "Teststr. 2", created_at: "2012-05-07 14:27:52", updated_at: "2012-05-07 14:27:52"&gt;] 
+1.9.3p194 :029 &gt; </screen></para>
 
     <para>Mehr Informationen zu <methodname>has_many ... :through</methodname>
     finden Sie unter <xref linkend="activerecord_has_many_through" />.</para>
