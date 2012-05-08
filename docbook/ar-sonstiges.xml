@@ -17,58 +17,57 @@
   <section xml:id="ar_default_werte">
     <title xml:id="ar_default_werte.title">Default-Werte</title>
 
-    <para>Wenn Sie bei einem ActiveRecord-Objekt bestimmte Default-Werte
-    brauchen, so können Sie das am einfachsten mit der Methode
-    <methodname>after_initialize</methodname> realisieren. Diese Methode wird
-    von Rails nach der Methode <methodname>initialize</methodname> aufgerufen
-    (siehe <xref linkend="ruby-initialize" />). Nehmen wir einmal an, wir
-    haben eine Model-Bestellung (<classname>Order</classname>) und eine
-    Mindestbestellmenge liegt immer bei 1, dann können wir beim Erstellen
-    eines neuen Datensatzes ja direkt 1 als Default-Wert eintragen.</para>
+    <indexterm>
+      <primary>ActiveRecord</primary>
 
-    <para>Setzen wir das Beispiel kurz auf:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new shop</command>
+      <secondary>Callback</secondary>
+
+      <tertiary>after_initialize</tertiary>
+    </indexterm>
+
+    <para>Wenn Sie bei einem ActiveRecord-Objekt bestimmte Default-Werte
+    brauchen, so können Sie das am einfachsten mit dem
+    <methodname>after_initialize</methodname> Callback realisieren. Diese
+    Methode wird von ActiveRecord beim Erstellen eines neuen Objektes
+    aufgerufen. Nehmen wir einmal an, wir haben eine Model-Bestellung
+    (<classname>Order</classname>) und eine Mindestbestellmenge liegt immer
+    bei 1, dann können wir beim Erstellen eines neuen Datensatzes ja direkt 1
+    als Default-Wert eintragen.</para>
+
+    <para>Setzen wir das Beispiel kurz auf:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new shop</command>
 [...]
-stefan@swmbp 0 1.9.2-p0 ~$ <command>cd shop</command>
-stefan@swmbp 0 1.9.2-p0 shop$ <command>bundle install</command>
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd shop</command>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails generate model order product_id:integer quantity:integer</command>
 [...]
-stefan@swmbp 0 1.9.2-p0 shop$ <command>rails generate model order product_name:string quantity:integer</command>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate</command>
 [...]
-stefan@swmbp 0 1.9.2-p0 shop$ <command>rake db:migrate</command>
-[...]
-stefan@swmbp 0 1.9.2-p0 shop$</screen></para>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
     <para>Wir schreiben in die Datei <filename>app/models/order.rb</filename>
-    die <methodname>after_initialize</methodname>-Methode:<programlisting>class Order &lt; ActiveRecord::Base
+    einen <methodname>after_initialize</methodname>-Callback:<programlisting>class Order &lt; ActiveRecord::Base
+  attr_accessible :product_id, :quantity
+<emphasis>  after_initialize :set_defaults
 
-  # Default-Wert fuer Menge auf 1 setzen
-  #
-  def after_initialize 
-    return unless new_record?
-    self.quantity = 1
-  end
+  private
+  def set_defaults 
+    self.quantity ||= 1
+  end</emphasis>
 end</programlisting></para>
 
     <para>Und jetzt probieren wir in der Console aus, ob ein neues
-    Order-Objekt automatisch die Menge 1 enthält:<screen>stefan@swmbp 0 1.9.2-p0 shop$ <command>rails console</command>
-Loading development environment (Rails 3.0.3)
-ruby-1.9.2-p0 &gt; <command>bestellung = Order.new</command>
- =&gt; #&lt;Order id: nil, product_name: nil, quantity: 1, created_at: nil, updated_at: nil&gt; 
-ruby-1.9.2-p0 &gt; <command>bestellung.save</command>
- =&gt; true 
-ruby-1.9.2-p0 &gt; <command>bestellung</command>
- =&gt; #&lt;Order id: 1, product_name: nil, quantity: 1, created_at: "2010-12-02 16:02:03", updated_at: "2010-12-02 16:02:03"&gt; 
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 shop$</screen></para>
+    Order-Objekt automatisch die Menge 1 enthält:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>order = Order.new</command>
+ =&gt; #&lt;Order id: nil, product_id: nil, quantity: 1, created_at: nil, updated_at: nil&gt; 
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
 
     <para>Funktioniert wie gewünscht.</para>
 
     <note>
       <para>Einige Leser werden sich fragen, warum wir nicht in der Migration
-      einen Default in der Datenbank gesetzt haben. Der Grund liegt in der
-      Datenbank-Unabhängigkeit und im Programmierstil. Wie so oft, gibt es
-      auch für dieses Problem mehrere Lösungsmöglichkeiten. Die
-      <methodname>after_initialize</methodname>-Methode erscheint mir am
-      saubersten.</para>
+      einen Default in der Datenbank gesetzt haben. Wie so oft, gibt es auch
+      für dieses Problem mehrere Lösungsmöglichkeiten.</para>
     </note>
   </section>
 </section>
