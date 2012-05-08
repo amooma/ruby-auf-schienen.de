@@ -17,10 +17,10 @@
     <title>Einleitung</title>
 
     <para>Sie haben viel gelesen und mussten lange auf diesen Moment warten.
-    Scaffolding ist Fluch und Segen gleichermaßen. Scaffolding heißt nicht
-    mehr, als dass ein Grundgerüst (<foreignphrase
-    xml:lang="en">scaffold</foreignphrase>) für eine Applikation erstellt
-    wird. Dieses Grundgerüst enthält nicht nur das <foreignphrase
+    Jetzt kommen wir zum Scaffolding. Diesem Fluch und Segen gleichermaßen.
+    Scaffolding heißt nicht mehr, als dass ein Grundgerüst (<foreignphrase
+    xml:lang="en">englisch: scaffold</foreignphrase>) für eine Applikation
+    erstellt wird. Dieses Grundgerüst enthält nicht nur das <foreignphrase
     xml:lang="en">Model</foreignphrase>, sondern auch eine einfache Web-GUI
     (also <foreignphrase xml:lang="en">Views</foreignphrase>) und natürlich
     einen <foreignphrase xml:lang="en">Controller</foreignphrase>. Der meiner
@@ -31,9 +31,6 @@
     <xref linkend="erste_schritte_mit_rails" /> und <xref
     linkend="activerecord_chapter" /> durchgearbeitet haben, werden Sie
     Scaffolding direkt verstehen und nutzen können.</para>
-
-    <para>Zwischen Rails 3.0 und 3.1 gibt es im Scaffolding einige
-    Unterschiede &#8211; auch wenn die Grundidee die gleiche ist.</para>
 
     <note>
       <para>Dieses Kapitel ist ein Einstieg in Scaffolding und keine alle
@@ -46,112 +43,23 @@
     <title>Generieren eines Scaffolds</title>
 
     <para>Legen wir zuerst mit Scaffolding eine Liste von Bundeskanzlern an.
-    Dazu müssen Sie erst mal eine neue Rails-Applikation anlegen:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new politics</command>
+    Dazu müssen Sie erst mal eine neue Rails-Applikation anlegen:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new history </command>
 [...]
-stefan@swmbp 0 1.9.2-p0 ~$ <command>cd politics</command>
-stefan@swmbp 0 1.9.2-p0 politics$ <command>bundle install</command>
-[...]
-stefan@swmbp 0 1.9.2-p0 politics$ </screen></para>
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd history</command> 
+Stefan-Wintermeyers-MacBook-Air:history xyz$</screen></para>
 
-    <section xml:id="scaffold_anlegen_rails_30">
-      <title>Scaffolding mit Rails 3.0</title>
+    <section xml:id="scaffold_anlegen">
+      <title xml:id="scaffold_anlegen.title">rails generate scaffold</title>
 
       <indexterm>
         <primary>Scaffolding</primary>
 
-        <secondary>Rails 3.0</secondary>
+        <secondary>Rails 3.2</secondary>
       </indexterm>
 
-      <para>Am Anfang schauen wir uns die Rails-3.0-Optionen von Scaffolding
-      an:<screen>stefan@swmbp 0 1.9.2-p0 politics$ <command>rails generate scaffold</command>
+      <para>Am Anfang schauen wir uns die Optionen von Scaffolding an:<screen>Stefan-Wintermeyers-MacBook-Air:history xyz$ <command>rails generate scaffold</command>
 Usage:
-  rails generate scaffold NAME [field:type field:type] [options]
-
-Options:
-  -o, --orm=NAME                  # Orm to be invoked
-                                  # Default: active_record
-      [--force-plural]            # Forces the use of a plural ModelName
-  -c, --scaffold-controller=NAME  # Scaffold controller to be invoked
-                                  # Default: scaffold_controller
-  -y, [--stylesheets]             # Indicates when to generate stylesheets
-                                  # Default: true
-
-ActiveRecord options:
-      [--migration]            # Indicates when to generate migration
-                               # Default: true
-      [--timestamps]           # Indicates when to generate timestamps
-                               # Default: true
-      [--parent=PARENT]        # The parent class for the generated model
-  -t, [--test-framework=NAME]  # Test framework to be invoked
-                               # Default: test_unit
-
-TestUnit options:
-      [--fixture]                   # Indicates when to generate fixture
-                                    # Default: true
-  -r, [--fixture-replacement=NAME]  # Fixture replacement to be invoked
-
-ScaffoldController options:
-  -e, [--template-engine=NAME]  # Template engine to be invoked
-                                # Default: erb
-      [--helper]                # Indicates when to generate helper
-                                # Default: true
-
-Runtime options:
-  -f, [--force]    # Overwrite files that already exist
-  -p, [--pretend]  # Run but do not make any changes
-  -q, [--quiet]    # Supress status output
-  -s, [--skip]     # Skip files that already exist
-
-Description:
-    Create rails files for scaffold generator.
-
-stefan@swmbp 0 1.9.2-p0 politics$</screen></para>
-
-      <para>Ich mache es kurz: Für unseren jetzigen Kenntnisstand können wir
-      <command>rails generate scaffold</command> wie <command>rails generate
-      model</command> benutzen (siehe <xref
-      linkend="activerecord_datenbank_anlegen" />). Legen wir jetzt das
-      Scaffold für Bundeskanzler an:<screen>stefan@swmbp 0 1.9.2-p0 politics$ <command>rails generate scaffold chancellor firstname:string lastname:string birthday:date day_of_death:date inauguration:date</command>
-      invoke  active_record
-      create    db/migrate/20101203175125_create_chancellors.rb
-      create    app/models/chancellor.rb
-      invoke    test_unit
-      create      test/unit/chancellor_test.rb
-      create      test/fixtures/chancellors.yml
-       route  resources :chancellors
-      invoke  scaffold_controller
-      create    app/controllers/chancellors_controller.rb
-      invoke    erb
-      create      app/views/chancellors
-      create      app/views/chancellors/index.html.erb
-      create      app/views/chancellors/edit.html.erb
-      create      app/views/chancellors/show.html.erb
-      create      app/views/chancellors/new.html.erb
-      create      app/views/chancellors/_form.html.erb
-      invoke    test_unit
-      create      test/functional/chancellors_controller_test.rb
-      invoke    helper
-      create      app/helpers/chancellors_helper.rb
-      invoke      test_unit
-      create        test/unit/helpers/chancellors_helper_test.rb
-      invoke  stylesheets
-      create    public/stylesheets/scaffold.css
-stefan@swmbp 0 1.9.2-p0 politics$ </screen></para>
-    </section>
-
-    <section xml:id="scaffold_anlegen_rails_31">
-      <title>Scaffolding mit Rails 3.1</title>
-
-      <indexterm>
-        <primary>Scaffolding</primary>
-
-        <secondary>Rails 3.1</secondary>
-      </indexterm>
-
-      <para>Am Anfang schauen wir uns die Rails-3.1-Optionen von Scaffolding
-      an:<screen>stefan@swmbp 0 1.9.2-p0:politics$ <command>rails generate scaffold</command>
-Usage:
-  rails generate scaffold NAME [field:type field:type] [options]
+  rails generate scaffold NAME [field[:type][:index] field[:type][:index]] [options]
 
 Options:
       [--skip-namespace]                        # Skip namespace (affects only isolated applications)
@@ -205,33 +113,41 @@ Description:
     under_scored, as the first argument, and an optional list of attribute
     pairs.
 
-    Attribute pairs are field:type arguments specifying the
-    model's attributes. Timestamps are added by default, so you don't have to
-    specify them by hand as 'created_at:datetime updated_at:datetime'.
+    Attributes are field arguments specifying the model's attributes. You can
+    optionally pass the type and an index to each field. For instance:
+    "title body:text tracking_id:integer:uniq" will generate a title field of
+    string type, a body with text type and a tracking_id as an integer with an
+    unique index. "index" could also be given instead of "uniq" if one desires
+    a non unique index.
+
+    Timestamps are added by default, so you don't have to specify them by hand
+    as 'created_at:datetime updated_at:datetime'.
 
     You don't have to think up every attribute up front, but it helps to
     sketch out a few so you can start working with the resource immediately.
 
-    For example, 'scaffold post title:string body:text published:boolean'
-    gives you a model with those three attributes, a controller that handles
+    For example, 'scaffold post title body:text published:boolean' gives
+    you a model with those three attributes, a controller that handles
     the create/show/update/destroy, forms to create and edit your posts, and
-    an index that lists them all, as well as a resources :posts
-    declaration in config/routes.rb.
+    an index that lists them all, as well as a resources :posts declaration
+    in config/routes.rb.
 
     If you want to remove all the generated files, run
     'rails destroy scaffold ModelName'.
 
 Examples:
     `rails generate scaffold post`
-    `rails generate scaffold post title:string body:text published:boolean`
-    `rails generate scaffold purchase order_id:integer amount:decimal`
+    `rails generate scaffold post title body:text published:boolean`
+    `rails generate scaffold purchase amount:decimal tracking_id:integer:uniq`
+Stefan-Wintermeyers-MacBook-Air:history xyz$</screen></para>
 
-stefan@swmbp 0 1.9.2-p0:politics$</screen></para>
-
-      <para>Diese Hilfe ist tatsächlich gut. Legen wir anhand des Beispieles
-      ein Scaffold für Bundeskanzler an:<screen>stefan@swmbp 0 1.9.2-p0:politics$ <command>rails generate scaffold chancellor firstname:string lastname:string birthday:date day_of_death:date inauguration:date</command>
+      <para>Ich mache es kurz: Für unseren jetzigen Kenntnisstand können wir
+      <command>rails generate scaffold</command> wie <command>rails generate
+      model</command> benutzen (siehe <xref
+      linkend="activerecord_datenbank_anlegen" />). Legen wir jetzt das
+      Scaffold für Bundeskanzler an:<screen>Stefan-Wintermeyers-MacBook-Air:history xyz$ <command>rails generate scaffold chancellor first_name last_name birthday:date day_of_death:date inauguration:date</command>
       invoke  active_record
-      create    db/migrate/20110524100537_create_chancellors.rb
+      create    db/migrate/20120508171951_create_chancellors.rb
       create    app/models/chancellor.rb
       invoke    test_unit
       create      test/unit/chancellor_test.rb
@@ -252,11 +168,14 @@ stefan@swmbp 0 1.9.2-p0:politics$</screen></para>
       create      app/helpers/chancellors_helper.rb
       invoke      test_unit
       create        test/unit/helpers/chancellors_helper_test.rb
-      create  app/assets/stylesheets/scaffold.css.scss
       invoke  assets
-      create    app/assets/javascripts/chancellors.js.coffee
-      create    app/assets/stylesheets/chancellors.css.scss
-stefan@swmbp 0 1.9.2-p0:politics stefan$</screen></para>
+      invoke    coffee
+      create      app/assets/javascripts/chancellors.js.coffee
+      invoke    scss
+      create      app/assets/stylesheets/chancellors.css.scss
+      invoke  scss
+      create    app/assets/stylesheets/scaffolds.css.scss
+Stefan-Wintermeyers-MacBook-Air:history xyz$</screen></para>
     </section>
   </section>
 
@@ -265,29 +184,26 @@ stefan@swmbp 0 1.9.2-p0:politics stefan$</screen></para>
 
     <para>Wie Sie sehen, wurde von <command>rails generate scaffold</command>
     schon das Model mit angelegt. Wir können entsprechend direkt <command>rake
-    db:migrate</command> aufrufen:<screen>stefan@swmbp 0 1.9.2-p0 politics$ <command>rake db:migrate</command>
-(in /Users/stefan/politics)
+    db:migrate</command> aufrufen:<screen>Stefan-Wintermeyers-MacBook-Air:history xyz$ <command>rake db:migrate</command>
 ==  CreateChancellors: migrating ==============================================
 -- create_table(:chancellors)
-   -&gt; 0.0015s
-==  CreateChancellors: migrated (0.0016s) =====================================
+   -&gt; 0.0018s
+==  CreateChancellors: migrated (0.0019s) =====================================
 
-stefan@swmbp 0 1.9.2-p0 politics$</screen></para>
+Stefan-Wintermeyers-MacBook-Air:history xyz$</screen></para>
 
     <para>Legen wir in der <filename>db/seeds.rb</filename> die ersten sechs
     Kanzler an. Bei Walter Scheel bin ich mir nicht sicher, aber es handelt
     sich bei diesem Buch ja um ein Werk zum Thema Rails und nicht zur
-    deutschen Nachkriegspolitik.<programlisting>Chancellor.create(:firstname =&gt; 'Konrad', :lastname =&gt; 'Adenauer', :birthday =&gt; '05.01.1876', :day_of_death =&gt; '19.04.1967', :inauguration =&gt; '15.09.1949')
-Chancellor.create(:firstname =&gt; 'Ludwig', :lastname =&gt; 'Erhard', :birthday =&gt; '04.02.1897', :day_of_death =&gt; '05.05.1977', :inauguration =&gt; '16.10.1963')
-Chancellor.create(:firstname =&gt; 'Kurt Georg', :lastname =&gt; 'Kiesinger', :birthday =&gt; '06.04.1904', :day_of_death =&gt; '09.03.1988', :inauguration =&gt; '01.12.1966')
-Chancellor.create(:firstname =&gt; 'Willy', :lastname =&gt; 'Brandt', :birthday =&gt; '18.12.1913', :day_of_death =&gt; '08.10.1992', :inauguration =&gt; '21.10.1969')
-Chancellor.create(:firstname =&gt; 'Walter', :lastname =&gt; 'Scheel', :birthday =&gt; '08.09.1919', :inauguration =&gt; '07.05.1974')
-Chancellor.create(:firstname =&gt; 'Helmut', :lastname =&gt; 'Schmidt', :birthday =&gt; '23.12.1918', :inauguration =&gt; '16.05.1974')
-</programlisting></para>
+    deutschen Nachkriegsgeschichte.<programlisting>Chancellor.create(:first_name =&gt; 'Konrad', :last_name =&gt; 'Adenauer', :birthday =&gt; '05.01.1876', :day_of_death =&gt; '19.04.1967', :inauguration =&gt; '15.09.1949')
+Chancellor.create(:first_name =&gt; 'Ludwig', :last_name =&gt; 'Erhard', :birthday =&gt; '04.02.1897', :day_of_death =&gt; '05.05.1977', :inauguration =&gt; '16.10.1963')
+Chancellor.create(:first_name =&gt; 'Kurt Georg', :last_name =&gt; 'Kiesinger', :birthday =&gt; '06.04.1904', :day_of_death =&gt; '09.03.1988', :inauguration =&gt; '01.12.1966')
+Chancellor.create(:first_name =&gt; 'Willy', :last_name =&gt; 'Brandt', :birthday =&gt; '18.12.1913', :day_of_death =&gt; '08.10.1992', :inauguration =&gt; '21.10.1969')
+Chancellor.create(:first_name =&gt; 'Walter', :last_name =&gt; 'Scheel', :birthday =&gt; '08.09.1919', :inauguration =&gt; '07.05.1974')
+Chancellor.create(:first_name =&gt; 'Helmut', :last_name =&gt; 'Schmidt', :birthday =&gt; '23.12.1918', :inauguration =&gt; '16.05.1974')</programlisting></para>
 
-    <para>Daten anlegen:<screen>stefan@swmbp 0 1.9.2-p0 politics$ <command>rake db:seed</command>
-(in /Users/stefan/politics)
-stefan@swmbp 0 1.9.2-p0 politics$</screen></para>
+    <para>Beispieldaten einspielen:<screen>Stefan-Wintermeyers-MacBook-Air:history xyz$ <command>rake db:seed</command>
+Stefan-Wintermeyers-MacBook-Air:history xyz$ </screen></para>
   </section>
 
   <section xml:id="scaffold_routen">
@@ -303,16 +219,15 @@ stefan@swmbp 0 1.9.2-p0 politics$</screen></para>
 
     <para>Ohne uns zu intensiv mit Routen zu beschäftigen, schauen wir gerade
     mal die verfügbaren Routen an. Dazu müssen Sie <command>rake
-    routes</command> eingeben:<screen>stefan@swmbp 0 1.9.2-p0 politics$ <command>rake routes</command>
-(in /Users/stefan/politics)
-    chancellors GET    /chancellors(.:format)          {:action=&gt;"index", :controller=&gt;"chancellors"}
-                POST   /chancellors(.:format)          {:action=&gt;"create", :controller=&gt;"chancellors"}
- new_chancellor GET    /chancellors/new(.:format)      {:action=&gt;"new", :controller=&gt;"chancellors"}
-edit_chancellor GET    /chancellors/:id/edit(.:format) {:action=&gt;"edit", :controller=&gt;"chancellors"}
-     chancellor GET    /chancellors/:id(.:format)      {:action=&gt;"show", :controller=&gt;"chancellors"}
-                PUT    /chancellors/:id(.:format)      {:action=&gt;"update", :controller=&gt;"chancellors"}
-                DELETE /chancellors/:id(.:format)      {:action=&gt;"destroy", :controller=&gt;"chancellors"}
-stefan@swmbp 0 1.9.2-p0 politics$</screen></para>
+    routes</command> eingeben:<screen>Stefan-Wintermeyers-MacBook-Air:history xyz$ <command>rake routes</command>
+    chancellors GET    /chancellors(.:format)          chancellors#index
+                POST   /chancellors(.:format)          chancellors#create
+ new_chancellor GET    /chancellors/new(.:format)      chancellors#new
+edit_chancellor GET    /chancellors/:id/edit(.:format) chancellors#edit
+     chancellor GET    /chancellors/:id(.:format)      chancellors#show
+                PUT    /chancellors/:id(.:format)      chancellors#update
+                DELETE /chancellors/:id(.:format)      chancellors#destroy
+Stefan-Wintermeyers-MacBook-Air:history xyz$</screen></para>
 
     <para>Das sind alle in dieser Rails-Applikation zur Verfügung stehenden
     Routen und damit URLs. Alle Routes rufen Actions (also Methoden) im
@@ -333,105 +248,8 @@ stefan@swmbp 0 1.9.2-p0 politics$</screen></para>
     <para>So viel vorweg: Sie müssen jetzt nicht Zeile für Zeile den
     Controller durcharbeiten. Es ist nur wichtig, dass Sie wissen, wo die
     Datei liegt und dass dort die einzelnen Methoden für die Aufrufe durch die
-    Routen liegen. Dann können Sie später &#8211; bei Unklarheiten &#8211;
-    dort nachschauen.</para>
-
-    <section xml:id="scaffold_controller_rails30">
-      <title>Rails 3.0</title>
-
-      <para><programlisting>class ChancellorsController &lt; ApplicationController
-
-  # GET /chancellors
-  # GET /chancellors.xml
-  def index
-    @chancellors = Chancellor.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml  { render :xml =&gt; @chancellors }
-    end
-  end
-
-  # GET /chancellors/1
-  # GET /chancellors/1.xml
-  def show
-    @chancellor = Chancellor.find(params[:id])
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml  { render :xml =&gt; @chancellor }
-    end
-  end
-
-  # GET /chancellors/new
-  # GET /chancellors/new.xml
-  def new
-    @chancellor = Chancellor.new
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.xml  { render :xml =&gt; @chancellor }
-    end
-  end
-
-  # GET /chancellors/1/edit
-  def edit
-    @chancellor = Chancellor.find(params[:id])
-  end
-
-  # POST /chancellors
-  # POST /chancellors.xml
-  def create
-    @chancellor = Chancellor.new(params[:chancellor])
-
-    respond_to do |format|
-      if @chancellor.save
-        format.html { redirect_to(@chancellor, :notice =&gt; 'Chancellor was successfully created.') }
-        format.xml  { render :xml =&gt; @chancellor, :status =&gt; :created, :location =&gt; @chancellor }
-      else
-        format.html { render :action =&gt; "new" }
-        format.xml  { render :xml =&gt; @chancellor.errors, :status =&gt; :unprocessable_entity }
-      end
-    end
-  end
-
-  # PUT /chancellors/1
-  # PUT /chancellors/1.xml
-  def update
-    @chancellor = Chancellor.find(params[:id])
-
-    respond_to do |format|
-      if @chancellor.update_attributes(params[:chancellor])
-        format.html { redirect_to(@chancellor, :notice =&gt; 'Chancellor was successfully updated.') }
-        format.xml  { head :ok }
-      else
-        format.html { render :action =&gt; "edit" }
-        format.xml  { render :xml =&gt; @chancellor.errors, :status =&gt; :unprocessable_entity }
-      end
-    end
-  end
-
-  # DELETE /chancellors/1
-  # DELETE /chancellors/1.xml
-  def destroy
-    @chancellor = Chancellor.find(params[:id])
-    @chancellor.destroy
-
-    respond_to do |format|
-      format.html { redirect_to(chancellors_url) }
-      format.xml  { head :ok }
-    end
-  end
-
-end
-</programlisting></para>
-    </section>
-
-    <section xml:id="scaffold_controller_rails31">
-      <title>Rails 3.1</title>
-
-      <para><programlisting>class ChancellorsController &lt; ApplicationController
-
+    Routen liegen. Dann können Sie später – bei Unklarheiten – dort
+    nachschauen.<programlisting>class ChancellorsController &lt; ApplicationController
   # GET /chancellors
   # GET /chancellors.json
   def index
@@ -494,7 +312,7 @@ end
     respond_to do |format|
       if @chancellor.update_attributes(params[:chancellor])
         format.html { redirect_to @chancellor, notice: 'Chancellor was successfully updated.' }
-        format.json { head :ok }
+        format.json { head :no_content }
       else
         format.html { render action: "edit" }
         format.json { render json: @chancellor.errors, status: :unprocessable_entity }
@@ -510,27 +328,24 @@ end
 
     respond_to do |format|
       format.html { redirect_to chancellors_url }
-      format.json { head :ok }
+      format.json { head :no_content }
     end
   end
-
 end
 </programlisting></para>
-    </section>
   </section>
 
   <section xml:id="scaffold_views">
     <title>Die Views</title>
 
-    <para>Jetzt starten wir den Rails-Webserver:<screen>stefan@swmbp 0 1.9.2-p0 politics$ <command>rails server</command>
+    <para>Jetzt starten wir den Rails-Webserver:<screen>Stefan-Wintermeyers-MacBook-Air:history xyz$ rails server
 =&gt; Booting WEBrick
-=&gt; Rails 3.0.3 application starting in development on http://0.0.0.0:3000
+=&gt; Rails 3.2.3 application starting in development on http://0.0.0.0:3000
 =&gt; Call with -d to detach
 =&gt; Ctrl-C to shutdown server
-[2010-12-03 19:09:48] INFO  WEBrick 1.3.1
-[2010-12-03 19:09:48] INFO  ruby 1.9.2 (2010-08-18) [x86_64-darwin10.4.0]
-[2010-12-03 19:09:48] INFO  WEBrick::HTTPServer#start: pid=17507 port=3000
-</screen></para>
+[2012-05-08 19:26:14] INFO  WEBrick 1.3.1
+[2012-05-08 19:26:14] INFO  ruby 1.9.3 (2012-04-20) [x86_64-darwin11.3.0]
+[2012-05-08 19:26:14] INFO  WEBrick::HTTPServer#start: pid=43118 port=3000</screen></para>
 
     <note>
       <para>Falls Sie jetzt eine Warnung Ihrer eingebauten Firewall bekommen,
@@ -611,12 +426,13 @@ end
 
       <para>Sie werden es sich schon denken können, aber schauen wir uns
       trotzdem das Verzeichnis <filename>app/views/chancellors</filename>
-      an:<screen>stefan@swmbp 0 1.9.2-p0:politics$ <command>ls app/views/chancellors</command>
+      an:<screen>Stefan-Wintermeyers-MacBook-Air:history xyz$ <command>ls app/views/chancellors</command> 
 _form.html.erb
 edit.html.erb
 index.html.erb
 new.html.erb
-show.html.erb</screen></para>
+show.html.erb
+Stefan-Wintermeyers-MacBook-Air:history xyz$</screen></para>
 
       <para>Für <methodname>index</methodname>, <methodname>edit</methodname>,
       <methodname>new</methodname> und <methodname>show</methodname> liegen
@@ -635,8 +451,8 @@ show.html.erb</screen></para>
 
 &lt;table&gt;
   &lt;tr&gt;
-    &lt;th&gt;Firstname&lt;/th&gt;
-    &lt;th&gt;Lastname&lt;/th&gt;
+    &lt;th&gt;First name&lt;/th&gt;
+    &lt;th&gt;Last name&lt;/th&gt;
     &lt;th&gt;Birthday&lt;/th&gt;
     &lt;th&gt;Day of death&lt;/th&gt;
     &lt;th&gt;Inauguration&lt;/th&gt;
@@ -647,8 +463,8 @@ show.html.erb</screen></para>
 
 &lt;% @chancellors.each do |chancellor| %&gt;
   &lt;tr&gt;
-    &lt;td&gt;&lt;%= chancellor.firstname %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= chancellor.lastname %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= chancellor.first_name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= chancellor.last_name %&gt;&lt;/td&gt;
     &lt;td&gt;&lt;%= chancellor.birthday %&gt;&lt;/td&gt;
     &lt;td&gt;&lt;%= chancellor.day_of_death %&gt;&lt;/td&gt;
     &lt;td&gt;&lt;%= chancellor.inauguration %&gt;&lt;/td&gt;
@@ -728,82 +544,8 @@ show.html.erb</screen></para>
       Daten, die Sie vielleicht irgendwann mal vergessen und die eine
       potenzielle Sicherheitslücke darstellen.</para>
 
-      <section xml:id="scaffold_xml_in_rails30">
-        <title>XML als Default in Rails 3.0</title>
-
-        <indexterm>
-          <primary>Web-API</primary>
-
-          <secondary>XML-Format</secondary>
-        </indexterm>
-
-        <para>Ganz am Anfang von
-        <filename>app/controllers/chancellors_controller.rb</filename> finden
-        Sie den Eintrag für die
-        <methodname>index</methodname>-Action:<programlisting>class ChancellorsController &lt; ApplicationController
-
-<emphasis role="bold">  # GET /chancellors
-  # GET /chancellors.xml
-</emphasis><emphasis role="bold">  def index
-    @chancellors = Chancellor.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml  { render :xml =&gt; @chancellors }
-    end
-  end
-</emphasis>
-<replaceable>[...]</replaceable></programlisting></para>
-
-        <para>Der Code ist übersichtlich. In der Instanz-Variable
-        <varname>@chancellors</varname> werden alle Bundeskanzler
-        abgespeichert. Danach wird irgendetwas mit einem Format gemacht. Hmmm…
-        da steht was von <code>xml</code>. Probieren wir mal Folgendes aus:
-        Bitte starten Sie mit <command>rails server</command> wieder den
-        Rails-Server und gehen Sie mit Ihrem Web-Browser auf die URL <uri
-        xlink:href="http://0.0.0.0:3000/chancellors.xml">http://0.0.0.0:3000/chancellors.xml</uri>.
-        Heureka! Sie bekommen folgende Ansicht:<screenshot>
-            <info>
-              <title>Index-XML-Anzeige</title>
-            </info>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="screenshots/chancellors_index_xml.jpg"></imagedata>
-              </imageobject>
-            </mediaobject>
-          </screenshot></para>
-
-        <para>Das bringt uns auch nicht richtig weiter. Vielleicht sollten wir
-        uns den Source-Code dieser Seite anschauen:<screenshot>
-            <info>
-              <title>Index-XML-Anzeige im Source-Code</title>
-            </info>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="screenshots/chancellors_index_xml_source.jpg"></imagedata>
-              </imageobject>
-            </mediaobject>
-          </screenshot></para>
-
-        <para>A-ha! Der Browser hat XML vom Rails-Webserver bekommen und
-        versucht es irgendwie darzustellen. Das Ausgeben der XML-Liste wird
-        von der Zeile<programlisting>      format.xml  { render :xml =&gt; @chancellors }</programlisting>realisiert.
-        Wenn Sie keine XML-Ausgabe wünschen, müssen Sie diese Zeile in der
-        <filename>app/controllers/chancellors_controller.rb</filename>
-        löschen.</para>
-
-        <warning>
-          <para>Relativ viele Rails-Entwickler benutzen fleißig Scaffolding,
-          vergessen aber die XML-Ausgabe zu deaktivieren. Das kann dann eine
-          trivial zu benutzende Sicherheitslücke in der Applikation
-          sein.</para>
-        </warning>
-      </section>
-
-      <section xml:id="scaffold_json_in_rails31">
-        <title>JSON als Default in Rails 3.1</title>
+      <section xml:id="scaffold_json">
+        <title xml:id="scaffold_json_default.title">JSON als Default</title>
 
         <indexterm>
           <primary>Web-API</primary>
@@ -815,8 +557,7 @@ show.html.erb</screen></para>
         <filename>app/controllers/chancellors_controller.rb</filename> finden
         Sie den Eintrag für die
         <methodname>index</methodname>-Action:<programlisting>class ChancellorsController &lt; ApplicationController
-
-<emphasis role="bold">  # GET /chancellors
+<emphasis>  # GET /chancellors
   # GET /chancellors.json
   def index
     @chancellors = Chancellor.all
@@ -826,8 +567,7 @@ show.html.erb</screen></para>
       format.json { render json: @chancellors }
     end
   end
-</emphasis>
-<replaceable>[...]</replaceable></programlisting></para>
+</emphasis><replaceable>[...]</replaceable></programlisting></para>
 
         <para>Der Code ist übersichtlich. In der Instanz-Variable
         <varname>@chancellors</varname> werden alle Bundeskanzler
@@ -876,21 +616,19 @@ show.html.erb</screen></para>
         beide Varianten im <code>respond_to</code>-Block angeben. Hier ein
         Beispiel mit der
         <filename>app/controllers/chancellors_controller.rb</filename> in der
-        <methodname>index</methodname>-Action (Rails 3.1):<programlisting>class ChancellorsController &lt; ApplicationController
-
-<emphasis role="bold">  # GET /chancellors
+        <methodname>index</methodname>-Action:<programlisting>class ChancellorsController &lt; ApplicationController
+  # GET /chancellors
   # GET /chancellors.json
   def index
     @chancellors = Chancellor.all
 
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render :xml =&gt; @chancellors }
       format.json { render json: @chancellors }
+      <emphasis>format.xml { render xml: @chancellors }</emphasis>
     end
   end
-</emphasis>
-<replaceable>[...]</replaceable></programlisting></para>
+[...]</programlisting></para>
       </section>
     </section>
   </section>
@@ -913,117 +651,85 @@ show.html.erb</screen></para>
       diesem Fall wäre ein Großteil des mit Scaffold angelegten Codes unnütz
       und müsste gelöscht werden. Probieren wir es nachfolgend aus:</para>
 
-      <para><screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new politics-read-only</command>
+      <para><screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new history2</command>  
 [...]
-stefan@swmbp 0 1.9.2-p0 ~$ <command>cd politics-read-only</command>
-stefan@swmbp 0 1.9.2-p0 politics-read-only$ <command>bundle install</command>
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd history2</command>
+Stefan-Wintermeyers-MacBook-Air:history2 xyz$ <command>rails generate scaffold chancellor first_name last_name birthday:date day_of_death:date inauguration:date</command>
 [...]
-stefan@swmbp 0 1.9.2-p0 politics-read-only$ <command>rails generate scaffold chancellor firstname:string lastname:string birthday:date day_of_death:date inauguration:date</command>
+Stefan-Wintermeyers-MacBook-Air:history2 xyz$ <command>rake db:migrate</command>
 [...]
-stefan@swmbp 0 1.9.2-p0 politics-read-only$ <command>rake db:migrate</command>
-[...]
-stefan@swmbp 0 1.9.2-p0 politics-read-only$</screen></para>
+Stefan-Wintermeyers-MacBook-Air:history2 xyz$</screen></para>
 
       <para>Jetzt die <filename>db/seeds.rb</filename> mit den ersten sechs
-      Kanzlern anlegen:<programlisting>Chancellor.create(:firstname =&gt; 'Konrad', :lastname =&gt; 'Adenauer', :birthday =&gt; '05.01.1876', :day_of_death =&gt; '19.04.1967', :inauguration =&gt; '15.09.1949')
-Chancellor.create(:firstname =&gt; 'Ludwig', :lastname =&gt; 'Erhard', :birthday =&gt; '04.02.1897', :day_of_death =&gt; '05.05.1977', :inauguration =&gt; '16.10.1963')
-Chancellor.create(:firstname =&gt; 'Kurt Georg', :lastname =&gt; 'Kiesinger', :birthday =&gt; '06.04.1904', :day_of_death =&gt; '09.03.1988', :inauguration =&gt; '01.12.1966')
-Chancellor.create(:firstname =&gt; 'Willy', :lastname =&gt; 'Brandt', :birthday =&gt; '18.12.1913', :day_of_death =&gt; '08.10.1992', :inauguration =&gt; '21.10.1969')
-Chancellor.create(:firstname =&gt; 'Walter', :lastname =&gt; 'Scheel', :birthday =&gt; '08.09.1919', :inauguration =&gt; '07.05.1974')
-Chancellor.create(:firstname =&gt; 'Helmut', :lastname =&gt; 'Schmidt', :birthday =&gt; '23.12.1918', :inauguration =&gt; '16.05.1974')
-</programlisting></para>
+      Kanzlern anlegen:<programlisting>Chancellor.create(:first_name =&gt; 'Konrad', :last_name =&gt; 'Adenauer', :birthday =&gt; '05.01.1876', :day_of_death =&gt; '19.04.1967', :inauguration =&gt; '15.09.1949')
+Chancellor.create(:first_name =&gt; 'Ludwig', :last_name =&gt; 'Erhard', :birthday =&gt; '04.02.1897', :day_of_death =&gt; '05.05.1977', :inauguration =&gt; '16.10.1963')
+Chancellor.create(:first_name =&gt; 'Kurt Georg', :last_name =&gt; 'Kiesinger', :birthday =&gt; '06.04.1904', :day_of_death =&gt; '09.03.1988', :inauguration =&gt; '01.12.1966')
+Chancellor.create(:first_name =&gt; 'Willy', :last_name =&gt; 'Brandt', :birthday =&gt; '18.12.1913', :day_of_death =&gt; '08.10.1992', :inauguration =&gt; '21.10.1969')
+Chancellor.create(:first_name =&gt; 'Walter', :last_name =&gt; 'Scheel', :birthday =&gt; '08.09.1919', :inauguration =&gt; '07.05.1974')
+Chancellor.create(:first_name =&gt; 'Helmut', :last_name =&gt; 'Schmidt', :birthday =&gt; '23.12.1918', :inauguration =&gt; '16.05.1974')</programlisting></para>
 
-      <para>Und diese Daten einspielen:<screen>stefan@swmbp 0 1.9.2-p0 politics$ <command>rake db:seed</command>
-stefan@swmbp 0 1.9.2-p0 politics$</screen></para>
+      <para>Und diese Daten einspielen:<screen>Stefan-Wintermeyers-MacBook-Air:history2 xyz$ <command>rake db:seed</command>
+Stefan-Wintermeyers-MacBook-Air:history2 xyz$</screen></para>
 
       <para>Da wir nur <methodname>index</methodname> und
-      <methodname>show</methodname> benötigen, müssen wir einige Views
-      löschen:<screen>stefan@swmbp 0 1.9.2-p0:politics-read-only$ <command>rm app/views/chancellors/_form.html.erb</command> 
-stefan@swmbp 0 1.9.2-p0:politics-read-only$ <command>rm app/views/chancellors/new.html.erb</command> 
-stefan@swmbp 0 1.9.2-p0:politics-read-only$ <command>rm app/views/chancellors/edit.html.erb</command> 
-stefan@swmbp 0 1.9.2-p0:politics-read-only$ <command>ls app/views/chancellors/</command>
-index.html.erb
-show.html.erb
-stefan@swmbp 0 1.9.2-p0:politics-read-only$</screen></para>
+      <methodname>show</methodname> benötigen, sollten wir die nicht
+      benötigten Views löschen:<screen>Stefan-Wintermeyers-MacBook-Air:history2 xyz$ <command>rm app/views/chancellors/_form.html.erb</command> 
+Stefan-Wintermeyers-MacBook-Air:history2 xyz$ <command>rm app/views/chancellors/new.html.erb</command> 
+Stefan-Wintermeyers-MacBook-Air:history2 xyz$ <command>rm app/views/chancellors/edit.html.erb</command> 
+Stefan-Wintermeyers-MacBook-Air:history2 xyz$</screen></para>
 
       <para>Die Datei
       <filename>app/controllers/chancellors_controller.rb</filename> können
       wir mit einem Editor vereinfachen. Sie muss so aussehen:<programlisting>class ChancellorsController &lt; ApplicationController
-
   # GET /chancellors
-  # GET /chancellors.json
   def index
     @chancellors = Chancellor.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @chancellors }
-    end
   end
 
   # GET /chancellors/1
-  # GET /chancellors/1.json
   def show
     @chancellor = Chancellor.find(params[:id])
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @chancellor }
-    end
   end
+end</programlisting></para>
 
-end
-</programlisting></para>
+      <para>Da wir nur HTML und keine JSON-Ausgabe benötigen, können wir uns
+      das <code>respond_to do |format|</code> Konstrukt sparen. Rails wird
+      dann Fall automatisch HTML rendern.</para>
 
-      <para>Eigentlich sind wir jetzt schon fertig. Allerdings sollten wir
-      noch die Routen anpassen. Bis jetzt zeigt uns <command>rake
-      routes</command> folgendes Ergebnis an:<screen>stefan@swmbp 0 1.9.2-p0:politics-read-only$ <command>rake routes</command>
-    chancellors GET    /chancellors(.:format)          {:action=&gt;"index", :controller=&gt;"chancellors"}
-                POST   /chancellors(.:format)          {:action=&gt;"create", :controller=&gt;"chancellors"}
- new_chancellor GET    /chancellors/new(.:format)      {:action=&gt;"new", :controller=&gt;"chancellors"}
-edit_chancellor GET    /chancellors/:id/edit(.:format) {:action=&gt;"edit", :controller=&gt;"chancellors"}
-     chancellor GET    /chancellors/:id(.:format)      {:action=&gt;"show", :controller=&gt;"chancellors"}
-                PUT    /chancellors/:id(.:format)      {:action=&gt;"update", :controller=&gt;"chancellors"}
-                DELETE /chancellors/:id(.:format)      {:action=&gt;"destroy", :controller=&gt;"chancellors"}
-stefan@swmbp 0 1.9.2-p0:politics-read-only stefan$</screen></para>
-
-      <para>Aber wir brauchen ja nur die Routen für
-      <methodname>index</methodname> und <methodname>show</methodname>. Bitte
-      öffnen Sie die Datei <filename>config/routes.rb</filename> und ändern
-      Sie sie wie folgt ab:<programlisting>PoliticsReadOnly::Application.routes.draw do
-  
+      <para>Wir brauchen nur die Routen für <methodname>index</methodname> und
+      <methodname>show</methodname>. Bitte öffnen Sie die Datei
+      <filename>config/routes.rb</filename> und ändern Sie sie wie folgt
+      ab:<programlisting>History2::Application.routes.draw do
   resources :chancellors, :only =&gt; [ :index, :show ]
-  
-end
-</programlisting></para>
+end</programlisting></para>
 
-      <para>Ein wiederholtes <command>rake routes</command> zeigt uns, dass
-      wirklich nur noch <methodname>index</methodname> und
-      <methodname>show</methodname> geroutet werden:<screen>stefan@swmbp 0 1.9.2-p0:politics-read-only$ <command>rake routes</command>
-chancellors GET /chancellors(.:format)     {:action=&gt;"index", :controller=&gt;"chancellors"}
- chancellor GET /chancellors/:id(.:format) {:action=&gt;"show", :controller=&gt;"chancellors"}
-stefan@swmbp 0 1.9.2-p0:politics-read-only$</screen></para>
+      <para>Ein <command>rake routes</command> zeigt uns, dass wirklich nur
+      noch <methodname>index</methodname> und <methodname>show</methodname>
+      geroutet werden:<screen>Stefan-Wintermeyers-MacBook-Air:history2 xyz$ <command>rake routes</command>
+chancellors GET /chancellors(.:format)     chancellors#index
+ chancellor GET /chancellors/:id(.:format) chancellors#show
+Stefan-Wintermeyers-MacBook-Air:history2 xyz$</screen></para>
 
       <para>Wenn wir jetzt mit <command>rails server</command> den Server
       starten und die URL <uri
       xlink:href="http://0.0.0.0:3000/chancellors">http://0.0.0.0:3000/chancellors</uri>
-      aufrufen, bekommen wir eine Fehlermeldung:<screen>stefan@swmbp 0 1.9.2-p0:politics-read-only$ <command>rails server</command>
+      aufrufen, bekommen wir eine Fehlermeldung:<screen>Stefan-Wintermeyers-MacBook-Air:history2 xyz$ <command>rails server</command>
 =&gt; Booting WEBrick
-=&gt; Rails 3.1.0.rc1 application starting in development on http://0.0.0.0:3000
+=&gt; Rails 3.2.3 application starting in development on http://0.0.0.0:3000
 =&gt; Call with -d to detach
 =&gt; Ctrl-C to shutdown server
-[2011-05-24 19:50:41] INFO  WEBrick 1.3.1
-[2011-05-24 19:50:41] INFO  ruby 1.9.2 (2011-02-18) [x86_64-darwin10.6.0]
-[2011-05-24 19:50:41] INFO  WEBrick::HTTPServer#start: pid=58997 port=3000
+[2012-05-08 22:46:28] INFO  WEBrick 1.3.1
+[2012-05-08 22:46:28] INFO  ruby 1.9.3 (2012-04-20) [x86_64-darwin11.3.0]
+[2012-05-08 22:46:28] INFO  WEBrick::HTTPServer#start: pid=43440 port=3000
 
 
-Started GET "/chancellors" for 127.0.0.1 at 2011-05-24 19:50:49 +0200
-  Processing by ChancellorsController#index as HTML
-  Chancellor Load (0.3ms)  SELECT "chancellors".* FROM "chancellors" 
-Rendered chancellors/index.html.erb within layouts/application (98.6ms)
-Completed 500 Internal Server Error in 136ms
+Started GET "/chancellors" for 127.0.0.1 at 2012-05-08 22:46:41 +0200
+Processing by ChancellorsController#index as HTML
+  Chancellor Load (0.1ms)  SELECT "chancellors".* FROM "chancellors" 
+  Rendered chancellors/index.html.erb within layouts/application (17.6ms)
+Completed 500 Internal Server Error in 81ms
 
-ActionView::Template::Error (undefined method `edit_chancellor_path' for #&lt;#&lt;Class:0x00000101811af8&gt;:0x00000100df89e0&gt;):
+ActionView::Template::Error (undefined method `edit_chancellor_path' for #&lt;#&lt;Class:0x007fc9150437c0&gt;:0x007fc915047b18&gt;):
     20:     &lt;td&gt;&lt;%= chancellor.day_of_death %&gt;&lt;/td&gt;
     21:     &lt;td&gt;&lt;%= chancellor.inauguration %&gt;&lt;/td&gt;
     22:     &lt;td&gt;&lt;%= link_to 'Show', chancellor %&gt;&lt;/td&gt;
@@ -1031,12 +737,15 @@ ActionView::Template::Error (undefined method `edit_chancellor_path' for #&lt;#&
     24:     &lt;td&gt;&lt;%= link_to 'Destroy', chancellor, confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
     25:   &lt;/tr&gt;
     26: &lt;% end %&gt;
-  app/views/chancellors/index.html.erb:23:in `block in _app_views_chancellors_index_html_erb__2076487168757058548_2154336360'
+  app/views/chancellors/index.html.erb:23:in `block in _app_views_chancellors_index_html_erb__3473545449794762094_70250803843160'
   app/views/chancellors/index.html.erb:15:in `each'
-  app/views/chancellors/index.html.erb:15:in `_app_views_chancellors_index_html_erb__2076487168757058548_2154336360'
-  app/controllers/chancellors_controller.rb:7:in `index'
+  app/views/chancellors/index.html.erb:15:in `_app_views_chancellors_index_html_erb__3473545449794762094_70250803843160'
 
-[...]</screen></para>
+
+  Rendered /Users/xyz/.rvm/gems/ruby-1.9.3-p194/gems/actionpack-3.2.3/lib/action_dispatch/middleware/templates/rescues/_trace.erb (27.7ms)
+  Rendered /Users/xyz/.rvm/gems/ruby-1.9.3-p194/gems/actionpack-3.2.3/lib/action_dispatch/middleware/templates/rescues/_request_and_response.erb (1.5ms)
+  Rendered /Users/xyz/.rvm/gems/ruby-1.9.3-p194/gems/actionpack-3.2.3/lib/action_dispatch/middleware/templates/rescues/template_error.erb within rescues/layout (40.6ms)
+</screen></para>
 
       <para>Die Fehlermeldung sagt, dass wir im View
       <filename>app/views/chancellors/index.html.erb</filename> eine Methode
@@ -1050,8 +759,8 @@ ActionView::Template::Error (undefined method `edit_chancellor_path' for #&lt;#&
 
 &lt;table&gt;
   &lt;tr&gt;
-    &lt;th&gt;Firstname&lt;/th&gt;
-    &lt;th&gt;Lastname&lt;/th&gt;
+    &lt;th&gt;First name&lt;/th&gt;
+    &lt;th&gt;Last name&lt;/th&gt;
     &lt;th&gt;Birthday&lt;/th&gt;
     &lt;th&gt;Day of death&lt;/th&gt;
     &lt;th&gt;Inauguration&lt;/th&gt;
@@ -1060,29 +769,26 @@ ActionView::Template::Error (undefined method `edit_chancellor_path' for #&lt;#&
 
 &lt;% @chancellors.each do |chancellor| %&gt;
   &lt;tr&gt;
-    &lt;td&gt;&lt;%= chancellor.firstname %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= chancellor.lastname %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= chancellor.first_name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= chancellor.last_name %&gt;&lt;/td&gt;
     &lt;td&gt;&lt;%= chancellor.birthday %&gt;&lt;/td&gt;
     &lt;td&gt;&lt;%= chancellor.day_of_death %&gt;&lt;/td&gt;
     &lt;td&gt;&lt;%= chancellor.inauguration %&gt;&lt;/td&gt;
     &lt;td&gt;&lt;%= link_to 'Show', chancellor %&gt;&lt;/td&gt;
   &lt;/tr&gt;
 &lt;% end %&gt;
-&lt;/table&gt;
-</programlisting></para>
+&lt;/table&gt;</programlisting></para>
 
       <para>Und wo wir schon gerade dabei sind, ändern wir auch noch die
       <filename>app/views/chancellors/show.html.erb</filename> entsprechend
-      ab:<programlisting>&lt;p id="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
-
-&lt;p&gt;
-  &lt;b&gt;Firstname:&lt;/b&gt;
-  &lt;%= @chancellor.firstname %&gt;
+      ab:<programlisting>&lt;p&gt;
+  &lt;b&gt;First name:&lt;/b&gt;
+  &lt;%= @chancellor.first_name %&gt;
 &lt;/p&gt;
 
 &lt;p&gt;
-  &lt;b&gt;Lastname:&lt;/b&gt;
-  &lt;%= @chancellor.lastname %&gt;
+  &lt;b&gt;Last name:&lt;/b&gt;
+  &lt;%= @chancellor.last_name %&gt;
 &lt;/p&gt;
 
 &lt;p&gt;
@@ -1098,11 +804,7 @@ ActionView::Template::Error (undefined method `edit_chancellor_path' for #&lt;#&
 &lt;p&gt;
   &lt;b&gt;Inauguration:&lt;/b&gt;
   &lt;%= @chancellor.inauguration %&gt;
-&lt;/p&gt;
-
-
-&lt;%= link_to 'Back', chancellors_path %&gt;
-</programlisting></para>
+&lt;/p&gt;</programlisting></para>
 
       <para>Jetzt ist unsere Applikation fertig. Starten Sie den Rails-Server
       mit <command>rails server</command> und öffnen Sie die URL <uri
