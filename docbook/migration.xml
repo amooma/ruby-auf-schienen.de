@@ -22,171 +22,129 @@
     <see>ActiveRecord, Migrations</see>
   </indexterm>
 
-  <para>SQL-Datenbank-Tabellen werden mit <foreignphrase
+  <para>SQL-Datenbank-Tabellen werden in Rails mit <foreignphrase
   xml:lang="en">Migrations</foreignphrase> generiert, und sie können ebenso
   mit <foreignphrase xml:lang="en">Migrations</foreignphrase> verändert
   werden. Wenn Sie mit <command>rails generate model</command> ein
   <foreignphrase xml:lang="en">Model</foreignphrase> anlegen, dann wird
   automatisch im Verzeichnis <filename>db/migrate/</filename> eine
   entsprechende <foreignphrase xml:lang="en">Migration</foreignphrase>-Datei
-  angelegt. Ich zeige Ihnen das Prinzip an einer Adressbuch-Applikation. Legen
-  wir die mal an:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new address-book</command>
-<replaceable>[...]</replaceable>
-stefan@swmbp 0 1.9.2-p0 ~$ <command>cd address-book</command>
-stefan@swmbp 0 1.9.2-p0 address-book$ <command>bundle install</command>
-<replaceable>[...]</replaceable>
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+  angelegt. Ich zeige Ihnen das Prinzip an einer Shop-Applikation. Legen wir
+  die mal an:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new shop</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd shop</command>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
-  <para>Legen wir ein <classname>Person</classname> Model an:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails generate model Person name:string street:string zip_code:string city:string phone:string</command>
+  <para>Legen wir ein <classname>Product</classname> Model an:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
       invoke  active_record
-      create    db/migrate/20101201154722_create_people.rb
-      create    app/models/person.rb
+      create    db/migrate/20120508160146_create_products.rb
+      create    app/models/product.rb
       invoke    test_unit
-      create      test/unit/person_test.rb
-      create      test/fixtures/people.yml
+      create      test/unit/product_test.rb
+      create      test/fixtures/products.yml
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
-stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate</command>
-(in /Users/stefan/address-book)
-==  CreatePeople: migrating ===================================================
--- create_table(:people)
-   -&gt; 0.0018s
-==  CreatePeople: migrated (0.0018s) ==========================================
-
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
-
-  <para>Es wurde automatisch die Migrations-Datei
-  <filename>db/migrate/20101201154722_create_people.rb</filename> angelegt.
-  Schauen wir uns die mal genauer an:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>cat db/migrate/20101201154722_create_people.rb</command></screen><programlisting>class CreatePeople &lt; ActiveRecord::Migration
-  def self.up
-    create_table :people do |t|
+  <para>Es wurde die Migrations-Datei
+  <filename>db/migrate/20120508160146_create_products.rb</filename> angelegt.
+  Schauen wir uns die mal genauer an:<programlisting>class CreateProducts &lt; ActiveRecord::Migration
+  def change
+    create_table :products do |t|
       t.string :name
-      t.string :street
-      t.string :zip_code
-      t.string :city
-      t.string :phone
+      t.decimal :price, :precision =&gt; 7, :scale =&gt; 2
+      t.integer :weight
+      t.boolean :in_stock
+      t.date :expiration_date
 
       t.timestamps
     end
   end
-
-  def self.down
-    drop_table :people
-  end
 end</programlisting></para>
 
-  <para>Die Klassenmethoden <methodname>self.up</methodname> und
-  <methodname>self.down</methodname> erstellen oder löschen die
-  Datenbank-Tabelle. Eigentlich alles recht logisch. Die Migrationsdateien
-  haben im Dateinamen die aktuelle Uhrzeit eingebettet und werden bei einer
-  Migration (also dem Aufruf von <command>rake db:migrate</command>) in der
-  chronologischen Reihenfolge abgearbeitet. Dabei werden immer nur die
-  Migrations abgearbeitet, die noch nicht ausgeführt wurden. Wenn wir jetzt
-  noch einmal <command>rake db:migrate</command> aufrufen, passiert nichts, da
-  die entsprechende Migration ja schon ausgeführt wurde:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate</command>
-(in /Users/stefan/address-book)
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+  <para>Die Klassenmethode <methodname>change</methodname> erstellt und löscht
+  bei einem Rollback die Datenbank-Tabelle. Die Migrationsdateien haben im
+  Dateinamen die aktuelle Uhrzeit eingebettet und werden bei einer Migration
+  (also dem Aufruf von <command>rake db:migrate</command>) in der
+  chronologischen Reihenfolge abgearbeitet.<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate</command>
+==  CreateProducts: migrating =================================================
+-- create_table(:products)
+   -&gt; 0.0017s
+==  CreateProducts: migrated (0.0018s) ========================================
 
-  <para>Wenn wir aber die Datenbank manuell löschen und danach wieder
-  <command>rake db:migrate</command> aufrufen, wird die Migration
-  wiederholt:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rm db/development.sqlite3</command> 
-stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate</command>
-(in /Users/stefan/address-book)
-==  CreatePeople: migrating ===================================================
--- create_table(:people)
-   -&gt; 0.0013s
-==  CreatePeople: migrated (0.0014s) ==========================================
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+  <para>Dabei werden immer nur die Migrations abgearbeitet, die noch nicht
+  ausgeführt wurden. Wenn wir jetzt noch einmal <command>rake
+  db:migrate</command> aufrufen, passiert nichts, da die entsprechende
+  Migration ja schon ausgeführt wurde:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate</command>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
-  <para>Zum weiteren Arbeiten erstellen wir folgende Datei
-  <filename>db/seeds.rb</filename>:<programlisting>firstnames = ['Horst', 'Udo', 'Martin', 'Ute', 'Ursula', 'Martina']
-lastnames = ['Meier', 'Udelhoven', 'Schroeder', 'Maier', 'Neuner']
-streets = ['Hauptstr.', 'Bahnhofstr.', 'Molkestr.', 'Berliner Str.', 'Hamburger Str.']
-cities = ['Beispielhausen', 'Hamburg', 'Berlin', 'Dresden']
+  <para>Wenn wir aber die Datenbank mit <command>rm</command> manuell löschen
+  und danach wieder <command>rake db:migrate</command> aufrufen, wird die
+  Migration wiederholt:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rm db/development.sqlite3</command> 
+Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate</command>
+==  CreateProducts: migrating =================================================
+-- create_table(:products)
+   -&gt; 0.0017s
+==  CreateProducts: migrated (0.0018s) ========================================
 
-anzahl_der_datensaetze = 1000
-r = Random.new(42)
-(0..anzahl_der_datensaetze).each do |i|
-  Person.create(:name =&gt; "#{firstnames[rand(firstnames.size)]} #{lastnames[rand(lastnames.size)]}",
-                :street =&gt; "#{streets[rand(streets.size)]} #{i + 1}",
-                :zip_code =&gt; "#{r.rand(89999) + 10000}",
-                :city =&gt; "#{cities[rand(cities.size)]}",
-                :phone =&gt; "0#{r.rand(89) + 10} #{r.rand(899999) + 100000}")
-end</programlisting></para>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
 
-  <para>Dann die Datei <filename>seeds.rb</filename> abarbeiten
-  lassen:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:seed</command>
-(in /Users/stefan/address-book)
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
-
-  <para>Jetzt haben wir eine ganze Menge zufälliger Adressen in der Datenbank.
-  Schauen wir ganz kurz in der <foreignphrase
-  xml:lang="en">Console</foreignphrase> nach:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails console</command>
-jLoading development environment (Rails 3.0.3)
-
-ruby-1.9.2-p0 &gt; <command>Person.last</command>
- =&gt; #&lt;Person id: 1000, name: "Udo Meier", street: "Bahnhofstr. 1001", zip_code: "24357", city: "Hamburg", phone: "066 430817", created_at: "2010-12-01 18:12:19", updated_at: "2010-12-01 18:12:19"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
-
-  <para>Nach einiger Zeit merken wir, dass wir bei vielen Personen nicht nur
-  eine normale Telefonnummer, sondern auch noch eine Handynummer abspeichern
-  wollen. Wir benötigen also ein weiteres Datenbankfeld
-  (<literal>mobile_phone</literal>). Dafür gibt es eine leicht zu merkende
-  Syntax <command>rails generate migration add_*</command>:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails generate migration add_mobile_phone_to_person mobile_phone:string</command>
+  <para>Nach einiger Zeit merken wir, dass wir bei vielen Produkten nicht nur
+  das Gewicht (height), sondern auch die Höhe (height) abspeichern möchten.
+  Wir benötigen also ein weiteres Datenbankfeld . Dafür gibt es eine leicht zu
+  merkende Syntax <command>rails generate migration add_*</command>:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails generate migration add_height_to_product height:integer</command>
       invoke  active_record
-      create    db/migrate/20101201181710_add_mobile_phone_to_person.rb
+      create    db/migrate/20120508160821_add_height_to_product.rb
+Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
 
-stefan@swmbp 0 1.9.2-p0 address-book$ <command>cat db/migrate/20101201181710_add_mobile_phone_to_person.rb</command></screen><programlisting>class AddMobilePhoneToPerson &lt; ActiveRecord::Migration
-  def self.up
-    add_column :people, :mobile_phone, :string
-  end
-
-  def self.down
-    remove_column :people, :mobile_phone
+  <para>In der Migrationsdatei
+  <filename>db/migrate/20120508160821_add_height_to_product.rb</filename>
+  findet sich wieder eine change Methode:<programlisting>class AddHeightToProduct &lt; ActiveRecord::Migration
+  def change
+    add_column :products, :height, :integer
   end
 end</programlisting></para>
 
   <para>Mit <command>rake db:migrate</command> können wir die neue Migration
-  einspielen:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate</command>
-(in /Users/stefan/address-book)
-==  AddMobilePhoneToPerson: migrating =========================================
--- add_column(:people, :mobile_phone, :string)
-   -&gt; 0.0006s
-==  AddMobilePhoneToPerson: migrated (0.0007s) ================================
+  einspielen:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate</command>
+==  AddHeightToProduct: migrating =============================================
+-- add_column(:products, :height, :integer)
+   -&gt; 0.0049s
+==  AddHeightToProduct: migrated (0.0050s) ====================================
 
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
   <para>In der <foreignphrase xml:lang="en">Console</foreignphrase> können wir
   uns das neue Feld anschauen. Es wurde nach dem Feld
-  <literal>updated_at</literal> angefügt:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails console</command>
-Loading development environment (Rails 3.0.3)
+  <literal>updated_at</literal> angefügt:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Product</command>
+ =&gt; Product(id: integer, name: string, price: decimal, weight: integer, in_stock: boolean, expiration_date: date, created_at: datetime, updated_at: datetime, height: integer) 
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
 
-ruby-1.9.2-p0 &gt; <command>Person.last</command>
- =&gt; #&lt;Person id: 1000, name: "Udo Meier", street: "Bahnhofstr. 1001", zip_code: "24357", city: "Hamburg", phone: "066 430817", created_at: "2010-12-01 18:12:19", updated_at: "2010-12-01 18:12:19", mobile_phone: nil&gt; 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+  <warning>
+    <para>Bitte beachten Sie, das Sie wahrscheinlich in
+    <filename>app/models/product.rb</filename> das neue Feld in
+    <methodname>attr_accessible</methodname> eintragen müssen. Sonst haben Sie
+    keinen Zugriff auf das <varname>height</varname> Attribute.</para>
+  </warning>
 
   <para>Was wäre im Fall, dass man noch einmal den vorherigen Stand der Dinge
-  betrachten möchten? Kein Problem. Es gibt ja immer auch eine Methode
-  <methodname>self.down</methodname>. Auf die vorherige Version können wir
-  deshalb mit <command>rake db:rollback</command> leicht zurückgehen:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:rollback</command>
-(in /Users/stefan/address-book)
-==  AddMobilePhoneToPerson: reverting =========================================
--- remove_column(:people, :mobile_phone)
-   -&gt; 0.5851s
-==  AddMobilePhoneToPerson: reverted (0.5852s) ================================
+  betrachten möchten? Kein Problem. Auf die vorherige Version können wir mit
+  <command>rake db:rollback</command> leicht zurückgehen:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:rollback</command>
+==  AddHeightToProduct: reverting =============================================
+-- remove_column("products", :height)
+   -&gt; 0.0357s
+==  AddHeightToProduct: reverted (0.0358s) ====================================
 
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
   <para>Jede Migration hat eine eigene Versionsnummer. Die Versionsnummer des
   aktuellen Status können Sie mit <command>rake db:version</command>
-  rausfinden:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:version</command>
-(in /Users/stefan/address-book)
-Current version: 20101201154722
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+  rausfinden:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:version</command>
+Current version: 20120508160146
+Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
 
   <important>
     <para>Bitte beachten Sie, dass alle Versionsnummern und Zeitstempel nur
@@ -196,21 +154,20 @@ stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
   </important>
 
   <para>Sie finden die entsprechende Version im Verzeichnis
-  <filename>db/migrate</filename> wieder:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>ls db/migrate</command>
-20101201154722_create_people.rb
-20101201181710_add_mobile_phone_to_person.rb
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+  <filename>db/migrate</filename> wieder:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>ls db/migrate</command> 
+20120508160146_create_products.rb
+20120508160821_add_height_to_product.rb
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
   <para>Auf eine bestimmte Migration können Sie mit <command>rake db:migrate
   VERSION=Versionsnummer</command> gehen. Die Null steht dabei für die nullte
-  Version (also den Start). Probieren wir das mal aus:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate VERSION=0</command>
-(in /Users/stefan/address-book)
-==  CreatePeople: reverting ===================================================
--- drop_table(:people)
-   -&gt; 0.0008s
-==  CreatePeople: reverted (0.0009s) ==========================================
+  Version (also den Start). Probieren wir das mal aus:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate VERSION=0</command>
+==  CreateProducts: reverting =================================================
+-- drop_table("products")
+   -&gt; 0.0007s
+==  CreateProducts: reverted (0.0007s) ========================================
 
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
 
   <para>Die Tabelle wurde mit allen Daten gelöscht. Wir sind wieder zurück auf
   Los.</para>
@@ -218,15 +175,17 @@ stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
   <section xml:id="activerecord_welche_datenbank">
     <title>Welche Datenbank wird benutzt?</title>
 
-    <para>Die Datenbank-Tabelle <literal>people</literal> wird durch die
-    Migration angelegt. Dabei sehen wir, dass Tabellen-Namen automatisch den
-    Plural der <foreignphrase xml:lang="en">Model</foreignphrase>s bekommen
+    <para>Die Datenbank-Tabelle wird durch die Migration angelegt. Dabei sehen
+    wir, dass Tabellen-Namen automatisch den Plural der <foreignphrase
+    xml:lang="en">Model</foreignphrase>s bekommen
     (<classname>Person</classname> vs. <literal>people</literal>). Aber in
     welcher Datenbank werden die Tabellen überhaupt angelegt? Das wird in der
     Konfigurationsdatei <filename>config/database.yml</filename>
-    definiert:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>cat config/database.yml</command></screen><programlisting># SQLite version 3.x
-#   gem install sqlite3-ruby (not necessary on OS X Leopard)
-
+    definiert:<programlisting># SQLite version 3.x
+#   gem install sqlite3
+#
+#   Ensure the SQLite 3 gem is defined in your Gemfile
+#   gem 'sqlite3'
 development:
   adapter: sqlite3
   database: db/development.sqlite3
@@ -246,7 +205,8 @@ production:
   adapter: sqlite3
   database: db/production.sqlite3
   pool: 5
-  timeout: 5000</programlisting></para>
+  timeout: 5000
+</programlisting></para>
 
     <para>Dort werden im YAML-Format (siehe <uri
     xlink:href="http://www.yaml.org/">http://www.yaml.org/</uri> bzw. <uri
@@ -271,336 +231,42 @@ production:
 
     <para>Um Ihre sicherlich vorhandene Neugierde zu befriedigen, schauen wir
     uns kurz noch die Datenbank mit dem Command-Line-Tool
-    <literal>sqlite3</literal> an:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>sqlite3 db/development.sqlite3</command> 
-SQLite version 3.6.12
+    <literal>sqlite3</literal> an:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ sqlite3 <command>db/development.sqlite3</command> 
+SQLite version 3.7.7 2011-06-25 16:35:41
 Enter ".help" for instructions
 Enter SQL statements terminated with a ";"
-
 sqlite&gt; <command>.tables</command>
 schema_migrations
-
 sqlite&gt; <command>.quit</command>
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$  </screen></para>
 
     <para>Nichts drin. Klar, wir haben ja auch nicht die Migration laufen
-    lassen:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate</command>
-(in /Users/stefan/address-book)
-==  CreatePeople: migrating ===================================================
--- create_table(:people)
-   -&gt; 0.0016s
-==  CreatePeople: migrated (0.0017s) ==========================================
+    lassen:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate</command>  
+==  CreateProducts: migrating =================================================
+-- create_table(:products)
+   -&gt; 0.0273s
+==  CreateProducts: migrated (0.0274s) ========================================
 
-==  AddMobilePhoneToPerson: migrating =========================================
--- add_column(:people, :mobile_phone, :string)
-   -&gt; 0.0007s
-==  AddMobilePhoneToPerson: migrated (0.0008s) ================================
+==  AddHeightToProduct: migrating =============================================
+-- add_column(:products, :height, :integer)
+   -&gt; 0.0009s
+==  AddHeightToProduct: migrated (0.0010s) ====================================
 
-stefan@swmbp 0 1.9.2-p0 address-book$ <command>sqlite3 db/development.sqlite3</command> 
-SQLite version 3.6.12
+Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>sqlite3 db/development.sqlite3</command> 
+SQLite version 3.7.7 2011-06-25 16:35:41
 Enter ".help" for instructions
 Enter SQL statements terminated with a ";"
-
 sqlite&gt; <command>.tables</command>
-people             schema_migrations
-
-sqlite&gt; <command>.schema people</command>
-CREATE TABLE "people" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar(255), "street" varchar(255), "zip_code" varchar(255), "city" varchar(255), "phone" varchar(255), "created_at" datetime, "updated_at" datetime, "mobile_phone" varchar(255));
-
+products           schema_migrations
+sqlite&gt; <command>.schema products</command>
+CREATE TABLE "products" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar(255), "price" decimal(7,2), "weight" integer, "in_stock" boolean, "expiration_date" date, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "height" integer);
 sqlite&gt; <command>.quit</command>
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
 
-    <para>Das Anlegen der Tabelle mit <command>rake db:migrate</command> wurde
-    natürlich auch im <filename>log/development.log</filename>
-    eingetragen:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>tail -n 21 log/development.log</command> 
-  SQL (0.1ms)   SELECT name
- FROM sqlite_master
- WHERE type = 'table' AND NOT name = 'sqlite_sequence'
-  SQL (0.1ms)  SELECT "schema_migrations"."version" FROM "schema_migrations"
-Migrating to CreatePeople (20101203142738)
-  SQL (0.0ms)  select sqlite_version(*)
-  SQL (0.4ms)  CREATE TABLE "people" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar(255), "street" varchar(255), "zip_code" varchar(255), "city" varchar(255), "phone" varchar(255), "created_at" datetime, "updated_at" datetime) 
-  SQL (0.1ms)  INSERT INTO "schema_migrations" ("version") VALUES ('20101203142738')
-Migrating to AddMobilePhoneToPerson (20101203142835)
-  SQL (0.4ms)  ALTER TABLE "people" ADD "mobile_phone" varchar(255)
-  SQL (0.1ms)  INSERT INTO "schema_migrations" ("version") VALUES ('20101203142835')
-  SQL (0.2ms)   SELECT name
- FROM sqlite_master
- WHERE type = 'table' AND NOT name = 'sqlite_sequence'
-
-  SQL (0.1ms)  SELECT "schema_migrations"."version" FROM "schema_migrations"
-  SQL (0.1ms)   SELECT name
- FROM sqlite_master
- WHERE type = 'table' AND NOT name = 'sqlite_sequence'
-
-  SQL (0.0ms)  PRAGMA index_list("people")
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
-
-    <para>Jetzt wissen Sie auch wofür die Tabelle
-    <literal>schema_migrations</literal> benutzt wird. War bei dem Namen aber
-    auch kein großes Rätsel. Bei der ersten von Rails durchgeführten Migration
-    wird diese Tabelle angelegt, falls sie noch nicht vorhanden ist. Sie dient
-    als eine Art Buchhaltung für die Migrations-Versionen.</para>
-
-    <para>Zum Schluss setzen wir die Datenbank wieder in den ursprünglichen
-    Stand:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate VERSION=0</command>
-(in /Users/stefan/address-book)
-==  CreatePeople: reverting ===================================================
--- drop_table(:people)
-   -&gt; 0.0008s
-==  CreatePeople: reverted (0.0009s) ==========================================
-
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
-  </section>
-
-  <section xml:id="ar_migration_db_aendern">
-    <title xml:id="ar_migration_db_aendern.title">Datenbank-Tabellen
-    ändern</title>
-
-    <para>Dass wir in unserer Datenbank-Tabelle <literal>people</literal> zwei
-    mal eine Telefonnummer haben ist nach dem was wir in <xref
-    linkend="activerecord_has_many" /> gelernt haben Blödsinn. Es würde mehr
-    Sinn machen die Telefonnummern in einer eigenen Datenbank-Tabelle zu
-    halten. Legen wir die mal an:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails generate model phone person_id:integer phone_type:string number:string</command>
-      invoke  active_record
-      create    db/migrate/20101201192459_create_phones.rb
-      create    app/models/phone.rb
-      invoke    test_unit
-      create      test/unit/phone_test.rb
-      create      test/fixtures/phones.yml
-stefan@swmbp 0 1.9.2-p0 address-book$</screen></para>
-
-    <para>Wenn wir jetzt <command>rake db:migrate</command> ausführen, werden
-    alle existierenden Migrations ausgeführt:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate</command>
-(in /Users/stefan/address-book)
-==  CreatePeople: migrating ===================================================
--- create_table(:people)
-   -&gt; 0.0014s
-==  CreatePeople: migrated (0.0015s) ==========================================
-
-==  AddMobilePhoneToPerson: migrating =========================================
--- add_column(:people, :mobile_phone, :string)
-   -&gt; 0.0006s
-==  AddMobilePhoneToPerson: migrated (0.0007s) ================================
-
-==  CreatePhones: migrating ===================================================
--- create_table(:phones)
-   -&gt; 0.0011s
-==  CreatePhones: migrated (0.0012s) ==========================================
-
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
-
-    <para>Da es sich mit Beispieldaten besser erklären lässt:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:seed</command>
-(in /Users/stefan/address-book)
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
-
-    <para>Jetzt haben wir zwar zwei getrennte Datenbank-Tabellen, aber noch
-    sind alle Telefonnummern in der Datenbank-Tabelle
-    <literal>people</literal>. Mit einer Migration können wir dieses Problem
-    sauber lösen. Legen wir dafür erst mal eine leere Migration-Datei
-    an:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails generate migration move_phone_numbers_to_the_phone_db</command>
-      invoke  active_record
-      create    db/migrate/20101201214154_move_phone_numbers_to_the_phone_db.rb
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
-
-    <para>Der Name der Migration ist technisch gesehen egal. Ich bemühe mich
-    sie immer für Menschen logisch zu benennen. Die gerade generierte Datei
-    ist noch jungfräulich:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>cat db/migrate/20101201214154_move_phone_numbers_to_the_phone_db.rb</command></screen><programlisting>class MovePhoneNumbersToThePhoneDb &lt; ActiveRecord::Migration
-  def self.up
-  end
-
-  def self.down
-  end
-end</programlisting></para>
-
-    <para>Wir müssen jetzt in der Methode <methodname>self.up</methodname> ein
-    kleines Programm einbauen, das durch alle Datensätze läuft und die
-    Telefonnummern in die dafür vorgesehene Datenbank-Tabelle
-    schreibt:<programlisting>class MovePhoneNumbersToThePhoneDb &lt; ActiveRecord::Migration
-<emphasis role="bold">  def self.up
-    # Schleife durch alle Person-Datensaetze
-    #
-    Person.all.each do |person|
-      # Wenn ein Telefoneintrag vorhanden ist, wird ein
-      # neuer Datensatz in der Phone-DB angelegt.
-      #
-      if ! person.phone.blank?
-        phone = Phone.new(:person_id =&gt; person.id, 
-                          :phone_type =&gt; 'Default', 
-                          :number =&gt; person.phone)
-        # Wenn das Abspeichern erfolgreich war, wird der 
-        # alte Eintrag auf nil gesetzt.
-        if phone.save
-          person.phone = nil
-          person.save
-        end
-      end
-      
-      # Wenn ein Handyeintrag vorhanden ist, wird ein
-      # neuer Datensatz in der Phone-DB-Tabelle angelegt.
-      #
-      if !person.mobile_phone.blank?
-        phone = Phone.new(:person_id =&gt; person.id, 
-                          :phone_type =&gt; 'Mobile', 
-                          :number =&gt; person.phone)
-        # Wenn das Abspeichern erfolgreich war, wird der 
-        # alte Eintrag auf nil gesetzt.
-        if phone.save
-          person.mobile_phone = nil
-          person.save
-        end
-      end
-      
-    end
-  end
-</emphasis>
-  def self.down
-  end
-end
-</programlisting></para>
-
-    <para>Starten wir die Migration:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate</command>
-(in /Users/stefan/address-book)
-==  MovePhoneNumbersToThePhoneDb: migrating ===================================
-==  MovePhoneNumbersToThePhoneDb: migrated (2.1447s) ==========================
-
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
-
-    <para>In der <foreignphrase xml:lang="en">Console</foreignphrase> können
-    wir das Ergebnis überprüfen:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails console</command>
-Loading development environment (Rails 3.0.3)
-
-ruby-1.9.2-p0 &gt; <command>Person.last</command>
- =&gt; #&lt;Person id: 1000, name: "Ute Maier", street: "Berliner Str. 1001", zip_code: "24357", city: "Dresden", phone: nil, created_at: "2010-12-01 21:55:13", updated_at: "2010-12-01 21:59:11", mobile_phone: nil&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Phone.last</command>
- =&gt; #&lt;Phone id: 1000, person_id: 1000, phone_type: "Default", number: "066 430817", created_at: "2010-12-01 21:59:11", updated_at: "2010-12-01 21:59:11"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
-
-    <para>Das sieht sehr gut aus. Allerdings müssen wir jetzt auch noch die
-    Methode <methodname>self.down</methodname> mit Leben füllen, damit wir das
-    ganze auch sauber zurückrollen können:<programlisting>class MovePhoneNumbersToThePhoneDb &lt; ActiveRecord::Migration
-  def self.up
-    # Schleife durch alle Person Datensaetze
-    #
-    Person.all.each do |person|
-      # Wenn ein Telefoneintrag vorhanden ist, wird ein
-      # neuer Datensatz in der Phone-DB angelegt.
-      #
-      if !person.phone.blank?
-        phone = Phone.new(:person_id =&gt; person.id, 
-        :phone_type =&gt; 'Default', 
-        :number =&gt; person.phone)
-        # Wenn das Abspeichern erfolgreich war, wird der 
-        # alte Eintrag auf nil gesetzt.
-        if phone.save
-          person.phone = nil
-          person.save
-        end
-      end
-
-      # Wenn ein Handyeintrag vorhanden ist, wird ein
-      # neuer Datensatz in der Phone-DB angelegt.
-      #
-      if !person.mobile_phone.blank?
-        phone = Phone.new(:person_id =&gt; person.id, 
-        :phone_type =&gt; 'Mobile', 
-        :number =&gt; person.phone)
-        # Wenn das Abspeichern erfolgreich war, wird der 
-        # alte Eintrag auf nil gesetzt.
-        if phone.save
-          person.mobile_phone = nil
-          person.save
-        end
-      end
-
-    end
-  end
-
-<emphasis role="bold">  def self.down
-    # Schleife durch alle Phone-Eintraege
-    #
-    Phone.all.each do |phone|
-      person = Person.where(:id =&gt; phone.person_id).first
-      if person != nil
-        if phone.phone_type == 'Default'
-          person.phone = phone.number
-          phone.destroy if person.save
-        elsif phone.phone_type == 'Mobile'
-          person.mobile_phone = phone.number
-          phone.destroy if person.save
-        end
-      end
-    end
-  end
-</emphasis>
-end
-</programlisting></para>
-
-    <para>Jetzt können wir mit <command>rake db:rollback</command> sauber
-    zurückrollen:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:rollback</command>
-(in /Users/stefan/address-book)
-==  MovePhoneNumbersToThePhoneDb: reverting ===================================
-==  MovePhoneNumbersToThePhoneDb: reverted (0.0381s) ==========================
-
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
-
-    <para>So weit so gut. Dummerweise habe ich aber in dieser Migration
-    vergessen auch die entsprechenden Tabellenspalten zu löschen. Noch in die
-    bereits fertige Migration einbauen? Nein, auf keinen Fall! Migrations
-    kosten nichts und man sollte nie alte Migrations <quote>anpassen</quote>.
-    Das läd nur zu Fehlern ein. Erstellen wir also eine neue
-    Migration:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails generate migration delete_phone_fields</command>
-      invoke  active_record
-      create    db/migrate/20101201222624_delete_phone_fields.rb
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
-
-    <para>Diesmal füllen wir in der Datei
-    <filename>db/migrate/20101201222624_delete_phone_fields.rb</filename>
-    direkt <methodname>self.up</methodname> und
-    <methodname>self.down</methodname> im gleichen Schritt:<programlisting>class DeletePhoneFields &lt; ActiveRecord::Migration
-  def self.up
-    remove_column :people, :phone
-    remove_column :people, :mobile_phone
-  end
-
-  def self.down
-    add_column :people, :phone, :string
-    add_column :people, :mobile_phone, :string
-  end
-end
-</programlisting></para>
-
-    <para>Beim <methodname>self.down</methodname> werden für den Fall eines
-    Rollbacks die Tabellenspalten wieder angelegt. Wenn wir jetzt
-    <command>rake db:migrate</command> ausführen werden natürlich zwei
-    Migrations ausgeführt, weil wir vorhin einen Rollback gemacht
-    haben:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate</command>
-(in /Users/stefan/address-book)
-==  MovePhoneNumbersToThePhoneDb: migrating ===================================
-==  MovePhoneNumbersToThePhoneDb: migrated (0.0382s) ==========================
-
-==  DeletePhoneFields: migrating ==============================================
--- remove_column(:people, :phone)
-   -&gt; 0.0540s
--- remove_column(:people, :mobile_phone)
-   -&gt; 0.0490s
-==  DeletePhoneFields: migrated (0.1033s) =====================================
-
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
-
-    <para>Die Tabellen sind nach der Migration sauber getrennt:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails console</command>
-Loading development environment (Rails 3.0.3)
-
-ruby-1.9.2-p0 &gt; <command>Person.first</command>
- =&gt; #&lt;Person id: 1, name: "Martin Schroeder", street: "Hauptstr. 2", zip_code: "25795", city: "Beispielhausen", created_at: "2010-12-01 22:35:18", updated_at: "2010-12-01 22:35:39"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Phone.where(:person_id =&gt; 1)</command>
- =&gt; [#&lt;Phone id: 1, person_id: 1, phone_type: "Default", number: "024 359178", created_at: "2010-12-01 22:35:39", updated_at: "2010-12-01 22:35:39"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+    <para>Die Tabelle <literal>schema_migrations</literal> wird zur
+    Versionierung der Migrationen benutzt wird. Bei der ersten von Rails
+    durchgeführten Migration wird diese Tabelle angelegt, falls sie noch nicht
+    vorhanden ist.</para>
   </section>
 
   <section xml:id="ar_migration_index">
@@ -612,13 +278,12 @@ stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
     eine kurze Einführung. Kurzversion: Damit werden Suchen für eine bestimmte
     Tabellen-Spalte schneller.</para>
 
-    <para>In unserem Adressbuch sollten wir das Feld <literal>name</literal>
-    in der Tabelle <literal>people</literal> indizieren. Dafür erstellen wir
-    eine neue Migration:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails generate migration create_index</command>
+    <para>In unserer Produktdatenbank sollten wir das Feld
+    <literal>name</literal> in der Tabelle <literal>products</literal>
+    indizieren. Dafür erstellen wir eine neue Migration:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails generate migration create_index</command>
       invoke  active_record
-      create    db/migrate/20101201224922_create_index.rb
-
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+      create    db/migrate/20120508162243_create_index.rb
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
     <para>In der Datei
     <filename>db/migrate/20101201224922_create_index.rb</filename> legen wir
@@ -626,24 +291,36 @@ stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
     <methodname>self.up</methodname> den Index an, und in der Methode
     <methodname>self.down</methodname> löschen wir ihn mit
     <methodname>remove_index</methodname> wieder:<programlisting>class CreateIndex &lt; ActiveRecord::Migration
-  def self.up
-    add_index :people, :name
+  def up
+    add_index :products, :name
   end
 
-  def self.down
-    remove_index :people, :name
+  def down
+    remove_index :products, :name
   end
 end</programlisting></para>
 
     <para>Mit <command>rake db:migrate</command> wird der Index
-    angelegt:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rake db:migrate</command>
-(in /Users/stefan/address-book)
+    angelegt:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate</command>
 ==  CreateIndex: migrating ====================================================
--- add_index(:people, :name)
-   -&gt; 0.0034s
-==  CreateIndex: migrated (0.0035s) ===========================================
+-- add_index(:products, :name)
+   -&gt; 0.0009s
+==  CreateIndex: migrated (0.0009s) ===========================================
 
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$  </screen></para>
+
+    <tip>
+      <para>Einen Index können Sie auch direkt beim Generieren des Models mit
+      anlegen. In unserem Fall (einem Index beim Attribute <code>name</code>)
+      sähe der Befehl so aus:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails generate model product name:string:index 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
+      invoke  active_record
+      create    db/migrate/20120508160146_create_products.rb
+      create    app/models/product.rb
+      invoke    test_unit
+      create      test/unit/product_test.rb
+      create      test/fixtures/products.yml
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+    </tip>
   </section>
 
   <section>
@@ -689,50 +366,6 @@ stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
       <para>Am Anfang fragt man sich: <quote>Muss das sein? Macht das wirklich
       Sinn?</quote>. Aber mit der Zeit lernt man diese automatischen Felder zu
       schätzen. Sie wegzulassen ist meist am falschen Ende gespart.</para>
-    </section>
-
-    <section>
-      <title>Dezimal-Stellen</title>
-
-      <para>Wenn man z. B. bei einem Preis-Feld eine Dezimal-Zahl mit zwei
-      Stellen hinter dem Komma benötigt, so muss man das nach dem Erstellen
-      des Models manuell in der Migrationsdatei ändern. Ansonsten laufen Sie
-      Gefahr, dass von Datenbank zu Datenbank unterschiedlich große Felder
-      angelegt werden (siehe <uri
-      xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/TableDefinition.html">http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/TableDefinition.html</uri>).</para>
-
-      <para>Legen wir ein Model <classname>Produkt</classname> mit Preisen
-      an:<screen>stefan@swmbp 0 1.9.2-p0 address-book$ <command>rails generate model product name:string price:decimal</command>
-      invoke  active_record
-      create    db/migrate/20101202095315_create_products.rb
-      create    app/models/product.rb
-      invoke    test_unit
-      create      test/unit/product_test.rb
-      create      test/fixtures/products.yml
-stefan@swmbp 0 1.9.2-p0 address-book$ </screen></para>
-
-      <para>Die
-      <filename>db/migrate/20101202095315_create_products.rb</filename> müssen
-      wir jetzt wie folgt verändern:<screen>class CreateProducts &lt; ActiveRecord::Migration
-  def self.up
-    create_table :products do |t|
-      t.string :name
-      <emphasis role="bold">t.decimal :price, :precision =&gt; 8, :scale =&gt; 2</emphasis>
-
-      t.timestamps
-    end
-  end
-
-  def self.down
-    drop_table :products
-  end
-end
-</screen></para>
-
-      <para>Die Parameter <code>:precision =&gt; 8, :scale =&gt; 2</code>
-      sagen aus, dass eine Zahl mit maximal 8 Stellen (davon 2 Stellen rechts
-      vom Komma) abgespeichert wird. Ein Beispiel für eine solche Zahl:
-      123456,78.</para>
     </section>
   </section>
 
