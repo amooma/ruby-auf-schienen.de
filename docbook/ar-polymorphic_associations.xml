@@ -23,148 +23,131 @@
   what types of models they can be associated with.</quote> Na, das ist ja
   jetzt klar wie Kloßbrühe! ;-)</para>
 
-  <para>Ein Beispiel! Nehmen wir an, dass wir zu den Personen und den
-  Telefonnummern in unserer Applikation Kommentare einbauen wollen. Und zwar
-  beliebig viele Kommentare (Comment). Mit dem Wissen aus <xref
-  linkend="activerecord_has_many_through" /> könnten wir uns zwei Modelle
-  anlegen und jeweils eine <methodname>has_many</methodname>-Verbindung zu
-  <classname>Person</classname> oder zu <classname>Phonenumber</classname>
-  aufbauen. Bei zweien würde das sogar noch halbwegs praktikabel sein. Aber
-  stellen Sie sich mal vor, Sie hätten gerne bei mehr Daten derartige
-  Kommentare. Dafür jedes Mal ein eigenes <foreignphrase
-  xml:lang="en">Model</foreignphrase> bauen? Genau da kommt die <foreignphrase
-  xml:lang="en">Polymorphic Association</foreignphrase> zum Tragen. Damit
-  können Sie ein <foreignphrase xml:lang="en">Model</foreignphrase>
-  <classname>Comment</classname> mit beliebig vielen anderen Modellen
-  verknüpfen.</para>
+  <para>Ich zeige Ihnen ein Beispiel, in dem wir ein Model für Autos
+  (<classname>Car</classname>) und ein Model für Fahrräder
+  (<classname>Bike</classname>) erstellen. Um ein Auto oder ein Fahrrad zu
+  beschreiben, verwenden wir ein Model zum Auszeichnen
+  (<classname>Tag</classname>). Ein Auto und ein Fahrrad kann beliebig viele
+  <methodname>tags</methodname> haben. Die Applikation:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new example</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd example</command> 
+Stefan-Wintermeyers-MacBook-Air:example xyz$</screen></para>
 
-  <para>Erstellen wir zuerst das <foreignphrase
-  xml:lang="en">Model</foreignphrase> <classname>Comment</classname>:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails generate model Comment commentable_type:string commentable_id:integer comment:string</command>
-      invoke  active_record
-      create    db/migrate/20101011084411_create_comments.rb
-      create    app/models/comment.rb
-      invoke    test_unit
-      create      test/unit/comment_test.rb
-      create      test/fixtures/comments.yml
-stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:migrate</command>
-(in /Users/stefan/phonebook)
-==  CreateComments: migrating =================================================
--- create_table(:comments)
-   -&gt; 0.0013s
-==  CreateComments: migrated (0.0013s) ========================================
+  <para>Jetzt die drei benötigten Modele:<screen>Stefan-Wintermeyers-MacBook-Air:example xyz$ <command>rails generate model car name</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:example xyz$ <command>rails generate model bike name</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:example xyz$ <command>rails generate model tag name taggable_type taggable_id:integer</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:example xyz$ <command>rake db:migrate</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:example xyz$</screen></para>
 
-stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
+  <para><classname>Car</classname> und <classname>Bike</classname> sind klar.
+  Bei <classname>Tag</classname> benutzen wir die Felder
+  <methodname>taggable_type</methodname> und
+  <methodname>taggable_id</methodname>, um ActiveRecord eine Möglichkeit zu
+  geben die Zuordnung für die polymorphic association abzuspeichern. Dies
+  müssen wir im Model entsprechend eintragen.</para>
 
-  <para>Das Suffix <quote><foreignphrase
-  xml:lang="en">able</foreignphrase></quote> (<replaceable>…</replaceable>bar)
-  beim Namen <quote><foreignphrase
-  xml:lang="en">commentable</foreignphrase></quote> (kommentierbar) ist
-  Rails-üblich, muss aber nicht sein. Wir brauchen ja zum Verknüpfen jetzt
-  nicht nur die ID des Eintrags, sondern müssen auch noch wissen, um welches
-  <foreignphrase xml:lang="en">Model</foreignphrase> es sich eigentlich
-  handelt. Da macht der Begriff <quote><foreignphrase
-  xml:lang="en">commentable_type</foreignphrase></quote> halbwegs Sinn.</para>
+  <para><filename>app/models/tag.rb</filename><programlisting>class Tag &lt; ActiveRecord::Base
+  attr_accessible :name, :taggable_id, :taggable_type
 
-  <para>Jetzt müssen wir in <filename>app/models/comment.rb</filename>
-  folgenden Eintrag machen:<programlisting>class Comment &lt; ActiveRecord::Base
-  belongs_to :commentable, :polymorphic =&gt; true
+  belongs_to :taggable, :polymorphic =&gt; true
 end</programlisting></para>
 
-  <para>Jetzt den Eintrag in
-  <filename>app/models/person.rb:</filename><programlisting>class Person &lt; ActiveRecord::Base
-  has_many :phonenumbers, :dependent =&gt; :destroy
-  
-  has_many :comments, :as =&gt; :commentable
+  <para><filename>app/models/car.rb</filename><programlisting>class Car &lt; ActiveRecord::Base
+  attr_accessible :name
+
+  has_many :tags, :as =&gt; :taggable  
 end</programlisting></para>
 
-  <para>Und noch den Eintrag in
-  <filename>app/models/phonenumber.rb:</filename><programlisting>class Phonenumber &lt; ActiveRecord::Base
-  belongs_to :person
-  
-  has_many :comments, :as =&gt; :commentable
-end</programlisting></para>
+  <para><filename>app/models/bike.rb</filename><programlisting>class Bike &lt; ActiveRecord::Base
+  attr_accessible :name
 
-  <para>Und jetzt passen wir noch die <filename>db/seeds.rb</filename> mit
-  brauchbaren Testdaten an:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
-#   Mayor.create(:name =&gt; 'Daley', :city =&gt; cities.first)
-
-Person.create(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier').phonenumbers.create([
-             {:name =&gt; 'Mobile', :number =&gt; '0171-12345678'}, 
-             {:name =&gt; 'Office', :number =&gt; '030-7777777'}, 
-             {:name =&gt; 'Home', :number =&gt; '030-8888888'}])
-Person.create(:firstname =&gt; 'Ute', :lastname =&gt; 'Meier').phonenumbers.create([
-             {:name =&gt; 'Home', :number =&gt; '030-8888888'}])
-Person.create(:firstname =&gt; 'Horst', :lastname =&gt; 'Apfelmus').phonenumbers.create([
-             {:name =&gt; 'Mobile', :number =&gt; '0171-1188811'}])
-Person.create(:lastname =&gt; 'Udelhoven')
-Person.create(:firstname =&gt; 'Ernst', :lastname =&gt; 'Steinwurf').phonenumbers.create([
-             {:name =&gt; 'Mobile', :number =&gt; '0172-22225678'}, 
-             {:name =&gt; 'Home', :number =&gt; '040-8888222'}])
+  has_many :tags, :as =&gt; :taggable
+end
 </programlisting></para>
 
-  <para>Die Datenbank löschen und neu mit der <filename>db/seeds.rb</filename>
-  befüllen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:setup</command>
-(in /Users/stefan/phonebook)
-db/test.sqlite3 already exists
-db/test.sqlite3 already exists
-db/development.sqlite3 already exists
-db/development.sqlite3 already exists
--- create_table("comments", {:force=&gt;true})
-   -&gt; 0.0053s
--- create_table("people", {:force=&gt;true})
-   -&gt; 0.0058s
--- create_table("phonenumbers", {:force=&gt;true})
-   -&gt; 0.0067s
--- initialize_schema_migrations_table()
-   -&gt; 0.0004s
--- assume_migrated_upto_version(20101011084411, "db/migrate")
-   -&gt; 0.0004s
-stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
+  <para>Wir benutzen bei Car und Bike ein zusätzliches <code>:as =&gt;
+  :taggable</code> bei der Definition von has_many. Bei
+  <classname>Tag</classname> benutzen wir <code>belongs_to :taggable,
+  :polymorphic =&gt; true</code> um ActiveRecord die polymorphic association
+  anzuzeigen.</para>
+
+  <tip>
+    <para>Das Suffix <quote><foreignphrase
+    xml:lang="en">able</foreignphrase></quote>
+    (<replaceable>…</replaceable>bar) beim Namen <quote><foreignphrase
+    xml:lang="en">taggable</foreignphrase></quote> ist Rails-üblich, muss aber
+    nicht sein. Wir brauchen ja zum Verknüpfen jetzt nicht nur die ID des
+    Eintrags, sondern müssen auch noch wissen, um welches <foreignphrase
+    xml:lang="en">Model</foreignphrase> es sich eigentlich handelt. Da macht
+    der Begriff <quote><foreignphrase
+    xml:lang="en">taggable_type</foreignphrase></quote> halbwegs Sinn.</para>
+  </tip>
 
   <para>Gehen wir mal in die <foreignphrase
-  xml:lang="en">Console</foreignphrase> und versuchen zwei Kommentare zu Herrn
-  Fritz Meier anzulegen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
+  xml:lang="en">Console</foreignphrase> und legen ein Auto und ein Fahrrad
+  an:<screen>Stefan-Wintermeyers-MacBook-Air:example xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>golf = Car.create(:name =&gt; 'VW Golf')</command>
+   (0.1ms)  begin transaction
+  SQL (5.2ms)  INSERT INTO "cars" ("created_at", "name", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 08 May 2012 07:20:45 UTC +00:00], ["name", "VW Golf"], ["updated_at", Tue, 08 May 2012 07:20:45 UTC +00:00]]
+   (2.4ms)  commit transaction
+ =&gt; #&lt;Car id: 1, name: "VW Golf", created_at: "2012-05-08 07:20:45", updated_at: "2012-05-08 07:20:45"&gt; 
+1.9.3p194 :002 &gt; <command>mountainbike = Bike.create(:name =&gt; 'Mountainbike')</command>
+   (0.1ms)  begin transaction
+  SQL (0.6ms)  INSERT INTO "bikes" ("created_at", "name", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 08 May 2012 07:20:51 UTC +00:00], ["name", "Mountainbike"], ["updated_at", Tue, 08 May 2012 07:20:51 UTC +00:00]]
+   (3.0ms)  commit transaction
+ =&gt; #&lt;Bike id: 1, name: "Mountainbike", created_at: "2012-05-08 07:20:51", updated_at: "2012-05-08 07:20:51"&gt; 
+1.9.3p194 :003 &gt;</screen></para>
 
-ruby-1.9.2-p0 &gt; <command>fritz = Person.first</command>
- =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-11 09:00:51", updated_at: "2010-10-11 09:00:51"&gt; 
+  <para>Jetzt definieren wir jeweils ein Tag mit der Farbe des entsprechenden
+  Objektes:<screen>1.9.3p194 :004 &gt; <command>golf.tags.create(:name =&gt; 'blau')</command>
+   (0.1ms)  begin transaction
+  SQL (0.6ms)  INSERT INTO "tags" ("created_at", "name", "taggable_id", "taggable_type", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Tue, 08 May 2012 07:23:21 UTC +00:00], ["name", "blau"], ["taggable_id", 1], ["taggable_type", "Car"], ["updated_at", Tue, 08 May 2012 07:23:21 UTC +00:00]]
+   (1.2ms)  commit transaction
+ =&gt; #&lt;Tag id: 1, name: "blau", taggable_type: "Car", taggable_id: 1, created_at: "2012-05-08 07:23:21", updated_at: "2012-05-08 07:23:21"&gt; 
+1.9.3p194 :005 &gt; <command>mountainbike.tags.create(:name =&gt; 'schwarz')</command>
+   (0.1ms)  begin transaction
+  SQL (0.6ms)  INSERT INTO "tags" ("created_at", "name", "taggable_id", "taggable_type", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Tue, 08 May 2012 07:27:11 UTC +00:00], ["name", "schwarz"], ["taggable_id", 1], ["taggable_type", "Bike"], ["updated_at", Tue, 08 May 2012 07:27:11 UTC +00:00]]
+   (3.1ms)  commit transaction
+ =&gt; #&lt;Tag id: 2, name: "schwarz", taggable_type: "Bike", taggable_id: 1, created_at: "2012-05-08 07:27:11", updated_at: "2012-05-08 07:27:11"&gt; 
+1.9.3p194 :006 &gt;</screen></para>
 
-ruby-1.9.2-p0 &gt; <command>fritz.comments.count</command>
- =&gt; 0 
+  <para>Beim Golf fügen wir noch ein weiteres <classname>Tag</classname>
+  hinzu:<screen>1.9.3p194 :006 &gt; <command>golf.tags.create(:name =&gt; 'Automatik')</command>
+   (0.1ms)  begin transaction
+  SQL (1.3ms)  INSERT INTO "tags" ("created_at", "name", "taggable_id", "taggable_type", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Tue, 08 May 2012 07:28:12 UTC +00:00], ["name", "Automatik"], ["taggable_id", 1], ["taggable_type", "Car"], ["updated_at", Tue, 08 May 2012 07:28:12 UTC +00:00]]
+   (3.7ms)  commit transaction
+ =&gt; #&lt;Tag id: 3, name: "Automatik", taggable_type: "Car", taggable_id: 1, created_at: "2012-05-08 07:28:12", updated_at: "2012-05-08 07:28:12"&gt; 
+1.9.3p194 :007 &gt; </screen></para>
 
-ruby-1.9.2-p0 &gt; <command>fritz.comments.create( :comment =&gt; 'Ein Beispiel' )</command>
- =&gt; #&lt;Comment id: 1, commentable_type: "Person", commentable_id: 1, comment: "Ein Beispiel", created_at: "2010-10-11 09:07:38", updated_at: "2010-10-11 09:07:38"&gt; 
+  <para>Schauen wir uns mal alle <classname>Tag</classname> Einträge
+  an:<screen>1.9.3p194 :007 &gt; <command>Tag.all</command>
+  Tag Load (0.4ms)  SELECT "tags".* FROM "tags" 
+ =&gt; [#&lt;Tag id: 1, name: "blau", taggable_type: "Car", taggable_id: 1, created_at: "2012-05-08 07:23:21", updated_at: "2012-05-08 07:23:21"&gt;, #&lt;Tag id: 2, name: "schwarz", taggable_type: "Bike", taggable_id: 1, created_at: "2012-05-08 07:27:11", updated_at: "2012-05-08 07:27:11"&gt;, #&lt;Tag id: 3, name: "Automatik", taggable_type: "Car", taggable_id: 1, created_at: "2012-05-08 07:28:12", updated_at: "2012-05-08 07:28:12"&gt;] 
+1.9.3p194 :008 &gt; </screen></para>
 
-ruby-1.9.2-p0 &gt; <command>fritz.comments.create( :comment =&gt; 'Noch ein Beispiel' )</command>
- =&gt; #&lt;Comment id: 2, commentable_type: "Person", commentable_id: 1, comment: "Noch ein Beispiel", created_at: "2010-10-11 09:07:44", updated_at: "2010-10-11 09:07:44"&gt; 
+  <para>Und jetzt alle tags des Golfs:<screen>1.9.3p194 :008 &gt; <command>golf.tags</command>
+  Tag Load (0.3ms)  SELECT "tags".* FROM "tags" WHERE "tags"."taggable_id" = 1 AND "tags"."taggable_type" = 'Car'
+ =&gt; [#&lt;Tag id: 1, name: "blau", taggable_type: "Car", taggable_id: 1, created_at: "2012-05-08 07:23:21", updated_at: "2012-05-08 07:23:21"&gt;, #&lt;Tag id: 3, name: "Automatik", taggable_type: "Car", taggable_id: 1, created_at: "2012-05-08 07:28:12", updated_at: "2012-05-08 07:28:12"&gt;] 
+1.9.3p194 :009 &gt; </screen></para>
 
-ruby-1.9.2-p0 &gt; <command>fritz.comments.count</command>
- =&gt; 2 
+  <para>Natürlich können Sie sich auch anzeigen lassen, zu welchem Objekt das
+  letzte <classname>Tag</classname> gehört:<screen>1.9.3p194 :009 &gt; <command>Tag.last.taggable</command>
+  Tag Load (0.3ms)  SELECT "tags".* FROM "tags" ORDER BY "tags"."id" DESC LIMIT 1
+  Car Load (0.2ms)  SELECT "cars".* FROM "cars" WHERE "cars"."id" = 1 LIMIT 1
+ =&gt; #&lt;Car id: 1, name: "VW Golf", created_at: "2012-05-08 07:20:45", updated_at: "2012-05-08 07:20:45"&gt; 
+1.9.3p194 :010 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:example xyz$</screen></para>
 
-ruby-1.9.2-p0 &gt; </screen></para>
-
-  <para>Das funktioniert also. Schauen wir uns jetzt den ersten Kommentar
-  an:<screen>ruby-1.9.2-p0 &gt; <command>Comment.first</command>
- =&gt; #&lt;Comment id: 1, commentable_type: "Person", commentable_id: 1, comment: "Ein Beispiel", created_at: "2010-10-11 09:07:38", updated_at: "2010-10-11 09:07:38"&gt; 
-
-ruby-1.9.2-p0 &gt; </screen></para>
-
-  <para>Alles logisch. Alles gut. Aber so wie ich Sie einschätze, wollen Sie
-  jetzt auch sehen, wie das mit Telefonnummern geht. Kein Problem:<screen>ruby-1.9.2-p0 &gt; <command>Phonenumber.first.comments.create( :comment =&gt; 'Und wieder ein Beispiel.' )</command>
- =&gt; #&lt;Comment id: 3, commentable_type: "Phonenumber", commentable_id: 1, comment: "Und wieder ein Beispiel.", created_at: "2010-10-11 09:17:29", updated_at: "2010-10-11 09:17:29"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Phonenumber.first.comments.create( :comment =&gt; 'xyz Beispiel' )</command>
- =&gt; #&lt;Comment id: 4, commentable_type: "Phonenumber", commentable_id: 1, comment: "xyz Beispiel", created_at: "2010-10-11 09:18:06", updated_at: "2010-10-11 09:18:06"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Phonenumber.first.comments</command>
- =&gt; [#&lt;Comment id: 3, commentable_type: "Phonenumber", commentable_id: 1, comment: "Und wieder ein Beispiel.", created_at: "2010-10-11 09:17:29", updated_at: "2010-10-11 09:17:29"&gt;, #&lt;Comment id: 4, commentable_type: "Phonenumber", commentable_id: 1, comment: "xyz Beispiel", created_at: "2010-10-11 09:18:06", updated_at: "2010-10-11 09:18:06"&gt;] 
-
-ruby-1.9.2-p0 &gt; </screen></para>
+  <para>Polymorphic associations sind immer praktisch, wenn man die
+  Datenbankstruktur normalisieren will. Wir hätten in diesem Beispiel ja auch
+  ein Model <classname>CarTag</classname> und <classname>BikeTag</classname>
+  definieren können, aber da <classname>Tag</classname> für beide gleich ist,
+  macht hier eine polymorphic association mehr Sinn.</para>
 
   <note>
     <para><foreignphrase xml:lang="en">Polymorphic
