@@ -38,101 +38,24 @@
     <tertiary>transaction()</tertiary>
   </indexterm>
 
+  <para>Als Transaction wird in der Datenbankwelt eine Menge von
+  SQL-Anweisungen benannt, die unbedingt in einem Stück und ohne Unterbrechung
+  abgearbeitet werden müssen. Sollte innerhalb einer Transaction ein Fehler
+  geschehen, so wird die Datenbank wieder auf den Stand vor Beginn der
+  Transaktion gesetzt.</para>
+
   <para>Es gibt immer mal wieder Anwendungsgebiete, bei denen man eine
   Datenbank-Transaktion durchführen muss. Das klassische Beispiel dafür ist
   eine Geldbewegung von einem zu einem anderen Konto. Die macht nur Sinn, wenn
   beide Aktionen (von einem Konto abbuchen und auf das Konto des Empfängers
   buchen) ausgeführt werden.</para>
 
-  <para>Zum Demonstrieren einer Transaktion brauchen wir wieder definierte
-  Beispieldaten. Deshalb füllen Sie bitte die Datei
-  <filename>db/seeds.rb</filename> mit folgendem Inhalt:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
-#   Mayor.create(:name =&gt; 'Daley', :city =&gt; cities.first)
-
-Person.create(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier').phonenumbers.create([
-             {:name =&gt; 'Mobile', :number =&gt; '0171-12345678'}, 
-             {:name =&gt; 'Office', :number =&gt; '030-7777777'}, 
-             {:name =&gt; 'Home', :number =&gt; '030-8888888'}])
-Person.create(:firstname =&gt; 'Ute', :lastname =&gt; 'Meier').phonenumbers.create([
-             {:name =&gt; 'Home', :number =&gt; '030-8888888'}])
-Person.create(:firstname =&gt; 'Horst', :lastname =&gt; 'Apfelmus').phonenumbers.create([
-             {:name =&gt; 'Mobile', :number =&gt; '0171-1188811'}])
-Person.create(:lastname =&gt; 'Udelhoven')
-Person.create(:firstname =&gt; 'Ernst', :lastname =&gt; 'Steinwurf').phonenumbers.create([
-             {:name =&gt; 'Mobile', :number =&gt; '0172-22225678'}, 
-             {:name =&gt; 'Home', :number =&gt; '040-8888222'}])
-</programlisting></para>
-
-  <para>Jetzt die Datenbank löschen und neu mit der
-  <filename>db/seeds.rb</filename> befüllen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
-(in /Users/stefan/phonebook)
-db/test.sqlite3 already exists
-db/test.sqlite3 already exists
-db/development.sqlite3 already exists
--- create_table("people", {:force=&gt;true})
-   -&gt; 0.0035s
--- create_table("phonenumbers", {:force=&gt;true})
-   -&gt; 0.0029s
--- initialize_schema_migrations_table()
-   -&gt; 0.0047s
--- assume_migrated_upto_version(20101008205906, "db/migrate")
-   -&gt; 0.0039s
-stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
-
   <para>Eine Transaktion wird nach folgendem Muster
   durchgeführt:<programlisting><emphasis role="bold">ActiveRecord::Base.transaction do</emphasis>
-  <replaceable>was_auch_immer_der_erste_schritt_ist</replaceable>
-  <replaceable>was_auch_immer_der_zweite_schritt_ist</replaceable>
-  <replaceable>was_auch_immer_der_dritte_schritt_ist</replaceable>
+  Book.create(:title =&gt; 'A')
+  Book.create(:title =&gt; 'B')
+  Book.create(:title =&gt; 'C').authors.create(:last_name =&gt; 'Z')
 <emphasis role="bold">end</emphasis></programlisting></para>
-
-  <para>Herr und Frau Meier haben beide die gleiche Telefonnummer:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>Person.includes(:phonenumbers).where( :phonenumbers =&gt; {:number =&gt; '030-8888888'} )</command>
- =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:21:57", updated_at: "2010-10-10 08:21:57"&gt;, #&lt;Person id: 2, firstname: "Ute", lastname: "Meier", created_at: "2010-10-10 08:21:57", updated_at: "2010-10-10 08:21:57"&gt;] 
-
-ruby-1.9.2-p0 &gt; </screen></para>
-
-  <para>Jetzt wollen beide nach Hamburg umziehen und bekommen dort eine neue
-  Telefonnummer. Jetzt wollen wir beim Ändern der Nummer sicherstellen, dass
-  beide Nummern in einer Transaktion geändert werden.</para>
-
-  <para>Hier ist der Code dazu:</para>
-
-  <para><screen>ruby-1.9.2-p0 &gt; <command>die_meiers = Person.includes(:phonenumbers).where( :phonenumbers =&gt; {:number =&gt; '030-8888888'} )</command>
- =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:21:57", updated_at: "2010-10-10 08:21:57"&gt;, #&lt;Person id: 2, firstname: "Ute", lastname: "Meier", created_at: "2010-10-10 08:21:57", updated_at: "2010-10-10 08:21:57"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>herr_meier_telefon = die_meiers.first.phonenumbers.first</command>
- =&gt; #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-10 08:21:57", updated_at: "2010-10-10 08:21:57"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>frau_meier_telefon = die_meiers.last.phonenumbers.first</command>
- =&gt; #&lt;Phonenumber id: 4, person_id: 2, name: "Home", number: "030-8888888", created_at: "2010-10-10 08:21:57", updated_at: "2010-10-10 08:21:57"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>ActiveRecord::Base.transaction do</command>
-ruby-1.9.2-p0 &gt;     <command>neue_nummer = '040-9999999'</command>
-ruby-1.9.2-p0 ?&gt;  <command>  herr_meier_telefon.number = neue_nummer</command>
-ruby-1.9.2-p0 ?&gt;    <command>herr_meier_telefon.save</command>
-ruby-1.9.2-p0 ?&gt;  <command>  frau_meier_telefon.number = neue_nummer</command>
-ruby-1.9.2-p0 ?&gt;  <command>  frau_meier_telefon.save</command>
-ruby-1.9.2-p0 ?&gt;  <command>end</command>
- =&gt; true 
-
-ruby-1.9.2-p0 &gt; <command>die_meiers = Person.includes(:phonenumbers).where( :phonenumbers =&gt; {:number =&gt; '040-9999999'} )</command>
- =&gt; [#&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:21:57", updated_at: "2010-10-10 08:21:57"&gt;, #&lt;Person id: 2, firstname: "Ute", lastname: "Meier", created_at: "2010-10-10 08:21:57", updated_at: "2010-10-10 08:21:57"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
-
-  <para>Jetzt werden Sie sagen: <quote>Ja, das hätte ich aber auch einfacher
-  mit <methodname>update_attributes</methodname> realisieren können (siehe
-  <xref linkend="activerecord_update_attributes" />)!</quote> Meine Antwort
-  darauf: Gut aufgepasst! Das hier ist ja nur ein Beispiel. ;-)</para>
 
   <para>Transaktionen sind ein komplexes Thema. Wenn Sie mehr Informationen
   dazu suchen, können Sie die ri-Hilfe dafür mit <command>ri
