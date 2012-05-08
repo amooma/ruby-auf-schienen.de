@@ -16,7 +16,8 @@
     <secondary>Validierung</secondary>
   </indexterm>
 
-  <para>ActiveRecord stellt mit
+  <para>Einer der häufigsten Fehlerquellen in Programmen sind nicht valide
+  Datensätze. ActiveRecord stellt mit
   <methodname>validates<replaceable>…</replaceable>()</methodname> eine
   schnelle und einfache Möglichkeit zur Validierung von Datensätzen zur
   Verfügung. So können Sie sicher sein, dass auch wirklich nur sinnvolle
@@ -26,71 +27,14 @@
     <title
     xml:id="activerecord_validation_vorbereitung.title">Vorbereitung</title>
 
-    <para>Erstellen wir eine neue Applikation für dieses Kapitel:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>rails new online_shop</command>
-      create  
-      create  README
-      create  Rakefile
-
-      [...]
-
-      create  vendor/plugins
-      create  vendor/plugins/.gitkeep
-stefan@swmbp 0 1.9.2-p0 ~$ <command>cd online_shop</command>
-stefan@swmbp 0 1.9.2-p0 online_shop$ <command>bundle install</command>
-Fetching source index for http://rubygems.org/
-Using rake (0.8.7) 
-
+    <para>Erstellen wir eine neue Applikation für dieses Kapitel:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new shop</command>
 [...]
-
-Your bundle was installed to `/Users/stefan/.rvm/gems/ruby-1.9.2-p0`
-stefan@swmbp 0 1.9.2-p0 online_shop$</screen></para>
-
-    <para>Ein User-Model:<screen>stefan@swmbp 0 1.9.2-p0 online_shop$ <command>rails generate model user login:string password_hash:string email:string firstname:string lastname:string gender:string birthday:date</command>
-      invoke  active_record
-      create    db/migrate/20101013104942_create_users.rb
-      create    app/models/user.rb
-      invoke    test_unit
-      create      test/unit/user_test.rb
-      create      test/fixtures/users.yml
-stefan@swmbp 0 1.9.2-p0 online_shop$ </screen></para>
-
-    <para>Ein Telefonnummern-Model:<screen>stefan@swmbp 0 1.9.2-p0 online_shop$ <command>rails generate model phone user_id:integer name:string country_code:string area_code:string number:string</command>
-      invoke  active_record
-      create    db/migrate/20101013105612_create_phones.rb
-      create    app/models/phone.rb
-      invoke    test_unit
-      create      test/unit/phone_test.rb
-      create      test/fixtures/phones.yml
-stefan@swmbp 0 1.9.2-p0 online_shop$</screen></para>
-
-    <para>Die Datenbank anlegen:<screen>stefan@swmbp 0 1.9.2-p0 online_shop$ <command>rake db:migrate</command>
-(in /Users/stefan/online_shop)
-==  CreateUsers: migrating ====================================================
--- create_table(:users)
-   -&gt; 0.0018s
-==  CreateUsers: migrated (0.0019s) ===========================================
-
-==  CreatePhones: migrating ===================================================
--- create_table(:phones)
-   -&gt; 0.0014s
-==  CreatePhones: migrated (0.0015s) ==========================================
-
-stefan@swmbp 0 1.9.2-p0 online_shop$</screen></para>
-
-    <para>Ein <classname>User</classname> kann mehrere Telefonnummern haben
-    (siehe <xref linkend="activerecord_has_many" />). Hier die entsprechende
-    <filename>app/models/user.rb</filename>:<programlisting>class User &lt; ActiveRecord::Base
-  has_many :phones, :dependent =&gt; :destroy
-end</programlisting></para>
-
-    <para>Und natürlich gehört ein <classname>Phone</classname> zu einem
-    <classname>User</classname>. Die entsprechende
-    <filename>app/models/phone.rb</filename>:<programlisting>class Phone &lt; ActiveRecord::Base
-  belongs_to :user
-end</programlisting></para>
-
-    <para>Brauchen wir auch Beispieldaten? Nein, die können wir auf der
-    Console eingeben.</para>
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd shop</command>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
   </section>
 
   <section>
@@ -103,43 +47,44 @@ end</programlisting></para>
     Convention over Configuration!</para>
 
     <para>Ohne jegliche Validierung können wir problemlos einen leeren
-    Datensatz in beiden Modellen anlegen:<screen>stefan@swmbp 0 1.9.2-p0 online_shop$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-ruby-1.9.2-p0 &gt; <command>test1 = User.create</command>
- =&gt; #&lt;User id: 1, login: nil, password_hash: nil, email: nil, firstname: nil, lastname: nil, gender: nil, birthday: nil, created_at: "2010-10-13 11:17:44", updated_at: "2010-10-13 11:17:44"&gt; 
-ruby-1.9.2-p0 &gt; <command>test2 = Phone.create</command>
- =&gt; #&lt;Phone id: 1, user_id: integer, name: nil, country_code: nil, area_code: nil, number: nil, created_at: "2010-10-13 11:17:49", updated_at: "2010-10-13 11:17:49"&gt; 
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 online_shop$</screen></para>
+    Datensatz in beiden Modellen anlegen:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Product.create</command>
+   (0.1ms)  begin transaction
+  SQL (7.9ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Tue, 08 May 2012 14:30:51 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", nil], ["price", nil], ["updated_at", Tue, 08 May 2012 14:30:51 UTC +00:00], ["weight", nil]]
+   (1.0ms)  commit transaction
+ =&gt; #&lt;Product id: 1, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: "2012-05-08 14:30:51", updated_at: "2012-05-08 14:30:51"&gt; 
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
-    <para>Beide Datensätze machen aber in der Realität keinen Sinn. Ein
-    <classname>User</classname> braucht ein <varname>login</varname> und eine
-    Telefonnummer ohne Nummer ist auch sinnfrei. In zeige <xref
+    <para>Dieser Datensatz macht aber in der Realität keinen Sinn. Ein
+    <classname>Product</classname> braucht einen <varname>name</varname> und
+    einen <methodname>price</methodname>. In zeige <xref
     linkend="activerecord_validation" /> ich Ihnen anhand von Beispielen, wie
     Sie für Ihre Applikation die richtigen Validations erarbeiten und sich
     damit langfristig viel Arbeit sparen können.</para>
 
     <para>Ich greife zur Veranschaulichung des Mechanismus mal <xref
     linkend="validates_presence_of" /> vorweg. Bitte füllen Sie Ihre
-    <filename>app/model/user.rb</filename> mit folgendem
-    Inhalt:<programlisting>class User &lt; ActiveRecord::Base
-  has_many :phones, :dependent =&gt; :destroy
-  
-  # Validations
-<emphasis>  validates_presence_of :login
-</emphasis>end
+    <filename>app/model/product.rb</filename> mit folgendem
+    Inhalt:<programlisting>class Product &lt; ActiveRecord::Base
+  attr_accessible :expiration_date, :in_stock, :name, :price, :weight
+
+  validates_presence_of :name
+  validates_presence_of :price
+end
 </programlisting></para>
 
     <para>Jetzt versuchen wir noch mal in der Console einen leeren Datensatz
-    anzulegen:<screen>stefan@swmbp 0 1.9.2-p0 online_shop$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-ruby-1.9.2-p0 &gt; <command>apfelmus = User.create</command>
- =&gt; #&lt;User id: nil, login: nil, password_hash: nil, email: nil, firstname: nil, lastname: nil, gender: nil, birthday: nil, created_at: nil, updated_at: nil&gt; 
-ruby-1.9.2-p0 &gt; <command>apfelmus</command>
- =&gt; #&lt;User id: nil, login: nil, password_hash: nil, email: nil, firstname: nil, lastname: nil, gender: nil, birthday: nil, created_at: nil, updated_at: nil&gt; 
-ruby-1.9.2-p0 &gt; <command>apfelmus.new_record?</command>
+    anzulegen:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>product = Product.create</command>
+   (0.1ms)  begin transaction
+   (0.1ms)  rollback transaction
+ =&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt; 
+1.9.3p194 :002 &gt; <command>product.new_record?</command>
  =&gt; true 
-ruby-1.9.2-p0 &gt; </screen></para>
+1.9.3p194 :003 &gt;  </screen></para>
 
     <para>Obwohl wir mit der Methode <methodname>create</methodname> (siehe
     <xref linkend="activerecord_create" />) einen neuen Datensatz anlegen
@@ -149,37 +94,28 @@ ruby-1.9.2-p0 &gt; </screen></para>
 
     <para>Haben wir Zugriff auf die Fehler? Ja, mit der Methode
     <methodname>errors</methodname> können wir uns die aufgetretenen Fehler
-    anschauen:<screen>ruby-1.9.2-p0 &gt; <command>apfelmus.errors</command>
- =&gt; {:login=&gt;["can't be blank"]} 
-ruby-1.9.2-p0 &gt;</screen></para>
+    anschauen:<screen>1.9.3p194 :003 &gt; <command>product.errors</command>
+ =&gt; #&lt;ActiveModel::Errors:0x007fd90ceefab0 @base=#&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:name=&gt;["can't be blank"], :price=&gt;["can't be blank"]}&gt; 
+1.9.3p194 :004 &gt; <command>product.errors.messages</command>
+ =&gt; {:name=&gt;["can't be blank"], :price=&gt;["can't be blank"]} 
+1.9.3p194 :005 &gt;</screen></para>
 
     <para>Diese Fehlermeldung ist für den menschlichen Benutzer definiert
     (mehr dazu und wie die Fehler ins Deutsche übersetzt werden können in
-    <xref linkend="i18n" />). Wir können aber noch eine Ebene höher gehen und
-    uns mit der Methode <methodname>validators</methodname> alle aktiven
-    Validierungen anschauen:<screen>ruby-1.9.2-p0 &gt; <command>User.validators</command>
- =&gt; [#&lt;ActiveModel::Validations::PresenceValidator:0x00000102b6c530 @attributes=[:login], @options={}&gt;] 
-ruby-1.9.2-p0 &gt;</screen></para>
+    <xref linkend="i18n" />). </para>
 
-    <para>In diesem einfachen Beispiel ist die Ausgabe noch sehr
-    übersichtlich. Aber wenn Sie komplexere Validierungen haben, können Sie
-    sich auch mit <methodname>validators_on</methodname> nur die Regeln für
-    das Attribut <varname>login</varname> anschauen:<screen>ruby-1.9.2-p0 &gt; <command>User.validators_on(:login)</command>
- =&gt; [#&lt;ActiveModel::Validations::PresenceValidator:0x00000102b6c530 @attributes=[:login], @options={}&gt;] 
-ruby-1.9.2-p0 &gt; </screen></para>
-
-    <para>Die Ausgabe <code>ActiveModel::Validations::PresenceValidator</code>
-    zeigt an, das es sich hierbei um einen
-    <classname>PresenceValidator</classname> handelt.</para>
-
-    <para>Erst wenn wir dem Attribute <varname>login</varname> einen Wert
-    zuweisen, können wir das Objekt abspeichern:<screen>ruby-1.9.2-p0 &gt; <command>apfelmus.login = 'apfelmus'</command>
- =&gt; "apfelmus" 
-ruby-1.9.2-p0 &gt; <command>apfelmus.save</command>
+    <para>Erst wenn wir den Attributen <varname>name</varname> und
+    <methodname>price</methodname> einen Wert zuweisen, können wir das Objekt
+    abspeichern:<screen>1.9.3p194 :005 &gt; <command>product.name = 'Milch (1 Liter)'</command>
+ =&gt; "Milch (1 Liter)" 
+1.9.3p194 :006 &gt; <command>product.price = 0.45</command>
+ =&gt; 0.45 
+1.9.3p194 :007 &gt; <command>product.save</command>
+   (2.6ms)  begin transaction
+  SQL (23.8ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Tue, 08 May 2012 15:18:45 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", "Milch (1 Liter)"], ["price", #&lt;BigDecimal:7fd90cc089f0,'0.45E0',9(45)&gt;], ["updated_at", Tue, 08 May 2012 15:18:45 UTC +00:00], ["weight", nil]]
+   (1.1ms)  commit transaction
  =&gt; true 
-ruby-1.9.2-p0 &gt; <command>apfelmus</command>
- =&gt; #&lt;User id: 2, login: "apfelmus", password_hash: nil, email: nil, firstname: nil, lastname: nil, gender: nil, birthday: nil, created_at: "2010-10-13 12:23:16", updated_at: "2010-10-13 12:23:16"&gt; 
-ruby-1.9.2-p0 &gt;</screen></para>
+1.9.3p194 :008 &gt;</screen></para>
 
     <section xml:id="validation_valid">
       <title xml:id="validation_valid.title">valid?</title>
@@ -194,15 +130,11 @@ ruby-1.9.2-p0 &gt;</screen></para>
 
       <para>Die Methode <methodname>valid?</methodname> gibt als Boolean aus,
       ob ein Objekt valide ist. So kann man schon vor dem eigentlichem
-      Abspeichern eine entsprechende Kontrolle machen:<screen>ruby-1.9.2-p0 &gt; <command>pflaumenmus = User.new</command>
- =&gt; #&lt;User id: nil, login: nil, password_hash: nil, email: nil, firstname: nil, lastname: nil, gender: nil, birthday: nil, created_at: nil, updated_at: nil&gt; 
-ruby-1.9.2-p0 &gt; <command>pflaumenmus.valid?</command>
+      Abspeichern eine entsprechende Kontrolle machen:<screen>1.9.3p194 :008 &gt; <command>product = Product.new</command>
+ =&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt; 
+1.9.3p194 :009 &gt; <command>product.valid?</command>
  =&gt; false 
-ruby-1.9.2-p0 &gt; <command>pflaumenmus.login = 'pflaumenmus'</command>
- =&gt; "pflaumenmus" 
-ruby-1.9.2-p0 &gt; <command>pflaumenmus.valid?</command>
- =&gt; true 
-ruby-1.9.2-p0 &gt;</screen></para>
+1.9.3p194 :010 &gt;</screen></para>
     </section>
 
     <section xml:id="validation_save_validate_false">
@@ -220,17 +152,21 @@ ruby-1.9.2-p0 &gt;</screen></para>
       <para>Wie so oft im Leben kann man auch hier alles umgehen. Wenn man der
       Methode <methodname>save</methodname> als Parameter <code>:validate
       =&gt; false</code> mitgibt, dann wird der Datensatz von
-      <code>Validation</code> abgespeichert:<screen>ruby-1.9.2-p0 &gt; <command>egon = User.new</command>
- =&gt; #&lt;User id: nil, login: nil, password_hash: nil, email: nil, firstname: nil, lastname: nil, gender: nil, birthday: nil, created_at: nil, updated_at: nil&gt; 
-ruby-1.9.2-p0 &gt; <command>egon.save</command>
+      <code>Validation</code> abgespeichert:<screen>1.9.3p194 :010 &gt; <command>product = Product.new</command>
+ =&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt; 
+1.9.3p194 :011 &gt; <command>product.save</command>
+   (0.1ms)  begin transaction
+   (0.1ms)  rollback transaction
  =&gt; false 
-ruby-1.9.2-p0 &gt; <command>egon.valid?</command>
+1.9.3p194 :012 &gt; <command>product.valid?</command>
  =&gt; false 
-ruby-1.9.2-p0 &gt; <command>egon.save(:validate =&gt; false)</command>
+1.9.3p194 :013 &gt; <command>product.save(:validate =&gt; false)</command>
+   (0.1ms)  begin transaction
+  SQL (0.6ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Tue, 08 May 2012 15:20:44 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", nil], ["price", nil], ["updated_at", Tue, 08 May 2012 15:20:44 UTC +00:00], ["weight", nil]]
+   (3.5ms)  commit transaction
  =&gt; true 
-ruby-1.9.2-p0 &gt; <command>egon</command>
- =&gt; #&lt;User id: 3, login: nil, password_hash: nil, email: nil, firstname: nil, lastname: nil, gender: nil, birthday: nil, created_at: "2010-10-13 12:32:33", updated_at: "2010-10-13 12:32:33"&gt; 
-ruby-1.9.2-p0 &gt; </screen></para>
+1.9.3p194 :014 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
       <warning>
         <para>Ich gehe davon aus, dass Sie die hier auftauchende Problematik
@@ -252,51 +188,40 @@ ruby-1.9.2-p0 &gt; </screen></para>
       <tertiary>validates_presence_of()</tertiary>
     </indexterm>
 
-    <para>In unseren beiden Modellen <varname>users</varname> und
-    <varname>phones</varname> gibt es ein paar Felder die auf jeden Fall
-    ausgefüllt werden müssen. Das erreichen wir mit
+    <para>In unserem Model <varname>product</varname> gibt es ein paar Felder
+    die auf jeden Fall ausgefüllt werden müssen. Das erreichen wir mit
     <methodname>validates_presence_of</methodname>.</para>
 
-    <para><filename>app/models/user.rb</filename><programlisting>class User &lt; ActiveRecord::Base
-  has_many :phones, :dependent =&gt; :destroy
-  
-  # Validations
-<emphasis>  validates_presence_of :login, :email, :lastname, :gender, :birthday
-</emphasis>end
-</programlisting></para>
+    <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
+  attr_accessible :expiration_date, :in_stock, :name, :price, :weight
 
-    <para><filename>app/models/phone.rb</filename><programlisting>class Phone &lt; ActiveRecord::Base
-  belongs_to :user
-
-  # Validations
-<emphasis>  validates_presence_of :country_code, :area_code, :number
-</emphasis>end</programlisting></para>
+<emphasis>  validates_presence_of :name
+  validates_presence_of :price</emphasis>
+end</programlisting></para>
 
     <para>Wenn wir damit einen leeren User Datensatz anlegen wollen, bekommen
-    wir massig Validierungsfehler:<screen>stefan@swmbp 0 1.9.2-p0 online_shop$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-ruby-1.9.2-p0 &gt; <command>egon = User.create</command>
- =&gt; #&lt;User id: nil, login: nil, password_hash: nil, email: nil, firstname: nil, lastname: nil, gender: nil, birthday: nil, created_at: nil, updated_at: nil&gt; 
-ruby-1.9.2-p0 &gt; <command>egon.errors</command>
- =&gt; {:login=&gt;["can't be blank"], :email=&gt;["can't be blank"], :lastname=&gt;["can't be blank"], :gender=&gt;["can't be blank"], :birthday=&gt;["can't be blank"]} 
-ruby-1.9.2-p0 &gt;</screen></para>
+    wir massig Validierungsfehler:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>product = Product.create</command>
+   (0.1ms)  begin transaction
+   (0.1ms)  rollback transaction
+ =&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt; 
+1.9.3p194 :002 &gt; p<command>roduct.errors</command>
+ =&gt; #&lt;ActiveModel::Errors:0x007ffe9189e0d0 @base=#&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:name=&gt;["can't be blank"], :price=&gt;["can't be blank"]}&gt; 
+1.9.3p194 :003 &gt;</screen></para>
 
     <para>Erst wenn wir alle Angaben gemacht haben, kann der Datensatz
-    gespeichert werden:<screen>ruby-1.9.2-p0 &gt; <command>egon.login = 'egon'</command>
- =&gt; "egon" 
-ruby-1.9.2-p0 &gt; <command>egon.email = 'egon@company.com'</command>
- =&gt; "egon@company.com" 
-ruby-1.9.2-p0 &gt; <command>egon.lastname = 'Meier'</command>
- =&gt; "Meier" 
-ruby-1.9.2-p0 &gt; <command>egon.gender = 'male'</command>
- =&gt; "male" 
-ruby-1.9.2-p0 &gt; <command>egon.birthday = Date.today - 20.years</command>
- =&gt; Sat, 13 Oct 1990 
-ruby-1.9.2-p0 &gt; <command>egon.save</command>
+    gespeichert werden:<screen>1.9.3p194 :003 &gt; <command>product.name = 'Milch (1 Liter)'</command>
+ =&gt; "Milch (1 Liter)" 
+1.9.3p194 :004 &gt; <command>product.price = 0.45</command>
+ =&gt; 0.45 
+1.9.3p194 :005 &gt; <command>product.save</command>
+   (0.1ms)  begin transaction
+  SQL (5.2ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Tue, 08 May 2012 15:25:22 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", "Milch (1 Liter)"], ["price", #&lt;BigDecimal:7ffe91a2d270,'0.45E0',9(45)&gt;], ["updated_at", Tue, 08 May 2012 15:25:22 UTC +00:00], ["weight", nil]]
+   (3.9ms)  commit transaction
  =&gt; true 
-ruby-1.9.2-p0 &gt; <command>egon</command>
- =&gt; #&lt;User id: 4, login: "egon", password_hash: nil, email: "egon@company.com", firstname: nil, lastname: "Meier", gender: "male", birthday: "1990-10-13", created_at: "2010-10-13 20:02:18", updated_at: "2010-10-13 20:02:18"&gt; 
-ruby-1.9.2-p0 &gt; </screen></para>
+1.9.3p194 :006 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
     <section xml:id="validates_presence_of_optionen">
       <title xml:id="validates_presence_of_optionen.title">Optionen</title>
@@ -371,36 +296,27 @@ ruby-1.9.2-p0 &gt; </screen></para>
     Länge eines bestimmten Attributes eingrenzen. Erklärt sich am Beispiel am
     einfachsten.</para>
 
-    <para><filename>app/models/user.rb</filename><programlisting>class User &lt; ActiveRecord::Base
-  has_many :phones, :dependent =&gt; :destroy
-  
-  # Validations
-  validates_presence_of :login, :email, :lastname, :gender, :birthday
-  
-<emphasis>  validates_length_of :login, :within =&gt; 3..20
-  validates_length_of :email, :within =&gt; 6..255
-  validates_length_of :lastname, :minimum =&gt; 2
-</emphasis>end
-</programlisting></para>
+    <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
+  attr_accessible :expiration_date, :in_stock, :name, :price, :weight
 
-    <para><filename>app/models/phone.rb</filename><programlisting>class Phone &lt; ActiveRecord::Base
-  belongs_to :user
+  validates_presence_of :name
+  validates_presence_of :price
 
-  # Validations
-  validates_presence_of :country_code, :area_code, :number
-  
-<emphasis>  validates_length_of :country_code, :within =&gt; 1..3
-  validates_length_of :area_code, :within =&gt; 2..5
-  validates_length_of :number, :minimum =&gt; 3
-</emphasis>end</programlisting></para>
+  <emphasis>validates_length_of :name, :within =&gt; 2..255</emphasis>
+end</programlisting></para>
 
-    <para>Wenn wir jetzt einen <classname>User</classname> mit einem
-    <methodname>login</methodname> aus einem oder zwei Buchstaben abspeichern
-    wollen, dann bekommen wir einen Fehler aufgezeigt:<screen>ruby-1.9.2-p0 &gt; <command>ed = User.create(:login =&gt; 'ed', :email =&gt; 'ed@company.com', :lastname =&gt; 'Steinbruch', :gender =&gt; 'male', :birthday =&gt; Date.today - 23.years)</command>
- =&gt; #&lt;User id: nil, login: "ed", password_hash: nil, email: "ed@company.com", firstname: nil, lastname: "Steinbruch", gender: "male", birthday: "1987-10-13", created_at: nil, updated_at: nil&gt; 
-ruby-1.9.2-p0 &gt; <command>ed.errors</command>
- =&gt; {:login=&gt;["is too short (minimum is 3 characters)"]} 
-ruby-1.9.2-p0 &gt;</screen></para>
+    <para>Wenn wir jetzt einen <classname>Product</classname> mit einem
+    <methodname>name</methodname> aus einem Buchstaben abspeichern wollen,
+    dann bekommen wir einen Fehler aufgezeigt:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>product = Product.create(:name =&gt; 'M', :price =&gt; 0.45)</command>
+   (0.1ms)  begin transaction
+   (0.1ms)  rollback transaction
+ =&gt; #&lt;Product id: nil, name: "M", price: #&lt;BigDecimal:7fd6ad8cec28,'0.45E0',9(45)&gt;, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt; 
+1.9.3p194 :002 &gt; <command>product.errors</command>
+ =&gt; #&lt;ActiveModel::Errors:0x007fd6ad88fe38 @base=#&lt;Product id: nil, name: "M", price: #&lt;BigDecimal:7fd6ad8d19c8,'0.45E0',9(45)&gt;, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:name=&gt;["is too short (minimum is 2 characters)"]}&gt; 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
     <section xml:id="validates_length_of_optionen">
       <title xml:id="validates_length_of_optionen.title">Optionen</title>
@@ -557,41 +473,35 @@ ruby-1.9.2-p0 &gt;</screen></para>
     überprüfen, ob ein Attributes eine Zahl ist. Erklärt sich am Beispiel am
     einfachsten.</para>
 
-    <para><filename>app/models/phone.rb</filename><programlisting>class Phone &lt; ActiveRecord::Base
-  belongs_to :user
+    <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
+  attr_accessible :expiration_date, :in_stock, :name, :price, :weight
 
-  # Validations
-  validates_presence_of :country_code, :area_code, :number
-  
-  validates_length_of :country_code, :within =&gt; 1..3
-  validates_length_of :area_code, :within =&gt; 2..5
-  validates_length_of :number, :minimum =&gt; 3
-  
-<emphasis>  validates_numericality_of :country_code, 
-                            :only_integer =&gt; true, 
-                            :greater_than_or_equal_to =&gt; 1,
-                            :less_than_or_equal_to =&gt; 99
-  validates_numericality_of [:area_code, :number], :only_integer =&gt; true
-</emphasis>end
-</programlisting></para>
+  validates_presence_of :name
+  validates_presence_of :price
 
-    <para>Wenn wir jetzt die Telefonnummer die nicht aus Zahlen, sondern auch
-    aus Zeichen besteht, bekommen wir einen Fehler angezeigt:<screen>stefan@swmbp 0 1.9.2-p0 online_shop$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-ruby-1.9.2-p0 &gt; <command>home_number = Phone.create(:country_code =&gt; '+49', :area_code =&gt; '30', :number =&gt; '88888-88')</command>
- =&gt; #&lt;Phone id: nil, name: nil, country_code: "+49", area_code: "30", number: "88888-88", created_at: nil, updated_at: nil&gt; 
-ruby-1.9.2-p0 &gt; <command>home_number.save</command>
- =&gt; false 
-ruby-1.9.2-p0 &gt; <command>home_number.errors</command>
- =&gt; {:number=&gt;["is not a number"]} 
-ruby-1.9.2-p0 &gt; </screen></para>
+  validates_length_of :name, :within =&gt; 2..255
 
-    <note>
-      <para>Obwohl die Attribute von Phone alle als String definiert sind,
-      können wir trotzdem mit
-      <methodname>validates_numericality_of</methodname> den Inhalt auf
-      Integers festlegen.</para>
-    </note>
+<emphasis>  validates_numericality_of :weight</emphasis>
+end</programlisting></para>
+
+    <para>Wenn wir jetzt das Gewicht (<varname>weight</varname>) die nicht aus
+    Zahlen, sondern auch aus Zeichen besteht, bekommen wir einen Fehler
+    angezeigt:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>product = Product.create(:name =&gt; 'Milch (1 Liter)', :price =&gt; 0.45, :weight =&gt; 'abc')</command>
+   (0.1ms)  begin transaction
+   (0.1ms)  rollback transaction
+ =&gt; #&lt;Product id: nil, name: "Milch (1 Liter)", price: #&lt;BigDecimal:7f8594def848,'0.45E0',9(45)&gt;, weight: 0, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt; 
+1.9.3p194 :002 &gt; <command>product.errors</command>
+ =&gt; #&lt;ActiveModel::Errors:0x007f8594ba3878 @base=#&lt;Product id: nil, name: "Milch (1 Liter)", price: #&lt;BigDecimal:7f8594df3588,'0.45E0',9(45)&gt;, weight: 0, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:weight=&gt;["is not a number"]}&gt; 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+
+    <tip>
+      <para>Auch wenn ein Attribute in der Datenbank ans String abgelegt wird,
+      kann man mit <methodname>validates_numericality_of</methodname> den
+      Inhalt auf Integers festlegen.</para>
+    </tip>
 
     <section xml:id="validates_numericality_of_optionen">
       <title
@@ -752,44 +662,50 @@ ruby-1.9.2-p0 &gt; </screen></para>
     <para>Mit <methodname>validates_uniqueness_of</methodname> können Sie
     definieren, dass der Wert dieses Attribut einzigartig in der Datenbank
     ist. Ein Klassiker dafür sind Accounts. Da sollte man immer sicher
-    stellen, das ein Account nicht doppelt vorhanden ist.. Erklärt sich am
+    stellen, das ein Account nicht doppelt vorhanden ist. Erklärt sich am
     Beispiel am einfachsten.</para>
 
-    <para><filename>app/models/user.rb</filename><programlisting>class User &lt; ActiveRecord::Base
-  has_many :phones, :dependent =&gt; :destroy
-  
-  # Validations
-  validates_presence_of :login, :email, :lastname, :gender, :birthday
-  
-  validates_length_of :login, :within =&gt; 3..20
-  validates_length_of :email, :within =&gt; 6..255
-  validates_length_of :lastname, :minimum =&gt; 2
-  
-<emphasis>  validates_uniqueness_of :login, :email
-</emphasis>end
-</programlisting></para>
+    <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
+  attr_accessible :expiration_date, :in_stock, :name, :price, :weight
 
-    <para>Wenn wir jetzt einen <classname>User</classname> mit einem schon
-    existierenden <methodname>login</methodname> einrichten wollen, bekommen
-    wir einen Fehler ausgegeben:<screen>ruby-1.9.2-p0 &gt; <command>ted = User.create(:login =&gt; 'ted', :email =&gt; 'ted@company.com', :lastname =&gt; 'Steinbruch', :gender =&gt; 'male', :birthday =&gt; Date.today - 23.years)</command>
- =&gt; #&lt;User id: 1, login: "ted", password_hash: nil, email: "ted@company.com", firstname: nil, lastname: "Steinbruch", gender: "male", birthday: "1987-10-14", created_at: "2010-10-14 06:24:54", updated_at: "2010-10-14 06:24:54"&gt; 
-ruby-1.9.2-p0 &gt; <command>ted2 = User.create(:login =&gt; 'ted', :email =&gt; 'ted@company.com', :lastname =&gt; 'Steinbruch', :gender =&gt; 'male', :birthday =&gt; Date.today - 23.years)</command>
- =&gt; #&lt;User id: nil, login: "ted", password_hash: nil, email: "ted@company.com", firstname: nil, lastname: "Steinbruch", gender: "male", birthday: "1987-10-14", created_at: nil, updated_at: nil&gt; 
-ruby-1.9.2-p0 &gt; <command>ted2.valid?</command>
- =&gt; false 
-ruby-1.9.2-p0 &gt; <command>ted2.errors</command>
- =&gt; {:login=&gt;["has already been taken"], :email=&gt;["has already been taken"]} 
-ruby-1.9.2-p0 &gt;</screen></para>
+  validates_presence_of :name
+  validates_presence_of :price
+
+  validates_length_of :name, :within =&gt; 2..255
+
+  validates_numericality_of :weight
+
+  <emphasis>validates_uniqueness_of :name</emphasis>
+end</programlisting></para>
+
+    <para>Wenn wir jetzt ein neues <classname>Product</classname> mit einem
+    schon existierenden <methodname>name</methodname> einrichten wollen,
+    bekommen wir einen Fehler ausgegeben:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Product.last</command>
+  Product Load (0.2ms)  SELECT "products".* FROM "products" ORDER BY "products"."id" DESC LIMIT 1
+ =&gt; #&lt;Product id: 4, name: "Milch (1 Liter)", price: #&lt;BigDecimal:7fc6e9695160,'0.45E0',9(45)&gt;, weight: nil, in_stock: nil, expiration_date: nil, created_at: "2012-05-08 15:25:22", updated_at: "2012-05-08 15:25:22"&gt; 
+1.9.3p194 :002 &gt; <command>product = Product.create(:name =&gt; 'Milch (1 Liter)', :price =&gt; 0.45, :weight =&gt; 1000)</command>
+   (0.1ms)  begin transaction
+  Product Exists (0.2ms)  SELECT 1 FROM "products" WHERE "products"."name" = 'Milch (1 Liter)' LIMIT 1
+   (0.1ms)  rollback transaction
+ =&gt; #&lt;Product id: nil, name: "Milch (1 Liter)", price: #&lt;BigDecimal:7fc6e9f7cb70,'0.45E0',9(45)&gt;, weight: 1000, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt; 
+1.9.3p194 :003 &gt; <command>product.errors</command>
+ =&gt; #&lt;ActiveModel::Errors:0x007fc6e9432300 @base=#&lt;Product id: nil, name: "Milch (1 Liter)", price: #&lt;BigDecimal:7fc6e9b09250,'0.45E0',9(45)&gt;, weight: 1000, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:name=&gt;["has already been taken"]}&gt; 
+1.9.3p194 :004 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
     <warning>
-      <para>Die Validierung mit validates_uniqueness_of ist kein absoluter
+      <para>Die Validierung mit
+      <methodname>validates_uniqueness_of</methodname> ist kein absoluter
       Garant für eine echte Einzigartigkeit des Attributes in der Datenbank.
       Es kann dabei zu einer Race-Condition kommen (siehe <uri
       xlink:href="http://de.wikipedia.org/wiki/Race_Condition">http://de.wikipedia.org/wiki/Race_Condition</uri>).
       Die detaillierte Diskussion dieses Effektes übersteigt allerdings die
       Tiefe eines Einsteigerbuches (es handelt sich um ein sehr seltenes
       Phänomen). Wenn Sie sich für diese Problematik interessieren, schauen
-      Sie bitte einmal in die Doku von validates_uniqueness_of (<command>ri
+      Sie bitte einmal in die Doku von
+      <methodname>validates_uniqueness_of</methodname> (<command>ri
       validates_uniqueness_of</command>). Dort werden Möglichkeiten
       aufgelistet, wie man dieses Problem lösen kann.</para>
     </warning>
@@ -891,31 +807,36 @@ ruby-1.9.2-p0 &gt;</screen></para>
     werden kann. Bei unserem Beispiel können wir das am Attribute
     <methodname>gender</methodname> veranschaulischen.</para>
 
-    <para><filename>app/models/user.rb</filename><programlisting>class User &lt; ActiveRecord::Base
-  has_many :phones, :dependent =&gt; :destroy
-  
-  # Validations
-  validates_presence_of :login, :email, :lastname, :gender, :birthday
-  
-  validates_length_of :login, :within =&gt; 3..20
-  validates_length_of :email, :within =&gt; 6..255
-  validates_length_of :lastname, :minimum =&gt; 2
-  
-  validates_uniqueness_of :login, :email
-  
-<emphasis>  validates_inclusion_of :gender, :in =&gt; %w( male female )
-</emphasis>end</programlisting></para>
+    <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
+  attr_accessible :expiration_date, :in_stock, :name, :price, :weight
 
-    <para>In unserem Datenmodel muss ein <classname>User</classname> als
-    <methodname>gender</methodname> entweder "male" (männlich) oder "female"
-    (weiblich) sein. Wenn wir einen anderen Wert als "male" oder "female"
-    eingeben, wird ein Validation-Fehler gemeldet:<screen>ruby-1.9.2-p0 &gt; <command>liz = User.create(:login =&gt; 'liz', :email =&gt; 'liz@company.com', :lastname =&gt; 'Steinbruch', :gender =&gt; 'weiblich', :birthday =&gt; Date.today - 23.years)</command>
- =&gt; #&lt;User id: nil, login: "liz", password_hash: nil, email: "liz@company.com", firstname: nil, lastname: "Steinbruch", gender: "weiblich", birthday: "1987-10-14", created_at: nil, updated_at: nil&gt; 
-ruby-1.9.2-p0 &gt; <command>liz.valid?</command>
- =&gt; false 
-ruby-1.9.2-p0 &gt; <command>liz.errors</command>
- =&gt; {:gender=&gt;["is not included in the list"]} 
-ruby-1.9.2-p0 &gt;</screen></para>
+  validates_presence_of :name
+  validates_presence_of :price
+
+  validates_length_of :name, :within =&gt; 2..255
+
+  validates_numericality_of :weight
+
+  validates_uniqueness_of :name
+
+  <emphasis>validates_inclusion_of :in_stock, :in =&gt; [true, false]</emphasis>
+end</programlisting></para>
+
+    <para>In unserem Datenmodel muss ein <classname>Product</classname> als
+    <methodname>in_stock</methodname> entweder <code>true</code> oder
+    <code>false</code> sein (es darf also kein nil geben). Wenn wir einen
+    anderen Wert als <code>true</code> oder <code>false</code> eingeben, wird
+    ein Validation-Fehler gemeldet:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>product = Product.create(:name =&gt; 'Milch fettarm (1 Liter)', :price =&gt; 0.45, :weight =&gt; 1000)</command>
+   (0.1ms)  begin transaction
+  Product Exists (0.2ms)  SELECT 1 FROM "products" WHERE "products"."name" = 'Milch fettarm (1 Liter)' LIMIT 1
+   (0.1ms)  rollback transaction
+ =&gt; #&lt;Product id: nil, name: "Milch fettarm (1 Liter)", price: #&lt;BigDecimal:7fd125470f38,'0.45E0',9(45)&gt;, weight: 1000, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt; 
+1.9.3p194 :002 &gt; <command>product.errors</command>
+ =&gt; #&lt;ActiveModel::Errors:0x007fd12513a648 @base=#&lt;Product id: nil, name: "Milch fettarm (1 Liter)", price: #&lt;BigDecimal:7fd125475bf0,'0.45E0',9(45)&gt;, weight: 1000, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:in_stock=&gt;["is not included in the list"]}&gt; 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
     <tip>
       <para>Denken Sie immer an die Macht von Ruby! Sie können so z.B. das
@@ -1007,36 +928,26 @@ validates_inclusion_of :age, :in =&gt; 18..105
       <tertiary>validates_exclusion_of()</tertiary>
     </indexterm>
 
-    <para>Mit <methodname>validates_exclusion_of</methodname> können Sie
-    definieren, aus welchen Werten der Inhalt dieses Attributes nicht erstellt
-    werden darf. Bei unserem Beispiel können wir das am Attribute
-    <methodname>login</methodname> veranschaulischen.</para>
+    <para><methodname>validates_exclusion_of</methodname> ist die Umkehrung
+    von <xref linkend="validates_inclusion_of" />. Sie können definieren, aus
+    welchen Werten der Inhalt dieses Attributes nicht erstellt werden darf.
+    </para>
 
-    <para><filename>app/models/user.rb</filename><programlisting>class User &lt; ActiveRecord::Base
-  has_many :phones, :dependent =&gt; :destroy
-  
-  # Validations
-  validates_presence_of :login, :email, :lastname, :gender, :birthday
-  
-  validates_length_of :login, :within =&gt; 3..20
-  validates_length_of :email, :within =&gt; 6..255
-  validates_length_of :lastname, :minimum =&gt; 2
-  
-  validates_uniqueness_of :login, :email
-  
-  validates_inclusion_of :gender, :in =&gt; %w( male female )
-<emphasis>  validates_exclusion_of :login, :in =&gt; %w( admin sysadmin administrator root )
-</emphasis>end</programlisting></para>
+    <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
+  attr_accessible :expiration_date, :in_stock, :name, :price, :weight
 
-    <para>Wir gehen dabei davon aus, das z.B. "admin" kein
-    <methodname>login</methodname> sein darf. Falls das doch versucht wird,
-    wird ein Validation-Fehler gemeldet:<screen>ruby-1.9.2-p0 &gt; <command>admin = User.create(:login =&gt; 'admin', :email =&gt; 'admin@company.com', :lastname =&gt; 'Master', :gender =&gt; 'male', :birthday =&gt; Date.today - 23.years)</command>
- =&gt; #&lt;User id: nil, login: "admin", password_hash: nil, email: "admin@company.com", firstname: nil, lastname: "Master", gender: "male", birthday: "1987-10-14", created_at: nil, updated_at: nil&gt; 
-ruby-1.9.2-p0 &gt; <command>admin.valid?</command>
- =&gt; false 
-ruby-1.9.2-p0 &gt; <command>admin.errors</command>
- =&gt; {:login=&gt;["is reserved"]} 
-ruby-1.9.2-p0 &gt; </screen></para>
+  validates_presence_of :name
+  validates_presence_of :price
+
+  validates_length_of :name, :within =&gt; 2..255
+
+  validates_numericality_of :weight
+
+  validates_uniqueness_of :name
+
+  validates_inclusion_of :in_stock, :in =&gt; [true, false]
+  <emphasis>validates_exclusion_of :in_stock, :in =&gt; [nil]</emphasis>
+end</programlisting></para>
 
     <tip>
       <para>Denken Sie immer an die Macht von Ruby! Sie können so z.B. das
@@ -1132,34 +1043,15 @@ validates_exclusion_of :age, :in =&gt; 0..17
     xlink:href="http://de.wikipedia.org/wiki/Regul%C3%A4rer_Ausdruck">http://de.wikipedia.org/wiki/Regulärer_Ausdruck</uri>)
     definieren wie sich der Inhalt eines Attributes aufbauen darf.</para>
 
-    <para><filename>app/models/user.rb</filename><programlisting>class User &lt; ActiveRecord::Base
-  has_many :phones, :dependent =&gt; :destroy
-  
-  # Validations
-  validates_presence_of :login, :email, :lastname, :gender, :birthday
-  
-  validates_length_of :login, :within =&gt; 3..20
-  validates_length_of :email, :within =&gt; 6..255
-  validates_length_of :lastname, :minimum =&gt; 2
-  
-  validates_uniqueness_of :login, :email
-  
-  validates_inclusion_of :gender, :in =&gt; %w( male female )
-  validates_exclusion_of :login, :in =&gt; %w( admin sysadmin administrator root )
-  
-<emphasis>  validates_format_of :email, :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
-</emphasis>end</programlisting></para>
+    <para>Mit <methodname>validates_format_of</methodname> kann man z.B. eine
+    einfache Validierung der Syntax einer E-Mail Adresse machen:</para>
+
+    <para><programlisting><emphasis>validates_format_of :email, :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
+</emphasis></programlisting></para>
 
     <para>Diese einfache Validierung einer E-Mail-Adresse auf syntaktische
     Korrektheit habe ich aus <command>ri validates_format_of</command>
-    übernommen. Falls eine syntaktisch nicht korrekte E-Mail-Adresse
-    eingegeben wird, kommt es zu einem Validation-Fehler:<screen>ruby-1.9.2-p0 &gt; <command>ingo = User.create(:login =&gt; 'ingo', :email =&gt; '@company.', :lastname =&gt; 'Udelhoven', :gender =&gt; 'male', :birthday =&gt; Date.today - 23.years)</command>
-  =&gt; #&lt;User id: nil, login: "ingo", password_hash: nil, email: "@company.", firstname: nil, lastname: "Udelhoven", gender: "male", birthday: "1987-10-14", created_at: nil, updated_at: nil&gt; 
-ruby-1.9.2-p0 &gt; <command>ingo.valid?</command>
- =&gt; false 
-ruby-1.9.2-p0 &gt; <command>ingo.errors</command>
- =&gt; {:email=&gt;["is invalid"]} 
-ruby-1.9.2-p0 &gt; </screen></para>
+    übernommen.</para>
 
     <warning>
       <para>Es sollte klar sein, dass die hier gezeigte
@@ -1252,58 +1144,44 @@ ruby-1.9.2-p0 &gt; </screen></para>
 
     <para>Mit der Methode <methodname>validates</methodname> können Sie ab
     Rails 3 ebenfalls alle Validierungen vornehmen. Ich zeige Ihnen mal den
-    Unterschied an der app/models/user.rb<itemizedlist>
+    Unterschied an der <filename>app/models/product.rb</filename><itemizedlist>
         <listitem>
           <para>Traditionell</para>
 
-          <para><filename>app/models/user.rb</filename><programlisting>class User &lt; ActiveRecord::Base
-  has_many :phones, :dependent =&gt; :destroy
-  
-  # Validations
-  validates_presence_of :login, :email, :lastname, :gender, :birthday
-  
-  validates_length_of :login, :within =&gt; 3..20
-  validates_length_of :email, :within =&gt; 6..255
-  validates_length_of :lastname, :minimum =&gt; 2
-  
-  validates_uniqueness_of :login, :email
-  
-  validates_inclusion_of :gender, :in =&gt; %w( male female )
-  validates_exclusion_of :login, :in =&gt; %w( admin sysadmin administrator root )
-  
-<emphasis><emphasis>  validates_format_of :email, :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
-</emphasis></emphasis>end</programlisting></para>
+          <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
+  attr_accessible :expiration_date, :in_stock, :name, :price, :weight
+
+  validates_presence_of :name
+  validates_presence_of :price
+
+  validates_length_of :name, :within =&gt; 2..255
+
+  validates_numericality_of :weight
+
+  validates_uniqueness_of :name
+
+  validates_inclusion_of :in_stock, :in =&gt; [true, false]
+end</programlisting></para>
         </listitem>
 
         <listitem>
           <para>mit <methodname>validates</methodname></para>
 
-          <para><filename>app/models/user.rb</filename><programlisting>class User &lt; ActiveRecord::Base
-  has_many :phones, :dependent =&gt; :destroy
-  
-  # Validations
-  validates :login,
+          <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
+  attr_accessible :expiration_date, :in_stock, :name, :price, :weight
+
+  validates :name,
             :presence =&gt; true,
             :uniqueness =&gt; true,
-            :length =&gt; { :within =&gt; 3..20 }
-            :exclusion =&gt; %w( admin sysadmin administrator root )
+            :length =&gt; { :within =&gt; 2..255 }
 
-  validates :email,
-            :presence =&gt; true,
-            :uniqueness =&gt; true,
-            :format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i },
-            :length =&gt; { :within =&gt; 6..255 }
+  validates :price, :presence =&gt; true
 
-  validates :lastname,
-            :presence =&gt; true,
-            :length =&gt; { :minimum =&gt; 2 }
+  validates :weight, :numericality =&gt; true
 
-  validates :gender,
+  validates :in_stock,
             :presence =&gt; true,
-            :inclusion =&gt; %w( male female )
-  
-  validates :birthday,
-            :presence =&gt; true
+            :inclusion =&gt; [true, false]
 end</programlisting></para>
         </listitem>
       </itemizedlist></para>
@@ -1317,5 +1195,4 @@ end</programlisting></para>
       validates</command> auf der Kommandozeile aufrufen.</para>
     </section>
   </section>
-
 </section>
