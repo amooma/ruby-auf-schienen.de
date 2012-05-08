@@ -11,8 +11,31 @@
 
   <para>Es gibt die Methoden <methodname>destroy</methodname> und
   <methodname>delete</methodname>, um Datensätze zu löschen. Diese Wortwahl
-  empfinde ich als reichlich schwierig. Ich muss oft selber nachschlagen, um
-  sicher zu sein, welche Methode was macht.</para>
+  und den damit einhergehenden Unterschieden empfinde ich für deutschsprachige
+  Anfänger als schwierig. Aber mit der Zeit gewöhnt man sich dran.</para>
+
+  <para>Als Beispiel benutzen wir folgende Rails-Applikation:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new bookshelf</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd bookshelf</command> 
+Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails generate model book title</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails generate model author book_id:integer first_name last_name</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rake db:migrate</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
+
+  <para><filename>app/models/book.rb</filename><programlisting>class Book &lt; ActiveRecord::Base
+  attr_accessible :title
+
+  has_many :authors, :dependent =&gt; :destroy
+end</programlisting></para>
+
+  <para><filename>app/models/author.rb</filename><programlisting>class Author &lt; ActiveRecord::Base
+  attr_accessible :book_id, :first_name, :last_name
+
+  belongs_to :book
+end</programlisting></para>
 
   <section xml:id="activerecord_destroy">
     <title xml:id="activerecord_destroy.title">destroy</title>
@@ -30,103 +53,97 @@
     B. <code>:dependent =&gt; :destroy</code> in <xref
     linkend="activerecord_1n_optionen" />). Vereinfacht kann man sagen: Lieber
     <methodname>destroy</methodname> nehmen; das ist sicherer, weil das
-    Rails-System dann mehr mitdenkt.<important>
-        <para>Die Instanz wird nach dem Löschen des Datenbankfeldes
-        <foreignphrase xml:lang="en">frozen</foreignphrase> (eingefroren). Sie
-        ist also noch da, kann aber nicht verändert werden.</para>
-      </important></para>
+    Rails-System dann mehr mitdenkt.</para>
 
-    <para>Für die Beispiele brauchen wir wieder definierte Daten. Deshalb
-    füllen Sie die Datei <filename>db/seeds.rb</filename> mit folgendem
-    Inhalt:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
-#   Mayor.create(:name =&gt; 'Daley', :city =&gt; cities.first)
+    <para>Legen wir einmal einen Datensatz an und löschen ihn danach
+    wieder:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>book = Book.create(:title =&gt; 'Homo faber')</command>
+   (0.1ms)  begin transaction
+  SQL (6.2ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 08 May 2012 08:10:58 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 08 May 2012 08:10:58 UTC +00:00]]
+   (1.3ms)  commit transaction
+ =&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-08 08:10:58", updated_at: "2012-05-08 08:10:58"&gt; 
+1.9.3p194 :002 &gt; <command>Book.all</command>
+  Book Load (0.3ms)  SELECT "books".* FROM "books" 
+ =&gt; [#&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-08 08:10:58", updated_at: "2012-05-08 08:10:58"&gt;] 
+1.9.3p194 :003 &gt; <command>book.destroy</command>
+   (0.1ms)  begin transaction
+  Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 1
+  SQL (0.3ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 1]]
+   (1.1ms)  commit transaction
+ =&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-08 08:10:58", updated_at: "2012-05-08 08:10:58"&gt; 
+1.9.3p194 :004 &gt; <command>Book.all</command>
+  Book Load (0.3ms)  SELECT "books".* FROM "books" 
+ =&gt; [] 
+1.9.3p194 :005 &gt;</screen></para>
 
-Person.create(:firstname =&gt; 'Fritz', :lastname =&gt; 'Meier').phonenumbers.create([
-             {:name =&gt; 'Mobile', :number =&gt; '0171-12345678'}, 
-             {:name =&gt; 'Office', :number =&gt; '030-7777777'}, 
-             {:name =&gt; 'Home', :number =&gt; '030-8888888'}])
-Person.create(:firstname =&gt; 'Ute', :lastname =&gt; 'Meier').phonenumbers.create([
-             {:name =&gt; 'Home', :number =&gt; '030-8888888'}])
-Person.create(:firstname =&gt; 'Horst', :lastname =&gt; 'Apfelmus').phonenumbers.create([
-             {:name =&gt; 'Mobile', :number =&gt; '0171-1188811'}])
-Person.create(:lastname =&gt; 'Udelhoven')
-Person.create(:firstname =&gt; 'Ernst', :lastname =&gt; 'Steinwurf').phonenumbers.create([
-             {:name =&gt; 'Mobile', :number =&gt; '0172-22225678'}, 
-             {:name =&gt; 'Home', :number =&gt; '040-8888222'}])
-</programlisting></para>
+    <para>Da wir im Book Model die Option <code>:dependent =&gt;
+    :destroy</code> benutzen, können wir beim löschen auch automatisch alle
+    Autoren mitlöschen:<screen>1.9.3p194 :005 &gt; <command>Book.create(:title =&gt; 'Homo faber').authors.create(:first_name =&gt; 'Max', :last_name =&gt; 'Frisch')</command>
+   (0.1ms)  begin transaction
+  SQL (0.6ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 08 May 2012 08:46:14 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 08 May 2012 08:46:14 UTC +00:00]]
+   (3.7ms)  commit transaction
+   (0.1ms)  begin transaction
+  SQL (0.6ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 2], ["created_at", Tue, 08 May 2012 08:46:14 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Tue, 08 May 2012 08:46:14 UTC +00:00]]
+   (0.8ms)  commit transaction
+ =&gt; #&lt;Author id: 1, book_id: 2, first_name: "Max", last_name: "Frisch", created_at: "2012-05-08 08:46:14", updated_at: "2012-05-08 08:46:14"&gt; 
+1.9.3p194 :006 &gt; <command>Book.all</command>
+  Book Load (0.3ms)  SELECT "books".* FROM "books" 
+ =&gt; [#&lt;Book id: 2, title: "Homo faber", created_at: "2012-05-08 08:46:14", updated_at: "2012-05-08 08:46:14"&gt;] 
+1.9.3p194 :007 &gt; <command>Author.all</command>
+  Author Load (0.2ms)  SELECT "authors".* FROM "authors" 
+ =&gt; [#&lt;Author id: 1, book_id: 2, first_name: "Max", last_name: "Frisch", created_at: "2012-05-08 08:46:14", updated_at: "2012-05-08 08:46:14"&gt;] 
+1.9.3p194 :008 &gt; <command>Book.first.destroy</command>
+  Book Load (0.3ms)  SELECT "books".* FROM "books" LIMIT 1
+   (0.1ms)  begin transaction
+  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 2
+  SQL (0.4ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
+  SQL (0.1ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 2]]
+   (2.4ms)  commit transaction
+ =&gt; #&lt;Book id: 2, title: "Homo faber", created_at: "2012-05-08 08:46:14", updated_at: "2012-05-08 08:46:14"&gt; 
+1.9.3p194 :009 &gt; <command>Author.all</command>
+  Author Load (0.3ms)  SELECT "authors".* FROM "authors" 
+ =&gt; [] 
+1.9.3p194 :010 &gt;</screen></para>
 
-    <para>Die Datei <filename>app/models/person.rb</filename> ändern Sie
-    danach wie folgt ab:<programlisting>class Person &lt; ActiveRecord::Base
-  has_many :phonenumbers, :dependent =&gt; :destroy
-end</programlisting></para>
-
-    <para>Jetzt die Datenbank löschen und neu mit der
-    <filename>db/seeds.rb</filename> befüllen:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rake db:reset</command>
-(in /Users/stefan/phonebook)
-db/test.sqlite3 already exists
-db/test.sqlite3 already exists
-db/development.sqlite3 already exists
--- create_table("people", {:force=&gt;true})
-   -&gt; 0.0035s
--- create_table("phonenumbers", {:force=&gt;true})
-   -&gt; 0.0029s
--- initialize_schema_migrations_table()
-   -&gt; 0.0047s
--- assume_migrated_upto_version(20101008205906, "db/migrate")
-   -&gt; 0.0039s
-stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
-
-    <para>Als Erstes löschen wir Herrn Fritz Meier inklusive all seiner
-    Telefonnummern:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
-
-ruby-1.9.2-p0 &gt; <command>fritz_meier = Person.where( :lastname =&gt; 'Meier', :firstname =&gt; 'Fritz' ).first</command>
- =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>fritz_meier.destroy</command>
- =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Person.where( :lastname =&gt; 'Meier', :firstname =&gt; 'Fritz' )</command>
-  =&gt; [] 
-
-ruby-1.9.2-p0 &gt; </screen></para>
-
-    <para>Das war einfach. Was ist aber mit der Variablen
-    <varname>fritz_meier</varname>? Die existiert noch mit den Daten im
-    sogenannten <foreignphrase xml:lang="en">frozen state</foreignphrase>
-    (eingefrorener Zustand). Zum Überprüfen gibt es die Methode <indexterm>
+    <para>Bitte denken Sie beim Löschen immer an den Unterschied des Inhaltes
+    der Datenbank und des Wertes des aktuell gelöschten Objektes. Die Instanz
+    wird nach dem Löschen des Datenbankfeldes <foreignphrase
+    xml:lang="en">frozen</foreignphrase> (eingefroren). Sie ist also in der
+    Datenbank nicht mehr, aber im Programm noch da, kann aber dort nicht
+    verändert werden. Lesen geht aber. Zum Überprüfen gibt es die Methode
+    <indexterm>
         <primary>frozen?()</primary>
-      </indexterm><methodname>frozen?</methodname>:<screen>ruby-1.9.2-p0 &gt; <command>fritz_meier</command>
- =&gt; #&lt;Person id: 1, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>fritz_meier.phonenumbers</command>
- =&gt; [#&lt;Phonenumber id: 1, person_id: 1, name: "Mobile", number: "0171-12345678", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt;, #&lt;Phonenumber id: 2, person_id: 1, name: "Office", number: "030-7777777", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt;, #&lt;Phonenumber id: 3, person_id: 1, name: "Home", number: "030-8888888", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>fritz_meier.frozen?</command>
+      </indexterm><methodname>frozen?</methodname>:<screen>1.9.3p194 :010 &gt; <command>book = Book.create(:title =&gt; 'Homo faber')</command>
+   (0.1ms)  begin transaction
+  SQL (2.6ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 08 May 2012 08:15:01 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 08 May 2012 08:15:01 UTC +00:00]]
+   (3.5ms)  commit transaction
+ =&gt; #&lt;Book id: 3, title: "Homo faber", created_at: "2012-05-08 08:15:01", updated_at: "2012-05-08 08:15:01"&gt; 
+1.9.3p194 :011 &gt; <command>book.destroy</command>
+   (0.1ms)  begin transaction
+  Author Load (0.3ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 3
+  SQL (0.4ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 3]]
+   (2.5ms)  commit transaction
+ =&gt; #&lt;Book id: 3, title: "Homo faber", created_at: "2012-05-08 08:15:01", updated_at: "2012-05-08 08:15:01"&gt; 
+1.9.3p194 :012 &gt; <command>Book.all</command>
+  Book Load (0.2ms)  SELECT "books".* FROM "books" 
+ =&gt; [#&lt;Book id: 2, title: "Homo faber", created_at: "2012-05-08 08:13:09", updated_at: "2012-05-08 08:13:09"&gt;] 
+1.9.3p194 :013 &gt; <command>book</command>
+ =&gt; #&lt;Book id: 3, title: "Homo faber", created_at: "2012-05-08 08:15:01", updated_at: "2012-05-08 08:15:01"&gt; 
+1.9.3p194 :014 &gt; <command>book.frozen?</command>
  =&gt; true 
-
-ruby-1.9.2-p0 &gt; </screen></para>
+1.9.3p194 :015 &gt; </screen></para>
 
     <para>Der Datensatz ist also in der Datenbank gelöscht, aber das Objekt
     mit allen Daten ist noch im laufenden Ruby-Programm vorhanden. Könnten wir
     damit den gesamten Datensatz wiederbeleben? Ja, allerdings ist das dann
-    ein neuer Datensatz (er hat also nicht mehr die ID 1):<screen>ruby-1.9.2-p0 &gt; <command>Person.create( fritz_meier.attributes )</command>
- =&gt; #&lt;Person id: 6, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Person.where( :lastname =&gt; 'Meier', :firstname =&gt; 'Fritz' )</command>
- =&gt; [#&lt;Person id: 6, firstname: "Fritz", lastname: "Meier", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
-
-    <para>Jetzt fehlen aber noch die Telefonnummern. Die können Sie jedoch
-    separat abspeichern (da sie ja noch im <foreignphrase
-    xml:lang="en">frozen</foreignphrase>-Objekt vorhanden sind).</para>
+    ein neuer Datensatz:<screen>1.9.3p194 :018 &gt; <command>Book.create(:title =&gt; book.title)</command>
+   (0.1ms)  begin transaction
+  SQL (0.6ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 08 May 2012 08:34:04 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 08 May 2012 08:34:04 UTC +00:00]]
+   (3.4ms)  commit transaction
+ =&gt; #&lt;Book id: 4, title: "Homo faber", created_at: "2012-05-08 08:34:04", updated_at: "2012-05-08 08:34:04"&gt; 
+1.9.3p194 :019 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ </screen></para>
   </section>
 
   <section xml:id="activerecord_delete">
@@ -146,27 +163,29 @@ stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
     beachtet. Die Methode <methodname>delete</methodname> löscht also nur die
     eine Zeile in der Datenbank und sonst nichts.</para>
 
-    <para>Löschen wir mal den Datensatz von Frau Meier:<screen>stefan@swmbp 0 1.9.2-p0 phonebook$ <command>rails console</command>
-Loading development environment (Rails 3.0.0)
+    <para>Erstellen wir ein Buch mit einem Autor und löschen das Buch danach
+    mit <methodname>delete</methodname>:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Book.create(:title =&gt; 'Homo faber').authors.create(:first_name =&gt; 'Max', :last_name =&gt; 'Frisch')</command>
+   (0.1ms)  begin transaction
+  SQL (0.7ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 08 May 2012 08:41:08 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 08 May 2012 08:41:08 UTC +00:00]]
+   (3.5ms)  commit transaction
+   (0.1ms)  begin transaction
+  SQL (0.4ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 6], ["created_at", Tue, 08 May 2012 08:41:08 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Tue, 08 May 2012 08:41:08 UTC +00:00]]
+   (1.0ms)  commit transaction
+ =&gt; #&lt;Author id: 3, book_id: 6, first_name: "Max", last_name: "Frisch", created_at: "2012-05-08 08:41:08", updated_at: "2012-05-08 08:41:08"&gt; 
+1.9.3p194 :002 &gt; <command>Book.last.delete</command>
+  Book Load (0.3ms)  SELECT "books".* FROM "books" ORDER BY "books"."id" DESC LIMIT 1
+  SQL (3.7ms)  DELETE FROM "books" WHERE "books"."id" = 6
+ =&gt; #&lt;Book id: 6, title: "Homo faber", created_at: "2012-05-08 08:41:08", updated_at: "2012-05-08 08:41:08"&gt; 
+1.9.3p194 :003 &gt; <command>Author.exists?(3)</command>
+  Author Exists (0.3ms)  SELECT 1 FROM "authors" WHERE "authors"."id" = 3 LIMIT 1
+ =&gt; true 
+1.9.3p194 :004 &gt; ruby-1.9.2-p0 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$  </screen></para>
 
-ruby-1.9.2-p0 &gt; <command>Person.first</command>
- =&gt; #&lt;Person id: 2, firstname: "Ute", lastname: "Meier", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Person.first.phonenumbers</command>
- =&gt; [#&lt;Phonenumber id: 4, person_id: 2, name: "Home", number: "030-8888888", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>Person.first.delete</command>
- =&gt; #&lt;Person id: 2, firstname: "Ute", lastname: "Meier", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt; 
-
-ruby-1.9.2-p0 &gt; <command>Phonenumber.where( :person_id =&gt; 2 )</command>
- =&gt; [#&lt;Phonenumber id: 4, person_id: 2, name: "Home", number: "030-8888888", created_at: "2010-10-10 08:54:36", updated_at: "2010-10-10 08:54:36"&gt;] 
-
-ruby-1.9.2-p0 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 phonebook$ </screen></para>
-
-    <para>Es wird zwar der Datensatz von Frau Meier gelöscht, aber die
-    Telefonnummern in der zu <classname>Phonenumber</classname> gehörenden
-    Datenbank-Tabelle bleiben als Karteileichen im System.</para>
+    <para>Es wird zwar der Datensatz des Buches 'Homo faber' gelöscht, aber
+    der Autor ist noch in der Datenbank gespeichert.</para>
 
     <para>Wie bei <methodname>destroy</methodname>, geht auch bei
     <methodname>delete</methodname> ein Objekt nach dem
