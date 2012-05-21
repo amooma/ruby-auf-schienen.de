@@ -31,18 +31,16 @@
     werden.</para>
 
     <para>Bauen wir uns zuerst eine Test-Rails-Applikation zum
-    Experimentieren:<screen>MacBook:~ sw$ <command>rails new webshop</command>
+    Experimentieren:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new shop</command>
 [...]
-MacBook:~ sw$ <command>cd webshop</command>
-MacBook:webshop sw$ <command>bundle install</command>
-[...]
-MacBook:webshop sw$ <command>rake db:migrate</command>
-MacBook:webshop sw$</screen></para>
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd shop</command>
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
     <para>Mit <command>rake routes</command> können wir uns die Routen eines
     Projektes anzeigen lassen. Probieren wir das direkt im frischen Projekt
-    aus:<screen>MacBook:webshop sw$ <command>rake routes</command>
-MacBook:webshop sw$</screen></para>
+    aus:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake routes</command>
+
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
     <para>Nichts. Es sind in einem neuen Rails-Projekt keine Routen
     eingetragen.</para>
@@ -63,20 +61,19 @@ MacBook:webshop sw$</screen></para>
     <filename>config/routes.rb</filename> mit vielen auskommentierten
     Beispielen bestückt. Für den Verlauf dieses Kapitels tun wir so, als wenn
     diese Beispiele nicht drin wären und zeigen immer nur die neu
-    eingetragenen Routen an (alles andere wäre eine grobe Verschwendung von
-    Druckerschwärze).</para>
+    eingetragenen Routen an.</para>
   </section>
 
   <section xml:id="routes_get">
     <title xml:id="routes_get.title">get</title>
 
     <para>Erstellen wir nachfolgend einen Controller mit drei einfachen
-    Seiten:<screen>MacBook:webshop sw$ <command>rails generate controller Home index ping pong</command>
+    Seiten:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails generate controller Home index ping pong</command>
       create  app/controllers/home_controller.rb
-       route  get "home/pong"
+<emphasis>       route  get "home/pong"
        route  get "home/ping"
        route  get "home/index"
-      invoke  erb
+</emphasis>      invoke  erb
       create    app/views/home
       create    app/views/home/index.html.erb
       create    app/views/home/ping.html.erb
@@ -88,16 +85,18 @@ MacBook:webshop sw$</screen></para>
       invoke    test_unit
       create      test/unit/helpers/home_helper_test.rb
       invoke  assets
-      create    app/assets/javascripts/home.js.coffee
-      create    app/assets/stylesheets/home.css.scss
-MacBook:webshop sw$</screen></para>
+      invoke    coffee
+      create      app/assets/javascripts/home.js.coffee
+      invoke    scss
+      create      app/assets/stylesheets/home.css.scss
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
     <para>Jetzt gibt <command>rake route</command> für diese drei Seiten eine
-    Route aus:<screen>MacBook:webshop sw$ <command>rake routes</command>
-home_index GET /home/index(.:format) {:controller=&gt;"home", :action=&gt;"index"}
- home_ping GET /home/ping(.:format)  {:controller=&gt;"home", :action=&gt;"ping"}
- home_pong GET /home/pong(.:format)  {:controller=&gt;"home", :action=&gt;"pong"}
-MacBook:webshop sw$</screen></para>
+    Route aus:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake routes</command>
+home_index GET /home/index(.:format) home#index
+ home_ping GET /home/ping(.:format)  home#ping
+ home_pong GET /home/pong(.:format)  home#pong
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
     <para>Die Seiten sind nach dem Starten des Rails-Servers mit
     <command>rails server</command> unter den folgenden URLs
@@ -107,7 +106,7 @@ MacBook:webshop sw$</screen></para>
           xlink:href="http://0.0.0.0:300/home/index">http://0.0.0.0:300/home/index</uri></para>
 
           <para>für <code>home_index GET /home/index(.:format)
-          {:controller=&gt;"home", :action=&gt;"index"}</code></para>
+          home#index</code></para>
         </listitem>
 
         <listitem>
@@ -115,7 +114,7 @@ MacBook:webshop sw$</screen></para>
           xlink:href="http://0.0.0.0:300/home/ping">http://0.0.0.0:300/home/ping</uri></para>
 
           <para>für <code>home_ping GET /home/ping(.:format)
-          {:controller=&gt;"home", :action=&gt;"ping"}</code></para>
+          home#ping</code></para>
         </listitem>
 
         <listitem>
@@ -123,7 +122,7 @@ MacBook:webshop sw$</screen></para>
           xlink:href="http://0.0.0.0:300/home/pong">http://0.0.0.0:300/home/pong</uri></para>
 
           <para>für <code>home_pong GET /home/pong(.:format)
-          {:controller=&gt;"home", :action=&gt;"pong"}</code></para>
+          home#pong</code></para>
         </listitem>
       </itemizedlist></para>
 
@@ -139,13 +138,12 @@ MacBook:webshop sw$</screen></para>
         </mediaobject>
       </screenshot></para>
 
-    <para>Rails sagt uns mit der Ausgabe <code>{:controller=&gt;"home",
-    :action=&gt;"index"}</code>, dass die Route <uri>/home/index</uri> in den
-    Controller <classname>home</classname> und dort zur Action/Methode
-    <methodname>index</methodname> geht. Definiert werden diese Routen in der
-    Datei <filename>config/routes.rb</filename>. <command>rails generate
-    controller Home index ping pong</command> hat dort automatisch folgende
-    Zeilen eingefügt:<programlisting>  get "home/index"
+    <para>Rails sagt uns mit der Ausgabe <code>home#index</code>, dass die
+    Route <uri>/home/index</uri> in den Controller <classname>home</classname>
+    und dort zur Action/Methode <methodname>index</methodname> geht. Definiert
+    werden diese Routen in der Datei <filename>config/routes.rb</filename>.
+    <command>rails generate controller Home index ping pong</command> hat dort
+    automatisch folgende Zeilen eingefügt:<programlisting>  get "home/index"
   
   get "home/ping"
   
@@ -159,30 +157,27 @@ MacBook:webshop sw$</screen></para>
     <para>In der Default <filename>config/routes.rb</filename>-Datei finden
     Sie recht weit unten folgenden Kommentar:<programlisting>  # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  # root :to =&gt; 'welcome#index'
-</programlisting></para>
+  # root :to =&gt; 'welcome#index'</programlisting></para>
 
     <para>Wenn Sie dort die letzte Zeile auskommentieren, können Sie damit
     Ihre <uri xlink:href="http://0.0.0.0:3000/">http://0.0.0.0:3000/</uri>
     definieren. Legen wir sie mal auf
-    <methodname>home#index</methodname>:<programlisting>Webshop::Application.routes.draw do
-  
+    <methodname>home#index</methodname>:<programlisting>Shop::Application.routes.draw do
   get "home/index"
-  
+
   get "home/ping"
-  
+
   get "home/pong"
-  
-  <emphasis role="bold">root :to =&gt; 'home#index'</emphasis>
-  
+
+  <emphasis>root :to =&gt; "home#index"</emphasis>
 end</programlisting></para>
 
-    <para>Unsere neuen Routen:<screen>MacBook:webshop sw$ <command>rake routes</command>
-home_index GET /home/index(.:format)     {:controller=&gt;"home", :action=&gt;"index"}
- home_ping GET /home/ping(.:format)      {:controller=&gt;"home", :action=&gt;"ping"}
- home_pong GET /home/pong(.:format)      {:controller=&gt;"home", :action=&gt;"pong"}
-      root     /                         {:controller=&gt;"home", :action=&gt;"index"}
-MacBook:webshop sw$</screen></para>
+    <para>Unsere neuen Routen:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake routes</command>
+home_index GET /home/index(.:format) home#index
+ home_ping GET /home/ping(.:format)  home#ping
+ home_pong GET /home/pong(.:format)  home#pong
+      root     /                     home#index
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
     <para><screenshot>
         <info>
@@ -199,8 +194,8 @@ MacBook:webshop sw$</screen></para>
     <important>
       <para>Nach dem Setzen der <code>root</code>-Route sollten Sie nicht das
       Löschen der Datei <filename>/public/index.html</filename>
-      vergessen!<screen>MacBook:webshop sw$ <command>rm public/index.html</command> 
-MacBook:webshop sw$</screen></para>
+      vergessen!<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rm public/index.html</command> 
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
     </important>
   </section>
 
@@ -216,27 +211,25 @@ MacBook:webshop sw$</screen></para>
     <para>Wenn wir zusätzlich zur URL <uri>/home/ping</uri> noch mit
     <uri>/home/ping-ping</uri> auf die gleiche Action im gleichen Controller
     zugreifen, so müssen wir die Datei <filename>config/routes.rb</filename>
-    wie folgt verändern:<programlisting>Webshop::Application.routes.draw do
-  
+    wie folgt verändern:<programlisting>Shop::Application.routes.draw do
   get "home/index"
-  
+
   get "home/ping"
-  
+
   get "home/pong"
-  
-  root :to =&gt; 'home#index'
-  
-  <emphasis role="bold">match 'home/ping-ping' =&gt; 'home#ping'</emphasis>
-  
+
+  root :to =&gt; "home#index"
+
+  <emphasis>match "home/ping-ping" =&gt; "home#ping"</emphasis>
 end</programlisting></para>
 
-    <para>Damit stehen uns folgende Routen zur Verfügung:<screen>MacBook:webshop sw$ <command>rake routes</command>
-home_index GET /home/index(.:format)     {:controller=&gt;"home", :action=&gt;"index"}
- home_ping GET /home/ping(.:format)      {:controller=&gt;"home", :action=&gt;"ping"}
- home_pong GET /home/pong(.:format)      {:controller=&gt;"home", :action=&gt;"pong"}
-      root     /                         {:controller=&gt;"home", :action=&gt;"index"}
-               /home/ping-ping(.:format) {:controller=&gt;"home", :action=&gt;"ping"}
-MacBook:webshop sw$</screen></para>
+    <para>Damit stehen uns folgende Routen zur Verfügung:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake routes</command>
+home_index GET /home/index(.:format)     home#index
+ home_ping GET /home/ping(.:format)      home#ping
+ home_pong GET /home/pong(.:format)      home#pong
+      root     /                         home#index
+               /home/ping-ping(.:format) home#ping
+Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
 
     <para><screenshot>
         <info>
@@ -253,28 +246,26 @@ MacBook:webshop sw$</screen></para>
     <para>Wenn Sie der Route <filename>/home/ping-ping</filename> einen Namen
     geben wollen, so können Sie dies mit der Einstellung <code>:as =&gt;
     "<replaceable>name</replaceable>"</code> in der
-    <filename>config/routes.rb</filename> realisieren:<programlisting>Webshop::Application.routes.draw do
-  
+    <filename>config/routes.rb</filename> realisieren:<programlisting>Shop::Application.routes.draw do
   get "home/index"
-  
+
   get "home/ping"
-  
+
   get "home/pong"
-  
-  root :to =&gt; 'home#index'
-  
-  <emphasis role="bold">match 'home/ping-ping' =&gt; 'home#ping', :as =&gt; "ping_ping"</emphasis>
-  
+
+  root :to =&gt; "home#index"
+
+  <emphasis>match "home/ping-ping" =&gt; "home#ping", :as =&gt; "ping_ping"</emphasis>
 end</programlisting></para>
 
     <para>Jetzt stehen Ihnen im System folgende Routen-Namen zur
-    Verfügung:<screen>MacBook:webshop sw$ <command>rake routes</command>
-home_index GET /home/index(.:format)     {:controller=&gt;"home", :action=&gt;"index"}
- home_ping GET /home/ping(.:format)      {:controller=&gt;"home", :action=&gt;"ping"}
- home_pong GET /home/pong(.:format)      {:controller=&gt;"home", :action=&gt;"pong"}
-      root     /                         {:controller=&gt;"home", :action=&gt;"index"}
- ping_ping     /home/ping-ping(.:format) {:controller=&gt;"home", :action=&gt;"ping"}
-MacBook:webshop sw$</screen></para>
+    Verfügung:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake routes</command>
+home_index GET /home/index(.:format)     home#index
+ home_ping GET /home/ping(.:format)      home#ping
+ home_pong GET /home/pong(.:format)      home#pong
+      root     /                         home#index
+ ping_ping     /home/ping-ping(.:format) home#ping
+Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
     <para>Sie sehen dabei, dass eine URL ein Minuszeichen enthalten darf, aber
     der Routen-Name nicht (ein Unterstrich geht aber).</para>
@@ -297,27 +288,25 @@ MacBook:webshop sw$</screen></para>
       <para>Match kann nicht nur fixe Routen zuordnen, sondern auch noch
       Parameter übergeben. Ein typisches Beispiel dafür wären Angaben zu einem
       Datum. Wir erstellen dazu nachfolgend eine
-      Mini-Blog-Applikation:<screen>MacBook:~ sw$ <command>rails new blog</command>
+      Mini-Blog-Applikation:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new blog</command>
 [...]
-MacBook:~ sw$ <command>cd blog</command>
-MacBook:blog sw$ <command>bundle install</command>
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd blog</command> 
+Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rails generate scaffold Post subject content published_at:date</command>
 [...]
-MacBook:blog sw$ <command>rails generate scaffold Post subject:string content:text posted_at:date</command>
+Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rake db:migrate</command>
 [...]
-MacBook:blog sw$ <command>rake db:migrate</command>
-[...]
-MacBook:blog sw$</screen></para>
+Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
 
       <para>Als Beispieldaten in der <filename>db/seeds.rb</filename> nehmen
-      wir:<programlisting>Post.create(:subject =&gt; 'Ein Test',            :posted_at =&gt; '01.10.2010')
-Post.create(:subject =&gt; 'Noch ein Test',       :posted_at =&gt; '01.10.2010')
-Post.create(:subject =&gt; 'Und wieder ein Test', :posted_at =&gt; '02.10.2010')
-Post.create(:subject =&gt; 'Letzter Test',        :posted_at =&gt; '01.11.2010')
-Post.create(:subject =&gt; 'Allerletzter Test',   :posted_at =&gt; '01.11.2011')</programlisting></para>
+      wir:<programlisting>Post.create(:subject =&gt; 'Ein Test',            :published_at =&gt; '01.10.2011')
+Post.create(:subject =&gt; 'Noch ein Test',       :published_at =&gt; '01.10.2011')
+Post.create(:subject =&gt; 'Und wieder ein Test', :published_at =&gt; '02.10.2011')
+Post.create(:subject =&gt; 'Letzter Test',        :published_at =&gt; '01.11.2011')
+Post.create(:subject =&gt; 'Allerletzter Test',   :published_at =&gt; '01.11.2012')</programlisting></para>
 
       <para>Mit <command>rake db:seed</command> spielen wir diese Daten in die
-      Datenbank:<screen>MacBook:blog sw$ <command>rake db:seed</command>
-MacBook:blog sw$</screen></para>
+      Datenbank:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rake db:seed</command>
+Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
 
       <para>Wenn wir jetzt mit <command>rails server</command> den
       Rails-Server starten und mit dem Browser auf die Seite <uri
@@ -343,11 +332,9 @@ MacBook:blog sw$</screen></para>
       optionalen Parametern beim <code>match</code>-Eintrag. Bitte tragen Sie
       folgende Konfiguration in die <filename>config/routes.rb</filename>
       ein:<programlisting>Blog::Application.routes.draw do
-  
   resources :posts
-  
+
   match "/:year(/:month(/:day))" =&gt; "posts#index"
-  
 end</programlisting></para>
 
       <para>Die runden Klammern stehen für optionale Parameter. In diesem Fall
@@ -363,7 +350,7 @@ end</programlisting></para>
       Das ist ja auch logisch. Erweitern wir aber mal die View-Datei
       <filename>app/views/posts/index.html.erb</filename> mit einem
       <code>&lt;%= debug params %&gt;</code> Aufruf ganz am
-      Anfang:<programlisting><emphasis role="bold">&lt;%= debug params %&gt;</emphasis>
+      Anfang:<programlisting><emphasis>&lt;%= debug params %&gt;</emphasis>
 
 &lt;h1&gt;Listing posts&lt;/h1&gt;
 
@@ -371,6 +358,7 @@ end</programlisting></para>
   &lt;tr&gt;
     &lt;th&gt;Subject&lt;/th&gt;
     &lt;th&gt;Content&lt;/th&gt;
+    &lt;th&gt;Published at&lt;/th&gt;
     &lt;th&gt;&lt;/th&gt;
     &lt;th&gt;&lt;/th&gt;
     &lt;th&gt;&lt;/th&gt;
@@ -380,6 +368,7 @@ end</programlisting></para>
   &lt;tr&gt;
     &lt;td&gt;&lt;%= post.subject %&gt;&lt;/td&gt;
     &lt;td&gt;&lt;%= post.content %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= post.published_at %&gt;&lt;/td&gt;
     &lt;td&gt;&lt;%= link_to 'Show', post %&gt;&lt;/td&gt;
     &lt;td&gt;&lt;%= link_to 'Edit', edit_post_path(post) %&gt;&lt;/td&gt;
     &lt;td&gt;&lt;%= link_to 'Destroy', post, confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
@@ -408,21 +397,27 @@ end</programlisting></para>
 
       <para>A-ha! Es wurde von der Route der Parameter
       <varname>params[:year]</varname> mit dem Wert <code>2010</code> gesetzt.
-      Sehr praktisch, denn das können wir im Controller
-      <filename>app/controllers/posts_controller.rb</filename> in der
-      Index-Methode wie folgt einbauen:<programlisting>def index
-  @posts = Post.all
-  
-<emphasis role="bold">  if params[:year]
-    @posts = Post.where(:posted_at =&gt; (Date.parse("01.01.#{params[:year]}")..Date.parse("31.12.#{params[:year]}")))
-  end</emphasis>
+      Im Logfile hätten wir übrigens auch nachschauen können:<screen>Started GET "/2010" for 127.0.0.1 at 2012-05-09 19:44:46 +0200
+Processing by PostsController#index as HTML
+  <emphasis>Parameters: {"year"=&gt;"2010"}</emphasis>
+  Post Load (0.5ms)  SELECT "posts".* FROM "posts" 
+  Rendered posts/index.html.erb within layouts/application (6.6ms)
+Completed 200 OK in 15ms (Views: 13.4ms | ActiveRecord: 0.5ms)</screen></para>
 
-  respond_to do |format|
-    format.html # index.html.erb
-    format.json { render json: @posts }
-  end
-end
-</programlisting></para>
+      <para>Sehr praktisch, denn diesen Parameter können wir im Controller
+      <filename>app/controllers/posts_controller.rb</filename> in der
+      Index-Methode wie folgt einbauen:<programlisting>  def index
+<emphasis>    if params[:year]
+      @posts = Post.where(:published_at =&gt; (Date.parse("01.01.#{params[:year]}")..(Date.parse("31.12.#{params[:year]}")))
+    else
+      @posts = Post.all
+    end</emphasis>
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @posts }
+    end
+  end</programlisting></para>
 
       <para>Damit bekommen wir das gewünschte Ergebnis (nur die 4 Postings aus
       dem Jahr 2010):<screenshot>
