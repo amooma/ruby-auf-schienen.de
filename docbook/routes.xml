@@ -487,6 +487,12 @@ end</programlisting></para>
         <title xml:id="advanced_constraints.title">Advanced
         Constraints</title>
 
+        <indexterm>
+          <primary>Routen</primary>
+
+          <secondary>Advanced Constraints</secondary>
+        </indexterm>
+
         <para>Mit der Route <code>match "/:year(/:month(/:day))" =&gt;
         "posts#index", :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt;
         /\d{2}/, :day =&gt; /\d{2}/ }</code> haben wir zwar die URL
@@ -597,31 +603,19 @@ end</programlisting></para>
       <secondary>resources</secondary>
     </indexterm>
 
-    <para>Bauen wir uns für <code>resources</code> eine neue Rails-Applikation
-    zum Experimentieren:<screen>MacBook:~ sw$ <command>rails new phonebook</command>
+    <para><code>resources</code> liefert Routen für eine RESTful Resource.
+    Probieren wir das anhand der Mini-Blog Applikation aus:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new blog</command>
 [...]
-MacBook:~ sw$ <command>cd phonebook</command>
-MacBook:phonebook sw$ <command>bundle install</command>
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd blog</command> 
+Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rails generate scaffold Post subject content published_at:date</command>
 [...]
-MacBook:phonebook sw$ </screen></para>
+Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rake db:migrate</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
 
-    <para>Beim Verwenden von Scaffold werden automatisch Routen für die neu
-    erschaffenen Ressourcen erstellt. Legen wir mal eine Ressource an:<screen>MacBook:phonebook sw$ <command>rails generate scaffold person firstname:string lastname:string</command>
-      invoke  active_record
-      create    db/migrate/20110531175742_create_people.rb
-      create    app/models/person.rb
-      invoke    test_unit
-      create      test/unit/person_test.rb
-      create      test/fixtures/people.yml
-       route  resources :people
-[...]
-MacBook:phonebook sw$ <command>rake db:migrate</command>
-[...]
-MacBook:phonebook sw$</screen></para>
-
-    <para>Die Datei <filename>config/routes.rb</filename> sieht damit so
-    aus:<programlisting>Webshop::Application.routes.draw do
-  <emphasis role="bold">resources :people</emphasis>
+    <para>Der scaffold Generator legt automatisch eine <code>resources</code>
+    Route in der <filename>config/routes.rb</filename> an:<programlisting>Blog::Application.routes.draw do
+  resources :posts
 end</programlisting></para>
 
     <note>
@@ -629,19 +623,79 @@ end</programlisting></para>
       <filename>config/routes.rb</filename> hinzugefügt.</para>
     </note>
 
-    <para>Die daraus resultierenden Routen:<screen>MacBook:webshop sw$ <command>rake routes</command>
-     people GET    /people(.:format)          {:action=&gt;"index", :controller=&gt;"people"}
-            POST   /people(.:format)          {:action=&gt;"create", :controller=&gt;"people"}
- new_person GET    /people/new(.:format)      {:action=&gt;"new", :controller=&gt;"people"}
-edit_person GET    /people/:id/edit(.:format) {:action=&gt;"edit", :controller=&gt;"people"}
-     person GET    /people/:id(.:format)      {:action=&gt;"show", :controller=&gt;"people"}
-            PUT    /people/:id(.:format)      {:action=&gt;"update", :controller=&gt;"people"}
-            DELETE /people/:id(.:format)      {:action=&gt;"destroy", :controller=&gt;"people"}
-MacBook:webshop sw$</screen></para>
+    <para>Die daraus resultierenden Routen:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rake routes</command>
+    posts GET    /posts(.:format)          posts#index
+          POST   /posts(.:format)          posts#create
+ new_post GET    /posts/new(.:format)      posts#new
+edit_post GET    /posts/:id/edit(.:format) posts#edit
+     post GET    /posts/:id(.:format)      posts#show
+          PUT    /posts/:id(.:format)      posts#update
+          DELETE /posts/:id(.:format)      posts#destroy
+Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
 
     <para>Diese RESTful Routen sind Ihnen bereits aus <xref
     linkend="scaffolding" /> bekannt. Sie werden benötigt, um die Datensätze
     anzuzeigen und zu verändern.</para>
+
+    <section>
+      <title>Bestimmte Routen mit :only oder :except auswählen</title>
+
+      <indexterm>
+        <primary>Routen</primary>
+
+        <secondary>resources</secondary>
+
+        <tertiary>only</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>Routen</primary>
+
+        <secondary>resources</secondary>
+
+        <tertiary>except</tertiary>
+      </indexterm>
+
+      <para>Wenn Sie nur bestimmte Routen aus dem fertigen Satz von RESTful
+      Routen benutzen wollen, so können Sie diese mit <code>:only</code> oder
+      <code>:except</code> einschränken.</para>
+
+      <para>Folgende <filename>conf/routes.rb</filename> definiert nur die
+      Routen für <code>index</code> und <code>show</code>:<programlisting>Blog::Application.routes.draw do
+
+  <emphasis>resources :posts, :only =&gt; [:index, :show]</emphasis>
+
+end</programlisting></para>
+
+      <para>Mit <command>rake routes</command> können wir das Ergebnis
+      überprüfen:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rake routes</command>
+posts GET /posts(.:format)     posts#index
+ post GET /posts/:id(.:format) posts#show
+Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
+
+      <para><code>except</code> arbeitet genau anders rum:<programlisting>Blog::Application.routes.draw do
+
+  <emphasis>resources :posts, :except =&gt; [:index, :show]</emphasis>
+
+end</programlisting></para>
+
+      <para>Jetzt sind alle Routen bis auf <code>index</code> und
+      <code>show</code> möglich:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rake routes</command>
+    posts POST   /posts(.:format)          posts#create
+ new_post GET    /posts/new(.:format)      posts#new
+edit_post GET    /posts/:id/edit(.:format) posts#edit
+     post PUT    /posts/:id(.:format)      posts#update
+          DELETE /posts/:id(.:format)      posts#destroy
+Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
+
+      <warning>
+        <para>Achten Sie bei der Verwendung von only und except bitte daran
+        auch die vom scaffold Generator generierten Views anzupassen. Dort
+        wird z.B. auf der index Seite mit <code>&lt;%= link_to 'New Post',
+        new_post_path %&gt;</code> auf den new View verlinkt, der im obigen
+        only-Beispiel dann aber gar nicht mehr existiert.</para>
+      </warning>
+    </section>
 
     <section xml:id="routes_nested_resources">
       <title xml:id="routes_nested_resources.title">Nested Resources</title>
@@ -665,337 +719,150 @@ MacBook:webshop sw$</screen></para>
       <methodname>has_many</methodname>-Verknüpfung (siehe <xref
       linkend="activerecord_has_many" />) arbeiten. Diese lassen sich
       eindeutig über Routen ansprechen. Legen wir eine zweite Ressource
-      <classname>phone</classname> an:<screen>MacBook:phonebook sw$ <command>rails generate scaffold phone person_id:integer phone_number:string</command>
-      invoke  active_record
-      create    db/migrate/20110531180003_create_phones.rb
-      create    app/models/phone.rb
-      invoke    test_unit
-      create      test/unit/phone_test.rb
-      create      test/fixtures/phones.yml
-       route  resources :phones
+      <classname>comment</classname> an:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rails generate scaffold comment post_id:integer content</command>
 [...]
-MacBook:phonebook sw$ <command>rake db:migrate</command>
+Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rake db:migrate</command>
 [...]
-MacBook:phonebook sw$ </screen></para>
+Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
 
       <para>Jetzt verküpfen wir beide Ressourcen miteinander. In der Datei
-      <filename>app/models/person.rb</filename> fügen wir ein
-      <methodname>has_many</methodname> hinzu:<programlisting>class Person &lt; ActiveRecord::Base
-  has_many :phones
-end</programlisting></para>
+      <filename>app/models/post.rb</filename> fügen wir ein
+      <methodname>has_many</methodname> hinzu:<programlisting>class Post &lt; ActiveRecord::Base
+  attr_accessible :content, :published_at, :subject
 
-      <para>Und in der Datei <filename>app/models/phone.rb</filename> das
-      Gegenstück <methodname>belongs_to</methodname>:<programlisting>class Phone &lt; ActiveRecord::Base
-  belongs_to :person
+  has_many :comments
 end
 </programlisting></para>
 
-      <para>Jetzt füllen wir die Datei <filename>db/seeds.rb</filename> (siehe
-      <xref linkend="seed_rb" />) noch mit ein paar
-      Beispieldatensätzen:<programlisting>Person.create(:lastname =&gt; 'Meier').phones.create([{:phone_number =&gt; '030 1234567'}, {:phone_number =&gt; '0171 1234567'}])
-Person.create(:lastname =&gt; 'Stein').phones.create(:phone_number =&gt; '040 1234567')
-Person.create(:lastname =&gt; 'Oberhuber')</programlisting></para>
+      <para>Und in der Datei <filename>app/models/comment.rb</filename> das
+      Gegenstück <methodname>belongs_to</methodname>:<programlisting>class Comment &lt; ActiveRecord::Base
+  attr_accessible :content, :post_id
 
-      <para>Die spielen wir mit <command>rake db:seed</command> ein:<screen>MacBook:phonebook sw$ <command>rake db:seed</command>
-MacBook:phonebook sw$</screen></para>
-
-      <para>Schauen wir uns das kurz in der Console an:<screen>MacBook:phonebook sw$ <command>rails console</command>
-Loading development environment (Rails 3.1.0.rc1)
-ruby-1.9.2-p180 :001 &gt; <command>Person.first</command>
-  Person Load (0.1ms)  SELECT "people".* FROM "people" LIMIT 1
- =&gt; #&lt;Person id: 1, firstname: nil, lastname: "Meier", created_at: "2011-05-31 18:03:07", updated_at: "2011-05-31 18:03:07"&gt; 
-ruby-1.9.2-p180 :002 &gt; <command>Person.first.phones</command>
-  Person Load (0.3ms)  SELECT "people".* FROM "people" LIMIT 1
-  Phone Load (0.2ms)  SELECT "phones".* FROM "phones" WHERE "phones"."person_id" = 1
- =&gt; [#&lt;Phone id: 1, person_id: 1, phone_number: "030 1234567", created_at: "2011-05-31 18:03:07", updated_at: "2011-05-31 18:03:07"&gt;, #&lt;Phone id: 2, person_id: 1, phone_number: "0171 1234567", created_at: "2011-05-31 18:03:07", updated_at: "2011-05-31 18:03:07"&gt;] 
-ruby-1.9.2-p180 :003 &gt; <command>exit</command>
-MacBook:phonebook sw$</screen></para>
-
-      <para>Wenn wir den Datensatz von <methodname>Person.first</methodname>
-      im Browser anschauen wollen, so müssen wir mit <command>rails
-      server</command> den Server starten und die URL <uri
-      xlink:href="http://0.0.0.0:3000/people/1">http://0.0.0.0:3000/people/1</uri>
-      aufrufen:<screenshot>
-          <info>
-            <title>http://0.0.0.0:3000/people/1</title>
-          </info>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screenshots/people_show_1_einfach.jpg"></imagedata>
-            </imageobject>
-          </mediaobject>
-        </screenshot></para>
-
-      <para>Wäre es nicht schön, wenn wir die Telefonnummern der
-      <methodname>Person.first</methodname> mit der URL <uri
-      xlink:href="http://0.0.0.0:3000/people/1/phones">http://0.0.0.0:3000/people/1/phones</uri>
-      aufrufen könnten? Genau das können wir mit Nested Resources realisieren!
-      Bitte ändern Sie Ihre <filename>config/routes.rb</filename> wie folgt
-      ab:<programlisting>Webshop::Application.routes.draw do
-  
-<emphasis role="bold">  resources :people do
-    resources :phones
-  end</emphasis>
-  
-  <emphasis role="bold">resources :phones</emphasis>
-  
-end</programlisting></para>
-
-      <para>Und jetzt müssen wir noch die
-      <methodname>index</methodname>-Methode in der
-      <filename>app/controllers/phones_controller.rb</filename>
-      ändern:<programlisting>  def index
-<emphasis role="bold">    if params[:person_id]
-      @person = Person.find(params[:person_id])
-      @phones = @person.phones
-    else 
-      @phones = Phone.all    
-    end</emphasis>
-    
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @phones }
-    end
-  end
+  belongs_to :post
+end
 </programlisting></para>
 
-      <para>Jetzt noch den Rails-Server mit <keycap>Ctrl-C</keycap> stoppen
-      und mit <command>rails server</command> wieder neu starten und mit dem
-      Browser <uri
-      xlink:href="http://0.0.0.0:3000/people/1/phones">http://0.0.0.0:3000/people/1/phones</uri>
-      aufrufen:<screenshot>
-          <info>
-            <title>http://0.0.0.0:3000/people/1/phones</title>
-          </info>
+      <para>Die vom scaffold Generator erstellten Routen sehen so aus:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rake routes</command>
+    comments GET    /comments(.:format)          comments#index
+             POST   /comments(.:format)          comments#create
+ new_comment GET    /comments/new(.:format)      comments#new
+edit_comment GET    /comments/:id/edit(.:format) comments#edit
+     comment GET    /comments/:id(.:format)      comments#show
+             PUT    /comments/:id(.:format)      comments#update
+             DELETE /comments/:id(.:format)      comments#destroy
+       posts GET    /posts(.:format)             posts#index
+             POST   /posts(.:format)             posts#create
+    new_post GET    /posts/new(.:format)         posts#new
+   edit_post GET    /posts/:id/edit(.:format)    posts#edit
+        post GET    /posts/:id(.:format)         posts#show
+             PUT    /posts/:id(.:format)         posts#update
+             DELETE /posts/:id(.:format)         posts#destroy
+Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
 
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screenshots/people_1_phones.jpg"></imagedata>
-            </imageobject>
-          </mediaobject>
-        </screenshot></para>
+      <para>Wir können also mit <uri>/posts/1</uri> das erste Post und mit
+      <uri>/comments</uri> alle Comments abfragen. Mit Hilfe von Nesting
+      können wir mit <uri>/posts/1/</uri>comments alle Comments des Posts mit
+      der ID 1 abfragen. Dazu müssen wir die
+      <filename>config/routes.rb</filename> abändern:<programlisting>Blog::Application.routes.draw do
 
-      <para>Durch die Nested Route wurde der Parameter
-      <varname>params[:person_id]</varname> an den Controller gegeben und wir
-      konnten im Controller gezielt die <classname>Phones</classname> für
-      diese <classname>Person</classname> heraussuchen. Falls dieser Parameter
-      nicht existiert, dann würde die URL <uri
-      xlink:href="http://0.0.0.0:3000/phones">http://0.0.0.0:3000/phones</uri>
-      aufgerufen und es würden alle Phones angezeigt.</para>
+<emphasis>  resources :posts do
+    resources :comments
+  end</emphasis>
 
-      <para>Bis jetzt haben wir in der <filename>config/routes.rb</filename>
-      zwei Einträge für <code>phones</code>. Einmal als Nested Resource
-      innerhalb der Ressource <code>people</code> und einmal als eigenständige
-      Ressource. <command>rake routes</command> zeigt beide Varianten:<screen>MacBook:phonebook sw$ <command>rake routes</command>
-    person_phones GET    /people/:person_id/phones(.:format)          {:action=&gt;"index", :controller=&gt;"phones"}
-                  POST   /people/:person_id/phones(.:format)          {:action=&gt;"create", :controller=&gt;"phones"}
- new_person_phone GET    /people/:person_id/phones/new(.:format)      {:action=&gt;"new", :controller=&gt;"phones"}
-edit_person_phone GET    /people/:person_id/phones/:id/edit(.:format) {:action=&gt;"edit", :controller=&gt;"phones"}
-     person_phone GET    /people/:person_id/phones/:id(.:format)      {:action=&gt;"show", :controller=&gt;"phones"}
-                  PUT    /people/:person_id/phones/:id(.:format)      {:action=&gt;"update", :controller=&gt;"phones"}
-                  DELETE /people/:person_id/phones/:id(.:format)      {:action=&gt;"destroy", :controller=&gt;"phones"}
-           people GET    /people(.:format)                            {:action=&gt;"index", :controller=&gt;"people"}
-                  POST   /people(.:format)                            {:action=&gt;"create", :controller=&gt;"people"}
-       new_person GET    /people/new(.:format)                        {:action=&gt;"new", :controller=&gt;"people"}
-      edit_person GET    /people/:id/edit(.:format)                   {:action=&gt;"edit", :controller=&gt;"people"}
-           person GET    /people/:id(.:format)                        {:action=&gt;"show", :controller=&gt;"people"}
-                  PUT    /people/:id(.:format)                        {:action=&gt;"update", :controller=&gt;"people"}
-                  DELETE /people/:id(.:format)                        {:action=&gt;"destroy", :controller=&gt;"people"}
-           phones GET    /phones(.:format)                            {:action=&gt;"index", :controller=&gt;"phones"}
-                  POST   /phones(.:format)                            {:action=&gt;"create", :controller=&gt;"phones"}
-        new_phone GET    /phones/new(.:format)                        {:action=&gt;"new", :controller=&gt;"phones"}
-       edit_phone GET    /phones/:id/edit(.:format)                   {:action=&gt;"edit", :controller=&gt;"phones"}
-            phone GET    /phones/:id(.:format)                        {:action=&gt;"show", :controller=&gt;"phones"}
-                  PUT    /phones/:id(.:format)                        {:action=&gt;"update", :controller=&gt;"phones"}
-                  DELETE /phones/:id(.:format)                        {:action=&gt;"destroy", :controller=&gt;"phones"}
-MacBook:phonebook sw$</screen></para>
+end
+</programlisting></para>
 
-      <para>Ganz oben stehen interessante neue Routen-Varianten, die wir so
-      noch nicht hatten: <code>new_person_phone</code>?
-      <code>edit_person_phone</code>? Gleich zwei Ressourcen in einem
-      Routen-Namen!</para>
+      <para>Damit bekommen wir dann die gewünschten Routen:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rake routes</command>
+    post_comments GET    /posts/:post_id/comments(.:format)          comments#index
+                  POST   /posts/:post_id/comments(.:format)          comments#create
+ new_post_comment GET    /posts/:post_id/comments/new(.:format)      comments#new
+edit_post_comment GET    /posts/:post_id/comments/:id/edit(.:format) comments#edit
+     post_comment GET    /posts/:post_id/comments/:id(.:format)      comments#show
+                  PUT    /posts/:post_id/comments/:id(.:format)      comments#update
+                  DELETE /posts/:post_id/comments/:id(.:format)      comments#destroy
+            posts GET    /posts(.:format)                            posts#index
+                  POST   /posts(.:format)                            posts#create
+         new_post GET    /posts/new(.:format)                        posts#new
+        edit_post GET    /posts/:id/edit(.:format)                   posts#edit
+             post GET    /posts/:id(.:format)                        posts#show
+                  PUT    /posts/:id(.:format)                        posts#update
+                  DELETE /posts/:id(.:format)                        posts#destroy
+Stefan-Wintermeyers-MacBook-Air:blog xyz$ </screen></para>
 
-      <para>Aber brauchen wir überhaupt den direkten Zugang via <uri
-      xlink:href="http://0.0.0.0:3000/phones">http://0.0.0.0:3000/phones</uri>
-      auf die Ressource <code>phones</code>? Eigentlich nein, da man nur die
-      Telefonnummern zu einer Person braucht. Also können wir in der
-      <filename>config/routes.rb</filename> die entsprechende Zeile löschen
-      und Zugriffe auf <classname>phones</classname> nur noch über
-      <classname>people</classname> zulassen:<programlisting>Webshop::Application.routes.draw do
-  resources :people do
-    resources :phones
-  end
-end</programlisting></para>
+      <para>Allerdings müssen wir in
+      <filename>app/controllers/comments_controller.rb</filename> noch ein
+      paar Änderungen vornehmen. Damit stellen wir sicher, das immer nur die
+      <varname>Comments</varname> des angegebenen <varname>Posts</varname>
+      angezeigt oder verändert werden (um die Übersicht zu verbessern, habe
+      ich den JSON-Teil rausgelöscht):<programlisting>class CommentsController &lt; ApplicationController
+  before_filter :find_post
 
-      <para>Schauen wir uns die Routen an:<screen>MacBook:phonebook sw$ <command>rake routes</command>
-    person_phones GET    /people/:person_id/phones(.:format)          {:action=&gt;"index", :controller=&gt;"phones"}
-                  POST   /people/:person_id/phones(.:format)          {:action=&gt;"create", :controller=&gt;"phones"}
- new_person_phone GET    /people/:person_id/phones/new(.:format)      {:action=&gt;"new", :controller=&gt;"phones"}
-edit_person_phone GET    /people/:person_id/phones/:id/edit(.:format) {:action=&gt;"edit", :controller=&gt;"phones"}
-     person_phone GET    /people/:person_id/phones/:id(.:format)      {:action=&gt;"show", :controller=&gt;"phones"}
-                  PUT    /people/:person_id/phones/:id(.:format)      {:action=&gt;"update", :controller=&gt;"phones"}
-                  DELETE /people/:person_id/phones/:id(.:format)      {:action=&gt;"destroy", :controller=&gt;"phones"}
-           people GET    /people(.:format)                            {:action=&gt;"index", :controller=&gt;"people"}
-                  POST   /people(.:format)                            {:action=&gt;"create", :controller=&gt;"people"}
-       new_person GET    /people/new(.:format)                        {:action=&gt;"new", :controller=&gt;"people"}
-      edit_person GET    /people/:id/edit(.:format)                   {:action=&gt;"edit", :controller=&gt;"people"}
-           person GET    /people/:id(.:format)                        {:action=&gt;"show", :controller=&gt;"people"}
-                  PUT    /people/:id(.:format)                        {:action=&gt;"update", :controller=&gt;"people"}
-                  DELETE /people/:id(.:format)                        {:action=&gt;"destroy", :controller=&gt;"people"}
-MacBook:phonebook sw$ </screen></para>
-
-      <para>Jetzt müssen wir aber noch den Controller und alle Views an die
-      neue Situation anpassen.</para>
-
-      <para>Um die Übersichtlichkeit dieser Beschreibung zu maximieren, gehen
-      wir beim Controller davon aus, dass nur Nested Resources und nur
-      HTML-Seiten angefragt werden.</para>
-
-      <para>Die Datei
-      <filename>app/controllers/phones_controller.rb</filename> sieht dann so
-      aus:<programlisting>class PhonesController &lt; ApplicationController
-  
-  before_filter :find_person
-  
-  # GET /phones
   def index
-    @phones = @person.phones
+    @comments = @post.comments
   end
 
-  # GET /phones/1
   def show
-    @phone = @person.phones.find(params[:id])
+    @comment = @post.comments.find(params[:id])
   end
 
-  # GET /phones/new
   def new
-    @phone = @person.phones.build
+    @comment = @post.comments.build
   end
 
-  # GET /phones/1/edit
   def edit
-    @phone = @person.phones.find(params[:id])
+    @comment = @post.comments.find(params[:id])
   end
 
-  # POST /phones
   def create
-    @phone = @person.phones.build(params[:phone])
+    @comment = @post.comments.build(params[:comment])
 
-    if @phone.save
-      redirect_to person_phone_path(@person, @phone), notice: 'Phone was successfully created.'
+    if @comment.save
+      redirect_to [@post, @comment], notice: 'Comment was successfully created.'
     else
       render action: "new"
     end
   end
 
-  # PUT /phones/1
   def update
-    @phone = @person.phones.find(params[:id])
+    @comment = @post.comments.find(params[:id])
 
-    if @phone.update_attributes(params[:phone])
-      redirect_to person_phone_path(@person, @phone), notice: 'Phone was successfully updated.'
+    if @comment.update_attributes(params[:comment])
+      redirect_to [@post, @comment], notice: 'Comment was successfully updated.'
     else
       render action: "edit"
     end
   end
 
-  # DELETE /phones/1
   def destroy
-    @phone = @person.phones.find(params[:id])
-    @phone.destroy
+    @comment = @post.comments.find(params[:id])
+    @comment.destroy
 
-    redirect_to person_phones_url(@person)
+    redirect_to post_comments_url(@post)
   end
-  
+
   private
-  
-  def find_person
-    @person = Person.find(params[:person_id])
+  def find_post
+    @post = Post.find(params[:post_id])
   end
-  
 end
 </programlisting></para>
 
-      <section xml:id="routes_nested_resources_index">
-        <title xml:id="routes_nested_resources_index.title">index</title>
+      <para>Leider ist das nur die halbe Miete, da in den Views noch auf die
+      alten Routen verwiesen wird. Wir müssen also jeden View entsprechend der
+      Nested Route anpassen.</para>
 
-        <para>Für den Aufruf von <uri
-        xlink:href="http://0.0.0.0:3000/people/1/phones">http://0.0.0.0:3000/people/1/phones</uri>
-        müssen wir die ganzen Routen in der View
-        <filename>app/views/phones/index.html.erb</filename>
-        ändern:<programlisting>&lt;h1&gt;Listing phones&lt;/h1&gt;
+      <para><filename>app/views/comments/_form.html.erb</filename></para>
 
-&lt;table&gt;
-  &lt;tr&gt;
-    &lt;th&gt;Person&lt;/th&gt;
-    &lt;th&gt;Phone number&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-  &lt;/tr&gt;
+      <para>Bitte beachten Sie hier, das der <code>form_for</code> Aufruf auf
+      <code>form_for([@post, @comment])</code> geändert werden muss.</para>
 
-&lt;% @phones.each do |phone| %&gt;
-  &lt;tr&gt;
-    &lt;td&gt;&lt;%= phone.person_id %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= phone.phone_number %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Show', <emphasis role="bold">person_phone_path(@person, phone)</emphasis> %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Edit', <emphasis role="bold">edit_person_phone_path(@person,phone)</emphasis> %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Destroy', <emphasis role="bold">person_phone_path(@person, phone)</emphasis>, confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
-  &lt;/tr&gt;
-&lt;% end %&gt;
-&lt;/table&gt;
-
-&lt;br /&gt;
-
-&lt;%= link_to 'New Phone', <emphasis role="bold">new_person_phone_path(@person)</emphasis> %&gt;
-</programlisting></para>
-      </section>
-
-      <section xml:id="routes_nested_resources_show">
-        <title xml:id="routes_nested_resources_show.title">show</title>
-
-        <para>Um mit <uri
-        xlink:href="http://0.0.0.0:3000/people/1/phones/1">http://0.0.0.0:3000/people/1/phones/1</uri>
-        ein <methodname>show</methodname> auf ein einzelnes Telefon zu
-        bekommen, müssen wir die Routen in der Datei
-        <filename>app/views/phones/view.html.erb</filename>
-        ändern:<programlisting>&lt;p id="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
-
-&lt;p&gt;
-  &lt;b&gt;Phone number:&lt;/b&gt;
-  &lt;%= @phone.phone_number %&gt;
-&lt;/p&gt;
-
-
-&lt;%= link_to 'Edit', <emphasis role="bold">edit_person_phone_path(@person, @phone)</emphasis> %&gt; |
-&lt;%= link_to 'Back', <emphasis role="bold">person_phones_path(@person)</emphasis> %&gt;
-</programlisting></para>
-      </section>
-
-      <section xml:id="routes_nested_resources_new">
-        <title xml:id="routes_nested_resources_new.title">new</title>
-
-        <para>Um mit <uri
-        xlink:href="http://0.0.0.0:3000/person/1/phones/new">http://0.0.0.0:3000/person/1/phones/new</uri>
-        ein neues Telefon anlegen zu können, müssen wir die Route in der Datei
-        <filename>app/views/phones/new.html.erb</filename>
-        ändern:<programlisting>&lt;h1&gt;New phone&lt;/h1&gt;
-
-&lt;%= render 'form' %&gt;
-
-&lt;%= link_to 'Back', <emphasis role="bold">person_phones_path(@person)</emphasis> %&gt;
-</programlisting></para>
-
-        <para>Und natürlich noch das Formular im Partial
-        <filename>app/views/phones/_form.html.erb</filename>:<programlisting>&lt;%= form_for(<emphasis
-              role="bold">[@person, @phone]</emphasis>) do |f| %&gt;
-  &lt;% if @phone.errors.any? %&gt;
+      <para><programlisting>&lt;%= form_for([@post, @comment]) do |f| %&gt;
+  &lt;% if @comment.errors.any? %&gt;
     &lt;div id="error_explanation"&gt;
-      &lt;h2&gt;&lt;%= pluralize(@phone.errors.count, "error") %&gt; prohibited this phone from being saved:&lt;/h2&gt;
+      &lt;h2&gt;&lt;%= pluralize(@comment.errors.count, "error") %&gt; prohibited this comment from being saved:&lt;/h2&gt;
 
       &lt;ul&gt;
-      &lt;% @phone.errors.full_messages.each do |msg| %&gt;
+      &lt;% @comment.errors.full_messages.each do |msg| %&gt;
         &lt;li&gt;&lt;%= msg %&gt;&lt;/li&gt;
       &lt;% end %&gt;
       &lt;/ul&gt;
@@ -1003,33 +870,68 @@ end
   &lt;% end %&gt;
 
   &lt;div class="field"&gt;
-    &lt;%= f.label :phone_number %&gt;&lt;br /&gt;
-    &lt;%= f.text_field :phone_number %&gt;
+    &lt;%= f.label :content %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :content %&gt;
   &lt;/div&gt;
   &lt;div class="actions"&gt;
     &lt;%= f.submit %&gt;
   &lt;/div&gt;
 &lt;% end %&gt;
 </programlisting></para>
-      </section>
 
-      <section>
-        <title>edit</title>
-
-        <para>Die Änderungen in der Datei
-        <filename>app/views/phones/edit.html.erb</filename> für den Zugriff
-        auf <uri>http://0.0.0.0:3000/people/1/phones/1/edit</uri> ähneln denen
-        vom View für <methodname>new</methodname>:<programlisting>&lt;h1&gt;Editing phone&lt;/h1&gt;
+      <para><filename>app/views/comments/edit.html.erb</filename><programlisting>&lt;h1&gt;Editing comment&lt;/h1&gt;
 
 &lt;%= render 'form' %&gt;
+</programlisting></para>
 
-&lt;%= link_to 'Show', <emphasis role="bold">person_phone_path(@person, @phone)</emphasis> %&gt; |
-&lt;%= link_to 'Back', <emphasis role="bold">person_phones_path(@person)</emphasis> %&gt;</programlisting></para>
+      <para><filename>app/views/comments/index.html.erb</filename><programlisting>&lt;h1&gt;Listing comments&lt;/h1&gt;
 
-        <para>Das Formular im Partial
-        <filename>app/views/phones/_form.html.erb</filename> brauchen wir
-        natürlich nichts mehr zu ändern.</para>
-      </section>
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Post&lt;/th&gt;
+    &lt;th&gt;Content&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @comments.each do |comment| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= comment.post_id %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= comment.content %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Show', [@post, comment] %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Edit', edit_post_comment_path(@post, comment) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', [@post, comment], confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+
+&lt;br /&gt;
+
+&lt;%= link_to 'New Comment', new_post_comment_path(@post) %&gt;
+</programlisting></para>
+
+      <para><filename>app/views/comments/new.html.erb</filename><programlisting>&lt;h1&gt;New comment&lt;/h1&gt;
+
+&lt;%= render 'form' %&gt;</programlisting></para>
+
+      <para><filename>app/views/comments/show.html.erb</filename><programlisting>&lt;p id="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;Post:&lt;/b&gt;
+  &lt;%= @comment.post_id %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;Content:&lt;/b&gt;
+  &lt;%= @comment.content %&gt;
+&lt;/p&gt;
+</programlisting></para>
+
+      <para>Bitte spielen Sie einmal mit den unter rake routes aufgeführten
+      URLs rum. So können Sie jetzt mit <uri>/posts/new</uri> einen neuen Post
+      und mit <uri>/posts/:post_id/comments/new</uri> einen neuen Comment zu
+      diesem Post generieren.</para>
     </section>
   </section>
 
