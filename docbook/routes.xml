@@ -23,12 +23,17 @@
 
     <para>In <xref linkend="dynamische_webseiten" /> und <xref
     linkend="scaffolding" /> hatten wir schon mal kurz Kontakt mit
-    <foreignphrase xml:lang="en">Routes</foreignphrase> (zu Deutsch: Routen).
-    In diesem Kapitel werden wir einen intensiveren Blick in die
-    Routing-Möglichkeit werfen. Mit Routen werden abgerufene URLs zu
-    bestimmtem Code in der Rails-Applikation geleitet. Weiterhin können damit
-    Variablen definiert werden, die aus der Applikation aufgerufen
-    werden.</para>
+    <foreignphrase xml:lang="en">Routes</foreignphrase>. Mit den in
+    <filename>config/routes.rb</filename> enthaltenen Routen wird definiert,
+    was in Rails Application passiert, wenn eine bestimmte URL vom Besucher
+    der Webseite angesteuert wird. Eine Route kann statisch und dynamisch sein
+    und evt. dynamische Werte mit Variablen an den Controller übergeben.
+    Sollten mehrere Routen auf eine URL zutreffen, so gewinnt die in der
+    <filename>config/routes.rb</filename> am oberste eingetragene.<note>
+        <para>Wenn Sie wenig Zeit haben, können Sie dieses Kapitel erst einmal
+        überspringen und später bei konkreten Fragen noch mal
+        nachschlagen.</para>
+      </note></para>
 
     <para>Bauen wir uns zuerst eine Test-Rails-Applikation zum
     Experimentieren:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new shop</command>
@@ -53,8 +58,10 @@ Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
       liegt im Verzeichnis <filename>/public</filename>. Dort liegt die Datei
       <filename>public/index.html</filename>, und immer wenn im Verzeichnis
       <filename>/public</filename> eine Datei liegt, die zur angegebenen URL
-      passt, bekommt diese eine höhere Priorität als eine Rails-Route. Das
-      Gleiche gilt auch für den Fall, dass es keine Rails-Route gibt.</para>
+      passt, bekommt diese eine höhere Priorität als eine Rails-Route. Falls
+      keine Route definiert ist, wird automatisch in
+      <filename>public</filename> nach <filename>index.html</filename>
+      gesucht.</para>
     </important>
 
     <para>Bei einem neuen Rails-Projekt ist die Datei
@@ -209,7 +216,7 @@ Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
     </indexterm>
 
     <para>Wenn wir zusätzlich zur URL <uri>/home/ping</uri> noch mit
-    <uri>/home/ping-ping</uri> auf die gleiche Action im gleichen Controller
+    <uri>/home/apfelmus</uri> auf die gleiche Action im gleichen Controller
     zugreifen, so müssen wir die Datei <filename>config/routes.rb</filename>
     wie folgt verändern:<programlisting>Shop::Application.routes.draw do
   get "home/index"
@@ -220,31 +227,31 @@ Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
   root :to =&gt; "home#index"
 
-  <emphasis>match "home/ping-ping" =&gt; "home#ping"</emphasis>
+  <emphasis>match "home/apfelmus" =&gt; "home#ping"</emphasis>
 end</programlisting></para>
 
     <para>Damit stehen uns folgende Routen zur Verfügung:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake routes</command>
-home_index GET /home/index(.:format)     home#index
- home_ping GET /home/ping(.:format)      home#ping
- home_pong GET /home/pong(.:format)      home#pong
-      root     /                         home#index
-               /home/ping-ping(.:format) home#ping
+   home_index GET /home/index(.:format)    home#index
+    home_ping GET /home/ping(.:format)     home#ping
+    home_pong GET /home/pong(.:format)     home#pong
+         root     /                        home#index
+<emphasis>home_apfelmus     /home/apfelmus(.:format) home#ping</emphasis>
 Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
 
     <para><screenshot>
         <info>
-          <title>http://0.0.0.0:3000/home/ping-pong</title>
+          <title>http://0.0.0.0:3000/home/apfelmus</title>
         </info>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="screenshots/home_ping-ping.jpg"></imagedata>
+            <imagedata fileref="screenshots/home_apfelmus.jpg"></imagedata>
           </imageobject>
         </mediaobject>
       </screenshot></para>
 
-    <para>Wenn Sie der Route <filename>/home/ping-ping</filename> einen Namen
-    geben wollen, so können Sie dies mit der Einstellung <code>:as =&gt;
+    <para>Wenn Sie der Route <filename>/home/apfelmus</filename> einen anderen
+    Namen geben wollen, so können Sie dies mit der Einstellung <code>:as =&gt;
     "<replaceable>name</replaceable>"</code> in der
     <filename>config/routes.rb</filename> realisieren:<programlisting>Shop::Application.routes.draw do
   get "home/index"
@@ -255,16 +262,16 @@ Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
 
   root :to =&gt; "home#index"
 
-  <emphasis>match "home/ping-ping" =&gt; "home#ping", :as =&gt; "ping_ping"</emphasis>
+  <emphasis>match "home/ping-ping" =&gt; "home#ping", :as =&gt; "apfelmus"</emphasis>
 end</programlisting></para>
 
     <para>Jetzt stehen Ihnen im System folgende Routen-Namen zur
     Verfügung:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake routes</command>
-home_index GET /home/index(.:format)     home#index
- home_ping GET /home/ping(.:format)      home#ping
- home_pong GET /home/pong(.:format)      home#pong
-      root     /                         home#index
- ping_ping     /home/ping-ping(.:format) home#ping
+home_index GET /home/index(.:format)    home#index
+ home_ping GET /home/ping(.:format)     home#ping
+ home_pong GET /home/pong(.:format)     home#pong
+      root     /                        home#index
+  <emphasis>apfelmus</emphasis>     /home/apfelmus(.:format) home#ping
 Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
     <para>Sie sehen dabei, dass eine URL ein Minuszeichen enthalten darf, aber
@@ -347,103 +354,46 @@ end</programlisting></para>
       xlink:href="http://0.0.0.0:3000/2010">http://0.0.0.0:3000/2010</uri>
       immer noch das gleiche Ergebnis wie beim Aufruf von <uri
       xlink:href="http://0.0.0.0:3000/posts">http://0.0.0.0:3000/posts</uri>.
-      Das ist ja auch logisch. Erweitern wir aber mal die View-Datei
-      <filename>app/views/posts/index.html.erb</filename> mit einem
-      <code>&lt;%= debug params %&gt;</code> Aufruf ganz am
-      Anfang:<programlisting><emphasis>&lt;%= debug params %&gt;</emphasis>
-
-&lt;h1&gt;Listing posts&lt;/h1&gt;
-
-&lt;table&gt;
-  &lt;tr&gt;
-    &lt;th&gt;Subject&lt;/th&gt;
-    &lt;th&gt;Content&lt;/th&gt;
-    &lt;th&gt;Published at&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-  &lt;/tr&gt;
-
-&lt;% @posts.each do |post| %&gt;
-  &lt;tr&gt;
-    &lt;td&gt;&lt;%= post.subject %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= post.content %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= post.published_at %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Show', post %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Edit', edit_post_path(post) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Destroy', post, confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
-  &lt;/tr&gt;
-&lt;% end %&gt;
-&lt;/table&gt;
-
-&lt;br /&gt;
-
-&lt;%= link_to 'New Post', new_post_path %&gt;
-</programlisting></para>
-
-      <para>Und jetzt rufen wir mit dem Browser noch mal <uri
-      xlink:href="http://0.0.0.0:3000/2010">http://0.0.0.0:3000/2010</uri>
-      auf:<screenshot>
-          <info>
-            <title>Index-View mit &lt;%= debug params %&gt;</title>
-          </info>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screenshots/2010_debug_index.jpg"></imagedata>
-            </imageobject>
-          </mediaobject>
-        </screenshot></para>
-
-      <para>A-ha! Es wurde von der Route der Parameter
-      <varname>params[:year]</varname> mit dem Wert <code>2010</code> gesetzt.
-      Im Logfile hätten wir übrigens auch nachschauen können:<screen>Started GET "/2010" for 127.0.0.1 at 2012-05-09 19:44:46 +0200
+      Das ist ja auch logisch. Aber schauen Sie einmal in die Ausgabe von
+      rails server:<screen>Started GET "/2010/" for 127.0.0.1 at 2012-05-22 11:27:29 +0200
 Processing by PostsController#index as HTML
   <emphasis>Parameters: {"year"=&gt;"2010"}</emphasis>
-  Post Load (0.5ms)  SELECT "posts".* FROM "posts" 
-  Rendered posts/index.html.erb within layouts/application (6.6ms)
-Completed 200 OK in 15ms (Views: 13.4ms | ActiveRecord: 0.5ms)</screen></para>
+  Post Load (0.2ms)  SELECT "posts".* FROM "posts" 
+  Rendered posts/index.html.erb within layouts/application (5.5ms)
+Completed 200 OK in 13ms (Views: 11.3ms | ActiveRecord: 0.2ms)</screen></para>
 
-      <para>Sehr praktisch, denn diesen Parameter können wir im Controller
-      <filename>app/controllers/posts_controller.rb</filename> in der
-      Index-Methode wie folgt einbauen:<programlisting>  def index
-<emphasis>    if params[:year]
-      @posts = Post.where(:published_at =&gt; (Date.parse("01.01.#{params[:year]}")..(Date.parse("31.12.#{params[:year]}")))
-    else
-      @posts = Post.all
-    end</emphasis>
+      <para>Die Route wurde erkannt und dem Hash
+      <code><varname>params</varname></code> (in der Ausgabe irreführend als
+      <code>Parameters</code> ausgeschrieben) ein Element <code>"year" =&gt;
+      "2010"</code> zugewiesen. Ein Aufruf der URL <uri
+      xlink:href="http://0.0.0.0:3000/2010/12/24">http://0.0.0.0:3000/2010/12/24</uri>
+      ergibt erwartungsgemäss folgende Ausgabe:<screen>Started GET "/2010/12/24" for 127.0.0.1 at 2012-05-22 11:30:49 +0200
+Processing by PostsController#index as HTML
+  <emphasis>Parameters: {"year"=&gt;"2010", "month"=&gt;"12", "day"=&gt;"24"}</emphasis>
+  Post Load (0.2ms)  SELECT "posts".* FROM "posts" 
+  Rendered posts/index.html.erb within layouts/application (5.9ms)
+Completed 200 OK in 13ms (Views: 11.5ms | ActiveRecord: 0.2ms)</screen></para>
 
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @posts }
-    end
-  end</programlisting></para>
+      <para>Bei der URL <uri
+      xlink:href="http://0.0.0.0:3000/2010/12/24">http://0.0.0.0:3000/2010/12/24</uri>
+      wurden folgende Werte im Hash <varname>params</varname> gespeichert:
+      <code>"year"=&gt;"2010", "month"=&gt;"12", "day"=&gt;"24"</code></para>
 
-      <para>Damit bekommen wir das gewünschte Ergebnis (nur die 4 Postings aus
-      dem Jahr 2010):<screenshot>
-          <info>
-            <title>Posts aus dem Jahr 2010</title>
-          </info>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screenshots/2010_posts_index.jpg"></imagedata>
-            </imageobject>
-          </mediaobject>
-        </screenshot></para>
-
-      <para>Die Anpassung in der Datei
-      <filename>app/controllers/posts_controller.rb</filename> für das
-      Anzeigen von Monaten und Tagen ist nur noch eine
-      Fleißarbeit:<programlisting>def index
-  @posts = Post.all
-
-<emphasis role="bold">  if params[:year] &amp;&amp; params[:month] &amp;&amp; params[:day]
-    @posts = Post.where(:posted_at =&gt; Date.parse("#{params[:day]}.#{params[:month]}.#{params[:year]}"))
-  elsif params[:year] and params[:month]
-    @posts = Post.where(:posted_at =&gt; (Date.parse("01.#{params[:month]}.#{params[:year]}")..Date.parse("01.#{params[:month]}.#{params[:year]}").end_of_month))
+      <para>Auf <varname>params[]</varname> haben wir im Controller Zugriff
+      auf die in der URL definierten Werte. Wir müssen nur noch die
+      <methodname>index</methodname> Methode in
+      <filename>app/controllers/posts_controller.rb</filename> anpassen, um
+      die für das entsprechende Datum, den entsprechenden Monat oder das
+      entsprechende Jahr eingetragenen <varname>posts</varname>
+      auszugeben:<programlisting>def index
+<emphasis>  if params[:day]
+    @posts = Post.where(:published_at =&gt; Date.parse("#{params[:day]}.#{params[:month]}.#{params[:year]}"))
+  elsif params[:month]
+    @posts = Post.where(:published_at =&gt; ( Date.parse("01.#{params[:month]}.#{params[:year]}") .. Date.parse("01.#{params[:month]}.#{params[:year]}").end_of_month ))
   elsif params[:year]
-    @posts = Post.where(:posted_at =&gt; (Date.parse("01.01.#{params[:year]}")..Date.parse("31.12.#{params[:year]}")))
+    @posts = Post.where(:published_at =&gt; ( Date.parse("01.01.#{params[:year]}") .. Date.parse("31.12.#{params[:year]}") ))
+  else
+    @posts = Post.all
   end</emphasis>
 
   respond_to do |format|
@@ -452,15 +402,16 @@ Completed 200 OK in 15ms (Views: 13.4ms | ActiveRecord: 0.5ms)</screen></para>
   end
 end</programlisting></para>
 
-      <para>Damit können wir jetzt Jahre, Monate oder auch ganz gezielt
-      einzelne Tage anzeigen:<screenshot>
+      <para>Damit bekommen wir beim Aufruf von <uri
+      xlink:href="http://0.0.0.0:3000/2011/10/01">http://0.0.0.0:3000/2011/10/01</uri>
+      alle <varname>posts</varname> des 01.10.2011 angezeigt.<screenshot>
           <info>
-            <title>Ansicht eines einzelnen Tages</title>
+            <title>Index-View für den 01.11.2011</title>
           </info>
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="screenshots/2010-10-01_posts_index.jpg"></imagedata>
+              <imagedata fileref="screenshots/posts_2011_10_01.jpg"></imagedata>
             </imageobject>
           </mediaobject>
         </screenshot></para>
@@ -478,7 +429,7 @@ end</programlisting></para>
 
       <para>In <xref linkend="routes_match_parameter" /> habe ich Ihnen
       gezeigt, wie man Parameter aus der URL auslesen und an den Controller
-      weitergeben kann. Leider hat der Eintrag in der
+      weitergeben kann. Leider hat der dort definierte Eintrag in der
       <filename>config/routes.rb</filename> <programlisting>match "/:year(/:month(/:day))" =&gt; "posts#index"</programlisting>einen
       entscheidenen Nachteil: Er überprüft die einzelnen Elemente nicht. Die
       URL <uri
@@ -497,16 +448,13 @@ end</programlisting></para>
         </screenshot></para>
 
       <para>In der Log-Ausgabe in <filename>log/development.log</filename>
-      sehen wir dabei folgenden Eintrag:<programlisting>Started GET "/ein/beispiel/dafuer" for 127.0.0.1 at 2011-06-02 21:01:17 +0200
-  Processing by PostsController#index as HTML
-  Parameters: {"year"=&gt;"ein", "month"=&gt;"beispiel", "day"=&gt;"dafuer"}
-  Post Load (0.2ms)  SELECT "posts".* FROM "posts" 
-Completed 500 Internal Server Error in 3ms
-</programlisting></para>
+      sehen wir dabei folgenden Eintrag:<programlisting>Started GET "/ein/beispiel/dafuer" for 127.0.0.1 at 2012-05-22 13:20:44 +0200
+Processing by PostsController#index as HTML
+  Parameters: {"year"=&gt;"ein", "month"=&gt;"beispiel", "day"=&gt;"dafuer"}</programlisting></para>
 
-      <para>Es ist klar, dass die Suche nach dem Datum
-      "<code>dafuer.beispiel.ein</code>" nicht funktionieren kann. Ein Datum
-      besteht nun mal aus Zahlen und nicht aus Buchstaben.</para>
+      <para>Es ist klar, dass <code>Date.parse( "dafuer.beispiel.ein")</code>
+      nicht funktionieren kann. Ein Datum besteht nun mal aus Zahlen und nicht
+      aus Buchstaben.</para>
 
       <para>Constraints können mittels Regular Expressions den Inhalt der URL
       besser definieren. In unserem Blog-Fall würde die
@@ -535,45 +483,59 @@ end</programlisting></para>
           </mediaobject>
         </screenshot></para>
 
-      <para>Wir haben aber noch nicht alle möglichen Fehleingaben abgefangen.
-      Es kann ja sein, dass jemand den 30.02.2010 als Datum angibt. Das würde
-      wieder zu einer Fehlermeldung im Controller führen. Um diesen Fall
-      abzufangen, müssen wir im Controller etwas mehr ausholen und noch eine
-      Methode <methodname>is_valid_date?</methodname>
-      einbauen:<programlisting>def index
-  @posts = Post.all
+      <section xml:id="advanced_constraints">
+        <title xml:id="advanced_constraints.title">Advanced
+        Constraints</title>
 
-  if params[:year] and params[:month] and params[:day] and is_valid_date?(params[:year], params[:month], params[:day])
-    @posts = Post.where(:posted_at =&gt; Date.parse("#{params[:day]}.#{params[:month]}.#{params[:year]}"))
-  elsif params[:year] and params[:month] and is_valid_date?(params[:year], params[:month], '01')
-    @posts = Post.where(:posted_at =&gt; (Date.parse("01.#{params[:month]}.#{params[:year]}")..Date.parse("01.#{params[:month]}.#{params[:year]}").end_of_month))
-  elsif params[:year] and is_valid_date?(params[:year], '01', '01')
-    @posts = Post.where(:posted_at =&gt; (Date.parse("01.01.#{params[:year]}")..Date.parse("31.12.#{params[:year]}")))
-  end
+        <para>Mit der Route <code>match "/:year(/:month(/:day))" =&gt;
+        "posts#index", :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt;
+        /\d{2}/, :day =&gt; /\d{2}/ }</code> haben wir zwar die URL
+        syntaktisch auf ein Datum überprüft, aber es kann natürlich ein User
+        immer noch die URL <uri
+        xlink:href="http://0.0.0.0:3000/2011/02/31">http://0.0.0.0:3000/2011/02/31</uri>
+        aufrufen. Da es keinen 31. Februar gibt, dürfte es diese Route logisch
+        nicht geben. Wir brauchen also eine Möglichkeit, die ein angegebenes
+        syntaktisch komplettes Datum darauf überprüft, ob es auch ein
+        korrektes Datum nach dem Kalender ist.</para>
 
-  respond_to do |format|
-    format.html # index.html.erb
-    format.json { render json: @posts }
-  end
-end
-
-def is_valid_date?(year, month, day)
-  begin
-    this_date = Date.new(year.to_i, month.to_i, day.to_i)
-    return true
-  rescue ArgumentError
-    return false
+        <para>Dazu müssen wir eine eigene Klasse definieren, mit der Objekte .
+        Bitte erstellen Sie dazu die Datei
+        <filename>lib/valid_date_contraint.rb</filename> mit folgendem
+        Inhalt:<programlisting>class ValidDateConstraint
+  def matches?(request)
+    begin
+      Date.parse("#{request.params[:day]}.#{request.params[:month]}.#{request.params[:year]}")
+      true
+    rescue
+      false
+    end
   end
 end</programlisting></para>
 
-      <note>
-        <para>Wer will, kann natürlich bei einem falschen Datum nicht wie in
-        diesem Beispiel einfach alle Einträge anzeigen, sondern mit einem
-        Redirect auf eine andere Seite umleiten. Das kombiniert mit einer
-        Fehlermeldung an den User wäre wahrscheinlich der beste Weg. Man kann
-        auch eine eigene Klasse zum Überprüfen des Datums schreiben und diese
-        im Constraint aufrufen.</para>
-      </note>
+        <para>Diese Klasse müssen wir jetzt laden. Bitte erstellen Sie dazu
+        die Datei <filename>config/initializers/load_extensions.rb</filename>
+        mit diesem Inhalt:<programlisting>require 'valid_date_constraint'</programlisting></para>
+
+        <para>Jetzt spliten wir die Datums-Route in der
+        <filename>config/routes.rb</filename> auf:<programlisting>Blog::Application.routes.draw do
+  resources :posts
+
+  match "/:year/:month/:day" =&gt; "posts#index", :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{2}/, :day =&gt; /\d{2}/ }, :constraints =&gt; ValidDateConstraint.new
+
+  match "/:year(/:month)" =&gt; "posts#index", :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{2}/ }
+end
+</programlisting></para>
+
+        <para>Das erste <methodname>match</methodname> reagiert auf alle URLs
+        mit drei Parametern die syntaktisch den gegebenen Contraints
+        entsprechen. Zusätzlich wird noch das Datum überprüft. Erst wenn das
+        Datum an sich valide ist, wird diese Route benutzt. Sie wird also
+        nicht bei der URL <uri
+        xlink:href="http://0.0.0.0:3000/2011/02/31">http://0.0.0.0:3000/2011/02/31</uri>
+        aufgerufen. Hingegen würde die URL <uri
+        xlink:href="http://0.0.0.0:3000/2011/10/01">http://0.0.0.0:3000/2011/10/01</uri>
+        funktionieren.</para>
+      </section>
     </section>
 
     <section xml:id="routes_match_redirects">
