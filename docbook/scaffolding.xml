@@ -26,19 +26,23 @@
   <section xml:base="scaffolding_einleitung">
     <title>Einleitung</title>
 
-    <para>In diesem Kapitel werden wir uns mit Scaffolding beschäftigen.
-    Scaffolding heißt nicht mehr, als dass per Generator ein Grundgerüst
+    <para>In diesem Kapitel werden wir uns mit Scaffolding beschäftigen. Ich
+    zeige Ihnen ein einfaches Scaffold und Sie müssen selbstständig das bisher
+    angeeignete Wissen anwenden (sprich den Controller und die Views
+    durcharbeiten). </para>
+
+    <para>Scaffolding heißt nicht mehr, als dass per Generator ein Grundgerüst
     (<foreignphrase xml:lang="en">englisch: scaffold</foreignphrase>) für eine
     Applikation erstellt wird. Dieses Grundgerüst enthält nicht nur das
     <foreignphrase xml:lang="en">Model</foreignphrase>, sondern auch eine
     einfache Web-GUI (also <foreignphrase xml:lang="en">Views</foreignphrase>)
     und natürlich einen <foreignphrase
     xml:lang="en">Controller</foreignphrase>. Als Programmierparadigma wird
-    hierfür REST (Representational State Transfer) benutzt. </para>
+    hierfür REST (Representational State Transfer) benutzt.</para>
 
     <para>Eine Definition von REST finden Sie unter <uri
     xlink:href="http://de.wikipedia.org/wiki/Representational_State_Transfer">http://de.wikipedia.org/wiki/Representational_State_Transfer</uri>.
-    Hier meine Super-Kurzversion: Der Erfinder Roy Fielding hat im Jahr 2000
+    Meine Super-Kurzversion: Der Erfinder Roy Fielding hat im Jahr 2000
     beschrieben, das man mit einem einfachen Regelwerk innerhalb der Idee von
     CRUD (siehe <uri
     xlink:href="http://de.wikipedia.org/wiki/CRUD">http://de.wikipedia.org/wiki/CRUD</uri>)
@@ -359,7 +363,7 @@ end
   <section xml:id="scaffold_views">
     <title>Die Views</title>
 
-    <para>Jetzt starten wir den Rails-Webserver:<screen>Stefan-Wintermeyers-MacBook-Air:history xyz$ rails server
+    <para>Jetzt starten wir den Rails-Webserver:<screen>Stefan-Wintermeyers-MacBook-Air:history xyz$ <command>rails server</command>
 =&gt; Booting WEBrick
 =&gt; Rails 3.2.3 application starting in development on http://0.0.0.0:3000
 =&gt; Call with -d to detach
@@ -504,6 +508,109 @@ Stefan-Wintermeyers-MacBook-Air:history xyz$</screen></para>
       <para>Als mittlerweiler alter ERB-Hase werden Sie keine Probleme haben,
       den Code zu lesen und zu verstehen. Falls doch, empfehle ich noch mal
       einen schnellen Blick in <xref linkend="erb-programmieren" />.</para>
+    </section>
+
+    <section xml:id="link_to">
+      <title xml:id="link_to.title">link_to</title>
+
+      <indexterm>
+        <primary>link_to</primary>
+      </indexterm>
+
+      <para>In den vom scaffold Generator genierierten Views sind Sie zum
+      ersten mal auf den Helpfer <code>link_to</code> gestossen. Damit werden
+      Verlinkungen innerhalb des Rails-Projektes erzeugt. Man kann natürlich
+      auch einen Link von Hand mit <code>&lt;a href=""&gt;</code> im erb
+      eintragen, aber für Verlinkungen innerhalb eines Rails-Projektes ist
+      <code>link_to</code> praktischer, weil man die Namen der Routen als Ziel
+      benutzen kann. Der Code wird damit wesentlich lesbarer. In obigen
+      Beispiel gibt es folgende Routen:<screen>Stefan-Wintermeyers-MacBook-Air:history xyz$ <command>rake routes</command>
+    chancellors GET    /chancellors(.:format)          chancellors#index
+                POST   /chancellors(.:format)          chancellors#create
+ new_chancellor GET    /chancellors/new(.:format)      chancellors#new
+edit_chancellor GET    /chancellors/:id/edit(.:format) chancellors#edit
+     chancellor GET    /chancellors/:id(.:format)      chancellors#show
+                PUT    /chancellors/:id(.:format)      chancellors#update
+                DELETE /chancellors/:id(.:format)      chancellors#destroy
+Stefan-Wintermeyers-MacBook-Air:history xyz$</screen></para>
+
+      <para>Der erste Teil dieser Route ist der Name der Route. Bei einem new
+      Aufruf ist das <code>new_chancellor</code>. Ein Link auf
+      <code>new_chancellor</code> sieht im erb-Code so aus (das können Sie am
+      Ende der Datei <filename>app/views/chancellors/index.html.erb</filename>
+      einsehen):<programlisting>&lt;%= link_to 'New Chancellor', new_chancellor_path %&gt;</programlisting></para>
+
+      <para>Im HTML-Code der generierten Seite (<uri
+      xlink:href="http://0.0.0.0:3000/chancellors">http://0.0.0.0:3000/chancellors</uri>)
+      sehen Sie das Ergebnis:<programlisting>&lt;a href="/chancellors/new"&gt;New Chancellor&lt;/a&gt;</programlisting></para>
+
+      <para>Mit <code>link_to</code> können sie auch auf Resourcen innerhalb
+      einer RESTful Resource verlinken. Auch dafür finden Sie in
+      <filename>app/views/chancellors/index.html.erb</filename> Beispiele. In
+      der Tabelle wird zu jedem <varname>chancellor</varname> ein
+      <code>show</code>, ein <code>edit</code> und ein <code>destroy</code>
+      link gerendert:<programlisting>&lt;% @chancellors.each do |chancellor| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= chancellor.first_name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= chancellor.last_name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= chancellor.birthday %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= chancellor.day_of_death %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= chancellor.inauguration %&gt;&lt;/td&gt;
+<emphasis>    &lt;td&gt;&lt;%= link_to 'Show', chancellor %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Edit', edit_chancellor_path(chancellor) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', chancellor, confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
+</emphasis>  &lt;/tr&gt;
+&lt;% end %&gt;</programlisting></para>
+
+      <para>Rails bestimmt anhand der Resource und der gewählten Route
+      automatisch die benötigte URL und das benötigte HTTP-Verb (sprich, ob es
+      sich um ein POST, GET, PUT oder DELETE) handelt. Beim Index- und
+      Show-Aufruf müssen Sie auf den Unterschied zwischen Plural und Singular
+      achten. <code>link_to 'Show', chancellor</code> verlinkt auf einen
+      einzelnen Datensatz und <code>link_to 'Show', chancellors_path</code>
+      verlinkt auf die Index-Ansicht.</para>
+
+      <para>Ob der Name der Route mit oder ohne den Zusatz <code>_path</code>
+      in <code>link_to</code> verwendet wird, hängt davon ab, ob Rails sich
+      anhand der restlichen Informationen die Route "denken" kann. Wird nur
+      ein Objekt (in unserem Beispiel die Variable
+      <varname>chancellor</varname>) angegeben, dann geht Rails automatisch
+      davon aus, das es sich um eine show-Route handelt.</para>
+
+      <informaltable>
+        <tgroup cols="2">
+          <tbody>
+            <row>
+              <entry><code>link_to 'Show', Chancellor.first</code></entry>
+
+              <entry>Link zum ersten Chancellor Eintrag.</entry>
+            </row>
+
+            <row>
+              <entry><code>link_to 'New Chancellor',
+              new_chancellor_path</code></entry>
+
+              <entry>Link zum Webinterface, in dem ein neuer Eintrag erstellt
+              werden kann.</entry>
+            </row>
+
+            <row>
+              <entry><code>link_to 'Edit',
+              edit_chancellor_path(Chancellor.first)</code></entry>
+
+              <entry>Link zum Formular, in dem der erste Chancellor Eintrag
+              editiert werden kann.</entry>
+            </row>
+
+            <row>
+              <entry><code>link_to 'Destroy', Chancellor.first, method:
+              :delete</code></entry>
+
+              <entry>Link zum Löschen des ersten Chancellor Eintrages.</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
     </section>
 
     <section xml:id="scaffold_json_und_xml">
@@ -847,6 +954,8 @@ ActionView::Template::Error (undefined method `edit_chancellor_path' for #&lt;#&
       ohne. Dann werden Sie schnell ein Gefühl dafür bekommen, ob es in Ihre
       Arbeitsweise passt oder nicht. Ich empfinde Scaffolding als
       Arbeitserleichterung für Standard-Applikationen.</para>
+
+      <para> </para>
     </section>
   </section>
 </chapter>
