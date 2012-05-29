@@ -29,7 +29,7 @@
     <para>In diesem Kapitel werden wir uns mit Scaffolding beschäftigen. Ich
     zeige Ihnen ein einfaches Scaffold und Sie müssen selbstständig das bisher
     angeeignete Wissen anwenden (sprich den Controller und die Views
-    durcharbeiten). </para>
+    durcharbeiten).</para>
 
     <para>Scaffolding heißt nicht mehr, als dass per Generator ein Grundgerüst
     (<foreignphrase xml:lang="en">englisch: scaffold</foreignphrase>) für eine
@@ -577,6 +577,8 @@ Stefan-Wintermeyers-MacBook-Air:history xyz$</screen></para>
       <varname>chancellor</varname>) angegeben, dann geht Rails automatisch
       davon aus, das es sich um eine show-Route handelt.</para>
 
+      <para>Beispiele:</para>
+
       <informaltable>
         <tgroup cols="2">
           <tbody>
@@ -611,6 +613,90 @@ Stefan-Wintermeyers-MacBook-Air:history xyz$</screen></para>
           </tbody>
         </tgroup>
       </informaltable>
+    </section>
+
+    <section xml:id="form_for">
+      <title xml:id="form_for.title">form_for</title>
+
+      <indexterm>
+        <primary>form_for</primary>
+      </indexterm>
+
+      <para>Im vom <code>new</code> und <code>edit</code> View benutzten
+      Partial <filename>app/views/chancellors/_form.html.erb</filename> finden
+      Sie folgenden Code für das Chancellor-Formular:<programlisting>&lt;%= form_for(@chancellor) do |f| %&gt;
+  &lt;% if @chancellor.errors.any? %&gt;
+    &lt;div id="error_explanation"&gt;
+      &lt;h2&gt;&lt;%= pluralize(@chancellor.errors.count, "error") %&gt; prohibited this chancellor from being saved:&lt;/h2&gt;
+
+      &lt;ul&gt;
+      &lt;% @chancellor.errors.full_messages.each do |msg| %&gt;
+        &lt;li&gt;&lt;%= msg %&gt;&lt;/li&gt;
+      &lt;% end %&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;% end %&gt;
+
+  &lt;div class="field"&gt;
+    &lt;%= f.label :first_name %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :first_name %&gt;
+  &lt;/div&gt;
+  &lt;div class="field"&gt;
+    &lt;%= f.label :last_name %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :last_name %&gt;
+  &lt;/div&gt;
+  &lt;div class="field"&gt;
+    &lt;%= f.label :birthday %&gt;&lt;br /&gt;
+    &lt;%= f.date_select :birthday %&gt;
+  &lt;/div&gt;
+  &lt;div class="field"&gt;
+    &lt;%= f.label :day_of_death %&gt;&lt;br /&gt;
+    &lt;%= f.date_select :day_of_death %&gt;
+  &lt;/div&gt;
+  &lt;div class="field"&gt;
+    &lt;%= f.label :inauguration %&gt;&lt;br /&gt;
+    &lt;%= f.date_select :inauguration %&gt;
+  &lt;/div&gt;
+  &lt;div class="actions"&gt;
+    &lt;%= f.submit %&gt;
+  &lt;/div&gt;
+&lt;% end %&gt;
+</programlisting></para>
+
+      <para>Der Helper <code>form_for</code> kümmert sich für Sie um die
+      Erstellung des HTML-Formulars, mit dem der User die Daten für den
+      Datensatz eingeben oder verändern kann. Wenn Sie hier ein <code>&lt;div
+      class="field"&gt;</code> Element löschen, dann kann dies nicht mehr zur
+      Eingabe im Web-Interface benutzt werden.</para>
+
+      <para>Bei der Verwendung von Validierungen im Model werden auftrettende
+      Validierungsfehler im folgenden Code am Kopf des Formulars
+      angezeigt:<programlisting>  &lt;% if @chancellor.errors.any? %&gt;
+    &lt;div id="error_explanation"&gt;
+      &lt;h2&gt;&lt;%= pluralize(@chancellor.errors.count, "error") %&gt; prohibited this chancellor from being saved:&lt;/h2&gt;
+
+      &lt;ul&gt;
+      &lt;% @chancellor.errors.full_messages.each do |msg| %&gt;
+        &lt;li&gt;&lt;%= msg %&gt;&lt;/li&gt;
+      &lt;% end %&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;% end %&gt;</programlisting></para>
+
+      <para>Ein solcher Fehler würde dann wie folgt auf der Webseite
+      angezeigt.</para>
+
+      <para><screenshot>
+          <info>
+            <title>Flash-Error für einen neuen Datensatz</title>
+          </info>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/chancellor_error_flash.jpg"></imagedata>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
     </section>
 
     <section xml:id="scaffold_json_und_xml">
@@ -955,7 +1041,7 @@ ActionView::Template::Error (undefined method `edit_chancellor_path' for #&lt;#&
       Arbeitsweise passt oder nicht. Ich empfinde Scaffolding als
       Arbeitserleichterung für Standard-Applikationen.</para>
 
-      <para> </para>
+      <para></para>
     </section>
   </section>
 </chapter>
