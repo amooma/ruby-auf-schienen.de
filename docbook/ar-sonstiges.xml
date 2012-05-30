@@ -14,6 +14,154 @@
   für ein Anfängerbuch. Es gibt kochrezeptartig Lösungen für konkrete
   ActiveRecord-Probleme.</para>
 
+  <section xml:id="ar_callbacks">
+    <title xml:id="ar_callbacks.title">Callbacks</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Callback</secondary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Callback</secondary>
+
+      <tertiary>before_validation</tertiary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Callback</secondary>
+
+      <tertiary>after_validation</tertiary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Callback</secondary>
+
+      <tertiary>before_save</tertiary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Callback</secondary>
+
+      <tertiary>before_create</tertiary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Callback</secondary>
+
+      <tertiary>after_save</tertiary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Callback</secondary>
+
+      <tertiary>after_create</tertiary>
+    </indexterm>
+
+    <para>Callbacks sind definierte Programmier-Einstiegspunkte (Hooks) im
+    Leben eines ActiveRecord Objektes. Eine Aufstellung aller Callbacks finden
+    Sie auf <uri
+    xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Callbacks.html">http://api.rubyonrails.org/classes/ActiveRecord/Callbacks.html</uri>.
+    Hier sind die am häufigsten verwendeten:<itemizedlist>
+        <listitem>
+          <para><code>before_validation</code></para>
+
+          <para>Wird vor der Validierung ausgeführt.</para>
+        </listitem>
+
+        <listitem>
+          <para><code>after_validation</code></para>
+
+          <para>Wird nach der Validierung ausgeführt.</para>
+        </listitem>
+
+        <listitem>
+          <para><code>before_save</code></para>
+
+          <para>Wird vor jedem Abspeichern ausgeführt.</para>
+        </listitem>
+
+        <listitem>
+          <para><code>before_create</code></para>
+
+          <para>Wird vor dem ersten Abspeichern ausgeführt.</para>
+        </listitem>
+
+        <listitem>
+          <para><code>after_save</code></para>
+
+          <para>Wird nach jedem Abspeichern ausgeführt.</para>
+        </listitem>
+
+        <listitem>
+          <para><code>after_create</code></para>
+
+          <para>Wird nach dem ersten Abspeichern ausgeführt.</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>Ein Callback wird immer im Model ausgeführt. Nehmen wir einmal an,
+    das Sie E-Mail Adresse in einem <classname>User</classname> Model immer in
+    Kleinbuchstaben speichern wollen, aber dem Benutzer des Webinterfaces die
+    Möglichkeit geben wollen auch Grossbuchstaben einzugeben. Dann könnten Sie
+    mit einem <methodname>before_save</methodname> Callback das Attribute
+    <varname>email</varname> mit der Methode <methodname>downcase</methodname>
+    in Kleinbuchstaben umwandeln. Das Model sähe dann so aus:<programlisting>class User &lt; ActiveRecord::Base
+  attr_accessible :email, :name
+
+  validates :name,
+            :presence =&gt; true
+
+  validates :email,
+            :presence =&gt; true,
+            :format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }
+
+  <emphasis>before_save :downcase_email</emphasis>
+
+  private
+
+<emphasis>  def downcase_email
+    self.email = self.email.downcase
+  end</emphasis>
+end</programlisting></para>
+
+    <para>Probieren wir einmal in der Console aus, ob es auch so funktioniert,
+    wie wir es uns vorstellen:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>User.create(name: 'Wintermeyer', email: 'Stefan.Wintermeyer@amooma.de')</command>
+   (0.1ms)  begin transaction
+  SQL (5.9ms)  INSERT INTO "users" ("created_at", "email", "name", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Wed, 30 May 2012 18:20:21 UTC +00:00], ["email", "stefan.wintermeyer@amooma.de"], ["name", "Wintermeyer"], ["updated_at", Wed, 30 May 2012 18:20:21 UTC +00:00]]
+   (2.8ms)  commit transaction
+ =&gt; #&lt;User id: 1, name: "Wintermeyer", email: "stefan.wintermeyer@amooma.de", created_at: "2012-05-30 18:20:21", updated_at: "2012-05-30 18:20:21"&gt; 
+1.9.3p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
+
+    <para>Obwohl die E-Mail Adresse mit einem grossen 'S' und 'W' angegeben
+    wurde, hat ActiveRecord automatisch innerhalb des
+    <methodname>before_save</methodname> Callbacks alle Buchstaben in
+    Kleinbuchstaben umgewandelt.</para>
+
+    <para>In <xref linkend="action_mailer" /> finden Sie ein Beispiel für das
+    gleiche Model, bei dem mit einem <methodname>after_create</methodname>
+    Callback automatisch eine E-Mail an einen neu angelegten User verschickt
+    wird. In <xref linkend="ar_default_werte" /> finden Sie ein Beispiel, wie
+    mit einem <methodname>after_initialize</methodname> Callback ein
+    Default-Wert für ein neues Objekt definiert wird.</para>
+  </section>
+
   <section xml:id="ar_default_werte">
     <title xml:id="ar_default_werte.title">Default-Werte</title>
 
