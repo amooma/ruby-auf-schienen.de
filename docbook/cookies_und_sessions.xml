@@ -19,11 +19,11 @@
     <para>Mit einem Cookie kann man auf dem System des Web-Browsers
     Informationen in Form von Strings als Key-Value-Pair (Schlüssel-Wert-Paar)
     speichern, die der Webserver vorher an diesen Browser geschickt hat. Die
-    Informationen werden später im HyperText-Transfer-Protocol-Header wieder
-    vom Browser an den Server geschickt. Ein Cookie wird dabei auf dem
-    Browsersystem weder durch einen Neustart des Browsers noch durch einen
-    Neustart des ganzen Systems gelöscht. Natürlich kann der Benutzer des
-    Browsers den Cookie manuell löschen.</para>
+    Informationen werden später im HTTP-Header wieder vom Browser an den
+    Server geschickt. Ein Cookie wird dabei (bei entsprechender Konfiguration)
+    auf dem Browsersystem weder durch einen Neustart des Browsers noch durch
+    einen Neustart des ganzen Systems gelöscht. Natürlich kann der Benutzer
+    des Browsers den Cookie manuell löschen.</para>
 
     <para><important>
         <para>Ein Browser muss keine Cookies akzeptieren und er muss sie auch
@@ -41,23 +41,22 @@
         nicht zu groß werden zu lassen.</para>
       </tip></para>
 
-    <para>Cookies werden gelesen und gesetzt wie wir es mit einem Hash der
-    <varname>cookies[]</varname> heißt machen würden. Um den technischen
-    Kleinkram kümmert sich dann Rails.</para>
+    <para>Rails bietet uns einen Hash mit dem Namen
+    <varname>cookies[]</varname>, den wir transparent benutzen können. Um den
+    technischen Kleinkram kümmert sich dann Rails automatisch im
+    Hintergrund.</para>
 
     <para>Um die Arbeitsweise mit Cookies zu veranschaulichen, bauen wir uns
     eine Rails-Applikation, die auf einer Seite einen Cookie setzt, auf einer
     anderen Seite diesen Cookie ausliest und den Inhalt anzeigt und einer
     dritten Seite, die den Cookie wieder löscht.</para>
 
-    <para><screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new cookie_jar</command>
+    <para><screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new cookie_jar</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>cd cookie_jar</command>
-Stefan-Wintermeyers-MacBook-Air:cookie_jar stefan$ <command>bundle install</command>
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd cookie_jar</command>
+Stefan-Wintermeyers-MacBook-Air:cookie_jar xyz$ <command>rails generate controller Home set_cookies show_cookies delete_cookies</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:cookie_jar stefan$ <command>rails generate controller Home set_cookies show_cookies delete_cookies</command>
-[...]
-Stefan-Wintermeyers-MacBook-Air:cookie_jar stefan$</screen></para>
+Stefan-Wintermeyers-MacBook-Air:cookie_jar xyz$</screen></para>
 
     <para>Die Controller-Datei
     <filename>app/controllers/home_controller.rb</filename> befüllen wir wie
@@ -86,8 +85,8 @@ end</programlisting></para>
 &lt;p&gt;Find me in app/views/home/show_cookies.html.erb&lt;/p&gt;
 
 &lt;table&gt;
- &lt;tr&gt;&lt;td&gt;User-Name&lt;/td&gt;&lt;td&gt;&lt;%= @user_name %&gt;&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;Kundennummer&lt;/td&gt;&lt;td&gt;&lt;%= @kundennummer %&gt;&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;User-Name:&lt;/td&gt;&lt;td&gt;&lt;%= @user_name %&gt;&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;Kundennummer:&lt;/td&gt;&lt;td&gt;&lt;%= @kundennummer %&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;</programlisting></para>
 
     <para>Starten Sie den Rails-Server mit <command>rails server</command> und
@@ -105,8 +104,10 @@ end</programlisting></para>
     xlink:href="http://0.0.0.0:3000/home/delete_cookies">http://0.0.0.0:3000/home/delete_cookies</uri>
     können Sie die Cookies wieder löschen.</para>
 
-    <para>Die so gesetzten Cookies leben auf dem Browser so lange, bis der
-    Browser ganz geschlossen wird.</para>
+    <important>
+      <para>Die so gesetzten Cookies "leben" auf dem Browser so lange, bis der
+      Browser ganz geschlossen wird.</para>
+    </important>
 
     <warning>
       <para>Der Inhalt eines normal gesetzten Cookies im Browser ist für den
@@ -190,9 +191,7 @@ end</programlisting></para>
 # If you change this key, all old signed cookies will become invalid!
 # Make sure the secret is at least 30 characters and all random,
 # no regular words or you'll be exposed to dictionary attacks.
-
-CookieJar::Application.config.secret_token = 'd06619d4de97e76be4943624afed'
-</programlisting></para>
+CookieJar::Application.config.secret_token = '85ec33910d4d57f3d3c69cb8fef20f158f68a219a76db71280779454a523330874fc4e42c7e62ecb25b8e4f5fcce1dcad88c7dcc9671a9922f675d770270a25a'</programlisting></para>
 
       <para><warning>
           <para>Sollten Sie Ihre Rails-Applikation irgendwann mal neu
@@ -238,18 +237,19 @@ end</programlisting>Der Inhalt des Cookies wird jetzt bei jedem Setzen
     </indexterm>
 
     <para>Da HTTP ein zustandsloses (stateless) Protokoll ist, treffen wir auf
-    besondere Probleme bei der Entwicklung von Anwendungen. Eigentlich hat
-    eine Webseite nicht mit einer anderen Webseite zu tun und sie wissen auch
-    nichts voneinander. Da man sich aber auf vielen Webseite z. B. nur einmal
+    besondere Probleme bei der Entwicklung von Anwendungen. Eine einzelne
+    Webseite hat nichts mit einer anderen Webseite zu tun und sie wissen auch
+    nichts voneinander. Da man sich aber auf vielen Webseite z.B. nur einmal
     und nicht auf jeder Seite neu anmelden will, ist das ein Problem. Die
-    Lösung dafür heißt Session. Von Rails wird automatisch für jeden neuen
-    Besucher der Webseite eine neue Session angelegt. Diese wird per Default
-    als Cookie (siehe <xref linkend="cookies" />) gespeichert und unterliegt
-    damit der Begrenzung auf 4 kB. Man kann die Sessions aber auch in der
-    Datenbank speichern (siehe <xref linkend="sessions_datenbank" />). Eine
-    eigenständige und eindeutige (unique) Session-ID wird automatisch erstellt
-    und der Cookie wird per Default beim Schließen des Webbrowsers
-    gelöscht.<warning>
+    Lösung dafür heißt Session und wird von Rails dem Programmierer
+    transparent als <varname>session[]</varname> Hash angeboten. Von Rails
+    wird dabei automatisch für jeden neuen Besucher der Webseite eine neue
+    Session angelegt. Diese wird per Default als Cookie (siehe <xref
+    linkend="cookies" />) gespeichert und unterliegt damit der Begrenzung auf
+    4 kB. Man kann die Sessions aber auch in der Datenbank speichern (siehe
+    <xref linkend="sessions_datenbank" />). Eine eigenständige und eindeutige
+    (unique) Session-ID wird automatisch erstellt und der Cookie wird per
+    Default beim Schließen des Webbrowsers gelöscht.<warning>
         <para>Bitte beachten Sie, dass nur von Rails generierte Seiten im
         Session-Management arbeiten. Wenn Sie eine statische HTML-Seite aus
         <filename>/public</filename> aufrufen, so läuft das außerhalb des
@@ -269,17 +269,15 @@ end</programlisting>Der Inhalt des Cookies wird jetzt bei jedem Setzen
       und drei Views. Beim Besuch eines Views werden die vorher besuchten
       Views in einer kleinen Liste angezeigt.</para>
 
-      <para>Die Basisapplikation:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>rails new breadcrumbs</command>
+      <para>Die Basisapplikation:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new breadcrumbs</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>cd breadcrumbs</command>
-Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$ <command>bundle install</command>
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd breadcrumbs</command>
+Stefan-Wintermeyers-MacBook-Air:breadcrumbs xyz$ <command>rails generate controller Home ping pong index</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$ <command>rails generate controller Home ping pong index</command>
-[...]
-Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$</screen></para>
+Stefan-Wintermeyers-MacBook-Air:breadcrumbs xyz$</screen></para>
 
-      <para>Als Erstes erstellen wir eine Methode, mit der wir die letzten 3
-      URLs in der Session speichern und setzen eine Instanz-Variable
+      <para>Als Erstes erstellen wir eine Methode, mit der wir die letzten
+      drei URLs in der Session speichern und setzen eine Instanz-Variable
       <varname>@breadcrumbs,</varname> um die Werte im View sauber abrufen zu
       können. Dazu richten wir einen <methodname>before_filter</methodname> in
       der <filename>app/controllers/home_controller.rb</filename>
@@ -314,26 +312,25 @@ end</programlisting></para>
 &lt;html&gt;
 &lt;head&gt;
   &lt;title&gt;Breadcrumbs&lt;/title&gt;
-  &lt;%= stylesheet_link_tag    "application" %&gt;
+  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
   &lt;%= javascript_include_tag "application" %&gt;
   &lt;%= csrf_meta_tags %&gt;
 &lt;/head&gt;
 &lt;body&gt;
 
-&lt;% if @breadcrumbs %&gt;
+<emphasis>&lt;% if @breadcrumbs %&gt;
   &lt;p&gt;Letzte Seitenaufrufe:&lt;/p&gt;
   &lt;ul&gt;
     &lt;% @breadcrumbs.each do |breadcrumb| %&gt;
       &lt;li&gt;&lt;%= link_to breadcrumb, breadcrumb %&gt;&lt;/li&gt;
     &lt;% end %&gt;
   &lt;/ul&gt;
-&lt;% end %&gt;
+&lt;% end %&gt;</emphasis>
 
 &lt;%= yield %&gt;
 
 &lt;/body&gt;
-&lt;/html&gt;
-</programlisting></para>
+&lt;/html&gt;</programlisting></para>
 
       <para>Jetzt können Sie mit <command>rails server</command> den
       Rails-Server starten und auf <uri
@@ -365,7 +362,7 @@ end</programlisting></para>
       frische Session aufbauen). Bei einem Logout einer Web-Applikation wird
       so beispielsweise oft die Session zurückgesetzt. Das geht einfach und
       wir bauen das kurz in unsere Breadcrumb-Applikation (siehe <xref
-      linkend="session_breadcrumbs" />) ein:<screen>Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$ <command>rails generate controller Home reset -s</command>
+      linkend="session_breadcrumbs" />) ein:<screen>Stefan-Wintermeyers-MacBook-Air:breadcrumbs xyz$ <command>rails generate controller Home reset -s</command>
         skip  app/controllers/home_controller.rb
        route  get "home/reset"
       invoke  erb
@@ -378,9 +375,11 @@ end</programlisting></para>
       invoke    test_unit
    identical      test/unit/helpers/home_helper_test.rb
       invoke  assets
-   identical    app/assets/javascripts/home.js.coffee
-   identical    app/assets/stylesheets/home.css.scss
-Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$</screen></para>
+      invoke    coffee
+   identical      app/assets/javascripts/home.js.coffee
+      invoke    scss
+   identical      app/assets/stylesheets/home.css.scss
+Stefan-Wintermeyers-MacBook-Air:breadcrumbs xyz$</screen></para>
 
       <para>Der entsprechend erweiterte Controller
       <filename>app/controllers/home_controller.rb</filename> sieht dann so
@@ -414,10 +413,16 @@ Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$</screen></para>
   
 end</programlisting></para>
 
-      <para>Wichtig ist es nicht nur <methodname>reset_session</methodname>
-      aufzurufen, sondern auch noch die Instanz-Variable
-      <varname>@breadcrumbs</varname> auf <code>nil</code> zu setzen. Sonst
-      würden im View doch noch die alten Breadcrumbs erscheinen.</para>
+      <para>Damit können Sie beim Aufruf der URL <uri
+      xlink:href="http://0.0.0.0:3000/home/reset">http://0.0.0.0:3000/home/reset</uri>
+      die aktuelle Session löschen. </para>
+
+      <important>
+        <para>Wichtig ist es nicht nur <methodname>reset_session</methodname>
+        aufzurufen, sondern auch noch die Instanz-Variable
+        <varname>@breadcrumbs</varname> auf <code>nil</code> zu setzen. Sonst
+        würden im View doch noch die alten Breadcrumbs erscheinen.</para>
+      </important>
     </section>
 
     <section xml:id="sessions_datenbank">
@@ -426,11 +431,11 @@ end</programlisting></para>
 
       <para>Die ganzen Session-Daten in einem Cookie auf dem Browser des Users
       zu speichern, ist nicht immer optimal. Alleine das Limit von 4 kB kommt
-      einem manchmal in die Quere. Es ist aber kein Problem, denn wir können
-      das Speichern der Session vom Cookie in die Datenbank umstellen. Dann
-      wird natürlich immer noch die Session-ID in einem Cookie gespeichert,
-      aber die ganzen restlichen Session-Daten in der Datenbank auf dem
-      Server.</para>
+      einem schnell mal in die Quere. Es ist aber kein Problem, denn wir
+      können das Speichern der Session vom Cookie in die Datenbank umstellen.
+      Dann wird natürlich immer noch die Session-ID in einem Cookie
+      gespeichert, aber die ganzen restlichen Session-Daten in der Datenbank
+      auf dem Server.</para>
 
       <para>Als Erstes verändern wir die Konfiguration des Session Stores in
       der Datei <filename>config/initializers/session_store.rb</filename>. Wir
@@ -438,33 +443,34 @@ end</programlisting></para>
       Kommentarzeichen vor dem <code>:active_record_store</code>
       heraus.<programlisting># Be sure to restart your server when you modify this file.
 
-# Breadcrumbs::Application.config.session_store :cookie_store, key: '_breadcrumbs_session'
+<emphasis># Breadcrumbs::Application.config.session_store :cookie_store, key: '_breadcrumbs_session'</emphasis>
 
 # Use the database for sessions instead of the cookie-based default,
 # which shouldn't be used to store highly confidential information
 # (create the session table with "rails generate session_migration")
 
-<emphasis role="bold">Breadcrumbs::Application.config.session_store :active_record_store</emphasis></programlisting></para>
+<emphasis>Breadcrumbs::Application.config.session_store :active_record_store</emphasis></programlisting></para>
 
       <para>Jetzt müssen wir noch die entsprechende Tabelle anlegen. Das geht
       mit <command>rails generate session_migration</command> und
-      <command>rake db:migrate</command>:<screen>Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$ <command>rails generate session_migration</command>
+      <command>rake db:migrate</command>:<screen>Stefan-Wintermeyers-MacBook-Air:breadcrumbs xyz$ <command>rails generate session_migration</command>
       invoke  active_record
-      create    db/migrate/20110606095336_add_sessions_table.rb
-Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$ <command>rake db:migrate</command>
+      create    db/migrate/20120530145134_add_sessions_table.rb
+Stefan-Wintermeyers-MacBook-Air:breadcrumbs xyz$ <command>rake db:migrate</command>
 ==  AddSessionsTable: migrating ===============================================
 -- create_table(:sessions)
-   -&gt; 0.0022s
+   -&gt; 0.0014s
 -- add_index(:sessions, :session_id)
-   -&gt; 0.0006s
+   -&gt; 0.0005s
 -- add_index(:sessions, :updated_at)
    -&gt; 0.0006s
-==  AddSessionsTable: migrated (0.0038s) ======================================
+==  AddSessionsTable: migrated (0.0027s) ======================================
 
-Stefan-Wintermeyers-MacBook-Air:breadcrumbs stefan$</screen></para>
+Stefan-Wintermeyers-MacBook-Air:breadcrumbs xyz$</screen></para>
 
-      <para>Logischerweise muss der Web-Server dafür heruntergefahren
-      werden.</para>
+      <para>Fertig. Jetzt müssen Sie mit <command>rails server</command> den
+      Server wieder starten und Rails speichert alle Sessions in der
+      Datenbank.</para>
     </section>
   </section>
 </chapter>
