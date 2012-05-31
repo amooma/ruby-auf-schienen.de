@@ -55,9 +55,10 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
 
     <para>Diese müssen wir noch in der <filename>config/routes.rb</filename>
     als Root-Seite eintragen:<programlisting>Webshop::Application.routes.draw do
-  get "page/index"
 
   root :to =&gt; 'page#index'
+  get "page/index"
+
 end</programlisting></para>
 
     <para>Die <filename>app/views/page/index.html.erb</filename> füllen wir
@@ -155,8 +156,8 @@ end</programlisting></para>
       eine Anpassung der <filename>config/routes.rb</filename><programlisting>Webshop::Application.routes.draw do
 
   <emphasis>scope "(:locale)", :locale =&gt; /en|de/ do</emphasis>
-    get "page/index"
     root :to =&gt; 'page#index'
+    get "page/index"
   <emphasis>end</emphasis>
 
 end</programlisting></para>
@@ -237,6 +238,50 @@ end</programlisting></para>
       um den Parameter <varname>locale</varname> erweitert. Sie müssen nichts
       weiter tun. Alle mit dem Scaffold Generator generierten Links werden
       automatisch entsprechend verändert.</para>
+
+      <section>
+        <title>Navigationsbeispiel</title>
+
+        <para>Um dem User die Möglichkeit zu geben einfach zwischen den
+        Sprachversionen hin- und herzuschalten, bieten sich am Kopf der
+        Webseite zwei Links an. Dabei sollte die aktuelle Sprache nicht als
+        aktiver Link angezeigt werden. Dies kann man in der
+        <filename>app/views/layouts/application.html.erb</filename> Datei für
+        alle Views wie folgt realisieren:<programlisting>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Webshop&lt;/title&gt;
+  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
+  &lt;%= javascript_include_tag "application" %&gt;
+  &lt;%= csrf_meta_tags %&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+<emphasis>&lt;p&gt;
+&lt;%= link_to_unless I18n.locale == :en, "English", locale: :en %&gt;
+|
+&lt;%= link_to_unless I18n.locale == :de, "Deutsch", locale: :de %&gt;
+&lt;/p&gt;</emphasis>
+
+&lt;%= yield %&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</programlisting></para>
+
+        <para>Die Navigation wird dann am Kopf der Seite angezeigt.</para>
+
+        <screenshot>
+          <info>
+            <title>Sprachauswahl in der Kopfzeile</title>
+          </info>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/I18n_locale_url_prefix_navigation.jpg"></imagedata>
+            </imageobject>
+          </mediaobject>
+        </screenshot>
+      </section>
     </section>
 
     <section>
@@ -316,25 +361,24 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
       <para>In der
       <filename>app/controllers/set_language_controller.rb</filename> Datei
       füllen wir die beiden Actions wie folgt:<programlisting>class SetLanguageController &lt; ApplicationController
-
   def english
     I18n.locale = :en
-    set_session_and_redirect_to_root
+    set_session_and_redirect
   end
 
   def german
     I18n.locale = :de
-    set_session_and_redirect_to_root
+    set_session_and_redirect
   end
 
   private
-  def set_session_and_redirect_to_root
-<emphasis>    session[:locale] = I18n.locale</emphasis>
-    redirect_to :root
+  def set_session_and_redirect
+    session[:locale] = I18n.locale
+    redirect_to :back
+    rescue ActionController::RedirectBackError
+      redirect_to :root
   end
-
-end
-</programlisting></para>
+end</programlisting></para>
 
       <para>Zum Schluss müssen wir noch in der Datei
       <filename>app/controllers/application_controller.rb</filename> die
@@ -357,6 +401,50 @@ end
       die Sprache auf Deutsch und mit dem Aufruf von <uri
       xlink:href="http://0.0.0.0:3000/set_language/english">http://0.0.0.0:3000/set_language/english</uri>
       die Sprache auf Englisch stellen.</para>
+
+      <section>
+        <title>Navigationsbeispiel</title>
+
+        <para>Um dem User die Möglichkeit zu geben einfach zwischen den
+        Sprachversionen hin- und herzuschalten, bieten sich am Kopf der
+        Webseite zwei Links an. Dabei sollte die aktuelle Sprache nicht als
+        aktiver Link angezeigt werden. Dies kann man in der
+        <filename>app/views/layouts/application.html.erb</filename> Datei für
+        alle Views wie folgt realisieren:<programlisting>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Webshop&lt;/title&gt;
+  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
+  &lt;%= javascript_include_tag "application" %&gt;
+  &lt;%= csrf_meta_tags %&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+<emphasis>&lt;p&gt;
+&lt;%= link_to_unless I18n.locale == :en, "English", set_language_english_path %&gt;
+|
+&lt;%= link_to_unless I18n.locale == :de, "Deutsch", set_language_german_path %&gt;
+&lt;/p&gt;</emphasis>
+
+&lt;%= yield %&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</programlisting></para>
+
+        <para>Die Navigation wird dann am Kopf der Seite angezeigt.</para>
+
+        <screenshot>
+          <info>
+            <title>Sprachauswahl in der Kopfzeile</title>
+          </info>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/I18n_locale_url_prefix_navigation.jpg"></imagedata>
+            </imageobject>
+          </mediaobject>
+        </screenshot>
+      </section>
     </section>
 
     <section xml:id="i18n_welcher_weg">
