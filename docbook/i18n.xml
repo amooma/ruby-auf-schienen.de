@@ -196,7 +196,7 @@ end</programlisting></para>
       xlink:href="http://0.0.0.0:3000/de/page/index">http://0.0.0.0:3000/de/page/index</uri>
       aufrufen:<screenshot>
           <info>
-            <title>http://0.0.0.0:3000/de</title>
+            <title>http://0.0.0.0:3000/de/page/index</title>
           </info>
 
           <mediaobject>
@@ -447,6 +447,64 @@ end
           </mediaobject>
         </screenshot>
       </section>
+    </section>
+
+    <section xml:id="i18n_url_path_prefix">
+      <title xml:id="i18n_locale_per_domain_endung.title">I18n.locale per
+      Domain-Endung setzen</title>
+
+      <indexterm>
+        <primary>I18n.locale</primary>
+
+        <secondary>Domain-Endung</secondary>
+      </indexterm>
+
+      <para>Wenn Sie mehrer Domains mit den für die entsprechenden Sprachen
+      typischen Domain-Endungen haben, dann können Sie natürlich darüber auch
+      die Sprache setzen. So würde ein Besucher von <uri
+      xlink:href="http://www.example.com">http://www.example.com</uri> die
+      Englische Version und ein Besucher von <uri
+      xlink:href="http://www.example.de">http://www.example.de</uri> die
+      Deutsche Version angezeigt bekommen. </para>
+
+      <para>Dazu müssen wir in der
+      <filename>app/controllers/application_controller.rb</filename> einen
+      <methodname>before_filter</methodname> setzen, der die aufgerufene
+      Domain analysiert und <varname>I18n.locale</varname>
+      setzt:<programlisting>class ApplicationController &lt; ActionController::Base
+  protect_from_forgery
+
+  before_filter :set_locale
+ 
+  private
+<emphasis>  def set_locale
+    case request.host.split('.').last
+    when 'de'
+      I18n.locale = :de
+    when 'com'
+      I18n.locale = :en
+    else
+      I18n.locale = I18n.default_locale
+    end 
+  end</emphasis>
+ 
+end</programlisting></para>
+
+      <tip>
+        <para>Zum Testen dieser Funktionalität können Sie auf Ihrem Linux oder
+        Mac OS X Entwicklungssystem in der Datei
+        <filename>/etc/hosts</filename> die folgenden Einträge
+        hinzufügen:<programlisting>0.0.0.0 www.example.com
+0.0.0.0 www.example.de
+</programlisting></para>
+
+        <para>Danach können Sie die URLs <uri
+        xlink:href="http://www.example.com:3000">http://www.example.com:3000</uri>
+        und <uri
+        xlink:href="http://www.example.de:3000">http://www.example.de:3000</uri>
+        aufrufen und bekommen die entsprechenden Sprachversionen
+        angezeigt.</para>
+      </tip>
     </section>
 
     <section xml:id="i18n_welcher_weg">
