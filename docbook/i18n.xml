@@ -42,7 +42,7 @@
 
     <para>Rails benutzt die Klasse <classname>I18n</classname> um alle
     Internationalisierungen abzubilden. <code>I18n.locale</code> speichert
-    dabei die aktuelle Spracheinstellung ab. Ich zeige Ihnen das mit einem
+    dabei die aktuelle Sprache ab. Ich zeige Ihnen das mit einem
     Mini-Webshop-Beispiel:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new webshop</command>
 [...]
 Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd webshop</command>
@@ -292,15 +292,24 @@ end</programlisting></para>
       Rails-Applikation die angegebene Sprache überhaupt unterstützen.</para>
     </section>
 
-    <section>
-      <title>I18n.locale in einer Session abspeichern</title>
+    <section xml:id="i18n_local_session">
+      <title xml:id="i18n_local_session.title">I18n.locale in einer Session
+      abspeichern</title>
+
+      <indexterm>
+        <primary>I18n.locale</primary>
+
+        <secondary>Session</secondary>
+      </indexterm>
 
       <para>Oft soll der Wert von <varname>I18n.locale</varname> in einer
-      Session (siehe <xref linkend="sessions" />) gespeichert werden. Legen
-      wir zum Setzen des Wertes als Beispiel in unserem Webshop einen
-      Controller <classname>SetLanguage</classname> mit den beiden Actions
-      <methodname>english</methodname> und <methodname>german</methodname>
-      an:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails generate controller SetLanguage english german</command>
+      Session (siehe <xref linkend="sessions" />) gespeichert werden.<tip>
+          <para>Der hier mit Sessions beschriebene Weg funktioniert natürlich
+          genau so gut mit Cookies. Siehe <xref linkend="cookies" />.</para>
+        </tip> Legen wir zum Setzen des Wertes als Beispiel in unserem Webshop
+      einen Controller <classname>SetLanguage</classname> mit den beiden
+      Actions <methodname>english</methodname> und
+      <methodname>german</methodname> an:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails generate controller SetLanguage english german</command>
 [...]
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
 
@@ -320,7 +329,7 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
 
   private
   def set_session_and_redirect_to_root
-    session[:locale] = I18n.locale
+<emphasis>    session[:locale] = I18n.locale</emphasis>
     redirect_to :root
   end
 
@@ -336,8 +345,8 @@ end
  
   private
   def set_locale
-    I18n.locale = session[:locale] || I18n.default_locale
-    session[:locale] = I18n.locale
+<emphasis>    I18n.locale = session[:locale] || I18n.default_locale
+    session[:locale] = I18n.locale</emphasis>
   end
 end
 </programlisting></para>
@@ -348,6 +357,21 @@ end
       die Sprache auf Deutsch und mit dem Aufruf von <uri
       xlink:href="http://0.0.0.0:3000/set_language/english">http://0.0.0.0:3000/set_language/english</uri>
       die Sprache auf Englisch stellen.</para>
+    </section>
+
+    <section xml:id="i18n_welcher_weg">
+      <title xml:id="i18n_welcher_weg.title">Welcher Weg ist der
+      beste?</title>
+
+      <para>Meiner Meinung nach führt eine Kombination der vorgestellten Wege
+      zum besten Ergebnis. Als Erst-Besucher einer Webseite freue ich mich,
+      wenn der Accept-Language HTTP Header meines Browsers korrekt gelesen und
+      umgesetzt wird. Es ist aber auch schön, die Sprache später in der
+      User-Konfiguration ändern zu können (gerade bei schlecht übersetzen
+      Seite ist oft Englisch besser). Und zum Schluss muss man sagen, das eine
+      gute Abbildbarkeit der Seite inklusive der Sprachen für eine
+      Suchmaschine sehr viel Wert ist. Rails gibt Ihnen die Möglichkeit alle
+      Varianten leicht zu benutzen und sogar zu verknüpfen.</para>
     </section>
   </section>
 
