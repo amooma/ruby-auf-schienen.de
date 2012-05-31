@@ -205,6 +205,12 @@ end</programlisting></para>
           </mediaobject>
         </screenshot></para>
 
+      <para>Beim Aufruf von <uri
+      xlink:href="http://0.0.0.0:3000/de">http://0.0.0.0:3000/en</uri> und
+      <uri
+      xlink:href="http://0.0.0.0:3000/de/page/index">http://0.0.0.0:3000/en/page/index</uri>
+      bekommen wir die jeweils englischen Seiten angezeigt.</para>
+
       <para>Jetzt haben wir aber ein Problem: Zwar kommen wir initial mit dem
       Prefix auf eine Seite mit der richtigen Sprache, aber was ist, wenn wir
       von dieser Seite auf eine andere Seite in unserem Rails-Projekt
@@ -229,7 +235,8 @@ end</programlisting></para>
       <methodname>url_for</methodname> (auf das
       <methodname>link_to</methodname> aufsetzt) erzeugten Links automatisch
       um den Parameter <varname>locale</varname> erweitert. Sie müssen nichts
-      mehr tun.</para>
+      weiter tun. Alle mit dem Scaffold Generator generierten Links werden
+      automatisch entsprechend verändert.</para>
     </section>
 
     <section>
@@ -288,7 +295,59 @@ end</programlisting></para>
     <section>
       <title>I18n.locale in einer Session abspeichern</title>
 
-      <para></para>
+      <para>Oft soll der Wert von <varname>I18n.locale</varname> in einer
+      Session (siehe <xref linkend="sessions" />) gespeichert werden. Legen
+      wir zum Setzen des Wertes als Beispiel in unserem Webshop einen
+      Controller <classname>SetLanguage</classname> mit den beiden Actions
+      <methodname>english</methodname> und <methodname>german</methodname>
+      an:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails generate controller SetLanguage english german</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
+
+      <para>In der
+      <filename>app/controllers/set_language_controller.rb</filename> Datei
+      füllen wir die beiden Actions wie folgt:<programlisting>class SetLanguageController &lt; ApplicationController
+
+  def english
+    I18n.locale = :en
+    set_session_and_redirect_to_root
+  end
+
+  def german
+    I18n.locale = :de
+    set_session_and_redirect_to_root
+  end
+
+  private
+  def set_session_and_redirect_to_root
+    session[:locale] = I18n.locale
+    redirect_to :root
+  end
+
+end
+</programlisting></para>
+
+      <para>Zum Schluss müssen wir noch in der Datei
+      <filename>app/controllers/application_controller.rb</filename> die
+      <methodname>set_locale</methodname> Methode anpassen:<programlisting>class ApplicationController &lt; ActionController::Base
+  protect_from_forgery
+
+  before_filter :set_locale
+ 
+  private
+  def set_locale
+    I18n.locale = session[:locale] || I18n.default_locale
+    session[:locale] = I18n.locale
+  end
+end
+</programlisting></para>
+
+      <para>Jetzt können Sie nach dem Starten von Rails mit <command>rails
+      server</command> mit dem Aufruf der URL <uri
+      xlink:href="http://0.0.0.0:3000/set_language/german">http://0.0.0.0:3000/set_language/german</uri>
+      die Sprache auf Deutsch und mit dem Aufruf von <uri
+      xlink:href="http://0.0.0.0:3000/set_language/english">http://0.0.0.0:3000/set_language/english</uri>
+      die Sprache auf Englisch stellen.</para>
     </section>
   </section>
 
