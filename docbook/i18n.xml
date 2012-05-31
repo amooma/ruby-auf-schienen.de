@@ -233,7 +233,60 @@ end</programlisting></para>
     </section>
 
     <section>
-      <title></title>
+      <title>I18n.locale per Accept-Language HTTP Header des Browsers
+      setzen</title>
+
+      <indexterm>
+        <primary>I18n.locale</primary>
+
+        <secondary>Accept-Language HTTP Header</secondary>
+      </indexterm>
+
+      <para>Wenn ein User Ihrer Webseite zum ersten mal aufschlägt, möchten
+      Sie ihm im Idealfall direkt die Webseite in der richtigen Sprache
+      anzeigen. Dafür können Sie das Accept-Language Feld im HTTP Header
+      auslesen. In jedem Webbrowser kann der Benutzer der Software seine
+      bevorzugte Sprache einstellen (siehe <uri
+      xlink:href="http://www.w3.org/International/questions/qa-lang-priorities">http://www.w3.org/International/questions/qa-lang-priorities</uri>).
+      Dieser Wert wird dem Webserver und damit Rails automatisch vom Browser
+      mitgeteilt.</para>
+
+      <para>Bitte verändern Sie
+      <filename>app/controllers/application_controller.rb</filename> wie folgt
+      ab:<programlisting>class ApplicationController &lt; ActionController::Base
+  protect_from_forgery
+
+  before_filter :set_locale
+ 
+  private
+<emphasis>  def extract_locale_from_accept_language_header
+    request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first
+  end
+
+  def set_locale
+    I18n.locale = extract_locale_from_accept_language_header || I18n.default_locale
+  end</emphasis>
+end
+</programlisting></para>
+
+      <para>Und vergessen Sie bitte nicht die
+      <filename>config/routes.rb</filename> von den Einstellungen in <xref
+      linkend="i18n_url_path_prefix" /> zu bereinigen:<programlisting>Webshop::Application.routes.draw do
+
+  get "page/index"
+  root :to =&gt; 'page#index'
+
+end</programlisting></para>
+
+      <para>Jetzt bekommen Sie immer die im Webbrowser definierte Sprache
+      ausgeliefert. Dabei ist zu beachten, das
+      <code>request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first</code>
+      nicht alle Fälle abfängt. So sollten Sie überprüfen, ob Sie in Ihrer
+      Rails-Applikation die angegebene Sprache überhaupt unterstützen.</para>
+    </section>
+
+    <section>
+      <title>I18n.locale in einer Session abspeichern</title>
 
       <para></para>
     </section>
