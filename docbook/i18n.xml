@@ -523,25 +523,50 @@ end</programlisting></para>
     </section>
   </section>
 
-  <section>
-    <title>Komplette Seiten übersetzen</title>
+  <section xml:id="i18n_komplette_seiten_uebersetzen">
+    <title xml:id="i18n_komplette_seiten_uebersetzen.title">Komplette Seiten
+    übersetzen</title>
 
     <para>Sie können jeden View anhand des Dateinamens in mehreren
     Sprachversionen ablegen. Dabei wird vor der Dateiendung html.erb die
     Abkürzung für die Sprache eingefügt. Wie in <xref
     linkend="i18n_sprache_einstellen" /> gezeigt würde der Dateiname für die
     Deutsche Version von <filename>app/views/page/index.html.erb</filename>
-    dann <filename>app/views/page/index.de.html.erb</filename> heissen. Die in
-    <varname>config.i18n.default_locale</varname> gespeicherte Sprache wird
-    dabei automatisch benutzt, wenn im Dateinamen keine Sprache eincodiert
-    wurde. Dies ist in einem neuen und noch nicht konfigurieren Rails-Projekt
-    Englisch.</para>
+    dann <filename>app/views/page/index.de.html.erb</filename> heissen.
+    </para>
+
+    <screen>|-app
+|---views
+|-----page
+|-------index.html.erb
+|-------index.de.html.erb
+</screen>
+
+    <para>Die in <varname>config.i18n.default_locale</varname> gespeicherte
+    Sprache wird dabei automatisch benutzt, wenn im Dateinamen keine Sprache
+    eincodiert wurde. Dies ist in einem neuen und noch nicht konfigurieren
+    Rails-Projekt Englisch.</para>
+
+    <para>Überlegen Sie vor der Erstellung einzelner Seiten für jede Sprache,
+    ob das konkrete Problem mit dem übersetzen einzelner Elemente besser zu
+    lösen wäre (siehe <xref
+    linkend="i18n_uebersetzen_einzelner_elemente" />).</para>
   </section>
 
-  <section>
-    <title>I18n Beispiel-Projekt Webshop</title>
+  <section xml:id="i18n_uebersetzen_einzelner_elemente">
+    <title xml:id="i18n_uebersetzen_einzelner_elemente.title">Übersetzen
+    einzelner Elemente</title>
 
-    <para>Als Beispiel-Projekt setzen wir einen einfachen Webshop auf:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new webshop</command>
+    <para>In <xref linkend="i18n_komplette_seiten_uebersetzen" /> haben Sie
+    gelesen wie man eine komplette erb Seite in verschiedene Sprachen
+    übersetzen kann. Oft ist das aber zu aufwendig und vor allen Dingen
+    fehleranfällig. Man verändert in der einen Sprachversion etwas und
+    vergisst diese Veränderung in der anderen Sprachversion nach zu
+    ziehen.</para>
+
+    <para>Als Beispiel benutzen wir einen Mini-Webshop in dem wir einen
+    Product Scaffold übersetzen. Das Ziel ist es die Applikation in Deutsch
+    und Englisch zur Verfügung zu stellen. Die Rails-Applikation:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new webshop</command>
 [...]
 Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd webshop</command>
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails generate scaffold Product name description 'price:decimal{7,2}'</command>
@@ -561,15 +586,172 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
 
   validates :price,
             :presence =&gt; true,
-            :numericality =&gt; true,
-            :greater_than =&gt; 0
+            :numericality =&gt; { :greater_than =&gt; 0 }
+end</programlisting></para>
+
+    <para>Bei der Sprachauswahl für den User nehmen wir den
+    URL-Prefix-Variante, die in <xref linkend="i18n_url_path_prefix" />
+    beschrieben wird. Dazu verwenden wir folgende
+    <filename>app/controllers/application_controller.rb</filename><programlisting>class ApplicationController &lt; ActionController::Base
+  protect_from_forgery
+
+  before_filter :set_locale
+ 
+  private
+  def set_locale
+    I18n.locale = params[:locale] || I18n.default_locale
+  end
 end
 </programlisting></para>
 
-    <para></para>
+    <para>Diese <filename>config/routes.rb</filename><programlisting>Webshop::Application.routes.draw do
 
-    <para></para>
+  scope "(:locale)", :locale =&gt; /en|de/ do
+    root :to =&gt; 'products#index'
+    resources :products
+  end
 
-    <para></para>
+end</programlisting></para>
+
+    <para>Fügen in der
+    <filename>app/views/layouts/application.html.erb</filename> noch die Links
+    für die Navigation ein:<programlisting>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Webshop&lt;/title&gt;
+  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
+  &lt;%= javascript_include_tag "application" %&gt;
+  &lt;%= csrf_meta_tags %&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;p&gt;
+&lt;%= link_to_unless I18n.locale == :en, "English", locale: :en %&gt;
+|
+&lt;%= link_to_unless I18n.locale == :de, "Deutsch", locale: :de %&gt;
+&lt;/p&gt;
+
+&lt;%= yield %&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</programlisting></para>
+
+    <para>Und vorm Starten von Rails mit <command>rails server</command>
+    löschen wir noch die <filename>public/index.html</filename> Datei, damit
+    wir als Root-Seite die Liste aller Produkte angezeigt bekommen.<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rm public/index.html</command> 
+Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails server</command>
+=&gt; Booting WEBrick
+=&gt; Rails 3.2.3 application starting in development on http://0.0.0.0:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2012-06-01 10:43:06] INFO  WEBrick 1.3.1
+[2012-06-01 10:43:06] INFO  ruby 1.9.3 (2012-04-20) [x86_64-darwin11.3.0]
+[2012-06-01 10:43:06] INFO  WEBrick::HTTPServer#start: pid=51412 port=3000</screen></para>
+
+    <para>Beim Aufruf von <uri
+    xlink:href="http://0.0.0.0:3000">http://0.0.0.0:3000</uri> bekommen wir
+    die normale Englische Seite angezeigt. <screenshot>
+        <info>
+          <title>Grundversion</title>
+        </info>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screenshots/i18n_webshop_base_version.jpg"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
+
+    <para>Wenn wir auf Deutsch klicken verändert sich bis auf die
+    Sprachnavigation ganz oben nichts auf der Seite.<screenshot>
+        <info>
+          <title>Grundversion de</title>
+        </info>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screenshots/i18n_webshop_base_version_de.jpg"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
+
+    <para>Bei beiden Sprachen wir die Datei
+    <filename>app/views/products/index.html.erb</filename> gerendet. Sie
+    enthält folgenden Code:<programlisting>&lt;h1&gt;Listing products&lt;/h1&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Name&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+    &lt;th&gt;Price&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @products.each do |product| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= product.name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= product.description %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= product.price %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Show', product %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Edit', edit_product_path(product) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', product, confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+
+&lt;br /&gt;
+
+&lt;%= link_to 'New Product', new_product_path %&gt;</programlisting></para>
+
+    <para>Jetzt müssen wir nur noch einen Weg finden die einzelnen Elemente
+    dieser Seite sinnvoll zu übersetzen.</para>
+
+    <section>
+      <title>I18n.t</title>
+
+      <para>Mit <methodname>I18n.t</methodname> können Sie vorher definierte
+      Übersetzungen abrufen. Die Übersetzungen werden per Default im
+      YAML-Format im Verzeichnis <filename>config/locales/</filename>
+      abgespeichert. Dort findet sich auch eine Beispieldatei
+      <filename>config/locales/en.yml</filename> mit folgendem
+      Inhalt:<programlisting># See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
+
+en:
+  hello: "Hello world"</programlisting></para>
+
+      <para>In der Rails-Console können wir mal ausprobieren, wie
+      <methodname>I18n.t</methodname> funktioniert:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>I18n.t :hello</command>
+ =&gt; "Hello world" 
+1.9.3p194 :002 &gt; <command>I18n.locale</command>
+ =&gt; :en 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
+
+      <para>Erstellen wir einmal eine
+      <filename>config/locales/de.yml</filename> mit folgendem
+      Inhalt:<programlisting>de:
+  hello: "Hallo Welt"</programlisting></para>
+
+      <para>Jetzt noch mal in die Console:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>I18n.locale</command>
+ =&gt; :en 
+1.9.3p194 :002 &gt; <command>I18n.t :hello</command>
+ =&gt; "Hello world" 
+1.9.3p194 :003 &gt; <command>I18n.locale = :de</command>
+ =&gt; :de 
+1.9.3p194 :004 &gt; <command>I18n.t :hello</command>
+ =&gt; "Hallo Welt" 
+1.9.3p194 :005 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
+
+      <para></para>
+
+      <para></para>
+    </section>
   </section>
 </chapter>
