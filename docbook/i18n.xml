@@ -8,31 +8,399 @@
          xmlns:db="http://docbook.org/ns/docbook">
   <title xml:id="i18n.title">Internationalisierung</title>
 
-  <section xml:id="config_i18n_default_locale">
-    <title xml:id="config_i18n_default_locale.title">Der Default ist
-    Englisch.</title>
+  <section xml:id="i18n_einfuehrung">
+    <title xml:id="i18n_einfuehrung.title">Einführung</title>
 
-    <para>In einem Rails-Projekt finden Sie in der Datei
-    <filename>config/application.rb</filename> die Einstellung für die
-    Default-Sprache. In einem neuen Rails-Projekt sieht die Einstellung so
-    aus:<programlisting>    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
-    # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
-    # config.i18n.default_locale = :de</programlisting></para>
+    <para>Falls Sie in der glücklichen Lage sind, nur englische Webseiten zu
+    erstellen, dann können Sie dieses Kapitel komplett überspringen. Für Sie
+    ist per Default alles korrekt eingestellt. Wenn Sie eine Webseite
+    erstellen wollen, die nur deutsch ist, dann müssen Sie in dieses Kapitel
+    eintauchen. Es reicht nicht, nur die Views zu übersetzen. Denn so bald Sie
+    auch nur Scaffolding benützen, müssen Sie sich schon um die englischen und
+    damit noch nicht übersetzen Validierungsfehler kümmern.</para>
 
-    <para>Wenn wir den Eintrag <code>config.i18n.default_locale = :de</code>
-    aktivieren würden, wäre der Default auf Deutsch eingestellt. Das an sich
-    nützt aber noch nichts, weil für eine durchgängige Internationalisierung
-    weit mehr brauchen. In diesem Kapitel zeige ich Ihnen, wie man eine
-    Rails-Applikation mit zwei Sprachen (Deutsch und Englisch) aufsetzen kann.
-    Weitere Sprachen sind dann leicht hinzuzufügen.</para>
+    <para>In Rails gibt es zwei grundsätzliche Möglichkeiten Inhalte von
+    Webseiten in verschiedenen Sprachen dazustellen. Für eher statische Views
+    gibt es die Möglichkeit für jede Sprache eine eigene Datei zu erstellen
+    und die Sprache im Dateinamen einzucodieren (siehe x<xref
+    linkend="i18n_komplette_seiten_uebersetzen" />). Damit könnte Ihr Views
+    Verzeichnis ungefähr so aussehen:<screen>|-app
+|---views
+|-----products
+|-------_form.html.erb
+|-------_form.de.html.erb
+|-------edit.html.erb
+|-------edit.de.html.erb
+|-------index.html.erb
+|-------index.de.html.erb
+|-------new.html.erb
+|-------new.de.html.erb
+|-------show.html.erb
+|-------show.de.html.erb
+|-------
+|-----page
+|-------index.html.erb
+|-------index.de.html.erb
+</screen></para>
 
-    <para>So viel vorweg: Eine Rails-Applikation mehrsprachig aufzusetzen ist
-    eine große Fleißarbeit.</para>
+    <para>Der zweite Ansatz ist einzelne Strings in einem Key-Value-Store
+    unter den verschiedenen Sprachen abzuspeichern. Aus diesem Key-Value-Store
+    kann dann innerhalb eines Views per
+    <methodname>I18n.translate()</methodname> der benötige String ausgelesen
+    und im View eingesetzt werden. Ein solcher Aufruf würde innerhalb einer
+    erb-Seite so aussehen:<programlisting>&lt;%= t :hello-world %&gt;</programlisting></para>
+
+    <para>Innerhalb dieses Ansatzes gibt es auch eine Möglichkeit mit
+    Variablen zu arbeiten und diese automatisch in einen String
+    einzusetzen.</para>
+
+    <tip>
+      <para>Sie können den ersten und zweiten Ansatz auch vermischen.</para>
+    </tip>
+
+    <para>Für Sonderfälle wie das Anzeigen von Zahlen, Währungen und Uhrzeiten
+    gibt es spezielle Helper. So ist sichergestellt, das auf einer deutschen
+    Webseite die Zahl 1000,23 als "1.000,23" und auf einer englischen Webseite
+    als "1,000.23" dargestellt werden kann. Als Beispiel dafür hier die
+    Deutsche und die Englisch (US) Variante für diesen Betrag als Geldbetrag
+    mit Währung in der Console:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.5)
+1.9.3-p194 :001 &gt; <command>helper.number_to_currency('1000.23', :locale =&gt; :de)</command>
+ =&gt; "1.000,23 €" 
+1.9.3-p194 :002 &gt; <command>helper.number_to_currency('1000.23', :locale =&gt; :en)</command>
+ =&gt; "$1,000.23" 
+1.9.3-p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
+  </section>
+
+  <section xml:id="i18n_einsprachig_deutsch">
+    <title xml:id="i18n_einsprachig_deutsch.title">Eine einsprachig Deutsche
+    Rails-Applikation</title>
+
+    <indexterm>
+      <primary>I18n</primary>
+
+      <secondary>Einsprachig Deutsch</secondary>
+    </indexterm>
+
+    <para>Es reicht bei einer nur für Deutsche User ausgerichteten
+    Rails-Applikation leider nicht aus, einfach alle Views ins Deutsche zu
+    übersetzen. Anhand einer einfachen Applikation zeige ich Ihnen, welche
+    Schritte beachtet werden müssen. Gehen wir alle diese Änderung an
+    folgender Literaturverzeichnis-Applikation durch:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new bibliography</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd bibliography</command> 
+Stefan-Wintermeyers-MacBook-Air:bibliography xyz$ <command>rails generate scaffold book title number_of_pages:integer 'price:decimal{7,2}'</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:bibliography xyz$ <command>rake db:migrate</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:bibliography xyz$</screen></para>
+
+    <para>Um Beispiele für Validerungsfehler zu bekommen, fügen Sie bitte in
+    der <filename>app/models/book.rb</filename> folgende Validierungen
+    ein:<programlisting>class Book &lt; ActiveRecord::Base
+  attr_accessible :number_of_pages, :price, :title
+
+  validates :title,
+            :presence =&gt; true,
+            :uniqueness =&gt; true,
+            :length =&gt; { :within =&gt; 2..255 }
+
+  validates :price,
+            :presence =&gt; true,
+            :numericality =&gt; { :greater_than =&gt; 0 }
+end
+</programlisting></para>
+
+    <para>Bitte suchen Sie in der Konfigurations-Datei
+    <filename>config/application.rb</filename> nach dem Wert
+    <varname>config.i18n.default_locale</varname> und setzen Sie in auf
+    <code>:de</code> für Deutsch. Im gleichen Zusammenhang fügen wir dann auch
+    in der Zeile darüber noch zwei weitere Verzeichnisse für Übersetzungen der
+    Models und der Views ein. Diese Verzeichnisstruktur ist nicht technisch
+    notwendig, verschaft aber bei grösseren Applikationen einen besseren
+    Überblick:<programlisting>    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
+<emphasis>    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'models', '*', '*.yml').to_s]
+    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'views', '*', '*.yml').to_s]
+    config.i18n.default_locale = :de</emphasis></programlisting></para>
+
+    <para>Die entsprechenden Verzeichnisse müssen dann noch angelegt
+    werden:<screen>Stefan-Wintermeyers-MacBook-Air:bibliography xyz$ <command>mkdir -p config/locales/models/book</command>
+Stefan-Wintermeyers-MacBook-Air:bibliography xyz$ <command>mkdir -p config/locales/views/book</command>
+Stefan-Wintermeyers-MacBook-Air:bibliography xyz$</screen></para>
+
+    <para>Jetzt müssen Sie eine Sprachkonfigurationsdatei für Deutsch
+    generieren oder einfacher eine fertige von Sven Fuchs aus seinem
+    Github-Repository <uri
+    xlink:href="https://github.com/svenfuchs/rails-i18n">https://github.com/svenfuchs/rails-i18n</uri>
+    downloaden:<screen>Stefan-Wintermeyers-MacBook-Air:bibliography xyz$ <command>cd config/locales</command>
+Stefan-Wintermeyers-MacBook-Air:locales xyz$ <command>curl -O https://raw.github.com/svenfuchs/rails-i18n/master/rails/locale/de.yml</command>
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  4940  100  4940    0     0   9574      0 --:--:-- --:--:-- --:--:-- 11932
+Stefan-Wintermeyers-MacBook-Air:locales xyz$ </screen></para>
+
+    <note>
+      <para>Wenn Sie wissen, wie Bundler funktioniert, könne Sie auch die
+      Zeile <code>gem 'rails-i18n'</code> in die Datei
+      <filename>Gemfile</filename> einfügen und danach
+      <command>bundle</command> ausführen. Damit bekommen Sie alle
+      Sprachdateien aus dem Repository eingespielt.</para>
+    </note>
+
+    <para>In der <filename>config/locales/de.yml</filename> Datei sind
+    benötigten Formate und generischen Formulierungen für Deutsch enthalten,
+    die wir für eine normale Rails-Applikation benötigen (z.B. die Wochentage,
+    Währungssymbol, usw.). Schauen Sie einmal mit Ihrem Lieblingseditor rein,
+    um einen Überblick zu bekommen.</para>
+
+    <para>Als nächstes müssen wir Rails erklären, das in Deutsch ein Model
+    'book' nicht 'book', sondern 'Buch' heißt. Das gleiche gilt für alle
+    Attribute. Dafür legen wir die Datei
+    <filename>config/locales/models/book/de.yml</filename> mit folgender
+    Struktur an. Als Nebeneffekt bekommen wir die Methoden
+    <methodname>Model.model_name.human</methodname> und
+    <methodname>Model.human_attribute_name(attribute)</methodname>, mit denen
+    wir die Model- und Attributnamen im View einfügen können.<programlisting># ruby encoding: utf-8
+
+de:
+  activerecord:
+    models:
+      book: 'Buch'
+    attributes:
+      book:
+        title: 'Titel'
+        number_of_pages: 'Seitenanzahl'
+        price: 'Preis'
+</programlisting></para>
+
+    <para>In der Datei <filename>config/locales/views/book/de.yml</filename>
+    fügen wir ein paar Werte für die Scaffold Views ein:<programlisting># ruby encoding: utf-8
+
+de:
+  views:
+    show: Anzeigen
+    edit: Editieren
+    destroy: Löschen
+    are_your_sure: Sind Sie sicher?
+    back: Zurück
+    edit: Editieren
+    book:
+      index:
+        title: Bücherliste
+        new: Neues Buch
+      edit:
+        title: Buch editieren
+      new:
+        title: Neues Buch
+      flash_messages:
+        book_was_successfully_created: 'Das Buch wurde erfolgreich angelegt.'
+        book_was_successfully_updated: 'Das Buch wurde erfolgreich aktualisiert.'</programlisting></para>
+
+    <para>Jetzt müssen wir noch "ein paar" Veränderungen in den Views
+    einbauen.</para>
+
+    <para><filename>app/views/books/_form.html.erb</filename><programlisting>&lt;%= form_for(@book) do |f| %&gt;
+  &lt;% if @book.errors.any? %&gt;
+    &lt;div id="error_explanation"&gt;
+      &lt;h2&gt;<emphasis>&lt;%= t 'activerecord.errors.template.header', :model =&gt; Book.model_name.human, :count =&gt; @book.errors.count %&gt;</emphasis>&lt;/h2&gt;
+      &lt;ul&gt;
+      &lt;% @book.errors.full_messages.each do |msg| %&gt;
+        &lt;li&gt;&lt;%= msg %&gt;&lt;/li&gt;
+      &lt;% end %&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;% end %&gt;
+
+  &lt;div class="field"&gt;
+    &lt;%= f.label :title %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :title %&gt;
+  &lt;/div&gt;
+  &lt;div class="field"&gt;
+    &lt;%= f.label :number_of_pages %&gt;&lt;br /&gt;
+    &lt;%= f.number_field :number_of_pages %&gt;
+  &lt;/div&gt;
+  &lt;div class="field"&gt;
+    &lt;%= f.label :price %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :price %&gt;
+  &lt;/div&gt;
+  &lt;div class="actions"&gt;
+    &lt;%= f.submit %&gt;
+  &lt;/div&gt;
+&lt;% end %&gt;
+</programlisting></para>
+
+    <para><filename>app/views/books/edit.html.erb</filename><programlisting>&lt;h1&gt;<emphasis>&lt;%= t 'views.book.edit.title' %&gt;</emphasis>&lt;/h1&gt;
+
+&lt;%= render 'form' %&gt;
+
+&lt;%= link_to <emphasis>I18n.t('views.show')</emphasis>, @book %&gt; |
+&lt;%= link_to <emphasis>I18n.t('views.back')</emphasis>, books_path %&gt;
+</programlisting></para>
+
+    <para><filename>app/views/books/index.html.erb</filename><programlisting>&lt;h1&gt;<emphasis>&lt;%= t 'views.book.index.title' %&gt;</emphasis>&lt;/h1&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;<emphasis>&lt;%= Book.human_attribute_name(:title) %&gt;</emphasis>&lt;/th&gt;
+    &lt;th&gt;<emphasis>&lt;%= Book.human_attribute_name(:number_of_pages) %&gt;</emphasis>&lt;/th&gt;
+    &lt;th&gt;<emphasis>&lt;%= Book.human_attribute_name(:price) %&gt;</emphasis>&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @books.each do |book| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= book.title %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= <emphasis>number_with_delimiter(book.number_of_pages)</emphasis> %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= <emphasis>number_to_currency(book.price)</emphasis> %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to <emphasis>I18n.t('views.show')</emphasis>, book %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to <emphasis>I18n.t('views.edit')</emphasis>, edit_book_path(book) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to <emphasis>I18n.t('views.destroy')</emphasis>, book, confirm: <emphasis>I18n.t('views.are_your_sure')</emphasis>, method: :delete %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+
+&lt;br /&gt;
+
+&lt;%= link_to <emphasis>I18n.t('views.book.index.new')</emphasis>, new_book_path %&gt;
+</programlisting></para>
+
+    <para><filename>app/views/books/new.html.erb</filename><programlisting>&lt;h1&gt;<emphasis>&lt;%= t 'views.book.new.title' %&gt;</emphasis>&lt;/h1&gt;
+
+&lt;%= render 'form' %&gt;
+
+&lt;%= link_to <emphasis>I18n.t('views.back')</emphasis>, books_path %&gt;
+</programlisting></para>
+
+    <para><filename>app/views/books/show.html.erb</filename><programlisting>&lt;p id="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;<emphasis>&lt;%= Book.human_attribute_name(:title) %&gt;</emphasis>:&lt;/b&gt;
+  &lt;%= @book.title %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;<emphasis>&lt;%= Book.human_attribute_name(:number_of_pages) %&gt;</emphasis>:&lt;/b&gt;
+  &lt;%= <emphasis>number_with_delimiter(@book.number_of_pages)</emphasis> %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;<emphasis>&lt;%= Book.human_attribute_name(:price) %&gt;</emphasis>:&lt;/b&gt;
+  &lt;%= <emphasis>number_to_currency(@book.price)</emphasis> %&gt;
+&lt;/p&gt;
+
+
+&lt;%= link_to <emphasis>I18n.t('views.edit')</emphasis>, edit_book_path(@book) %&gt; |
+&lt;%= link_to <emphasis>I18n.t('views.back')</emphasis>, books_path %&gt;</programlisting></para>
+
+    <note>
+      <para>Im show- und index-View habe ich die Helper
+      <methodname>number_with_delimiter</methodname> und
+      <methodname>number_to_currency</methodname> eingebaut, damit die Zahlen
+      für den End-User schöner dargestellt werden.</para>
+    </note>
+
+    <para>Ganz zum Schluss müssen wir im Controller
+    <filename>app/controllers/books_controller.rb</filename> noch ein paar
+    Flash-Messages anpassen:<programlisting>
+class BooksController &lt; ApplicationController
+  # GET /books
+  # GET /books.json
+  def index
+    @books = Book.all
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @books }
+    end
+  end
+
+  # GET /books/1
+  # GET /books/1.json
+  def show
+    @book = Book.find(params[:id])
+
+    respond_to do |format|
+      format.html # show.html.erb
+      format.json { render json: @book }
+    end
+  end
+
+  # GET /books/new
+  # GET /books/new.json
+  def new
+    @book = Book.new
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.json { render json: @book }
+    end
+  end
+
+  # GET /books/1/edit
+  def edit
+    @book = Book.find(params[:id])
+  end
+
+  # POST /books
+  # POST /books.json
+  def create
+    @book = Book.new(params[:book])
+
+    respond_to do |format|
+      if @book.save
+        format.html { redirect_to @book, notice: <emphasis>I18n.t('views.book.flash_messages.book_was_successfully_created')</emphasis> }
+        format.json { render json: @book, status: :created, location: @book }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @book.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # PUT /books/1
+  # PUT /books/1.json
+  def update
+    @book = Book.find(params[:id])
+
+    respond_to do |format|
+      if @book.update_attributes(params[:book])
+        format.html { redirect_to @book, notice: <emphasis>I18n.t('views.book.flash_messages.book_was_successfully_updated')</emphasis> }
+        format.json { head :no_content }
+      else
+        format.html { render action: "edit" }
+        format.json { render json: @book.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # DELETE /books/1
+  # DELETE /books/1.json
+  def destroy
+    @book = Book.find(params[:id])
+    @book.destroy
+
+    respond_to do |format|
+      format.html { redirect_to books_url }
+      format.json { head :no_content }
+    end
+  end
+end
+</programlisting></para>
+
+    <para>Jetzt können Sie die vom Scaffold Generator angelegten Views
+    komplett auf Deutsch benutzen. Die hier gezeigte Struktur der YAML-Dateien
+    lässt sich natürlich nach eigenem Geschmack anpassen. Die Texte in den
+    Views und im Controller werden mit I18n.t angezeigt. An dieser Stelle
+    könnte man natürlich bei einer rein deutschen Anwendung auch direkt den
+    deutschen Text einbauen.</para>
   </section>
 
   <section xml:id="i18n_sprache_einstellen">
-    <title xml:id="ganze_seiten_uebersetzen.title">Sprache einstellen -
-    I18n.locale setzen</title>
+    <title xml:id="i18n_sprache_einstellen.title">I18n.locale zum Definieren
+    der gewünschten Sprache benutzen</title>
 
     <indexterm>
       <primary>I18n</primary>
@@ -40,10 +408,10 @@
       <secondary>I18n.locale</secondary>
     </indexterm>
 
-    <para>Rails benutzt die Klasse <classname>I18n</classname> um alle
-    Internationalisierungen abzubilden. <code>I18n.locale</code> speichert
-    dabei die aktuelle Sprache ab. Ich zeige Ihnen das mit einem
-    Mini-Webshop-Beispiel:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new webshop</command>
+    <para>Natürlich muss eine Rails-Applikation wissen, in welcher Sprache
+    eine Webseite dargestellt werden soll. <code>I18n.locale</code> speichert
+    die aktuelle Sprache ab und kann von der Applikation ausgelesen werden.
+    Ich zeige Ihnen das mit einem Mini-Webshop-Beispiel:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new webshop</command>
 [...]
 Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd webshop</command>
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
@@ -84,9 +452,10 @@ end</programlisting></para>
         </mediaobject>
       </screenshot></para>
 
-    <para>Stoppen Sie den Rails-Server mit <keycap>CTRL-C</keycap> und ändern
-    Sie in der Datei <filename>config/application.rb</filename> die
-    Einstellung für die Default-Sprache auf:<programlisting>    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
+    <para>Sie sehen, das "en" für Englisch als Default eingestellt ist.
+    Stoppen Sie den Rails-Server mit <keycap>CTRL-C</keycap> und ändern Sie in
+    der Datei <filename>config/application.rb</filename> die Einstellung für
+    die Default-Sprache auf:<programlisting>    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
 
     <emphasis>config.i18n.default_locale = :de</emphasis></programlisting></para>
@@ -600,9 +969,9 @@ end</programlisting></para>
   private
   def set_locale
     I18n.locale = params[:locale] || I18n.default_locale
+    Rails.application.routes.default_url_options[:locale]= I18n.locale
   end
-end
-</programlisting></para>
+end</programlisting></para>
 
     <para>Diese <filename>config/routes.rb</filename><programlisting>Webshop::Application.routes.draw do
 
@@ -728,9 +1097,7 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails server</command>
       YAML-Format im Verzeichnis <filename>config/locales/</filename>
       abgespeichert. Dort findet sich auch eine Beispieldatei
       <filename>config/locales/en.yml</filename> mit folgendem
-      Inhalt:<programlisting># See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
-
-en:
+      Inhalt:<programlisting>en:
   hello: "Hello world"</programlisting></para>
 
       <para>In der Rails-Console können wir mal ausprobieren, wie
@@ -761,9 +1128,9 @@ Loading development environment (Rails 3.2.3)
 1.9.3p194 :005 &gt; <command>exit</command>
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
 
-      <para>I18n.t sucht den entsprechenden Eintrag in der in
-      <varname>I18n.locale</varname> definierten Sprache. Dabei ist es egal,
-      ob Sie mit <methodname>I18n.t</methodname> oder
+      <para><methodname>I18n.t</methodname> sucht per Defautl den Eintrag in
+      der in <varname>I18n.locale</varname> definierten Sprache. Dabei ist es
+      egal, ob Sie mit <methodname>I18n.t</methodname> oder
       <methodname>I18n.translate</methodname> arbeiten. Es ist auch egal, ob
       Sie nach einem Symbol oder einem String suchen:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
@@ -776,9 +1143,24 @@ Loading development environment (Rails 3.2.3)
 1.9.3p194 :004 &gt; <command>exit</command>
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
 
+      <para>Sie können die gewünschte Sprache auch für einen einzelnen I18n.t
+      Aufruf mit <code>:locale =&gt; :de</code> spezifizieren.<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>I18n.locale</command>
+ =&gt; :en 
+1.9.3p194 :002 &gt; <command>I18n.t :hello, :locale =&gt; :de</command>
+ =&gt; "Hallo Welt" 
+1.9.3p194 :003 &gt; <command>I18n.t :hello</command>
+ =&gt; "Hello world" 
+1.9.3p194 :004 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
+
       <para>Wenn eine Übersetzung nicht vorhanden ist, bekommen Sie eine
-      Fehlermeldung. Sie können allerdings für diesen Fall mit <code>:default
-      =&gt; 'beliebiger Default-Wert'</code> einen Default definieren:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+      "<code>translation missing:</code>"-Fehlermeldung. Dies gilt auch, wenn
+      eine Übersetzung nur in einer Sprache fehlt (dann gehen alle anderen
+      Sprachen, aber bei der fehlenden Übersetzung wird die Fehlermeldung
+      ausgegeben). Sie können für diesen Fall mit <code>:default =&gt;
+      'beliebiger Default-Wert'</code> einen Default definieren:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>I18n.t 'asdfasdfasdf'</command>
  =&gt; "translation missing: en.asdfasdfasdf" 
@@ -787,9 +1169,33 @@ Loading development environment (Rails 3.2.3)
 1.9.3p194 :003 &gt; <command>exit</command>
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
 
-      <para></para>
+      <para>Sie können in der YAML-Struktur auch mehrere Ebenen angeben. Bitte
+      ergänzen Sie dazu die <filename>config/locale/en.yml</filename> wie
+      folgt:<programlisting>en:
+  hello: "Hello world"
+  example:
+    test: "A test"
+  aaa:
+    bbb:
+      test: "An other test"</programlisting></para>
 
-      <para></para>
+      <para>Die verschiedenen Ebenen können Sie innerhalb des Strings mit
+      Punkten anzeigen oder mit einem <code>:scope</code> bei den Symbols. Sie
+      können auch beide Varianten vermischen.<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>I18n.t 'example.test'</command>
+ =&gt; "A test" 
+1.9.3p194 :002 &gt; <command>I18n.t 'aaa.bbb.test'</command>
+ =&gt; "An other test" 
+1.9.3p194 :003 &gt; <command>I18n.t :test, :scope =&gt; [:aaa, :bbb]</command>
+ =&gt; "An other test" 
+1.9.3p194 :004 &gt; <command>I18n.t :test, :scope =&gt; 'aaa.bbb'</command>
+ =&gt; "An other test" 
+1.9.3p194 :005 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
+
+      <para>Die Struktur, mit der Sie Ihre Übersetzungen in den YAML-Dateien
+      abspeichern bleibt Ihnen überlassen.</para>
 
       <para></para>
     </section>
