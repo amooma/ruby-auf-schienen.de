@@ -304,8 +304,7 @@ de:
 
     <para>Ganz zum Schluss müssen wir im Controller
     <filename>app/controllers/books_controller.rb</filename> noch ein paar
-    Flash-Messages anpassen:<programlisting>
-class BooksController &lt; ApplicationController
+    Flash-Messages anpassen:<programlisting>class BooksController &lt; ApplicationController
   # GET /books
   # GET /books.json
   def index
@@ -393,9 +392,59 @@ end
     <para>Jetzt können Sie die vom Scaffold Generator angelegten Views
     komplett auf Deutsch benutzen. Die hier gezeigte Struktur der YAML-Dateien
     lässt sich natürlich nach eigenem Geschmack anpassen. Die Texte in den
-    Views und im Controller werden mit I18n.t angezeigt. An dieser Stelle
-    könnte man natürlich bei einer rein deutschen Anwendung auch direkt den
-    deutschen Text einbauen.</para>
+    Views und im Controller werden mit <methodname>I18n.t
+    </methodname>angezeigt. An dieser Stelle könnte man natürlich bei einer
+    rein deutschen Anwendung auch direkt den deutschen Text einbauen.</para>
+
+    <section xml:id="i18n_deutschsprachige_pfade">
+      <title xml:id="i18n_deutschsprachige_pfade.title">Deutschsprachige
+      Pfade</title>
+
+      <indexterm>
+        <primary>I18n</primary>
+
+        <secondary>Deutschsprachige Pfade</secondary>
+      </indexterm>
+
+      <para>Unsere Bücherliste ist komplett deutsch, aber die aufzurufenden
+      URLs sind alle noch in English. Wenn wir alle Bücher unter der URL <uri
+      xlink:href="http://0.0.0.0:3000/buecher">http://0.0.0.0:3000/buecher</uri>
+      und nicht unter <uri
+      xlink:href="http://0.0.0.0:3000/books">http://0.0.0.0:3000/books</uri>
+      abrufbar machen möchten, so müssen wir in der
+      <filename>config/routes.rb</filename> folgenden Eintrag
+      machen:<programlisting>Bibliography::Application.routes.draw do
+
+<emphasis>  scope(:path_names =&gt; { :new =&gt; "neu", :edit =&gt; "bearbeiten" }) do
+    resources :books, :path =&gt; "buecher"
+  end</emphasis>
+
+end
+</programlisting></para>
+
+      <para>Damit ergeben sich folgende neue Pfade:<screen>Stefan-Wintermeyers-MacBook-Air:bibliography xyz$ <command>rake routes</command>
+    books GET    /buecher(.:format)                books#index
+          POST   /buecher(.:format)                books#create
+ new_book GET    /buecher/neu(.:format)            books#new
+edit_book GET    /buecher/:id/bearbeiten(.:format) books#edit
+     book GET    /buecher/:id(.:format)            books#show
+          PUT    /buecher/:id(.:format)            books#update
+          DELETE /buecher/:id(.:format)            books#destroy
+Stefan-Wintermeyers-MacBook-Air:bibliography xyz$</screen></para>
+
+      <para>Das schöne an den Rails-Routen ist, das Sie nicht mehr machen
+      müssen. Der Rest wird transparent von den Routen verwaltet.</para>
+
+      <para> </para>
+    </section>
+  </section>
+
+  <section>
+    <title>Mehrsprachige Rails-Applikation</title>
+
+    <para>Die mehrsprachige Rails-Applikation ändelt sehr der in <xref
+    linkend="i18n_einsprachig_deutsch" /> gezeigten rein Deutschen
+    Rails-Applikation. Allerdings müssen wir </para>
   </section>
 
   <section xml:id="i18n_sprache_einstellen">
