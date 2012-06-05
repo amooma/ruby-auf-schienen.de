@@ -198,7 +198,14 @@ de:
         book_was_successfully_updated: 'Das Buch wurde erfolgreich aktualisiert.'</programlisting></para>
 
     <para>Jetzt müssen wir noch "ein paar" Veränderungen in den Views
-    einbauen.</para>
+    einbauen. Wir benutzen dabei den <methodname>I18n.t</methodname> Helper,
+    der im View auch mit <methodname>t</methodname> abgekürzt werden kann.
+    <methodname>I18n.t</methodname> ließt aus der YAML-Datei den ensprechenden
+    Eintrag aus. Wir könnten bei einer rein deutschsprachigen Applikation auch
+    direkt den deutschen Text in den View schreiben, aber so können wir im
+    Fall des Falles leichter auf Mehrsprachigkeit umstellen. Mehr
+    Informationen zu I18n.t finden Sie unter <xref
+    linkend="i18n_i18n_t" />.</para>
 
     <para><filename>app/views/books/_form.html.erb</filename><programlisting>&lt;%= form_for(@book) do |f| %&gt;
   &lt;% if @book.errors.any? %&gt;
@@ -444,134 +451,139 @@ Stefan-Wintermeyers-MacBook-Air:bibliography xyz$</screen></para>
 
     <para>Die mehrsprachige Rails-Applikation ändelt sehr der in <xref
     linkend="i18n_einsprachig_deutsch" /> gezeigten rein Deutschen
-    Rails-Applikation. Allerdings müssen wir </para>
-  </section>
+    Rails-Applikation. Allerdings müssen wir YAML-Sprachdateien für alle
+    benötigten Sprachen definieren und der Rails-Applikation sagen, welche
+    Sprache gerade benutzt werden soll. Dazu verwenden wir
+    <varname>I18n.locale</varname>.</para>
 
-  <section xml:id="i18n_sprache_einstellen">
-    <title xml:id="i18n_sprache_einstellen.title">I18n.locale zum Definieren
-    der gewünschten Sprache benutzen</title>
+    <section xml:id="i18n_sprache_einstellen">
+      <title xml:id="i18n_sprache_einstellen.title">I18n.locale zum Definieren
+      der gewünschten Sprache benutzen</title>
 
-    <indexterm>
-      <primary>I18n</primary>
+      <indexterm>
+        <primary>I18n</primary>
 
-      <secondary>I18n.locale</secondary>
-    </indexterm>
+        <secondary>I18n.locale</secondary>
+      </indexterm>
 
-    <para>Natürlich muss eine Rails-Applikation wissen, in welcher Sprache
-    eine Webseite dargestellt werden soll. <code>I18n.locale</code> speichert
-    die aktuelle Sprache ab und kann von der Applikation ausgelesen werden.
-    Ich zeige Ihnen das mit einem Mini-Webshop-Beispiel:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new webshop</command>
+      <para>Natürlich muss eine Rails-Applikation wissen, in welcher Sprache
+      eine Webseite dargestellt werden soll. <code>I18n.locale</code>
+      speichert die aktuelle Sprache ab und kann von der Applikation
+      ausgelesen werden. Ich zeige Ihnen das mit einem
+      Mini-Webshop-Beispiel:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new webshop</command>
 [...]
 Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd webshop</command>
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
 
-    <para>Dieser bekommt eine Homepage:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails generate controller Page index</command>
+      <para>Dieser bekommt eine Homepage:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails generate controller Page index</command>
 [...]
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rm public/index.html</command> 
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
 
-    <para>Diese müssen wir noch in der <filename>config/routes.rb</filename>
-    als Root-Seite eintragen:<programlisting>Webshop::Application.routes.draw do
+      <para>Diese müssen wir noch in der <filename>config/routes.rb</filename>
+      als Root-Seite eintragen:<programlisting>Webshop::Application.routes.draw do
 
   root :to =&gt; 'page#index'
   get "page/index"
 
 end</programlisting></para>
 
-    <para>Die <filename>app/views/page/index.html.erb</filename> füllen wir
-    mit folgendem Beispiel: <programlisting>&lt;h1&gt;Example Webshop&lt;/h1&gt;
+      <para>Die <filename>app/views/page/index.html.erb</filename> füllen wir
+      mit folgendem Beispiel: <programlisting>&lt;h1&gt;Example Webshop&lt;/h1&gt;
 &lt;p&gt;Welcome to this webshop.&lt;/p&gt;
 
 &lt;p&gt;&lt;b&gt;I18n.locale:&lt;/b&gt; 
 &lt;%= I18n.locale %&gt;
 &lt;/p&gt;</programlisting></para>
 
-    <para>Wenn wir den Rails-Server mit <command>rails server</command>
-    starten und im Browser <uri
-    xlink:href="http://0.0.0.0:3000/">http://0.0.0.0:3000/</uri> aufrufen,
-    dann sehen wir folgende Webseite:<screenshot>
-        <info>
-          <title>Index-Seite page#index</title>
-        </info>
+      <para>Wenn wir den Rails-Server mit <command>rails server</command>
+      starten und im Browser <uri
+      xlink:href="http://0.0.0.0:3000/">http://0.0.0.0:3000/</uri> aufrufen,
+      dann sehen wir folgende Webseite:<screenshot>
+          <info>
+            <title>Index-Seite page#index</title>
+          </info>
 
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="screenshots/i18n_ganze_seite_page_index.jpg"></imagedata>
-          </imageobject>
-        </mediaobject>
-      </screenshot></para>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/i18n_ganze_seite_page_index.jpg"></imagedata>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
-    <para>Sie sehen, das "en" für Englisch als Default eingestellt ist.
-    Stoppen Sie den Rails-Server mit <keycap>CTRL-C</keycap> und ändern Sie in
-    der Datei <filename>config/application.rb</filename> die Einstellung für
-    die Default-Sprache auf:<programlisting>    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
+      <para>Sie sehen, das "en" für Englisch als Default eingestellt ist.
+      Stoppen Sie den Rails-Server mit <keycap>CTRL-C</keycap> und ändern Sie
+      in der Datei <filename>config/application.rb</filename> die Einstellung
+      für die Default-Sprache auf:<programlisting>    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
 
     <emphasis>config.i18n.default_locale = :de</emphasis></programlisting></para>
 
-    <para>Wenn Sie danach rails server starten und mit dem Webbrowser <uri
-    xlink:href="http://0.0.0.0:3000/">http://0.0.0.0:3000/</uri> wieder
-    aufrufen, dann sehen Sie folgende Webseite:<screenshot>
-        <info>
-          <title>Index-Seite page#index mit config.i18n.default_locale =
-          :de</title>
-        </info>
+      <para>Wenn Sie danach rails server starten und mit dem Webbrowser <uri
+      xlink:href="http://0.0.0.0:3000/">http://0.0.0.0:3000/</uri> wieder
+      aufrufen, dann sehen Sie folgende Webseite:<screenshot>
+          <info>
+            <title>Index-Seite page#index mit config.i18n.default_locale =
+            :de</title>
+          </info>
 
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="screenshots/i18n_ganze_seite_page_index_default_locale_de.jpg"></imagedata>
-          </imageobject>
-        </mediaobject>
-      </screenshot></para>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/i18n_ganze_seite_page_index_default_locale_de.jpg"></imagedata>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
-    <para>Die Webseite hat sich nicht verändert, aber als Ausgabe von
-    <code>&lt;%= I18n.locale %&gt;</code> bekommen sie jetzt '<code>de</code>'
-    für Deutsch und nicht mehr '<code>en</code>' für Englisch angezeigt.
-    </para>
+      <para>Die Webseite hat sich nicht verändert, aber als Ausgabe von
+      <code>&lt;%= I18n.locale %&gt;</code> bekommen sie jetzt
+      '<code>de</code>' für Deutsch und nicht mehr '<code>en</code>' für
+      Englisch angezeigt.</para>
 
-    <para>Bitte stoppen Sie den Rails-Server mit <keycap>CTRL-C</keycap> und
-    ändern Sie in der Datei <filename>config/application.rb</filename> die
-    Einstellung für die Default-Sprache auf <code>en</code> für
-    Englisch:<programlisting>    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
+      <para>Bitte stoppen Sie den Rails-Server mit <keycap>CTRL-C</keycap> und
+      ändern Sie in der Datei <filename>config/application.rb</filename> die
+      Einstellung für die Default-Sprache auf <code>en</code> für
+      Englisch:<programlisting>    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
 
     <emphasis>config.i18n.default_locale = :en</emphasis></programlisting></para>
 
-    <para>Wir wissen jetzt wie der Default für <varname>I18n.locale</varname>
-    in der gesamten Applikation gesetzt wird, aber das ist ja nur die halbe
-    Miete. Ein User möchte sich seine Sprache selber aussuchen. Dafür gibt es
-    ein verschiedene Ansätze. Zum Veranschaulichen dieser Ansätze brauchen wir
-    eine zweite Seite, die einen deutschen Text anzeigt. Bitte legen Sie die
-    Datei <filename>app/views/page/index.de.html.erb</filename> mit diesem
-    Inhalt an:<programlisting>&lt;h1&gt;Beispiel Webshop&lt;/h1&gt;
+      <para>Wir wissen jetzt wie der Default für
+      <varname>I18n.locale</varname> in der gesamten Applikation gesetzt wird,
+      aber das ist ja nur die halbe Miete. Ein User möchte sich seine Sprache
+      selber aussuchen. Dafür gibt es ein verschiedene Ansätze. Zum
+      Veranschaulichen dieser Ansätze brauchen wir eine zweite Seite, die
+      einen deutschen Text anzeigt. Bitte legen Sie die Datei
+      <filename>app/views/page/index.de.html.erb</filename> mit diesem Inhalt
+      an:<programlisting>&lt;h1&gt;Beispiel Webshop&lt;/h1&gt;
 &lt;p&gt;Willkommen in diesem Webshop.&lt;/p&gt;
 
 &lt;p&gt;&lt;b&gt;I18n.locale:&lt;/b&gt; 
 &lt;%= I18n.locale %&gt;
 &lt;/p&gt;</programlisting></para>
 
-    <section xml:id="i18n_url_path_prefix">
-      <title xml:id="i18n_url_path_prefix.title">I18n.locale per URL
-      Path-Prefix setzen</title>
+      <section xml:id="i18n_url_path_prefix">
+        <title xml:id="i18n_url_path_prefix.title">I18n.locale per URL
+        Path-Prefix setzen</title>
 
-      <indexterm>
-        <primary>I18n.locale</primary>
+        <indexterm>
+          <primary>I18n.locale</primary>
 
-        <secondary>Path-Prefix</secondary>
-      </indexterm>
+          <secondary>Path-Prefix</secondary>
+        </indexterm>
 
-      <indexterm>
-        <primary>default_url_options</primary>
-      </indexterm>
+        <indexterm>
+          <primary>default_url_options</primary>
+        </indexterm>
 
-      <para>Der charmanter Weg die Sprache zu setzen ist sie als Prefix mit in
-      die URL aufzunehmen. So können Suchmaschinen besser verschiedene
-      Sprachversionen verwalten. <uri
-      xlink:href="http://0.0.0.0:3000/de">http://0.0.0.0:3000/de</uri> soll
-      die Deutsche Version der Homepage und <uri
-      xlink:href="http://0.0.0.0:3000/en">http://0.0.0.0:3000/en</uri> die
-      Englische Version der Homepage anzeigen. Der erste Schritt dafür ist
-      eine Anpassung der <filename>config/routes.rb</filename><programlisting>Webshop::Application.routes.draw do
+        <para>Der charmanter Weg die Sprache zu setzen ist sie als Prefix mit
+        in die URL aufzunehmen. So können Suchmaschinen besser verschiedene
+        Sprachversionen verwalten. <uri
+        xlink:href="http://0.0.0.0:3000/de">http://0.0.0.0:3000/de</uri> soll
+        die Deutsche Version der Homepage und <uri
+        xlink:href="http://0.0.0.0:3000/en">http://0.0.0.0:3000/en</uri> die
+        Englische Version der Homepage anzeigen. Der erste Schritt dafür ist
+        eine Anpassung der
+        <filename>config/routes.rb</filename><programlisting>Webshop::Application.routes.draw do
 
   <emphasis>scope "(:locale)", :locale =&gt; /en|de/ do</emphasis>
     root :to =&gt; 'page#index'
@@ -580,11 +592,11 @@ end</programlisting></para>
 
 end</programlisting></para>
 
-      <para>Als nächstes müssen wir in der
-      <filename>app/controllers/application_controller.rb</filename> einen
-      <methodname>before_filter</methodname> setzen, der den von der Route
-      gesetzen Parameter locale als <varname>I18n.locale</varname>
-      setzt:<programlisting>class ApplicationController &lt; ActionController::Base
+        <para>Als nächstes müssen wir in der
+        <filename>app/controllers/application_controller.rb</filename> einen
+        <methodname>before_filter</methodname> setzen, der den von der Route
+        gesetzen Parameter locale als <varname>I18n.locale</varname>
+        setzt:<programlisting>class ApplicationController &lt; ActionController::Base
   protect_from_forgery
 
   <emphasis>before_filter :set_locale</emphasis>
@@ -595,50 +607,50 @@ end</programlisting></para>
   end</emphasis>
 end</programlisting></para>
 
-      <para>Zum Testen Rails mit <command>rails server</command> starten und
-      die URL <uri
-      xlink:href="http://0.0.0.0:3000/de">http://0.0.0.0:3000/de</uri>
-      aufrufen. <screenshot>
-          <info>
-            <title>http://0.0.0.0:3000/de</title>
-          </info>
+        <para>Zum Testen Rails mit <command>rails server</command> starten und
+        die URL <uri
+        xlink:href="http://0.0.0.0:3000/de">http://0.0.0.0:3000/de</uri>
+        aufrufen. <screenshot>
+            <info>
+              <title>http://0.0.0.0:3000/de</title>
+            </info>
 
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screenshots/i18n_path_prefix_de_root.jpg"></imagedata>
-            </imageobject>
-          </mediaobject>
-        </screenshot></para>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/i18n_path_prefix_de_root.jpg"></imagedata>
+              </imageobject>
+            </mediaobject>
+          </screenshot></para>
 
-      <para>Natürlich können wir auch <uri
-      xlink:href="http://0.0.0.0:3000/de/page/index">http://0.0.0.0:3000/de/page/index</uri>
-      aufrufen:<screenshot>
-          <info>
-            <title>http://0.0.0.0:3000/de/page/index</title>
-          </info>
+        <para>Natürlich können wir auch <uri
+        xlink:href="http://0.0.0.0:3000/de/page/index">http://0.0.0.0:3000/de/page/index</uri>
+        aufrufen:<screenshot>
+            <info>
+              <title>http://0.0.0.0:3000/de/page/index</title>
+            </info>
 
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screenshots/i18n_path_prefix_de_page_index.jpg"></imagedata>
-            </imageobject>
-          </mediaobject>
-        </screenshot></para>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/i18n_path_prefix_de_page_index.jpg"></imagedata>
+              </imageobject>
+            </mediaobject>
+          </screenshot></para>
 
-      <para>Beim Aufruf von <uri
-      xlink:href="http://0.0.0.0:3000/de">http://0.0.0.0:3000/en</uri> und
-      <uri
-      xlink:href="http://0.0.0.0:3000/de/page/index">http://0.0.0.0:3000/en/page/index</uri>
-      bekommen wir die jeweils englischen Seiten angezeigt.</para>
+        <para>Beim Aufruf von <uri
+        xlink:href="http://0.0.0.0:3000/de">http://0.0.0.0:3000/en</uri> und
+        <uri
+        xlink:href="http://0.0.0.0:3000/de/page/index">http://0.0.0.0:3000/en/page/index</uri>
+        bekommen wir die jeweils englischen Seiten angezeigt.</para>
 
-      <para>Jetzt haben wir aber ein Problem: Zwar kommen wir initial mit dem
-      Prefix auf eine Seite mit der richtigen Sprache, aber was ist, wenn wir
-      von dieser Seite auf eine andere Seite in unserem Rails-Projekt
-      verlinken wollen? Dann müssten wir den Prefix manuell in den Link
-      einbauen. Das will keiner. Deshalb gibt es eine Lösung in Form von
-      <code>Rails.application.routes.default_url_options</code>. Wir müssen
-      nur unsere <methodname>set_locale</methodname> Methode in
-      <filename>app/controllers/application_controller.rb</filename>
-      entsprechend erweitern:<programlisting>class ApplicationController &lt; ActionController::Base
+        <para>Jetzt haben wir aber ein Problem: Zwar kommen wir initial mit
+        dem Prefix auf eine Seite mit der richtigen Sprache, aber was ist,
+        wenn wir von dieser Seite auf eine andere Seite in unserem
+        Rails-Projekt verlinken wollen? Dann müssten wir den Prefix manuell in
+        den Link einbauen. Das will keiner. Deshalb gibt es eine Lösung in
+        Form von <code>Rails.application.routes.default_url_options</code>.
+        Wir müssen nur unsere <methodname>set_locale</methodname> Methode in
+        <filename>app/controllers/application_controller.rb</filename>
+        entsprechend erweitern:<programlisting>class ApplicationController &lt; ActionController::Base
   protect_from_forgery
 
   before_filter :set_locale
@@ -650,22 +662,22 @@ end</programlisting></para>
   end
 end</programlisting></para>
 
-      <para>Damit werden alle mit <methodname>link_to</methodname> und
-      <methodname>url_for</methodname> (auf das
-      <methodname>link_to</methodname> aufsetzt) erzeugten Links automatisch
-      um den Parameter <varname>locale</varname> erweitert. Sie müssen nichts
-      weiter tun. Alle mit dem Scaffold Generator generierten Links werden
-      automatisch entsprechend verändert.</para>
+        <para>Damit werden alle mit <methodname>link_to</methodname> und
+        <methodname>url_for</methodname> (auf das
+        <methodname>link_to</methodname> aufsetzt) erzeugten Links automatisch
+        um den Parameter <varname>locale</varname> erweitert. Sie müssen
+        nichts weiter tun. Alle mit dem Scaffold Generator generierten Links
+        werden automatisch entsprechend verändert.</para>
 
-      <section>
-        <title>Navigationsbeispiel</title>
+        <section>
+          <title>Navigationsbeispiel</title>
 
-        <para>Um dem User die Möglichkeit zu geben einfach zwischen den
-        Sprachversionen hin- und herzuschalten, bieten sich am Kopf der
-        Webseite zwei Links an. Dabei sollte die aktuelle Sprache nicht als
-        aktiver Link angezeigt werden. Dies kann man in der
-        <filename>app/views/layouts/application.html.erb</filename> Datei für
-        alle Views wie folgt realisieren:<programlisting>&lt;!DOCTYPE html&gt;
+          <para>Um dem User die Möglichkeit zu geben einfach zwischen den
+          Sprachversionen hin- und herzuschalten, bieten sich am Kopf der
+          Webseite zwei Links an. Dabei sollte die aktuelle Sprache nicht als
+          aktiver Link angezeigt werden. Dies kann man in der
+          <filename>app/views/layouts/application.html.erb</filename> Datei
+          für alle Views wie folgt realisieren:<programlisting>&lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
   &lt;title&gt;Webshop&lt;/title&gt;
@@ -686,44 +698,44 @@ end</programlisting></para>
 &lt;/body&gt;
 &lt;/html&gt;</programlisting></para>
 
-        <para>Die Navigation wird dann am Kopf der Seite angezeigt.</para>
+          <para>Die Navigation wird dann am Kopf der Seite angezeigt.</para>
 
-        <screenshot>
-          <info>
-            <title>Sprachauswahl in der Kopfzeile</title>
-          </info>
+          <screenshot>
+            <info>
+              <title>Sprachauswahl in der Kopfzeile</title>
+            </info>
 
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screenshots/I18n_locale_url_prefix_navigation.jpg"></imagedata>
-            </imageobject>
-          </mediaobject>
-        </screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/I18n_locale_url_prefix_navigation.jpg"></imagedata>
+              </imageobject>
+            </mediaobject>
+          </screenshot>
+        </section>
       </section>
-    </section>
 
-    <section>
-      <title>I18n.locale per Accept-Language HTTP Header des Browsers
-      setzen</title>
+      <section>
+        <title>I18n.locale per Accept-Language HTTP Header des Browsers
+        setzen</title>
 
-      <indexterm>
-        <primary>I18n.locale</primary>
+        <indexterm>
+          <primary>I18n.locale</primary>
 
-        <secondary>Accept-Language HTTP Header</secondary>
-      </indexterm>
+          <secondary>Accept-Language HTTP Header</secondary>
+        </indexterm>
 
-      <para>Wenn ein User Ihrer Webseite zum ersten mal aufschlägt, möchten
-      Sie ihm im Idealfall direkt die Webseite in der richtigen Sprache
-      anzeigen. Dafür können Sie das Accept-Language Feld im HTTP Header
-      auslesen. In jedem Webbrowser kann der Benutzer der Software seine
-      bevorzugte Sprache einstellen (siehe <uri
-      xlink:href="http://www.w3.org/International/questions/qa-lang-priorities">http://www.w3.org/International/questions/qa-lang-priorities</uri>).
-      Dieser Wert wird dem Webserver und damit Rails automatisch vom Browser
-      mitgeteilt.</para>
+        <para>Wenn ein User Ihrer Webseite zum ersten mal aufschlägt, möchten
+        Sie ihm im Idealfall direkt die Webseite in der richtigen Sprache
+        anzeigen. Dafür können Sie das Accept-Language Feld im HTTP Header
+        auslesen. In jedem Webbrowser kann der Benutzer der Software seine
+        bevorzugte Sprache einstellen (siehe <uri
+        xlink:href="http://www.w3.org/International/questions/qa-lang-priorities">http://www.w3.org/International/questions/qa-lang-priorities</uri>).
+        Dieser Wert wird dem Webserver und damit Rails automatisch vom Browser
+        mitgeteilt.</para>
 
-      <para>Bitte verändern Sie
-      <filename>app/controllers/application_controller.rb</filename> wie folgt
-      ab:<programlisting>class ApplicationController &lt; ActionController::Base
+        <para>Bitte verändern Sie
+        <filename>app/controllers/application_controller.rb</filename> wie
+        folgt ab:<programlisting>class ApplicationController &lt; ActionController::Base
   protect_from_forgery
 
   before_filter :set_locale
@@ -739,48 +751,49 @@ end</programlisting></para>
 end
 </programlisting></para>
 
-      <para>Und vergessen Sie bitte nicht die
-      <filename>config/routes.rb</filename> von den Einstellungen in <xref
-      linkend="i18n_url_path_prefix" /> zu bereinigen:<programlisting>Webshop::Application.routes.draw do
+        <para>Und vergessen Sie bitte nicht die
+        <filename>config/routes.rb</filename> von den Einstellungen in <xref
+        linkend="i18n_url_path_prefix" /> zu bereinigen:<programlisting>Webshop::Application.routes.draw do
 
   get "page/index"
   root :to =&gt; 'page#index'
 
 end</programlisting></para>
 
-      <para>Jetzt bekommen Sie immer die im Webbrowser definierte Sprache
-      ausgeliefert. Dabei ist zu beachten, das
-      <code>request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first</code>
-      nicht alle Fälle abfängt. So sollten Sie überprüfen, ob Sie in Ihrer
-      Rails-Applikation die angegebene Sprache überhaupt unterstützen. Es gibt
-      einige fertige Gems, die Ihnen diese Arbeit einfach abnehmen. Die
-      Suchmaschine Ihrer Wahl wird Ihnen bei der Suche helfen.</para>
-    </section>
+        <para>Jetzt bekommen Sie immer die im Webbrowser definierte Sprache
+        ausgeliefert. Dabei ist zu beachten, das
+        <code>request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first</code>
+        nicht alle Fälle abfängt. So sollten Sie überprüfen, ob Sie in Ihrer
+        Rails-Applikation die angegebene Sprache überhaupt unterstützen. Es
+        gibt einige fertige Gems, die Ihnen diese Arbeit einfach abnehmen. Die
+        Suchmaschine Ihrer Wahl wird Ihnen bei der Suche helfen.</para>
+      </section>
 
-    <section xml:id="i18n_local_session">
-      <title xml:id="i18n_local_session.title">I18n.locale in einer Session
-      abspeichern</title>
+      <section xml:id="i18n_local_session">
+        <title xml:id="i18n_local_session.title">I18n.locale in einer Session
+        abspeichern</title>
 
-      <indexterm>
-        <primary>I18n.locale</primary>
+        <indexterm>
+          <primary>I18n.locale</primary>
 
-        <secondary>Session</secondary>
-      </indexterm>
+          <secondary>Session</secondary>
+        </indexterm>
 
-      <para>Oft soll der Wert von <varname>I18n.locale</varname> in einer
-      Session (siehe <xref linkend="sessions" />) gespeichert werden.<tip>
-          <para>Der hier mit Sessions beschriebene Weg funktioniert natürlich
-          genau so gut mit Cookies. Siehe <xref linkend="cookies" />.</para>
-        </tip> Legen wir zum Setzen des Wertes als Beispiel in unserem Webshop
-      einen Controller <classname>SetLanguage</classname> mit den beiden
-      Actions <methodname>english</methodname> und
-      <methodname>german</methodname> an:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails generate controller SetLanguage english german</command>
+        <para>Oft soll der Wert von <varname>I18n.locale</varname> in einer
+        Session (siehe <xref linkend="sessions" />) gespeichert werden.<tip>
+            <para>Der hier mit Sessions beschriebene Weg funktioniert
+            natürlich genau so gut mit Cookies. Siehe <xref
+            linkend="cookies" />.</para>
+          </tip> Legen wir zum Setzen des Wertes als Beispiel in unserem
+        Webshop einen Controller <classname>SetLanguage</classname> mit den
+        beiden Actions <methodname>english</methodname> und
+        <methodname>german</methodname> an:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails generate controller SetLanguage english german</command>
 [...]
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
 
-      <para>In der
-      <filename>app/controllers/set_language_controller.rb</filename> Datei
-      füllen wir die beiden Actions wie folgt:<programlisting>class SetLanguageController &lt; ApplicationController
+        <para>In der
+        <filename>app/controllers/set_language_controller.rb</filename> Datei
+        füllen wir die beiden Actions wie folgt:<programlisting>class SetLanguageController &lt; ApplicationController
   def english
     I18n.locale = :en
     set_session_and_redirect
@@ -800,9 +813,9 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
   end
 end</programlisting></para>
 
-      <para>Zum Schluss müssen wir noch in der Datei
-      <filename>app/controllers/application_controller.rb</filename> die
-      <methodname>set_locale</methodname> Methode anpassen:<programlisting>class ApplicationController &lt; ActionController::Base
+        <para>Zum Schluss müssen wir noch in der Datei
+        <filename>app/controllers/application_controller.rb</filename> die
+        <methodname>set_locale</methodname> Methode anpassen:<programlisting>class ApplicationController &lt; ActionController::Base
   protect_from_forgery
 
   before_filter :set_locale
@@ -815,22 +828,22 @@ end</programlisting></para>
 end
 </programlisting></para>
 
-      <para>Jetzt können Sie nach dem Starten von Rails mit <command>rails
-      server</command> mit dem Aufruf der URL <uri
-      xlink:href="http://0.0.0.0:3000/set_language/german">http://0.0.0.0:3000/set_language/german</uri>
-      die Sprache auf Deutsch und mit dem Aufruf von <uri
-      xlink:href="http://0.0.0.0:3000/set_language/english">http://0.0.0.0:3000/set_language/english</uri>
-      die Sprache auf Englisch stellen.</para>
+        <para>Jetzt können Sie nach dem Starten von Rails mit <command>rails
+        server</command> mit dem Aufruf der URL <uri
+        xlink:href="http://0.0.0.0:3000/set_language/german">http://0.0.0.0:3000/set_language/german</uri>
+        die Sprache auf Deutsch und mit dem Aufruf von <uri
+        xlink:href="http://0.0.0.0:3000/set_language/english">http://0.0.0.0:3000/set_language/english</uri>
+        die Sprache auf Englisch stellen.</para>
 
-      <section>
-        <title>Navigationsbeispiel</title>
+        <section>
+          <title>Navigationsbeispiel</title>
 
-        <para>Um dem User die Möglichkeit zu geben einfach zwischen den
-        Sprachversionen hin- und herzuschalten, bieten sich am Kopf der
-        Webseite zwei Links an. Dabei sollte die aktuelle Sprache nicht als
-        aktiver Link angezeigt werden. Dies kann man in der
-        <filename>app/views/layouts/application.html.erb</filename> Datei für
-        alle Views wie folgt realisieren:<programlisting>&lt;!DOCTYPE html&gt;
+          <para>Um dem User die Möglichkeit zu geben einfach zwischen den
+          Sprachversionen hin- und herzuschalten, bieten sich am Kopf der
+          Webseite zwei Links an. Dabei sollte die aktuelle Sprache nicht als
+          aktiver Link angezeigt werden. Dies kann man in der
+          <filename>app/views/layouts/application.html.erb</filename> Datei
+          für alle Views wie folgt realisieren:<programlisting>&lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
   &lt;title&gt;Webshop&lt;/title&gt;
@@ -851,45 +864,45 @@ end
 &lt;/body&gt;
 &lt;/html&gt;</programlisting></para>
 
-        <para>Die Navigation wird dann am Kopf der Seite angezeigt.</para>
+          <para>Die Navigation wird dann am Kopf der Seite angezeigt.</para>
 
-        <screenshot>
-          <info>
-            <title>Sprachauswahl in der Kopfzeile</title>
-          </info>
+          <screenshot>
+            <info>
+              <title>Sprachauswahl in der Kopfzeile</title>
+            </info>
 
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screenshots/I18n_locale_url_prefix_navigation.jpg"></imagedata>
-            </imageobject>
-          </mediaobject>
-        </screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/I18n_locale_url_prefix_navigation.jpg"></imagedata>
+              </imageobject>
+            </mediaobject>
+          </screenshot>
+        </section>
       </section>
-    </section>
 
-    <section xml:id="i18n_locale_per_domain_endung">
-      <title xml:id="i18n_locale_per_domain_endung.title">I18n.locale per
-      Domain-Endung setzen</title>
+      <section xml:id="i18n_locale_per_domain_endung">
+        <title xml:id="i18n_locale_per_domain_endung.title">I18n.locale per
+        Domain-Endung setzen</title>
 
-      <indexterm>
-        <primary>I18n.locale</primary>
+        <indexterm>
+          <primary>I18n.locale</primary>
 
-        <secondary>Domain-Endung</secondary>
-      </indexterm>
+          <secondary>Domain-Endung</secondary>
+        </indexterm>
 
-      <para>Wenn Sie mehrer Domains mit den für die entsprechenden Sprachen
-      typischen Domain-Endungen haben, dann können Sie natürlich darüber auch
-      die Sprache setzen. So würde ein Besucher von <uri
-      xlink:href="http://www.example.com">http://www.example.com</uri> die
-      Englische Version und ein Besucher von <uri
-      xlink:href="http://www.example.de">http://www.example.de</uri> die
-      Deutsche Version angezeigt bekommen. </para>
+        <para>Wenn Sie mehrer Domains mit den für die entsprechenden Sprachen
+        typischen Domain-Endungen haben, dann können Sie natürlich darüber
+        auch die Sprache setzen. So würde ein Besucher von <uri
+        xlink:href="http://www.example.com">http://www.example.com</uri> die
+        Englische Version und ein Besucher von <uri
+        xlink:href="http://www.example.de">http://www.example.de</uri> die
+        Deutsche Version angezeigt bekommen.</para>
 
-      <para>Dazu müssen wir in der
-      <filename>app/controllers/application_controller.rb</filename> einen
-      <methodname>before_filter</methodname> setzen, der die aufgerufene
-      Domain analysiert und <varname>I18n.locale</varname>
-      setzt:<programlisting>class ApplicationController &lt; ActionController::Base
+        <para>Dazu müssen wir in der
+        <filename>app/controllers/application_controller.rb</filename> einen
+        <methodname>before_filter</methodname> setzen, der die aufgerufene
+        Domain analysiert und <varname>I18n.locale</varname>
+        setzt:<programlisting>class ApplicationController &lt; ActionController::Base
   protect_from_forgery
 
   before_filter :set_locale
@@ -908,83 +921,84 @@ end
  
 end</programlisting></para>
 
-      <tip>
-        <para>Zum Testen dieser Funktionalität können Sie auf Ihrem Linux oder
-        Mac OS X Entwicklungssystem in der Datei
-        <filename>/etc/hosts</filename> die folgenden Einträge
-        hinzufügen:<programlisting>0.0.0.0 www.example.com
+        <tip>
+          <para>Zum Testen dieser Funktionalität können Sie auf Ihrem Linux
+          oder Mac OS X Entwicklungssystem in der Datei
+          <filename>/etc/hosts</filename> die folgenden Einträge
+          hinzufügen:<programlisting>0.0.0.0 www.example.com
 0.0.0.0 www.example.de
 </programlisting></para>
 
-        <para>Danach können Sie die URLs <uri
-        xlink:href="http://www.example.com:3000">http://www.example.com:3000</uri>
-        und <uri
-        xlink:href="http://www.example.de:3000">http://www.example.de:3000</uri>
-        aufrufen und bekommen die entsprechenden Sprachversionen
-        angezeigt.</para>
-      </tip>
+          <para>Danach können Sie die URLs <uri
+          xlink:href="http://www.example.com:3000">http://www.example.com:3000</uri>
+          und <uri
+          xlink:href="http://www.example.de:3000">http://www.example.de:3000</uri>
+          aufrufen und bekommen die entsprechenden Sprachversionen
+          angezeigt.</para>
+        </tip>
+      </section>
+
+      <section xml:id="i18n_welcher_weg">
+        <title xml:id="i18n_welcher_weg.title">Welcher Weg ist der
+        beste?</title>
+
+        <para>Meiner Meinung nach führt eine Kombination der vorgestellten
+        Wege zum besten Ergebnis. Als Erst-Besucher einer Webseite freue ich
+        mich, wenn der Accept-Language HTTP Header meines Browsers korrekt
+        gelesen und umgesetzt wird. Es ist aber auch schön, die Sprache später
+        in der User-Konfiguration ändern zu können (gerade bei schlecht
+        übersetzen Seite ist oft Englisch besser). Und zum Schluss muss man
+        sagen, das eine gute Abbildbarkeit der Seite inklusive der Sprachen
+        für eine Suchmaschine sehr viel Wert ist. Rails gibt Ihnen die
+        Möglichkeit alle Varianten leicht zu benutzen und sogar zu
+        verknüpfen.</para>
+      </section>
     </section>
 
-    <section xml:id="i18n_welcher_weg">
-      <title xml:id="i18n_welcher_weg.title">Welcher Weg ist der
-      beste?</title>
+    <section xml:id="i18n_komplette_seiten_uebersetzen">
+      <title xml:id="i18n_komplette_seiten_uebersetzen.title">Komplette Views
+      (Web-Seiten) am Stück übersetzen</title>
 
-      <para>Meiner Meinung nach führt eine Kombination der vorgestellten Wege
-      zum besten Ergebnis. Als Erst-Besucher einer Webseite freue ich mich,
-      wenn der Accept-Language HTTP Header meines Browsers korrekt gelesen und
-      umgesetzt wird. Es ist aber auch schön, die Sprache später in der
-      User-Konfiguration ändern zu können (gerade bei schlecht übersetzen
-      Seite ist oft Englisch besser). Und zum Schluss muss man sagen, das eine
-      gute Abbildbarkeit der Seite inklusive der Sprachen für eine
-      Suchmaschine sehr viel Wert ist. Rails gibt Ihnen die Möglichkeit alle
-      Varianten leicht zu benutzen und sogar zu verknüpfen.</para>
-    </section>
-  </section>
+      <para>Sie können jeden View anhand des Dateinamens in mehreren
+      Sprachversionen ablegen. Dabei wird vor der Dateiendung html.erb die
+      Abkürzung für die Sprache eingefügt. Wie in <xref
+      linkend="i18n_sprache_einstellen" /> gezeigt würde der Dateiname für die
+      Deutsche Version von <filename>app/views/page/index.html.erb</filename>
+      dann <filename>app/views/page/index.de.html.erb</filename>
+      heissen.</para>
 
-  <section xml:id="i18n_komplette_seiten_uebersetzen">
-    <title xml:id="i18n_komplette_seiten_uebersetzen.title">Komplette Seiten
-    übersetzen</title>
-
-    <para>Sie können jeden View anhand des Dateinamens in mehreren
-    Sprachversionen ablegen. Dabei wird vor der Dateiendung html.erb die
-    Abkürzung für die Sprache eingefügt. Wie in <xref
-    linkend="i18n_sprache_einstellen" /> gezeigt würde der Dateiname für die
-    Deutsche Version von <filename>app/views/page/index.html.erb</filename>
-    dann <filename>app/views/page/index.de.html.erb</filename> heissen.
-    </para>
-
-    <screen>|-app
+      <screen>|-app
 |---views
 |-----page
 |-------index.html.erb
 |-------index.de.html.erb
 </screen>
 
-    <para>Die in <varname>config.i18n.default_locale</varname> gespeicherte
-    Sprache wird dabei automatisch benutzt, wenn im Dateinamen keine Sprache
-    eincodiert wurde. Dies ist in einem neuen und noch nicht konfigurieren
-    Rails-Projekt Englisch.</para>
+      <para>Die in <varname>config.i18n.default_locale</varname> gespeicherte
+      Sprache wird dabei automatisch benutzt, wenn im Dateinamen keine Sprache
+      eincodiert wurde. Dies ist in einem neuen und noch nicht konfigurieren
+      Rails-Projekt Englisch.</para>
 
-    <para>Überlegen Sie vor der Erstellung einzelner Seiten für jede Sprache,
-    ob das konkrete Problem mit dem übersetzen einzelner Elemente besser zu
-    lösen wäre (siehe <xref
-    linkend="i18n_uebersetzen_einzelner_elemente" />).</para>
-  </section>
+      <para>Überlegen Sie vor der Erstellung einzelner Seiten für jede
+      Sprache, ob das konkrete Problem mit dem übersetzen einzelner Elemente
+      besser zu lösen wäre (siehe <xref
+      linkend="i18n_uebersetzen_einzelner_elemente" />).</para>
+    </section>
 
-  <section xml:id="i18n_uebersetzen_einzelner_elemente">
-    <title xml:id="i18n_uebersetzen_einzelner_elemente.title">Übersetzen
-    einzelner Elemente</title>
+    <section xml:id="i18n_uebersetzen_einzelner_elemente">
+      <title xml:id="i18n_uebersetzen_einzelner_elemente.title">Übersetzen
+      einzelner Elemente</title>
 
-    <para>In <xref linkend="i18n_komplette_seiten_uebersetzen" /> haben Sie
-    gelesen wie man eine komplette erb Seite in verschiedene Sprachen
-    übersetzen kann. Oft ist das aber zu aufwendig und vor allen Dingen
-    fehleranfällig. Man verändert in der einen Sprachversion etwas und
-    vergisst diese Veränderung in der anderen Sprachversion nach zu
-    ziehen.</para>
+      <para>In <xref linkend="i18n_komplette_seiten_uebersetzen" /> haben Sie
+      gelesen wie man eine komplette erb Seite in verschiedene Sprachen
+      übersetzen kann. Oft ist das aber zu aufwendig und vor allen Dingen
+      fehleranfällig. Man verändert in der einen Sprachversion etwas und
+      vergisst diese Veränderung in der anderen Sprachversion nach zu
+      ziehen.</para>
 
-    <para>Als Beispiel benutzen wir einen Mini-Webshop in dem wir einen
-    Product Scaffold übersetzen. Das Ziel ist es die Applikation in Deutsch
-    und Englisch zur Verfügung zu stellen. Die Rails-Applikation:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new webshop</command>
+      <para>Als Beispiel benutzen wir einen Mini-Webshop in dem wir einen
+      Product Scaffold übersetzen. Das Ziel ist es die Applikation in Deutsch
+      und Englisch zur Verfügung zu stellen. Die Rails-Applikation:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new webshop</command>
 [...]
 Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd webshop</command>
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails generate scaffold Product name description 'price:decimal{7,2}'</command>
@@ -993,8 +1007,8 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rake db:migrate</command>
 [...]
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
 
-    <para>Das Product-Model definieren wir in der
-    <filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
+      <para>Das Product-Model definieren wir in der
+      <filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
   attr_accessible :description, :name, :price
 
   validates :name,
@@ -1007,10 +1021,10 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
             :numericality =&gt; { :greater_than =&gt; 0 }
 end</programlisting></para>
 
-    <para>Bei der Sprachauswahl für den User nehmen wir den
-    URL-Prefix-Variante, die in <xref linkend="i18n_url_path_prefix" />
-    beschrieben wird. Dazu verwenden wir folgende
-    <filename>app/controllers/application_controller.rb</filename><programlisting>class ApplicationController &lt; ActionController::Base
+      <para>Bei der Sprachauswahl für den User nehmen wir den
+      URL-Prefix-Variante, die in <xref linkend="i18n_url_path_prefix" />
+      beschrieben wird. Dazu verwenden wir folgende
+      <filename>app/controllers/application_controller.rb</filename><programlisting>class ApplicationController &lt; ActionController::Base
   protect_from_forgery
 
   before_filter :set_locale
@@ -1022,7 +1036,7 @@ end</programlisting></para>
   end
 end</programlisting></para>
 
-    <para>Diese <filename>config/routes.rb</filename><programlisting>Webshop::Application.routes.draw do
+      <para>Diese <filename>config/routes.rb</filename><programlisting>Webshop::Application.routes.draw do
 
   scope "(:locale)", :locale =&gt; /en|de/ do
     root :to =&gt; 'products#index'
@@ -1031,9 +1045,9 @@ end</programlisting></para>
 
 end</programlisting></para>
 
-    <para>Fügen in der
-    <filename>app/views/layouts/application.html.erb</filename> noch die Links
-    für die Navigation ein:<programlisting>&lt;!DOCTYPE html&gt;
+      <para>Fügen in der
+      <filename>app/views/layouts/application.html.erb</filename> noch die
+      Links für die Navigation ein:<programlisting>&lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
   &lt;title&gt;Webshop&lt;/title&gt;
@@ -1054,9 +1068,9 @@ end</programlisting></para>
 &lt;/body&gt;
 &lt;/html&gt;</programlisting></para>
 
-    <para>Und vorm Starten von Rails mit <command>rails server</command>
-    löschen wir noch die <filename>public/index.html</filename> Datei, damit
-    wir als Root-Seite die Liste aller Produkte angezeigt bekommen.<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rm public/index.html</command> 
+      <para>Und vorm Starten von Rails mit <command>rails server</command>
+      löschen wir noch die <filename>public/index.html</filename> Datei, damit
+      wir als Root-Seite die Liste aller Produkte angezeigt bekommen.<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rm public/index.html</command> 
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails server</command>
 =&gt; Booting WEBrick
 =&gt; Rails 3.2.3 application starting in development on http://0.0.0.0:3000
@@ -1066,36 +1080,36 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails server</command>
 [2012-06-01 10:43:06] INFO  ruby 1.9.3 (2012-04-20) [x86_64-darwin11.3.0]
 [2012-06-01 10:43:06] INFO  WEBrick::HTTPServer#start: pid=51412 port=3000</screen></para>
 
-    <para>Beim Aufruf von <uri
-    xlink:href="http://0.0.0.0:3000">http://0.0.0.0:3000</uri> bekommen wir
-    die normale Englische Seite angezeigt. <screenshot>
-        <info>
-          <title>Grundversion</title>
-        </info>
+      <para>Beim Aufruf von <uri
+      xlink:href="http://0.0.0.0:3000">http://0.0.0.0:3000</uri> bekommen wir
+      die normale Englische Seite angezeigt. <screenshot>
+          <info>
+            <title>Grundversion</title>
+          </info>
 
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="screenshots/i18n_webshop_base_version.jpg"></imagedata>
-          </imageobject>
-        </mediaobject>
-      </screenshot></para>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/i18n_webshop_base_version.jpg"></imagedata>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
-    <para>Wenn wir auf Deutsch klicken verändert sich bis auf die
-    Sprachnavigation ganz oben nichts auf der Seite.<screenshot>
-        <info>
-          <title>Grundversion de</title>
-        </info>
+      <para>Wenn wir auf Deutsch klicken verändert sich bis auf die
+      Sprachnavigation ganz oben nichts auf der Seite.<screenshot>
+          <info>
+            <title>Grundversion de</title>
+          </info>
 
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="screenshots/i18n_webshop_base_version_de.jpg"></imagedata>
-          </imageobject>
-        </mediaobject>
-      </screenshot></para>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/i18n_webshop_base_version_de.jpg"></imagedata>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
-    <para>Bei beiden Sprachen wir die Datei
-    <filename>app/views/products/index.html.erb</filename> gerendet. Sie
-    enthält folgenden Code:<programlisting>&lt;h1&gt;Listing products&lt;/h1&gt;
+      <para>Bei beiden Sprachen wir die Datei
+      <filename>app/views/products/index.html.erb</filename> gerendet. Sie
+      enthält folgenden Code:<programlisting>&lt;h1&gt;Listing products&lt;/h1&gt;
 
 &lt;table&gt;
   &lt;tr&gt;
@@ -1123,34 +1137,34 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails server</command>
 
 &lt;%= link_to 'New Product', new_product_path %&gt;</programlisting></para>
 
-    <para>Jetzt müssen wir nur noch einen Weg finden die einzelnen Elemente
-    dieser Seite sinnvoll zu übersetzen.</para>
+      <para>Jetzt müssen wir nur noch einen Weg finden die einzelnen Elemente
+      dieser Seite sinnvoll zu übersetzen.</para>
 
-    <section>
-      <title>I18n.t</title>
+      <section xml:id="i18n_i18n_t">
+        <title xml:id="i18n_i18n_t.title">I18n.t</title>
 
-      <indexterm>
-        <primary>I18n</primary>
+        <indexterm>
+          <primary>I18n</primary>
 
-        <secondary>I18n.t</secondary>
-      </indexterm>
+          <secondary>I18n.t</secondary>
+        </indexterm>
 
-      <indexterm>
-        <primary>I18n</primary>
+        <indexterm>
+          <primary>I18n</primary>
 
-        <secondary>I18n.translate</secondary>
-      </indexterm>
+          <secondary>I18n.translate</secondary>
+        </indexterm>
 
-      <para>Mit <methodname>I18n.t</methodname> können Sie vorher definierte
-      Übersetzungen abrufen. Die Übersetzungen werden per Default im
-      YAML-Format im Verzeichnis <filename>config/locales/</filename>
-      abgespeichert. Dort findet sich auch eine Beispieldatei
-      <filename>config/locales/en.yml</filename> mit folgendem
-      Inhalt:<programlisting>en:
+        <para>Mit <methodname>I18n.t</methodname> können Sie vorher definierte
+        Übersetzungen abrufen. Die Übersetzungen werden per Default im
+        YAML-Format im Verzeichnis <filename>config/locales/</filename>
+        abgespeichert. Dort findet sich auch eine Beispieldatei
+        <filename>config/locales/en.yml</filename> mit folgendem
+        Inhalt:<programlisting>en:
   hello: "Hello world"</programlisting></para>
 
-      <para>In der Rails-Console können wir mal ausprobieren, wie
-      <methodname>I18n.t</methodname> funktioniert:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+        <para>In der Rails-Console können wir mal ausprobieren, wie
+        <methodname>I18n.t</methodname> funktioniert:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>I18n.t :hello</command>
  =&gt; "Hello world" 
@@ -1159,12 +1173,12 @@ Loading development environment (Rails 3.2.3)
 1.9.3p194 :003 &gt; <command>exit</command>
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
 
-      <para>Erstellen wir einmal eine
-      <filename>config/locales/de.yml</filename> mit folgendem
-      Inhalt:<programlisting>de:
+        <para>Erstellen wir einmal eine
+        <filename>config/locales/de.yml</filename> mit folgendem
+        Inhalt:<programlisting>de:
   hello: "Hallo Welt"</programlisting></para>
 
-      <para>Jetzt noch mal in die Console:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+        <para>Jetzt noch mal in die Console:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>I18n.locale</command>
  =&gt; :en 
@@ -1177,11 +1191,11 @@ Loading development environment (Rails 3.2.3)
 1.9.3p194 :005 &gt; <command>exit</command>
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
 
-      <para><methodname>I18n.t</methodname> sucht per Defautl den Eintrag in
-      der in <varname>I18n.locale</varname> definierten Sprache. Dabei ist es
-      egal, ob Sie mit <methodname>I18n.t</methodname> oder
-      <methodname>I18n.translate</methodname> arbeiten. Es ist auch egal, ob
-      Sie nach einem Symbol oder einem String suchen:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+        <para><methodname>I18n.t</methodname> sucht per Defautl den Eintrag in
+        der in <varname>I18n.locale</varname> definierten Sprache. Dabei ist
+        es egal, ob Sie mit <methodname>I18n.t</methodname> oder
+        <methodname>I18n.translate</methodname> arbeiten. Es ist auch egal, ob
+        Sie nach einem Symbol oder einem String suchen:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>I18n.t :hello</command>
  =&gt; "Hello world" 
@@ -1192,8 +1206,9 @@ Loading development environment (Rails 3.2.3)
 1.9.3p194 :004 &gt; <command>exit</command>
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
 
-      <para>Sie können die gewünschte Sprache auch für einen einzelnen I18n.t
-      Aufruf mit <code>:locale =&gt; :de</code> spezifizieren.<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+        <para>Sie können die gewünschte Sprache auch für einen einzelnen
+        <methodname>I18n.t</methodname> Aufruf mit <code>:locale =&gt;
+        :de</code> spezifizieren.<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>I18n.locale</command>
  =&gt; :en 
@@ -1204,12 +1219,13 @@ Loading development environment (Rails 3.2.3)
 1.9.3p194 :004 &gt; <command>exit</command>
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
 
-      <para>Wenn eine Übersetzung nicht vorhanden ist, bekommen Sie eine
-      "<code>translation missing:</code>"-Fehlermeldung. Dies gilt auch, wenn
-      eine Übersetzung nur in einer Sprache fehlt (dann gehen alle anderen
-      Sprachen, aber bei der fehlenden Übersetzung wird die Fehlermeldung
-      ausgegeben). Sie können für diesen Fall mit <code>:default =&gt;
-      'beliebiger Default-Wert'</code> einen Default definieren:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+        <para>Wenn eine Übersetzung nicht vorhanden ist, bekommen Sie eine
+        "<code>translation missing:</code>"-Fehlermeldung. Dies gilt auch,
+        wenn eine Übersetzung nur in einer Sprache fehlt (dann gehen alle
+        anderen Sprachen, aber bei der fehlenden Übersetzung wird die
+        Fehlermeldung ausgegeben). Sie können für diesen Fall mit
+        <code>:default =&gt; 'beliebiger Default-Wert'</code> einen Default
+        definieren:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>I18n.t 'asdfasdfasdf'</command>
  =&gt; "translation missing: en.asdfasdfasdf" 
@@ -1218,9 +1234,9 @@ Loading development environment (Rails 3.2.3)
 1.9.3p194 :003 &gt; <command>exit</command>
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
 
-      <para>Sie können in der YAML-Struktur auch mehrere Ebenen angeben. Bitte
-      ergänzen Sie dazu die <filename>config/locale/en.yml</filename> wie
-      folgt:<programlisting>en:
+        <para>Sie können in der YAML-Struktur auch mehrere Ebenen angeben.
+        Bitte ergänzen Sie dazu die <filename>config/locale/en.yml</filename>
+        wie folgt:<programlisting>en:
   hello: "Hello world"
   example:
     test: "A test"
@@ -1228,9 +1244,9 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
     bbb:
       test: "An other test"</programlisting></para>
 
-      <para>Die verschiedenen Ebenen können Sie innerhalb des Strings mit
-      Punkten anzeigen oder mit einem <code>:scope</code> bei den Symbols. Sie
-      können auch beide Varianten vermischen.<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+        <para>Die verschiedenen Ebenen können Sie innerhalb des Strings mit
+        Punkten anzeigen oder mit einem <code>:scope</code> bei den Symbols.
+        Sie können auch beide Varianten vermischen.<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>I18n.t 'example.test'</command>
  =&gt; "A test" 
@@ -1243,10 +1259,11 @@ Loading development environment (Rails 3.2.3)
 1.9.3p194 :005 &gt; <command>exit</command>
 Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
 
-      <para>Die Struktur, mit der Sie Ihre Übersetzungen in den YAML-Dateien
-      abspeichern bleibt Ihnen überlassen.</para>
+        <para>Die Struktur, mit der Sie Ihre Übersetzungen in den YAML-Dateien
+        abspeichern bleibt Ihnen überlassen.</para>
 
-      <para></para>
+        <para></para>
+      </section>
     </section>
   </section>
 </chapter>
