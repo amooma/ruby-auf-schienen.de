@@ -1279,9 +1279,19 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
 Stefan-Wintermeyers-MacBook-Air:bibliography xyz$ <command>mkdir -p config/locales/views/product</command>
 Stefan-Wintermeyers-MacBook-Air:bibliography xyz$</screen></para>
 
-        <para>Bitte legen Sie die Datei
-        <filename>config/locales/models/product/de.yml</filename> mit
-        folgendem Inhalt an.<programlisting># ruby encoding: utf-8
+        <para>Damit die dort angelegten YAML-Dateien auch automatisch
+        eingelesen werden, müssen Sie die folgenden Zeilen in der Datei
+        <filename>config/application.rb</filename> einfügen:<programlisting>    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
+<emphasis>    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'models', '*', '*.yml').to_s]
+    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'views', '*', '*.yml').to_s]
+    config.i18n.default_locale = :en</emphasis></programlisting></para>
+
+        <section>
+          <title>Deutsch</title>
+
+          <para>Bitte legen Sie die Datei
+          <filename>config/locales/models/product/de.yml</filename> mit
+          folgendem Inhalt an.<programlisting># ruby encoding: utf-8
 
 de:
   activerecord:
@@ -1294,9 +1304,9 @@ de:
         price: 'Preis'
 </programlisting></para>
 
-        <para>In der Datei
-        <filename>config/locales/views/product/de.yml</filename> fügen wir ein
-        paar Werte für die Scaffold Views ein:<programlisting># ruby encoding: utf-8
+          <para>In der Datei
+          <filename>config/locales/views/product/de.yml</filename> fügen wir
+          ein paar Werte für die Scaffold Views ein:<programlisting># ruby encoding: utf-8
 
 de:
   views:
@@ -1309,44 +1319,66 @@ de:
     product:
       index:
         title: Liste aller Produkte
-        new: Neues Produkt
+        new_product: Neues Produkt
       edit:
         title: Produkt editieren
       new:
         title: Neues Produkt
       flash_messages:
-        book_was_successfully_created: 'Das Produkt wurde erfolgreich angelegt.'
-        book_was_successfully_updated: 'Das Produkt wurde erfolgreich aktualisiert.'</programlisting></para>
+        product_was_successfully_created: 'Das Produkt wurde erfolgreich angelegt.'
+        product_was_successfully_updated: 'Das Produkt wurde erfolgreich aktualisiert.'</programlisting></para>
 
-        <para>Damit diese Dateien auch automatisch eingelesen werden, müssen
-        Sie die folgenden Zeilen in der Datei
-        <filename>config/application.rb</filename> einfügen:<programlisting>    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
-<emphasis>    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'models', '*', '*.yml').to_s]
-    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'views', '*', '*.yml').to_s]
-    config.i18n.default_locale = :en</emphasis></programlisting></para>
-
-        <para>Zum Schluss kopieren wir noch eine fertige Standard-Übersetzung
-        von Sven Fuchs aus seinem Github-Repository <uri
-        xlink:href="https://github.com/svenfuchs/rails-i18n">https://github.com/svenfuchs/rails-i18n</uri>:<screen>Stefan-Wintermeyers-MacBook-Air:bibliography xyz$ <command>cd config/locales</command>
+          <para>Zum Schluss kopieren wir noch eine fertige
+          Standard-Übersetzung von Sven Fuchs aus seinem Github-Repository
+          <uri
+          xlink:href="https://github.com/svenfuchs/rails-i18n">https://github.com/svenfuchs/rails-i18n</uri>:<screen>Stefan-Wintermeyers-MacBook-Air:bibliography xyz$ <command>cd config/locales</command>
 Stefan-Wintermeyers-MacBook-Air:locales xyz$ <command>curl -O https://raw.github.com/svenfuchs/rails-i18n/master/rails/locale/de.yml</command>
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100  4940  100  4940    0     0   9574      0 --:--:-- --:--:-- --:--:-- 11932
 Stefan-Wintermeyers-MacBook-Air:locales xyz$ </screen></para>
 
-        <note>
-          <para>Wenn Sie wissen, wie Bundler funktioniert, könne Sie auch die
-          Zeile <code>gem 'rails-i18n'</code> in die Datei
-          <filename>Gemfile</filename> einfügen und danach
-          <command>bundle</command> ausführen. Damit bekommen Sie alle
-          Sprachdateien aus dem Repository eingespielt.</para>
-        </note>
+          <note>
+            <para>Wenn Sie wissen, wie Bundler funktioniert, könne Sie auch
+            die Zeile <code>gem 'rails-i18n'</code> in die Datei
+            <filename>Gemfile</filename> einfügen und danach
+            <command>bundle</command> ausführen. Damit bekommen Sie alle
+            Sprachdateien aus dem Repository eingespielt.</para>
+          </note>
 
-        <para>In der <filename>config/locales/de.yml</filename> Datei sind
-        benötigten Formate und generischen Formulierungen für Deutsch
-        enthalten, die wir für eine normale Rails-Applikation benötigen (z.B.
-        die Wochentage, Währungssymbol, usw.). Schauen Sie einmal mit Ihrem
-        Lieblingseditor rein, um einen Überblick zu bekommen.</para>
+          <para>In der <filename>config/locales/de.yml</filename> Datei sind
+          benötigten Formate und generischen Formulierungen für Deutsch
+          enthalten, die wir für eine normale Rails-Applikation benötigen
+          (z.B. die Wochentage, Währungssymbol, usw.). Schauen Sie einmal mit
+          Ihrem Lieblingseditor rein, um einen Überblick zu bekommen.</para>
+        </section>
+
+        <section>
+          <title>Englisch</title>
+
+          <para>Da für Englisch die meisten Sachen schon im System vorhanden
+          sind, müssen wir nur in der Datei
+          <filename>config/locales/views/product/en.yml</filename> ein paar
+          Werte für die Scaffold Views einfügen:<programlisting>de:
+  views:
+    show: Show
+    edit: Edit
+    destroy: Delete
+    are_your_sure: Are you sure?
+    back: Back
+    edit: Edit
+    product:
+      index:
+        title: List of all products
+        new_product: New product
+      edit:
+        title: Edit Product
+      new:
+        title: New product
+      flash_messages:
+        product_was_successfully_created: 'Product was successfully created.'
+        product_was_successfully_updated: 'Product was successfully updated.'</programlisting></para>
+        </section>
       </section>
 
       <section>
@@ -1437,9 +1469,9 @@ Stefan-Wintermeyers-MacBook-Air:locales xyz$ </screen></para>
     &lt;td&gt;&lt;%= product.name %&gt;&lt;/td&gt;
     &lt;td&gt;&lt;%= product.description %&gt;&lt;/td&gt;
     &lt;td&gt;&lt;%= number_to_currency(product.price) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to I18n.t('views.defaults.show'), product %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to I18n.t('views.defaults.edit'), edit_product_path(product) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to I18n.t('views.defaults.destroy'), product, confirm: I18n.t('views.defaults.are_you_sure'), method: :delete %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to I18n.t('views.show'), product %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to I18n.t('views.edit'), edit_product_path(product) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to I18n.t('views.destroy'), product, confirm: I18n.t('views.are_you_sure'), method: :delete %&gt;&lt;/td&gt;
   &lt;/tr&gt;
 &lt;% end %&gt;
 &lt;/table&gt;
@@ -1467,7 +1499,10 @@ Stefan-Wintermeyers-MacBook-Air:locales xyz$ </screen></para>
           <para>In der <filename>app/views/products/show.html.erb</filename>
           benutzen wir wieder <methodname>human_attribute_name()</methodname>
           für die Attribute. Zusätzlich müssen noch die Links mit
-          <methodname>I18n.t</methodname> übersetzt werden:<programlisting>&lt;p id="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
+          <methodname>I18n.t</methodname> übersetzt werden. Wie beim index
+          View benutzen wir auch
+          <methodname>number_to_currency()</methodname>, um den Preis
+          formatiert anzuzeigen:<programlisting>&lt;p id="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
 
 &lt;p&gt;
   &lt;b&gt;&lt;%= Product.human_attribute_name(:name) %&gt;:&lt;/b&gt;
@@ -1481,7 +1516,7 @@ Stefan-Wintermeyers-MacBook-Air:locales xyz$ </screen></para>
 
 &lt;p&gt;
   &lt;b&gt;&lt;%= Product.human_attribute_name(:price) %&gt;:&lt;/b&gt;
-  &lt;%= @product.price %&gt;
+  &lt;%= number_to_currency(product.price) %&gt;
 &lt;/p&gt;
 
 &lt;%= link_to I18n.t('views.edit'), edit_product_path(@product) %&gt; |
@@ -1541,7 +1576,7 @@ Stefan-Wintermeyers-MacBook-Air:locales xyz$ </screen></para>
 
     respond_to do |format|
       if @product.save
-        format.html { redirect_to @product, notice: I18n.t('views.product.flash_messages.book_was_successfully_created') }
+        format.html { redirect_to @product, notice: I18n.t('views.product.flash_messages.product_was_successfully_created') }
         format.json { render json: @product, status: :created, location: @product }
       else
         format.html { render action: "new" }
@@ -1557,7 +1592,7 @@ Stefan-Wintermeyers-MacBook-Air:locales xyz$ </screen></para>
 
     respond_to do |format|
       if @product.update_attributes(params[:product])
-        format.html { redirect_to @product, notice: I18n.t('views.product.flash_messages.book_was_successfully_updated') }
+        format.html { redirect_to @product, notice: I18n.t('views.product.flash_messages.product_was_successfully_updated') }
         format.json { head :no_content }
       else
         format.html { render action: "edit" }
