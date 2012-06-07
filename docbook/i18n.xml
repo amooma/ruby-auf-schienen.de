@@ -1142,7 +1142,7 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails server</command>
 &lt;%= link_to 'New Product', new_product_path %&gt;</programlisting></para>
 
       <para>Jetzt müssen wir nur noch einen Weg finden die einzelnen Elemente
-      dieser Seite sinnvoll zu übersetzen.</para>
+      dieser Seite sinnvoll und möglichst generisch zu übersetzen.</para>
 
       <section xml:id="i18n_i18n_t">
         <title xml:id="i18n_i18n_t.title">I18n.t</title>
@@ -1317,6 +1317,36 @@ de:
       flash_messages:
         book_was_successfully_created: 'Das Produkt wurde erfolgreich angelegt.'
         book_was_successfully_updated: 'Das Produkt wurde erfolgreich aktualisiert.'</programlisting></para>
+
+        <para>Damit diese Dateien auch automatisch eingelesen werden, müssen
+        Sie die folgenden Zeilen in der Datei
+        <filename>config/application.rb</filename> einfügen:<programlisting>    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
+<emphasis>    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'models', '*', '*.yml').to_s]
+    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'views', '*', '*.yml').to_s]
+    config.i18n.default_locale = :en</emphasis></programlisting></para>
+
+        <para>Zum Schluss kopieren wir noch eine fertige Standard-Übersetzung
+        von Sven Fuchs aus seinem Github-Repository <uri
+        xlink:href="https://github.com/svenfuchs/rails-i18n">https://github.com/svenfuchs/rails-i18n</uri>:<screen>Stefan-Wintermeyers-MacBook-Air:bibliography xyz$ <command>cd config/locales</command>
+Stefan-Wintermeyers-MacBook-Air:locales xyz$ <command>curl -O https://raw.github.com/svenfuchs/rails-i18n/master/rails/locale/de.yml</command>
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  4940  100  4940    0     0   9574      0 --:--:-- --:--:-- --:--:-- 11932
+Stefan-Wintermeyers-MacBook-Air:locales xyz$ </screen></para>
+
+        <note>
+          <para>Wenn Sie wissen, wie Bundler funktioniert, könne Sie auch die
+          Zeile <code>gem 'rails-i18n'</code> in die Datei
+          <filename>Gemfile</filename> einfügen und danach
+          <command>bundle</command> ausführen. Damit bekommen Sie alle
+          Sprachdateien aus dem Repository eingespielt.</para>
+        </note>
+
+        <para>In der <filename>config/locales/de.yml</filename> Datei sind
+        benötigten Formate und generischen Formulierungen für Deutsch
+        enthalten, die wir für eine normale Rails-Applikation benötigen (z.B.
+        die Wochentage, Währungssymbol, usw.). Schauen Sie einmal mit Ihrem
+        Lieblingseditor rein, um einen Überblick zu bekommen.</para>
       </section>
 
       <section>
