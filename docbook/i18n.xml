@@ -13,18 +13,222 @@
 
     <para>Falls Sie in der glücklichen Lage sind, nur englische Webseiten zu
     erstellen, dann können Sie dieses Kapitel komplett überspringen. Für Sie
-    ist per Default alles korrekt eingestellt. Wenn Sie eine Webseite
-    erstellen wollen, die nur deutsch ist, dann müssen Sie in dieses Kapitel
-    eintauchen. Es reicht nicht, nur die Views zu übersetzen. Denn so bald Sie
-    auch nur Scaffolding benützen, müssen Sie sich schon um die englischen und
-    damit noch nicht übersetzen Validierungsfehler kümmern.</para>
+    ist per Default alles korrekt eingestellt. Aber bereits wenn Sie eine
+    Webseite erstellen wollen, die nur deutsch ist, dann müssen Sie in dieses
+    Kapitel eintauchen. Es reicht nicht, nur die Views zu übersetzen. Denn so
+    bald Sie auch nur Scaffolding benützen, müssen Sie sich schon um die
+    englischen und damit noch nicht übersetzen Validierungsfehler
+    kümmern.</para>
 
-    <para>In Rails gibt es zwei grundsätzliche Möglichkeiten Inhalte von
-    Webseiten in verschiedenen Sprachen dazustellen. Für eher statische Views
-    gibt es die Möglichkeit für jede Sprache eine eigene Datei zu erstellen
-    und die Sprache im Dateinamen einzucodieren (siehe x<xref
-    linkend="i18n_komplette_seiten_uebersetzen" />). Damit könnte Ihr Views
-    Verzeichnis ungefähr so aussehen:<screen>|-app
+    <para>Die <classname>I18n</classname> Klasse ist innerhalb der
+    Rails-Applikation für alle Übersetzungbelange zuständig. Sie stellt zwei
+    dafür wichtige Methoden zur Verfügung:<itemizedlist>
+        <listitem>
+          <para><methodname>I18n.translate</methodname> oder
+          <methodname>I18n.t</methodname></para>
+
+          <para>Übernimmt das Einfügen von vorher definierten Textbausteinen.
+          Diese können Variablen enthalten.</para>
+        </listitem>
+
+        <listitem>
+          <para><methodname>I18n.localize</methodname> oder
+          <methodname>I18n.l</methodname></para>
+
+          <para>Übernimmt das Anpassen von Zeit- und Datumsangaben an das
+          lokale Format.</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>Mit <methodname>I18n.locale</methodname> wird die im aktuellen
+    Aufruf gewünschte Sprache definiert. In der Konfigurationsdatei
+    <filename>config/application.rb</filename> wird mit dem Eintrag
+    <varname>config.i18n.default_locale</varname> der Defaultwert für
+    <methodname>I18n.locale</methodname> gesetzt. Wenn Sie dort nichts ändern
+    ist dieser Wert auf <varname>:en</varname> für Englisch
+    eingestellt.</para>
+
+    <para>Für Sonderfälle wie das Anzeigen von Zahlen, Währungen und Uhrzeiten
+    gibt es spezielle Helper. So ist sichergestellt, das auf einer deutschen
+    Webseite die Zahl 1000,23 als "1.000,23" und auf einer englischen Webseite
+    als "1,000.23" dargestellt werden kann. Als Beispiel dafür hier die
+    Deutsche und die Englisch (US) Variante für diesen Betrag als Geldbetrag
+    mit Währung in der Console:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.5)
+1.9.3-p194 :001 &gt; <command>helper.number_to_currency('1000.23', :locale =&gt; :de)</command>
+ =&gt; "1.000,23 €" 
+1.9.3-p194 :002 &gt; <command>helper.number_to_currency('1000.23', :locale =&gt; :en)</command>
+ =&gt; "$1,000.23" 
+1.9.3-p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
+
+    <section xml:id="i18n_i18n_t">
+      <title xml:id="i18n_i18n_t.title">I18n.t</title>
+
+      <indexterm>
+        <primary>I18n</primary>
+
+        <secondary>I18n.t</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>I18n</primary>
+
+        <secondary>I18n.translate</secondary>
+      </indexterm>
+
+      <para>Mit <methodname>I18n.t</methodname> können Sie vorher definierte
+      Übersetzungen abrufen. Die Übersetzungen werden per Default im
+      YAML-Format im Verzeichnis <filename>config/locales/</filename>
+      abgespeichert. Die Verwendung von YAML als Format ist allerdings nicht
+      technisch zwingend notwendig. </para>
+
+      <para>In <filename>config/locales/</filename> findet sich eine
+      Beispieldatei <filename>config/locales/en.yml</filename> mit folgendem
+      Inhalt:<programlisting>en:
+  hello: "Hello world"</programlisting></para>
+
+      <para>In der Rails-Console können wir mal ausprobieren, wie
+      <methodname>I18n.t</methodname> funktioniert:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>I18n.t :hello</command>
+ =&gt; "Hello world" 
+1.9.3p194 :002 &gt; <command>I18n.locale</command>
+ =&gt; :en 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
+
+      <para>Erstellen wir einmal eine
+      <filename>config/locales/de.yml</filename> mit folgendem
+      Inhalt:<programlisting>de:
+  hello: "Hallo Welt"</programlisting></para>
+
+      <para>Jetzt noch mal in die Console:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>I18n.locale</command>
+ =&gt; :en 
+1.9.3p194 :002 &gt; <command>I18n.t :hello</command>
+ =&gt; "Hello world" 
+1.9.3p194 :003 &gt; <command>I18n.locale = :de</command>
+ =&gt; :de 
+1.9.3p194 :004 &gt; <command>I18n.t :hello</command>
+ =&gt; "Hallo Welt" 
+1.9.3p194 :005 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
+
+      <para><methodname>I18n.t</methodname> sucht per Defautl den Eintrag in
+      der in <varname>I18n.locale</varname> definierten Sprache. Dabei ist es
+      egal, ob Sie mit <methodname>I18n.t</methodname> oder
+      <methodname>I18n.translate</methodname> arbeiten. Es ist auch egal, ob
+      Sie nach einem Symbol oder einem String suchen:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>I18n.t :hello</command>
+ =&gt; "Hello world" 
+1.9.3p194 :002 &gt; <command>I18n.t 'hello'</command>
+ =&gt; "Hello world" 
+1.9.3p194 :003 &gt; <command>I18n.translate 'hello'</command>
+ =&gt; "Hello world" 
+1.9.3p194 :004 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
+
+      <para>Sie können die gewünschte Sprache auch für einen einzelnen
+      <methodname>I18n.t</methodname> Aufruf mit <code>:locale =&gt;
+      :de</code> spezifizieren.<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>I18n.locale</command>
+ =&gt; :en 
+1.9.3p194 :002 &gt; <command>I18n.t :hello, :locale =&gt; :de</command>
+ =&gt; "Hallo Welt" 
+1.9.3p194 :003 &gt; <command>I18n.t :hello</command>
+ =&gt; "Hello world" 
+1.9.3p194 :004 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
+
+      <para>Wenn eine Übersetzung nicht vorhanden ist, bekommen Sie eine
+      "<code>translation missing:</code>"-Fehlermeldung. Dies gilt auch, wenn
+      eine Übersetzung nur in einer Sprache fehlt (dann gehen alle anderen
+      Sprachen, aber bei der fehlenden Übersetzung wird die Fehlermeldung
+      ausgegeben). Sie können für diesen Fall mit <code>:default =&gt;
+      'beliebiger Default-Wert'</code> einen Default definieren:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>I18n.t 'asdfasdfasdf'</command>
+ =&gt; "translation missing: en.asdfasdfasdf" 
+1.9.3p194 :002 &gt; <command>I18n.t 'asdfasdfasdf', :default =&gt; 'asdfasdfasdf'</command>
+ =&gt; "asdfasdfasdf" 
+1.9.3p194 :003 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
+
+      <para>Sie können in der YAML-Struktur auch mehrere Ebenen angeben. Bitte
+      ergänzen Sie dazu die <filename>config/locale/en.yml</filename> wie
+      folgt:<programlisting>en:
+  hello: "Hello world"
+  example:
+    test: "A test"
+  aaa:
+    bbb:
+      test: "An other test"</programlisting></para>
+
+      <para>Die verschiedenen Ebenen können Sie innerhalb des Strings mit
+      Punkten anzeigen oder mit einem <code>:scope</code> bei den Symbols. Sie
+      können auch beide Varianten vermischen.<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>I18n.t 'example.test'</command>
+ =&gt; "A test" 
+1.9.3p194 :002 &gt; <command>I18n.t 'aaa.bbb.test'</command>
+ =&gt; "An other test" 
+1.9.3p194 :003 &gt; <command>I18n.t :test, :scope =&gt; [:aaa, :bbb]</command>
+ =&gt; "An other test" 
+1.9.3p194 :004 &gt; <command>I18n.t :test, :scope =&gt; 'aaa.bbb'</command>
+ =&gt; "An other test" 
+1.9.3p194 :005 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
+
+      <para>Die Struktur, mit der Sie Ihre Übersetzungen in den YAML-Dateien
+      abspeichern bleibt Ihnen überlassen. Die in <xref
+      linkend="i18n_einsprachig_deutsch" /> vorgestellte Struktur erleichtert
+      aber einiges und deshalb werden wir dies auch für diese Applikation
+      übernehmen.</para>
+
+      <section>
+        <title>I18n.t im View einsetzen</title>
+
+        <para>Im View können Sie <methodname>I18n.t</methodname> wie folgt
+        verwenden:<programlisting>&lt;%= t :hello-world %&gt;
+
+&lt;%= I18n.t :hello-world %&gt;
+
+&lt;%= I18n.translate :hello-world %&gt;
+
+&lt;%= I18n.t 'hello-world' %&gt;
+
+&lt;%= I18n.t 'aaa.bbb.test' %&gt;
+
+&lt;%= link_to <emphasis>I18n.t('views.destroy')</emphasis>, book, confirm: <emphasis>I18n.t('views.are_you_sure')</emphasis>, method: :delete %&gt;</programlisting></para>
+      </section>
+    </section>
+
+    <section xml:id="i18n_localized_views">
+      <title xml:id="i18n_localized_views.title">Lokalisierte Views (localized
+      views)</title>
+
+      <indexterm>
+        <primary>I18n</primary>
+
+        <secondary>Localized views</secondary>
+      </indexterm>
+
+      <para>In Rails gibt es eine praktische Möglichkeiten für einen View
+      mehrere Varianten als "localized views" abzuspeichern, die jeweils
+      andere Sprachen abbilden. Diese Technik ist unabhängig von der möglichen
+      Verwendung von <methodname>I18n.t</methodname> in diesen Views. Der
+      Dateiname ergibt sich dabei aus dem Viewnamen, dem Sprachcode (z.B.
+      <filename>de</filename> für Deutsch) und <filename>html.erb</filename>
+      für ERB-Seiten. Jeweils durch einen Punkt abgetrennt. So würde die
+      Deutschsprachige Variante der <filename>index.html.erb</filename> Seite
+      den Dateinamen <filename>index.de.html.erb</filename> bekommen.</para>
+
+      <para>Damit könnte Ihr Views Verzeichnis beispielsweie so
+      aussehen:<screen>|-app
 |---views
 |-----products
 |-------_form.html.erb
@@ -43,34 +247,11 @@
 |-------index.de.html.erb
 </screen></para>
 
-    <para>Der zweite Ansatz ist einzelne Strings in einem Key-Value-Store
-    unter den verschiedenen Sprachen abzuspeichern. Aus diesem Key-Value-Store
-    kann dann innerhalb eines Views per
-    <methodname>I18n.translate()</methodname> der benötige String ausgelesen
-    und im View eingesetzt werden. Ein solcher Aufruf würde innerhalb einer
-    erb-Seite so aussehen:<programlisting>&lt;%= t :hello-world %&gt;</programlisting></para>
-
-    <para>Innerhalb dieses Ansatzes gibt es auch eine Möglichkeit mit
-    Variablen zu arbeiten und diese automatisch in einen String
-    einzusetzen.</para>
-
-    <tip>
-      <para>Sie können den ersten und zweiten Ansatz auch vermischen.</para>
-    </tip>
-
-    <para>Für Sonderfälle wie das Anzeigen von Zahlen, Währungen und Uhrzeiten
-    gibt es spezielle Helper. So ist sichergestellt, das auf einer deutschen
-    Webseite die Zahl 1000,23 als "1.000,23" und auf einer englischen Webseite
-    als "1,000.23" dargestellt werden kann. Als Beispiel dafür hier die
-    Deutsche und die Englisch (US) Variante für diesen Betrag als Geldbetrag
-    mit Währung in der Console:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.5)
-1.9.3-p194 :001 &gt; <command>helper.number_to_currency('1000.23', :locale =&gt; :de)</command>
- =&gt; "1.000,23 €" 
-1.9.3-p194 :002 &gt; <command>helper.number_to_currency('1000.23', :locale =&gt; :en)</command>
- =&gt; "$1,000.23" 
-1.9.3-p194 :003 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
+      <para>Die in <varname>config.i18n.default_locale</varname> gespeicherte
+      Sprache wird dabei automatisch benutzt, wenn im Dateinamen keine Sprache
+      eincodiert wurde. Dies ist in einem neuen und noch nicht konfigurieren
+      Rails-Projekt Englisch.</para>
+    </section>
   </section>
 
   <section xml:id="i18n_einsprachig_deutsch">
@@ -444,8 +625,6 @@ Stefan-Wintermeyers-MacBook-Air:bibliography xyz$</screen></para>
 
       <para>Das schöne an den Rails-Routen ist, das Sie nicht mehr machen
       müssen. Der Rest wird transparent von den Routen verwaltet.</para>
-
-      <para> </para>
     </section>
   </section>
 
@@ -959,46 +1138,9 @@ end</programlisting></para>
       </section>
     </section>
 
-    <section xml:id="i18n_komplette_seiten_uebersetzen">
-      <title xml:id="i18n_komplette_seiten_uebersetzen.title">Komplette Views
-      (Web-Seiten) am Stück übersetzen</title>
-
-      <para>Sie können jeden View anhand des Dateinamens in mehreren
-      Sprachversionen ablegen. Dabei wird vor der Dateiendung html.erb die
-      Abkürzung für die Sprache eingefügt. Wie in <xref
-      linkend="i18n_sprache_einstellen" /> gezeigt würde der Dateiname für die
-      Deutsche Version von <filename>app/views/page/index.html.erb</filename>
-      dann <filename>app/views/page/index.de.html.erb</filename>
-      heissen.</para>
-
-      <screen>|-app
-|---views
-|-----page
-|-------index.html.erb
-|-------index.de.html.erb
-</screen>
-
-      <para>Die in <varname>config.i18n.default_locale</varname> gespeicherte
-      Sprache wird dabei automatisch benutzt, wenn im Dateinamen keine Sprache
-      eincodiert wurde. Dies ist in einem neuen und noch nicht konfigurieren
-      Rails-Projekt Englisch.</para>
-
-      <para>Überlegen Sie vor der Erstellung einzelner Seiten für jede
-      Sprache, ob das konkrete Problem mit dem übersetzen einzelner Elemente
-      besser zu lösen wäre (siehe <xref
-      linkend="i18n_uebersetzen_einzelner_elemente" />).</para>
-    </section>
-
-    <section xml:id="i18n_uebersetzen_einzelner_elemente">
-      <title xml:id="i18n_uebersetzen_einzelner_elemente.title">Übersetzen
-      einzelner Elemente</title>
-
-      <para>In <xref linkend="i18n_komplette_seiten_uebersetzen" /> haben Sie
-      gelesen wie man eine komplette erb Seite in verschiedene Sprachen
-      übersetzen kann. Oft ist das aber zu aufwendig und vor allen Dingen
-      fehleranfällig. Man verändert in der einen Sprachversion "eine
-      Kleinigkeit" und vergisst diese Veränderung in der anderen Sprachversion
-      nach zu ziehen.</para>
+    <section xml:id="i18n_mehrsprachiges_scaffold">
+      <title xml:id="i18n_mehrsprachiges_scaffold.title">Mehrsprachiges
+      Scaffolds</title>
 
       <para>Als Beispiel benutzen wir einen Mini-Webshop in dem wir einen
       Product Scaffold übersetzen. Das Ziel ist es die Applikation in Deutsch
@@ -1143,132 +1285,6 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails server</command>
 
       <para>Jetzt müssen wir nur noch einen Weg finden die einzelnen Elemente
       dieser Seite sinnvoll und möglichst generisch zu übersetzen.</para>
-
-      <section xml:id="i18n_i18n_t">
-        <title xml:id="i18n_i18n_t.title">I18n.t</title>
-
-        <indexterm>
-          <primary>I18n</primary>
-
-          <secondary>I18n.t</secondary>
-        </indexterm>
-
-        <indexterm>
-          <primary>I18n</primary>
-
-          <secondary>I18n.translate</secondary>
-        </indexterm>
-
-        <para>Mit <methodname>I18n.t</methodname> können Sie vorher definierte
-        Übersetzungen abrufen. Die Übersetzungen werden per Default im
-        YAML-Format im Verzeichnis <filename>config/locales/</filename>
-        abgespeichert. Dort findet sich auch eine Beispieldatei
-        <filename>config/locales/en.yml</filename> mit folgendem
-        Inhalt:<programlisting>en:
-  hello: "Hello world"</programlisting></para>
-
-        <para>In der Rails-Console können wir mal ausprobieren, wie
-        <methodname>I18n.t</methodname> funktioniert:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>I18n.t :hello</command>
- =&gt; "Hello world" 
-1.9.3p194 :002 &gt; <command>I18n.locale</command>
- =&gt; :en 
-1.9.3p194 :003 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
-
-        <para>Erstellen wir einmal eine
-        <filename>config/locales/de.yml</filename> mit folgendem
-        Inhalt:<programlisting>de:
-  hello: "Hallo Welt"</programlisting></para>
-
-        <para>Jetzt noch mal in die Console:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>I18n.locale</command>
- =&gt; :en 
-1.9.3p194 :002 &gt; <command>I18n.t :hello</command>
- =&gt; "Hello world" 
-1.9.3p194 :003 &gt; <command>I18n.locale = :de</command>
- =&gt; :de 
-1.9.3p194 :004 &gt; <command>I18n.t :hello</command>
- =&gt; "Hallo Welt" 
-1.9.3p194 :005 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
-
-        <para><methodname>I18n.t</methodname> sucht per Defautl den Eintrag in
-        der in <varname>I18n.locale</varname> definierten Sprache. Dabei ist
-        es egal, ob Sie mit <methodname>I18n.t</methodname> oder
-        <methodname>I18n.translate</methodname> arbeiten. Es ist auch egal, ob
-        Sie nach einem Symbol oder einem String suchen:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>I18n.t :hello</command>
- =&gt; "Hello world" 
-1.9.3p194 :002 &gt; <command>I18n.t 'hello'</command>
- =&gt; "Hello world" 
-1.9.3p194 :003 &gt; <command>I18n.translate 'hello'</command>
- =&gt; "Hello world" 
-1.9.3p194 :004 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
-
-        <para>Sie können die gewünschte Sprache auch für einen einzelnen
-        <methodname>I18n.t</methodname> Aufruf mit <code>:locale =&gt;
-        :de</code> spezifizieren.<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>I18n.locale</command>
- =&gt; :en 
-1.9.3p194 :002 &gt; <command>I18n.t :hello, :locale =&gt; :de</command>
- =&gt; "Hallo Welt" 
-1.9.3p194 :003 &gt; <command>I18n.t :hello</command>
- =&gt; "Hello world" 
-1.9.3p194 :004 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
-
-        <para>Wenn eine Übersetzung nicht vorhanden ist, bekommen Sie eine
-        "<code>translation missing:</code>"-Fehlermeldung. Dies gilt auch,
-        wenn eine Übersetzung nur in einer Sprache fehlt (dann gehen alle
-        anderen Sprachen, aber bei der fehlenden Übersetzung wird die
-        Fehlermeldung ausgegeben). Sie können für diesen Fall mit
-        <code>:default =&gt; 'beliebiger Default-Wert'</code> einen Default
-        definieren:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>I18n.t 'asdfasdfasdf'</command>
- =&gt; "translation missing: en.asdfasdfasdf" 
-1.9.3p194 :002 &gt; <command>I18n.t 'asdfasdfasdf', :default =&gt; 'asdfasdfasdf'</command>
- =&gt; "asdfasdfasdf" 
-1.9.3p194 :003 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:webshop xyz$ </screen></para>
-
-        <para>Sie können in der YAML-Struktur auch mehrere Ebenen angeben.
-        Bitte ergänzen Sie dazu die <filename>config/locale/en.yml</filename>
-        wie folgt:<programlisting>en:
-  hello: "Hello world"
-  example:
-    test: "A test"
-  aaa:
-    bbb:
-      test: "An other test"</programlisting></para>
-
-        <para>Die verschiedenen Ebenen können Sie innerhalb des Strings mit
-        Punkten anzeigen oder mit einem <code>:scope</code> bei den Symbols.
-        Sie können auch beide Varianten vermischen.<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>I18n.t 'example.test'</command>
- =&gt; "A test" 
-1.9.3p194 :002 &gt; <command>I18n.t 'aaa.bbb.test'</command>
- =&gt; "An other test" 
-1.9.3p194 :003 &gt; <command>I18n.t :test, :scope =&gt; [:aaa, :bbb]</command>
- =&gt; "An other test" 
-1.9.3p194 :004 &gt; <command>I18n.t :test, :scope =&gt; 'aaa.bbb'</command>
- =&gt; "An other test" 
-1.9.3p194 :005 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
-
-        <para>Die Struktur, mit der Sie Ihre Übersetzungen in den YAML-Dateien
-        abspeichern bleibt Ihnen überlassen. Die in <xref
-        linkend="i18n_einsprachig_deutsch" /> vorgestellte Struktur
-        erleichtert aber einiges und deshalb werden wir dies auch für diese
-        Applikation übernehmen.</para>
-      </section>
 
       <section>
         <title>Textbausteine im YAML-Format</title>
