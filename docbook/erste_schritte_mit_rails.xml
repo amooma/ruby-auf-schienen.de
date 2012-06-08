@@ -31,10 +31,7 @@
     arbeiten uns damit Stück für Stück in die Materie ein.</para>
 
     <para>Auch in diesem Kapitel wird es manchmal hoppla-hopp zugehen. Wir
-    stoßen auf typische Henne-Ei-Probleme – wie zum Beispiel: <quote>Wie
-    erkläre ich MVC (Model-View-Controller)?</quote>. Ich habe mich für den
-    Ansatz <quote>Wir fangen mal an und erklären bei der Arbeit</quote>
-    entschieden.</para>
+    stoßen auf typische Henne-Ei-Probleme.</para>
 
     <section xml:id="arbeits-umgebung-development">
       <title>Arbeits-Umgebung (Development)</title>
@@ -1701,5 +1698,191 @@ Stefan-Wintermeyers-MacBook-Air:pingpong xyz$</screen></para>
     den Generator machen. Sie müssen also nicht einen Generator benutzen. Er
     soll in erster Linie eine Arbeitserleichterung sein und Fehlerquellen bei
     stupiden Aufgaben vermeiden.</para>
+  </section>
+
+  <section xml:id="einstieg_misc">
+    <title xml:id="einstieg_misc.title">Misc</title>
+
+    <para>Sie haben jetzt schon mal eine einfache Rails-Applikation ausgeführt
+    und werden im nächsten Kapitel tief ins Thema ActiveRecord einsteigen.
+    Deshalb an dieser Stelle eine minimale Erklärung zu einigen
+    Begrifflichkeiten, die in der Rails-Welt immer mal wieder auftauchen.
+    </para>
+
+    <section xml:id="mvc">
+      <title xml:id="mvc.title">"Model View Controller"-Architektur
+      (MVC)</title>
+
+      <para>Laut <uri
+      xlink:href="http://de.wikipedia.org/wiki/Model_View_Controller">http://de.wikipedia.org/wiki/Model_View_Controller</uri>
+      heißt MVC im Deutschen "Modell-Präsentation-Steuerung". Das macht die
+      Sache schon viel einfacher. ;-)</para>
+
+      <para>MVC ist eine Struktur zur Software-Entwicklung. Man hat sich
+      einfach darauf geeinigt, das ein Teil der Software an dieser Stelle und
+      ein anderer Teil der Software immer an einer anderen Stelle ist. Nicht
+      mehr und nicht weniger. Diese Einigung birgt den enormen Vorteil, das
+      man nach einer gewissen Einarbeitungszeit genau weiß, wo man welche
+      Funktionalität in einem Rails-Projekt suchen bzw. neu einbauen
+      muss.</para>
+
+      <section xml:id="mvc_model">
+        <title xml:id="mvc_model.title">Model</title>
+
+        <indexterm>
+          <primary>Rails</primary>
+
+          <secondary>MVC</secondary>
+
+          <tertiary>Model</tertiary>
+        </indexterm>
+
+        <para>"Model" steht hier für Datenmodel. Per Default handelt es sich
+        bei Rails-Applikationen um ein ActiveRecord Datenmodell (siehe <xref
+        linkend="activerecord_chapter" />).</para>
+
+        <para>Alle Models finden Sie im Verzeichnis
+        <filename>app/models/</filename></para>
+      </section>
+
+      <section xml:id="mvc_view">
+        <title xml:id="mvc_view.title">View</title>
+
+        <indexterm>
+          <primary>Rails</primary>
+
+          <secondary>MVC</secondary>
+
+          <tertiary>View</tertiary>
+        </indexterm>
+
+        <para>Der "View" ist für die Präsentation der Applikation zuständig.
+        Er übernimmt das Rendern der Webseite, einer XML- oder JSON-Datei. Ein
+        View könnte aber auch ein PDF oder einen ASCII-Text rendern. Das hängt
+        ganz von Ihrer Applikation ab.</para>
+
+        <para>Alle Views finden Sie im Verzeichnis
+        <filename>app/views/</filename></para>
+      </section>
+
+      <section xml:id="mvc_controller">
+        <title xml:id="mvc_controller.title">Controller</title>
+
+        <indexterm>
+          <primary>Rails</primary>
+
+          <secondary>MVC</secondary>
+
+          <tertiary>Controller</tertiary>
+        </indexterm>
+
+        <para>Nachdem ein Webseitenaufruf in einer Route (siehe <xref
+        linkend="routes" />) gelandet ist, kommt er von dort in den
+        Controller. Die Route gibt dabei als Ziel eine bestimmte Methode
+        (Action) an. Diese Methode kann dann gewünschte Aufgaben (z.B. einen
+        bestimmten Datensatz suchen und in einer Instanz-Variable abspeichern)
+        erfüllen und lässt danach den gewünschten View rendern.</para>
+
+        <para>Alle Controller finden Sie im Verzeichnis
+        <filename>app/controllers/</filename></para>
+      </section>
+    </section>
+
+    <section xml:id="helper">
+      <title xml:id="helper.title">Helper</title>
+
+      <indexterm>
+        <primary>Rails</primary>
+
+        <secondary>Helper</secondary>
+      </indexterm>
+
+      <para>Eine Helper-Methode nimmt Ihnen wiederholende Arbeiten in einem
+      View ab. Wenn Sie z.B. bei einer Hotel-Bewertung Sterne (*) und nicht
+      eine Zahl von 1 bis 5 anzeigen wollen, so können Sie folgenden Helper in
+      der Datei <filename>app/helpers/application_helper.rb</filename>
+      definieren:<programlisting>module ApplicationHelper
+
+  def render_stars(value)
+    output = ''
+    if (1..5).include?(value)
+      value.times { output += '*'}
+    end
+    output
+  end
+
+end
+</programlisting></para>
+
+      <para>Mit diesem Helper können wir dann in einem View den folgenden Code
+      anwenden:<programlisting>&lt;p&gt;
+&lt;b&gt;Bewertung:&lt;/b&gt; &lt;%= render_stars(5) %&gt;
+&lt;/p&gt;</programlisting></para>
+
+      <para>Sie können einen Helper auch in der Console ausprobieren:<screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.5)
+1.9.3-p194 :001 &gt; <command>helper.render_stars(5)</command>
+ =&gt; "*****" 
+1.9.3-p194 :002 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
+
+      <para>Es gibt von Rails eine Menge vordefinierter Helper, die wir in den
+      nächsten Kapiteln benutzen werden. Sie können aber auch selber Helper
+      definieren. Dabei können alle Helper aus der Datei
+      <filename>app/helpers/application_helper.rb</filename> in jedem View
+      angewendet werden. Helper, die nur in bestimmten Views verfügbar sein
+      sollen, müssen pro Controller definiert werden. Beim Erstellen eines
+      Controllers wird automatisch in <filename>app/helpers</filename> eine
+      Datei für Helper dieses Controllers erstellt. Diese bietet die
+      Möglichkeit Helper nur für diesen Controller bzw. für die Views dieses
+      Controllers zu definieren.</para>
+
+      <para>Alle Helper finden Sie im Verzeichnis
+      <filename>app/helpers/</filename></para>
+    </section>
+
+    <section xml:id="dry">
+      <title xml:id="dry.title">DRY - Don't repeat yourself</title>
+
+      <indexterm>
+        <primary>DRY</primary>
+      </indexterm>
+
+      <para>Viele Rails-Programmierer sind grosse DRY-Fans. DRY heißt nichts
+      anderes, als das man versuchen sollte sich wiederholende
+      Programmierlogic in eigene Methoden auszulagern. </para>
+
+      <section xml:id="refactoring">
+        <title xml:id="refactoring.title">Refactoring</title>
+
+        <indexterm>
+          <primary>Refactoring</primary>
+        </indexterm>
+
+        <para>Im Zusammenhang von DRY wird oft das Wort Refactoring benutzt.
+        Dabei geht es um funktionierende Applikationen, die weiter optimiert
+        werden. Die Applikation an sich verändert dabei nicht Ihre Oberfläche.
+        Sie wird im Kern aber u.a. durch DRY optimiert.</para>
+      </section>
+    </section>
+
+    <section xml:id="convention_over_configuration">
+      <title xml:id="convention_over_configuration.title">Convention Over
+      Configuration</title>
+
+      <indexterm>
+        <primary>Convention over configuration</primary>
+      </indexterm>
+
+      <para>Convention over configuration (auf Deutsch Konvention vor
+      Konfiguration siehe <uri
+      xlink:href="http://de.wikipedia.org/wiki/Konvention_vor_Konfiguration">http://de.wikipedia.org/wiki/Konvention_vor_Konfiguration</uri>)
+      ist ein wichtiger Grundpfeiler einer Rails-Applikation. Es sagt aus, das
+      der Programmierer sich beim Start eines Projektes nicht erst für
+      bestimmte Features entscheiden und diese per Konfigurationsparameter
+      einstellen muss. Es gibt einen Grund-Konsenz und dieser ist per Default
+      eingestellt. Erst wenn man ausserhalb dieses Grund-Konsenzes arbeiten
+      will, dann muss man die entsprechenden Parameter verändern.</para>
+    </section>
   </section>
 </chapter>
