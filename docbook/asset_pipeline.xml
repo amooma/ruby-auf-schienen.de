@@ -16,16 +16,20 @@
   <section xml:id="asset_pipeline_einleitung">
     <title xml:id="asset_pipeline_einleitung.title">Einleitung</title>
 
-    <para>Eine typische Rails-Applikation besteht nicht nur aus html.erb
-    View-Dateien, sondern auch noch aus CSS, JavaScript und diversen
-    Grafikdateien. Diese Dateien könnte man statisch im Verzeichnis
-    <filename>public</filename> ablegen, aber die Asset-Pipeline von Rails 3.2
-    ermöglicht es dem Entwickler ein optimaleres Ergebnis zu bekommen, weil
-    z.B. JavaScript-Dateien vorm Deployment (siehe <xref
-    linkend="deployment" />) optimiert werden können. Weiterhin stellt die
-    Asset-Pipeline automatisch sicher, das diese Dateien optimal vom Browser
-    und evtuellen Proxies gecachet werden. All dies führt zu einer besseren
-    Performance Ihrer Rails-Applikation.</para>
+    <para>Die Asset Pipeline ist wird seit Rails 3.1 per Default eingerichtet
+    und benutzt. Sie bietet dem Rails-Entwickler die Möglichkeit CSS,
+    JavaScript und Grafikdateien optimaler - sprich komprimierter und damit
+    schneller - an den Browser auszuliefern. So werden verschiedene
+    CSS-Dateien zu einer grossen Datei zusammengefasst und mit einem
+    Fingerabdruck im Dateinamen an den Browser ausgeliefert. Dieser
+    Fingerabdruck ermöglicht es dem Browser und einem evt. dazwischen
+    liegendem Proxy die Dateien optimal zu cachen und führt damit zu einer
+    wesentlich schnelleren Webapplikation.</para>
+
+    <para>Sie können innerhalb der Asset Pipeline ausführlich und
+    übersichtlich CSS, SASS, JavaScript und CoffeeScript programmieren, um
+    später daraus automatisch komprimierte CSS- und JavaScript-Dateien
+    ausliefern zu lassen.</para>
 
     <para>Als Beispiel nehmen wir wieder unseren Webshop mit einem Product
     Scaffold:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new webshop</command>
@@ -46,17 +50,210 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
     |-- application.css
     |-- products.css.scss
     `-- scaffolds.css.scss</screen></para>
+
+    <para>Die Dateien
+    <filename>app/assets/javascripts/application.js</filename> und
+    <filename>app/assets/stylesheets/application.css</filename> sind
+    sogenannte Manifest Dateien. Sie includen automatisch die anderen Dateien
+    im jeweiligen Verzeichnis.</para>
+
+    <section>
+      <title>application.js Manifest</title>
+
+      <para>Die Datei
+      <filename>app/assets/javascripts/application.js</filename> hat folgenden
+      Inhalt:<programlisting>// This is a manifest file that'll be compiled into application.js, which will include all the files
+// listed below.
+//
+// Any JavaScript/Coffee file within this directory, lib/assets/javascripts, vendor/assets/javascripts,
+// or vendor/assets/javascripts of plugins, if any, can be referenced here using a relative path.
+//
+// It's not advisable to add code directly here, but if you do, it'll appear at the bottom of the
+// the compiled file.
+//
+// WARNING: THE FIRST BLANK LINE MARKS THE END OF WHAT'S TO BE PROCESSED, ANY BLANK LINE SHOULD
+// GO AFTER THE REQUIRES BELOW.
+//
+//= require jquery
+//= require jquery_ujs
+//= require_tree .</programlisting></para>
+
+      <para>In der application.js werden automatisch die im
+      <code>jquery-rails</code> Gem definierten jQuery Dateien eingebunden
+      (weitere Informationen zu jQuery finden Sie unter <uri
+      xlink:href="http://jquery.com/">http://jquery.com/</uri>). Zusätzlich
+      werden mit <code>require_tree .</code> alle anderen Dateien in diesem
+      Verzeichnis eingebunden.</para>
+
+      <para>Das noch nicht optimierte Ergebnis können Sie sich in der
+      Entwicklungsumgebung unter der URL <uri
+      xlink:href="http://0.0.0.0:3000/assets/application.js">http://0.0.0.0:3000/assets/application.js</uri>
+      anschauen.</para>
+    </section>
+
+    <section xml:id="asset_precompile">
+      <title xml:id="asset_precompile.title">rake assets:precompile</title>
+
+      <indexterm>
+        <primary>rake assets:precompile</primary>
+      </indexterm>
+
+      <para>Bei der Benutzung der Asset Pipeline ist zu beachten, das Sie vor
+      dem Starten des Rails-Servers in der Production Umgebung die Assets
+      pre-compilen müssen. Dies geschieht mit dem Befehl <command>rake
+      assets:precompile</command><screen>Stefan-Wintermeyers-MacBook-Air:webshop xyz$ <command>rake assets:precompile</command>
+/Users/xyz/.rvm/rubies/ruby-1.9.3-p194/bin/ruby /Users/xyz/.rvm/gems/ruby-1.9.3-p194@global/bin/rake assets:precompile:all RAILS_ENV=production RAILS_GROUPS=assets
+Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
+
+      <note>
+        <para>Falls Sie dies vergessen werden Sie im Log folgende
+        Fehlermeldung finden:<screen>ActionView::Template::Error (application.css isn't precompiled)</screen></para>
+      </note>
+
+      <para>Die von <command>rake assets:precompile</command> erstellten
+      Dateien finden Sie dann im <filename>public/assets</filename>
+      Verzeichnis<screen>public/assets
+|-- application-0149f820dbdd285aa65e241569d8c256.css
+|-- application-0149f820dbdd285aa65e241569d8c256.css.gz
+|-- application-f8ca698e63b86d217c88772a65d2d20e.js
+|-- application-f8ca698e63b86d217c88772a65d2d20e.js.gz
+|-- application.css
+|-- application.css.gz
+|-- application.js
+|-- application.js.gz
+|-- manifest.yml
+|-- rails-be8732dac73d845ac5b142c8fb5f9fb0.png
+`-- rails.png</screen></para>
+
+      <para>Werfen Sie einmal mit Ihren Lieblingseditor einen Blick in die
+      erstellten <filename>css</filename> und <filename>js</filename> Dateien.
+      Sie werden optimierten Code finden. Falls der Webserver dies
+      unterstützt, werden direkt die gezippten <filename>gz</filename> Dateien
+      ausgeliefert, was noch einmal zur Schnelligkeit beiträgt.</para>
+
+      <note>
+        <para>Der Unterschied in der Dateigröße ist enorm. Die in der
+        Entwicklungsumgebung erzeugte <filename>application.js</filename>
+        Datei ist 100 KB groß. Die von <command>rake
+        assets:precompile</command> erstelle <filename>js.gz</filename> Datei
+        nur noch 36 KB. Gerade Benutzer von Mobiltelefonen werden es Ihnen
+        danken.</para>
+      </note>
+    </section>
   </section>
 
-  <section>
-    <title>Bilder (Images)</title>
+  <section xml:id="coding_links_zu_assets">
+    <title xml:id="coding_links_zu_assets.title">Coding Links zu einem
+    Asset</title>
 
-    <para></para>
-  </section>
+    <indexterm>
+      <primary>Asset Pipeline</primary>
+    </indexterm>
 
-  <section>
-    <title>CSS</title>
+    <para>Alle Dateien unterhalb des <filename>app/assets</filename>
+    Verzeichnisses werden vom Rails-Server normal ausgeliefert. So können Sie
+    sich unter der URL <uri
+    xlink:href="http://0.0.0.0:3000/assets/rails.png">http://0.0.0.0:3000/assets/rails.png</uri>
+    das unter app/assets/images/rails.png abgespeicherte Rails-Logo und unter
+    <uri
+    xlink:href="http://0.0.0.0:3000/assets/application.js">http://0.0.0.0:3000/assets/application.js</uri>
+    den Inhalt von <filename>app/assets/javascripts/application.js</filename>
+    anzeigen lassen. Dabei wird das <filename>rails.png</filename> Image 1:1
+    ausgeliefert und die <filename>application.js</filename> Datei erst von
+    der Asset Pipeline erstellt.</para>
 
-    <para></para>
+    <para>Sie sollten allerdings nie in einem View diese Dateien hart
+    verdrahtet eingeben. Für die optimale Benutzung der Asset Pipeline müssen
+    Sie die hier beschriebenen Helper benutzen.</para>
+
+    <section xml:id="coding_link_image_tag">
+      <title xml:id="coding_link_image_tag.title">Coding Link zu einer Grafik
+      (Image)</title>
+
+      <indexterm>
+        <primary>image_tag</primary>
+      </indexterm>
+
+      <para>Eine Grafik (Image) können Sie mit dem Helper
+      <code>image_tag</code> abrufen. Für die Datei
+      <filename>app/assets/images/rails.png</filename> sähe das dann im View
+      so aus:<programlisting>&lt;%= image_tag "rails.png" %&gt;</programlisting></para>
+
+      <para>Im Development-Modus entsteht daraus der folgende
+      HTML-Code:<programlisting>&lt;img alt="Rails" src="/assets/rails.png" /&gt;</programlisting></para>
+
+      <para>Im Production-Modus bekommen Sie einen HTML-Code, der auf eine
+      precompiled Datei mit einem Fingerabdruck verweißt:<programlisting>&lt;img alt="Rails" src="/assets/rails-be8732dac73d845ac5b142c8fb5f9fb0.png" /&gt;</programlisting></para>
+    </section>
+
+    <section xml:id="coding_link_javascript_include_tag">
+      <title xml:id="coding_link_javascript_include_tag.title">Coding Link zu
+      einer JavaScript Datei </title>
+
+      <indexterm>
+        <primary>javascript_include_tag</primary>
+      </indexterm>
+
+      <para>Eine von der Asset Pipeline compilierte JavaScript Datei können
+      Sie mit dem Helper <code>javascript_include_tag</code> abrufen. Für die
+      Datei <filename>app/assets/javascripts/application.js</filename> sähe
+      das im View so aus:<programlisting>%= javascript_include_tag "application" %&gt;</programlisting></para>
+
+      <para>Im Development-Modus entsteht daraus der folgende
+      HTML-Code:<programlisting>&lt;link href="/assets/application.css?body=1" media="all" rel="stylesheet" type="text/css" /&gt;
+&lt;link href="/assets/products.css?body=1" media="all" rel="stylesheet" type="text/css" /&gt;
+&lt;link href="/assets/scaffolds.css?body=1" media="all" rel="stylesheet" type="text/css" /&gt;</programlisting></para>
+
+      <para>Im Production-Modus bekommen Sie einen HTML-Code, der nur auf eine
+      precompiled Datei mit einem Fingerabdruck verweißt:<programlisting>&lt;link href="/assets/application-0149f820dbdd285aa65e241569d8c256.css" media="all" rel="stylesheet" type="text/css" /&gt;
+</programlisting></para>
+    </section>
+
+    <section xml:id="coding_link_stylesheet_link_tag">
+      <title xml:id="coding_link_stylesheet_link_tag.title">Coding Link zu
+      einer CSS Datei</title>
+
+      <indexterm>
+        <primary>stylesheet_link_tag</primary>
+      </indexterm>
+
+      <para>Ein von der Asset Pipeline compiliertes Stylesheet können Sie mit
+      dem Helper <code>stylesheet_link_tag</code> abrufen. Für die Datei
+      <filename>app/assets/stylesheets/application.css</filename> sähe das im
+      View so aus:<programlisting>&lt;%= stylesheet_link_tag "application" %&gt;</programlisting></para>
+
+      <para>Im Development-Modus entsteht daraus der folgende
+      HTML-Code:<programlisting>&lt;script src="/assets/jquery.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/assets/jquery_ujs.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/assets/products.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/assets/application.js?body=1" type="text/javascript"&gt;&lt;/script&gt;</programlisting></para>
+
+      <para>Im Production-Modus bekommen Sie einen HTML-Code, der nur auf eine
+      precompiled Datei mit einem Fingerabdruck verweißt:<programlisting>&lt;script src="/assets/application-f8ca698e63b86d217c88772a65d2d20e.js" type="text/javascript"&gt;&lt;/script&gt;</programlisting></para>
+    </section>
+
+    <section xml:id="coding_links_application_html_erb_defaults">
+      <title
+      xml:id="coding_links_application_html_erb_defaults.title">Defaults in
+      der application.html.erb</title>
+
+      <para>Die vom Scaffold Generator per Default anlegte
+      <filename>app/views/layouts/application.html.erb</filename> Datei
+      enthält übrigens schon die Coding Links zu diesen JavaScript und
+      Stylesheet Dateien:<programlisting>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Webshop&lt;/title&gt;
+<emphasis>  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
+  &lt;%= javascript_include_tag "application" %&gt;</emphasis>
+  &lt;%= csrf_meta_tags %&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;%= yield %&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</programlisting></para>
+    </section>
   </section>
 </chapter>
