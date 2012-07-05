@@ -50,36 +50,36 @@
     (<foreignphrase xml:lang="en">Associations</foreignphrase>).</para>
   </note>
 
-  <para>Wir erstellen als Erstes die Rails-Applikation:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new bookshelf</command>
+  <para>Wir erstellen als Erstes die Rails-Applikation:<screen>MacBook:~ xyz$ <command>rails new bookshelf</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd bookshelf</command> 
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ </screen></para>
+MacBook:~ xyz$ <command>cd bookshelf</command> 
+MacBook:bookshelf xyz$ </screen></para>
 
-  <para>Jetzt legen wir das Model für die Bücher an:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails generate model book title</command>
+  <para>Jetzt legen wir das Model für die Bücher an:<screen>MacBook:bookshelf xyz$ <command>rails generate model book title</command>
       invoke  active_record
       create    db/migrate/20120506132424_create_books.rb
       create    app/models/book.rb
       invoke    test_unit
       create      test/unit/book_test.rb
       create      test/fixtures/books.yml
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ </screen></para>
+MacBook:bookshelf xyz$ </screen></para>
 
   <para>Und zum Schluss legen wir noch die Datenbank-Tabelle für die Autoren
   an. In dieser benötigen wir ein Zuordnungsfeld zur Bücher-Tabelle. Dieser
   Fremdschlüssel (<foreignphrase xml:lang="en">Foreign key</foreignphrase>)
   wird per Default immer als Name des referenzierten Objekts (hier:
   <literal>book</literal>) mit angehängtem <literal>_id</literal>
-  gesetzt:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails generate model author book_id:integer first_name last_name</command>
+  gesetzt:<screen>MacBook:bookshelf xyz$ <command>rails generate model author book_id:integer first_name last_name</command>
       invoke  active_record
       create    db/migrate/20120506132619_create_authors.rb
       create    app/models/author.rb
       invoke    test_unit
       create      test/unit/author_test.rb
       create      test/fixtures/authors.yml
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
+MacBook:bookshelf xyz$</screen></para>
 
   <para>Danach ein <command>rake db:migrate</command> ausführen, damit die
-  Datenbank-Tabellen auch angelegt werden:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rake db:migrate</command>
+  Datenbank-Tabellen auch angelegt werden:<screen>MacBook:bookshelf xyz$ <command>rake db:migrate</command>
 ==  CreateBooks: migrating ====================================================
 -- create_table(:books)
    -&gt; 0.0014s
@@ -90,17 +90,17 @@ Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
    -&gt; 0.0015s
 ==  CreateAuthors: migrated (0.0015s) =========================================
 
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ </screen></para>
+MacBook:bookshelf xyz$ </screen></para>
 
   <para>Schauen wir uns das mal auf der <foreignphrase
-  xml:lang="en">Console</foreignphrase> an:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails console</command>
+  xml:lang="en">Console</foreignphrase> an:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Book</command>
  =&gt; Book(id: integer, title: string, created_at: datetime, updated_at: datetime) 
 1.9.3p194 :002 &gt; <command>Author</command>
  =&gt; Author(id: integer, book_id: integer, first_name: string, last_name: string, created_at: datetime, updated_at: datetime) 
 1.9.3p194 :003 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ </screen></para>
+MacBook:bookshelf xyz$ </screen></para>
 
   <para>Die zwei Datenbank-Tabellen sind eingerichtet und können mit
   ActiveRecord benutzt werden. Allerdings weiß ActiveRecord noch nichts von
@@ -143,7 +143,7 @@ end</programlisting></para>
       <title xml:id="activerecord_hinzufuegen_manuell.title">Manuell</title>
 
       <para>Wir löschen die Datenbank mit <command>rake
-      db:reset</command><screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rake db:reset</command>
+      db:reset</command><screen>MacBook:bookshelf xyz$ <command>rake db:reset</command>
 -- create_table("authors", {:force=&gt;true})
    -&gt; 0.0151s
 -- create_table("books", {:force=&gt;true})
@@ -152,12 +152,12 @@ end</programlisting></para>
    -&gt; 0.0033s
 -- assume_migrated_upto_version(20120506132619, ["/Users/xyz/bookshelf/db/migrate"])
    -&gt; 0.0033s
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ </screen></para>
+MacBook:bookshelf xyz$ </screen></para>
 
       <para>Und erstellen zuerst ein Objekt mit den Buch-Daten. Dann merken
       wir uns die ID für diesen Datensatz und erstellen danach die
       Autoren-Datensatz mit dieser ID im Feld
-      <literal>book_id</literal>:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails console</command>
+      <literal>book_id</literal>:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>book = Book.create(:title =&gt; 'Homo faber')</command>
    (0.1ms)  begin transaction
@@ -176,7 +176,7 @@ Loading development environment (Rails 3.2.3)
   Author Load (0.3ms)  SELECT "authors".* FROM "authors" 
  =&gt; [#&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-05-06 13:48:17", updated_at: "2012-05-06 13:48:17"&gt;] 
 1.9.3p194 :005 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
+MacBook:bookshelf xyz$</screen></para>
 
       <indexterm>
         <primary>ActiveRecord</primary>
@@ -207,9 +207,9 @@ Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
       wenig ActiveRecord-Magie. Wir können mit der Methode
       <methodname>create</methodname> von <literal>authors</literal> zu jedem
       <classname>Book</classname>-Objekt neue Autoren hinzufügen. Diese werden
-      automatisch korrekt mit der <literal>book_id</literal> bestückt:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rake db:reset</command>
+      automatisch korrekt mit der <literal>book_id</literal> bestückt:<screen>MacBook:bookshelf xyz$ <command>rake db:reset</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails console</command>
+MacBook:bookshelf xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>book = Book.create(:title =&gt; 'Homo faber')</command>
    (0.1ms)  begin transaction
@@ -228,13 +228,13 @@ Loading development environment (Rails 3.2.3)
   Author Load (0.3ms)  SELECT "authors".* FROM "authors" 
  =&gt; [#&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-05-06 13:52:52", updated_at: "2012-05-06 13:52:52"&gt;] 
 1.9.3p194 :005 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
+MacBook:bookshelf xyz$</screen></para>
 
       <para>Sie können auch direkt das
       <methodname>authors.create()</methodname> hinter das
-      <methodname>Book.create()</methodname> setzen:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rake db:reset</command>
+      <methodname>Book.create()</methodname> setzen:<screen>MacBook:bookshelf xyz$ <command>rake db:reset</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails console</command>
+MacBook:bookshelf xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Book.create(:title =&gt; 'Homo faber').authors.create(:first_name =&gt; 'Max', :last_name =&gt; 'Frisch')</command>
    (0.1ms)  begin transaction
@@ -251,15 +251,15 @@ Loading development environment (Rails 3.2.3)
   Author Load (0.3ms)  SELECT "authors".* FROM "authors" 
  =&gt; [#&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-05-06 13:56:38", updated_at: "2012-05-06 13:56:38"&gt;] 
 1.9.3p194 :004 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
+MacBook:bookshelf xyz$</screen></para>
 
       <para>Da <methodname>create</methodname> statt nur einem <foreignphrase
       xml:lang="en">Hash</foreignphrase> alternativ auch ein <foreignphrase
       xml:lang="en">Array</foreignphrase> von <foreignphrase
       xml:lang="en">Hashes</foreignphrase> akzeptiert, können Sie auch mehrere
-      Autoren für ein Buch auf einmal anlegen:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rake db:reset</command>
+      Autoren für ein Buch auf einmal anlegen:<screen>MacBook:bookshelf xyz$ <command>rake db:reset</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails console</command>
+MacBook:bookshelf xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Book.create(:title =&gt; 'Beispiel').authors.create([{:last_name =&gt; 'A'}, {:last_name =&gt; 'B'}, {:last_name =&gt; 'C'}])</command>
    (0.1ms)  begin transaction
@@ -282,7 +282,7 @@ Loading development environment (Rails 3.2.3)
   Author Load (0.3ms)  SELECT "authors".* FROM "authors" 
  =&gt; [#&lt;Author id: 1, book_id: 1, first_name: nil, last_name: "A", created_at: "2012-05-06 14:03:27", updated_at: "2012-05-06 14:03:27"&gt;, #&lt;Author id: 2, book_id: 1, first_name: nil, last_name: "B", created_at: "2012-05-06 14:03:27", updated_at: "2012-05-06 14:03:27"&gt;, #&lt;Author id: 3, book_id: 1, first_name: nil, last_name: "C", created_at: "2012-05-06 14:03:27", updated_at: "2012-05-06 14:03:27"&gt;] 
 1.9.3p194 :004 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
+MacBook:bookshelf xyz$</screen></para>
 
       <para>Allerdings ist das in der Praxis nur dann sinnvoll, wenn die
       Text-Zeile dadurch nicht zu lang und unübersichtlich wird.</para>
@@ -302,9 +302,9 @@ Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
       <para>Die Methode <methodname>build</methodname> ähnelt
       <methodname>create</methodname>. Allerdings wird der Datensatz nicht
       abgespeichert. Dies erfolgt erst nach einem
-      <methodname>save</methodname>:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rake db:reset</command>
+      <methodname>save</methodname>:<screen>MacBook:bookshelf xyz$ <command>rake db:reset</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails console</command>
+MacBook:bookshelf xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>book = Book.create(:title =&gt; 'Homo faber')</command>
    (0.1ms)  begin transaction
@@ -323,14 +323,14 @@ Loading development environment (Rails 3.2.3)
 1.9.3p194 :005 &gt; <command>author.new_record?</command>
  =&gt; false 
 1.9.3p194 :006 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
+MacBook:bookshelf xyz$</screen></para>
 
       <warning>
         <para>Bei der Benutzung von <methodname>create</methodname> und
         <methodname>build</methodname> müssen natürlich logische
         Abhängigkeiten beachtet werden, sonst gibt es einen Fehler. So kann
         man nicht zwei <methodname>build</methodname>-Methoden miteinander
-        verketten. Beispiel:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails console</command>
+        verketten. Beispiel:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Book.build(:title =&gt; 'Beispiel').authors.build(:last_name =&gt; 'A')</command>
 NoMethodError: undefined method `build' for #&lt;Class:0x007ff8c52d2330&gt;
@@ -342,7 +342,7 @@ NoMethodError: undefined method `build' for #&lt;Class:0x007ff8c52d2330&gt;
  from script/rails:6:in `require'
  from script/rails:6:in `&lt;main&gt;'
 1.9.3p194 :002 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ </screen></para>
+MacBook:bookshelf xyz$ </screen></para>
       </warning>
     </section>
   </section>
@@ -373,13 +373,13 @@ Book.create(:title =&gt; 'Der Zauberberg').authors.create(:first_name =&gt; 'Tho
 Book.create(:title =&gt; 'In einer Familie').authors.create(:first_name =&gt; 'Heinrich', :last_name =&gt; 'Mann')</programlisting></para>
 
     <para>Jetzt die Datenbank löschen und neu mit der
-    <filename>db/seeds.rb</filename> befüllen:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rake db:reset</command>
+    <filename>db/seeds.rb</filename> befüllen:<screen>MacBook:bookshelf xyz$ <command>rake db:reset</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
+MacBook:bookshelf xyz$</screen></para>
 
     <para>Das Praktische an der 1:n-Zuordnung in ActiveRecord ist der
     besonders einfache Zugang zu den n-Instanzen. Schauen wir uns das für den
-    ersten Datensatz an:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails console</command>
+    ersten Datensatz an:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Book.first</command>
   Book Load (0.1ms)  SELECT "books".* FROM "books" LIMIT 1
@@ -389,13 +389,13 @@ Loading development environment (Rails 3.2.3)
   Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 1
  =&gt; [#&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-05-06 14:23:43", updated_at: "2012-05-06 14:23:43"&gt;] 
 1.9.3p194 :003 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
+MacBook:bookshelf xyz$</screen></para>
 
     <para>Ist das cool?! Man kann einfach durch die Pluralform des
     n-<foreignphrase xml:lang="en">Model</foreignphrase> auf die Datensätze
     zugreifen. Die Ergebnismenge wird als <foreignphrase
     xml:lang="en">Array</foreignphrase> zurückgegeben. Ob es auch andersherum
-    geht? Sehen wir uns mal die erste Telefonnummer an:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails console</command>
+    geht? Sehen wir uns mal die erste Telefonnummer an:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Author.first</command>
   Author Load (0.1ms)  SELECT "authors".* FROM "authors" LIMIT 1
@@ -405,7 +405,7 @@ Loading development environment (Rails 3.2.3)
   Book Load (0.2ms)  SELECT "books".* FROM "books" WHERE "books"."id" = 1 LIMIT 1
  =&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-06 14:23:43", updated_at: "2012-05-06 14:23:43"&gt; 
 1.9.3p194 :003 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
+MacBook:bookshelf xyz$</screen></para>
 
     <para>Bingo! Auch der Zugriff zur zugeordneten
     <classname>Book</classname>-Klasse ist ganz einfach. Und da es sich nur um
@@ -446,12 +446,12 @@ Book.create(:title =&gt; 'Der Zauberberg').authors.create(:first_name =&gt; 'Tho
 Book.create(:title =&gt; 'In einer Familie').authors.create(:first_name =&gt; 'Heinrich', :last_name =&gt; 'Mann')</programlisting></para>
 
     <para>Jetzt die Datenbank löschen und neu mit der
-    <filename>db/seeds.rb</filename> befüllen:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rake db:reset</command>
+    <filename>db/seeds.rb</filename> befüllen:<screen>MacBook:bookshelf xyz$ <command>rake db:reset</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
+MacBook:bookshelf xyz$</screen></para>
 
     <para>Dann legen wir mal los. Als Erstes schauen wir uns an, wie viele
-    Bücher in der Datenbank sind:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails console</command>
+    Bücher in der Datenbank sind:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Book.count</command>
    (0.1ms)  SELECT COUNT(*) FROM "books" 
@@ -462,7 +462,7 @@ Loading development environment (Rails 3.2.3)
    (0.2ms)  SELECT COUNT(*) FROM "authors" 
  =&gt; 11 
 1.9.3p194 :003 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
+MacBook:bookshelf xyz$</screen></para>
 
     <section xml:id="activerecord_1n_joins">
       <title xml:id="activerecord_1n_joins.title">joins</title>
@@ -488,7 +488,7 @@ Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
           xlink:href="http://de.wikipedia.org/wiki/Relationale_Algebra#Join">http://de.wikipedia.org/wiki/Relationale_Algebra#Join.</uri></para>
         </footnote> Damit können wir die beiden <foreignphrase
       xml:lang="en">Models</foreignphrase> auch in der Suche
-      verknüpfen:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails console</command>
+      verknüpfen:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Book.joins(:authors).where(:authors =&gt; {:last_name =&gt; 'Mann'})</command>
   Book Load (0.2ms)  SELECT "books".* FROM "books" INNER JOIN "authors" ON "authors"."book_id" = "books"."id" WHERE "authors"."last_name" = 'Mann'
@@ -497,20 +497,20 @@ Loading development environment (Rails 3.2.3)
    (0.4ms)  SELECT COUNT(*) FROM "books" INNER JOIN "authors" ON "authors"."book_id" = "books"."id" WHERE "authors"."last_name" = 'Mann'
  =&gt; 2 
 1.9.3p194 :003 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
+MacBook:bookshelf xyz$</screen></para>
 
       <para>Zwei Bücher mit einem Autoren 'Mann' sind in der Datenbank. Im SQL
       sehen Sie, das die Methode <methodname>joins</methodname> ein
       <literal>INNER JOIN</literal> ausführt.</para>
 
       <para>Selbstverständlich können wir das Ganze auch umdrehen. Wir suchen
-      uns den Autor des Buches 'Homo faber':<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails console</command>
+      uns den Autor des Buches 'Homo faber':<screen>MacBook:bookshelf xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Author.joins(:book).where(:books =&gt; {:title =&gt; 'Homo faber'})</command>
   Author Load (0.2ms)  SELECT "authors".* FROM "authors" INNER JOIN "books" ON "books"."id" = "authors"."book_id" WHERE "books"."title" = 'Homo faber'
  =&gt; [#&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-05-07 07:14:08", updated_at: "2012-05-07 07:14:08"&gt;] 
 1.9.3p194 :002 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
+MacBook:bookshelf xyz$</screen></para>
     </section>
 
     <section xml:id="activerecord_1n_includes">
@@ -536,13 +536,13 @@ Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
       <methodname>joins</methodname> (siehe <xref
       linkend="activerecord_1n_joins" />). Auch damit kann man innerhalb einer
       1:n-Verknüpfung suchen. Suchen wir noch mal alle Bücher mit einem Autor,
-      der als Nachnamen 'Mann' hat:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails console</command>
+      der als Nachnamen 'Mann' hat:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Book.includes(:authors).where(:authors =&gt; {:last_name =&gt; 'Mann'})</command>
   SQL (0.4ms)  SELECT "books"."id" AS t0_r0, "books"."title" AS t0_r1, "books"."created_at" AS t0_r2, "books"."updated_at" AS t0_r3, "authors"."id" AS t1_r0, "authors"."book_id" AS t1_r1, "authors"."first_name" AS t1_r2, "authors"."last_name" AS t1_r3, "authors"."created_at" AS t1_r4, "authors"."updated_at" AS t1_r5 FROM "books" LEFT OUTER JOIN "authors" ON "authors"."book_id" = "books"."id" WHERE "authors"."last_name" = 'Mann'
  =&gt; [#&lt;Book id: 6, title: "Der Zauberberg", created_at: "2012-05-07 07:14:08", updated_at: "2012-05-07 07:14:08"&gt;, #&lt;Book id: 7, title: "In einer Familie", created_at: "2012-05-07 07:14:08", updated_at: "2012-05-07 07:14:08"&gt;] 
 1.9.3p194 :002 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
+MacBook:bookshelf xyz$</screen></para>
 
       <para>Sie sehen in der Console-Ausgabe, das der SQL-Code sich von der
       <methodname>joins</methodname>-Abfrage unterscheidet.</para>
@@ -612,7 +612,7 @@ Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
     Kontext von <methodname>has_many</methodname> bedeutet das, dass man die
     zu einem <classname>Book</classname> gehörigen
     <classname>Author</classname>-Datensätze in einem Streich löschen
-    kann:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails console</command>
+    kann:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>book = Book.find_by_title('Julius Shulman: The Last Decade')</command>
   Book Load (0.3ms)  SELECT "books".* FROM "books" WHERE "books"."title" = 'Julius Shulman: The Last Decade' LIMIT 1
@@ -630,7 +630,7 @@ Loading development environment (Rails 3.2.3)
 1.9.3p194 :004 &gt; <command>book.authors</command>
  =&gt; [] 
 1.9.3p194 :005 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
+MacBook:bookshelf xyz$</screen></para>
   </section>
 
   <section xml:id="activerecord_1n_optionen">
@@ -707,7 +707,7 @@ end</programlisting></para>
 
             <para>Erstellen wir als Beispiel mal ein neues Buch mit neuen
             Autoren und schauen uns an, wie ActiveRecord diese dann
-            sortiert:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails console</command>
+            sortiert:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Book.create(:title =&gt; 'Test').authors.create([{:last_name =&gt; 'Z'}, {:last_name =&gt; 'A'}])</command>
    (0.1ms)  begin transaction
@@ -724,7 +724,7 @@ Loading development environment (Rails 3.2.3)
   Author Load (0.4ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 8 ORDER BY last_name
  =&gt; [#&lt;Author id: 13, book_id: 8, first_name: nil, last_name: "A", created_at: "2012-05-07 07:45:34", updated_at: "2012-05-07 07:45:34"&gt;, #&lt;Author id: 12, book_id: 8, first_name: nil, last_name: "Z", created_at: "2012-05-07 07:45:34", updated_at: "2012-05-07 07:45:34"&gt;] 
 1.9.3p194 :003 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ </screen></para>
+MacBook:bookshelf xyz$ </screen></para>
 
             <para>Und falls mal umgekehrt sortiert werden
             soll:<programlisting>has_many :authors, <emphasis role="bold">:order =&gt; 'title DESC'</emphasis></programlisting></para>
@@ -748,7 +748,7 @@ end</programlisting></para>
 
             <para>Im folgenden Beispiel löschen wir das erste Buch in der
             Datenbank-Tabelle. Dabei werden automatisch alle Autoren dieses
-            Buches ebenfalls gelöscht:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$ <command>rails console</command>
+            Buches ebenfalls gelöscht:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Book.first</command>
   Book Load (0.2ms)  SELECT "books".* FROM "books" LIMIT 1
@@ -769,7 +769,7 @@ Loading development environment (Rails 3.2.3)
   Author Exists (0.2ms)  SELECT 1 FROM "authors" WHERE "authors"."id" = 1 LIMIT 1
  =&gt; false 
 1.9.3p194 :005 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
+MacBook:bookshelf xyz$</screen></para>
 
             <important>
               <indexterm>
@@ -821,45 +821,45 @@ Stefan-Wintermeyers-MacBook-Air:bookshelf xyz$</screen></para>
             <replaceable>…</replaceable></code>.</para>
 
             <para>Fangen wir bei null mit einer neuen Rails Applikation
-            an:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new bookshelf2</command>
+            an:<screen>MacBook:~ xyz$ <command>rails new bookshelf2</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd bookshelf2</command>
-Stefan-Wintermeyers-MacBook-Air:bookshelf2 xyz$</screen></para>
+MacBook:~ xyz$ <command>cd bookshelf2</command>
+MacBook:bookshelf2 xyz$</screen></para>
 
             <para>Jetzt legen wir wieder die Modelle für
             <classname>Book</classname> und <classname>Author</classname> an.
             Beim Author lassen wir aber die <varname>book_id</varname>
-            weg:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf2 xyz$ <command>rails generate model book title</command>
+            weg:<screen>MacBook:bookshelf2 xyz$ <command>rails generate model book title</command>
       invoke  active_record
       create    db/migrate/20120507085137_create_books.rb
       create    app/models/book.rb
       invoke    test_unit
       create      test/unit/book_test.rb
       create      test/fixtures/books.yml
-Stefan-Wintermeyers-MacBook-Air:bookshelf2 xyz$ <command>rails generate model author first_name last_name</command>
+MacBook:bookshelf2 xyz$ <command>rails generate model author first_name last_name</command>
       invoke  active_record
       create    db/migrate/20120507085158_create_authors.rb
       create    app/models/author.rb
       invoke    test_unit
       create      test/unit/author_test.rb
       create      test/fixtures/authors.yml
-Stefan-Wintermeyers-MacBook-Air:bookshelf2 xyz$</screen></para>
+MacBook:bookshelf2 xyz$</screen></para>
 
             <para>Zum Schluss erstellen wir ein Model
             <classname>Authorship</classname>, das ein Feld
             <varname>book_id</varname> und ein Feld
-            <varname>author_id</varname> enthält:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf2 xyz$ <command>rails generate model authorship book_id:integer author_id:integer</command>
+            <varname>author_id</varname> enthält:<screen>MacBook:bookshelf2 xyz$ <command>rails generate model authorship book_id:integer author_id:integer</command>
       invoke  active_record
       create    db/migrate/20120507085358_create_authorships.rb
       create    app/models/authorship.rb
       invoke    test_unit
       create      test/unit/authorship_test.rb
       create      test/fixtures/authorships.yml
-Stefan-Wintermeyers-MacBook-Air:bookshelf2 xyz$</screen></para>
+MacBook:bookshelf2 xyz$</screen></para>
 
-            <para>Danach ein <command>rake db:migrate</command><screen>Stefan-Wintermeyers-MacBook-Air:bookshelf2 xyz$ <command>rake db:migrate</command>
+            <para>Danach ein <command>rake db:migrate</command><screen>MacBook:bookshelf2 xyz$ <command>rake db:migrate</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:bookshelf2 xyz$ </screen></para>
+MacBook:bookshelf2 xyz$ </screen></para>
 
             <para><classname>Authorship</classname> verknüpfen wir per
             <methodname>belongs_to</methodname> mit
@@ -894,7 +894,7 @@ end</programlisting></para>
 end
 </programlisting></para>
 
-            <para>Jetzt legen wir ein Buch an:<screen>Stefan-Wintermeyers-MacBook-Air:bookshelf2 xyz$ <command>rails console</command>
+            <para>Jetzt legen wir ein Buch an:<screen>MacBook:bookshelf2 xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>book = Book.create(:title =&gt; 'Homo faber')</command>
    (0.1ms)  begin transaction

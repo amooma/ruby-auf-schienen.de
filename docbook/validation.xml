@@ -27,14 +27,14 @@
     <title
     xml:id="activerecord_validation_vorbereitung.title">Vorbereitung</title>
 
-    <para>Erstellen wir eine neue Applikation für dieses Kapitel:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new shop</command>
+    <para>Erstellen wir eine neue Applikation für dieses Kapitel:<screen>MacBook:~ xyz$ <command>rails new shop</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd shop</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
+MacBook:~ xyz$ <command>cd shop</command>
+MacBook:shop xyz$ <command>rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate</command>
+MacBook:shop xyz$ <command>rake db:migrate</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
   </section>
 
   <section>
@@ -47,7 +47,7 @@ Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
     Convention over Configuration!</para>
 
     <para>Ohne jegliche Validierung können wir problemlos einen leeren
-    Datensatz in beiden Modellen anlegen:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+    Datensatz in beiden Modellen anlegen:<screen>MacBook:shop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Product.create</command>
    (0.1ms)  begin transaction
@@ -55,7 +55,7 @@ Loading development environment (Rails 3.2.3)
    (1.0ms)  commit transaction
  =&gt; #&lt;Product id: 1, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: "2012-05-08 14:30:51", updated_at: "2012-05-08 14:30:51"&gt; 
 1.9.3p194 :002 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
 
     <para>Dieser Datensatz macht aber in der Realität keinen Sinn. Ein
     <classname>Product</classname> braucht einen <varname>name</varname> und
@@ -76,7 +76,7 @@ end
 </programlisting></para>
 
     <para>Jetzt versuchen wir noch mal in der Console einen leeren Datensatz
-    anzulegen:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+    anzulegen:<screen>MacBook:shop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>product = Product.create</command>
    (0.1ms)  begin transaction
@@ -166,7 +166,7 @@ Loading development environment (Rails 3.2.3)
    (3.5ms)  commit transaction
  =&gt; true 
 1.9.3p194 :014 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
 
       <warning>
         <para>Ich gehe davon aus, dass Sie die hier auftauchende Problematik
@@ -200,7 +200,7 @@ Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 end</programlisting></para>
 
     <para>Wenn wir damit einen leeren User Datensatz anlegen wollen, bekommen
-    wir massig Validierungsfehler:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+    wir massig Validierungsfehler:<screen>MacBook:shop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>product = Product.create</command>
    (0.1ms)  begin transaction
@@ -221,7 +221,7 @@ Loading development environment (Rails 3.2.3)
    (3.9ms)  commit transaction
  =&gt; true 
 1.9.3p194 :006 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
 
     <section xml:id="validates_presence_of_optionen">
       <title xml:id="validates_presence_of_optionen.title">Optionen</title>
@@ -307,7 +307,7 @@ end</programlisting></para>
 
     <para>Wenn wir jetzt einen <classname>Product</classname> mit einem
     <methodname>name</methodname> aus einem Buchstaben abspeichern wollen,
-    dann bekommen wir einen Fehler aufgezeigt:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+    dann bekommen wir einen Fehler aufgezeigt:<screen>MacBook:shop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>product = Product.create(:name =&gt; 'M', :price =&gt; 0.45)</command>
    (0.1ms)  begin transaction
@@ -316,7 +316,7 @@ Loading development environment (Rails 3.2.3)
 1.9.3p194 :002 &gt; <command>product.errors</command>
  =&gt; #&lt;ActiveModel::Errors:0x007fd6ad88fe38 @base=#&lt;Product id: nil, name: "M", price: #&lt;BigDecimal:7fd6ad8d19c8,'0.45E0',9(45)&gt;, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:name=&gt;["is too short (minimum is 2 characters)"]}&gt; 
 1.9.3p194 :003 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
 
     <section xml:id="validates_length_of_optionen">
       <title xml:id="validates_length_of_optionen.title">Optionen</title>
@@ -486,7 +486,7 @@ end</programlisting></para>
 
     <para>Wenn wir jetzt das Gewicht (<varname>weight</varname>) die nicht aus
     Zahlen, sondern auch aus Zeichen besteht, bekommen wir einen Fehler
-    angezeigt:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+    angezeigt:<screen>MacBook:shop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>product = Product.create(:name =&gt; 'Milch (1 Liter)', :price =&gt; 0.45, :weight =&gt; 'abc')</command>
    (0.1ms)  begin transaction
@@ -495,7 +495,7 @@ Loading development environment (Rails 3.2.3)
 1.9.3p194 :002 &gt; <command>product.errors</command>
  =&gt; #&lt;ActiveModel::Errors:0x007f8594ba3878 @base=#&lt;Product id: nil, name: "Milch (1 Liter)", price: #&lt;BigDecimal:7f8594df3588,'0.45E0',9(45)&gt;, weight: 0, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:weight=&gt;["is not a number"]}&gt; 
 1.9.3p194 :003 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
 
     <tip>
       <para>Auch wenn ein Attribute in der Datenbank ans String abgelegt wird,
@@ -680,7 +680,7 @@ end</programlisting></para>
 
     <para>Wenn wir jetzt ein neues <classname>Product</classname> mit einem
     schon existierenden <methodname>name</methodname> einrichten wollen,
-    bekommen wir einen Fehler ausgegeben:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+    bekommen wir einen Fehler ausgegeben:<screen>MacBook:shop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Product.last</command>
   Product Load (0.2ms)  SELECT "products".* FROM "products" ORDER BY "products"."id" DESC LIMIT 1
@@ -693,7 +693,7 @@ Loading development environment (Rails 3.2.3)
 1.9.3p194 :003 &gt; <command>product.errors</command>
  =&gt; #&lt;ActiveModel::Errors:0x007fc6e9432300 @base=#&lt;Product id: nil, name: "Milch (1 Liter)", price: #&lt;BigDecimal:7fc6e9b09250,'0.45E0',9(45)&gt;, weight: 1000, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:name=&gt;["has already been taken"]}&gt; 
 1.9.3p194 :004 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
 
     <warning>
       <para>Die Validierung mit
@@ -826,7 +826,7 @@ end</programlisting></para>
     <methodname>in_stock</methodname> entweder <code>true</code> oder
     <code>false</code> sein (es darf also kein nil geben). Wenn wir einen
     anderen Wert als <code>true</code> oder <code>false</code> eingeben, wird
-    ein Validation-Fehler gemeldet:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+    ein Validation-Fehler gemeldet:<screen>MacBook:shop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>product = Product.create(:name =&gt; 'Milch fettarm (1 Liter)', :price =&gt; 0.45, :weight =&gt; 1000)</command>
    (0.1ms)  begin transaction
@@ -836,7 +836,7 @@ Loading development environment (Rails 3.2.3)
 1.9.3p194 :002 &gt; <command>product.errors</command>
  =&gt; #&lt;ActiveModel::Errors:0x007fd12513a648 @base=#&lt;Product id: nil, name: "Milch fettarm (1 Liter)", price: #&lt;BigDecimal:7fd125475bf0,'0.45E0',9(45)&gt;, weight: 1000, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:in_stock=&gt;["is not included in the list"]}&gt; 
 1.9.3p194 :003 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
 
     <tip>
       <para>Denken Sie immer an die Macht von Ruby! Sie können so z.B. das

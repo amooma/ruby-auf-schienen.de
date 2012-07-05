@@ -24,14 +24,14 @@
   <section xml:id="named_scopes_vorbereitung">
     <title xml:id="named_scopes_vorbereitung.title">Vorbereitung</title>
 
-    <para>Wir bauen uns einen kleinen Online-Shop:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new shop</command>
+    <para>Wir bauen uns einen kleinen Online-Shop:<screen>MacBook:~ xyz$ <command>rails new shop</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd shop</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
+MacBook:~ xyz$ <command>cd shop</command>
+MacBook:shop xyz$ <command>rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate</command>
+MacBook:shop xyz$ <command>rake db:migrate</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
 
     <para>Füllen Sie bitte die Datei <filename>db/seeds.rb</filename> mit
     folgendem Inhalt:<programlisting># ruby encoding: utf-8
@@ -45,9 +45,9 @@ Product.create(:name =&gt; 'Eier (12 Stück)', :in_stock =&gt; true, :price =&gt
 Product.create(:name =&gt; 'Erdnüsse (8 x 200 g Packung)', :in_stock =&gt; false, :weight =&gt; 1600, :price =&gt; 17.49, :expiration_date =&gt; Date.today + 1.year)</programlisting></para>
 
     <para>Jetzt die Datenbank löschen und neu mit der
-    <filename>db/seeds.rb</filename> befüllen:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:reset</command>
+    <filename>db/seeds.rb</filename> befüllen:<screen>MacBook:shop xyz$ <command>rake db:reset</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
   </section>
 
   <section xml:id="einfache_named_scopes">
@@ -55,13 +55,13 @@ Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 
     <para>Wenn wir in unserem Online-Shop nur Produkte, die auf Lager sind
     anzeigen wollen, so könnten wir jedesmal die folgende Abfrage
-    machen:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+    machen:<screen>MacBook:shop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Product.where(:in_stock =&gt; true)</command>
   Product Load (0.2ms)  SELECT "products".* FROM "products" WHERE "products"."in_stock" = 't'
  =&gt; [#&lt;Product id: 1, name: "Milch (1 Liter)", price: #&lt;BigDecimal:7fd17c8cbbd0,'0.45E0',9(45)&gt;, weight: 1000, in_stock: true, expiration_date: "2012-05-22", created_at: "2012-05-08 12:43:15", updated_at: "2012-05-08 12:43:15"&gt;, #&lt;Product id: 2, name: "Butter (250 g)", price: #&lt;BigDecimal:7fd17c8ca870,'0.75E0',9(45)&gt;, weight: 250, in_stock: true, expiration_date: "2012-05-22", created_at: "2012-05-08 12:43:15", updated_at: "2012-05-08 12:43:15"&gt;, #&lt;Product id: 4, name: "Gummibärchen (6 x 300 g)", price: #&lt;BigDecimal:7fd17c8d13f0,'0.496E1',18(45)&gt;, weight: 1500, in_stock: true, expiration_date: "2013-05-08", created_at: "2012-05-08 12:43:15", updated_at: "2012-05-08 12:43:15"&gt;, #&lt;Product id: 5, name: "Super-Duper Backmischung", price: #&lt;BigDecimal:7fd17c8cfd98,'0.1112E2',18(45)&gt;, weight: nil, in_stock: true, expiration_date: "2013-05-08", created_at: "2012-05-08 12:43:15", updated_at: "2012-05-08 12:43:15"&gt;, #&lt;Product id: 6, name: "Eier (12 Stück)", price: #&lt;BigDecimal:7fd17c8d52e8,'0.2E1',9(36)&gt;, weight: nil, in_stock: true, expiration_date: "2012-05-15", created_at: "2012-05-08 12:43:15", updated_at: "2012-05-08 12:43:15"&gt;] 
 1.9.3p194 :002 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
 
     <para>Wir könnten aber auch in der
     <filename>app/models/product.rb</filename> einen NamedScope
@@ -71,7 +71,7 @@ Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
   <emphasis>scope :available, where(:in_stock =&gt; true)</emphasis>
 end</programlisting></para>
 
-    <para>Und diesen dann benutzen:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+    <para>Und diesen dann benutzen:<screen>MacBook:shop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Product.available.count</command>
    (0.2ms)  SELECT COUNT(*) FROM "products" WHERE "products"."in_stock" = 't'
@@ -80,7 +80,7 @@ Loading development environment (Rails 3.2.3)
    (0.2ms)  SELECT COUNT(*) FROM "products" WHERE "products"."in_stock" = 't'
  =&gt; 5 
 1.9.3p194 :003 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
 
     <para>Lassen Sie uns für das Beispiel einen zweiten NamedScope in der
     <filename>app/models/product.rb</filename> definieren:<programlisting>class Product &lt; ActiveRecord::Base
@@ -91,7 +91,7 @@ Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 end</programlisting></para>
 
     <para>Jetzt können wir alle günstigen (cheap) Produkte, die auf Lager sind
-    ausgeben:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+    ausgeben:<screen>MacBook:shop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Product.cheap.count</command>
    (0.3ms)  SELECT COUNT(*) FROM "products" WHERE (("products"."price" BETWEEN 0 AND 1 OR "products"."price" IN (NULL)))
@@ -100,7 +100,7 @@ Loading development environment (Rails 3.2.3)
    (0.4ms)  SELECT COUNT(*) FROM "products" WHERE "products"."in_stock" = 't' AND (("products"."price" BETWEEN 0 AND 1 OR "products"."price" IN (NULL)))
  =&gt; 2 
 1.9.3p194 :003 &gt; exit
-Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
+MacBook:shop xyz$ </screen></para>
   </section>
 
   <section xml:id="named_scope_lambda">
@@ -124,13 +124,13 @@ Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
 end</programlisting></para>
 
     <para>Damit erhalten wir immer korrekt die heute noch essbaren
-    Lebensmittel:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+    Lebensmittel:<screen>MacBook:shop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Product.consumable.count</command>
    (0.1ms)  SELECT COUNT(*) FROM "products" WHERE (expiration_date &gt; '2012-05-08')
  =&gt; 7 
 1.9.3p194 :002 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
   </section>
 
   <section>
@@ -146,13 +146,13 @@ Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 end</programlisting></para>
 
     <para>Jetzt können wir alle Produkte zählen, die weniger als 50 cent
-    kosten:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+    kosten:<screen>MacBook:shop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Product.cheaper_than(0.5).count</command>
    (0.2ms)  SELECT COUNT(*) FROM "products" WHERE (price &lt; 0.5)
  =&gt; 2 
 1.9.3p194 :002 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz</screen></para>
+MacBook:shop xyz</screen></para>
   </section>
 
   <section xml:id="named_scope_create">
@@ -171,14 +171,14 @@ end</programlisting></para>
     <para>Mit diesem NamedScope können wir dann nicht nur alle Produkte, die
     auf Lager sind raussuchen, sondern auch einen neue Produkte anlegen, der
     im Feld <varname>in_stock</varname> den Wert <code>true</code>
-    enthalten:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+    enthalten:<screen>MacBook:shop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>product = Product.available.build</command>
  =&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: true, created_at: nil, updated_at: nil&gt; 
 1.9.3p194 :002 &gt; <command>product.in_stock</command>
  =&gt; true 
 1.9.3p194 :003 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
 
     <para>Das funktioniert bei der Methode <methodname>build</methodname>
     (siehe <xref linkend="activerecord_hinzufuegen_build" />) und

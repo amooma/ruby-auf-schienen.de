@@ -30,19 +30,19 @@
   automatisch im Verzeichnis <filename>db/migrate/</filename> eine
   entsprechende <foreignphrase xml:lang="en">Migration</foreignphrase>-Datei
   angelegt. Ich zeige Ihnen das Prinzip an einer Shop-Applikation. Legen wir
-  die mal an:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new shop</command>
+  die mal an:<screen>MacBook:~ xyz$ <command>rails new shop</command>
 [...]
-Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd shop</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:~ xyz$ <command>cd shop</command>
+MacBook:shop xyz$</screen></para>
 
-  <para>Legen wir ein <classname>Product</classname> Model an:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
+  <para>Legen wir ein <classname>Product</classname> Model an:<screen>MacBook:shop xyz$ <command>rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
       invoke  active_record
       create    db/migrate/20120508160146_create_products.rb
       create    app/models/product.rb
       invoke    test_unit
       create      test/unit/product_test.rb
       create      test/fixtures/products.yml
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
 
   <para>Es wurde die Migrations-Datei
   <filename>db/migrate/20120508160146_create_products.rb</filename> angelegt.
@@ -64,38 +64,38 @@ end</programlisting></para>
   bei einem Rollback die Datenbank-Tabelle. Die Migrationsdateien haben im
   Dateinamen die aktuelle Uhrzeit eingebettet und werden bei einer Migration
   (also dem Aufruf von <command>rake db:migrate</command>) in der
-  chronologischen Reihenfolge abgearbeitet.<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate</command>
+  chronologischen Reihenfolge abgearbeitet.<screen>MacBook:shop xyz$ <command>rake db:migrate</command>
 ==  CreateProducts: migrating =================================================
 -- create_table(:products)
    -&gt; 0.0017s
 ==  CreateProducts: migrated (0.0018s) ========================================
 
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
 
   <para>Dabei werden immer nur die Migrations abgearbeitet, die noch nicht
   ausgeführt wurden. Wenn wir jetzt noch einmal <command>rake
   db:migrate</command> aufrufen, passiert nichts, da die entsprechende
-  Migration ja schon ausgeführt wurde:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+  Migration ja schon ausgeführt wurde:<screen>MacBook:shop xyz$ <command>rake db:migrate</command>
+MacBook:shop xyz$</screen></para>
 
   <para>Wenn wir aber die Datenbank mit <command>rm</command> manuell löschen
   und danach wieder <command>rake db:migrate</command> aufrufen, wird die
-  Migration wiederholt:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rm db/development.sqlite3</command> 
-Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate</command>
+  Migration wiederholt:<screen>MacBook:shop xyz$ <command>rm db/development.sqlite3</command> 
+MacBook:shop xyz$ <command>rake db:migrate</command>
 ==  CreateProducts: migrating =================================================
 -- create_table(:products)
    -&gt; 0.0017s
 ==  CreateProducts: migrated (0.0018s) ========================================
 
-Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
+MacBook:shop xyz$ </screen></para>
 
   <para>Nach einiger Zeit merken wir, dass wir bei vielen Produkten nicht nur
   das Gewicht (height), sondern auch die Höhe (height) abspeichern möchten.
   Wir benötigen also ein weiteres Datenbankfeld . Dafür gibt es eine leicht zu
-  merkende Syntax <command>rails generate migration add_*</command>:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails generate migration add_height_to_product height:integer</command>
+  merkende Syntax <command>rails generate migration add_*</command>:<screen>MacBook:shop xyz$ <command>rails generate migration add_height_to_product height:integer</command>
       invoke  active_record
       create    db/migrate/20120508160821_add_height_to_product.rb
-Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
+MacBook:shop xyz$ </screen></para>
 
   <para>In der Migrationsdatei
   <filename>db/migrate/20120508160821_add_height_to_product.rb</filename>
@@ -106,22 +106,22 @@ Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
 end</programlisting></para>
 
   <para>Mit <command>rake db:migrate</command> können wir die neue Migration
-  einspielen:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate</command>
+  einspielen:<screen>MacBook:shop xyz$ <command>rake db:migrate</command>
 ==  AddHeightToProduct: migrating =============================================
 -- add_column(:products, :height, :integer)
    -&gt; 0.0049s
 ==  AddHeightToProduct: migrated (0.0050s) ====================================
 
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
 
   <para>In der <foreignphrase xml:lang="en">Console</foreignphrase> können wir
   uns das neue Feld anschauen. Es wurde nach dem Feld
-  <literal>updated_at</literal> angefügt:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails console</command>
+  <literal>updated_at</literal> angefügt:<screen>MacBook:shop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Product</command>
  =&gt; Product(id: integer, name: string, price: decimal, weight: integer, in_stock: boolean, expiration_date: date, created_at: datetime, updated_at: datetime, height: integer) 
 1.9.3p194 :002 &gt; <command>exit</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
+MacBook:shop xyz$ </screen></para>
 
   <warning>
     <para>Bitte beachten Sie, das Sie wahrscheinlich in
@@ -132,19 +132,19 @@ Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
 
   <para>Was wäre im Fall, dass man noch einmal den vorherigen Stand der Dinge
   betrachten möchten? Kein Problem. Auf die vorherige Version können wir mit
-  <command>rake db:rollback</command> leicht zurückgehen:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:rollback</command>
+  <command>rake db:rollback</command> leicht zurückgehen:<screen>MacBook:shop xyz$ <command>rake db:rollback</command>
 ==  AddHeightToProduct: reverting =============================================
 -- remove_column("products", :height)
    -&gt; 0.0357s
 ==  AddHeightToProduct: reverted (0.0358s) ====================================
 
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
 
   <para>Jede Migration hat eine eigene Versionsnummer. Die Versionsnummer des
   aktuellen Status können Sie mit <command>rake db:version</command>
-  rausfinden:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:version</command>
+  rausfinden:<screen>MacBook:shop xyz$ <command>rake db:version</command>
 Current version: 20120508160146
-Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
+MacBook:shop xyz$ </screen></para>
 
   <important>
     <para>Bitte beachten Sie, dass alle Versionsnummern und Zeitstempel nur
@@ -154,20 +154,20 @@ Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
   </important>
 
   <para>Sie finden die entsprechende Version im Verzeichnis
-  <filename>db/migrate</filename> wieder:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>ls db/migrate</command> 
+  <filename>db/migrate</filename> wieder:<screen>MacBook:shop xyz$ <command>ls db/migrate</command> 
 20120508160146_create_products.rb
 20120508160821_add_height_to_product.rb
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
 
   <para>Auf eine bestimmte Migration können Sie mit <command>rake db:migrate
   VERSION=Versionsnummer</command> gehen. Die Null steht dabei für die nullte
-  Version (also den Start). Probieren wir das mal aus:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate VERSION=0</command>
+  Version (also den Start). Probieren wir das mal aus:<screen>MacBook:shop xyz$ <command>rake db:migrate VERSION=0</command>
 ==  CreateProducts: reverting =================================================
 -- drop_table("products")
    -&gt; 0.0007s
 ==  CreateProducts: reverted (0.0007s) ========================================
 
-Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
+MacBook:shop xyz$ </screen></para>
 
   <para>Die Tabelle wurde mit allen Daten gelöscht. Wir sind wieder zurück auf
   Los.</para>
@@ -231,17 +231,17 @@ production:
 
     <para>Um Ihre sicherlich vorhandene Neugierde zu befriedigen, schauen wir
     uns kurz noch die Datenbank mit dem Command-Line-Tool
-    <literal>sqlite3</literal> an:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ sqlite3 <command>db/development.sqlite3</command> 
+    <literal>sqlite3</literal> an:<screen>MacBook:shop xyz$ sqlite3 <command>db/development.sqlite3</command> 
 SQLite version 3.7.7 2011-06-25 16:35:41
 Enter ".help" for instructions
 Enter SQL statements terminated with a ";"
 sqlite&gt; <command>.tables</command>
 schema_migrations
 sqlite&gt; <command>.quit</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz$  </screen></para>
+MacBook:shop xyz$  </screen></para>
 
     <para>Nichts drin. Klar, wir haben ja auch nicht die Migration laufen
-    lassen:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate</command>  
+    lassen:<screen>MacBook:shop xyz$ <command>rake db:migrate</command>  
 ==  CreateProducts: migrating =================================================
 -- create_table(:products)
    -&gt; 0.0273s
@@ -252,7 +252,7 @@ Stefan-Wintermeyers-MacBook-Air:shop xyz$  </screen></para>
    -&gt; 0.0009s
 ==  AddHeightToProduct: migrated (0.0010s) ====================================
 
-Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>sqlite3 db/development.sqlite3</command> 
+MacBook:shop xyz$ <command>sqlite3 db/development.sqlite3</command> 
 SQLite version 3.7.7 2011-06-25 16:35:41
 Enter ".help" for instructions
 Enter SQL statements terminated with a ";"
@@ -261,7 +261,7 @@ products           schema_migrations
 sqlite&gt; <command>.schema products</command>
 CREATE TABLE "products" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar(255), "price" decimal(7,2), "weight" integer, "in_stock" boolean, "expiration_date" date, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "height" integer);
 sqlite&gt; <command>.quit</command>
-Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
+MacBook:shop xyz$ </screen></para>
 
     <para>Die Tabelle <literal>schema_migrations</literal> wird zur
     Versionierung der Migrationen benutzt wird. Bei der ersten von Rails
@@ -280,10 +280,10 @@ Stefan-Wintermeyers-MacBook-Air:shop xyz$ </screen></para>
 
     <para>In unserer Produktdatenbank sollten wir das Feld
     <literal>name</literal> in der Tabelle <literal>products</literal>
-    indizieren. Dafür erstellen wir eine neue Migration:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails generate migration create_index</command>
+    indizieren. Dafür erstellen wir eine neue Migration:<screen>MacBook:shop xyz$ <command>rails generate migration create_index</command>
       invoke  active_record
       create    db/migrate/20120508162243_create_index.rb
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
 
     <para>In der Datei
     <filename>db/migrate/20101201224922_create_index.rb</filename> legen wir
@@ -301,25 +301,25 @@ Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
 end</programlisting></para>
 
     <para>Mit <command>rake db:migrate</command> wird der Index
-    angelegt:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rake db:migrate</command>
+    angelegt:<screen>MacBook:shop xyz$ <command>rake db:migrate</command>
 ==  CreateIndex: migrating ====================================================
 -- add_index(:products, :name)
    -&gt; 0.0009s
 ==  CreateIndex: migrated (0.0009s) ===========================================
 
-Stefan-Wintermeyers-MacBook-Air:shop xyz$  </screen></para>
+MacBook:shop xyz$  </screen></para>
 
     <tip>
       <para>Einen Index können Sie auch direkt beim Generieren des Models mit
       anlegen. In unserem Fall (einem Index beim Attribute <code>name</code>)
-      sähe der Befehl so aus:<screen>Stefan-Wintermeyers-MacBook-Air:shop xyz$ <command>rails generate model product name:string:index 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
+      sähe der Befehl so aus:<screen>MacBook:shop xyz$ <command>rails generate model product name:string:index 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
       invoke  active_record
       create    db/migrate/20120508160146_create_products.rb
       create    app/models/product.rb
       invoke    test_unit
       create      test/unit/product_test.rb
       create      test/fixtures/products.yml
-Stefan-Wintermeyers-MacBook-Air:shop xyz$</screen></para>
+MacBook:shop xyz$</screen></para>
     </tip>
   </section>
 
