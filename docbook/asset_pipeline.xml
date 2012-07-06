@@ -23,8 +23,8 @@
     CSS-Dateien zu einer grossen Datei zusammengefasst und mit einem
     Fingerabdruck im Dateinamen an den Browser ausgeliefert. Dieser
     Fingerabdruck ermöglicht es dem Browser und einem evt. dazwischen
-    liegendem Proxy die Dateien optimal zu cachen und führt damit zu einer
-    wesentlich schnelleren Webapplikation.</para>
+    liegendem Proxy die Dateien optimal zu cachen und führt damit zu
+    schnelleren schnelleren Ladezeiten im Browser.</para>
 
     <para>Sie können innerhalb der Asset Pipeline ausführlich und
     übersichtlich CSS, SASS, JavaScript und CoffeeScript programmieren, um
@@ -57,12 +57,28 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
     sogenannte Manifest Dateien. Sie includen automatisch die anderen Dateien
     im jeweiligen Verzeichnis.</para>
 
-    <section>
-      <title>application.js Manifest</title>
+    <section xml:id="manifest_dateien">
+      <title xml:id="manifest_dateien.title">Manifest Dateien</title>
 
-      <para>Die Datei
-      <filename>app/assets/javascripts/application.js</filename> hat folgenden
-      Inhalt:<programlisting>// This is a manifest file that'll be compiled into application.js, which will include all the files
+      <indexterm>
+        <primary>Manifest Dateien</primary>
+      </indexterm>
+
+      <para>In <filename>app/assets/javascripts</filename> und
+      <filename>app/assets/stylesheets</filename> gibt es immer sogenannte
+      Manifest Dateien, die Anweisungen an die Asset Pipeline enthalten. Sie
+      definieren, was alles eingebunden werden soll.</para>
+
+      <section xml:id="application.js_manifest">
+        <title xml:id="application.js_manifest.title">application.js</title>
+
+        <indexterm>
+          <primary>application.js</primary>
+        </indexterm>
+
+        <para>Die Datei
+        <filename>app/assets/javascripts/application.js</filename> hat
+        folgenden Inhalt:<programlisting>// This is a manifest file that'll be compiled into application.js, which will include all the files
 // listed below.
 //
 // Any JavaScript/Coffee file within this directory, lib/assets/javascripts, vendor/assets/javascripts,
@@ -78,17 +94,46 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
 //= require jquery_ujs
 //= require_tree .</programlisting></para>
 
-      <para>In der application.js werden automatisch die im
-      <code>jquery-rails</code> Gem definierten jQuery Dateien eingebunden
-      (weitere Informationen zu jQuery finden Sie unter <uri
-      xlink:href="http://jquery.com/">http://jquery.com/</uri>). Zusätzlich
-      werden mit <code>require_tree .</code> alle anderen Dateien in diesem
-      Verzeichnis eingebunden.</para>
+        <para>In der <filename>application.js</filename> werden automatisch
+        die im <code>jquery-rails</code> Gem definierten jQuery Dateien
+        eingebunden (weitere Informationen zu jQuery finden Sie unter <uri
+        xlink:href="http://jquery.com/">http://jquery.com/</uri>). Zusätzlich
+        werden mit <code>require_tree .</code> alle anderen Dateien in diesem
+        Verzeichnis eingebunden.</para>
 
-      <para>Das noch nicht optimierte Ergebnis können Sie sich in der
-      Entwicklungsumgebung unter der URL <uri
-      xlink:href="http://0.0.0.0:3000/assets/application.js">http://0.0.0.0:3000/assets/application.js</uri>
-      anschauen.</para>
+        <para>Das noch nicht optimierte Ergebnis können Sie sich in der
+        Entwicklungsumgebung unter der URL <uri
+        xlink:href="http://0.0.0.0:3000/assets/application.js">http://0.0.0.0:3000/assets/application.js</uri>
+        anschauen.</para>
+      </section>
+
+      <section xml:id="application.css_manifest">
+        <title xml:id="application.css_manifest.title">application.css</title>
+
+        <indexterm>
+          <primary>application.css</primary>
+        </indexterm>
+
+        <para>Die Datei
+        <filename>app/assets/stylesheets/application.css</filename> hat
+        folgenden Inhalt:<programlisting>/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or vendor/assets/stylesheets of plugins, if any, can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the top of the
+ * compiled file, but it's generally better to create a new file per style scope.
+ *
+ *= require_self
+ *= require_tree .
+ */
+</programlisting></para>
+
+        <para>Es werden mit dem Befehl <code>require_tree .</code> automatisch
+        alle Dateien in diesem Verzeichnis eingebunden.</para>
+      </section>
     </section>
 
     <section xml:id="asset_precompile">
@@ -138,7 +183,27 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
         assets:precompile</command> erstelle <filename>js.gz</filename> Datei
         nur noch 36 KB. Gerade Benutzer von Mobiltelefonen werden es Ihnen
         danken.</para>
+
+        <para>Der Gewindigkeitsvorteil liegt übrigens nicht nur in der reinen
+        Dateigröße, sondern auch darin, das nur eine Datei und nicht mehrere
+        Dateien downgeloadet wird. Der HTTP-Overhead beim Laden eine Datei ist
+        zeitintensiv.</para>
       </note>
+    </section>
+
+    <section xml:id="asset_pipeline_fingerabdruck">
+      <title xml:id="asset_pipeline_fingerabdruck.title">Der
+      Fingerabdruck</title>
+
+      <indexterm>
+        <primary>Asset Pipeline Fingerabdruck</primary>
+      </indexterm>
+
+      <para>Der Fingerabdruck im Dateinamen setzt sich aus einer Hash-Summe
+      zusammen. Diese wird aus dem Inhalt der jeweiligen Datei generiert. Nur
+      durch diesen Fingerabdruck können wir sicher sein, das optimal gecachet
+      wird und das bei einer Veränderung im Inhalt nicht ein alter Cache
+      benutzt wird. Eine simple, aber sehr effektive Methode.</para>
     </section>
   </section>
 
@@ -147,15 +212,15 @@ Stefan-Wintermeyers-MacBook-Air:webshop xyz$</screen></para>
     Asset</title>
 
     <indexterm>
-      <primary>Asset Pipeline</primary>
+      <primary>Coding Links</primary>
     </indexterm>
 
     <para>Alle Dateien unterhalb des <filename>app/assets</filename>
     Verzeichnisses werden vom Rails-Server normal ausgeliefert. So können Sie
     sich unter der URL <uri
     xlink:href="http://0.0.0.0:3000/assets/rails.png">http://0.0.0.0:3000/assets/rails.png</uri>
-    das unter app/assets/images/rails.png abgespeicherte Rails-Logo und unter
-    <uri
+    das unter <filename>app/assets/images/rails.png</filename> abgespeicherte
+    Rails-Logo und unter <uri
     xlink:href="http://0.0.0.0:3000/assets/application.js">http://0.0.0.0:3000/assets/application.js</uri>
     den Inhalt von <filename>app/assets/javascripts/application.js</filename>
     anzeigen lassen. Dabei wird das <filename>rails.png</filename> Image 1:1
