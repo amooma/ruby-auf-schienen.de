@@ -25,6 +25,280 @@
     <title>Eigener Server</title>
 
     <para></para>
+
+    <section>
+      <title>Erstellen der Rails-Applikation</title>
+
+      <para>Wir erstellen die Mini-Blog Rail-Applikation:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new blog</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd blog</command>
+Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rails generate scaffold post subject content:text</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rake db:migrate</command>
+==  CreatePosts: migrating ====================================================
+-- create_table(:posts)
+   -&gt; 0.0015s
+==  CreatePosts: migrated (0.0016s) ===========================================
+
+Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
+
+      <para>Für das Deployment und den Webserver benötigen wir einige Gems.
+      Bitte fügen Sie diese wie folgt der Datei <filename>Gemfile</filename>
+      hinzu:<programlisting>source 'https://rubygems.org'
+
+gem 'rails', '3.2.6'
+
+# Bundle edge Rails instead:
+# gem 'rails', :git =&gt; 'git://github.com/rails/rails.git'
+
+gem 'sqlite3'
+
+
+# Gems used only for assets and not required
+# in production environments by default.
+group :assets do
+  gem 'sass-rails',   '~&gt; 3.2.3'
+  gem 'coffee-rails', '~&gt; 3.2.1'
+
+  # See https://github.com/sstephenson/execjs#readme for more supported runtimes
+  # gem 'therubyracer', :platforms =&gt; :ruby
+
+  gem 'uglifier', '&gt;= 1.0.3'
+end
+
+gem 'jquery-rails'
+
+# To use ActiveModel has_secure_password
+# gem 'bcrypt-ruby', '~&gt; 3.0.0'
+
+# To use Jbuilder templates for JSON
+# gem 'jbuilder'
+
+# Use unicorn as the app server
+# gem 'unicorn'
+
+# Deploy with Capistrano
+# gem 'capistrano'
+
+# To use debugger
+# gem 'debugger'
+
+<emphasis>group :production do
+  # Use MySQL as the database
+  gem 'mysql'
+
+  # Use unicorn as the app server
+  gem 'unicorn'
+end
+
+group :development do
+  # Use Capistrano and rvm for deployment
+  gem 'capistrano'
+  gem 'rvm-capistrano'
+end
+
+group :assets do
+  gem 'therubyracer', :platforms =&gt; :ruby
+end</emphasis></programlisting></para>
+
+      <para>Danach ein <command>bundle install</command> ausführen:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>bundle install</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
+    </section>
+
+    <section>
+      <title>Github als Repository benutzen</title>
+
+      <para>Bitte legen Sie sich unter <uri
+      xlink:href="https://github.com">https://github.com</uri> einen neuen
+      Account an oder benutzen Sie einen bereits existierenden Github-Account.
+      Legen Sie mit diesem Account ein neues Repository mit dem Namen
+      "<code>blog</code>" an.</para>
+
+      <para>Für das einfachere Arbeiten empfehle ich Ihnen Ihren SSH Key in
+      Ihrem Github-Account unter <uri
+      xlink:href="https://github.com/settings/ssh">https://github.com/settings/ssh</uri>
+      einzutragen. Das habe ich für dieses Tutorial auch so gemacht.</para>
+
+      <para>Jetzt können Sie Ihr Rails-Projekt commiten und pushen. Bitte
+      tauschen Sie dabei <code>ihr_github_account</code> mit Ihrem
+      Github-Account aus:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>git init</command>
+Initialized empty Git repository in /Users/xyz/blog/.git/
+Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>git add .</command>
+Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>git commit -m 'first commit'</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>git remote add origin git@github.com:ihr_github_account/blog.git</command>
+Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>git push -u origin master</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
+
+      <para></para>
+    </section>
+
+    <section>
+      <title>Installation auf Debian 6</title>
+
+      <para>Bitte loggen Sie sich als <code>root</code> auf dem Debian Server
+      ein.</para>
+
+      <para>Als erstes installieren wir den Webserver nginx:<screen>root@debian:~# <command>curl http://nginx.org/keys/nginx_signing.key | apt-key add -</command>
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  1561  100  1561    0     0   3887      0 --:--:-- --:--:-- --:--:--  8819
+OK
+root@debian:~# <command>echo 'deb http://nginx.org/packages/debian/ squeeze nginx' &gt;&gt; /etc/apt/sources.list</command>
+root@debian:~# <command>echo 'deb-src http://nginx.org/packages/debian/ squeeze nginx' &gt;&gt; /etc/apt/sources.list</command>
+root@debian:~# <command>apt-get update</command>
+[...]
+root@debian:~# <command>apt-get -y install nginx</command>
+[...]
+root@debian:~# </screen></para>
+
+      <para>Als nächstes installieren wir die Datenbank MySQL. Dabei werden
+      Sie nach einem Datenbankpasswort gefragt. Bitte merken Sie sich dieses
+      Passwort und geben Sie es später in der Datei
+      <filename>config/database.yml</filename> in Ihrem Rails-Projekt
+      an.<screen>root@debian:~# <command>apt-get -y install mysql-server libmysql-ruby libmysqlclient-dev</command>
+[...]
+root@debian:~# </screen></para>
+
+      <para>Wir erstellen einen neuen User mit dem Namen
+      <code>deployer</code>:<screen>root@debian:~# <command>adduser deployer</command>
+Lege Benutzer »deployer« an ...
+Lege neue Gruppe »deployer« (1002) an ...
+Lege neuen Benutzer »deployer« (1002) mit Gruppe »deployer« an ...
+Erstelle Home-Verzeichnis »/home/deployer« ...
+Kopiere Dateien aus »/etc/skel« ...
+Geben Sie ein neues UNIX-Passwort ein: 
+Geben Sie das neue UNIX-Passwort erneut ein: 
+passwd: Passwort erfolgreich geändert
+Benutzerinformationen für deployer werden geändert.
+Geben Sie einen neuen Wert an oder drücken Sie ENTER für den Standardwert
+ Vollständiger Name []: Deployer
+ Raumnummer []: 
+ Telefon geschäftlich []: 
+ Telefon privat []: 
+ Sonstiges []: 
+Sind die Informationen korrekt? [J/n] J
+root@debian:~#</screen></para>
+
+      <para>Für diesen User erstellen wir einen public SSH-Key. Für ein
+      einfacheres Deployment verwenden Sie an dieser Stelle bitte eine leere
+      (also keine) Passphrase.<screen>root@debian:~# <command>su - deployer</command>
+deployer@debian:~$ <command>ssh-keygen</command>
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/deployer/.ssh/id_rsa): 
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/deployer/.ssh/id_rsa.
+Your public key has been saved in /home/deployer/.ssh/id_rsa.pub.
+The key fingerprint is:
+ba:11:90:2a:e3:8f:5b:2e:70:99:50:86:a1:9a:2c:b7 deployer@debian
+The key's randomart image is:
++--[ RSA 2048]----+
+|.o               |
+|o o  .           |
+|.o  o            |
+|+. . .           |
+|*ooo  . S        |
+|+++.   o         |
+|.oE.  o          |
+| .=    o         |
+| ooo  .          |
++-----------------+
+deployer@debian:~$ <command>cat .ssh/id_rsa.pub</command> 
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDJEGixOcPRdBMry7PPG/Rgla50EM+JPKGYGD/yJ8v7bdrfT68t2/eVbj6+YebWh1tRebE3qqouqmZjIlocr1j67SmfXZ/sswBT/pXOhP89JtHPMolx7rUQ8wQF3aDrnVDJG0gdvRm212vN2bou3N5dzhekmWmbS3R0ZGNM9ZgTw8rhTOd1M2QVTzyV1i1PehoFxOu1WIc1gN5C42zihbJ6fGgVb45WeKzXSi6bQ6PMKD1gAMJpXHPvKLhi0wLN0wNOJwa6BKR3pmgICSBuoziAhhCS/7gBDJnqRmx1zax/1CShJD3QEGHvofA9okYuYVqyrJi1hdF8ZgMnQCb31I21 deployer@debian
+deployer@debian:~$</screen></para>
+
+      <para>Der erzeugte Key liegt in der Datei
+      <filename>/home/deployer/.ssh/id_rsa.pub</filename>. Bitte loggen Sie
+      sich jetzt in Ihren Github-Account ein und fügen im Admin Bereich diesen
+      Key bei Deploy Keys hinzu. Danach connecten Sie sich bitte auf der
+      Console einmal mit dem Github SSH-Server und bestätigen Sie die "Are you
+      sure you want to continue connection (yes/no)?" Frage mit einem yes.
+      <screen>deployer@debian:~$ <command>ssh git@github.com</command>
+The authenticity of host 'github.com (207.97.227.239)' can't be established.
+RSA key fingerprint is 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48.
+Are you sure you want to continue connecting (yes/no)? <command>yes</command>
+Warning: Permanently added 'github.com,207.97.227.239' (RSA) to the list of known hosts.
+PTY allocation request failed on channel 0
+Hi xyz/blog! You've successfully authenticated, but GitHub does not provide shell access.
+                 Connection to github.com closed.
+deployer@debian:~$</screen></para>
+
+      <para>Jetzt machen wir wieder als <code>root</code> weiter:<screen>deployer@debian:~$ <command>exit</command>
+Abgemeldet
+root@debian:~#</screen></para>
+
+      <para>In der MySQL-Datenbank müssen wir noch die Database
+      <code>blog</code> mit Zugriffsrechten für den lokalen Benutzer
+      <code>deployer</code> anlegen:<screen>deployer@debian:~$ <command>mysql -u root -p</command>
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 40
+Server version: 5.1.63-0+squeeze1 (Debian)
+
+Copyright (c) 2000, 2011, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql&gt; <command>CREATE DATABASE blog;</command>
+Query OK, 1 row affected (0.00 sec)
+
+mysql&gt; <command>GRANT USAGE ON *.* TO deployer@localhost IDENTIFIED BY 'IhrLieblingsPasswort';</command>
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; <command>GRANT ALL PRIVILEGES ON blog.* TO deployer@localhost;</command>
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; <command>exit</command>
+Bye
+deployer@debian:~$</screen></para>
+
+      <para></para>
+
+      <para></para>
+
+      <para></para>
+
+      <para><screen>curl http://nginx.org/packages/keys/nginx_signing.key | apt-key add -
+
+cat 'deb http://nginx.org/packages/debian/ squeeze nginx' &gt;&gt; /etc/apt/sources.list
+cat 'deb-src http://nginx.org/packages/debian/ squeeze nginx' &gt;&gt; /etc/apt/sources.list
+
+apt-get update
+
+apt-get -y install nginx
+
+adduser deployer
+
+apt-get -y install mysql-server
+apt-get -y install libmysql-ruby libmysqlclient-dev
+
+
+su - deployer
+rails installieren
+
+/etc/init.d/nginx stop
+rm /etc/nginx/sites-enabled/default
+cp nginx.conf /etc/nginx/sites-enabled/blog
+cp unicorn_init.sh /etc/int.d/unicorn_blog
+
+
+update-rc.d unicorn_blog defaults
+
+
+
+</screen></para>
+
+      <para></para>
+
+      <para></para>
+    </section>
   </section>
 
   <section>
