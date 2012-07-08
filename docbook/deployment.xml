@@ -25,11 +25,9 @@
   </section>
 
   <section>
-    <title>Erstellen der Rails-Applikation auf Ihrem
-    Entwicklungssystem</title>
+    <title>Das Entwicklungssystem</title>
 
-    <para>Folgende Schritte müssen Sie auf Ihrem Entwicklungssystem
-    ausführen:</para>
+    <para>Wir fangen mit einer neuen Rails-Applikation an.</para>
 
     <section>
       <title>rails new blog</title>
@@ -47,9 +45,12 @@ Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rake db:migrate</command>
 
 Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
 
-      <para>Für das Deployment und den Webserver benötigen wir einige Gems.
-      Bitte fügen Sie diese Konfiguration in der Datei
-      <filename>Gemfile</filename> hinzu:<programlisting><emphasis>group :production do
+      <section>
+        <title>Gems für das Deployment</title>
+
+        <para>Für das Deployment und den Webserver benötigen wir einige Gems.
+        Bitte fügen Sie diese Konfiguration in der Datei
+        <filename>Gemfile</filename> hinzu:<programlisting><emphasis>group :production do
   # Use MySQL as the database
   gem 'mysql'
 
@@ -67,13 +68,14 @@ group :assets do
   gem 'therubyracer', :platforms =&gt; :ruby
 end</emphasis></programlisting></para>
 
-      <para>Danach ein <command>bundle install</command> ausführen:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>bundle install</command>
+        <para>Danach ein <command>bundle install</command> ausführen:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>bundle install</command>
 [...]
 Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
+      </section>
     </section>
 
     <section>
-      <title>Production Datenbank einrichten</title>
+      <title>Production Datenbank Konfiguration</title>
 
       <para>In der Datei <filename>config/database.yml</filename> müssen wir
       für das Produktionssystem die Datenbankkonfiguration für die
@@ -107,7 +109,7 @@ test:
     </section>
 
     <section>
-      <title>Unicorn einrichten</title>
+      <title>Unicorn Konfiguration</title>
 
       <para>Bitte fügen Sie die Konfigurationsdatei
       <filename>config/unicorn.rb</filename> mit folgendem Inhalt
@@ -123,7 +125,7 @@ timeout 30</programlisting></para>
     </section>
 
     <section>
-      <title>Capistrano einrichten</title>
+      <title>Capistrano Konfiguration</title>
 
       <para>Wir richten eine Capistrano Standardkonfiguration ein:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>capify .</command>  
 [add] writing './Capfile'
@@ -219,60 +221,15 @@ Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
       <para>Bitte loggen Sie sich als <code>root</code> auf dem Debian Server
       ein.</para>
 
-      <para>Als erstes installieren wir den Webserver nginx:<screen>root@debian:~# <command>curl http://nginx.org/keys/nginx_signing.key | apt-key add -</command>
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100  1561  100  1561    0     0   3887      0 --:--:-- --:--:-- --:--:--  8819
-OK
-root@debian:~# <command>echo 'deb http://nginx.org/packages/debian/ squeeze nginx' &gt;&gt; /etc/apt/sources.list</command>
-root@debian:~# <command>echo 'deb-src http://nginx.org/packages/debian/ squeeze nginx' &gt;&gt; /etc/apt/sources.list</command>
-root@debian:~# <command>apt-get update</command>
+      <para>Als erstes installieren wir ein paar Pakete die wir
+      brauchen.<screen>root@debian:~# <command>apt-get -y install build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion</command>
 [...]
-root@debian:~# <command>apt-get -y install nginx</command>
-[...]
-root@debian:~# </screen></para>
-
-      <para>Für unser Rails-Projekt fügen wir eine neue Konfigurationdatei
-      <filename>/etc/nginx/conf.d/blog.conf</filename> mit folgendem Inhalt
-      hinzu:<programlisting>upstream unicorn {
-  server unix:/tmp/unicorn.blog.sock fail_timeout=0;
-}
-
-server {
-  listen 80 default deferred;
-  # server_name example.com;
-  root /home/deployer/apps/blog/current/public;
-
-  location ^~ /assets/ {
-    gzip_static on;
-    expires max;
-    add_header Cache-Control public;
-  }
-
-  try_files $uri/index.html $uri @unicorn;
-  location @unicorn {
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header Host $http_host;
-    proxy_redirect off;
-    proxy_pass http://unicorn;
-  }
-
-  error_page 500 502 503 504 /500.html;
-  client_max_body_size 4G;
-  keepalive_timeout 10;
-}</programlisting></para>
-
-      <para>Die Default Konfigurationsdatei benennen wir um, damit sie nicht
-      mehr ausgeführt wird. Danach starten wir den Webserver neu.<screen>root@debian:~# <command>mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.backup</command>
-root@debian:~# <command>/etc/init.d/nginx restart</command>
-Restarting nginx: nginx.
 root@debian:~# </screen></para>
 
       <para>Als nächstes installieren wir die Datenbank MySQL. Dabei werden
       Sie nach einem Datenbankpasswort gefragt. Bitte merken Sie sich dieses
-      Passwort und geben Sie es später in der Datei
-      <filename>config/database.yml</filename> in Ihrem Rails-Projekt
-      an.<screen>root@debian:~# <command>apt-get -y install mysql-server libmysql-ruby libmysqlclient-dev</command>
+      Passwort. Damit kann sich später <code>root</code> auf der Datenbank
+      einlogen.<screen>root@debian:~# <command>apt-get -y install mysql-server libmysql-ruby libmysqlclient-dev</command>
 [...]
 root@debian:~# </screen></para>
 
@@ -325,7 +282,7 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDJEGixOcPRdBMry7PPG/Rgla50EM+JPKGYGD/yJ8v7
 deployer@debian:~$</screen></para>
 
       <para>Der erzeugte Key liegt in der Datei
-      <filename>/home/deployer/.ssh/id_rsa.pub</filename>. </para>
+      <filename>/home/deployer/.ssh/id_rsa.pub</filename>.</para>
 
       <important>
         <para>Bitte loggen Sie sich jetzt in Ihren Github-Account ein und
@@ -334,8 +291,8 @@ deployer@debian:~$</screen></para>
         xlink:href="https://github.com/ihr_github_account/blog/admin/keys">https://github.com/ihr_github_account/blog/admin/keys</uri></para>
       </important>
 
-      <para>Danach connecten Sie sich bitte auf der Console einmal mit dem
-      Github SSH-Server und bestätigen Sie die "Are you sure you want to
+      <para>Danach verbinden Sie sich mit ssh bitte auf der Console einmal mit
+      dem Github SSH-Server und bestätigen Sie die "Are you sure you want to
       continue connection (yes/no)?" Frage mit einem yes. <screen>deployer@debian:~$ <command>ssh git@github.com</command>
 The authenticity of host 'github.com (207.97.227.239)' can't be established.
 RSA key fingerprint is 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48.
@@ -351,8 +308,8 @@ Abgemeldet
 root@debian:~#</screen></para>
 
       <para>In der MySQL-Datenbank müssen wir noch die Database
-      <code>blog</code> mit Zugriffsrechten für den lokalen Benutzer
-      <code>deployer</code> anlegen:<screen>deployer@debian:~$ <command>mysql -u root -p</command>
+      <code>blog</code> mit Zugriffsrechten für den User <code>deployer</code>
+      anlegen:<screen>deployer@debian:~$ <command>mysql -u root -p</command>
 Enter password: 
 Welcome to the MySQL monitor.  Commands end with ; or \g.
 Your MySQL connection id is 40
@@ -378,6 +335,55 @@ Query OK, 0 rows affected (0.00 sec)
 mysql&gt; <command>exit</command>
 Bye
 deployer@debian:~$</screen></para>
+
+      <para>Als nächstes installieren wir den Webserver nginx:<screen>root@debian:~# <command>curl http://nginx.org/keys/nginx_signing.key | apt-key add -</command>
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  1561  100  1561    0     0   3887      0 --:--:-- --:--:-- --:--:--  8819
+OK
+root@debian:~# <command>echo 'deb http://nginx.org/packages/debian/ squeeze nginx' &gt;&gt; /etc/apt/sources.list</command>
+root@debian:~# <command>echo 'deb-src http://nginx.org/packages/debian/ squeeze nginx' &gt;&gt; /etc/apt/sources.list</command>
+root@debian:~# <command>apt-get update</command>
+[...]
+root@debian:~# <command>apt-get -y install nginx</command>
+[...]
+root@debian:~# </screen></para>
+
+      <para>Für unser Rails-Projekt fügen wir eine neue Konfigurationdatei
+      <filename>/etc/nginx/conf.d/blog.conf</filename> mit folgendem Inhalt
+      hinzu:<programlisting>upstream unicorn {
+  server unix:/tmp/unicorn.blog.sock fail_timeout=0;
+}
+
+server {
+  listen 80 default deferred;
+  # server_name example.com;
+  root /home/deployer/apps/blog/current/public;
+
+  location ^~ /assets/ {
+    gzip_static on;
+    expires max;
+    add_header Cache-Control public;
+  }
+
+  try_files $uri/index.html $uri @unicorn;
+  location @unicorn {
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_redirect off;
+    proxy_pass http://unicorn;
+  }
+
+  error_page 500 502 503 504 /500.html;
+  client_max_body_size 4G;
+  keepalive_timeout 10;
+}</programlisting></para>
+
+      <para>Die Default Konfigurationsdatei benennen wir um, damit sie nicht
+      mehr ausgeführt wird. Danach stoppen wir den Webserver erst mal.<screen>root@debian:~# <command>mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.backup</command>
+root@debian:~# <command>/etc/init.d/nginx stop</command>
+Stopping nginx: nginx.
+root@debian:~# </screen></para>
 
       <para>Für Unicorn benötigen wir noch ein Init-Script. Bitte legen Sie
       die Datei <filename>/etc/init.d/unicorn_blog</filename> mit folgendem
