@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="deployment"
+<chapter version="5.0" xml:id="rails_production_webserver"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -7,10 +7,25 @@
          xmlns:m="http://www.w3.org/1998/Math/MathML"
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
-  <title xml:id="deployment.title">Produktions Webserver aufsetzen</title>
+  <title xml:id="rails_production_webserver.title">Rails
+  Production-Webserver</title>
 
-  <section>
-    <title>Einleitung</title>
+  <indexterm>
+    <primary>Webserver</primary>
+
+    <secondary>Production</secondary>
+  </indexterm>
+
+  <indexterm>
+    <primary>Nginx</primary>
+  </indexterm>
+
+  <indexterm>
+    <primary>Unicorn</primary>
+  </indexterm>
+
+  <section xml:id="production_webserver_einleitung">
+    <title xml:id="production_webserver_einleitung.title">Einleitung</title>
 
     <para>Im Rest des Buches arbeiten wir immer mit dem Entwicklungssystem.
     Dazu starten wir Rails mit <command>rails server</command>. Schauen wir
@@ -48,14 +63,15 @@
     abarbeiten (das entsprechende Modul ist fast immer installiert). Bei Rails
     sieht es leider anders aus. Die Hürden sind wesentlich höher und des
     Aufwand größer. Es gibt eine grosse Menge an möglichen Kombinationen (z.B.
-    "Apache, lighttpd oder Nginx?" und "Unicon, Thin oder Mongrel?"). Es ist
+    "Apache, lighttpd oder Nginx?" und "Unicorn, Thin oder Mongrel?"). Es ist
     unmöglich alle Varianten hier detailiert zu beschreiben. Ich habe mich für
     meine Lieblingskombination von Nginx und Unicorn entschieden. Dies heißt
     aber nicht, das andere Kombinationen schlechter sind. Es ist eine
     subjektive Wahl.</para>
 
-    <section>
-      <title>Aufgabenstellung</title>
+    <section xml:id="production_webserver_zielsystem">
+      <title xml:id="production_webserver_zielsystem.title">Das
+      Zielsystem</title>
 
       <para>Wir setzen unseren Produktions-Webserver auf einem Debian 6 System
       auf. Ruby 1.9.3 installieren wir per RVM mit dem neuen User
@@ -69,11 +85,19 @@
     </section>
   </section>
 
-  <section>
-    <title>Installation</title>
+  <section xml:id="production_webserver_installation">
+    <title
+    xml:id="production_webserver_installation.title">Installation</title>
 
     <para>Bitte loggen Sie sich als <code>root</code> auf dem Webserver
     ein.</para>
+
+    <warning>
+      <para>Bitte beachten Sie bei der Verwendung dieser
+      Installationsanleitung für andere Rails-Projekte, das der Name "blog"
+      (für die jeweilige Rails-Applikation) in allen Konfigurationsdateien und
+      Skripten mit dem jeweiligen Projektnamen ersetzt werden muss.</para>
+    </warning>
 
     <para>Als erstes installieren wir ein paar Pakete die wir
     brauchen.<screen>root@debian:~# <command>apt-get -y install build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion python</command>
@@ -185,7 +209,9 @@ deployer@debian:~$ </screen></para>
         <para>Bitte führen Sie <emphasis>jetzt</emphasis> als User
         <code>deployer</code> die in <xref linkend="rails3-install-debian" />
         aufgeführten Schritte zur Installation von Ruby 1.9.3 und Rails 3.2
-        per rvm aus.</para>
+        per rvm aus. Hier ist die Kurzversion:<screen>deployer@debian:~$ <command>curl -L https://get.rvm.io | bash -s stable &amp;&amp; source ~/.rvm/scripts/'rvm' &amp;&amp; rvm install 1.9.3 &amp;&amp; gem install rails</command>
+[...]
+deployer@debian:~$</screen></para>
       </important>
 
       <para>Um diese Anleitung zu einfach wie möglich zu halten, erstellen wir
@@ -453,7 +479,7 @@ update-rc.d: using dependency based boot sequencing
 root@debian:~# <command>/etc/init.d/unicorn_blog start</command>
 root@debian:~# </screen></para>
 
-      <para></para>
+      <para>Fertig.</para>
     </section>
   </section>
 
