@@ -7,14 +7,373 @@
          xmlns:m="http://www.w3.org/1998/Math/MathML"
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
-  <title xml:id="deployment.title">Deployment</title>
-
-  <indexterm>
-    <primary>Deployment</primary>
-  </indexterm>
+  <title xml:id="deployment.title">Produktions Webserver aufsetzen</title>
 
   <section>
     <title>Einleitung</title>
+
+    <warning>
+      <para>Dieses Howto ist noch nicht fertig! Bitte erst benutzen, wenn
+      diese Warnung nicht mehr angezeigt wird!</para>
+    </warning>
+
+    <para>Im Rest des Buches arbeiten wir immer mit dem Entwicklungssystem.
+    Dazu starten wir Rails mit rails server. Schauen wir uns die Ausgabe noch
+    mal genau an:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rails server</command>
+=&gt; Booting WEBrick
+=&gt; Rails 3.2.6 application starting in development on http://0.0.0.0:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2012-07-09 12:19:40] INFO  WEBrick 1.3.1
+[2012-07-09 12:19:40] INFO  ruby 1.9.3 (2012-04-20) [x86_64-darwin11.4.0]
+[2012-07-09 12:19:40] INFO  WEBrick::HTTPServer#start: pid=86773 port=3000</screen></para>
+
+    <para>Die zweite Zeile sagt aus, das wir im "development" Modus sind und
+    das die Applikation unter der URL <uri
+    xlink:href="http://0.0.0.0:3000">http://0.0.0.0:3000</uri> erreichbar ist.
+    Als Webserver wird dabei WEBrick verwendet (siehe <uri
+    xlink:href="http://de.wikipedia.org/wiki/WEBrick">http://de.wikipedia.org/wiki/WEBrick</uri>).
+    WEBrick ist ein sehr einfacher HTTP Webserver und Bestandteil der Ruby
+    Standardbibliothek. WEBrick ist aber nur zur Entwicklung geeignet.</para>
+
+    <para>Für ein Produktivsystem nimmt man normalerweise einen Standard
+    Webserver wie Apache, lighttpd oder Nginx, der als Reverse-Proxy und
+    Loadbalancer zum Rails-System agiert. Das Rails-System wird dann aber
+    nicht vom langsamen WEBrick betrieben, sondern von performanten Lösungen
+    wie Unicorn (<uri
+    xlink:href="http://unicorn.bogomips.org/">http://unicorn.bogomips.org/</uri>),
+    Mongrel (<uri
+    xlink:href="http://de.wikipedia.org/wiki/Mongrel">http://de.wikipedia.org/wiki/Mongrel</uri>)
+    oder Thin (<uri
+    xlink:href="http://code.macournoyer.com/thin/">http://code.macournoyer.com/thin/</uri>).</para>
+
+    <para>Bei einem typischen PHP-Projekt reicht es den PHP-Code einfach in
+    ein bestimmtes Verzeichnis zu legen und in 9 von 10 Fällen kann der zur
+    Verfügung stehende Apache-Webserver bereits PHP Code automatisch
+    abarbeiten (das entsprechende Modul ist fast immer installiert). Bei Rails
+    sieht es leider anders aus. Die Hürden sind wesentlich höher und des
+    Aufwand größer. Es gibt eine grosse Menge an möglichen Kombinationen (z.B.
+    "Apache, lighttpd oder Nginx?" und "Unicon, Thin oder Mongrel?"). Es ist
+    unmöglich alle Varianten hier detailiert zu beschreiben. Ich habe mich für
+    meine Lieblingskombination von Nginx und Unicorn entschieden. Dies heißt
+    aber nicht, das andere Kombinationen schlechter sind. Es ist eine
+    subjektive Wahl.</para>
+
+    <section>
+      <title>Systembeschreibung</title>
+
+      <para>Wir setzen unseren Webserver auf einem Debian 6 System auf. Ruby
+      1.9.3 installieren wir per RVM mit dem neuen User <code>deployer</code>.
+      Die von uns benutze Rails-Applikation heißt <code>blog</code>.</para>
+
+      <important>
+        <para>Zum Durchführen dieser Installation benötigen Sie Root-Rechte
+        auf dem Webserver!</para>
+      </important>
+    </section>
+  </section>
+
+  <section>
+    <title>Installation</title>
+
+    <para>Bitte loggen Sie sich als <code>root</code> auf dem Webserver
+    ein.</para>
+
+    <para>Als erstes installieren wir ein paar Pakete die wir
+    brauchen.<screen>root@debian:~# <command>apt-get -y install build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion python</command>
+[...]
+root@debian:~# </screen></para>
+
+    <para>Jetzt installieren wir Node.js. Bitte gehen Sie dafür auf die
+    Homepage von Node.js (<uri
+    xlink:href="http://nodejs.org/">http://nodejs.org/</uri>) und suchen Sie
+    dort nach dem aktuellen stabilen Release.<screen>root@debian:~# <command>cd /usr/src</command>
+root@debian:/usr/src# <command>wget http://nodejs.org/dist/v0.8.1/node-v0.8.1.tar.gz</command>
+[...]
+root@debian:/usr/src# <command>tar xzf node-v0.8.1.tar.gz</command> 
+root@debian:/usr/src# <command>cd node-v0.8.1</command>
+root@debian:/usr/src/node-v0.8.1# <command>./configure</command> 
+[...]
+root@debian:/usr/src/node-v0.8.1# <command>make</command>
+[...]
+root@debian:/usr/src/node-v0.8.1# <command>make install</command>
+[...]
+root@debian:/usr/src/node-v0.8.1# <command>cd</command>
+[...]
+root@debian:~# </screen></para>
+
+    <para>Als nächstes installieren wir den Webserver nginx:<screen>root@debian:~# <command>curl http://nginx.org/keys/nginx_signing.key | apt-key add -</command>
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  1561  100  1561    0     0   3887      0 --:--:-- --:--:-- --:--:--  8819
+OK
+root@debian:~# <command>echo 'deb http://nginx.org/packages/debian/ squeeze nginx' &gt;&gt; /etc/apt/sources.list</command>
+root@debian:~# <command>echo 'deb-src http://nginx.org/packages/debian/ squeeze nginx' &gt;&gt; /etc/apt/sources.list</command>
+root@debian:~# <command>apt-get update</command>
+[...]
+root@debian:~# <command>apt-get -y install nginx</command>
+[...]
+root@debian:~# </screen></para>
+
+    <para>Wir erstellen einen neuen User mit dem Namen
+    <code>deployer</code>:<screen>root@debian:~# <command>adduser deployer</command>
+Lege Benutzer »deployer« an ...
+Lege neue Gruppe »deployer« (1002) an ...
+Lege neuen Benutzer »deployer« (1002) mit Gruppe »deployer« an ...
+Erstelle Home-Verzeichnis »/home/deployer« ...
+Kopiere Dateien aus »/etc/skel« ...
+Geben Sie ein neues UNIX-Passwort ein: 
+Geben Sie das neue UNIX-Passwort erneut ein: 
+passwd: Passwort erfolgreich geändert
+Benutzerinformationen für deployer werden geändert.
+Geben Sie einen neuen Wert an oder drücken Sie ENTER für den Standardwert
+ Vollständiger Name []: Deployer
+ Raumnummer []: 
+ Telefon geschäftlich []: 
+ Telefon privat []: 
+ Sonstiges []: 
+Sind die Informationen korrekt? [J/n] J
+root@debian:~#</screen></para>
+
+    <para>Jetzt legen wir ein Verzeichnis <filename>/var/www</filename> an und
+    setzten die Rechte dafür:<screen>root@debian:~# <command>mkdir -p /var/www</command>
+root@debian:~# <command>usermod -a -G www-data nginx</command>
+root@debian:~# <command>usermod -a -G www-data deployer</command>
+root@debian:~# <command>chgrp -R www-data /var/www</command>
+root@debian:~# <command>chmod -R 775 /var/www</command>
+root@debian:~#</screen></para>
+
+    <para>Für unser Rails-Projekt fügen wir eine neue Konfigurationdatei
+    <filename>/etc/nginx/conf.d/blog.conf</filename> mit folgendem Inhalt
+    hinzu:<programlisting>upstream unicorn {
+  server unix:/tmp/unicorn.blog.sock fail_timeout=0;
+}
+
+server {
+  listen 80 default deferred;
+  # server_name example.com;
+  root /var/www/blog/current/public;
+
+  location ^~ /assets/ {
+    gzip_static on;
+    expires max;
+    add_header Cache-Control public;
+  }
+
+  try_files $uri/index.html $uri @unicorn;
+  location @unicorn {
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_redirect off;
+    proxy_pass http://unicorn;
+  }
+
+  error_page 500 502 503 504 /500.html;
+  client_max_body_size 4G;
+  keepalive_timeout 10;
+}</programlisting></para>
+
+    <para>Die Default Konfigurationsdatei benennen wir um, damit sie nicht
+    mehr ausgeführt wird. Danach restarten wir nginx.<screen>root@debian:~# <command>mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.backup</command>
+root@debian:~# <command>/etc/init.d/nginx restart</command>
+Restarting nginx: nginx.
+root@debian:~# </screen></para>
+
+    <para>Bitte loggen Sie sich jetzt als User <code>deployer</code> ein und
+    führen die <xref linkend="rails3-install-debian" /> aufgeführten Schritte
+    zur Installation von Ruby 1.9.3 und Rails 3.2 per rvm aus.</para>
+
+    <section>
+      <title>Rails Projekt einspielen</title>
+
+      <para>Um diese Anleitung zu einfach wie möglich zu halten, erstellen wir
+      ein einfaches Blog auf dem Server.<screen>deployer@debian:~$ <command>rails new blog</command>
+[...]
+deployer@debian:~$ <command>cd blog</command>
+deployer@debian:~/blog$ <command>rails generate scaffold post subject content:text</command>
+[...]
+deployer@debian:~/blog$</screen></para>
+
+      <para>In diesem Rails-Projekt müssen wir den Webserver unicorn einbauen.
+      Das geht durch einbau der folgenden Zeile in der Datei
+      Gemfile:<programlisting>gem 'unicorn'</programlisting></para>
+
+      <para>Danach ein <command>bundle install</command> durchführen:<screen>deployer@debian:~/blog$ <command>bundle install</command>
+[...]
+deployer@debian:~/blog$ </screen></para>
+
+      <para>Für die Unicorn Konfiguration nehmen wir als Basis die Datei <uri
+      xlink:href="https://raw.github.com/defunkt/unicorn/master/examples/unicorn.conf.rb">https://raw.github.com/defunkt/unicorn/master/examples/unicorn.conf.rb</uri>
+      und speichern Sie an unseren Server angepasst wie folgt in der Datei
+      <filename>config/unicorn.rb</filename> ab:<programlisting># Use at least one worker per core if you're on a dedicated server,
+# more will usually help for _short_ waits on databases/caches.
+worker_processes 4
+
+# Since Unicorn is never exposed to outside clients, it does not need to
+# run on the standard HTTP port (80), there is no reason to start Unicorn
+# as root unless it's from system init scripts.
+# If running the master process as root and the workers as an unprivileged
+# user, do this to switch euid/egid in the workers (also chowns logs):
+# user "unprivileged_user", "unprivileged_group"
+
+# Help ensure your application will always spawn in the symlinked
+# "current" directory that Capistrano sets up.
+<emphasis>working_directory "/var/www/blog/current"</emphasis> # available in 0.94.0+
+
+# listen on both a Unix domain socket and a TCP port,
+# we use a shorter backlog for quicker failover when busy
+<emphasis>listen "/tmp/unicorn.blog.sock", :backlog =&gt; 64</emphasis>
+listen 8080, :tcp_nopush =&gt; true
+
+# nuke workers after 30 seconds instead of 60 seconds (the default)
+timeout 30
+
+# feel free to point this anywhere accessible on the filesystem
+<emphasis>pid "/var/tmp/unicorn.blog.pid"</emphasis>
+
+# By default, the Unicorn logger will write to stderr.
+# Additionally, ome applications/frameworks log to stderr or stdout,
+# so prevent them from going to /dev/null when daemonized here:
+<emphasis>stderr_path "/var/log/unicorn.blog.stderr.log"
+stdout_path "/var/log/unicorn.blog.stdout.log"</emphasis>
+
+# combine Ruby 2.0.0dev or REE with "preload_app true" for memory savings
+# http://rubyenterpriseedition.com/faq.html#adapt_apps_for_cow
+preload_app true
+GC.respond_to?(:copy_on_write_friendly=) and
+  GC.copy_on_write_friendly = true
+
+before_fork do |server, worker|
+  # the following is highly recomended for Rails + "preload_app true"
+  # as there's no need for the master process to hold a connection
+  defined?(ActiveRecord::Base) and
+    ActiveRecord::Base.connection.disconnect!
+
+  # The following is only recommended for memory/DB-constrained
+  # installations.  It is not needed if your system can house
+  # twice as many worker_processes as you have configured.
+  #
+  # # This allows a new master process to incrementally
+  # # phase out the old master process with SIGTTOU to avoid a
+  # # thundering herd (especially in the "preload_app false" case)
+  # # when doing a transparent upgrade.  The last worker spawned
+  # # will then kill off the old master process with a SIGQUIT.
+  # old_pid = "#{server.config[:pid]}.oldbin"
+  # if old_pid != server.pid
+  #   begin
+  #     sig = (worker.nr + 1) &gt;= server.worker_processes ? :QUIT : :TTOU
+  #     Process.kill(sig, File.read(old_pid).to_i)
+  #   rescue Errno::ENOENT, Errno::ESRCH
+  #   end
+  # end
+  #
+  # Throttle the master from forking too quickly by sleeping.  Due
+  # to the implementation of standard Unix signal handlers, this
+  # helps (but does not completely) prevent identical, repeated signals
+  # from being lost when the receiving process is busy.
+  # sleep 1
+end
+
+after_fork do |server, worker|
+  # per-process listener ports for debugging/admin/migrations
+  # addr = "127.0.0.1:#{9293 + worker.nr}"
+  # server.listen(addr, :tries =&gt; -1, :delay =&gt; 5, :tcp_nopush =&gt; true)
+
+  # the following is *required* for Rails + "preload_app true",
+  defined?(ActiveRecord::Base) and
+    ActiveRecord::Base.establish_connection
+
+  # if preload_app is true, then you may also want to check and
+  # restart any other shared sockets/descriptors such as Memcached,
+  # and Redis.  TokyoCabinet file handles are safe to reuse
+  # between any number of forked children (assuming your kernel
+  # correctly implements pread()/pwrite() system calls)
+end</programlisting></para>
+
+      <para>Jetzt müssen wir noch das aktuelle Verzeichnis der Applikation mit
+      dem Verzeichnis <filename>/var/www/blog/current</filename>
+      verlinken:<screen>deployer@debian:~$ <command>mkdir -p /var/www/blog</command>
+deployer@debian:~$ <command>ln -s /home/deployer/blog /var/www/blog/current</command>
+deployer@debian:~$</screen></para>
+
+      <para>Jetzt müssen wir uns wieder als User <code>root</code> einloggen
+      und das Init-Skript <filename>/etc/init.d/unicorn_blog</filename> mit
+      folgendem Inhalt erstellen:<programlisting>#! /bin/sh
+
+# File: /etc/init.d/unicorn
+
+### BEGIN INIT INFO
+# Provides:          unicorn
+# Required-Start:    $local_fs $remote_fs $network $syslog
+# Required-Stop:     $local_fs $remote_fs $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts the unicorn web server
+# Description:       starts unicorn
+### END INIT INFO
+
+DAEMON=/usr/bin/unicorn
+DAEMON_OPTS="-c /var/www/blog/current/config/unicorn.rb -D"
+NAME=unicorn
+DESC="Unicorn app for blog"
+PID=/var/tmp/unicorn.blog.pid
+
+case "$1" in
+  start)
+    echo -n "Starting $DESC: "
+    $DAEMON $DAEMON_OPTS
+    echo "$NAME."
+    ;;
+  stop)
+    echo -n "Stopping $DESC: "
+        kill -QUIT `cat $PID`
+    echo "$NAME."
+    ;;
+  restart)
+    echo -n "Restarting $DESC: "
+        kill -QUIT `cat $PID`
+    sleep 1
+    $DAEMON $DAEMON_OPTS
+    echo "$NAME."
+    ;;
+  reload)
+        echo -n "Reloading $DESC configuration: "
+        kill -HUP `cat $PID`
+        echo "$NAME."
+        ;;
+  *)
+    echo "Usage: $NAME {start|stop|restart|reload}" &gt;&amp;2
+    exit 1
+    ;;
+esac
+
+exit 0</programlisting></para>
+
+      <para>Das Init-Skript muss jetzt noch scharf geschaltet werden:<screen>root@debian:~# <command>chmod +x /etc/init.d/unicorn_blog</command> 
+root@debian:~# <command>update-rc.d -f unicorn_blog defaults</command>
+update-rc.d: using dependency based boot sequencing
+root@debian:~# </screen></para>
+
+      <para></para>
+
+      <para></para>
+
+      <para> Dazu loggen wir uns als User <code>deployer</code> ein und
+      erstellen im Verzeichnis <filename>/var/www/blog/current</filename> eine
+      neue Rails-Applikation mit dem Scaffold Post:</para>
+
+      <para></para>
+
+      <para></para>
+    </section>
+  </section>
+
+  <section>
+    <title>Einleitung</title>
+
+    <indexterm>
+      <primary>Deployment</primary>
+    </indexterm>
 
     <para>Bis jetzt haben wir immer in der Entwicklungsumgebung gearbeitet.
     Irgendwann kommt natürlich der Fall, das man die erstellte Rails-Anwendung
