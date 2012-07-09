@@ -192,6 +192,10 @@ root@debian:~# </screen></para>
 deployer@debian:~$ <command>cd blog</command>
 deployer@debian:~/blog$ <command>rails generate scaffold post subject content:text</command>
 [...]
+deployer@debian:~/blog$ <command>rake db:migrate RAILS_ENV=production</command>
+[...]
+deployer@debian:~/blog$ <command>rake assets:precompile</command>
+/home/deployer/.rvm/rubies/ruby-1.9.3-p194/bin/ruby /home/deployer/.rvm/gems/ruby-1.9.3-p194@global/bin/rake assets:precompile:all RAILS_ENV=production RAILS_GROUPS=assets
 deployer@debian:~/blog$</screen></para>
 
       <para>In diesem Rails-Projekt müssen wir den Webserver unicorn einbauen.
@@ -234,8 +238,8 @@ timeout 30
 # By default, the Unicorn logger will write to stderr.
 # Additionally, ome applications/frameworks log to stderr or stdout,
 # so prevent them from going to /dev/null when daemonized here:
-<emphasis>stderr_path "/var/log/unicorn.blog.stderr.log"
-stdout_path "/var/log/unicorn.blog.stdout.log"</emphasis>
+<emphasis>stderr_path "/var/www/blog/current/log/unicorn.blog.stderr.log"
+stdout_path "/var/www/blog/current/log/unicorn.blog.stdout.log"</emphasis>
 
 # combine Ruby 2.0.0dev or REE with "preload_app true" for memory savings
 # http://rubyenterpriseedition.com/faq.html#adapt_apps_for_cow
@@ -298,69 +302,87 @@ deployer@debian:~$</screen></para>
 
       <para>Jetzt müssen wir uns wieder als User <code>root</code> einloggen
       und das Init-Skript <filename>/etc/init.d/unicorn_blog</filename> mit
-      folgendem Inhalt erstellen:<programlisting>#! /bin/sh
+      folgendem Inhalt erstellen:<programlisting>#!/bin/sh
+set -e
 
-# File: /etc/init.d/unicorn
+# Feel free to change any of the following variables for your app:
+TIMEOUT=${TIMEOUT-60}
+APP_ROOT=/var/www/blog/current
+# PID=$APP_ROOT/tmp/pids/unicorn.pid
+PID=/var/run/unicorn.blog.pid
+CMD="cd $APP_ROOT; bundle exec unicorn -D -c $APP_ROOT/config/unicorn.rb -E production"
+AS_USER=deployer
+set -u
 
-### BEGIN INIT INFO
-# Provides:          unicorn
-# Required-Start:    $local_fs $remote_fs $network $syslog
-# Required-Stop:     $local_fs $remote_fs $network $syslog
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: starts the unicorn web server
-# Description:       starts unicorn
-### END INIT INFO
+OLD_PIN="$PID.oldbin"
 
-DAEMON=/usr/bin/unicorn
-DAEMON_OPTS="-c /var/www/blog/current/config/unicorn.rb -D"
-NAME=unicorn
-DESC="Unicorn app for blog"
-PID=/var/tmp/unicorn.blog.pid
+sig () {
+  test -s "$PID" &amp;&amp; kill -$1 `cat $PID`
+}
+
+oldsig () {
+  test -s $OLD_PIN &amp;&amp; kill -$1 `cat $OLD_PIN`
+}
+
+run () {
+  if [ "$(id -un)" = "$AS_USER" ]; then
+    eval $1
+  else
+    su -c "$1" - $AS_USER
+  fi
+}
 
 case "$1" in
-  start)
-    echo -n "Starting $DESC: "
-    $DAEMON $DAEMON_OPTS
-    echo "$NAME."
-    ;;
-  stop)
-    echo -n "Stopping $DESC: "
-        kill -QUIT `cat $PID`
-    echo "$NAME."
-    ;;
-  restart)
-    echo -n "Restarting $DESC: "
-        kill -QUIT `cat $PID`
-    sleep 1
-    $DAEMON $DAEMON_OPTS
-    echo "$NAME."
-    ;;
-  reload)
-        echo -n "Reloading $DESC configuration: "
-        kill -HUP `cat $PID`
-        echo "$NAME."
-        ;;
-  *)
-    echo "Usage: $NAME {start|stop|restart|reload}" &gt;&amp;2
-    exit 1
-    ;;
-esac
+start)
+  sig 0 &amp;&amp; echo &gt;&amp;2 "Already running" &amp;&amp; exit 0
+  run "$CMD"
+  ;;
+stop)
+  sig QUIT &amp;&amp; exit 0
+  echo &gt;&amp;2 "Not running"
+  ;;
+force-stop)
+  sig TERM &amp;&amp; exit 0
+  echo &gt;&amp;2 "Not running"
+  ;;
+restart|reload)
+  sig HUP &amp;&amp; echo reloaded OK &amp;&amp; exit 0
+  echo &gt;&amp;2 "Couldn't reload, starting '$CMD' instead"
+  run "$CMD"
+  ;;
+upgrade)
+  if sig USR2 &amp;&amp; sleep 2 &amp;&amp; sig 0 &amp;&amp; oldsig QUIT
+  then
+    n=$TIMEOUT
+    while test -s $OLD_PIN &amp;&amp; test $n -ge 0
+    do
+      printf '.' &amp;&amp; sleep 1 &amp;&amp; n=$(( $n - 1 ))
+    done
+    echo
 
-exit 0</programlisting></para>
+    if test $n -lt 0 &amp;&amp; test -s $OLD_PIN
+    then
+      echo &gt;&amp;2 "$OLD_PIN still exists after $TIMEOUT seconds"
+      exit 1
+    fi
+    exit 0
+  fi
+  echo &gt;&amp;2 "Couldn't upgrade, starting '$CMD' instead"
+  run "$CMD"
+  ;;
+reopen-logs)
+  sig USR1
+  ;;
+*)
+  echo &gt;&amp;2 "Usage: $0 &lt;start|stop|restart|upgrade|force-stop|reopen-logs&gt;"
+  exit 1
+  ;;
+esac</programlisting></para>
 
       <para>Das Init-Skript muss jetzt noch scharf geschaltet werden:<screen>root@debian:~# <command>chmod +x /etc/init.d/unicorn_blog</command> 
 root@debian:~# <command>update-rc.d -f unicorn_blog defaults</command>
 update-rc.d: using dependency based boot sequencing
 root@debian:~# </screen></para>
-
-      <para></para>
-
-      <para></para>
-
-      <para> Dazu loggen wir uns als User <code>deployer</code> ein und
-      erstellen im Verzeichnis <filename>/var/www/blog/current</filename> eine
-      neue Rails-Applikation mit dem Scaffold Post:</para>
 
       <para></para>
 
