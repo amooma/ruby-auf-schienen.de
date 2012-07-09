@@ -12,14 +12,9 @@
   <section>
     <title>Einleitung</title>
 
-    <warning>
-      <para>Dieses Howto ist noch nicht fertig! Bitte erst benutzen, wenn
-      diese Warnung nicht mehr angezeigt wird!</para>
-    </warning>
-
     <para>Im Rest des Buches arbeiten wir immer mit dem Entwicklungssystem.
-    Dazu starten wir Rails mit rails server. Schauen wir uns die Ausgabe noch
-    mal genau an:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rails server</command>
+    Dazu starten wir Rails mit <command>rails server</command>. Schauen wir
+    uns die Ausgabe noch mal genau an:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rails server</command>
 =&gt; Booting WEBrick
 =&gt; Rails 3.2.6 application starting in development on http://0.0.0.0:3000
 =&gt; Call with -d to detach
@@ -60,11 +55,12 @@
     subjektive Wahl.</para>
 
     <section>
-      <title>Systembeschreibung</title>
+      <title>Aufgabenstellung</title>
 
-      <para>Wir setzen unseren Webserver auf einem Debian 6 System auf. Ruby
-      1.9.3 installieren wir per RVM mit dem neuen User <code>deployer</code>.
-      Die von uns benutze Rails-Applikation heißt <code>blog</code>.</para>
+      <para>Wir setzen unseren Produktions-Webserver auf einem Debian 6 System
+      auf. Ruby 1.9.3 installieren wir per RVM mit dem neuen User
+      <code>deployer</code>. Die von uns benutze Rails-Applikation heißt
+      <code>blog</code>. Als Datenbank benutzen wir SQLite.</para>
 
       <important>
         <para>Zum Durchführen dieser Installation benötigen Sie Root-Rechte
@@ -179,15 +175,24 @@ root@debian:~# <command>/etc/init.d/nginx restart</command>
 Restarting nginx: nginx.
 root@debian:~# </screen></para>
 
-    <para>Bitte loggen Sie sich jetzt als User <code>deployer</code> ein und
-    führen die <xref linkend="rails3-install-debian" /> aufgeführten Schritte
-    zur Installation von Ruby 1.9.3 und Rails 3.2 per rvm aus.</para>
+    <para>Weiter geht es mit dem User deployer:<screen>root@debian:~# <command>su - deployer</command>
+deployer@debian:~$ </screen></para>
 
     <section>
-      <title>Rails Projekt einspielen</title>
+      <title>Das Rails-Projekt</title>
+
+      <important>
+        <para>Bitte führen Sie <emphasis>jetzt</emphasis> als User
+        <code>deployer</code> die in <xref linkend="rails3-install-debian" />
+        aufgeführten Schritte zur Installation von Ruby 1.9.3 und Rails 3.2
+        per rvm aus.</para>
+      </important>
 
       <para>Um diese Anleitung zu einfach wie möglich zu halten, erstellen wir
-      ein einfaches Blog auf dem Server.<screen>deployer@debian:~$ <command>rails new blog</command>
+      ein einfaches Blog auf dem Server. Das entsprechende Rails-Projekt
+      können Sie natürlich auch schon fertig vorbereiten und dann per scp oder
+      rsync auf den Server spielen. Bitte achten Sie dann aber auf die
+      richtigen Verzeichnisse.<screen>deployer@debian:~$ <command>rails new blog</command>
 [...]
 deployer@debian:~$ <command>cd blog</command>
 deployer@debian:~/blog$ <command>rails generate scaffold post subject content:text</command>
@@ -198,13 +203,27 @@ deployer@debian:~/blog$ <command>rake assets:precompile</command>
 /home/deployer/.rvm/rubies/ruby-1.9.3-p194/bin/ruby /home/deployer/.rvm/gems/ruby-1.9.3-p194@global/bin/rake assets:precompile:all RAILS_ENV=production RAILS_GROUPS=assets
 deployer@debian:~/blog$</screen></para>
 
-      <para>In diesem Rails-Projekt müssen wir den Webserver unicorn einbauen.
-      Das geht durch einbau der folgenden Zeile in der Datei
-      Gemfile:<programlisting>gem 'unicorn'</programlisting></para>
+      <important>
+        <para>Bitte beachten Sie das <command>rake db:migrate</command> mit
+        einem <command>RAILS_ENV=production</command> abgeschlossen wird. Nur
+        so wird die Produktionsdatenbank migriert. <command>rake
+        assets:precompile</command> stellt sicher, das alle in der Asset
+        Pipeline vorhandenen Assets für die Produktionsumgebung bereit
+        gestellt werden (siehe <xref linkend="asset_pipeline" />).</para>
+      </important>
+
+      <para>In diesem Rails-Projekt müssen wir den Webserver Unicorn einbauen.
+      Das geht durch hinzufügen der folgenden Zeile in der Datei
+      <filename>Gemfile</filename>:<programlisting>gem 'unicorn'</programlisting></para>
 
       <para>Danach ein <command>bundle install</command> durchführen:<screen>deployer@debian:~/blog$ <command>bundle install</command>
 [...]
 deployer@debian:~/blog$ </screen></para>
+
+      <para>Um Unicorn mit der RVM Umgebung aus einen Init.d Skript starten zu
+      können, müssen wir jetzt noch einen entsprechenden Wrapper
+      generieren:<screen>deployer@debian:~/blog$ <command>rvm wrapper 1.9.3 bootup unicorn</command>
+deployer@debian:~/blog$</screen></para>
 
       <para>Für die Unicorn Konfiguration nehmen wir als Basis die Datei <uri
       xlink:href="https://raw.github.com/defunkt/unicorn/master/examples/unicorn.conf.rb">https://raw.github.com/defunkt/unicorn/master/examples/unicorn.conf.rb</uri>
@@ -218,7 +237,7 @@ worker_processes 4
 # as root unless it's from system init scripts.
 # If running the master process as root and the workers as an unprivileged
 # user, do this to switch euid/egid in the workers (also chowns logs):
-# user "unprivileged_user", "unprivileged_group"
+user "deployer", "www-data"
 
 # Help ensure your application will always spawn in the symlinked
 # "current" directory that Capistrano sets up.
@@ -233,7 +252,7 @@ listen 8080, :tcp_nopush =&gt; true
 timeout 30
 
 # feel free to point this anywhere accessible on the filesystem
-<emphasis>pid "/var/tmp/unicorn.blog.pid"</emphasis>
+<emphasis>pid "/tmp/unicorn.blog.pid"</emphasis>
 
 # By default, the Unicorn logger will write to stderr.
 # Additionally, ome applications/frameworks log to stderr or stdout,
@@ -252,30 +271,6 @@ before_fork do |server, worker|
   # as there's no need for the master process to hold a connection
   defined?(ActiveRecord::Base) and
     ActiveRecord::Base.connection.disconnect!
-
-  # The following is only recommended for memory/DB-constrained
-  # installations.  It is not needed if your system can house
-  # twice as many worker_processes as you have configured.
-  #
-  # # This allows a new master process to incrementally
-  # # phase out the old master process with SIGTTOU to avoid a
-  # # thundering herd (especially in the "preload_app false" case)
-  # # when doing a transparent upgrade.  The last worker spawned
-  # # will then kill off the old master process with a SIGQUIT.
-  # old_pid = "#{server.config[:pid]}.oldbin"
-  # if old_pid != server.pid
-  #   begin
-  #     sig = (worker.nr + 1) &gt;= server.worker_processes ? :QUIT : :TTOU
-  #     Process.kill(sig, File.read(old_pid).to_i)
-  #   rescue Errno::ENOENT, Errno::ESRCH
-  #   end
-  # end
-  #
-  # Throttle the master from forking too quickly by sleeping.  Due
-  # to the implementation of standard Unix signal handlers, this
-  # helps (but does not completely) prevent identical, repeated signals
-  # from being lost when the receiving process is busy.
-  # sleep 1
 end
 
 after_fork do |server, worker|
@@ -286,12 +281,6 @@ after_fork do |server, worker|
   # the following is *required* for Rails + "preload_app true",
   defined?(ActiveRecord::Base) and
     ActiveRecord::Base.establish_connection
-
-  # if preload_app is true, then you may also want to check and
-  # restart any other shared sockets/descriptors such as Memcached,
-  # and Redis.  TokyoCabinet file handles are safe to reuse
-  # between any number of forked children (assuming your kernel
-  # correctly implements pread()/pwrite() system calls)
 end</programlisting></para>
 
       <para>Jetzt müssen wir noch das aktuelle Verzeichnis der Applikation mit
@@ -300,86 +289,165 @@ end</programlisting></para>
 deployer@debian:~$ <command>ln -s /home/deployer/blog /var/www/blog/current</command>
 deployer@debian:~$</screen></para>
 
-      <para>Jetzt müssen wir uns wieder als User <code>root</code> einloggen
-      und das Init-Skript <filename>/etc/init.d/unicorn_blog</filename> mit
-      folgendem Inhalt erstellen:<programlisting>#!/bin/sh
-set -e
+      <para>Jetzt müssen Sie als User <code>root</code>
+      weiterarbeiten:<screen>deployer@debian:~$ <command>exit</command>
+Abgemeldet
+root@debian:~# </screen></para>
 
-# Feel free to change any of the following variables for your app:
-TIMEOUT=${TIMEOUT-60}
-APP_ROOT=/var/www/blog/current
-# PID=$APP_ROOT/tmp/pids/unicorn.pid
-PID=/var/run/unicorn.blog.pid
-CMD="cd $APP_ROOT; bundle exec unicorn -D -c $APP_ROOT/config/unicorn.rb -E production"
-AS_USER=deployer
-set -u
+      <para>Das Init-Skript <filename>/etc/init.d/unicorn_blog</filename> mit
+      folgendem Inhalt erstellen:<programlisting>#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          unicorn 
+# Required-Start:    $local_fs $remote_fs $network $syslog
+# Required-Stop:     $local_fs $remote_fs $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts unicorn blog
+# Description:       starts the unicorn webserver for the blog
+### END INIT INFO
 
-OLD_PIN="$PID.oldbin"
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC="Unicorn for /var/www/blog"
+NAME=unicorn_blog
+DAEMON=/home/deployer/.rvm/bin/bootup_unicorn
+DAEMON_ARGS="-D -c /var/www/blog/current/config/unicorn.rb -E production"
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
 
-sig () {
-  test -s "$PID" &amp;&amp; kill -$1 `cat $PID`
+# Exit if the package is not installed
+[ -x "$DAEMON" ] || exit 0
+
+# Read configuration variable file if it is present
+[ -r /etc/default/$NAME ] &amp;&amp; . /etc/default/$NAME
+
+# Load the VERBOSE setting and other rcS variables
+. /lib/init/vars.sh
+
+# Define LSB log_* functions.
+# Depend on lsb-base (&gt;= 3.2-14) to ensure that this file is present
+# and status_of_proc is working.
+. /lib/lsb/init-functions
+
+#
+# Function that starts the daemon/service
+#
+do_start()
+{
+  # Return
+  #   0 if daemon has been started
+  #   1 if daemon was already running
+  #   2 if daemon could not be started
+  start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test &gt; /dev/null \
+    || return 1
+  start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- \
+    $DAEMON_ARGS \
+    || return 2
+  # Add code here, if necessary, that waits for the process to be ready
+  # to handle requests from services started subsequently which depend
+  # on this one.  As a last resort, sleep for some time.
 }
 
-oldsig () {
-  test -s $OLD_PIN &amp;&amp; kill -$1 `cat $OLD_PIN`
+#
+# Function that stops the daemon/service
+#
+do_stop()
+{
+  # Return
+  #   0 if daemon has been stopped
+  #   1 if daemon was already stopped
+  #   2 if daemon could not be stopped
+  #   other if a failure occurred
+  start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
+  RETVAL="$?"
+  [ "$RETVAL" = 2 ] &amp;&amp; return 2
+  # Wait for children to finish too if this is a daemon that forks
+  # and if the daemon is only ever run from this initscript.
+  # If the above conditions are not satisfied then add some other code
+  # that waits for the process to drop all resources that could be
+  # needed by services started subsequently.  A last resort is to
+  # sleep for some time.
+  start-stop-daemon --stop --quiet --oknodo --retry=0/30/KILL/5 --exec $DAEMON
+  [ "$?" = 2 ] &amp;&amp; return 2
+  # Many daemons don't delete their pidfiles when they exit.
+  rm -f $PIDFILE
+  return "$RETVAL"
 }
 
-run () {
-  if [ "$(id -un)" = "$AS_USER" ]; then
-    eval $1
-  else
-    su -c "$1" - $AS_USER
-  fi
+#
+# Function that sends a SIGHUP to the daemon/service
+#
+do_reload() {
+  #
+  # If the daemon can reload its configuration without
+  # restarting (for example, when it is sent a SIGHUP),
+  # then implement that here.
+  #
+  start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --name $NAME
+  return 0
 }
 
 case "$1" in
-start)
-  sig 0 &amp;&amp; echo &gt;&amp;2 "Already running" &amp;&amp; exit 0
-  run "$CMD"
+  start)
+  [ "$VERBOSE" != no ] &amp;&amp; log_daemon_msg "Starting $DESC" "$NAME"
+  do_start
+  case "$?" in
+    0|1) [ "$VERBOSE" != no ] &amp;&amp; log_end_msg 0 ;;
+    2) [ "$VERBOSE" != no ] &amp;&amp; log_end_msg 1 ;;
+  esac
   ;;
-stop)
-  sig QUIT &amp;&amp; exit 0
-  echo &gt;&amp;2 "Not running"
+  stop)
+  [ "$VERBOSE" != no ] &amp;&amp; log_daemon_msg "Stopping $DESC" "$NAME"
+  do_stop
+  case "$?" in
+    0|1) [ "$VERBOSE" != no ] &amp;&amp; log_end_msg 0 ;;
+    2) [ "$VERBOSE" != no ] &amp;&amp; log_end_msg 1 ;;
+  esac
   ;;
-force-stop)
-  sig TERM &amp;&amp; exit 0
-  echo &gt;&amp;2 "Not running"
+  status)
+       status_of_proc "$DAEMON" "$NAME" &amp;&amp; exit 0 || exit $?
+       ;;
+  #reload|force-reload)
+  #
+  # If do_reload() is not implemented then leave this commented out
+  # and leave 'force-reload' as an alias for 'restart'.
+  #
+  #log_daemon_msg "Reloading $DESC" "$NAME"
+  #do_reload
+  #log_end_msg $?
+  #;;
+  restart|force-reload)
+  #
+  # If the "reload" option is implemented then remove the
+  # 'force-reload' alias
+  #
+  log_daemon_msg "Restarting $DESC" "$NAME"
+  do_stop
+  case "$?" in
+    0|1)
+    do_start
+    case "$?" in
+      0) log_end_msg 0 ;;
+      1) log_end_msg 1 ;; # Old process is still running
+      *) log_end_msg 1 ;; # Failed to start
+    esac
+    ;;
+    *)
+      # Failed to stop
+    log_end_msg 1
+    ;;
+  esac
   ;;
-restart|reload)
-  sig HUP &amp;&amp; echo reloaded OK &amp;&amp; exit 0
-  echo &gt;&amp;2 "Couldn't reload, starting '$CMD' instead"
-  run "$CMD"
+  *)
+  #echo "Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload}" &gt;&amp;2
+  echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" &gt;&amp;2
+  exit 3
   ;;
-upgrade)
-  if sig USR2 &amp;&amp; sleep 2 &amp;&amp; sig 0 &amp;&amp; oldsig QUIT
-  then
-    n=$TIMEOUT
-    while test -s $OLD_PIN &amp;&amp; test $n -ge 0
-    do
-      printf '.' &amp;&amp; sleep 1 &amp;&amp; n=$(( $n - 1 ))
-    done
-    echo
+esac
 
-    if test $n -lt 0 &amp;&amp; test -s $OLD_PIN
-    then
-      echo &gt;&amp;2 "$OLD_PIN still exists after $TIMEOUT seconds"
-      exit 1
-    fi
-    exit 0
-  fi
-  echo &gt;&amp;2 "Couldn't upgrade, starting '$CMD' instead"
-  run "$CMD"
-  ;;
-reopen-logs)
-  sig USR1
-  ;;
-*)
-  echo &gt;&amp;2 "Usage: $0 &lt;start|stop|restart|upgrade|force-stop|reopen-logs&gt;"
-  exit 1
-  ;;
-esac</programlisting></para>
+:</programlisting></para>
 
-      <para>Das Init-Skript muss jetzt noch scharf geschaltet werden:<screen>root@debian:~# <command>chmod +x /etc/init.d/unicorn_blog</command> 
+      <para>Das Init-Skript muss jetzt noch scharf geschaltet und Unicorn
+      gestartet werden:<screen>root@debian:~# <command>chmod +x /etc/init.d/unicorn_blog</command> 
 root@debian:~# <command>update-rc.d -f unicorn_blog defaults</command>
 update-rc.d: using dependency based boot sequencing
 root@debian:~# <command>/etc/init.d/unicorn_blog start</command>
