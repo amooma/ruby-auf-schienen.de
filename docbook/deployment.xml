@@ -423,13 +423,16 @@ Query OK, 0 rows affected (0.00 sec)
 mysql&gt; <command>GRANT ALL PRIVILEGES ON blog.* TO deployer@localhost;</command>
 Query OK, 0 rows affected (0.00 sec)
 
-mysql&gt; <command>exit</command>
+mysql&gt; <command>exit</command>;
 Bye
 deployer@debian:~$</screen></para>
     </section>
 
     <section xml:id="production_webserver_mysql_gem">
       <title xml:id="production_webserver_mysql_gem.title">MySQL Gem</title>
+
+      <para>Zum User <code>deployer</code> wechseln:<screen>root@debian:~# <command>su - deployer</command>
+deployer@debian:~$ </screen></para>
 
       <para>In der Gemfile Datei müssen Sie noch folgenden Eintrag
       hinzufügen:<programlisting>group :production do
@@ -487,6 +490,8 @@ test:
       <code>production</code> Umgebung aus:<screen>deployer@debian:~$ <command>cd blog</command>
 deployer@debian:~/blog$ <command>rake db:migrate RAILS_ENV=production</command>
 [...]
+deployer@debian:~/blog$ <command>exit</command>
+[...]
 deployer@debian:~/blog$</screen></para>
     </section>
 
@@ -494,9 +499,13 @@ deployer@debian:~/blog$</screen></para>
       <title xml:id="production_webserver_unicorn_restart.title">Unicorn
       Neustart</title>
 
-      <para>Zum Schluss müssen wir Unicorn einmal neu starten.<screen>root@debian:~# <command>/etc/init.d/unicorn_blog restart</command>
+      <para>Zum Schluss müssen wir als <code>root</code> Unicorn neu
+      starten.<screen>root@debian:~# <command>/etc/init.d/unicorn_blog restart</command>
 Starting unicorn...
 root@debian:~#</screen></para>
+
+      <para>Jetzt läuft Ihre Produktionsumgebung mit einer
+      MySQL-Datenbank.</para>
     </section>
   </section>
 
