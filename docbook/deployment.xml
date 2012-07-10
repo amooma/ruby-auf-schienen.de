@@ -127,10 +127,11 @@ root@debian:~# </screen></para>
     <section xml:id="production_webserver_nodejs">
       <title xml:id="production_webserver_nodejs.title">Node.js</title>
 
-      <para>Jetzt installieren wir Node.js. Bitte gehen Sie dafür auf die
-      Homepage von Node.js (<uri
-      xlink:href="http://nodejs.org/">http://nodejs.org/</uri>) und suchen Sie
-      dort nach dem aktuellen stabilen Release.<screen>root@debian:~# <command>cd /usr/src</command>
+      <para>Zum optimalen Einsatz der Asset Pipeline installieren wir Node.js.
+      Bitte gehen Sie dafür auf die Homepage von Node.js (<uri
+      xlink:href="http://nodejs.org/">http://nodejs.org/</uri>), suchen Sie
+      dort nach dem aktuellen stabilen Release und passen Sie die hier
+      angegebenen Kommandos entsprechend an.<screen>root@debian:~# <command>cd /usr/src</command>
 root@debian:/usr/src# <command>wget http://nodejs.org/dist/v0.8.1/node-v0.8.1.tar.gz</command>
 [...]
 root@debian:/usr/src# <command>tar xzf node-v0.8.1.tar.gz</command> 
@@ -149,7 +150,10 @@ root@debian:~# </screen></para>
     <section xml:id="production_webserver_nginx">
       <title xml:id="production_webserver_nginx.title">nginx</title>
 
-      <para>Als nächstes installieren wir den Webserver nginx:<screen>root@debian:~# <command>curl http://nginx.org/keys/nginx_signing.key | apt-key add -</command>
+      <para>Nginx wird unser Webserver zur Aussenwelt. Er fungiert als Proxy
+      und Loadbalancer. Da in der Debian-Distribution eine recht alte
+      Nginx-Version vertrieben wird, installieren wir die von Nginx direkt
+      vertriebenen Pakete hinzu.<screen>root@debian:~# <command>curl http://nginx.org/keys/nginx_signing.key | apt-key add -</command>
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100  1561  100  1561    0     0   3887      0 --:--:-- --:--:-- --:--:--  8819
@@ -167,8 +171,9 @@ root@debian:~# </screen></para>
       <title xml:id="production_webserver_user_deployer.title">User
       Deployer</title>
 
-      <para>Wir erstellen einen neuen User mit dem Namen
-      <code>deployer</code>:<screen>root@debian:~# <command>adduser deployer</command>
+      <para>Unser Rails-Projekt wird innerhalb eines mit RVM im User-Space
+      installierten Ruby und Rails laufen. Dafür erstellen wir einen neuen
+      User mit dem Namen <code>deployer</code>:<screen>root@debian:~# <command>adduser deployer</command>
 Lege Benutzer »deployer« an ...
 Lege neue Gruppe »deployer« (1002) an ...
 Lege neuen Benutzer »deployer« (1002) mit Gruppe »deployer« an ...
@@ -252,7 +257,7 @@ deployer@debian:~$ </screen></para>
       <para>Bitte führen Sie als User <code>deployer</code> die in <xref
       linkend="rails3-install-debian" /> aufgeführten Schritte zur
       Installation von Ruby 1.9.3 und Rails 3.2 per rvm aus. Hier ist die
-      Kurzversion:<screen>deployer@debian:~$ <command>curl -L https://get.rvm.io | bash -s stable &amp;&amp; source ~/.rvm/scripts/'rvm' &amp;&amp; rvm install 1.9.3 &amp;&amp; gem install rails</command>
+      Ein-Zeilen-Cut-and-Paste-Kurzversion:<screen>deployer@debian:~$ <command>curl -L https://get.rvm.io | bash -s stable &amp;&amp; source ~/.rvm/scripts/'rvm' &amp;&amp; rvm install 1.9.3 &amp;&amp; gem install rails</command>
 [...]
 deployer@debian:~$</screen></para>
     </section>
