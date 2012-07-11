@@ -7,8 +7,8 @@
          xmlns:m="http://www.w3.org/1998/Math/MathML"
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
-  <title xml:id="rails_production_webserver.title">Rails
-  Production-Webserver</title>
+  <title xml:id="rails_production_webserver.title">Webserver im
+  Produktionsbetrieb</title>
 
   <indexterm>
     <primary>Webserver</primary>
@@ -53,9 +53,11 @@
     wie Unicorn (<uri
     xlink:href="http://unicorn.bogomips.org/">http://unicorn.bogomips.org/</uri>),
     Mongrel (<uri
-    xlink:href="http://de.wikipedia.org/wiki/Mongrel">http://de.wikipedia.org/wiki/Mongrel</uri>)
-    oder Thin (<uri
-    xlink:href="http://code.macournoyer.com/thin/">http://code.macournoyer.com/thin/</uri>).</para>
+    xlink:href="http://de.wikipedia.org/wiki/Mongrel">http://de.wikipedia.org/wiki/Mongrel</uri>),
+    Thin (<uri
+    xlink:href="http://code.macournoyer.com/thin/">http://code.macournoyer.com/thin/</uri>)
+    oder Puma (<uri
+    xlink:href="http://puma.io/">http://puma.io/</uri>).</para>
 
     <para>Bei einem typischen PHP-Projekt reicht es den PHP-Code einfach in
     ein bestimmtes Verzeichnis zu legen und in 9 von 10 Fällen kann der zur
@@ -63,11 +65,11 @@
     abarbeiten (das entsprechende Modul ist fast immer installiert). Bei Rails
     sieht es leider anders aus. Die Hürden sind wesentlich höher und des
     Aufwand größer. Es gibt eine grosse Menge an möglichen Kombinationen (z.B.
-    "Apache, lighttpd oder Nginx?" und "Unicorn, Thin oder Mongrel?"). Es ist
-    unmöglich alle Varianten hier detailiert zu beschreiben. Ich habe mich für
-    meine Lieblingskombination von Nginx und Unicorn entschieden. Dies heißt
-    aber nicht, das andere Kombinationen schlechter sind. Es ist eine
-    subjektive Wahl.</para>
+    "Apache, lighttpd oder Nginx?" und "Unicorn, Thin, Puma oder Mongrel?").
+    Es ist unmöglich alle Varianten hier detailiert zu beschreiben. Ich habe
+    mich für meine Lieblingskombination von Nginx und Unicorn entschieden.
+    Dies heißt aber nicht, das andere Kombinationen schlechter sind. Es ist
+    eine subjektive Wahl.</para>
 
     <section xml:id="production_webserver_debian6">
       <title xml:id="production_webserver_debian6.title">Debian 6</title>
@@ -98,15 +100,17 @@
     </section>
   </section>
 
-  <section>
-    <title>Vorbereitung auf dem Webserver</title>
+  <section xml:id="deployment_grundinstallation_webserver">
+    <title
+    xml:id="deployment_grundinstallation_webserver.title">Grundinstallation
+    Webserver</title>
 
     <para>Bitte loggen Sie sich als <code>root</code> auf dem Webserver
     ein.</para>
 
-    <section xml:id="production_webserver_buildsystem">
+    <section xml:id="deployment_grundinstallation_webserver_buildsystem">
       <title
-      xml:id="production_webserver_buildsystem.title">Buildsystem</title>
+      xml:id="deployment_grundinstallation_webserver_buildsystem.title">Buildsystem</title>
 
       <para>Als erstes installieren wir ein paar Pakete die wir
       brauchen.<screen>root@debian:~# <command>apt-get -y install build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion python</command>
@@ -114,8 +118,9 @@
 root@debian:~# </screen></para>
     </section>
 
-    <section xml:id="production_webserver_nodejs">
-      <title xml:id="production_webserver_nodejs.title">Node.js</title>
+    <section xml:id="deployment_grundinstallation_webserver_nodejs">
+      <title
+      xml:id="deployment_grundinstallation_webserver_nodejs.title">Node.js</title>
 
       <para>Zum optimalen Einsatz der Asset Pipeline installieren wir Node.js.
       Bitte gehen Sie dafür auf die Homepage von Node.js (<uri
@@ -137,8 +142,9 @@ root@debian:/usr/src/node-v0.8.1# <command>cd</command>
 root@debian:~# </screen></para>
     </section>
 
-    <section xml:id="production_webserver_nginx">
-      <title xml:id="production_webserver_nginx.title">nginx</title>
+    <section xml:id="deployment_grundinstallation_webserver_nginx">
+      <title
+      xml:id="deployment_grundinstallation_webserver_nginx.title">nginx</title>
 
       <para>Nginx wird unser Webserver zur Aussenwelt. Er fungiert als Proxy
       und Loadbalancer. Da in der Debian-Distribution eine recht alte
@@ -157,9 +163,10 @@ root@debian:~# <command>apt-get -y install nginx</command>
 root@debian:~# </screen></para>
     </section>
 
-    <section xml:id="production_webserver_user_deployer">
-      <title xml:id="production_webserver_user_deployer.title">User
-      Deployer</title>
+    <section xml:id="deployment_grundinstallation_webserver_deployer_anlegen">
+      <title
+      xml:id="deployment_grundinstallation_webserver_deployer_anlegen.title">User
+      Deployer anlegen</title>
 
       <para>Unser Rails-Projekt wird innerhalb eines mit RVM im User-Space
       installierten Ruby und Rails laufen. Dafür erstellen wir einen neuen
@@ -183,9 +190,10 @@ Sind die Informationen korrekt? [J/n] J
 root@debian:~#</screen></para>
     </section>
 
-    <section xml:id="production_webserver_verzeichnisstruktur">
+    <section xml:id="deployment_grundinstallation_webserver_verzeichnisstruktur_anlegen">
       <title
-      xml:id="production_webserver_verzeichnisstruktur.title">Verzeichnisstruktur</title>
+      xml:id="deployment_grundinstallation_webserver_verzeichnisstruktur_anlegen.title">Verzeichnisstruktur
+      anlegen</title>
 
       <para>Jetzt legen wir ein Verzeichnis <filename>/var/www</filename> an
       und setzten die Rechte dafür:<screen>root@debian:~# <command>mkdir -p /var/www</command>
@@ -196,8 +204,9 @@ root@debian:~# <command>chmod -R 775 /var/www</command>
 root@debian:~#</screen></para>
     </section>
 
-    <section xml:id="production_webserver_rails_umgebung">
-      <title xml:id="production_webserver_rails_umgebung.title">Rails-Umgebung
+    <section xml:id="deployment_grundinstallation_webserver_rails_umgebung_deployer">
+      <title
+      xml:id="deployment_grundinstallation_webserver_rails_umgebung_deployer.title">Rails-Umgebung
       für den User Deployer aufsetzen</title>
 
       <para>Weiter geht es mit dem User <code>deployer</code>:<screen>root@debian:~# <command>su - deployer</command>
@@ -219,8 +228,9 @@ deployer@debian:~$ <command>exit</command>
 root@debian:~$</screen></para>
     </section>
 
-    <section xml:id="production_webserver_datenbank">
-      <title xml:id="production_webserver_datenbank.title">Datenbank</title>
+    <section xml:id="deployment_grundinstallation_webserver_datenbank">
+      <title
+      xml:id="deployment_grundinstallation_webserver_datenbank.title">Datenbank</title>
 
       <para>In <xref linkend="production_webserver_installation" />
       installieren wir ein System mit einer SQlite Datenbank. Meistens will
@@ -229,8 +239,9 @@ root@debian:~$</screen></para>
       auf diesem System installieren kann und welche Anpassungen man im
       Rails-Projekt vornehmen muss.</para>
 
-      <section xml:id="production_webserver_mysql_installation">
-        <title xml:id="production_webserver_mysql_installation.title">MySQL
+      <section xml:id="deployment_grundinstallation_webserver_mysql_installation">
+        <title
+        xml:id="deployment_grundinstallation_webserver_mysql_installation.title">MySQL
         Installation</title>
 
         <para>Als nächstes installieren wir die Datenbank MySQL. Dabei werden
@@ -241,8 +252,9 @@ root@debian:~$</screen></para>
 root@debian:~# </screen></para>
       </section>
 
-      <section xml:id="production_webserver_datenbank_anlegen">
-        <title xml:id="production_webserver_datenbank_anlegen.title">Datenbank
+      <section xml:id="deployment_grundinstallation_webserver_create_database">
+        <title
+        xml:id="deployment_grundinstallation_webserver_create_database.title">Datenbank
         mit Rechten anlegen</title>
 
         <para>In der MySQL-Datenbank müssen wir die Datenbank
@@ -276,8 +288,9 @@ deployer@debian:~$</screen></para>
       </section>
     </section>
 
-    <section xml:id="production_webserver_memcached">
-      <title xml:id="production_webserver_memcached.title">Memcache
+    <section xml:id="deployment_grundinstallation_webserver_memcached">
+      <title
+      xml:id="deployment_grundinstallation_webserver_memcached.title">Memcache
       installieren</title>
 
       <para>Wer mit einem Cache-Server arbeitet (was sehr zu empfehlen ist),
@@ -290,9 +303,9 @@ root@debian:~#</screen></para>
     </section>
   </section>
 
-  <section xml:id="production_webserver_installation">
-    <title xml:id="production_webserver_installation.title">Installation
-    einfacher Webserver</title>
+  <section xml:id="webserver_ohne_deployment">
+    <title xml:id="webserver_ohne_deployment.title">Webserver ohne
+    Deployment</title>
 
     <para>Bitte loggen Sie sich als <code>root</code> auf dem Webserver
     ein.</para>
@@ -304,9 +317,9 @@ root@debian:~#</screen></para>
       Skripten mit dem jeweiligen Projektnamen ersetzt werden muss.</para>
     </warning>
 
-    <section xml:id="production_webserver_neues_rails_projekt_aufsetzen">
+    <section xml:id="webserver_ohne_deployment_neues_rails_projekt">
       <title
-      xml:id="production_webserver_neues_rails_projekt_aufsetzen.title">Neues
+      xml:id="webserver_ohne_deployment_neues_rails_projekt.title">Neues
       Rails-Projekt aufsetzen</title>
 
       <para>Um diese Anleitung zu einfach wie möglich zu halten, erstellen wir
@@ -591,71 +604,31 @@ root@debian:~#</screen></para>
       </section>
     </section>
 
-    <section>
-      <title>Neue Version des Rails-Projektes einspielen</title>
+    <section xml:id="webserver_ohne_deployment_neues_version_des_rails_projekts_einspielen">
+      <title
+      xml:id="webserver_ohne_deployment_neues_version_des_rails_projekts_einspielen.title">Neue
+      Version des Rails-Projektes einspielen</title>
+
+      <para>Wie die Überschrift schon sagt, haben wir bei dieser Variante
+      keine automatische Deployment-Mechanismen zur Verfügung. Diese können
+      Sie sich aber leicht selbst per Skript realisieren.</para>
 
       <para>Wenn Sie Veränderungen am Rails-Projekt aktivieren wollen, so
-      müssen Sie nach einem Update des Codes Unicorn neu starten:<screen>root@debian:~# <command>/etc/init.d/unicorn_blog restart</command>
+      müssen Sie als User <code>deployer</code> nach einem Update des Codes
+      mit <command>rake assets:precompile</command> sicher stellen, das alle
+      in der Asset Pipeline vorhandenen Assets für die Produktionsumgebung
+      wieder bereit gestellt werden (siehe <xref
+      linkend="asset_pipeline" />).<screen>deployer@debian:~/blog$ <command>rake assets:precompile</command>
+/home/deployer/.rvm/rubies/ruby-1.9.3-p194/bin/ruby /home/deployer/.rvm/gems/ruby-1.9.3-p194@global/bin/rake assets:precompile:all RAILS_ENV=production RAILS_GROUPS=assets
+deployer@debian:~/blog$</screen>Danach müssen Sie als User <code>root</code>
+      Unicorn neu starten:<screen>root@debian:~# <command>/etc/init.d/unicorn_blog restart</command>
 root@debian:~# </screen></para>
-    </section>
-
-    <section xml:id="production_webserver_was_noch_zu_tun_ist">
-      <title xml:id="production_webserver_was_noch_zu_tun_ist.title">Was noch
-      zu tun ist.</title>
-
-      <para>Bitte denken Sie immer an folgende Punkte, die jeder Admin für
-      sich selbst entscheiden und umsetzen muss:<itemizedlist>
-          <listitem>
-            <para>Automatisches und regelmässiges Backup der Datenbank und des
-            Rails-Projektes.</para>
-          </listitem>
-
-          <listitem>
-            <para>Logrotate der Logdateien einrichten.</para>
-          </listitem>
-
-          <listitem>
-            <para>Monitor für Systemlast und Festplattenplatz
-            einrichten.</para>
-          </listitem>
-
-          <listitem>
-            <para>Regelmässig Debian Sicherheitsupdates einspielen, so bald
-            diese verfügbar sind.</para>
-          </listitem>
-        </itemizedlist></para>
-
-      <section xml:id="production_webserver_404">
-        <title xml:id="production_webserver.title">404 und Co.</title>
-
-        <para>Schauen Sie zum Schluss bitte in Ihrem Rails-Projekt in das
-        Verzeichnis <filename>public</filename> und passen Sie die dort
-        gespeicherten HTML-Seiten Ihren Bedürfnissen an. Dabei geht es in
-        erster Linie um das Design der Seiten. Diese sind per Default etwas
-        spärlich und haben auch keinen Bezug zu Ihrer restlichen Webseite.
-        Wenn Sie Ihr Webseite updaten und dazu den Unicorn-Server
-        runterfahren, so wird nginx in der Zwischenzeit die Webseite
-        <filename>public/500.html</filename> ausliefern.</para>
-
-        <para>Eine Auflistung von HTTP-Fehlercodes finden Sie auf <uri
-        xlink:href="http://de.selfhtml.org/servercgi/server/httpstatuscodes.htm">http://de.selfhtml.org/servercgi/server/httpstatuscodes.htm</uri></para>
-      </section>
-
-      <section xml:id="production_webserver_mehrere_server">
-        <title xml:id="production_webserver_mehrere_server.title">Mehrere
-        Rails-Server auf einem System</title>
-
-        <para>Sie können problemlos mehrere Rails-Server auf einem System
-        laufen lassen. Sie müssen dafür für jeden Rails-Server einen eigenen
-        Unicorn aufsetzen. Auf diesen können Sie dann vom nginx aus verteilen.
-        Mit dem nginx können Sie auch definieren, auf welche IP-Adresse ein
-        Rails-Server von Aussen erreichbar ist.</para>
-      </section>
     </section>
   </section>
 
-  <section>
-    <title>Deployen mit Capistrano</title>
+  <section xml:id="webserver_mit_capistrano">
+    <title xml:id="webserver_mit_capistrano.title">Webserver mit
+    Capistrano-Deployment</title>
 
     <indexterm>
       <primary>Deployment</primary>
@@ -663,9 +636,9 @@ root@debian:~# </screen></para>
 
     <para>In <xref linkend="production_webserver_datenbank" /> haben wir ein
     neues Rails-Projekt auf dem Produktivsystem erstellt. Das ist logischweise
-    nicht der normale Weg. Normalerweise wird das Rails-Projekt von einem oder
-    mehreren Entwicklern auf den eigenen Rechnern entwickelt und dann später
-    auf den Produktiv-Server upgeloadet.</para>
+    meistens nicht der normale Weg. Normalerweise wird das Rails-Projekt von
+    einem oder mehreren Entwicklern auf den eigenen Rechnern entwickelt und
+    dann später auf den Produktiv-Server upgeloadet.</para>
 
     <warning>
       <para>Dieses Howto ist noch nicht fertig! Bitte erst benutzen, wenn
@@ -684,8 +657,9 @@ root@debian:~# </screen></para>
     Produktiv-Server mit nginx und einem mit RVM mit dem User
     <code>deployer</code> installierten Ruby 1.9.3 und Rails 3.2.</para>
 
-    <section>
-      <title>Das Entwicklungssystem</title>
+    <section xml:id="webserver_mit_capistrano_entwicklungssystem">
+      <title
+      xml:id="webserver_mit_capistrano_entwicklungssystem.title">Entwicklungssystem</title>
 
       <para>Wir fangen wieder mit einer neuen Rails-Applikation an. Bitte
       erstellen Sie diese Applikation auf Ihrem Entwicklungsrechner.</para>
@@ -823,6 +797,10 @@ after_fork do |server, worker|
   # the following is *required* for Rails + "preload_app true",
   defined?(ActiveRecord::Base) and
     ActiveRecord::Base.establish_connection
+end
+
+before_exec do |server|
+  ENV["BUNDLE_GEMFILE"] = "/var/www/blog/current/Gemfile"
 end</programlisting></para>
       </section>
 
@@ -1013,8 +991,10 @@ Stefan-Wintermeyers-MacBook-Air:blog xyz$ </screen></para>
       <filename>/var/www/blog/current</filename> Verzeichnis verlinkt. </para>
     </section>
 
-    <section>
-      <title>Webserver Konfiguration</title>
+    <section xml:id="webserver_mit_capistrano_webserver_konfiguration">
+      <title
+      xml:id="webserver_mit_capistrano_webserver_konfiguration.title">Webserver
+      Konfiguration</title>
 
       <para>Jetzt müssen wir noch ein Init-Skript und eine Konfigurationsdatei
       auf dem Webserver schreiben und aktivieren.</para>
@@ -1042,7 +1022,7 @@ Stefan-Wintermeyers-MacBook-Air:blog xyz$ </screen></para>
 UNICORN=/home/deployer/.rvm/bin/bootup_unicorn
 UNICORN_ARGS="-D -c /var/www/blog/current/config/unicorn.rb -E production"
 KILL=/bin/kill
-PID=/var/www/blog/shared/tmp/pids/unicorn.pid
+PID=/var/www/blog/shared/pids/unicorn.pid
 
 sig () {
   test -s "$PID" &amp;&amp; kill -$1 `cat $PID`
@@ -1122,14 +1102,15 @@ root@debian:~#</screen></para>
       </section>
     </section>
 
-    <section>
-      <title>Neue Version des Rails-Projektes einspielen</title>
+    <section xml:id="webserver_mit_capistrano_webserver_deployment">
+      <title
+      xml:id="webserver_mit_capistrano_webserver_deployment.title">Deployment</title>
 
       <para>Der grosse Vorteil von der Arbeit mit Capistrano ist das einfache
-      Einspielen neuer Versionen. Dies geht immer vom Entwicklungssystem aus
-      mit dem Befehl <command>cap deploy</command>. Nach einem zweiten
-      <command>cap deploy</command> sieht die Verzeichnisstruktur so
-      aus:<screen>/var/www/blog
+      Einspielen neuer Versionen (das Deployment). Dies geht immer vom
+      Entwicklungssystem aus mit dem Befehl <command>cap deploy</command>.
+      Nach einem zweiten <command>cap deploy</command> sieht die
+      Verzeichnisstruktur so aus:<screen>/var/www/blog
 ├── current -&gt; /var/www/blog/releases/20120711132357
 ├── releases
 │   ├── 20120711131031
@@ -1156,8 +1137,69 @@ root@debian:~#</screen></para>
     </section>
   </section>
 
-  <section>
-    <title>Cloud platform as a service Provider</title>
+  <section xml:id="production_webserver_sonstiges">
+    <title xml:id="production_webserver_sonstiges.title">Sonstiges</title>
+
+    <para></para>
+
+    <section xml:id="production_webserver_was_noch_zu_tun_ist">
+      <title xml:id="production_webserver_was_noch_zu_tun_ist.title">Was noch
+      zu tun ist.</title>
+
+      <para>Bitte denken Sie immer an folgende Punkte, die jeder Admin für
+      sich selbst entscheiden und umsetzen muss:<itemizedlist>
+          <listitem>
+            <para>Automatisches und regelmässiges Backup der Datenbank und des
+            Rails-Projektes.</para>
+          </listitem>
+
+          <listitem>
+            <para>Logrotate der Logdateien einrichten.</para>
+          </listitem>
+
+          <listitem>
+            <para>Monitor für Systemlast und Festplattenplatz
+            einrichten.</para>
+          </listitem>
+
+          <listitem>
+            <para>Regelmässig Debian Sicherheitsupdates einspielen, so bald
+            diese verfügbar sind.</para>
+          </listitem>
+        </itemizedlist></para>
+    </section>
+
+    <section xml:id="production_webserver_404">
+      <title xml:id="production_webserver.title">404 und Co.</title>
+
+      <para>Schauen Sie zum Schluss bitte in Ihrem Rails-Projekt in das
+      Verzeichnis <filename>public</filename> und passen Sie die dort
+      gespeicherten HTML-Seiten Ihren Bedürfnissen an. Dabei geht es in erster
+      Linie um das Design der Seiten. Diese sind per Default etwas spärlich
+      und haben auch keinen Bezug zu Ihrer restlichen Webseite. Wenn Sie Ihr
+      Webseite updaten und dazu den Unicorn-Server runterfahren, so wird nginx
+      in der Zwischenzeit die Webseite <filename>public/500.html</filename>
+      ausliefern.</para>
+
+      <para>Eine Auflistung von HTTP-Fehlercodes finden Sie auf <uri
+      xlink:href="http://de.selfhtml.org/servercgi/server/httpstatuscodes.htm">http://de.selfhtml.org/servercgi/server/httpstatuscodes.htm</uri></para>
+    </section>
+
+    <section xml:id="production_webserver_mehrere_server">
+      <title xml:id="production_webserver_mehrere_server.title">Mehrere
+      Rails-Server auf einem System</title>
+
+      <para>Sie können problemlos mehrere Rails-Server auf einem System laufen
+      lassen. Sie müssen dafür für jeden Rails-Server einen eigenen Unicorn
+      aufsetzen. Auf diesen können Sie dann vom nginx aus verteilen. Mit dem
+      nginx können Sie auch definieren, auf welche IP-Adresse ein Rails-Server
+      von Aussen erreichbar ist.</para>
+    </section>
+  </section>
+
+  <section xml:id="production_webserver_paas">
+    <title xml:id="production_webserver_paas.title">Cloud platform as a
+    service Provider</title>
 
     <para>Wer selber keinen Webserver im Internet zur Verfügung hat oder von
     Anfang an direkt auf ein PaaS (Platform as a Service) System deployen
