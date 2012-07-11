@@ -260,6 +260,13 @@ deployer@debian:~$ </screen></para>
       Ein-Zeilen-Cut-and-Paste-Kurzversion:<screen>deployer@debian:~$ <command>curl -L https://get.rvm.io | bash -s stable &amp;&amp; source ~/.rvm/scripts/'rvm' &amp;&amp; rvm install 1.9.3 &amp;&amp; gem install rails</command>
 [...]
 deployer@debian:~$</screen></para>
+
+      <para>Um Unicorn mit der RVM Umgebung aus einen Init.d Skript starten zu
+      können, müssen wir jetzt noch einen entsprechenden Wrapper
+      generieren:<screen>deployer@debian:~$ <command>gem install unicorn</command>
+[...]
+deployer@debian:~$ <command>rvm wrapper 1.9.3 bootup unicorn</command>
+deployer@debian:~$</screen></para>
     </section>
 
     <section xml:id="production_webserver_neues_rails_projekt_aufsetzen">
@@ -304,11 +311,6 @@ deployer@debian:~/blog$</screen></para>
         durchführen:<screen>deployer@debian:~/blog$ <command>bundle install</command>
 [...]
 deployer@debian:~/blog$ </screen></para>
-
-        <para>Um Unicorn mit der RVM Umgebung aus einen Init.d Skript starten
-        zu können, müssen wir jetzt noch einen entsprechenden Wrapper
-        generieren:<screen>deployer@debian:~/blog$ <command>rvm wrapper 1.9.3 bootup unicorn</command>
-deployer@debian:~/blog$</screen></para>
 
         <para>Für die Unicorn Konfiguration nehmen wir als Basis die Datei
         <uri
@@ -739,6 +741,70 @@ Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
       </section>
 
       <section>
+        <title>Unicorn Konfiguration</title>
+
+        <para>Für die Unicorn Konfiguration nehmen wir als Basis die Datei
+        <uri
+        xlink:href="https://raw.github.com/defunkt/unicorn/master/examples/unicorn.conf.rb">https://raw.github.com/defunkt/unicorn/master/examples/unicorn.conf.rb</uri>
+        und speichern Sie an unseren Server angepasst wie folgt in der Datei
+        <filename>config/unicorn.rb</filename> ab:<programlisting># Use at least one worker per core if you're on a dedicated server,
+# more will usually help for _short_ waits on databases/caches.
+worker_processes 4
+
+# Since Unicorn is never exposed to outside clients, it does not need to
+# run on the standard HTTP port (80), there is no reason to start Unicorn
+# as root unless it's from system init scripts.
+# If running the master process as root and the workers as an unprivileged
+# user, do this to switch euid/egid in the workers (also chowns logs):
+user "deployer", "www-data"
+
+# Help ensure your application will always spawn in the symlinked
+# "current" directory that Capistrano sets up.
+APP_PATH = "/var/www/blog/current"
+working_directory APP_PATH
+
+# listen on both a Unix domain socket and a TCP port,
+# we use a shorter backlog for quicker failover when busy
+listen "/tmp/unicorn.blog.sock", :backlog =&gt; 64
+listen 8080, :tcp_nopush =&gt; true
+
+# nuke workers after 30 seconds instead of 60 seconds (the default)
+timeout 30
+
+# feel free to point this anywhere accessible on the filesystem
+pid APP_PATH + "/tmp/pids/unicorn.pid"
+
+# By default, the Unicorn logger will write to stderr.
+# Additionally, ome applications/frameworks log to stderr or stdout,
+# so prevent them from going to /dev/null when daemonized here:
+stderr_path APP_PATH + "/log/unicorn.blog.stderr.log"
+stdout_path APP_PATH + "/log/unicorn.blog.stdout.log"
+
+# combine Ruby 2.0.0dev or REE with "preload_app true" for memory savings
+# http://rubyenterpriseedition.com/faq.html#adapt_apps_for_cow
+preload_app true
+GC.respond_to?(:copy_on_write_friendly=) and
+  GC.copy_on_write_friendly = true
+
+before_fork do |server, worker|
+  # the following is highly recomended for Rails + "preload_app true"
+  # as there's no need for the master process to hold a connection
+  defined?(ActiveRecord::Base) and
+    ActiveRecord::Base.connection.disconnect!
+end
+
+after_fork do |server, worker|
+  # per-process listener ports for debugging/admin/migrations
+  # addr = "127.0.0.1:#{9293 + worker.nr}"
+  # server.listen(addr, :tries =&gt; -1, :delay =&gt; 5, :tcp_nopush =&gt; true)
+
+  # the following is *required* for Rails + "preload_app true",
+  defined?(ActiveRecord::Base) and
+    ActiveRecord::Base.establish_connection
+end</programlisting></para>
+      </section>
+
+      <section>
         <title>Capistrano Konfiguration</title>
 
         <para>Wir richten eine Capistrano Standardkonfiguration ein:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>capify .</command>  
@@ -751,6 +817,8 @@ Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
         folgendem Inhalt ein. Bitte denken Sie daran den Text
         ip.addresse.ihres.servers mit der IP-Addresse Ihres Web-Servers
         auszutauschen!<programlisting>require "bundler/capistrano"
+require "rvm/capistrano"
+set :rvm_ruby_string, '1.9.3'
 
 server "ip.addresse.ihres.servers", :web, :app, :db, primary: true
 
@@ -886,8 +954,8 @@ deployer@debian:~$</screen></para>
         beschriebene Installation haben, löschen Sie bitte das Verzeichnis
         <filename>/var/www/blog/current</filename></para>
 
-        <screen>deployer@debian:~/apps/blog$ <command>rm -rf /var/www/blog/current</command>
-deployer@debian:~/apps/blog$</screen>
+        <screen>deployer@debian:~$ <command>rm -rf /var/www/blog/current</command>
+deployer@debian:~$</screen>
 
         <para>Mit <command>cap deploy:setup</command> können wir die
         notwendige Verzeichnisstruktur auf dem Zielsystem einrichten. Wenn Sie
