@@ -591,6 +591,14 @@ root@debian:~#</screen></para>
       </section>
     </section>
 
+    <section>
+      <title>Neue Version des Rails-Projektes einspielen</title>
+
+      <para>Wenn Sie Veränderungen am Rails-Projekt aktivieren wollen, so
+      müssen Sie nach einem Update des Codes Unicorn neu starten:<screen>root@debian:~# <command>/etc/init.d/unicorn_blog restart</command>
+root@debian:~# </screen></para>
+    </section>
+
     <section xml:id="production_webserver_was_noch_zu_tun_ist">
       <title xml:id="production_webserver_was_noch_zu_tun_ist.title">Was noch
       zu tun ist.</title>
@@ -895,20 +903,21 @@ Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
         xlink:href="https://github.com/ihr_github_account/blog">https://github.com/ihr_github_account/blog</uri>
         eingesehen werden.</para>
       </section>
+    </section>
+
+    <section>
+      <title>Webserver</title>
+
+      <para>Folgende Schritte müssen Sie auf dem Webserver-System
+      durchführen.</para>
 
       <section>
-        <title>Schritte auf dem Webserver</title>
+        <title>SSH Key generieren</title>
 
-        <para>Folgende Schritte müssen Sie auf dem Webserver-System
-        durchführen.</para>
-
-        <section>
-          <title>SSH Key generieren</title>
-
-          <para>Für den User <code>deployer</code> erstellen wir einen public
-          SSH-Key. Bitte loggen Sie sich auf dem Webserver als User
-          <code>deployer</code> ein. Am einfachsten ist das Deployment später
-          bei der Verwendung einer leeren Passphrase.<screen>deployer@debian:~$ <command>ssh-keygen</command>
+        <para>Für den User <code>deployer</code> erstellen wir einen public
+        SSH-Key. Bitte loggen Sie sich auf dem Webserver als User
+        <code>deployer</code> ein. Am einfachsten ist das Deployment später
+        bei der Verwendung einer leeren Passphrase.<screen>deployer@debian:~$ <command>ssh-keygen</command>
 Generating public/private rsa key pair.
 Enter file in which to save the key (/home/deployer/.ssh/id_rsa): 
 Enter passphrase (empty for no passphrase): 
@@ -933,19 +942,19 @@ deployer@debian:~$ <command>cat .ssh/id_rsa.pub</command>
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDJEGixOcPRdBMry7PPG/Rgla50EM+JPKGYGD/yJ8v7bdrfT68t2/eVbj6+YebWh1tRebE3qqouqmZjIlocr1j67SmfXZ/sswBT/pXOhP89JtHPMolx7rUQ8wQF3aDrnVDJG0gdvRm212vN2bou3N5dzhekmWmbS3R0ZGNM9ZgTw8rhTOd1M2QVTzyV1i1PehoFxOu1WIc1gN5C42zihbJ6fGgVb45WeKzXSi6bQ6PMKD1gAMJpXHPvKLhi0wLN0wNOJwa6BKR3pmgICSBuoziAhhCS/7gBDJnqRmx1zax/1CShJD3QEGHvofA9okYuYVqyrJi1hdF8ZgMnQCb31I21 deployer@debian
 deployer@debian:~$</screen></para>
 
-          <para>Der erzeugte Key liegt in der Datei
-          <filename>/home/deployer/.ssh/id_rsa.pub</filename>.</para>
+        <para>Der erzeugte Key liegt in der Datei
+        <filename>/home/deployer/.ssh/id_rsa.pub</filename>.</para>
 
-          <important>
-            <para>Bitte loggen Sie sich jetzt in Ihren Github-Account ein und
-            fügen im Admin Bereich Ihres Github-Projektes diesen Key bei
-            Deploy Keys hinzu. Siehe <uri
-            xlink:href="https://github.com/ihr_github_account/blog/admin/keys">https://github.com/ihr_github_account/blog/admin/keys</uri></para>
-          </important>
+        <important>
+          <para>Bitte loggen Sie sich jetzt in Ihren Github-Account ein und
+          fügen im Admin Bereich Ihres Github-Projektes diesen Key bei Deploy
+          Keys hinzu. Siehe <uri
+          xlink:href="https://github.com/ihr_github_account/blog/admin/keys">https://github.com/ihr_github_account/blog/admin/keys</uri></para>
+        </important>
 
-          <para>Danach verbinden Sie sich mit ssh bitte auf der Console einmal
-          mit dem Github SSH-Server und bestätigen Sie die "Are you sure you
-          want to continue connection (yes/no)?" Frage mit einem yes. <screen>deployer@debian:~$ <command>ssh git@github.com</command>
+        <para>Danach verbinden Sie sich mit ssh bitte auf der Console einmal
+        mit dem Github SSH-Server und bestätigen Sie die "Are you sure you
+        want to continue connection (yes/no)?" Frage mit einem yes. <screen>deployer@debian:~$ <command>ssh git@github.com</command>
 The authenticity of host 'github.com (207.97.227.239)' can't be established.
 RSA key fingerprint is 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48.
 Are you sure you want to continue connecting (yes/no)? <command>yes</command>
@@ -955,38 +964,38 @@ Hi ihr_github_account/blog! You've successfully authenticated, but GitHub does n
                  Connection to github.com closed.
 deployer@debian:~$</screen></para>
 
-          <para>Jetzt können Sie auf Ihrem Entwicklungssystem mit dem Deployen
-          anfangen.</para>
-        </section>
+        <para>Jetzt können Sie auf Ihrem Entwicklungssystem mit dem Deployen
+        anfangen.</para>
       </section>
+    </section>
 
-      <section>
-        <title>Deployen</title>
+    <section>
+      <title>cap deploy:setup</title>
 
-        <para>Mit <command>cap deploy:setup</command> können wir die
-        notwendige Verzeichnisstruktur auf dem Zielsystem einrichten. Wenn Sie
-        Ihren SSH-Key nicht auf dem Zielsystem abgelegt haben, werden Sie vom
-        Skript nach dem Passwort des Users <code>deployer</code> gefragt. Je
-        nach Anbindung und CPU-Power kann dieser initialle Setup-Schritt
-        länger dauern.<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>cap deploy:setup</command>
+      <para>Mit <command>cap deploy:setup</command> können wir die notwendige
+      Verzeichnisstruktur auf dem Zielsystem einrichten. Wenn Sie Ihren
+      SSH-Key nicht auf dem Zielsystem abgelegt haben, werden Sie vom Skript
+      nach dem Passwort des Users <code>deployer</code> gefragt. Je nach
+      Anbindung und CPU-Power kann dieser initialle Setup-Schritt länger
+      dauern.<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>cap deploy:setup</command>
 [...]
 Stefan-Wintermeyers-MacBook-Air:blog xyz$ </screen></para>
 
-        <para>Nach dem <command>cap deploy:setup</command> finden Sie auf
-        Ihrem Webserver die folgende Verzeichnisstruktur:<screen>/var/www/blog
+      <para>Nach dem <command>cap deploy:setup</command> finden Sie auf Ihrem
+      Webserver die folgende Verzeichnisstruktur:<screen>/var/www/blog
 ├── releases
 └── shared
     ├── log
     ├── pids
     └── system</screen></para>
 
-        <para>Das erste Deploy können wir mit <command>cap deploy</command>
-        starten:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>cap deploy</command>
+      <para>Das erste Deploy können wir mit <command>cap deploy</command>
+      starten:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>cap deploy</command>
 [...]
 Stefan-Wintermeyers-MacBook-Air:blog xyz$ </screen></para>
 
-        <para>Danach sehen wir das Ergebnis des Deploys wieder in der
-        Verzeichnisstruktur des Webservers:<screen>/var/www/blog
+      <para>Danach sehen wir das Ergebnis des Deploys wieder in der
+      Verzeichnisstruktur des Webservers:<screen>/var/www/blog
 ├── current -&gt; /var/www/blog/releases/20120711131031
 ├── releases
 │   └── 20120711131031
@@ -998,46 +1007,27 @@ Stefan-Wintermeyers-MacBook-Air:blog xyz$ </screen></para>
     ├── pids
     └── system</screen></para>
 
-        <para>Capistrano hat für die neue Applikations-Version im
-        Unterverzeichnis <filename>/var/www/blog/releases</filename> ein neues
-        Verzeichnis angelegt und dieses mit dem
-        <filename>/var/www/blog/current</filename> Verzeichnis verlinkt. Das
-        gleiche passiert bei jedem neuen <command>cap deploy</command>. Nach
-        einem zweiten cap deploy sieht die Verzeichnisstruktur so aus:<screen>/var/www/blog
-├── current -&gt; /var/www/blog/releases/20120711132357
-├── releases
-│   ├── 20120711131031
-│   └── 20120711132357
-└── shared
-    ├── assets
-    ├── bundle
-    ├── cached-copy
-    ├── log
-    ├── pids
-    └── system</screen></para>
+      <para>Capistrano hat für die neue Applikations-Version im
+      Unterverzeichnis <filename>/var/www/blog/releases</filename> ein neues
+      Verzeichnis angelegt und dieses mit dem
+      <filename>/var/www/blog/current</filename> Verzeichnis verlinkt. </para>
+    </section>
 
-        <para>So werden im Verzeichnis
-        <filename>/var/www/blog/releases</filename> immer die jeweiligen
-        Releases gespeichert.</para>
+    <section>
+      <title>Webserver Konfiguration</title>
 
-        <para>Im Verzeichnis <filename>/var/www/blog/shared</filename> finden
-        Sie Verzeichnisse, die vom jeweiligen Release geteilt (shared) werden.
-        Diese werden immer automatisch innerhalb von
-        <filename>/var/www/blog/current</filename> verlinkt.</para>
-
-        <para>Mit der von uns verwendeten Konfiguration werden automatisch die
-        letzten 5 Releases gespeichert und alle älteren gelöscht.</para>
-      </section>
+      <para>Jetzt müssen wir noch ein Init-Skript und eine Konfigurationsdatei
+      auf dem Webserver schreiben und aktivieren.</para>
 
       <section xml:id="production_webserver_capistrano_unicorn_init_script">
         <title
         xml:id="production_webserver_capistrano_unicorn_init_script.title">Unicorn
         Init-Skript</title>
 
-        <para>Jetzt müssen Sie sich als User <code>root</code> auf dem
-        Webserver einloggen und das Init-Skript
-        <filename>/etc/init.d/unicorn_blog</filename> mit folgendem Inhalt
-        erstellen:<programlisting>#!/bin/bash
+        <para>Bitte loggen Sie sich als User <code>root</code> auf dem
+        Webserver ein und erstellen Sie das Init-Skript
+        <filename>/etc/init.d/unicorn_blog</filename> mit folgendem
+        Inhalt:<programlisting>#!/bin/bash
 
 ### BEGIN INIT INFO
 # Provides:          unicorn
@@ -1130,6 +1120,39 @@ root@debian:~# <command>/etc/init.d/nginx restart</command>
 Restarting nginx: nginx.
 root@debian:~#</screen></para>
       </section>
+    </section>
+
+    <section>
+      <title>Neue Version des Rails-Projektes einspielen</title>
+
+      <para>Der grosse Vorteil von der Arbeit mit Capistrano ist das einfache
+      Einspielen neuer Versionen. Dies geht immer vom Entwicklungssystem aus
+      mit dem Befehl <command>cap deploy</command>. Nach einem zweiten
+      <command>cap deploy</command> sieht die Verzeichnisstruktur so
+      aus:<screen>/var/www/blog
+├── current -&gt; /var/www/blog/releases/20120711132357
+├── releases
+│   ├── 20120711131031
+│   └── 20120711132357
+└── shared
+    ├── assets
+    ├── bundle
+    ├── cached-copy
+    ├── log
+    ├── pids
+    └── system</screen></para>
+
+      <para>So werden im Verzeichnis
+      <filename>/var/www/blog/releases</filename> immer die jeweiligen
+      Releases gespeichert.</para>
+
+      <para>Im Verzeichnis <filename>/var/www/blog/shared</filename> finden
+      Sie Verzeichnisse, die vom jeweiligen Release geteilt (shared) werden.
+      Diese werden immer automatisch innerhalb von
+      <filename>/var/www/blog/current</filename> verlinkt.</para>
+
+      <para>Mit der von uns verwendeten Konfiguration werden automatisch die
+      letzten 5 Releases gespeichert und alle älteren gelöscht.</para>
     </section>
   </section>
 
