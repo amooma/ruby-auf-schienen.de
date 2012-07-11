@@ -444,6 +444,79 @@ root@debian:~# </screen></para>
         erreichbar.</para>
       </section>
     </section>
+
+    <section xml:id="production_webserver_was_noch_zu_tun_ist">
+      <title xml:id="production_webserver_was_noch_zu_tun_ist.title">Was noch
+      zu tun ist.</title>
+
+      <para>Bitte denken Sie immer an folgende Punkte, die jeder Admin für
+      sich selbst entscheiden und umsetzen muss:<itemizedlist>
+          <listitem>
+            <para>Je nach benötigter Datenmenge und Geschwindigkeit, sollten
+            Sie eine grosse SQL-Datenbank installieren. Siehe <xref
+            linkend="production_webserver_datenbank" /></para>
+          </listitem>
+
+          <listitem>
+            <para>Automatisches und regelmässiges Backup der Datenbank und des
+            Rails-Projektes.</para>
+          </listitem>
+
+          <listitem>
+            <para>Logrotate der Logdateien einrichten.</para>
+          </listitem>
+
+          <listitem>
+            <para>Monitor für Systemlast und Festplattenplatz
+            einrichten.</para>
+          </listitem>
+
+          <listitem>
+            <para>Sicherheitsupdates einspielen, so bald diese verfügbar
+            sind.</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <section xml:id="production_webserver_404">
+        <title xml:id="production_webserver.title">404 und Co.</title>
+
+        <para>Schauen Sie zum Schluss bitte in Ihrem Rails-Projekt in das
+        Verzeichnis <filename>public</filename> und passen Sie die dort
+        gespeicherten HTML-Seiten Ihren Bedürfnissen an. Dabei geht es in
+        erster Linie um das Design der Seiten. Diese sind per Default etwas
+        spärlich und haben auch keinen Bezug zu Ihrer restlichen Webseite.
+        Wenn Sie Ihr Webseite updaten und dazu den Unicorn-Server
+        runterfahren, so wird nginx in der Zwischenzeit die Webseite
+        <filename>public/500.html</filename> ausliefern.</para>
+
+        <para>Eine Auflistung von HTTP-Fehlercodes finden Sie auf <uri
+        xlink:href="http://de.selfhtml.org/servercgi/server/httpstatuscodes.htm">http://de.selfhtml.org/servercgi/server/httpstatuscodes.htm</uri></para>
+      </section>
+
+      <section xml:id="production_webserver_memcached">
+        <title xml:id="production_webserver_memcached.title">Memcache
+        installieren</title>
+
+        <para>Wer mit einem Cache-Server arbeitet (was sehr zu empfehlen ist),
+        der muss natürlich noch eine entsprechende Software installieren. Bei
+        memcached (<uri
+        xlink:href="http://memcached.org/">http://memcached.org/</uri>) wären
+        das die folgende Eingabe:<screen>root@debian:~# <command>apt-get -y install memcached</command>
+[...]
+root@debian:~#</screen></para>
+      </section>
+
+      <section xml:id="production_webserver_mehrere_server">
+        <title xml:id="production_webserver_mehrere_server.title">Mehrere
+        Rails-Server auf einem System</title>
+
+        <para>Sie können problemlos mehrere Rails-Server auf einem System
+        laufen lassen. Sie müssen dafür für jeden Rails-Server einen eigenen
+        Unicorn aufsetzen. Auf diesen können Sie dann vom nginx aus verteilen.
+        Mit dem nginx können Sie auch definieren, auf welche IP-Adresse ein
+        Rails-Server von Aussen erreichbar ist.</para>
+      </section>
+    </section>
   </section>
 
   <section xml:id="production_webserver_datenbank">
@@ -589,11 +662,23 @@ root@debian:~#</screen></para>
       <primary>Deployment</primary>
     </indexterm>
 
-    <para>In <xref linkend="production_webserver_datenbank" /> haben wir eine
-    Rails-Installation auf einem Produktivsystem durchgeführt. Dies war
-    allerdings ein einmaliger Vorgang. Da man aber normalerweise immer mal
-    wieder ein Update auf den Webserver einspielen muss, brauchen wir dafür
-    ein System.</para>
+    <para>In <xref linkend="production_webserver_datenbank" /> haben wir ein
+    neues Rails-Projekt auf dem Produktivsystem erstellt. Das ist logischweise
+    nicht der normale Weg. Normalerweise wird das Rails-Projekt von einem oder
+    mehreren Entwicklern auf den eigenen Rechnern entwickelt und dann später
+    auf den Produktiv-Server upgeloadet.</para>
+
+    <para>Gerade bei der Arbeit mit mehreren Entwicklern ist der Einsatz einer
+    Versionsverwaltung angebracht. Mit Capistrano können Sie dann aus dieser
+    Versionsverwaltung Updates des Rails-Projektes auf einen oder mehrere
+    Webserver verteilen. In diesem Kapitel benutzen wir Git als verteilte
+    Versionsverwaltung und Github (<uri
+    xlink:href="http://github.com">http://github.com</uri>) als Server zum
+    Hosten des Gits.</para>
+
+    <para>Für dieses Tutorial benötigen Sie einen bereits fertig installierten
+    Produktiv-Server mit nginx und einem mit RVM mit dem User
+    <code>deployer</code> installierten Ruby 1.9.3 und Rails 3.2.</para>
 
     <para><warning>
         <para>Dieses Howto ist noch nicht fertig! Bitte erst benutzen, wenn
@@ -628,17 +713,13 @@ Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
         <para>Für das Deployment und den Webserver benötigen wir einige Gems.
         Bitte fügen Sie diese Konfiguration in der Datei
         <filename>Gemfile</filename> hinzu:<programlisting><emphasis>group :production do
-  # Use MySQL as the database
-  gem 'mysql'
-
   # Use unicorn as the app server
   gem 'unicorn'
 end
 
 group :development do
-  # Use Capistrano and rvm for deployment
+  # Use Capistrano for the deployment
   gem 'capistrano'
-  gem 'rvm-capistrano'
 end
 </emphasis></programlisting></para>
 
@@ -671,7 +752,7 @@ set :deploy_via, :remote_cache
 set :use_sudo, false
 
 set :scm, "git"
-set :repository, "git@github.com:wintermeyer/#{application}.git"
+set :repository, "git@github.com:ihr_github_account/#{application}.git"
 set :branch, "master"
 
 default_run_options[:pty] = true
@@ -723,20 +804,19 @@ Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
       xlink:href="https://github.com/ihr_github_account/blog">https://github.com/ihr_github_account/blog</uri>
       eingesehen werden.</para>
     </section>
-  </section>
-
-  <section>
-    <title>Schritte auf dem Webserver</title>
-
-    <para>Folgende Schritte müssen Sie auf dem Webserver-System
-    durchführen.</para>
 
     <section>
-      <title>SSH Key generieren</title>
+      <title>Schritte auf dem Webserver</title>
 
-      <para>Für den User <code>deployer</code> erstellen wir einen public
-      SSH-Key. Für ein einfacheres Deployment verwenden Sie an dieser Stelle
-      bitte eine leere (also keine) Passphrase.<screen>root@debian:~# <command>su - deployer</command>
+      <para>Folgende Schritte müssen Sie auf dem Webserver-System
+      durchführen.</para>
+
+      <section>
+        <title>SSH Key generieren</title>
+
+        <para>Für den User <code>deployer</code> erstellen wir einen public
+        SSH-Key. Für ein einfacheres Deployment verwenden Sie an dieser Stelle
+        bitte eine leere (also keine) Passphrase.<screen>root@debian:~# <command>su - deployer</command>
 deployer@debian:~$ <command>ssh-keygen</command>
 Generating public/private rsa key pair.
 Enter file in which to save the key (/home/deployer/.ssh/id_rsa): 
@@ -762,19 +842,19 @@ deployer@debian:~$ <command>cat .ssh/id_rsa.pub</command>
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDJEGixOcPRdBMry7PPG/Rgla50EM+JPKGYGD/yJ8v7bdrfT68t2/eVbj6+YebWh1tRebE3qqouqmZjIlocr1j67SmfXZ/sswBT/pXOhP89JtHPMolx7rUQ8wQF3aDrnVDJG0gdvRm212vN2bou3N5dzhekmWmbS3R0ZGNM9ZgTw8rhTOd1M2QVTzyV1i1PehoFxOu1WIc1gN5C42zihbJ6fGgVb45WeKzXSi6bQ6PMKD1gAMJpXHPvKLhi0wLN0wNOJwa6BKR3pmgICSBuoziAhhCS/7gBDJnqRmx1zax/1CShJD3QEGHvofA9okYuYVqyrJi1hdF8ZgMnQCb31I21 deployer@debian
 deployer@debian:~$</screen></para>
 
-      <para>Der erzeugte Key liegt in der Datei
-      <filename>/home/deployer/.ssh/id_rsa.pub</filename>.</para>
+        <para>Der erzeugte Key liegt in der Datei
+        <filename>/home/deployer/.ssh/id_rsa.pub</filename>.</para>
 
-      <important>
-        <para>Bitte loggen Sie sich jetzt in Ihren Github-Account ein und
-        fügen im Admin Bereich Ihres Github-Projektes diesen Key bei Deploy
-        Keys hinzu. Siehe <uri
-        xlink:href="https://github.com/ihr_github_account/blog/admin/keys">https://github.com/ihr_github_account/blog/admin/keys</uri></para>
-      </important>
+        <important>
+          <para>Bitte loggen Sie sich jetzt in Ihren Github-Account ein und
+          fügen im Admin Bereich Ihres Github-Projektes diesen Key bei Deploy
+          Keys hinzu. Siehe <uri
+          xlink:href="https://github.com/ihr_github_account/blog/admin/keys">https://github.com/ihr_github_account/blog/admin/keys</uri></para>
+        </important>
 
-      <para>Danach verbinden Sie sich mit ssh bitte auf der Console einmal mit
-      dem Github SSH-Server und bestätigen Sie die "Are you sure you want to
-      continue connection (yes/no)?" Frage mit einem yes. <screen>deployer@debian:~$ <command>ssh git@github.com</command>
+        <para>Danach verbinden Sie sich mit ssh bitte auf der Console einmal
+        mit dem Github SSH-Server und bestätigen Sie die "Are you sure you
+        want to continue connection (yes/no)?" Frage mit einem yes. <screen>deployer@debian:~$ <command>ssh git@github.com</command>
 The authenticity of host 'github.com (207.97.227.239)' can't be established.
 RSA key fingerprint is 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48.
 Are you sure you want to continue connecting (yes/no)? <command>yes</command>
@@ -784,22 +864,20 @@ Hi ihr_github_account/blog! You've successfully authenticated, but GitHub does n
                  Connection to github.com closed.
 deployer@debian:~$</screen></para>
 
-      <para>Jetzt machen wir wieder als <code>root</code> weiter:<screen>deployer@debian:~$ <command>exit</command>
+        <para>Jetzt machen wir wieder als <code>root</code> weiter:<screen>deployer@debian:~$ <command>exit</command>
 Abgemeldet
 root@debian:~#</screen></para>
-
-      <para>I</para>
+      </section>
     </section>
-  </section>
 
-  <section>
-    <title>Deployen</title>
+    <section>
+      <title>Deployen</title>
 
-    <para>Als erstes richten wir mit <command>cap deploy:setup</command> das
-    Zielsystem ein. Wenn Sie Ihren SSH-Key nicht auf dem Zielsystem abgelegt
-    haben, werden Sie vom Skript nach dem Passwort des Users
-    <code>deployer</code> gefragt. Je nach Anbindung und CPU-Power kann dieser
-    initialle Setup-Schritt länger dauern.<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>cap deploy:setup</command>
+      <para>Als erstes richten wir mit <command>cap deploy:setup</command> das
+      Zielsystem ein. Wenn Sie Ihren SSH-Key nicht auf dem Zielsystem abgelegt
+      haben, werden Sie vom Skript nach dem Passwort des Users
+      <code>deployer</code> gefragt. Je nach Anbindung und CPU-Power kann
+      dieser initialle Setup-Schritt länger dauern.<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>cap deploy:setup</command>
   * executing `deploy:setup'
     triggering before callbacks for `deploy:setup'
   * executing `rvm:install_rvm'
@@ -813,22 +891,32 @@ root@debian:~#</screen></para>
     command finished in 1211ms
 Stefan-Wintermeyers-MacBook-Air:blog xyz$ </screen></para>
 
-    <para></para>
+      <para></para>
 
-    <para>Rest kommt noch. ...</para>
+      <para>Rest kommt noch. ...</para>
 
-    <para></para>
+      <para></para>
+    </section>
   </section>
 
   <section>
-    <title>Heroku</title>
+    <title>Cloud platform as a service Provider</title>
 
-    <para></para>
-  </section>
+    <para>Wer selber keinen Webserver im Internet zur Verfügung hat oder von
+    Anfang an direkt auf ein PaaS (Platform as a Service) System deployen
+    möchte, der sollte sich einmal die Angebote der folgenden Anbieter
+    anschauen.</para>
 
-  <section>
-    <title>Engineyard</title>
+    <section>
+      <title>Heroku</title>
 
-    <para></para>
+      <para></para>
+    </section>
+
+    <section>
+      <title>Engineyard</title>
+
+      <para></para>
+    </section>
   </section>
 </chapter>
