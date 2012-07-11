@@ -73,7 +73,7 @@
       <title xml:id="production_webserver_zielsystem.title">Das System</title>
 
       <para>Wir setzen unseren Produktions-Webserver auf einem minimalen
-      Debian 6 System auf. </para>
+      Debian 6 System auf.</para>
 
       <note>
         <para>Diese Beschreibung setzt ein frisch installiertes Debian
@@ -275,86 +275,6 @@ Query OK, 0 rows affected (0.00 sec)
 mysql&gt; <command>exit</command>;
 Bye
 deployer@debian:~$</screen></para>
-      </section>
-
-      <section xml:id="production_webserver_mysql_gem">
-        <title xml:id="production_webserver_mysql_gem.title">MySQL Gem</title>
-
-        <para>Zum User <code>deployer</code> wechseln:<screen>root@debian:~# <command>su - deployer</command>
-deployer@debian:~$ </screen></para>
-
-        <para>In der Gemfile Datei müssen Sie noch folgenden Eintrag
-        hinzufügen:<programlisting>group :production do
-  # Use MySQL as the database
-  gem 'mysql'
-end</programlisting></para>
-
-        <para>Danach als User <code>deployer</code> wieder ein <command>bundle
-        install</command> durchführen.<screen>deployer@debian:~/blog$ <command>bundle install</command>
-[...]
-deployer@debian:~/blog$</screen></para>
-      </section>
-
-      <section xml:id="production_webserver_database_yml">
-        <title xml:id="production_webserver_database_yml.title">Production
-        Datenbank Konfiguration</title>
-
-        <para>In der Datei <filename>config/database.yml</filename> müssen wir
-        für das Produktionssystem die Datenbankkonfiguration für die
-        MySQL-Datenbank eintragen. Bitte achten Sie darauf das korrekte
-        Passwort einzutragen.<programlisting># SQLite version 3.x
-#   gem install sqlite3
-#
-#   Ensure the SQLite 3 gem is defined in your Gemfile
-#   gem 'sqlite3'
-development:
-  adapter: sqlite3
-  database: db/development.sqlite3
-  pool: 5
-  timeout: 5000
-
-# Warning: The database defined as "test" will be erased and
-# re-generated from your development database when you run "rake".
-# Do not set this db to the same as development or production.
-test:
-  adapter: sqlite3
-  database: db/test.sqlite3
-  pool: 5
-  timeout: 5000
-
-<emphasis>production:
-  adapter: mysql
-  encoding: utf8
-  database: blog
-  username: deployer
-  password: IhrLieblingsPasswort</emphasis></programlisting></para>
-      </section>
-
-      <section xml:id="production_webserver_rake_db_migrate">
-        <title xml:id="production_webserver_rake_db_migrate.title">rake
-        db:migrate RAILS_ENV=production</title>
-
-        <para>Die neue Datenbank muss von Rails aus noch mit Tabellen gefüllt
-        werden. Dazu führen wir eine Migration aus in der
-        <code>production</code> Umgebung aus:<screen>deployer@debian:~$ <command>cd blog</command>
-deployer@debian:~/blog$ <command>rake db:migrate RAILS_ENV=production</command>
-[...]
-deployer@debian:~/blog$ <command>exit</command>
-[...]
-deployer@debian:~/blog$</screen></para>
-      </section>
-
-      <section xml:id="production_webserver_unicorn_restart">
-        <title xml:id="production_webserver_unicorn_restart.title">Unicorn
-        Neustart</title>
-
-        <para>Zum Schluss müssen wir als <code>root</code> Unicorn neu
-        starten.<screen>root@debian:~# <command>/etc/init.d/unicorn_blog restart</command>
-Starting unicorn...
-root@debian:~#</screen></para>
-
-        <para>Jetzt läuft Ihre Produktionsumgebung mit einer
-        MySQL-Datenbank.</para>
       </section>
     </section>
 
