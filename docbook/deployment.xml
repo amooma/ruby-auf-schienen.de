@@ -69,8 +69,8 @@
     aber nicht, das andere Kombinationen schlechter sind. Es ist eine
     subjektive Wahl.</para>
 
-    <section xml:id="production_webserver_zielsystem">
-      <title xml:id="production_webserver_zielsystem.title">Das System</title>
+    <section xml:id="production_webserver_debian6">
+      <title xml:id="production_webserver_debian6.title">Debian 6</title>
 
       <para>Wir setzen unseren Produktions-Webserver auf einem minimalen
       Debian 6 System auf.</para>
@@ -89,9 +89,7 @@
 
       <para>Ruby 1.9.3 installieren wir per RVM mit dem neuen User
       <code>deployer</code>. Die von uns benutze Rails-Applikation heißt
-      <code>blog</code>. Als Datenbank benutzen wir SQLite (die Anbindung
-      einer "grossen" SQL-Datenbank wird in <xref
-      linkend="production_webserver_datenbank" /> beschrieben).</para>
+      <code>blog</code>.</para>
 
       <important>
         <para>Zum Durchführen dieser Installation benötigen Sie Root-Rechte
@@ -101,7 +99,7 @@
   </section>
 
   <section>
-    <title>Vorbereitung</title>
+    <title>Vorbereitung auf dem Webserver</title>
 
     <para>Bitte loggen Sie sich als <code>root</code> auf dem Webserver
     ein.</para>
@@ -218,7 +216,7 @@ deployer@debian:~$</screen></para>
 [...]
 deployer@debian:~$ <command>rvm wrapper 1.9.3 bootup unicorn</command>
 deployer@debian:~$ <command>exit</command>
-deployer@debian:~$</screen></para>
+root@debian:~$</screen></para>
     </section>
 
     <section xml:id="production_webserver_datenbank">
@@ -324,8 +322,8 @@ deployer@debian:~/blog$</screen></para>
       <section>
         <title>Gemfile anpassen</title>
 
-        <para>Bitte schreiben Sie in die Datei Gemfile folgenden
-        Inhalt:<programlisting>source 'https://rubygems.org'
+        <para>Bitte schreiben Sie in die Datei <filename>Gemfile</filename>
+        folgenden Inhalt:<programlisting>source 'https://rubygems.org'
 
 gem 'rails', '3.2.6'
 
@@ -357,7 +355,8 @@ group :production do
 end
 </programlisting></para>
 
-        <para>Danach mit bundle install alles Gems installieren:<screen>deployer@debian:~/blog$ <command>bundle install</command>
+        <para>Danach mit <command>bundle install</command> alle Gems
+        installieren:<screen>deployer@debian:~/blog$ <command>bundle install</command>
 [...]
 deployer@debian:~/blog$</screen></para>
       </section>
@@ -431,7 +430,7 @@ listen 8080, :tcp_nopush =&gt; true
 timeout 30
 
 # feel free to point this anywhere accessible on the filesystem
-pid APP_PATH + "/tmp/pids/unicorn.pid"
+pid APP_PATH + "/tmp/unicorn.pid"
 
 # By default, the Unicorn logger will write to stderr.
 # Additionally, ome applications/frameworks log to stderr or stdout,
@@ -513,7 +512,7 @@ root@debian:~# </screen></para>
 UNICORN=/home/deployer/.rvm/bin/bootup_unicorn
 UNICORN_ARGS="-D -c /home/deployer/blog/config/unicorn.rb -E production"
 KILL=/bin/kill
-PID=/home/deployer/tmp/pids/unicorn.pid
+PID=/home/deployer/tmp/unicorn.pid
 
 sig () {
   test -s "$PID" &amp;&amp; kill -$1 `cat $PID`
@@ -599,12 +598,6 @@ root@debian:~#</screen></para>
       <para>Bitte denken Sie immer an folgende Punkte, die jeder Admin für
       sich selbst entscheiden und umsetzen muss:<itemizedlist>
           <listitem>
-            <para>Je nach benötigter Datenmenge und Geschwindigkeit, sollten
-            Sie eine grosse SQL-Datenbank installieren. Siehe <xref
-            linkend="production_webserver_datenbank" /></para>
-          </listitem>
-
-          <listitem>
             <para>Automatisches und regelmässiges Backup der Datenbank und des
             Rails-Projektes.</para>
           </listitem>
@@ -619,8 +612,8 @@ root@debian:~#</screen></para>
           </listitem>
 
           <listitem>
-            <para>Sicherheitsupdates einspielen, so bald diese verfügbar
-            sind.</para>
+            <para>Regelmässig Debian Sicherheitsupdates einspielen, so bald
+            diese verfügbar sind.</para>
           </listitem>
         </itemizedlist></para>
 
@@ -1034,6 +1027,108 @@ Stefan-Wintermeyers-MacBook-Air:blog xyz$ </screen></para>
 
         <para>Mit der von uns verwendeten Konfiguration werden automatisch die
         letzten 5 Releases gespeichert und alle älteren gelöscht.</para>
+      </section>
+
+      <section xml:id="production_webserver_capistrano_unicorn_init_script">
+        <title
+        xml:id="production_webserver_capistrano_unicorn_init_script.title">Unicorn
+        Init-Skript</title>
+
+        <para>Jetzt müssen Sie sich als User <code>root</code> auf dem
+        Webserver einloggen und das Init-Skript
+        <filename>/etc/init.d/unicorn_blog</filename> mit folgendem Inhalt
+        erstellen:<programlisting>#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:          unicorn
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Unicorn webserver
+# Description:       Unicorn webserver for the blog
+### END INIT INFO
+
+UNICORN=/home/deployer/.rvm/bin/bootup_unicorn
+UNICORN_ARGS="-D -c /var/www/blog/current/config/unicorn.rb -E production"
+KILL=/bin/kill
+PID=/var/www/blog/shared/tmp/pids/unicorn.pid
+
+sig () {
+  test -s "$PID" &amp;&amp; kill -$1 `cat $PID`
+}
+
+case "$1" in
+        start)
+                echo "Starting unicorn..."
+                $UNICORN $UNICORN_ARGS
+                ;;
+        stop)
+                sig QUIT &amp;&amp; exit 0
+                echo &gt;&amp;2 "Not running"
+                ;;
+        restart)
+                $0 stop
+                $0 start
+                ;;
+        status)
+                ;;
+        *)
+                echo "Usage: $0 {start|stop|restart|status}"
+                ;;
+esac</programlisting></para>
+
+        <para>Das Init-Skript muss jetzt noch scharf geschaltet und Unicorn
+        gestartet werden:<screen>root@debian:~# <command>chmod +x /etc/init.d/unicorn_blog</command> 
+root@debian:~# <command>update-rc.d -f unicorn_blog defaults</command>
+update-rc.d: using dependency based boot sequencing
+root@debian:~# <command>/etc/init.d/unicorn_blog start</command>
+root@debian:~# </screen></para>
+
+        <para>Ihr Rails-Projekt ist jetzt über die IP-Adresse des Webservers
+        erreichbar.</para>
+      </section>
+
+      <section xml:id="production_webserver_capistrano_nginx_konfiguration">
+        <title
+        xml:id="production_webserver_capistrano_nginx_konfiguration.title">nginx
+        Konfiguration</title>
+
+        <para>Für das Rails-Projekt fügen wir eine neue Konfigurationdatei
+        <filename>/etc/nginx/conf.d/blog.conf</filename> mit folgendem Inhalt
+        hinzu:<programlisting>upstream unicorn {
+  server unix:/tmp/unicorn.blog.sock fail_timeout=0;
+}
+
+server {
+  listen 80 default deferred;
+  # server_name example.com;
+  root /var/www/blog/current/public;
+
+  location ^~ /assets/ {
+    gzip_static on;
+    expires max;
+    add_header Cache-Control public;
+  }
+
+  try_files $uri/index.html $uri @unicorn;
+  location @unicorn {
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_redirect off;
+    proxy_pass http://unicorn;
+  }
+
+  error_page 500 502 503 504 /500.html;
+  client_max_body_size 4G;
+  keepalive_timeout 10;
+}</programlisting></para>
+
+        <para>Die Default Konfigurationsdatei benennen wir um, damit sie nicht
+        mehr ausgeführt wird. Danach restarten wir nginx.<screen>root@debian:~# <command>mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.backup</command>
+root@debian:~# <command>/etc/init.d/nginx restart</command>
+Restarting nginx: nginx.
+root@debian:~#</screen></para>
       </section>
     </section>
   </section>
