@@ -774,27 +774,36 @@ pid APP_PATH + "/tmp/pids/unicorn.pid"
 stderr_path APP_PATH + "/log/unicorn.blog.stderr.log"
 stdout_path APP_PATH + "/log/unicorn.blog.stdout.log"
 
-# combine Ruby 2.0.0dev or REE with "preload_app true" for memory savings
-# http://rubyenterpriseedition.com/faq.html#adapt_apps_for_cow
-preload_app true
-GC.respond_to?(:copy_on_write_friendly=) and
-  GC.copy_on_write_friendly = true
-
 before_fork do |server, worker|
   # the following is highly recomended for Rails + "preload_app true"
   # as there's no need for the master process to hold a connection
-  defined?(ActiveRecord::Base) and
+  if defined?(ActiveRecord::Base)
     ActiveRecord::Base.connection.disconnect!
+  end
+
+  # Before forking, kill the master process that belongs to the .oldbin PID.
+  # This enables 0 downtime deploys.
+  old_pid = "/tmp/unicorn.my_site.pid.oldbin"
+  if File.exists?(old_pid) &amp;&amp; server.pid != old_pid
+    begin
+      Process.kill("QUIT", File.read(old_pid).to_i)
+    rescue Errno::ENOENT, Errno::ESRCH
+      # someone else did our job for us
+    end
+  end
 end
 
 after_fork do |server, worker|
-  # per-process listener ports for debugging/admin/migrations
-  # addr = "127.0.0.1:#{9293 + worker.nr}"
-  # server.listen(addr, :tries =&gt; -1, :delay =&gt; 5, :tcp_nopush =&gt; true)
-
   # the following is *required* for Rails + "preload_app true",
-  defined?(ActiveRecord::Base) and
+  if defined?(ActiveRecord::Base)
     ActiveRecord::Base.establish_connection
+  end
+
+  # if preload_app is true, then you may also want to check and
+  # restart any other shared sockets/descriptors such as Memcached,
+  # and Redis.  TokyoCabinet file handles are safe to reuse
+  # between any number of forked children (assuming your kernel
+  # correctly implements pread()/pwrite() system calls)
 end
 
 before_exec do |server|
@@ -833,9 +842,23 @@ set :branch, "master"
 default_run_options[:pty] = true
 ssh_options[:forward_agent] = true
 
+after 'deploy', 'deploy:cleanup'
+after 'deploy', 'deploy:migrate'
 
-after 'deploy:restart', 'deploy:cleanup'
-after 'deploy', 'deploy:migrate'</programlisting></para>
+namespace :deploy do
+  %w[start stop restart reload].each do |command|
+    desc "#{command} unicorn server"
+    task command, roles: :app, except: {no_release: true} do
+      run "sudo /etc/init.d/unicorn_#{application} #{command}"
+    end
+  end
+
+  # desc "Zero-downtime restart of Unicorn"
+  # task :restart, :except =&gt; { :no_release =&gt; true } do
+  #   run "sudo /bin/kill -s USR2 `cat /var/www/blog/shared/pids/unicorn.pid`"
+  # end
+
+end</programlisting></para>
 
         <para>Und die Datei <filename>Capfile</filename> müssen wir noch wie
         folgt abändern:<programlisting>load 'deploy'
@@ -1035,6 +1058,9 @@ case "$1" in
                 sig QUIT &amp;&amp; exit 0
                 echo &gt;&amp;2 "Not running"
                 ;;
+        reload)
+                sig USR2 &amp;&amp; exit 0
+                ;;
         restart)
                 $0 stop
                 $0 start
@@ -1042,7 +1068,7 @@ case "$1" in
         status)
                 ;;
         *)
-                echo "Usage: $0 {start|stop|restart|status}"
+                echo "Usage: $0 {start|stop|reload|restart|status}"
                 ;;
 esac</programlisting></para>
 
@@ -1098,6 +1124,23 @@ root@debian:~# <command>/etc/init.d/nginx restart</command>
 Restarting nginx: nginx.
 root@debian:~#</screen></para>
       </section>
+    </section>
+
+    <section>
+      <title>sudo</title>
+
+      <para>Im Capistrano Deploy-Skript brauchen wir eine Möglichkeit Unicorn
+      zu stoppen und starten. Dazu müssen wir sudo auf dem Webserver
+      installieren:<screen>root@debian:~# <command>apt-get install sudo</command>
+[...]
+root@debian:~# </screen></para>
+
+      <para>Und in der Datei <filename>/etc/sudoers</filename> die folgende
+      Zeile hinzufügen:<programlisting>deployer ALL= NOPASSWD: /etc/init.d/unicorn_blog</programlisting></para>
+
+      <para></para>
+
+      <para></para>
     </section>
 
     <section xml:id="webserver_mit_capistrano_webserver_deployment">
