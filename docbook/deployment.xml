@@ -429,47 +429,60 @@ user "deployer", "www-data"
 
 # Help ensure your application will always spawn in the symlinked
 # "current" directory that Capistrano sets up.
-<emphasis>APP_PATH = "/home/deployer/blog"
-</emphasis><emphasis>working_directory APP_PATH</emphasis>
+APP_PATH = "/var/www/blog/current"
+working_directory APP_PATH
 
 # listen on both a Unix domain socket and a TCP port,
 # we use a shorter backlog for quicker failover when busy
-<emphasis>listen "/tmp/unicorn.blog.sock", :backlog =&gt; 64</emphasis>
+listen "/tmp/unicorn.blog.sock", :backlog =&gt; 64
 listen 8080, :tcp_nopush =&gt; true
 
 # nuke workers after 30 seconds instead of 60 seconds (the default)
 timeout 30
 
 # feel free to point this anywhere accessible on the filesystem
-pid APP_PATH + "/tmp/unicorn.pid"
+pid APP_PATH + "/tmp/pids/unicorn.pid"
 
 # By default, the Unicorn logger will write to stderr.
 # Additionally, ome applications/frameworks log to stderr or stdout,
 # so prevent them from going to /dev/null when daemonized here:
-<emphasis>stderr_path APP_PATH + "/log/unicorn.blog.stderr.log"
-stdout_path APP_PATH + "/log/unicorn.blog.stdout.log"</emphasis>
-
-# combine Ruby 2.0.0dev or REE with "preload_app true" for memory savings
-# http://rubyenterpriseedition.com/faq.html#adapt_apps_for_cow
-preload_app true
-GC.respond_to?(:copy_on_write_friendly=) and
-  GC.copy_on_write_friendly = true
+stderr_path APP_PATH + "/log/unicorn.blog.stderr.log"
+stdout_path APP_PATH + "/log/unicorn.blog.stdout.log"
 
 before_fork do |server, worker|
   # the following is highly recomended for Rails + "preload_app true"
   # as there's no need for the master process to hold a connection
-  defined?(ActiveRecord::Base) and
+  if defined?(ActiveRecord::Base)
     ActiveRecord::Base.connection.disconnect!
+  end
+
+  # Before forking, kill the master process that belongs to the .oldbin PID.
+  # This enables 0 downtime deploys.
+  old_pid = "/tmp/unicorn.my_site.pid.oldbin"
+  if File.exists?(old_pid) &amp;&amp; server.pid != old_pid
+    begin
+      Process.kill("QUIT", File.read(old_pid).to_i)
+    rescue Errno::ENOENT, Errno::ESRCH
+      # someone else did our job for us
+    end
+  end
 end
 
 after_fork do |server, worker|
-  # per-process listener ports for debugging/admin/migrations
-  # addr = "127.0.0.1:#{9293 + worker.nr}"
-  # server.listen(addr, :tries =&gt; -1, :delay =&gt; 5, :tcp_nopush =&gt; true)
-
   # the following is *required* for Rails + "preload_app true",
-  defined?(ActiveRecord::Base) and
+  if defined?(ActiveRecord::Base)
     ActiveRecord::Base.establish_connection
+  end
+
+  # if preload_app is true, then you may also want to check and
+  # restart any other shared sockets/descriptors such as Memcached,
+  # and Redis.  TokyoCabinet file handles are safe to reuse
+  # between any number of forked children (assuming your kernel
+  # correctly implements pread()/pwrite() system calls)
+end
+
+before_exec do |server|
+  ENV["BUNDLE_GEMFILE"] = "/var/www/blog/current/Gemfile"
 end</programlisting></para>
       </section>
 
@@ -618,9 +631,24 @@ root@debian:~#</screen></para>
       wieder bereit gestellt werden (siehe <xref
       linkend="asset_pipeline" />).<screen>deployer@debian:~/blog$ <command>rake assets:precompile</command>
 /home/deployer/.rvm/rubies/ruby-1.9.3-p194/bin/ruby /home/deployer/.rvm/gems/ruby-1.9.3-p194@global/bin/rake assets:precompile:all RAILS_ENV=production RAILS_GROUPS=assets
-deployer@debian:~/blog$</screen>Danach müssen Sie als User <code>root</code>
-      Unicorn neu starten:<screen>root@debian:~# <command>/etc/init.d/unicorn_blog restart</command>
+deployer@debian:~/blog$</screen></para>
+
+      <para>Sollten Sie neue Migrationen einspielen, so müssen Sie natürlich
+      auch <command>rake db:migrate RAILS_ENV=production</command>
+      ausführen:<screen>deployer@debian:~/blog$ <command>rake db:migrate RAILS_ENV=production</command>
+[...]
+deployer@debian:~/blog$ </screen></para>
+
+      <para>Danach müssen Sie als User <code>root</code> Unicorn neu
+      starten:<screen>root@debian:~# <command>/etc/init.d/unicorn_blog restart</command>
 root@debian:~# </screen></para>
+
+      <tip>
+        <para>In den meisten Fällen ist eine Installation mit einem
+        Capistrano-Deployment sinnvoller. Es ist initial ein Tick mehr Aufwand
+        (siehe <xref linkend="webserver_mit_capistrano" />), aber bietet dann
+        mehr Komfort und Sicherheit.</para>
+      </tip>
     </section>
   </section>
 
@@ -638,11 +666,6 @@ root@debian:~# </screen></para>
     einem oder mehreren Entwicklern auf den eigenen Rechnern entwickelt und
     dann später auf den Produktiv-Server upgeloadet.</para>
 
-    <warning>
-      <para>Dieses Howto ist noch nicht fertig! Bitte erst benutzen, wenn
-      diese Warnung nicht mehr angezeigt wird.</para>
-    </warning>
-
     <para>Gerade bei der Arbeit mit mehreren Entwicklern ist der Einsatz einer
     Versionsverwaltung angebracht. Mit Capistrano können Sie dann aus dieser
     Versionsverwaltung Updates des Rails-Projektes auf einen oder mehrere
@@ -653,7 +676,9 @@ root@debian:~# </screen></para>
 
     <para>Für dieses Tutorial benötigen Sie einen bereits fertig installierten
     Produktiv-Server mit nginx und einem mit RVM mit dem User
-    <code>deployer</code> installierten Ruby 1.9.3 und Rails 3.2.</para>
+    <code>deployer</code> installierten Ruby 1.9.3 und Rails 3.2 (eine genaue
+    Anleitung dazu finden Sie unter <xref
+    linkend="deployment_grundinstallation_webserver" />).</para>
 
     <section xml:id="webserver_mit_capistrano_entwicklungssystem">
       <title
@@ -853,11 +878,12 @@ namespace :deploy do
     end
   end
 
-  # desc "Zero-downtime restart of Unicorn"
+  # Use this if you know what you are doing.
+  #
+  # desc "Zero-Downtime restart of Unicorn"
   # task :restart, :except =&gt; { :no_release =&gt; true } do
-  #   run "sudo /bin/kill -s USR2 `cat /var/www/blog/shared/pids/unicorn.pid`"
+  #   run "sudo /etc/init.d/unicorn_#{application} reload"
   # end
-
 end</programlisting></para>
 
         <para>Und die Datei <filename>Capfile</filename> müssen wir noch wie
@@ -1130,17 +1156,13 @@ root@debian:~#</screen></para>
       <title>sudo</title>
 
       <para>Im Capistrano Deploy-Skript brauchen wir eine Möglichkeit Unicorn
-      zu stoppen und starten. Dazu müssen wir sudo auf dem Webserver
-      installieren:<screen>root@debian:~# <command>apt-get install sudo</command>
+      per Init-Skript zu stoppen und starten. Dazu müssen wir sudo auf dem
+      Webserver installieren:<screen>root@debian:~# <command>apt-get install sudo</command>
 [...]
 root@debian:~# </screen></para>
 
       <para>Und in der Datei <filename>/etc/sudoers</filename> die folgende
       Zeile hinzufügen:<programlisting>deployer ALL= NOPASSWD: /etc/init.d/unicorn_blog</programlisting></para>
-
-      <para></para>
-
-      <para></para>
     </section>
 
     <section xml:id="webserver_mit_capistrano_webserver_deployment">
@@ -1175,13 +1197,18 @@ root@debian:~# </screen></para>
 
       <para>Mit der von uns verwendeten Konfiguration werden automatisch die
       letzten 5 Releases gespeichert und alle älteren gelöscht.</para>
+
+      <tip>
+        <para>Capistrano ist ein sehr mächtiges Tool. Es lohnt sich für jeden
+        Admin mal einen Blick auf das Capistrano Wiki (<uri
+        xlink:href="https://github.com/capistrano/capistrano/wiki">https://github.com/capistrano/capistrano/wiki</uri>)
+        zu werfen.</para>
+      </tip>
     </section>
   </section>
 
   <section xml:id="production_webserver_sonstiges">
     <title xml:id="production_webserver_sonstiges.title">Sonstiges</title>
-
-    <para></para>
 
     <section xml:id="production_webserver_was_noch_zu_tun_ist">
       <title xml:id="production_webserver_was_noch_zu_tun_ist.title">Was noch
@@ -1244,19 +1271,14 @@ root@debian:~# </screen></para>
 
     <para>Wer selber keinen Webserver im Internet zur Verfügung hat oder von
     Anfang an direkt auf ein PaaS (Platform as a Service) System deployen
-    möchte, der sollte sich einmal die Angebote der folgenden Anbieter
-    anschauen.</para>
+    möchte, der sollte sich einmal die Angebote der entsprechenden Anbieter
+    anschauen. Die beiden US Marktführer sind aktuell Heroku (<uri
+    xlink:href="http://www.heroku.com/">http://www.heroku.com/</uri>) und
+    Engine Yard (<uri
+    xlink:href="http://www.engineyard.com/">http://www.engineyard.com/</uri>).</para>
 
-    <section>
-      <title>Heroku</title>
-
-      <para></para>
-    </section>
-
-    <section>
-      <title>Engineyard</title>
-
-      <para></para>
-    </section>
+    <para>PaaS als Platform bietet meistens weniger Möglichkeiten als der
+    eigene Server. Allerdings bieten Sie einen 7x24 Support für diese
+    Plattform, falls mal etwas nicht funktioniert. </para>
   </section>
 </chapter>
