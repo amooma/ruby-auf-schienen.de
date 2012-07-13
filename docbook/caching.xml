@@ -238,8 +238,9 @@ Stefan-Wintermeyers-MacBook-Air:phone_book xyz$</screen></para>
       </section>
     </section>
 
-    <section>
-      <title>Anfangsgeschwindigkeit der zu optimierenden Seiten</title>
+    <section xml:id="caching_einleitung_normale_geschwindigkeit">
+      <title xml:id="caching_einleitung_normale_geschwindigkeit.title">Normale
+      Geschwindigkeit der zu optimierenden Seiten</title>
 
       <para>Wir optimieren in diesem Kapitel die folgenden Webseiten. Die
       Rails-Applikation wird mit <command>rails server</command> im
@@ -260,8 +261,10 @@ Stefan-Wintermeyers-MacBook-Air:phone_book xyz$</screen></para>
       der Seite. Dazu muss man in der Realität noch das Ausliefern der Seite
       an den Webbrowser hinzurechnen.</para>
 
-      <section>
-        <title>Liste aller Firmen (Index-View)</title>
+      <section xml:id="caching_einleitung_normale_geschwindigkeit_index_view">
+        <title
+        xml:id="caching_einleitung_normale_geschwindigkeit_index_view.title">Liste
+        aller Firmen (Index-View)</title>
 
         <para>Unter der URL <uri
         xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>
@@ -271,8 +274,10 @@ Stefan-Wintermeyers-MacBook-Air:phone_book xyz$</screen></para>
         <para>Das Generieren der Seite dauert 85ms.<screen>Completed 200 OK in 85ms (Views: 71.9ms | ActiveRecord: 12.5ms)</screen></para>
       </section>
 
-      <section>
-        <title>Detailansicht einer einzelnen Firma (Show-View)</title>
+      <section xml:id="caching_einleitung_normale_geschwindigkeit_show_view">
+        <title
+        xml:id="caching_einleitung_normale_geschwindigkeit_show_view.title">Detailansicht
+        einer einzelnen Firma (Show-View)</title>
 
         <para>Unter der URL <uri
         xlink:href="http://0.0.0.0:3000/companies/1">http://0.0.0.0:3000/companies/1</uri>
@@ -296,9 +301,13 @@ Stefan-Wintermeyers-MacBook-Air:phone_book xyz$</screen></para>
     beim zweiten Laden nicht noch mal geladen. Ihr Browser hat diese Dateien
     bereits im Cache und spart somit Zugriffszeit und Bandbreite.</para>
 
-    <para>Für einen Webbrowser gibt es verschiedene Möglichkeiten
-    rauszufinden, ob eine Datei oder eine Webseite im Cache noch gültig
-    ist.</para>
+    <para>Innerhalb des Rails-Frameworks ist es unser Ziel die Fragestellung
+    "Hat sich eine Seite verändert?" bereits im Controller zu beantworten.
+    Denn normalerweise wird die meiste Zeit beim Rendern der Seite in einem
+    View verbraucht. In <xref
+    linkend="caching_einleitung_normale_geschwindigkeit_index_view" /> kann
+    man das gut sehen: Von insgesamt 85ms werden alleine 71,9ms und damit mehr
+    als 80% der Gesamtzeit mit dem Rendern des Views verbraucht.</para>
 
     <section xml:id="http_caching_last_modified">
       <title xml:id="http_caching_last_modified.title">Last-Modified</title>
@@ -396,24 +405,6 @@ Processing by CompaniesController#index as */*
       ganze Webseite ausgeliefert. Mit dieser Methode können Sie auch
       dynamisch generierte Webseiten per <code>Last-Modified</code> Header
       ausliefern lassen.</para>
-
-      <section>
-        <title>Die Magie von touch</title>
-
-        <para>Was passiert, wenn ein <classname>Employee</classname> verändert
-        oder gelöscht wird? Dann würde sich auf jeden Fall der Show-View und
-        evt. auch der Index-View ändern müssen. Das ist der Grund für die
-        Zeile <programlisting>belongs_to :company, :touch =&gt; true</programlisting>
-        im Employee Model. Jedesmal, wenn ein Objekt der Klasse
-        <classname>Employee</classname> verändert abgespeichert wird, updatet
-        ActiveRecord bei der Benutzung von <code>:touch =&gt; true</code> das
-        darüberliegende <classname>Company</classname> Element in der
-        Datenbank. Das <varname>updated_at</varname> Feld wird auf die
-        aktuelle Uhrzeit gesetzt. Es wird ge-"touch"-t.</para>
-
-        <para>Deshalb ist sichergestellt, das auch dann wieder eine korrekte
-        Webseite ausgeliefert wird.</para>
-      </section>
     </section>
 
     <section xml:id="http_caching_etag">
@@ -425,10 +416,139 @@ Processing by CompaniesController#index as */*
       Webseiten-Inhalte dann anhand eines Rollen-Models generiert. Dann kann
       es sein, das der Anwender A als Admin einen Edit-Link angezeigt bekommt
       und Anwender B als normaler User diesen Edit-Link nicht angezeigt
-      bekommt.</para>
+      bekommt. Bei solchen Szenarien nützt uns der in <xref
+      linkend="http_caching_last_modified" /> erklärte Last-Modified Header
+      nichts.</para>
 
-      <para>Bei solchen Szeanrien können wir den per Default immer aktivierte
-      Etag Header benutzen. Er wird </para>
+      <para>Bei solchen Szeanrien können wir den Etag Header benutzen. Das
+      Etag wird vom Webserver generiert und beim ersten Aufruf einer Webseite
+      mitgeliefert. Der Browser kann bei späteren Abfragen der gleichen URL
+      mit der Anfrage <code>If-None-Match:</code> beim Webserver anfragen, ob
+      sich die entsprechende Webseite geändert hat.</para>
+
+      <para>Ändern Sie bitte in der Controller-Datei
+      <filename>app/controllers/companies_controller.rb</filename> die
+      <methodname>index</methodname> und <methodname>show</methodname>
+      Methoden wie folgt ab:<programlisting>  def index
+    @companies = Company.all
+
+    fresh_when etag: @companies
+  end
+
+  def show
+    @company = Company.find(params[:id])
+
+    fresh_when etag: @company
+  end</programlisting></para>
+
+      <para>Beim Etag kommt allerdings noch eine Rails Besonderheit ins Spiel:
+      Rails setzt automatisch bei jedem neuen Besucher der Webseite ein neues
+      CSRF-Token. Damit werden Cross-Site Request Forgery Angriffe vermieden
+      (siehe <uri
+      xlink:href="http://de.wikipedia.org/wiki/Cross-Site_Request_Forgery">http://de.wikipedia.org/wiki/Cross-Site_Request_Forgery</uri>).
+      Dadurch bekommt aber auch jeder neue Anwender einer Webseite ein neues
+      Etag für die an sich gleiche Seite. Um bei gleichen Anwendern auch
+      identische CSRF-Tokens zu bekommen, werden diese vom Webbrowser in einem
+      Cookie gespeichert und somit bei jedem Aufruf einer Webseite an den
+      Webserver zurückgeschickt. Das von uns zum Entwickeln benutzte curl
+      macht das aber nicht standardmässig. Wir können Curl aber sagen, das
+      alle Cookies in einer Datei gespeichert werden sollen und diese Cookies
+      später bei einer Anfrage auch übertragen.</para>
+
+      <para>Das Abspeichern erfolgt mit dem <code>-c cookies.txt</code>
+      Parameter.<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>curl -I http://0.0.0.0:3000/companies -c cookies.txt</command>
+HTTP/1.1 200 OK 
+Etag: "b5f711016cb2e5fce352230e607ceffe"
+Content-Type: text/html; charset=utf-8
+Cache-Control: max-age=0, private, must-revalidate
+[...]
+
+Stefan-Wintermeyers-MacBook-Air:~ stefan$</screen></para>
+
+      <para>Mit dem <code>-b cookies.txt</code> Parameter sendet curl bei
+      einer Anfrage diese Cookies an den Webserver. Jetzt bekommen wir bei
+      zwei aufeinander folgenden Anfragen den gleichen ETag geliefert:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>curl -I http://0.0.0.0:3000/companies -b cookies.txt</command>
+HTTP/1.1 200 OK 
+<emphasis>Etag: "132c1be24595b9b5f7b2c08b300592b1"</emphasis>
+Content-Type: text/html; charset=utf-8
+Cache-Control: max-age=0, private, must-revalidate
+[...]
+
+Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>curl -I http://0.0.0.0:3000/companies -b cookies.txt</command>
+HTTP/1.1 200 OK 
+<emphasis>Etag: "132c1be24595b9b5f7b2c08b300592b1"</emphasis>
+Content-Type: text/html; charset=utf-8
+Cache-Control: max-age=0, private, must-revalidate
+[...]
+
+Stefan-Wintermeyers-MacBook-Air:~ stefan$</screen></para>
+
+      <para>Jetzt benutzen wir diesen Etag, um mit If-None-Match in der
+      Anfrage rauszubekommen, ob die von uns gecachete Version noch aktuell
+      ist:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>curl -I http://0.0.0.0:3000/companies -b cookies.txt --header 'If-None-Match: "132c1be24595b9b5f7b2c08b300592b1"'</command>
+<emphasis>HTTP/1.1 304 Not Modified</emphasis> 
+Etag: "132c1be24595b9b5f7b2c08b300592b1"
+Cache-Control: max-age=0, private, must-revalidate
+[...]
+
+Stefan-Wintermeyers-MacBook-Air:~ stefan$</screen></para>
+
+      <para>Wir bekommen einen <code>304 Not Modified</code> geliefert.
+      Schauen wir noch ins Rails-Log:<screen>Started HEAD "/companies" for 127.0.0.1 at 2012-07-13 18:45:38 +0200
+Processing by CompaniesController#index as */*
+  Company Load (0.3ms)  SELECT "companies".* FROM "companies" 
+Completed 304 Not Modified in 3ms (ActiveRecord: 0.3ms)</screen></para>
+
+      <para>Rails hat für die Verarbeitung der Anfrage nur 3ms benötigt. Fast
+      30 mal schneller als die Variante ohne Cache! Plus wieder die
+      eingesparte Bandbreite. Der Anwender freut sich wieder über die schnelle
+      Webapplikation.</para>
+
+      <section xml:id="http_caching_etag_current_user">
+        <title
+        xml:id="http_caching_etag_current_user.title">current_user</title>
+
+        <para>Wir können als Grundlage für die Generierung eines Etags nicht
+        nur ein Objekt, sondern auch ein Array von Objekten übergeben. So
+        können wir das Problem mit dem eingeloggten User lösen. Nehmen wir
+        einmal an, das ein eingelogter User mit der Methode
+        <methodname>current_user</methodname> ausgegeben wird. Dann würden die
+        <methodname>index</methodname> und <methodname>show</methodname>
+        Methoden im
+        <filename>app/controllers/companies_controller.rb</filename>
+        Controller so ausssehen:<programlisting>  def index
+    @companies = Company.all
+
+    <emphasis>fresh_when etag: [@companies, current_user]</emphasis>
+  end
+
+  def show
+    @company = Company.find(params[:id])
+
+    <emphasis>fresh_when etag: [@company, current_user]</emphasis>
+  end</programlisting></para>
+
+        <para>Sie können beliebig viele Objekte in diesem Array unterbringen
+        und somit definieren, wann eine Seite sich nicht verändert hat.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>Die Magie von touch</title>
+
+      <para>Was passiert, wenn ein <classname>Employee</classname> verändert
+      oder gelöscht wird? Dann würde sich auf jeden Fall der Show-View und
+      evt. auch der Index-View ändern müssen. Das ist der Grund für die Zeile
+      <programlisting>belongs_to :company, :touch =&gt; true</programlisting>
+      im Employee Model. Jedesmal, wenn ein Objekt der Klasse
+      <classname>Employee</classname> verändert abgespeichert wird, updatet
+      ActiveRecord bei der Benutzung von <code>:touch =&gt; true</code> das
+      darüberliegende <classname>Company</classname> Element in der Datenbank.
+      Das <varname>updated_at</varname> Feld wird auf die aktuelle Uhrzeit
+      gesetzt. Es wird ge-"touch"-t.</para>
+
+      <para>Deshalb ist sichergestellt, das auch dann wieder eine korrekte
+      Webseite ausgeliefert wird.</para>
     </section>
   </section>
 </chapter>
