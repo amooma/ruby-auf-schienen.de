@@ -8,9 +8,427 @@
          xmlns:db="http://docbook.org/ns/docbook">
   <title xml:id="caching.title">Caching</title>
 
-  <section xml:id="caching_grundlagen">
-    <title xml:id="caching_grundlagen.title">Grundlagen</title>
+  <section xml:id="caching_einleitung">
+    <title xml:id="caching_einleitung.title">Einleitung</title>
 
-    <para></para>
+    <para>Im allgemeinen wird mit Caching bei Webapplikationen immer so lange
+    gewartet, bis man an Performanceprobleme kommt. Als erstes schaut sich der
+    Admin dann die Datenbank an und fügt hier und dort noch einen Index hinzu.
+    Wenn das alles nicht mehr hilft, schaut man sich dann die Views an und
+    fügt Fragment-Caching hinzu. Das ist aber der suboptimale Ansatz für die
+    Arbeit mit Caches. Ziel dieses Kapitels ist Ihnen ein Verständnis für die
+    Funktionsweise von Key-Based-Cache-Expiration zu geben. Damit können Sie
+    dann neue Applikationen schon auf Datenbank-Struktur-Ebene so planen, das
+    Sie bei der Entwicklung optimal cachen können.</para>
+
+    <para>Dabei gibt es zwei Hauptargumente für die Benutzung von
+    Caching:<itemizedlist>
+        <listitem>
+          <para>Die Applikation wird für den Anwender schneller. Eine
+          schnellere Webseite resultiert in glücklichere Anwender.</para>
+        </listitem>
+
+        <listitem>
+          <para>Sie brauchen weniger Hardware für den Webserver, weil sie
+          weniger Resourcen zum Abarbeiten der Anfragen benötigen. Die
+          Ersparnis ist meistens enorm. </para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>Wenn beide Punkte für Sie irrelevant sind, dann brauchen Sie dieses
+    Kapitel nicht zu lesen.</para>
+
+    <para>Wir betrachten drei verschiedene Caching-Methoden:<itemizedlist>
+        <listitem>
+          <para>HTTP-Caching</para>
+
+          <para>Das ist der Vorschlaghammer unter den Cache-Methoden und ist
+          die ultimative Performance-Waffe. Gerade Webseiten die für mobile
+          Endgeräte gedacht sind (z.B. iPhone), sollte versuchen HTTP-Caching
+          maximal auszunutzen. Bei der Kombination aus
+          Key-Based-Cache-Expiration mit HTTP-Caching sparen Sie massiv
+          Rechenzeit auf dem Server und Bandbreite.</para>
+        </listitem>
+
+        <listitem>
+          <para>Page-Caching</para>
+
+          <para>Das ist der Schraubenzieher unter den Cache-Methoden. Man kann
+          sehr viel Performance rausholen, aber es ist nicht so gut wie
+          HTTP-Caching.</para>
+        </listitem>
+
+        <listitem>
+          <para>Fragment-Caching</para>
+
+          <para>Quasi die Pinzette unter den Cache-Methoden. Aber nicht zu
+          unterschätzen. Kleinvieh macht auch Mist.</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>Unser Ziel ist es alle drei Methoden optimal mit einander zu
+    verknüpfen.</para>
+
+    <section xml:id="caching_beispielapplikation">
+      <title xml:id="caching_beispielapplikation.title">Eine einfache
+      Beispielapplikation</title>
+
+      <para>Um die Caching-Methoden auszuprobieren, brauchen wir eine
+      Beispielapplikation. Wir verwenden ein einfaches Telefonbuch mit einem
+      Model für die Firma und ein Model für die Mitarbeiter der Firmen.</para>
+
+      <important>
+        <para>Bitte bedenken: Wenn die später aufgezeigten Einsparungen schon
+        bei einer solch einfachen Applikation so gross sind, dann werden sie
+        bei komplexeren Applikationen mit komplexeren Views um so grösser
+        sein.</para>
+      </important>
+
+      <para>Wir erstellen die neue Rails-App:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new phone_book</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd phone_book</command> 
+Stefan-Wintermeyers-MacBook-Air:phone_book xyz$ <command>rails generate scaffold company name</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:phone_book xyz$ <command>rails generate scaffold employee company_id:integer last_name first_name phone_number</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:phone_book xyz$ <command>rake db:migrate</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:phone_book xyz$</screen></para>
+
+      <section>
+        <title>Models</title>
+
+        <para>Wir fügen ein paar rudimentäre Regeln in die beiden Models
+        ein.</para>
+
+        <para><filename>app/models/company.rb</filename><programlisting>class Company &lt; ActiveRecord::Base
+  attr_accessible :name
+
+  validates :name,
+            :presence =&gt; true,
+            :uniqueness =&gt; true
+
+  has_many :employees, :dependent =&gt; :destroy
+
+  def to_s
+    name
+  end
+end
+</programlisting></para>
+
+        <para><filename>app/models/employee.rb</filename><programlisting>class Employee &lt; ActiveRecord::Base
+  attr_accessible :company_id, :first_name, :last_name, :phone_number
+
+  belongs_to :company, :touch =&gt; true
+
+  validates :first_name,
+            :presence =&gt; true
+
+  validates :last_name,
+            :presence =&gt; true
+
+  validates :company,
+            :presence =&gt; true
+
+  def to_s
+    "#{first_name} #{last_name}"
+  end
+end</programlisting></para>
+      </section>
+
+      <section>
+        <title>Views</title>
+
+        <para>Die folgenden zwei Company Views verändern wir, um im Index-View
+        die Anzahl der Mitarbeiter und im Show-View alle Mitarbeiter
+        aufzulisten.</para>
+
+        <para><filename>app/views/companies/index.html.erb</filename><programlisting>&lt;h1&gt;Listing companies&lt;/h1&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Name&lt;/th&gt;
+    &lt;th&gt;Number of employees&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @companies.each do |company| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= company.name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= company.employees.count %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Show', company %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Edit', edit_company_path(company) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', company, method: :delete, data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+
+&lt;br /&gt;
+
+&lt;%= link_to 'New Company', new_company_path %&gt;
+</programlisting></para>
+
+        <para><filename>app/views/companies/show.html.erb</filename><programlisting>&lt;p id="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;Name:&lt;/b&gt;
+  &lt;%= @company.name %&gt;
+&lt;/p&gt;
+
+
+&lt;%= link_to 'Edit', edit_company_path(@company) %&gt; |
+&lt;%= link_to 'Back', companies_path %&gt;
+
+&lt;h2&gt;Listing employees&lt;/h2&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Last name&lt;/th&gt;
+    &lt;th&gt;First name&lt;/th&gt;
+    &lt;th&gt;Phone number&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @company.employees.each do |employee| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= employee.last_name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= employee.first_name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= employee.phone_number %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;</programlisting></para>
+      </section>
+
+      <section>
+        <title>Beispieldaten</title>
+
+        <para>Für das einfache Befüllen der Datenbank benutzen wir das Faker
+        Gem (siehe <uri
+        xlink:href="http://faker.rubyforge.org/">http://faker.rubyforge.org/</uri>).
+        Mit Faker kann man zufällige Namen und Telefonnummern generieren.
+        Bitte fügen Sie in der <filename>Gemfile</filename> Datei diese Zeile
+        hinzu:<programlisting>gem 'faker'</programlisting></para>
+
+        <para>Danach ein <command>bundle install</command> starten:<screen>Stefan-Wintermeyers-MacBook-Air:phone_book xyz$ <command>bundle install</command>
+[...]
+Stefan-Wintermeyers-MacBook-Air:phone_book xyz$</screen></para>
+
+        <para>In der <filename>db/seeds.rb</filename> lassen wir 30 Firmen mit
+        einer jeweils zufälligen Anzahl an Mitarbeitern
+        erstellen:<programlisting>30.times do
+  company = Company.new(:name =&gt; Faker::Company.name)
+  if company.save
+    SecureRandom.random_number(100).times do
+      company.employees.create(:first_name =&gt; Faker::Name.first_name, :last_name =&gt; Faker::Name.last_name, :phone_number =&gt; Faker::PhoneNumber.phone_number)
+    end
+  end
+end</programlisting></para>
+
+        <para>Das Einspielen erfolgt mit <command>rake
+        db:seed</command><screen>Stefan-Wintermeyers-MacBook-Air:phone_book xyz$ <command>rake db:seed</command>
+Stefan-Wintermeyers-MacBook-Air:phone_book xyz$</screen></para>
+
+        <para>Sie können die Applikation mit rails server starten und mit
+        einem Webbrowser die Beispieldaten unten den URLs <uri
+        xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>
+        und <uri
+        xlink:href="http://0.0.0.0:3000/companies/1">http://0.0.0.0:3000/companies/1</uri>
+        abrufen.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>Anfangsgeschwindigkeit der zu optimierenden Seiten</title>
+
+      <para>Wir optimieren in diesem Kapitel die folgenden Webseiten. Die
+      Rails-Applikation wird mit <command>rails server</command> im
+      Development-Modus gestartet. Die jeweiligen Zahlen hängen natürlich
+      immer von der eingesetzen Hardware ab.<screen>Stefan-Wintermeyers-MacBook-Air:phone_book xyz$ <command>rails server</command>
+=&gt; Booting WEBrick
+=&gt; Rails 3.2.6 application starting in development on http://0.0.0.0:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2012-07-13 14:31:45] INFO  WEBrick 1.3.1
+[2012-07-13 14:31:45] INFO  ruby 1.9.3 (2012-04-20) [x86_64-darwin11.4.0]
+[2012-07-13 14:31:45] INFO  WEBrick::HTTPServer#start: pid=14357 port=3000</screen></para>
+
+      <para>Zum Aufruf der Webseiten benutzen wir das Kommandozeilentool curl
+      (<uri xlink:href="http://curl.haxx.se/">http://curl.haxx.se/</uri>).
+      Natürlich können Sie die Webseiten auch mit anderen Webbrowsern
+      aufrufen. Wir betrachten die im Rails-Log angezeigte Zeit zum Erstellen
+      der Seite. Dazu muss man in der Realität noch das Ausliefern der Seite
+      an den Webbrowser hinzurechnen.</para>
+
+      <section>
+        <title>Liste aller Firmen (Index-View)</title>
+
+        <para>Unter der URL <uri
+        xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>
+        bekommt der Anwender eine Liste aller gespeicherten Firmen mit der
+        jeweiligen Anzahl von Mitarbeitern angezeigt.</para>
+
+        <para>Das Generieren der Seite dauert 85ms.<screen>Completed 200 OK in 85ms (Views: 71.9ms | ActiveRecord: 12.5ms)</screen></para>
+      </section>
+
+      <section>
+        <title>Detailansicht einer einzelnen Firma (Show-View)</title>
+
+        <para>Unter der URL <uri
+        xlink:href="http://0.0.0.0:3000/companies/1">http://0.0.0.0:3000/companies/1</uri>
+        bekommt der Anwender die Detailsansicht der ersten Firma mit allen
+        Mitarbeitern angezeigt.</para>
+
+        <para>Das Generieren der Seite dauert 21ms.<screen>Completed 200 OK in 21ms (Views: 19.1ms | ActiveRecord: 1.1ms)</screen></para>
+      </section>
+    </section>
+  </section>
+
+  <section xml:id="http_caching">
+    <title xml:id="http_caching.title">HTTP-Caching</title>
+
+    <para>HTTP-Caching versucht bereits geladene Webseiten oder Dateien wieder
+    zu verwenden. Wenn Sie z.B. mehrmals am Tag auf eine Webseite wie <uri
+    xlink:href="http://www.heise.de">http://www.heise.de</uri> oder <uri
+    xlink:href="http://www.spiegel.de">http://www.spiegel.de</uri> gehen, um
+    sich dort immer die aktuellen Nachrichten durch zu lesen, dann werden
+    bestimmte Elemente dieser Seite (z.B. die Logo-Grafik am Kopf der Seite)
+    beim zweiten Laden nicht noch mal geladen. Ihr Browser hat diese Dateien
+    bereits im Cache und spart somit Zugriffszeit und Bandbreite.</para>
+
+    <para>Für einen Webbrowser gibt es verschiedene Möglichkeiten
+    rauszufinden, ob eine Datei oder eine Webseite im Cache noch gültig
+    ist.</para>
+
+    <section xml:id="http_caching_last_modified">
+      <title xml:id="http_caching_last_modified.title">Last-Modified</title>
+
+      <important>
+        <para>Bitte passen Sie die in den Beispielen verwendeten Uhrzeiten an
+        Ihre Gegenheiten an.</para>
+      </important>
+
+      <para>Der Webbrowser weiß, wann er eine Webseite downgeloadet und danach
+      in den Cache gelegt hat. Diese Information kann er dem Webserver in
+      einem <code>If-Modified-Since:</code> Header übergeben. Der Webserver
+      kann diese Information dann mit der entsprechenden Datei vergleichen und
+      entweder eine neuere Version ausliefern oder einen HTTP 304 Not Modified
+      Code als Antwort liefern. Bei einem 304 liefert der Webbrowser die
+      gecachete Version. Sie werden jetzt sagen "Das ist ja schön bei
+      Grafiken, aber das nützt mir ja bei dynamisch generierten Webseiten wie
+      dem Index-View der Firmen nichts". Da haben Sie aber die Fähigkeiten von
+      Rails unterschätzt. ;-)</para>
+
+      <para>Ändern Sie bitte in der Controller-Datei
+      <filename>app/controllers/companies_controller.rb</filename> die
+      <methodname>index</methodname> und <methodname>show</methodname>
+      Methoden wie folgt ab:<programlisting>  def index
+    @companies = Company.order(:id)
+
+    fresh_when last_modified: @companies.maximum(:updated_at)
+  end
+
+  def show
+    @company = Company.find(params[:id])
+
+    fresh_when last_modified: @company.updated_at
+  end</programlisting></para>
+
+      <note>
+        <para>Wie nehmen <code>@companies = Company.order(:id)</code> anstelle
+        von <code>@companies = Company.all</code> um ActiveRecords Lazy
+        Loading (siehe <xref linkend="lazy_loading" />) benutzen zu
+        können.</para>
+      </note>
+
+      <para>Nach einem Neustart der Rails-Applikation schauen wir uns mal den
+      HTTP-Header von <uri
+      xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>
+      an:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>curl -I http://0.0.0.0:3000/companies</command>
+HTTP/1.1 200 OK 
+<emphasis>Last-Modified: Fri, 13 Jul 2012 12:14:50 GMT</emphasis>
+Content-Type: text/html; charset=utf-8
+Cache-Control: max-age=0, private, must-revalidate
+X-Ua-Compatible: IE=Edge
+X-Request-Id: a2b4f9bc64f53637691a4665563568f6
+X-Runtime: 0.066358
+Content-Length: 0
+Server: WEBrick/1.3.1 (Ruby/1.9.3/2012-04-20)
+Date: Fri, 13 Jul 2012 14:22:24 GMT
+Connection: Keep-Alive
+Set-Cookie: _phone_book_session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRkkiJTliNWQxOTQ4ZDNmNTI2M2Q0ZjZiZTI5ZjdjYzIyY2EwBjsAVEkiEF9jc3JmX3Rva2VuBjsARkkiMVg1ZjNBNFBWcWxZSWJQRzM3aVczS2hiTzBtckx4SzFjeWQwOEZGWHVwNkU9BjsARg%3D%3D--08bd7983f93a82133df64e0c742953808c2e6d1f; path=/; HttpOnly
+
+Stefan-Wintermeyers-MacBook-Air:~ stefan$</screen></para>
+
+      <para>Der <code>Last-Modified</code> Eintrag im HTTP-Header wurde von
+      <methodname>fresh_when</methodname> im Controller generiert. Wenn wir
+      später die gleiche Webseite abrufen und dabei diese Uhrzeit mit angeben,
+      dann bekommen wir nicht die Webseite, sondern einen <code>304 Not
+      Modified</code> zurück:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>curl -I http://0.0.0.0:3000/companies --header 'If-Modified-Since: Fri, 13 Jul 2012 12:14:50 GMT'</command>
+HTTP/1.1 304 Not Modified 
+Last-Modified: Fri, 13 Jul 2012 12:14:50 GMT
+Cache-Control: max-age=0, private, must-revalidate
+X-Ua-Compatible: IE=Edge
+X-Request-Id: 7802f078add46dc372adaec92f343fe2
+X-Runtime: 0.008647
+Server: WEBrick/1.3.1 (Ruby/1.9.3/2012-04-20)
+Date: Fri, 13 Jul 2012 14:27:15 GMT
+Connection: close
+
+Stefan-Wintermeyers-MacBook-Air:~ stefan$</screen></para>
+
+      <para>Im Rails-Log finden wir folgendes:<screen>Started HEAD "/companies" for 127.0.0.1 at 2012-07-13 16:29:53 +0200
+Processing by CompaniesController#index as */*
+   (0.2ms)  SELECT MAX("companies"."updated_at") AS max_id FROM "companies" 
+<emphasis>Completed 304 Not Modified in 2ms (ActiveRecord: 0.2ms)</emphasis></screen></para>
+
+      <para>Rails hat für die Beantwortung dieser Anfrage 2ms im Vergleich zu
+      67ms zur Standard-Variante benötigt. Das ist mehr als 40 mal schneller!
+      Sie haben also rund 40 mal weniger Resourcen auf dem Server benötigt.
+      Und es wurde massiv Bandbreite eingespart. Der Anwender bekommt die
+      Seite viel schneller angezeigt.</para>
+
+      <para>Erzielt wurde dieses Ergebnis durch
+      <code>@companies.maximum(:updated_at)</code> im Controller. Wir haben
+      nur abfragen müssen, wann das letzte Update in der Datenbank gemacht
+      wurde. Sobald sich ein einzelner Company Datensatz ändert, so wird der
+      Wert auf den dann aktuellen Zeitpunkt gesetzt und es wird wieder die
+      ganze Webseite ausgeliefert. Mit dieser Methode können Sie auch
+      dynamisch generierte Webseiten per <code>Last-Modified</code> Header
+      ausliefern lassen.</para>
+
+      <section>
+        <title>Die Magie von touch</title>
+
+        <para>Was passiert, wenn ein <classname>Employee</classname> verändert
+        oder gelöscht wird? Dann würde sich auf jeden Fall der Show-View und
+        evt. auch der Index-View ändern müssen. Das ist der Grund für die
+        Zeile <programlisting>belongs_to :company, :touch =&gt; true</programlisting>
+        im Employee Model. Jedesmal, wenn ein Objekt der Klasse
+        <classname>Employee</classname> verändert abgespeichert wird, updatet
+        ActiveRecord bei der Benutzung von <code>:touch =&gt; true</code> das
+        darüberliegende <classname>Company</classname> Element in der
+        Datenbank. Das <varname>updated_at</varname> Feld wird auf die
+        aktuelle Uhrzeit gesetzt. Es wird ge-"touch"-t.</para>
+
+        <para>Deshalb ist sichergestellt, das auch dann wieder eine korrekte
+        Webseite ausgeliefert wird.</para>
+      </section>
+    </section>
+
+    <section xml:id="http_caching_etag">
+      <title xml:id="http_caching_etag.title">Etag</title>
+
+      <para>Manchmal ist das <varname>update_at</varname> Feld eines
+      bestimmten Objektes nicht alleine aussagefähig. Wenn Sie z.B. eine
+      Webseite haben, auf der sich Anwender einloggen können und die
+      Webseiten-Inhalte dann anhand eines Rollen-Models generiert. Dann kann
+      es sein, das der Anwender A als Admin einen Edit-Link angezeigt bekommt
+      und Anwender B als normaler User diesen Edit-Link nicht angezeigt
+      bekommt.</para>
+
+      <para>Bei solchen Szeanrien können wir den per Default immer aktivierte
+      Etag Header benutzen. Er wird </para>
+    </section>
   </section>
 </chapter>
