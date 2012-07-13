@@ -533,8 +533,30 @@ Processing by CompaniesController#index as */*
       </section>
     </section>
 
-    <section>
-      <title>Die Magie von touch</title>
+    <section xml:id="http_caching_etag_and_last_modified">
+      <title xml:id="http_caching_etag_and_last_modified.title">Etag und
+      Last-Modified kombinieren</title>
+
+      <para>Sie können <code>Etag</code> und <code>Last-Modified</code> auch
+      zusammen anwenden. Verwenden Sie dazu nur
+      <methodname>fresh_when</methodname> ohne den Zusatz
+      <parameter>etag:</parameter> oder <parameter>:last_modified</parameter>.
+      Das Beispiel aus <xref linkend="http_caching_last_modified" /> sieht
+      damit so aus:<programlisting>  def index
+    @companies = Company.order(:id)
+
+    fresh_when @companies.maximum(:updated_at)
+  end
+
+  def show
+    @company = Company.find(params[:id])
+
+    fresh_when @company.updated_at
+  end</programlisting></para>
+    </section>
+
+    <section xml:id="http_caching_touch">
+      <title xml:id="http_caching_touch.title">Die Magie von touch</title>
 
       <para>Was passiert, wenn ein <classname>Employee</classname> verändert
       oder gelöscht wird? Dann würde sich auf jeden Fall der Show-View und
@@ -549,6 +571,43 @@ Processing by CompaniesController#index as */*
 
       <para>Deshalb ist sichergestellt, das auch dann wieder eine korrekte
       Webseite ausgeliefert wird.</para>
+    </section>
+
+    <section xml:id="http_caching_stale">
+      <title xml:id="http_caching_stale.title">stale?</title>
+
+      <para>Bis jetzt sind wir immer davon ausgegangen, das nur HTML-Seiten
+      ausgeliefert werden. Deshalb konnten wir
+      <methodname>fresh_when</methodname> benutzen und danach auf den
+      <code>respond_to do |format|</code> Block verzichten. HTTP-Caching ist
+      aber nicht auf HTML-Seiten beschränkt. Wenn wir allerdings zusätzlich
+      z.B. JSON rendern und via HTTP-Caching ausliefern wollen, so müssen wir
+      die <methodname>stale?</methodname> Methode benutzen. Die Anwendung von
+      <methodname>stale?</methodname> ähnelt sonst der von
+      <methodname>fresh_when</methodname>. Das Beispiel aus <xref
+      linkend="http_caching_etag" /> würde bei Verwendung von
+      <methodname>stale?</methodname> und beim zusätzlichen Rendern von JSON
+      so aussehen:<programlisting>  def index
+    @companies = Company.all
+
+    if stale? etag: @companies
+      respond_to do |format|
+        format.html # index.html.erb
+        format.json { render json: @companies }
+      end
+    end
+  end
+
+  def show
+    @company = Company.find(params[:id])
+
+    if stale? etag: @company
+      respond_to do |format|
+        format.html # show.html.erb
+        format.json { render json: @company }
+      end
+    end
+  end</programlisting></para>
     </section>
   </section>
 </chapter>
