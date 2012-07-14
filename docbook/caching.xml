@@ -220,7 +220,11 @@ Stefan-Wintermeyers-MacBook-Air:phone_book xyz$</screen></para>
   company = Company.new(:name =&gt; Faker::Company.name)
   if company.save
     SecureRandom.random_number(100).times do
-      company.employees.create(:first_name =&gt; Faker::Name.first_name, :last_name =&gt; Faker::Name.last_name, :phone_number =&gt; Faker::PhoneNumber.phone_number)
+      company.employees.create(
+                               :first_name =&gt; Faker::Name.first_name, 
+                               :last_name =&gt; Faker::Name.last_name, 
+                               :phone_number =&gt; Faker::PhoneNumber.phone_number
+                              )
     end
   end
 end</programlisting></para>
@@ -541,7 +545,8 @@ Processing by CompaniesController#index as */*
       zusammen anwenden. Das sieht dann so aus:<programlisting>  def index
     @companies = Company.order(:id)
 
-    fresh_when :etag =&gt; @companies.all, :last_modified =&gt; @companies.maximum(:updated_at)
+    fresh_when :etag =&gt; @companies.all, 
+               :last_modified =&gt; @companies.maximum(:updated_at)
   end
 
   def show
@@ -591,7 +596,8 @@ Processing by CompaniesController#index as */*
       JSON so aussehen:<programlisting>  def index
     @companies = Company.order(:id)
 
-    if stale? :etag =&gt; @companies.all, :last_modified =&gt; @companies.maximum(:updated_at)
+    if stale? :etag =&gt; @companies.all, 
+              :last_modified =&gt; @companies.maximum(:updated_at)
       respond_to do |format|
         format.html
         format.json { render json: @companies }
@@ -611,35 +617,139 @@ Processing by CompaniesController#index as */*
   end</programlisting></para>
     </section>
 
+    <section xml:id="http_caching_public">
+      <title xml:id="http_caching_public.title">Proxies mitbenutzen
+      (public)</title>
+
+      <para>Bis jetzt sind wir immer von einem Cache im Webbrowser
+      ausgegangen. Es gibt aber im Internet sehr viele Proxies, die oft näher
+      beim Anwender sind und deshalb bei Seiten die nicht personalisiert sind
+      sinnvoll cachen können. Wenn es sich in unserem Beispiel um ein
+      öffentlich zugängliches Telefonbuch handeln würde, dann könnten wir die
+      für uns kostenlose Dienste der Proxies mit dem Parameter <code>public:
+      true</code> in <methodname>fresh_when</methodname> oder
+      <methodname>stale?</methodname> aktivieren. Das Beispiel aus <xref
+      linkend="http_caching_etag_and_last_modified" /> würde bei Verwendung
+      von <code>public: true</code> so aussehen:<programlisting>  def index
+    @companies = Company.order(:id)
+
+    fresh_when :etag =&gt; @companies.all, 
+               :last_modified =&gt; @companies.maximum(:updated_at),
+               :public =&gt; true
+  end
+
+  def show
+    @company = Company.find(params[:id])
+
+    fresh_when @company, public: true
+  end</programlisting></para>
+
+      <para>Beim Aufruf der Webseite bekommen wir die Ausgabe:<screen>Stefan-Wintermeyers-MacBook-Air:rails-buch stefan$ <command>curl -I http://0.0.0.0:3000/companies</command>
+HTTP/1.1 200 OK 
+Etag: "d45a37972109e8ccea1160d81a6ff79d"
+Last-Modified: Sat, 14 Jul 2012 12:40:25 GMT
+Content-Type: text/html; charset=utf-8
+<emphasis>Cache-Control: public</emphasis>
+[...]</screen></para>
+
+      <para>Der Header <code>Cache-Control: public</code> sagt allen Proxies,
+      das sie diese Webseite auch cachen können.</para>
+
+      <warning>
+        <para>Die Benutzung von Proxies muss immer mit grosser Vorsicht
+        geschehen. Auf der einen Seite sind sie hervorrangend geeignet, die
+        eigene Webseite schneller an mehr User auszuliefern, aber auf der
+        anderen Seite muss man auch ganz sicher sein, das keine
+        personalisierten Seiten auf öffentlichen Proxies gecachet werden. So
+        haben CSRF-Tags und Flash-Nachrichten nichts in einem öffentlichen
+        Proxy zu suchen. Um bei CSRF-Tags ganz sicher zu gehen empfiehlt es
+        sich im Default
+        <filename>app/views/layouts/application.html.erb</filename> Layout die
+        Ausgabe von <methodname>csrf_meta_tag</methodname> davon abhängig zu
+        machen, ob die Seite öffentlich gecachet werden darf oder
+        nicht:<programlisting>&lt;%= csrf_meta_tag unless response.cache_control[:public] %&gt;</programlisting></para>
+      </warning>
+    </section>
+
     <section>
-      <title>Cache-Control</title>
+      <title>Cache-Control mit einem Zeitlimit</title>
 
       <para>Bei der Benutzung von <code>Etag</code> und
-      <code>Last-Modified</code> gehen wir immer davon aus, das der Webbrowser
+      <code>Last-Modified</code> gehen wir in <xref
+      linkend="http_caching_etag" /> und <xref
+      linkend="http_caching_last_modified" /> davon aus, das der Webbrowser
       auf jeden Fall noch mal beim Webserver nachfragt, ob die gecachete
-      Version einer Webseite noch aktuell ist. Das ist aber oft gar nicht
-      notwendig. Wenn wir uns sicher sind, das gerade gerenderte Webseite auch
-      noch in einer Stunde, einem Tag oder einem Monat genau so aussieht, dann
-      können wir das dem Browser per Cache-Control mitteilen.</para>
+      Version einer Webseite noch aktuell ist. Das ist eine sehr sicherere
+      Vorgehensweise.</para>
+
+      <para>Allerdings kann man die Optimierung durch eine Prognose in die
+      Zukunft noch ein Stück weiter treiben: Wenn ich mir beim Ausliefern
+      einer Webseite sicher bin, das diese Webseite sich in den nächsten zwei
+      Minuten, Stunden oder Tagen nicht verändert, dann kann ich das dem
+      Webbrowser direkt mitteilen. Dann braucht er in dieser Zeitspanne nicht
+      noch einmal nachzufragen. Diese Overhead-Einsparung hat besonders bei
+      Mobilen-Webbrowsern mit relativ hohen Latenzen Vorteile. Ausserdem spart
+      man natürlich auf dem Webserver noch einmal Server-Load.</para>
 
       <para>Bei der Ausgabe des HTTP-Headers wird Ihnen bei den
       <code>Etag</code> und <code>Last-Modified</code> Beispielen vielleicht
       schon die entsprechende Zeile <screen>Cache-Control: max-age=0, private, must-revalidate</screen>aufgefallen
       sein. Der Eintrag <code>must-revalidate</code> sagt dem Webbrowser, das
       er auf jeden Fall noch mal beim Webserver nachfragen soll, ob sich eine
-      Webseite mittlerweile verändert hat.</para>
+      Webseite mittlerweile verändert hat. Der zweite Parameter
+      <code>private</code> bedeutet, das nur der Webbrowser diese Seite cachen
+      darf. Auf dem Weg liegende Proxies dürfen diese Seite nicht
+      cachen.</para>
 
       <para>Wenn wir bei unserem Telefonbuch sagen, das die Webseite
-      mindestens für 2 Minuten so bleiben wird, so können wir das x<xref
+      mindestens für 2 Minuten so bleiben wird, so können wir das <xref
       linkend="http_caching_etag_and_last_modified" /> Beispiel um die dafür
       vorgesehene Methode <methodname>expires_in</methodname> erweitern. Der
-      Controller app/controllers/companies.rb würde dann folgenden Code für
-      die index und show Methode
-      enthalten:<programlisting></programlisting></para>
+      Controller <filename>app/controllers/companies.rb</filename> würde dann
+      folgenden Code für die <methodname>index</methodname> und
+      <methodname>show</methodname> Methode enthalten:<programlisting>  def index
+    @companies = Company.order(:id)
 
-      <para></para>
+    expires_in 2.minutes
+    fresh_when :etag =&gt; @companies.all, :last_modified =&gt; @companies.maximum(:updated_at)
+  end
 
-      <para></para>
+  def show
+    @company = Company.find(params[:id])
+
+    expires_in 2.minutes
+    fresh_when @company
+  end
+</programlisting></para>
+
+      <para>Jetzt bekommen wir bei einer Abfrage eine andere Cache-Control
+      Information:<screen>Stefan-Wintermeyers-MacBook-Air:rails-buch stefan$ <command>curl -I http://0.0.0.0:3000/companies</command>
+HTTP/1.1 200 OK 
+Etag: "d45a37972109e8ccea1160d81a6ff79d"
+Last-Modified: Sat, 14 Jul 2012 12:40:25 GMT
+Content-Type: text/html; charset=utf-8
+<emphasis>Cache-Control: max-age=120, private</emphasis>
+[...]</screen></para>
+
+      <para>Die zwei Minuten werden in Sekunden angegeben
+      (<code>max-age=120</code>) und zusätzlich entfällt
+      <code>must-revalidate</code>. Der Webbrowser muss also in den nächsten
+      120 Sekunden nicht mehr beim Webserver nachfragen, ob sich der Inhalt
+      dieser Seite geändert hat.</para>
+
+      <note>
+        <para>Dieser Mechanismus wird auch von der Asset Pipeline benutzt.
+        Dort im Produktivbetrieb erstellte Asssets sind durch die Prüfsumme im
+        Dateinamen eindeutig identifizierbar und können sehr lange sowohl im
+        Webbrowser wie auch in öffentlichen Proxies gecachet werden. Deswegen
+        haben wir in <xref
+        linkend="production_webserver_capistrano_nginx_konfiguration" /> in
+        der nginx Konfigurationsdatei den Abschnitt<programlisting>location ^~ /assets/ {
+  gzip_static on;
+  expires max;
+  add_header Cache-Control public;
+}</programlisting></para>
+      </note>
     </section>
   </section>
 </chapter>
