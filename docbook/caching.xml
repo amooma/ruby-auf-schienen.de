@@ -505,8 +505,8 @@ Processing by CompaniesController#index as */*
       Webapplikation.</para>
 
       <section xml:id="http_caching_etag_current_user">
-        <title
-        xml:id="http_caching_etag_current_user.title">current_user</title>
+        <title xml:id="http_caching_etag_current_user.title">current_user und
+        andere potentielle Parameter</title>
 
         <para>Wir können als Grundlage für die Generierung eines Etags nicht
         nur ein Objekt, sondern auch ein Array von Objekten übergeben. So
@@ -538,21 +538,22 @@ Processing by CompaniesController#index as */*
       Last-Modified kombinieren</title>
 
       <para>Sie können <code>Etag</code> und <code>Last-Modified</code> auch
-      zusammen anwenden. Verwenden Sie dazu nur
-      <methodname>fresh_when</methodname> ohne den Zusatz
-      <parameter>etag:</parameter> oder <parameter>:last_modified</parameter>.
-      Das Beispiel aus <xref linkend="http_caching_last_modified" /> sieht
-      damit so aus:<programlisting>  def index
+      zusammen anwenden. Das sieht dann so aus:<programlisting>  def index
     @companies = Company.order(:id)
 
-    fresh_when @companies.maximum(:updated_at)
+    fresh_when :etag =&gt; @companies.all, :last_modified =&gt; @companies.maximum(:updated_at)
   end
 
   def show
     @company = Company.find(params[:id])
 
-    fresh_when @company.updated_at
+    fresh_when @company
   end</programlisting></para>
+
+      <para>Sie sehen, das es beim show View eine Kurzform gibt. Das liegt
+      daran, das <varname>@company</varname> eine Methode
+      <methodname>updated_at</methodname> hat. Diese wird dann automatisch von
+      <methodname>fresh_when</methodname> benutzt.</para>
     </section>
 
     <section xml:id="http_caching_touch">
@@ -585,14 +586,14 @@ Processing by CompaniesController#index as */*
       die <methodname>stale?</methodname> Methode benutzen. Die Anwendung von
       <methodname>stale?</methodname> ähnelt sonst der von
       <methodname>fresh_when</methodname>. Das Beispiel aus <xref
-      linkend="http_caching_etag" /> würde bei Verwendung von
-      <methodname>stale?</methodname> und beim zusätzlichen Rendern von JSON
-      so aussehen:<programlisting>  def index
-    @companies = Company.all
+      linkend="http_caching_etag_and_last_modified" /> würde bei Verwendung
+      von <methodname>stale?</methodname> und beim zusätzlichen Rendern von
+      JSON so aussehen:<programlisting>  def index
+    @companies = Company.order(:id)
 
-    if stale? etag: @companies
+    if stale? :etag =&gt; @companies.all, :last_modified =&gt; @companies.maximum(:updated_at)
       respond_to do |format|
-        format.html # index.html.erb
+        format.html
         format.json { render json: @companies }
       end
     end
@@ -601,13 +602,44 @@ Processing by CompaniesController#index as */*
   def show
     @company = Company.find(params[:id])
 
-    if stale? etag: @company
+    if stale? @company
       respond_to do |format|
-        format.html # show.html.erb
+        format.html
         format.json { render json: @company }
       end
     end
   end</programlisting></para>
+    </section>
+
+    <section>
+      <title>Cache-Control</title>
+
+      <para>Bei der Benutzung von <code>Etag</code> und
+      <code>Last-Modified</code> gehen wir immer davon aus, das der Webbrowser
+      auf jeden Fall noch mal beim Webserver nachfragt, ob die gecachete
+      Version einer Webseite noch aktuell ist. Das ist aber oft gar nicht
+      notwendig. Wenn wir uns sicher sind, das gerade gerenderte Webseite auch
+      noch in einer Stunde, einem Tag oder einem Monat genau so aussieht, dann
+      können wir das dem Browser per Cache-Control mitteilen.</para>
+
+      <para>Bei der Ausgabe des HTTP-Headers wird Ihnen bei den
+      <code>Etag</code> und <code>Last-Modified</code> Beispielen vielleicht
+      schon die entsprechende Zeile <screen>Cache-Control: max-age=0, private, must-revalidate</screen>aufgefallen
+      sein. Der Eintrag <code>must-revalidate</code> sagt dem Webbrowser, das
+      er auf jeden Fall noch mal beim Webserver nachfragen soll, ob sich eine
+      Webseite mittlerweile verändert hat.</para>
+
+      <para>Wenn wir bei unserem Telefonbuch sagen, das die Webseite
+      mindestens für 2 Minuten so bleiben wird, so können wir das x<xref
+      linkend="http_caching_etag_and_last_modified" /> Beispiel um die dafür
+      vorgesehene Methode <methodname>expires_in</methodname> erweitern. Der
+      Controller app/controllers/companies.rb würde dann folgenden Code für
+      die index und show Methode
+      enthalten:<programlisting></programlisting></para>
+
+      <para></para>
+
+      <para></para>
     </section>
   </section>
 </chapter>
