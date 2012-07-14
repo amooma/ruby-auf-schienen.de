@@ -357,7 +357,7 @@ Stefan-Wintermeyers-MacBook-Air:phone_book xyz$</screen></para>
       <para>Nach einem Neustart der Rails-Applikation schauen wir uns mal den
       HTTP-Header von <uri
       xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>
-      an:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>curl -I http://0.0.0.0:3000/companies</command>
+      an:<screen>MacBook:~ xyz$ <command>curl -I http://0.0.0.0:3000/companies</command>
 HTTP/1.1 200 OK 
 <emphasis>Last-Modified: Fri, 13 Jul 2012 12:14:50 GMT</emphasis>
 Content-Type: text/html; charset=utf-8
@@ -371,13 +371,13 @@ Date: Fri, 13 Jul 2012 14:22:24 GMT
 Connection: Keep-Alive
 Set-Cookie: _phone_book_session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRkkiJTliNWQxOTQ4ZDNmNTI2M2Q0ZjZiZTI5ZjdjYzIyY2EwBjsAVEkiEF9jc3JmX3Rva2VuBjsARkkiMVg1ZjNBNFBWcWxZSWJQRzM3aVczS2hiTzBtckx4SzFjeWQwOEZGWHVwNkU9BjsARg%3D%3D--08bd7983f93a82133df64e0c742953808c2e6d1f; path=/; HttpOnly
 
-Stefan-Wintermeyers-MacBook-Air:~ stefan$</screen></para>
+MacBook:~ xyz$</screen></para>
 
       <para>Der <code>Last-Modified</code> Eintrag im HTTP-Header wurde von
       <methodname>fresh_when</methodname> im Controller generiert. Wenn wir
       später die gleiche Webseite abrufen und dabei diese Uhrzeit mit angeben,
       dann bekommen wir nicht die Webseite, sondern einen <code>304 Not
-      Modified</code> zurück:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>curl -I http://0.0.0.0:3000/companies --header 'If-Modified-Since: Fri, 13 Jul 2012 12:14:50 GMT'</command>
+      Modified</code> zurück:<screen>MacBook:~ xyz$ <command>curl -I http://0.0.0.0:3000/companies --header 'If-Modified-Since: Fri, 13 Jul 2012 12:14:50 GMT'</command>
 HTTP/1.1 304 Not Modified 
 Last-Modified: Fri, 13 Jul 2012 12:14:50 GMT
 Cache-Control: max-age=0, private, must-revalidate
@@ -388,7 +388,7 @@ Server: WEBrick/1.3.1 (Ruby/1.9.3/2012-04-20)
 Date: Fri, 13 Jul 2012 14:27:15 GMT
 Connection: close
 
-Stefan-Wintermeyers-MacBook-Air:~ stefan$</screen></para>
+MacBook:~ xyz$</screen></para>
 
       <para>Im Rails-Log finden wir folgendes:<screen>Started HEAD "/companies" for 127.0.0.1 at 2012-07-13 16:29:53 +0200
 Processing by CompaniesController#index as */*
@@ -460,42 +460,42 @@ Processing by CompaniesController#index as */*
       später bei einer Anfrage auch übertragen.</para>
 
       <para>Das Abspeichern erfolgt mit dem <code>-c cookies.txt</code>
-      Parameter.<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>curl -I http://0.0.0.0:3000/companies -c cookies.txt</command>
+      Parameter.<screen>MacBook:~ xyz$ <command>curl -I http://0.0.0.0:3000/companies -c cookies.txt</command>
 HTTP/1.1 200 OK 
 Etag: "b5f711016cb2e5fce352230e607ceffe"
 Content-Type: text/html; charset=utf-8
 Cache-Control: max-age=0, private, must-revalidate
 [...]
 
-Stefan-Wintermeyers-MacBook-Air:~ stefan$</screen></para>
+MacBook:~ xyz$</screen></para>
 
       <para>Mit dem <code>-b cookies.txt</code> Parameter sendet curl bei
       einer Anfrage diese Cookies an den Webserver. Jetzt bekommen wir bei
-      zwei aufeinander folgenden Anfragen den gleichen ETag geliefert:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>curl -I http://0.0.0.0:3000/companies -b cookies.txt</command>
+      zwei aufeinander folgenden Anfragen den gleichen ETag geliefert:<screen>MacBook:~ xyz$ <command>curl -I http://0.0.0.0:3000/companies -b cookies.txt</command>
 HTTP/1.1 200 OK 
 <emphasis>Etag: "132c1be24595b9b5f7b2c08b300592b1"</emphasis>
 Content-Type: text/html; charset=utf-8
 Cache-Control: max-age=0, private, must-revalidate
 [...]
 
-Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>curl -I http://0.0.0.0:3000/companies -b cookies.txt</command>
+MacBook:~ xyz$ <command>curl -I http://0.0.0.0:3000/companies -b cookies.txt</command>
 HTTP/1.1 200 OK 
 <emphasis>Etag: "132c1be24595b9b5f7b2c08b300592b1"</emphasis>
 Content-Type: text/html; charset=utf-8
 Cache-Control: max-age=0, private, must-revalidate
 [...]
 
-Stefan-Wintermeyers-MacBook-Air:~ stefan$</screen></para>
+MacBook:~ xyz$</screen></para>
 
       <para>Jetzt benutzen wir diesen Etag, um mit If-None-Match in der
       Anfrage rauszubekommen, ob die von uns gecachete Version noch aktuell
-      ist:<screen>Stefan-Wintermeyers-MacBook-Air:~ stefan$ <command>curl -I http://0.0.0.0:3000/companies -b cookies.txt --header 'If-None-Match: "132c1be24595b9b5f7b2c08b300592b1"'</command>
+      ist:<screen>MacBook:~ xyz$ <command>curl -I http://0.0.0.0:3000/companies -b cookies.txt --header 'If-None-Match: "132c1be24595b9b5f7b2c08b300592b1"'</command>
 <emphasis>HTTP/1.1 304 Not Modified</emphasis> 
 Etag: "132c1be24595b9b5f7b2c08b300592b1"
 Cache-Control: max-age=0, private, must-revalidate
 [...]
 
-Stefan-Wintermeyers-MacBook-Air:~ stefan$</screen></para>
+MacBook:~ xyz$</screen></para>
 
       <para>Wir bekommen einen <code>304 Not Modified</code> geliefert.
       Schauen wir noch ins Rails-Log:<screen>Started HEAD "/companies" for 127.0.0.1 at 2012-07-13 18:45:38 +0200
