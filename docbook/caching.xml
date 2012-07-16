@@ -237,8 +237,8 @@ end</programlisting></para>
         db:seed</command><screen>Stefan-Wintermeyers-MacBook-Air:phone_book xyz$ <command>rake db:seed</command>
 Stefan-Wintermeyers-MacBook-Air:phone_book xyz$</screen></para>
 
-        <para>Sie können die Applikation mit rails server starten und mit
-        einem Webbrowser die Beispieldaten unten den URLs <uri
+        <para>Sie können die Applikation mit <command>rails server</command>
+        starten und mit einem Webbrowser die Beispieldaten unten den URLs <uri
         xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>
         und <uri
         xlink:href="http://0.0.0.0:3000/companies/1">http://0.0.0.0:3000/companies/1</uri>
@@ -811,9 +811,343 @@ Content-Type: text/html; charset=utf-8
     </section>
   </section>
 
-  <section>
-    <title></title>
+  <section xml:id="page_caching">
+    <title xml:id="page_caching.title">Page Caching</title>
 
-    <para></para>
+    <indexterm>
+      <primary>Caching</primary>
+
+      <secondary>Page Caching</secondary>
+    </indexterm>
+
+    <para>Beim Page Caching geht es darum komplette HTML-Seite (also das
+    Render-Ergebnis eines Views) in einem Unterverzeichnis der
+    <filename>public</filename> Verzeichnisses abzulegen und beim nächsten
+    Aufruf dieser Webseite von dort direkt auszuliefern. Zusätzlich kann man
+    auch direkt eine komprimierte gz-Version der HTML-Seite dort abspeichern.
+    Ein Produktiv-Webserver wird Dateien unterhabl von
+    <filename>public</filename> automatisch selbst ausliefern und kann auch so
+    konfiguriert werden, das - falls gz-Dateien vorhanden sind - diese direkt
+    ausgeliefert werden.</para>
+
+    <para>Bei komplexen Views die auch mal 500ms und mehr zum Rendern brauchen
+    ist die Zeitersparnis natürlich bedeutend. Als Webseitenbetreiber spart
+    man wieder wertvolle Serverresourcen und kann mehr Besucher mit der
+    gleichen Hardware bedienen. Der Besucher der Webseite profitiert durch
+    eine schnellere Auslieferung der Seite.</para>
+
+    <para>Der Nachteil liegt darin, das diese Methode nur für
+    <filename>public</filename> Webseiten geeignet ist. Also Webseiten die
+    nicht auf bestimmte User zugeschnitten sind. Ein weiterer Nachteil liegt
+    darin, das man bei der Programmierung selber entsprechende Seite updaten,
+    bzw. löschen muss.</para>
+
+    <para>Bitte installieren Sie eine frische Beispielapplikation (siehe <xref
+    linkend="caching_beispielapplikation" />).</para>
+
+    <section xml:id="page_caching_im_devel_modus_aktivieren">
+      <title xml:id="page_caching_im_devel_modus_aktivieren.title">Page
+      Caching im Development-Modus aktivieren</title>
+
+      <para>Als erstes müssen wir in der Datei
+      <filename>config/environments/development.rb</filename> den Eintrag
+      <code>config.action_controller.perform_caching</code> auf
+      <code>true</code> setzen:<programlisting>config.action_controller.perform_caching = true</programlisting></para>
+
+      <para>Sonst können wir das Page Caching im Development-Modus nicht
+      ausprobieren. Im Production-Modus ist Page Caching per Default
+      aktiviert.</para>
+    </section>
+
+    <section>
+      <title>Company Index- und Show-View cachen</title>
+
+      <indexterm>
+        <primary>Caching</primary>
+
+        <secondary>Page Caching</secondary>
+
+        <tertiary>caches_page</tertiary>
+      </indexterm>
+
+      <para>Page Caching wird im Controller aktiviert. Wenn wir für Company
+      die Index- und Show-Views cachen wollen, dann müssen wir im Controller
+      <filename>app/controllers/companies_controller.rb</filename> am Kopf den
+      <code>caches_page :index, :show</code> Befehl eingeben:<programlisting>class CompaniesController &lt; ApplicationController
+  <emphasis>caches_page :index, :show</emphasis>
+
+  # GET /companies
+  # GET /companies.json
+  def index
+    @companies = Company.all
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @companies }
+    end
+  end
+
+[...]</programlisting></para>
+
+      <para>Vor dem Starten der Applikation sieht das
+      <filename>public</filename> Verzeichnis so aus:<screen>public/
+|-- 404.html
+|-- 422.html
+|-- 500.html
+|-- favicon.ico
+|-- index.html
+`-- robots.txt</screen></para>
+
+      <para>Nach dem Starten der Applikation mit <command>rails
+      server</command> und dem Abruf der URLs <uri
+      xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>
+      und <uri
+      xlink:href="http://0.0.0.0:3000/companies/1">http://0.0.0.0:3000/companies/1</uri>
+      mit einem Webbrowser sieht es so aus:<screen>public/
+|-- 404.html
+|-- 422.html
+|-- 500.html
+|-- companies
+|   `-- 1.html
+|-- companies.html
+|-- favicon.ico
+|-- index.html
+`-- robots.txt</screen></para>
+
+      <para>Die Dateien <filename>public/companies.html</filename> und
+      <filename>public/companies/1.html</filename> wurden vom Page Caching
+      erstellt. Ab sofort wird der Webserver beim Aufruf dieser Seiten nur
+      noch die gecachten Versionen liefern.</para>
+
+      <section>
+        <title>gz Versionen</title>
+
+        <indexterm>
+          <primary>Caching</primary>
+
+          <secondary>Page Caching</secondary>
+
+          <tertiary>:gzip =&gt; :best_compression</tertiary>
+        </indexterm>
+
+        <para>Wenn man Page Cache einsetzt, dann sollte man auch direkt
+        gezippte gz-Dateien cachen. Das geht mit der Option <code>:gzip =&gt;
+        true</code> oder anstatt <code>true</code> einen bestimmten
+        Kompressionsparameter als Symbol (z.B.
+        <code>:best_compression</code>).</para>
+
+        <para>Der Controller
+        <filename>app/controllers/companies_controller.rb</filename> würde
+        dann am Anfang so aussehen:<programlisting>class CompaniesController &lt; ApplicationController
+  <emphasis>caches_page :index, :show, :gzip =&gt; :best_compression</emphasis>
+
+  # GET /companies
+  # GET /companies.json
+  def index
+    @companies = Company.all
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @companies }
+    end
+  end
+
+[...]</programlisting></para>
+
+        <para>Damit werden automatisch eine komprimierte und eine
+        unkomprimierte Variante eines jeden Page Caches abgespeichert:<screen>public/
+|-- 404.html
+|-- 422.html
+|-- 500.html
+|-- companies
+|   |-- 1.html
+|   `-- 1.html.gz
+|-- companies.html
+|-- companies.html.gz
+|-- favicon.ico
+|-- index.html
+`-- robots.txt</screen></para>
+      </section>
+    </section>
+
+    <section xml:id="page_caches_automatisch_loeschen">
+      <title xml:id="page_caches_automatisch_loeschen.title">Page Caches
+      automatisch löschen</title>
+
+      <indexterm>
+        <primary>Caching</primary>
+
+        <secondary>Page Caching</secondary>
+
+        <tertiary>löschen</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>Caching</primary>
+
+        <secondary>Page Caching</secondary>
+
+        <tertiary>Sweeper</tertiary>
+      </indexterm>
+
+      <para>Sobald sich die im View verwendeten Daten verändern, müssen
+      natürlich die gespeicherten Cache-Dateien gelöscht werden. Sonst wäre
+      der Cache nicht mehr aktuell.</para>
+
+      <para>Laut offizieller Rails-Doku ist die Lösung für dieses Problem die
+      Klasse <classname>ActionController::Caching::Sweeper</classname>. Dieser
+      auf <uri
+      xlink:href="http://guides.rubyonrails.org/caching_with_rails.html#sweepers">http://guides.rubyonrails.org/caching_with_rails.html#sweepers</uri>
+      beschriebene Weg hat aber einen großen Nachteil: Er beschränkt sich nur
+      auf Aktionen, die innerhalb des Controllers geschehen. Wenn ein Objekt
+      z.B. in der Console gelöscht wird, dann werden keine Sweepers
+      getriggert. Deshalb stelle ich Ihnen den Ansatz vor das Löschen der
+      Cache-Dateien im Model zu triggern.</para>
+
+      <para>In unserer Telefonbuchapplikation müssen wir bei der Veränderung
+      einer Firma immer den Cache für <uri
+      xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>
+      und <uri
+      xlink:href="http://0.0.0.0:3000/companies/1">http://0.0.0.0:3000/companies/id_der_firma</uri>
+      löschen. Bei einer Veränderung eines Angestellten müssen wir zusätzlich
+      noch die entsprechenden Caches zu dem Angestellten löschen. </para>
+
+      <important>
+        <para>Wir müssen wir darauf achten keine Seiten mit einer
+        Flash-Nachricht zu cachen. Weiterhin macht es auch keinen Sinn bei
+        diesen gecacheten Seiten einen CSRF-Meta-Tag einzubauen. Beides wird
+        im folgenden Code beachtet.</para>
+      </important>
+
+      <section>
+        <title>Controller</title>
+
+        <para>Fangen wir mit den Controllern an. Bitte ändern Sie den Anfang
+        von <filename>app/controllers/companies_controller.rb</filename> wie
+        folgt ab:<programlisting>class CompaniesController &lt; ApplicationController
+<emphasis>  caches_page :index, :show, :gzip =&gt; :best_compression, 
+                             :if =&gt; Proc.new { flash.count == 0 }
+  before_filter(only: [:index, :show]) { @page_caching_is_active = true if flash.count == 0 }</emphasis>
+
+  # GET /companies
+  # GET /companies.json
+  def index
+    @companies = Company.all
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @companies }
+    end
+  end
+
+[...]</programlisting></para>
+
+        <para>Bitte fügen Sie die <methodname>cache_page</methodname>
+        Anweisung auch in den Controller
+        <filename>app/controllers/employees_controller.rb</filename>
+        ein:<programlisting>class EmployeesController &lt; ApplicationController
+<emphasis>  caches_page :index, :show, :gzip =&gt; :best_compression, 
+                             :if =&gt; Proc.new { flash.count == 0 }
+  before_filter(only: [:index, :show]) { @page_caching_is_active = true if flash.count == 0 }</emphasis>
+
+  # GET /employees
+  # GET /employees.json
+  def index
+    @employees = Employee.all
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @employees }
+    end
+  end
+
+[...]</programlisting></para>
+      </section>
+
+      <section>
+        <title>Models</title>
+
+        <para>Jetzt müssen wir in den Models noch eintragen, das die
+        entsprechenden Caches automatisch gelöscht werden, sobald sich ein
+        Objekt erstellt, verändert oder gelöscht wird.</para>
+
+        <para><filename>app/models/company.rb</filename><programlisting>class Company &lt; ActiveRecord::Base
+  attr_accessible :name
+
+  validates :name,
+            :presence =&gt; true,
+            :uniqueness =&gt; true
+
+  has_many :employees, :dependent =&gt; :destroy
+
+<emphasis>  after_create   :expire_cache
+  after_update   :expire_cache
+  before_destroy :expire_cache
+</emphasis>
+  def to_s
+    name
+  end
+
+<emphasis>  def expire_cache
+    ActionController::Base.expire_page(Rails.application.routes.url_helpers.company_path(self))
+    ActionController::Base.expire_page(Rails.application.routes.url_helpers.companies_path)
+  end
+</emphasis>
+end</programlisting></para>
+
+        <para><filename>app/models/employee.rb</filename><programlisting>class Employee &lt; ActiveRecord::Base
+  attr_accessible :company_id, :first_name, :last_name, :phone_number
+
+  belongs_to :company, :touch =&gt; true
+
+  validates :first_name,
+            :presence =&gt; true
+
+  validates :last_name,
+            :presence =&gt; true
+
+  validates :company,
+            :presence =&gt; true
+
+<emphasis>  after_create   :expire_cache
+  after_update   :expire_cache
+  before_destroy :expire_cache</emphasis>
+
+  def to_s
+    "#{first_name} #{last_name}"
+  end
+
+<emphasis>  def expire_cache
+    ActionController::Base.expire_page(Rails.application.routes.url_helpers.employee_path(self))
+    ActionController::Base.expire_page(Rails.application.routes.url_helpers.employees_path)
+    self.company.expire_cache
+  end</emphasis>
+
+end</programlisting></para>
+      </section>
+
+      <section>
+        <title>application.html.erb</title>
+
+        <para>In der
+        <filename>app/views/layouts/application.html.erb</filename> müssen wir
+        noch berücksichtigen, ob ein CSRF-Meta-Tag eingebaut wird. Dies ist
+        bei gecacheten Seiten nicht der Fall.<programlisting>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;PhoneBook&lt;/title&gt;
+  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
+  &lt;%= javascript_include_tag "application" %&gt;
+  <emphasis>&lt;%= csrf_meta_tag unless @page_caching_is_active %&gt;</emphasis>
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;%= yield %&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</programlisting> </para>
+      </section>
+    </section>
   </section>
 </chapter>
