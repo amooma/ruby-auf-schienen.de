@@ -1150,4 +1150,377 @@ end</programlisting></para>
       </section>
     </section>
   </section>
+
+  <section xml:id="fragment_caching">
+    <title xml:id="fragment_caching.title">Fragment Caching</title>
+
+    <indexterm>
+      <primary>Caching</primary>
+
+      <secondary>Fragment Caching</secondary>
+    </indexterm>
+
+    <para>Mit Fragment Caching können Sie einzelne Teile eines Views cachen.
+    Es kann problemlos zusammen mit <xref linkend="http_caching" /> und <xref
+    linkend="page_caching" /> eingesetzt werden. Die Vorteile liegen auch hier
+    in der Reduzierung der Server-Load und der schnelleren
+    Webseitengenerierung und damit einer besseren Usability.</para>
+
+    <para>Bitte installieren Sie eine frische Beispielapplikation (siehe <xref
+    linkend="caching_beispielapplikation" />).</para>
+
+    <section xml:id="fragment_caching_im_devel_modus_aktivieren">
+      <title
+      xml:id="fragment_caching_im_devel_modus_aktivieren.title">Fragment
+      Caching im Development-Modus aktivieren</title>
+
+      <para>Als erstes müssen wir in der Datei
+      <filename>config/environments/development.rb</filename> den Eintrag
+      <code>config.action_controller.perform_caching</code> auf
+      <code>true</code> setzen:<programlisting>config.action_controller.perform_caching = true</programlisting></para>
+
+      <para>Sonst können wir das Fragement Caching im Development-Modus nicht
+      ausprobieren. Im Production-Modus ist Fragement Caching per Default
+      aktiviert.</para>
+    </section>
+
+    <section xml:id="fragment_caching_tabelle_cachen">
+      <title xml:id="fragment_caching_tabelle_cachen.title">Tabelle des
+      Index-View cachen</title>
+
+      <para>Auf der Seite <uri
+      xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>
+      wird eine sehr rechenintensive Tabelle mit allen Firmen gerendert. Diese
+      Tabelle können wir im gesamten cachen. Dazu müssen wir die Tabelle in
+      einen <code>&lt;% cache('name_des_caches') do %&gt; ... &lt;% end
+      %&gt;</code> Block einbauen:<programlisting>&lt;% cache('name_des_caches') do %&gt;
+
+[...]
+
+&lt;% end %&gt;</programlisting></para>
+
+      <para>Bitte verändern Sie die Datei
+      <filename>app/views/companies/index.html.erb</filename> wie
+      folgt:<programlisting>&lt;h1&gt;Listing companies&lt;/h1&gt;
+
+<emphasis>&lt;% cache('table_of_all_companies') do %&gt;</emphasis>
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Name&lt;/th&gt;
+    &lt;th&gt;Number of employees&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @companies.each do |company| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= company.name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= company.employees.count %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Show', company %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Edit', edit_company_path(company) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', company, method: :delete, data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+<emphasis>&lt;% end %&gt;</emphasis>
+
+&lt;br /&gt;
+
+&lt;%= link_to 'New Company', new_company_path %&gt;</programlisting></para>
+
+      <para>Danach können Sie den Rails-Server mit <command>rails
+      server</command> starten und die URL <uri
+      xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>
+      aufrufen. Im Development-Log werden Sie dann den folgenden Eintrag
+      finden:<screen><emphasis>Write fragment views/table_of_all_companies (2.9ms)</emphasis>
+  Rendered companies/index.html.erb within layouts/application (119.8ms)
+Completed 200 OK in <emphasis>209ms</emphasis> (Views: 143.1ms | ActiveRecord: 15.0ms)</screen></para>
+
+      <para>Das Schreiben des Caches hat 2.0ms gedauert. Im Gesamten hat das
+      Rendern der Seite 209 ms gedauert.</para>
+
+      <para>Bei einem wiederholten Aufruf der gleichen Seite bekommen Sie eine
+      andere Ausgabe im Log:<screen><emphasis>Read fragment views/table_of_all_companies (0.2ms)</emphasis>
+  Rendered companies/index.html.erb within layouts/application (0.8ms)
+Completed 200 OK in <emphasis>37ms</emphasis> (Views: 34.6ms | ActiveRecord: 0.3ms)</screen></para>
+
+      <para>Das Lesen des Caches dauerte 0.2ms und das gesamte Rendern der
+      Seite 37ms. Nur ein Fünftel Rechenzeit!</para>
+    </section>
+
+    <section xml:id="fragment_cache_loeschen">
+      <title xml:id="fragment_cache_loeschen.title">Fragment Cache
+      löschen</title>
+
+      <indexterm>
+        <primary>Caching</primary>
+
+        <secondary>Fragment Caching</secondary>
+
+        <tertiary>Cache löschen</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>Caching</primary>
+
+        <secondary>Fragment Caching</secondary>
+
+        <tertiary>expire_fragment</tertiary>
+      </indexterm>
+
+      <para>Mit der Methode <methodname>expire_fragment</methodname> können
+      Sie gezielt Fragment Caches löschen. Von der Grundidee können wir das
+      genauso im Model einbauen wie in <xref
+      linkend="page_caches_automatisch_loeschen" /> gezeigt.</para>
+
+      <para>Die Model-Datei <filename>app/models/company.rb</filename> würde
+      dann so aussehen:<programlisting>class Company &lt; ActiveRecord::Base
+  attr_accessible :name
+
+  validates :name,
+            :presence =&gt; true,
+            :uniqueness =&gt; true
+
+  has_many :employees, :dependent =&gt; :destroy
+
+  after_create   :expire_cache
+  after_update   :expire_cache
+  before_destroy :expire_cache
+
+  def to_s
+    name
+  end
+
+  def expire_cache
+    <emphasis>ActionController::Base.new.expire_fragment('table_of_all_companies')</emphasis>
+  end
+end</programlisting></para>
+
+      <para>Da sich die Anzahl der Employees auch auf diese Tabelle auswirkt,
+      müssten wir auch die Datei <filename>app/models/employees.rb</filename>
+      entsprechend erweitern:<programlisting>class Employee &lt; ActiveRecord::Base
+  attr_accessible :company_id, :first_name, :last_name, :phone_number
+
+  belongs_to :company, :touch =&gt; true
+
+  validates :first_name,
+            :presence =&gt; true
+
+  validates :last_name,
+            :presence =&gt; true
+
+  validates :company,
+            :presence =&gt; true
+
+  after_create   :expire_cache
+  after_update   :expire_cache
+  before_destroy :expire_cache
+
+  def to_s
+    "#{first_name} #{last_name}"
+  end
+
+  def expire_cache
+    <emphasis>ActionController::Base.new.expire_fragment('table_of_all_companies')</emphasis>
+  end  
+end</programlisting></para>
+
+      <para>Das gezielte Löschen von Fragment Caches ist programmiertechnisch
+      oft aufwendig. Erstens übersieht man häufig etwas und zweitens ist es
+      auch nicht einfach in grossen Projekten über die verschiedenen Namen der
+      Caches den Überblick zu bewahren. Oft ist es einfacher mit der
+      <methodname>cache_key</methodname> Methode automatische Namen zu
+      erstellen, die im Cache automatisch altern (siehe <xref
+      linkend="fragment_auto_expiring" />).</para>
+    </section>
+
+    <section xml:id="fragment_auto_expiring">
+      <title xml:id="fragment_auto_expiring.title">Auto-Expiring
+      Caches</title>
+
+      <indexterm>
+        <primary>Caching</primary>
+
+        <secondary>Fragment Caching</secondary>
+
+        <tertiary>cache_key</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>Caching</primary>
+
+        <secondary>Fragment Caching</secondary>
+
+        <tertiary>Auto-Expiring</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>cache_key</primary>
+      </indexterm>
+
+      <para>Die Verwaltung von Fragment Caches ist bei der in <xref
+      linkend="fragment_caching_tabelle_cachen" /> verwendeten
+      Namenskonvention nicht trivial. Man kann zwar bei sauberer
+      Programmierung sicher sein, das der Cache keinen überflüssigen Balast
+      mitschleppt, aber auf der anderen Seite kann einem das auch eigentlich
+      egal sein. Ein Cache ist immer so aufgebaut, das er selbstständig alte
+      und nicht benötigte Elemente löscht. Wenn wir ähnlich wie in der Asset
+      Pipeline (siehe <xref linkend="asset_pipeline" />) einen Mechanismus
+      einsetzen, der einen Fragment Cache unique benennt, dann müssten wir
+      nicht aufwendig Fragment Caches löschen.</para>
+
+      <para>Genau dafür gibt es die Methode
+      <methodname>cache_key</methodname>. <methodname>cache_key</methodname>
+      gibt Ihnen einen unique Namen für ein Element. Probieren wir es einmal
+      in der Console aus. Als erstes lassen wir uns drei mal den immer
+      identischen <methodname>cache_key</methodname> des ersten Company
+      Eintrages geben ("companies/2-20120716190032"), dann touchen wir den
+      Eintrag (mit einem <methodname>touch</methodname> wird das Attribute
+      <varname>updated_at</varname> auf die aktuelle Uhrzeit gesetzt) und zum
+      Schluss geben wir noch mal drei mal den neuen
+      <methodname>cache_key</methodname> aus
+      ("companies/2-20120716192035"):<screen>Stefan-Wintermeyers-MacBook-Air:phone_book xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.6)
+1.9.3p194 :001 &gt; <command>Company.first.cache_key</command>
+  Company Load (0.1ms)  SELECT "companies".* FROM "companies" LIMIT 1
+ =&gt; "companies/2-20120716190032" 
+1.9.3p194 :002 &gt; <command>Company.first.cache_key</command>
+  Company Load (0.3ms)  SELECT "companies".* FROM "companies" LIMIT 1
+ =&gt; "companies/2-20120716190032" 
+1.9.3p194 :003 &gt; <command>Company.first.cache_key</command>
+  Company Load (0.3ms)  SELECT "companies".* FROM "companies" LIMIT 1
+ =&gt; "companies/2-20120716190032" 
+1.9.3p194 :004 &gt; <command>Company.first.touch</command>
+  Company Load (0.3ms)  SELECT "companies".* FROM "companies" LIMIT 1
+  SQL (2.0ms)  UPDATE "companies" SET "updated_at" = '2012-07-16 19:20:35.223146' WHERE "companies"."id" = 2
+ =&gt; true 
+1.9.3p194 :005 &gt; <command>Company.first.cache_key</command>
+  Company Load (0.3ms)  SELECT "companies".* FROM "companies" LIMIT 1
+ =&gt; "companies/2-20120716192035" 
+1.9.3p194 :006 &gt; <command>Company.first.cache_key</command>
+  Company Load (0.3ms)  SELECT "companies".* FROM "companies" LIMIT 1
+ =&gt; "companies/2-20120716192035" 
+1.9.3p194 :007 &gt; <command>Company.first.cache_key</command>
+  Company Load (0.3ms)  SELECT "companies".* FROM "companies" LIMIT 1
+ =&gt; "companies/2-20120716192035" 
+1.9.3p194 :008 &gt; <command>exit</command>
+Stefan-Wintermeyers-MacBook-Air:phone_book xyz$</screen></para>
+
+      <para>Verändern wir einmal mit diesem Wissen den Index-View in der Datei
+      <filename>app/views/companies/index.html.erb</filename>:<programlisting>&lt;h1&gt;Listing companies&lt;/h1&gt;
+
+<emphasis>&lt;% cache(@companies) do %&gt;</emphasis>
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Name&lt;/th&gt;
+    &lt;th&gt;Number of employees&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @companies.each do |company| %&gt;
+  <emphasis>&lt;% cache(company) do %&gt;</emphasis>
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= company.name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= company.employees.count %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Show', company %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Edit', edit_company_path(company) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', company, method: :delete, data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  <emphasis>&lt;% end %&gt;</emphasis>
+&lt;% end %&gt;
+&lt;/table&gt;<emphasis>
+&lt;% end %&gt;</emphasis>
+
+&lt;br /&gt;
+
+&lt;%= link_to 'New Company', new_company_path %&gt;</programlisting></para>
+
+      <para>Wir benutzen hier nicht nur einen Fragment Cache für die ganze
+      Tabelle, sondern auch jeweils einen für jede Zeile. Der erste Aufruf
+      dauert damit auch länger als vorher. Aber wenn sich einzelne Firmen
+      ändern, muss immer nur eine Zeile neu gerendet werden.</para>
+
+      <note>
+        <para>In welcher Detailtiefe man Fragment Cacheing einsetzen sollte,
+        kann nicht allgemein beantwortet werden. Experimentieren Sie damit und
+        schauen Sie sich im Log an, was wie lange dauert.</para>
+      </note>
+    </section>
+
+    <section xml:id="fragment_cache_software_version">
+      <title
+      xml:id="fragment_cache_software_version.title">Software-Versionierung
+      und Fragment Caches</title>
+
+      <para>Als Entwickler sollten Sie beim Einsatz von Fragment Caches immer
+      einen Versionsstand mit eincodieren. Nur so können Sie sicher sein, das
+      bei einer neuen Software-Version nicht ein alter Cache mit einem alten
+      Inhalt ausgeliefert wird. Sie können dazu den Namen des Fragment Caches
+      nicht als String, sondern als Array angeben. Beispiel:<programlisting>&lt;% cache(['V3.23', @companies]) do %&gt;
+
+[...]
+
+&lt;% end %&gt;</programlisting></para>
+    </section>
+
+    <section xml:id="fragment_cache_cache_store">
+      <title xml:id="fragment_cache_cache_store.title">Cache Store</title>
+
+      <indexterm>
+        <primary>Caching</primary>
+
+        <secondary>Fragment Caching</secondary>
+
+        <tertiary>Cache Store</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>Cache Store</primary>
+      </indexterm>
+
+      <para>Der Cache Store verwaltet die gespeicherten Fragment Caches. Wenn
+      nicht anders konfiguriert ist dies der MemoryStore von Rails. Dieser
+      Cache Store ist gut zum Entwicklen geeignet, aber für ein
+      Produktivsystem weniger, weil er pro Ruby on Rails Prozess eigenständig
+      agiert. Wenn Sie also im Produktivsystem mehrere Ruby on Rails Prozesse
+      parallel laufen lassen, dann hält jeder Prozess einen eigenen
+      MemoryStore vor.</para>
+
+      <section xml:id="fragment_cache_memcachestore">
+        <title xml:id="fragment_cache_memcachestore">MemCacheStore</title>
+
+        <indexterm>
+          <primary>Cache Store</primary>
+
+          <secondary>MemCacheStore</secondary>
+        </indexterm>
+
+        <indexterm>
+          <primary>memcached</primary>
+        </indexterm>
+
+        <para>Die meistens Produktivsysteme benutzen memcached (<uri
+        xlink:href="http://memcached.org/">http://memcached.org/</uri>) als
+        Cache Store. Um memcached als Cache Store im Produktivsystem zu
+        aktieren, müssen Sie in der Datei
+        <filename>config/environments/production.rb</filename> die folgende
+        Zeile hinzufügen:<programlisting>config.cache_store = :mem_cache_store</programlisting></para>
+
+        <para>Die Kombination von sinnvoll eingesetzten Auto-Expiring Caches
+        und memcached ist ein einfaches Rezept für eine performante
+        Webseite.</para>
+      </section>
+
+      <section>
+        <title>Andere Cache Stores</title>
+
+        <para>In der offiziellen Rails Doku finden Sie unter <uri
+        xlink:href="http://guides.rubyonrails.org/caching_with_rails.html#cache-stores">http://guides.rubyonrails.org/caching_with_rails.html#cache-stores</uri>
+        eine Liste mit anderen Cache Stores.</para>
+      </section>
+    </section>
+  </section>
 </chapter>
