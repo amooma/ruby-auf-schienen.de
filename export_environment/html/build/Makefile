@@ -70,6 +70,7 @@ all:
 	cp $(EXPORTDIR)/html/*.css $(EXPORTDIR)/html/gzip/
 	find $(EXPORTDIR)/html/gzip/ -name "*.css" -exec gzip -9 {} \;
 	mv $(EXPORTDIR)/html/gzip/*.gz $(EXPORTDIR)/html/
+	cp -r $(EXPORTDIR)/html/custom-admons-callouts /var/www/cdn.amooma.de/ruby-auf-schienen.de/
 
 	rmdir $(EXPORTDIR)/html/gzip
 
