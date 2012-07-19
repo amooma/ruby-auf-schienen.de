@@ -56,6 +56,7 @@ all:
 
 	mkdir -p $(EXPORTDIR)/html
 	cp $(HTMLDIR)/default.css $(HTMLDIR)/common.css $(EXPORTDIR)/html
+	cp $(HTMLDIR)/favicon.ico $(EXPORTDIR)/html
 	cp -R ${DEPENDDIR}/custom-admons-callouts/ $(EXPORTDIR)/html
 	cp -R ${DOCBOOKSRCDIR}/${IMAGEDIR} $(EXPORTDIR)/html
 
