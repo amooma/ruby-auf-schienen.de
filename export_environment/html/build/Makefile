@@ -61,10 +61,16 @@ all:
 	cp -R ${DOCBOOKSRCDIR}/${IMAGEDIR} $(EXPORTDIR)/html
 
 	xsltproc $(EXTRAPARAMS) --xinclude $(HTMLDIR)/rubyonrails-html.xsl $(DOCBOOKSRCDIR)/$(MAINFILE); \
+
 	mkdir -p $(EXPORTDIR)/html/gzip
 	cp $(EXPORTDIR)/html/*.html $(EXPORTDIR)/html/gzip/
 	find $(EXPORTDIR)/html/gzip/ -name "*.html" -exec gzip -9 {} \;
 	mv $(EXPORTDIR)/html/gzip/*.gz $(EXPORTDIR)/html/
+
+	cp $(EXPORTDIR)/html/*.css $(EXPORTDIR)/html/gzip/
+	find $(EXPORTDIR)/html/gzip/ -name "*.css" -exec gzip -9 {} \;
+	mv $(EXPORTDIR)/html/gzip/*.gz $(EXPORTDIR)/html/
+
 	rmdir $(EXPORTDIR)/html/gzip
 
 	
