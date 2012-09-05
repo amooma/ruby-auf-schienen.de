@@ -827,12 +827,12 @@ Content-Type: text/html; charset=utf-8
     <para>Beim Page Caching geht es darum komplette HTML-Seite (also das
     Render-Ergebnis eines Views) in einem Unterverzeichnis der
     <filename>public</filename> Verzeichnisses abzulegen und beim nächsten
-    Aufruf dieser Webseite von dort direkt auszuliefern. Zusätzlich kann man
-    auch direkt eine komprimierte gz-Version der HTML-Seite dort abspeichern.
-    Ein Produktiv-Webserver wird Dateien unterhabl von
-    <filename>public</filename> automatisch selbst ausliefern und kann auch so
-    konfiguriert werden, das - falls gz-Dateien vorhanden sind - diese direkt
-    ausgeliefert werden.</para>
+    Aufruf dieser Webseite von dort direkt vom Webserver (z.B. Nginx)
+    ausliefern zu lassen. Zusätzlich kann man auch direkt eine komprimierte
+    gz-Version der HTML-Seite dort abspeichern. Ein Produktiv-Webserver wird
+    Dateien unterhabl von <filename>public</filename> automatisch selbst
+    ausliefern und kann auch so konfiguriert werden, das - falls gz-Dateien
+    vorhanden sind - diese direkt ausgeliefert werden.</para>
 
     <para>Bei komplexen Views die auch mal 500ms und mehr zum Rendern brauchen
     ist die Zeitersparnis natürlich bedeutend. Als Webseitenbetreiber spart
@@ -840,11 +840,12 @@ Content-Type: text/html; charset=utf-8
     gleichen Hardware bedienen. Der Besucher der Webseite profitiert durch
     eine schnellere Auslieferung der Seite.</para>
 
-    <para>Der Nachteil liegt darin, das diese Methode nur für
-    <filename>public</filename> Webseiten geeignet ist. Also Webseiten die
-    nicht auf bestimmte User zugeschnitten sind. Ein weiterer Nachteil liegt
-    darin, das man bei der Programmierung selber entsprechende Seite updaten,
-    bzw. löschen muss.</para>
+    <warning>
+      <para>Achten Sie bei der Programmierung Ihrer Rails-Applikation darauf
+      diese Seite auch selbst upzudaten, bzw. zu löschen! Eine Beschreibung
+      dazu finden Sie in <xref linkend="page_caches_automatisch_loeschen"/>.
+      Sonst enden Sie später mit einem veralteten Cache.</para>
+    </warning>
 
     <para>Bitte installieren Sie eine frische Beispielapplikation (siehe <xref
     linkend="caching_beispielapplikation"/>).</para>
@@ -863,7 +864,7 @@ Content-Type: text/html; charset=utf-8
       aktiviert.</para>
     </section>
 
-    <section>
+    <section xml:id="page_caching_fuer_index_und_show">
       <title>Company Index- und Show-View cachen</title>
 
       <indexterm>
@@ -923,7 +924,7 @@ Content-Type: text/html; charset=utf-8
       erstellt. Ab sofort wird der Webserver beim Aufruf dieser Seiten nur
       noch die gecachten Versionen liefern.</para>
 
-      <section>
+      <section xml:id="page_caching_gz_compression">
         <title>gz Versionen</title>
 
         <indexterm>
@@ -971,6 +972,29 @@ Content-Type: text/html; charset=utf-8
 |-- favicon.ico
 |-- index.html
 `-- robots.txt</screen></para>
+      </section>
+
+      <section xml:id="page_caching_html_ending_nginx_rewrite">
+        <title>Die Dateiendung .html</title>
+
+        <para>Rails speichert die mit <uri
+        xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>
+        aufgerufene Seite unter dem Dateinamen
+        <filename>companies.html</filename>. Damit wird der vorgeschaltete
+        Webserver zwar diese Datei beim Aufruf von <uri
+        xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies.html</uri>
+        finden und ausliefern, aber nicht beim Aufruf von <uri
+        xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>,
+        denn es fehlt ja das <filename>.html</filename> am Ende der URI. Je
+        nach verwendeten Webserver kann man das aber in der Konfigration des
+        Webservers abfangen. Bei der Verwendung von Nginx geht sehr allgemein
+        mit folgender Konfiguration:<programlisting>if (-f $request_filename.html) {
+  rewrite (.*) $1.html break;
+}</programlisting></para>
+
+        <para>Nginx schaut damit nach, ob eine Datei mit der Endung
+        <filename>.html</filename> von der aktuell aufgerufenen URI existiert.
+        Falls ja, wird die URI entsprechend umgeschrieben.</para>
       </section>
     </section>
 
