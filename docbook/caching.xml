@@ -992,16 +992,19 @@ Content-Type: text/html; charset=utf-8
         xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies.html</uri>
         finden und ausliefern, aber nicht beim Aufruf von <uri
         xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>,
-        denn es fehlt ja das <filename>.html</filename> am Ende der URI. Je
-        nach verwendeten Webserver kann man das aber in der Konfigration des
-        Webservers abfangen. Bei der Verwendung von Nginx geht sehr allgemein
-        mit folgender Konfiguration:<programlisting>if (-f $request_filename.html) {
-  rewrite (.*) $1.html break;
-}</programlisting></para>
+        denn es fehlt ja das <filename>.html</filename> am Ende der
+        URI.</para>
+
+        <para>Bei der Verwendung des in <xref
+        linkend="rails_production_webserver"/> erklärten Nginx-Servers geht
+        das am leichtesten mit der folgenden Anpassung der
+        <code>try_files</code> Anweisung in der
+        Nginx-Konfiguration-Datei:<programlisting>try_files $uri/index.html $uri $uri.html @unicorn;
+</programlisting></para>
 
         <para>Nginx schaut damit nach, ob eine Datei mit der Endung
-        <filename>.html</filename> von der aktuell aufgerufenen URI existiert.
-        Falls ja, wird die URI entsprechend umgeschrieben.</para>
+        <filename>.html</filename> von der aktuell aufgerufenen URI
+        existiert.</para>
       </section>
     </section>
 

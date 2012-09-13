@@ -18,8 +18,7 @@
   </indexterm>
 
   <para>Einer der häufigsten Fehlerquellen in Programmen sind nicht valide
-  Datensätze. ActiveRecord stellt mit
-  <methodname>validates<replaceable>…</replaceable>()</methodname> eine
+  Datensätze. ActiveRecord stellt mit <methodname>validates</methodname> eine
   schnelle und einfache Möglichkeit zur Validierung von Datensätzen zur
   Verfügung. So können Sie sicher sein, dass auch wirklich nur sinnvolle
   Datensätze den Weg in Ihr Datenbank finden.</para>
@@ -48,44 +47,46 @@ MacBook:shop xyz$</screen></para>
     Convention over Configuration!</para>
 
     <para>Ohne jegliche Validierung können wir problemlos einen leeren
-    Datensatz in beiden Modellen anlegen:<screen>MacBook:shop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
+    Datensatz in beiden Modellen anlegen:<screen>SW:shop stefan$ <command>rails console</command>
+Loading development environment (Rails 3.2.8)
 1.9.3p194 :001 &gt; <command>Product.create</command>
    (0.1ms)  begin transaction
-  SQL (7.9ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Tue, 08 May 2012 14:30:51 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", nil], ["price", nil], ["updated_at", Tue, 08 May 2012 14:30:51 UTC +00:00], ["weight", nil]]
-   (1.0ms)  commit transaction
- =&gt; #&lt;Product id: 1, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: "2012-05-08 14:30:51", updated_at: "2012-05-08 14:30:51"&gt; 
+  SQL (8.9ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Mon, 10 Sep 2012 14:45:33 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", nil], ["price", nil], ["updated_at", Mon, 10 Sep 2012 14:45:33 UTC +00:00], ["weight", nil]]
+   (0.9ms)  commit transaction
+ =&gt; #&lt;Product id: 1, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: "2012-09-10 14:45:33", updated_at: "2012-09-10 14:45:33"&gt; 
 1.9.3p194 :002 &gt; <command>exit</command>
-MacBook:shop xyz$</screen></para>
+SW:shop stefan$</screen></para>
 
     <para>Dieser Datensatz macht aber in der Realität keinen Sinn. Ein
     <classname>Product</classname> braucht einen <varname>name</varname> und
-    einen <methodname>price</methodname>. In zeige <xref
-    linkend="activerecord_validation"/> ich Ihnen anhand von Beispielen, wie
-    Sie für Ihre Applikation die richtigen Validations erarbeiten und sich
-    damit langfristig viel Arbeit sparen können.</para>
+    einen <methodname>price</methodname>. Deshalb kann man in ActiveRecord
+    Validierungen definieren. Damit können Sie als Programmierer sicher
+    stellen, das nur für Sie valide Datensätze in Ihrer Datenbank
+    abgespeichert werden.</para>
 
-    <para>Ich greife zur Veranschaulichung des Mechanismus mal <xref
-    linkend="validates_presence_of"/> vorweg. Bitte füllen Sie Ihre
+    <para>Ich greife zur Veranschaulichung des Mechanismus den
+    <code>presence</code> Helper vorweg. Bitte füllen Sie Ihre
     <filename>app/model/product.rb</filename> mit folgendem
     Inhalt:<programlisting>class Product &lt; ActiveRecord::Base
   attr_accessible :expiration_date, :in_stock, :name, :price, :weight
 
-  validates_presence_of :name
-  validates_presence_of :price
-end
-</programlisting></para>
+  validates :name,
+            :presence =&gt; true
+
+  validates :price,
+            :presence =&gt; true
+end</programlisting></para>
 
     <para>Jetzt versuchen wir noch mal in der Console einen leeren Datensatz
-    anzulegen:<screen>MacBook:shop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
+    anzulegen:<screen>SW:shop stefan$ <command>rails console</command>
+Loading development environment (Rails 3.2.8)
 1.9.3p194 :001 &gt; <command>product = Product.create</command>
-   (0.1ms)  begin transaction
+   (0.0ms)  begin transaction
    (0.1ms)  rollback transaction
  =&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt; 
-1.9.3p194 :002 &gt; <command>product.new_record?</command>
- =&gt; true 
-1.9.3p194 :003 &gt;  </screen></para>
+1.9.3p194 :002 &gt; <command>product.valid?</command>
+ =&gt; false 
+1.9.3p194 :003 &gt; </screen></para>
 
     <para>Obwohl wir mit der Methode <methodname>create</methodname> (siehe
     <xref linkend="activerecord_create"/>) einen neuen Datensatz anlegen
@@ -94,16 +95,17 @@ Loading development environment (Rails 3.2.3)
     und dann gespeichert.</para>
 
     <para>Haben wir Zugriff auf die Fehler? Ja, mit der Methode
-    <methodname>errors</methodname> können wir uns die aufgetretenen Fehler
-    anschauen:<screen>1.9.3p194 :003 &gt; <command>product.errors</command>
- =&gt; #&lt;ActiveModel::Errors:0x007fd90ceefab0 @base=#&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:name=&gt;["can't be blank"], :price=&gt;["can't be blank"]}&gt; 
+    <methodname>errors</methodname> bzw. mit
+    <methodname>errors.messages</methodname> können wir uns die aufgetretenen
+    Fehler anschauen:<screen>1.9.3p194 :003 &gt; <command>product.errors</command>
+ =&gt; #&lt;ActiveModel::Errors:0x007ff88537fae8 @base=#&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:name=&gt;["can't be blank"], :price=&gt;["can't be blank"]}&gt; 
 1.9.3p194 :004 &gt; <command>product.errors.messages</command>
  =&gt; {:name=&gt;["can't be blank"], :price=&gt;["can't be blank"]} 
 1.9.3p194 :005 &gt;</screen></para>
 
-    <para>Diese Fehlermeldung ist für den menschlichen Benutzer definiert
-    (mehr dazu und wie die Fehler ins Deutsche übersetzt werden können in
-    <xref linkend="i18n"/>).</para>
+    <para>Diese Fehlermeldung ist für einen menschlichen und
+    englischsprachigen Benutzer definiert (mehr dazu und wie die Fehler ins
+    Deutsche übersetzt werden können in <xref linkend="i18n"/>).</para>
 
     <para>Erst wenn wir den Attributen <varname>name</varname> und
     <methodname>price</methodname> einen Wert zuweisen, können wir das Objekt
@@ -112,9 +114,9 @@ Loading development environment (Rails 3.2.3)
 1.9.3p194 :006 &gt; <command>product.price = 0.45</command>
  =&gt; 0.45 
 1.9.3p194 :007 &gt; <command>product.save</command>
-   (2.6ms)  begin transaction
-  SQL (23.8ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Tue, 08 May 2012 15:18:45 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", "Milch (1 Liter)"], ["price", #&lt;BigDecimal:7fd90cc089f0,'0.45E0',9(45)&gt;], ["updated_at", Tue, 08 May 2012 15:18:45 UTC +00:00], ["weight", nil]]
-   (1.1ms)  commit transaction
+   (0.1ms)  begin transaction
+  SQL (6.4ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Mon, 10 Sep 2012 14:52:44 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", "Milch (1 Liter)"], ["price", #&lt;BigDecimal:7ff8852ea5d8,'0.45E0',9(45)&gt;], ["updated_at", Mon, 10 Sep 2012 14:52:44 UTC +00:00], ["weight", nil]]
+   (0.8ms)  commit transaction
  =&gt; true 
 1.9.3p194 :008 &gt;</screen></para>
 
@@ -179,7 +181,7 @@ MacBook:shop xyz$</screen></para>
   </section>
 
   <section xml:id="validates_presence_of">
-    <title xml:id="validates_presence_of.title">validates_presence_of</title>
+    <title xml:id="validates_presence_of.title">presence</title>
 
     <indexterm>
       <primary>ActiveRecord</primary>
@@ -189,16 +191,28 @@ MacBook:shop xyz$</screen></para>
       <tertiary>validates_presence_of()</tertiary>
     </indexterm>
 
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>validates</secondary>
+
+      <tertiary>presence</tertiary>
+    </indexterm>
+
     <para>In unserem Model <varname>product</varname> gibt es ein paar Felder
     die auf jeden Fall ausgefüllt werden müssen. Das erreichen wir mit
-    <methodname>validates_presence_of</methodname>.</para>
+    <methodname>presence</methodname>.</para>
 
     <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
   attr_accessible :expiration_date, :in_stock, :name, :price, :weight
 
-<emphasis>  validates_presence_of :name
-  validates_presence_of :price</emphasis>
-end</programlisting></para>
+  validates :name,
+            :presence =&gt; true
+
+  validates :price,
+            :presence =&gt; true
+end
+</programlisting></para>
 
     <para>Wenn wir damit einen leeren User Datensatz anlegen wollen, bekommen
     wir massig Validierungsfehler:<screen>MacBook:shop xyz$ <command>rails console</command>
@@ -223,67 +237,10 @@ Loading development environment (Rails 3.2.3)
  =&gt; true 
 1.9.3p194 :006 &gt; <command>exit</command>
 MacBook:shop xyz$</screen></para>
-
-    <section xml:id="validates_presence_of_optionen">
-      <title xml:id="validates_presence_of_optionen.title">Optionen</title>
-
-      <para><methodname>validates_presence_of</methodname> kann mit folgenden
-      Optionen aufgerufen werden:<itemizedlist>
-          <listitem>
-            <para><code>:message</code></para>
-
-            <para>Um eine eigene Fehlermeldung auszugeben. Default: "can‘t be
-            blank". Beispiel:</para>
-
-            <para><programlisting>validates_presence_of :attribute, :message =&gt; "can't be blank" </programlisting><note>
-                <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
-                linkend="i18n"/>.</para>
-              </note></para>
-          </listitem>
-
-          <listitem>
-            <para><methodname>:on</methodname></para>
-
-            <para>Um zu definieren, ob diese Validierung bei einem
-            <methodname>save</methodname>, einem
-            <methodname>create</methodname> oder einem
-            <methodname>update</methodname> durchgeführt werden soll. Der
-            Default ist <methodname>save</methodname> (also bei
-            <methodname>create</methodname> und bei
-            <methodname>update</methodname>). Beispiel:<programlisting>validates_presence_of :attribute, :on =&gt; :create
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:if</code></para>
-
-            <para>Definiert eine Methode, einen Proc oder einen String der
-            definiert, ob die Validierung ausgeführt werden soll.
-            Beispiel:<programlisting>validates_presence_of :attribute, :if =&gt; Date.today.monday?
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:unless</code></para>
-
-            <para>Wie <methodname>if</methodname>, nur das hier definiert
-            wird, wann die Validierung nicht erfolgen soll.
-            Beispiel:<programlisting>validates_presence_of :attribute, :unless =&gt; Date.today.tuesday?
-</programlisting></para>
-          </listitem>
-        </itemizedlist></para>
-    </section>
-
-    <section xml:id="validates_presence_of_doku">
-      <title xml:id="validates_presence_of_doku.title">Weitere Doku</title>
-
-      <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
-      validates_presence_of</command> auf der Kommandozeile aufrufen.</para>
-    </section>
   </section>
 
   <section xml:id="validates_length_of">
-    <title xml:id="validates_length_of.title">validates_length_of</title>
+    <title xml:id="validates_length_of.title">length</title>
 
     <indexterm>
       <primary>ActiveRecord</primary>
@@ -293,23 +250,34 @@ MacBook:shop xyz$</screen></para>
       <tertiary>validates_length_of()</tertiary>
     </indexterm>
 
-    <para>Mit <methodname>validates_length_of</methodname> können Sie die
-    Länge eines bestimmten Attributes eingrenzen. Erklärt sich am Beispiel am
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>validates</secondary>
+
+      <tertiary>length</tertiary>
+    </indexterm>
+
+    <para>Mit <methodname>length</methodname> können Sie die Länge eines
+    bestimmten Attributes eingrenzen. Erklärt sich am Beispiel am
     einfachsten.</para>
 
     <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
   attr_accessible :expiration_date, :in_stock, :name, :price, :weight
 
-  validates_presence_of :name
-  validates_presence_of :price
+  validates :name,
+            :presence =&gt; true,
+            <emphasis>:length =&gt; { :in =&gt; 2..20 }</emphasis>
 
-  <emphasis>validates_length_of :name, :within =&gt; 2..255</emphasis>
-end</programlisting></para>
+  validates :price,
+            :presence =&gt; true
+end
+</programlisting></para>
 
     <para>Wenn wir jetzt einen <classname>Product</classname> mit einem
     <methodname>name</methodname> aus einem Buchstaben abspeichern wollen,
     dann bekommen wir einen Fehler aufgezeigt:<screen>MacBook:shop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
+Loading development environment (Rails 3.2.8)
 1.9.3p194 :001 &gt; <command>product = Product.create(:name =&gt; 'M', :price =&gt; 0.45)</command>
    (0.1ms)  begin transaction
    (0.1ms)  rollback transaction
@@ -322,53 +290,55 @@ MacBook:shop xyz$</screen></para>
     <section xml:id="validates_length_of_optionen">
       <title xml:id="validates_length_of_optionen.title">Optionen</title>
 
-      <para><methodname>validates_length_of</methodname> kann mit folgenden
-      Optionen aufgerufen werden:<itemizedlist>
+      <para><methodname>length</methodname> kann mit folgenden Optionen
+      aufgerufen werden:<itemizedlist>
           <listitem>
             <para><code>:minimum</code></para>
 
             <para>Die minimale Länge eines Attributes. Beispiel:</para>
 
-            <para><programlisting>validates_length_of :attribute, :minimum =&gt; 3</programlisting></para>
+            <para><programlisting>validates :name,
+          :presence =&gt; true,
+          <emphasis>:length =&gt; { :minimum =&gt; 2 }</emphasis></programlisting></para>
           </listitem>
 
           <listitem>
             <para><methodname>:maximum</methodname></para>
 
             <para>Die maximale Länge eines Attributes.
-            Beispiel:<programlisting>validates_length_of :attribute, :maximum =&gt; 255
-</programlisting></para>
+            Beispiel:<programlisting>validates :name,
+          :presence =&gt; true,
+          <emphasis>:length =&gt; { :maximum =&gt; 20 }</emphasis></programlisting></para>
           </listitem>
 
           <listitem>
             <para><code>:is</code></para>
 
-            <para>Ist genau so viele Zeichen lang. Beispiel:<programlisting>validates_length_of :attribute, :is =&gt; 23
-</programlisting></para>
+            <para>Ist genau so viele Zeichen lang. Beispiel:<programlisting>validates :name,
+          :presence =&gt; true,
+          <emphasis>:length =&gt; { :is =&gt; 8 }</emphasis></programlisting></para>
           </listitem>
 
           <listitem>
-            <para><code>:within</code></para>
+            <para><code>:in oder :within</code></para>
 
             <para>Definiert einen Längenraum. Als erstes kommt das Minimum und
-            als zweites das Maximum. Beispiel:<programlisting>validates_length_of :attribute, :within =&gt; 6..255
-</programlisting></para>
+            als zweites das Maximum. Beispiel:<programlisting>validates :name,
+          :presence =&gt; true,
+          <emphasis>:length =&gt; { :in =&gt; 2..20 }</emphasis></programlisting></para>
           </listitem>
 
           <listitem>
-            <para><code>:allow_nil</code></para>
+            <para><code>:tokenizer</code></para>
 
-            <para>Das Attribut darf den Wert nil haben. Default: false.
-            Beispiel:<programlisting>validates_length_of :attribute, :allow_nil =&gt; true
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:allow_blank</code></para>
-
-            <para>Das Attribut darf ganz leer sein. Default: false.
-            Beispiel:<programlisting>validates_length_of :attribute, :allow_blank =&gt; true
-</programlisting></para>
+            <para>Damit kann definiert werden wie das Attribut zum Zählen
+            gesplittet werden soll. Default: Default: <code>lambda{ |value|
+            value.split(//) }</code> (damit werden einzelne Zeichen gezählt).
+            Beispiel (zum Zählen von Wörtern):<programlisting>validates :content,
+          :presence =&gt; true,
+          :length =&gt; { :in =&gt; 2..20 },
+          <emphasis>:tokenizer =&gt; lambda {|str| str.scan(/\w+/)}
+</emphasis></programlisting></para>
           </listitem>
 
           <listitem>
@@ -376,7 +346,10 @@ MacBook:shop xyz$</screen></para>
 
             <para>Definiert die Fehlermeldung von
             <methodname>:maximum</methodname>. Default: "is too long (maximum
-            is %d characters)". Beispiel:<programlisting>validates_length_of :attribute, :too_long =&gt; 'way too many characters'
+            is %d characters)". Beispiel:<programlisting>validates :name,
+          :presence =&gt; true,
+          :length =&gt; { :maximum =&gt; 20 },
+          <emphasis>:too_long =&gt; "must have at most %{count} characters"</emphasis>
 </programlisting><note>
                 <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
                 linkend="i18n"/>.</para>
@@ -388,79 +361,21 @@ MacBook:shop xyz$</screen></para>
 
             <para>Definiert die Fehlermeldung von
             <methodname>:minimum</methodname>. Default: "is too short (min is
-            %d characters)". Beispiel:<programlisting>validates_length_of :attribute, :too_short =&gt; 'just not enough characters'
+            %d characters)". Beispiel:<programlisting>validates :name,
+          :presence =&gt; true,
+          :length =&gt; { :minimum =&gt; 5 },
+          <emphasis>:too_short =&gt; "must have at least %{count} characters"</emphasis>
 </programlisting><note>
                 <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
                 linkend="i18n"/>.</para>
               </note></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:wrong_length</code></para>
-
-            <para>Definiert die Fehlermeldung von
-            <methodname>:is</methodname>. Default: "is the wrong length
-            (should be %d characters)". Beispiel:<programlisting>validates_length_of :attribute, :wrong_length =&gt; 'not the right number of characters'
-</programlisting><note>
-                <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
-                linkend="i18n"/>.</para>
-              </note></para>
-          </listitem>
-
-          <listitem>
-            <para><methodname>:on</methodname></para>
-
-            <para>Um zu definieren, ob diese Validierung bei einem
-            <methodname>save</methodname>, einem
-            <methodname>create</methodname> oder einem
-            <methodname>update</methodname> durchgeführt werden soll. Der
-            Default ist <methodname>save</methodname> (also bei
-            <methodname>create</methodname> und bei
-            <methodname>update</methodname>). Beispiel:<programlisting>validates_length_of :attribute, :on =&gt; :create
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:if</code></para>
-
-            <para>Definiert eine Methode, einen Proc oder einen String der
-            definiert, ob die Validierung ausgeführt werden soll.
-            Beispiel:<programlisting>validates_length_of :attribute, :if =&gt; Date.today.monday?
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:unless</code></para>
-
-            <para>Wie <methodname>if</methodname>, nur das hier definiert
-            wird, wann die Validierung nicht erfolgen soll.
-            Beispiel:<programlisting>validates_length_of :attribute, :unless =&gt; Date.today.tuesday?
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:tokenizer</code></para>
-
-            <para>Damit kann definiert werden wie das Attribut zum Zählen
-            gesplittet werden soll. Default: Default: <code>lambda{ |value|
-            value.split(//) }</code> (damit werden einzelne Zeichen gezählt).
-            Beispiel (zum Zählen von Wörtern):<programlisting>validates_length_of :attribute, :tokenizer =&gt; lambda {|str| str.scan(/\w+/)}
-</programlisting></para>
           </listitem>
         </itemizedlist></para>
-    </section>
-
-    <section xml:id="validates_length_of_doku">
-      <title xml:id="validates_length_of_doku.title">Weitere Doku</title>
-
-      <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
-      validates_length_of</command> auf der Kommandozeile aufrufen.</para>
     </section>
   </section>
 
   <section xml:id="validates_numericality_of">
-    <title
-    xml:id="validates_numericality_of.title">validates_numericality_of</title>
+    <title xml:id="validates_numericality_of.title">numericality</title>
 
     <indexterm>
       <primary>ActiveRecord</primary>
@@ -470,25 +385,37 @@ MacBook:shop xyz$</screen></para>
       <tertiary>validates_numericality_of()</tertiary>
     </indexterm>
 
-    <para>Mit <methodname>validates_numericality_of</methodname> können Sie
-    überprüfen, ob ein Attributes eine Zahl ist. Erklärt sich am Beispiel am
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>validates</secondary>
+
+      <tertiary>numericality</tertiary>
+    </indexterm>
+
+    <para>Mit <methodname>numericality</methodname> können Sie überprüfen, ob
+    ein Attributes eine Zahl ist. Erklärt sich am Beispiel am
     einfachsten.</para>
 
     <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
   attr_accessible :expiration_date, :in_stock, :name, :price, :weight
 
-  validates_presence_of :name
-  validates_presence_of :price
+  validates :name,
+            :presence =&gt; true,
+            :length =&gt; { :in =&gt; 2..20 }
 
-  validates_length_of :name, :within =&gt; 2..255
+  validates :price,
+            :presence =&gt; true
 
-<emphasis>  validates_numericality_of :weight</emphasis>
-end</programlisting></para>
+  validates :weight,
+            <emphasis>:numericality =&gt; true</emphasis>
+end
+</programlisting></para>
 
     <para>Wenn wir jetzt das Gewicht (<varname>weight</varname>) die nicht aus
     Zahlen, sondern auch aus Zeichen besteht, bekommen wir einen Fehler
     angezeigt:<screen>MacBook:shop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
+Loading development environment (Rails 3.2.8)
 1.9.3p194 :001 &gt; <command>product = Product.create(:name =&gt; 'Milch (1 Liter)', :price =&gt; 0.45, :weight =&gt; 'abc')</command>
    (0.1ms)  begin transaction
    (0.1ms)  rollback transaction
@@ -500,53 +427,22 @@ MacBook:shop xyz$</screen></para>
 
     <tip>
       <para>Auch wenn ein Attribute in der Datenbank ans String abgelegt wird,
-      kann man mit <methodname>validates_numericality_of</methodname> den
-      Inhalt auf Integers festlegen.</para>
+      kann man mit <methodname>numericality</methodname> den Inhalt auf eine
+      Zahl festlegen.</para>
     </tip>
 
     <section xml:id="validates_numericality_of_optionen">
       <title
       xml:id="validates_numericality_of_optionen.title">Optionen</title>
 
-      <para><methodname>validates_numericality_of</methodname> kann mit
-      folgenden Optionen aufgerufen werden:<itemizedlist>
-          <listitem>
-            <para><code>:message</code></para>
-
-            <para>Um eine eigene Fehlermeldung auszugeben. Default: "can‘t be
-            blank". Beispiel:<programlisting>validates_numericality_of :attribute, :message =&gt; 'must be a number'
-</programlisting><note>
-                <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
-                linkend="i18n"/>.</para>
-              </note></para>
-          </listitem>
-
-          <listitem>
-            <para><methodname>:on</methodname></para>
-
-            <para>Um zu definieren, ob diese Validierung bei einem
-            <methodname>save</methodname>, einem
-            <methodname>create</methodname> oder einem
-            <methodname>update</methodname> durchgeführt werden soll. Der
-            Default ist <methodname>save</methodname> (also bei
-            <methodname>create</methodname> und bei
-            <methodname>update</methodname>). Beispiel:<programlisting>validates_numericality_of :attribute, :on =&gt; :create
-</programlisting></para>
-          </listitem>
-
+      <para><methodname>numericality</methodname> kann mit folgenden Optionen
+      aufgerufen werden:<itemizedlist>
           <listitem>
             <para><code>:only_integer</code></para>
 
             <para>Das Attribut darf nur eine Integer Zahl enthalten. Default:
-            false. Beispiel:<programlisting>validates_numericality_of :attribute, :only_integer =&gt; true
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:allow_nil</code></para>
-
-            <para>Das Attribut darf den Wert nil haben.
-            Beispiel:<programlisting>validates_numericality_of :attribute, :allow_nil =&gt; true
+            false. Beispiel:<programlisting>validates :weight, 
+          :numericality =&gt; { :only_integer =&gt; true }
 </programlisting></para>
           </listitem>
 
@@ -554,7 +450,8 @@ MacBook:shop xyz$</screen></para>
             <para><code>:greater_than</code></para>
 
             <para>Die im Attribut gespeicherte Zahl muss grösser sein, als der
-            hier angegebene Wert. Beispiel:<programlisting>validates_numericality_of :attribute, :greater_than =&gt; 23
+            hier angegebene Wert. Beispiel:<programlisting>validates :weight, 
+          :numericality =&gt; { :greater_than =&gt; 100 }
 </programlisting></para>
           </listitem>
 
@@ -562,7 +459,8 @@ MacBook:shop xyz$</screen></para>
             <para><code>:greater_than_or_equal_to</code></para>
 
             <para>Die im Attribut gespeicherte Zahl muss grösser oder gleich
-            dem hier angegebene Wert sein. Beispiel:<programlisting>validates_numericality_of :attribute, :greater_than_or_equal_to =&gt; 23
+            dem hier angegebene Wert sein. Beispiel:<programlisting>validates :weight, 
+          :numericality =&gt; { :greater_than_or_equal_to =&gt; 100 }
 </programlisting></para>
           </listitem>
 
@@ -570,7 +468,8 @@ MacBook:shop xyz$</screen></para>
             <para><code>:equal_to</code></para>
 
             <para>Definiert einen bestimmten Wert, den das Attribute haben
-            muss. Beispiel:<programlisting>validates_numericality_of :attribute, :equal_to =&gt; 23
+            muss. Beispiel:<programlisting>validates :weight, 
+          :numericality =&gt; { :equal_to =&gt; 100 }
 </programlisting></para>
           </listitem>
 
@@ -578,7 +477,8 @@ MacBook:shop xyz$</screen></para>
             <para><code>:less_than</code></para>
 
             <para>Die im Attribut gespeicherte Zahl muss kleiner sein, als der
-            hier angegebene Wert. Beispiel:<programlisting>validates_numericality_of :attribute, :less_than =&gt; 23
+            hier angegebene Wert. Beispiel:<programlisting>validates :weight, 
+          :numericality =&gt; { :less_than =&gt; 100 }
 </programlisting></para>
           </listitem>
 
@@ -586,7 +486,8 @@ MacBook:shop xyz$</screen></para>
             <para><code>:less_than_or_equal_to</code></para>
 
             <para>Die im Attribut gespeicherte Zahl muss kleiner oder gleich
-            dem hier angegebene Wert sein. Beispiel:<programlisting>validates_numericality_of :attribute, :less_than_or_equal_to =&gt; 23
+            dem hier angegebene Wert sein. Beispiel:<programlisting>validates :weight, 
+          :numericality =&gt; { :less_than_or_equal_to =&gt; 100 }
 </programlisting></para>
           </listitem>
 
@@ -594,7 +495,8 @@ MacBook:shop xyz$</screen></para>
             <para><code>:odd</code></para>
 
             <para>Die im Attribut gespeicherte Zahl muss ungerade sein.
-            Beispiel:<programlisting>validates_numericality_of :attribute, :odd
+            Beispiel:<programlisting>validates :weight, 
+          :numericality =&gt; { :odd =&gt; true }
 </programlisting></para>
           </listitem>
 
@@ -602,25 +504,8 @@ MacBook:shop xyz$</screen></para>
             <para><code>:even</code></para>
 
             <para>Die im Attribut gespeicherte Zahl muss gerade sein.
-            Beispiel:<programlisting>validates_numericality_of :attribute, :even
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:if</code></para>
-
-            <para>Definiert eine Methode, einen Proc oder einen String der
-            definiert, ob die Validierung ausgeführt werden soll.
-            Beispiel:<programlisting>validates_numericality_of :attribute, :if =&gt; Date.today.monday?
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:unless</code></para>
-
-            <para>Wie <methodname>if</methodname>, nur das hier definiert
-            wird, wann die Validierung nicht erfolgen soll.
-            Beispiel:<programlisting>validates_numericality_of :attribute, :unless =&gt; Date.today.tuesday?
+            Beispiel:<programlisting>validates :weight, 
+          :numericality =&gt; { :even =&gt; true }
 </programlisting></para>
           </listitem>
         </itemizedlist><note>
@@ -637,20 +522,11 @@ MacBook:shop xyz$</screen></para>
 </programlisting></para>
         </note></para>
     </section>
-
-    <section xml:id="validates_numericality_of_doku">
-      <title xml:id="validates_numericality_of_doku.title">Weitere
-      Doku</title>
-
-      <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
-      validates_numericality_of</command> auf der Kommandozeile
-      aufrufen.</para>
-    </section>
   </section>
 
   <section xml:id="validates_uniqueness_of">
     <title annotations="Diese Methode ist in Rails 3 deprecated."
-    xml:id="validates_uniqueness_of.title">validates_uniqueness_of</title>
+    xml:id="validates_uniqueness_of.title">uniqueness</title>
 
     <indexterm>
       <primary>ActiveRecord</primary>
@@ -660,29 +536,32 @@ MacBook:shop xyz$</screen></para>
       <tertiary>validates_uniqueness_of()</tertiary>
     </indexterm>
 
-    <para>Mit <methodname>validates_uniqueness_of</methodname> können Sie
-    definieren, dass der Wert dieses Attribut einzigartig in der Datenbank
-    ist. Ein Klassiker dafür sind Accounts. Da sollte man immer sicher
-    stellen, das ein Account nicht doppelt vorhanden ist. Erklärt sich am
-    Beispiel am einfachsten.</para>
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>validates</secondary>
+
+      <tertiary>uniqueness</tertiary>
+    </indexterm>
+
+    <para>Mit <methodname>uniqueness</methodname> können Sie definieren, dass
+    der Wert dieses Attribut einzigartig in der Datenbank ist. Wenn ein
+    Produkt in der Datenbank einen eindeutigen und nicht doppelt vorhandenen
+    Namen haben soll, dann geht das mit dieser Validierung:</para>
 
     <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
   attr_accessible :expiration_date, :in_stock, :name, :price, :weight
 
-  validates_presence_of :name
-  validates_presence_of :price
-
-  validates_length_of :name, :within =&gt; 2..255
-
-  validates_numericality_of :weight
-
-  <emphasis>validates_uniqueness_of :name</emphasis>
-end</programlisting></para>
+  validates :name,
+            :presence =&gt; true,
+            <emphasis>:uniqueness =&gt; true</emphasis>
+end
+</programlisting></para>
 
     <para>Wenn wir jetzt ein neues <classname>Product</classname> mit einem
     schon existierenden <methodname>name</methodname> einrichten wollen,
     bekommen wir einen Fehler ausgegeben:<screen>MacBook:shop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
+Loading development environment (Rails 3.2.8)
 1.9.3p194 :001 &gt; <command>Product.last</command>
   Product Load (0.2ms)  SELECT "products".* FROM "products" ORDER BY "products"."id" DESC LIMIT 1
  =&gt; #&lt;Product id: 4, name: "Milch (1 Liter)", price: #&lt;BigDecimal:7fc6e9695160,'0.45E0',9(45)&gt;, weight: nil, in_stock: nil, expiration_date: nil, created_at: "2012-05-08 15:25:22", updated_at: "2012-05-08 15:25:22"&gt; 
@@ -697,36 +576,20 @@ Loading development environment (Rails 3.2.3)
 MacBook:shop xyz$</screen></para>
 
     <warning>
-      <para>Die Validierung mit
-      <methodname>validates_uniqueness_of</methodname> ist kein absoluter
-      Garant für eine echte Einzigartigkeit des Attributes in der Datenbank.
-      Es kann dabei zu einer Race-Condition kommen (siehe <uri
+      <para>Die Validierung mit <methodname>uniqueness</methodname> ist kein
+      absoluter Garant für eine echte Einzigartigkeit des Attributes in der
+      Datenbank. Es kann dabei zu einer Race-Condition kommen (siehe <uri
       xlink:href="http://de.wikipedia.org/wiki/Race_Condition">http://de.wikipedia.org/wiki/Race_Condition</uri>).
       Die detaillierte Diskussion dieses Effektes übersteigt allerdings die
-      Tiefe eines Einsteigerbuches (es handelt sich um ein sehr seltenes
-      Phänomen). Wenn Sie sich für diese Problematik interessieren, schauen
-      Sie bitte einmal in die Doku von
-      <methodname>validates_uniqueness_of</methodname> (<command>ri
-      validates_uniqueness_of</command>). Dort werden Möglichkeiten
-      aufgelistet, wie man dieses Problem lösen kann.</para>
+      Tiefe eines Einsteigerbuches (es handelt sich um ein extrem seltenes
+      Phänomen).</para>
     </warning>
 
     <section xml:id="validates_uniqueness_of_optionen">
       <title xml:id="validates_uniqueness_of_optionen.title">Optionen</title>
 
-      <para><methodname>validates_uniqueness_of</methodname> kann mit
-      folgenden Optionen aufgerufen werden:<itemizedlist>
-          <listitem>
-            <para><code>:message</code></para>
-
-            <para>Um eine eigene Fehlermeldung auszugeben. Default: "has
-            already been taken". Beispiel:<programlisting>validates_uniqueness_of :attribute, :message =&gt; 'hmmm... not good. It has been already taken.'
-</programlisting><note>
-                <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
-                linkend="i18n"/>.</para>
-              </note></para>
-          </listitem>
-
+      <para><methodname>uniqueness</methodname> kann mit folgenden Optionen
+      aufgerufen werden:<itemizedlist>
           <listitem>
             <para><code>:scope</code></para>
 
@@ -736,64 +599,26 @@ MacBook:shop xyz$</screen></para>
             definieren, das eine Telefonnummer pro User nur einmal gespeichert
             werden darf. Das sähe dann so aus:</para>
 
-            <para><programlisting>validates_uniqueness_of :phone_number, :scope =&gt; :user_id</programlisting></para>
+            <para><programlisting>validates :name,
+          :presence =&gt; true,
+          <emphasis>:uniqueness =&gt; { :scope =&gt; :user_id }</emphasis></programlisting></para>
           </listitem>
 
           <listitem>
             <para><methodname>:case_sensitive</methodname></para>
 
             <para>Überprüft die Einzigartikeit auch auf Gross- und
-            Kleinschreibung. Default: False. Beispiel:<programlisting>validates_uniqueness_of :attribute, :case_sensitive =&gt; true
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:allow_nil</code></para>
-
-            <para>Das Attribut darf den Wert nil haben. Default: false.
-            Beispiel:<programlisting>validates_uniqueness_of :attribute, :allow_nil =&gt; true
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:allow_blank</code></para>
-
-            <para>Das Attribut darf ganz leer sein. Default: false.
-            Beispiel:<programlisting>validates_uniqueness_of :attribute, :allow_blank =&gt; true
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:if</code></para>
-
-            <para>Definiert eine Methode, einen Proc oder einen String der
-            definiert, ob die Validierung ausgeführt werden soll.
-            Beispiel:<programlisting>validates_uniqueness_of :attribute, :if =&gt; Date.today.monday?
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:unless</code></para>
-
-            <para>Wie <methodname>if</methodname>, nur das hier definiert
-            wird, wann die Validierung nicht erfolgen soll.
-            Beispiel:<programlisting>validates_uniqueness_of :attribute, :unless =&gt; Date.today.tuesday?
+            Kleinschreibung. Default: False. Beispiel:<programlisting>validates :name,
+          :presence =&gt; true,
+          <emphasis>:uniqueness =&gt; { :case_sensitive =&gt; true }</emphasis>
 </programlisting></para>
           </listitem>
         </itemizedlist></para>
     </section>
-
-    <section xml:id="validates_uniqueness_of_doku">
-      <title xml:id="validates_uniqueness_of_doku.title">Weitere Doku</title>
-
-      <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
-      validates_uniqueness_of</command> auf der Kommandozeile aufrufen.</para>
-    </section>
   </section>
 
   <section xml:id="validates_inclusion_of">
-    <title
-    xml:id="validates_inclusion_of.title">validates_inclusion_of</title>
+    <title xml:id="validates_inclusion_of.title">inclusion</title>
 
     <indexterm>
       <primary>ActiveRecord</primary>
@@ -803,32 +628,40 @@ MacBook:shop xyz$</screen></para>
       <tertiary>validates_inclusion_of()</tertiary>
     </indexterm>
 
-    <para>Mit <methodname>validates_inclusion_of</methodname> können Sie
-    definieren, aus welchen Werten der Inhalt dieses Attributes erstellt
-    werden kann. Bei unserem Beispiel können wir das am Attribute
-    <methodname>gender</methodname> veranschaulischen.</para>
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>validates</secondary>
+
+      <tertiary>inclusion</tertiary>
+    </indexterm>
+
+    <para>Mit <methodname>inclusion</methodname> können Sie definieren, aus
+    welchen Werten der Inhalt dieses Attributes erstellt werden kann. Bei
+    unserem Beispiel können wir das am Attribute
+    <methodname>in_stock</methodname> veranschaulischen.</para>
 
     <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
   attr_accessible :expiration_date, :in_stock, :name, :price, :weight
 
-  validates_presence_of :name
-  validates_presence_of :price
+  validates :name,
+            :presence =&gt; true,
+            :length =&gt; { :in =&gt; 2..20 }
 
-  validates_length_of :name, :within =&gt; 2..255
+  validates :price,
+            :presence =&gt; true
 
-  validates_numericality_of :weight
-
-  validates_uniqueness_of :name
-
-  <emphasis>validates_inclusion_of :in_stock, :in =&gt; [true, false]</emphasis>
-end</programlisting></para>
+  validates :in_stock,
+            <emphasis>:inclusion =&gt; { :in =&gt; [true, false] }</emphasis>
+end
+</programlisting></para>
 
     <para>In unserem Datenmodel muss ein <classname>Product</classname> als
     <methodname>in_stock</methodname> entweder <code>true</code> oder
     <code>false</code> sein (es darf also kein nil geben). Wenn wir einen
     anderen Wert als <code>true</code> oder <code>false</code> eingeben, wird
     ein Validation-Fehler gemeldet:<screen>MacBook:shop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
+Loading development environment (Rails 3.2.8)
 1.9.3p194 :001 &gt; <command>product = Product.create(:name =&gt; 'Milch fettarm (1 Liter)', :price =&gt; 0.45, :weight =&gt; 1000)</command>
    (0.1ms)  begin transaction
   Product Exists (0.2ms)  SELECT 1 FROM "products" WHERE "products"."name" = 'Milch fettarm (1 Liter)' LIMIT 1
@@ -849,77 +682,26 @@ MacBook:shop xyz$</screen></para>
     <section xml:id="validates_inclusion_of_optionen">
       <title xml:id="validates_inclusion_of_optionen.title">Optionen</title>
 
-      <para><methodname>validates_inclusion_of</methodname> kann mit folgenden
-      Optionen aufgerufen werden:<itemizedlist>
+      <para><methodname>inclusion</methodname> kann mit folgenden Optionen
+      aufgerufen werden:<itemizedlist>
           <listitem>
             <para><code>:message</code></para>
 
             <para>Um eine eigene Fehlermeldung auszugeben. Default: "is not
-            included in the list". Beispiel:<programlisting>validates_inclusion_of :attribute, :message =&gt; 'this one is not allowed'
+            included in the list". Beispiel:<programlisting>validates :in_stock,
+          :inclusion =&gt; { :in =&gt; [true, false], 
+                          <emphasis>:message =&gt; 'this one is not allowed'</emphasis> }
 </programlisting><note>
                 <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
                 linkend="i18n"/>.</para>
               </note></para>
           </listitem>
-
-          <listitem>
-            <para><code>:in</code></para>
-
-            <para>Definiert das Enumerable Objekt mit allen erlaubten Werten
-            für dieses Attribut. Beispiele:</para>
-
-            <para><programlisting>validates_inclusion_of :gender, :in =&gt; %w( male female )
-validates_inclusion_of :age, :in =&gt; 18..105
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:allow_nil</code></para>
-
-            <para>Das Attribut darf den Wert nil haben. Default: false.
-            Beispiel:<programlisting>validates_inclusion_of :attribute, :allow_nil =&gt; true
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:allow_blank</code></para>
-
-            <para>Das Attribut darf ganz leer sein. Default:false.
-            Beispiel:<programlisting>validates_inclusion_of :attribute, :allow_blank =&gt; true
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:if</code></para>
-
-            <para>Definiert eine Methode, einen Proc oder einen String der
-            definiert, ob die Validierung ausgeführt werden soll.
-            Beispiel:<programlisting>validates_inclusion_of :attribute, :if =&gt; Date.today.monday?
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:unless</code></para>
-
-            <para>Wie <methodname>if</methodname>, nur das hier definiert
-            wird, wann die Validierung nicht erfolgen soll.
-            Beispiel:<programlisting>validates_inclusion_of :attribute, :unless =&gt; Date.today.tuesday?
-</programlisting></para>
-          </listitem>
         </itemizedlist></para>
-    </section>
-
-    <section xml:id="validates_inclusion_of_doku">
-      <title xml:id="validates_inclusion_of_doku.title">Weitere Doku</title>
-
-      <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
-      validates_inclusion_of</command> auf der Kommandozeile aufrufen.</para>
     </section>
   </section>
 
   <section xml:id="validates_exclusion_of">
-    <title
-    xml:id="validates_exclusion_of.title">validates_exclusion_of</title>
+    <title xml:id="validates_exclusion_of.title">exclusion</title>
 
     <indexterm>
       <primary>ActiveRecord</primary>
@@ -929,107 +711,63 @@ validates_inclusion_of :age, :in =&gt; 18..105
       <tertiary>validates_exclusion_of()</tertiary>
     </indexterm>
 
-    <para><methodname>validates_exclusion_of</methodname> ist die Umkehrung
-    von <xref linkend="validates_inclusion_of"/>. Sie können definieren, aus
-    welchen Werten der Inhalt dieses Attributes nicht erstellt werden
-    darf.</para>
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>validates</secondary>
+
+      <tertiary>exclusion</tertiary>
+    </indexterm>
+
+    <para><methodname>exclusion</methodname> ist die Umkehrung von <xref
+    linkend="validates_inclusion_of"/>. Sie können definieren, aus welchen
+    Werten der Inhalt dieses Attributes nicht erstellt werden darf.</para>
 
     <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
   attr_accessible :expiration_date, :in_stock, :name, :price, :weight
 
-  validates_presence_of :name
-  validates_presence_of :price
+  validates :name,
+            :presence =&gt; true,
+            :length =&gt; { :in =&gt; 2..20 }
 
-  validates_length_of :name, :within =&gt; 2..255
+  validates :price,
+            :presence =&gt; true
 
-  validates_numericality_of :weight
-
-  validates_uniqueness_of :name
-
-  validates_inclusion_of :in_stock, :in =&gt; [true, false]
-  <emphasis>validates_exclusion_of :in_stock, :in =&gt; [nil]</emphasis>
-end</programlisting></para>
+  validates :in_stock,
+            <emphasis>:exclusion =&gt; { :in =&gt; [nil] }</emphasis>
+end
+</programlisting></para>
 
     <tip>
       <para>Denken Sie immer an die Macht von Ruby! Sie können so z.B. das
       Enumerable Objekt für in immer live aus einer anderen Datenbank
-      generieren. Das heißt die Validation ist nicht statisch
-      definiert.</para>
+      generieren. Das heißt die Validation muss nicht statisch definiert
+      werden.</para>
     </tip>
 
     <section xml:id="validates_exclusion_of_optionen">
       <title xml:id="validates_exclusion_of_optionen.title">Optionen</title>
 
-      <para><methodname>validates_exclusion_of</methodname> kann mit folgenden
-      Optionen aufgerufen werden:<itemizedlist>
+      <para><methodname>exclusion</methodname> kann mit folgenden Optionen
+      aufgerufen werden:<itemizedlist>
           <listitem>
             <para><code>:message</code></para>
 
             <para>Um eine eigene Fehlermeldung auszugeben. Default: "is not
-            included in the list". Beispiel:<programlisting>validates_exclusion_of :attribute, :message =&gt; 'this one is not allowed'
+            included in the list". Beispiel:<programlisting>validates :in_stock,
+          :exclusion =&gt; { :in =&gt; [nil], 
+                          <emphasis>:message =&gt; 'xyz'</emphasis> }
 </programlisting><note>
                 <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
                 linkend="i18n"/>.</para>
               </note></para>
           </listitem>
-
-          <listitem>
-            <para><code>:in</code></para>
-
-            <para>Definiert das Enumerable Objekt mit allen nicht erlaubten
-            Werten für dieses Attribut. Beispiele:</para>
-
-            <para><programlisting>validates_exclusion_of :login, :in =&gt; %w( admin root sysadmin )
-validates_exclusion_of :age, :in =&gt; 0..17
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:allow_nil</code></para>
-
-            <para>Das Attribut darf den Wert nil haben. Default: false.
-            Beispiel:<programlisting>validates_exclusion_of :attribute, :allow_nil =&gt; true
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:allow_blank</code></para>
-
-            <para>Das Attribut darf ganz leer sein. Default: false.
-            Beispiel:<programlisting>validates_exclusion_of :attribute, :allow_blank =&gt; true
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:if</code></para>
-
-            <para>Definiert eine Methode, einen Proc oder einen String der
-            definiert, ob die Validierung ausgeführt werden soll.
-            Beispiel:<programlisting>validates_exclusion_of :attribute, :if =&gt; Date.today.monday?
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:unless</code></para>
-
-            <para>Wie <methodname>if</methodname>, nur das hier definiert
-            wird, wann die Validierung nicht erfolgen soll.
-            Beispiel:<programlisting>validates_exclusion_of :attribute, :unless =&gt; Date.today.tuesday?
-</programlisting></para>
-          </listitem>
         </itemizedlist></para>
-    </section>
-
-    <section xml:id="validates_exclusion_of_doku">
-      <title xml:id="validates_exclusion_of_doku.title">Weitere Doku</title>
-
-      <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
-      validates_exclusion_of</command> auf der Kommandozeile aufrufen.</para>
     </section>
   </section>
 
   <section xml:id="validates_format_of">
-    <title xml:id="validates_format_of.title">validates_format_of</title>
+    <title xml:id="validates_format_of.title">format</title>
 
     <indexterm>
       <primary>ActiveRecord</primary>
@@ -1039,20 +777,24 @@ validates_exclusion_of :age, :in =&gt; 0..17
       <tertiary>validates_format_of()</tertiary>
     </indexterm>
 
-    <para>Mit <methodname>validates_format_of</methodname> können Sie mit
-    einer Regular Expression (siehe <uri
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>validates</secondary>
+
+      <tertiary>format</tertiary>
+    </indexterm>
+
+    <para>Mit <methodname>format</methodname> können Sie mit einer Regular
+    Expression (siehe <uri
     xlink:href="http://de.wikipedia.org/wiki/Regul%C3%A4rer_Ausdruck">http://de.wikipedia.org/wiki/Regulärer_Ausdruck</uri>)
     definieren wie sich der Inhalt eines Attributes aufbauen darf.</para>
 
-    <para>Mit <methodname>validates_format_of</methodname> kann man z.B. eine
-    einfache Validierung der Syntax einer E-Mail Adresse machen:</para>
+    <para>Mit <methodname>format</methodname> kann man z.B. eine einfache
+    Validierung der Syntax einer E-Mail Adresse machen:</para>
 
-    <para><programlisting><emphasis>validates_format_of :email, :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
-</emphasis></programlisting></para>
-
-    <para>Diese einfache Validierung einer E-Mail-Adresse auf syntaktische
-    Korrektheit habe ich aus <command>ri validates_format_of</command>
-    übernommen.</para>
+    <para><programlisting>validates :email, 
+          <emphasis>:format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }</emphasis></programlisting></para>
 
     <warning>
       <para>Es sollte klar sein, dass die hier gezeigte
@@ -1070,132 +812,100 @@ validates_exclusion_of :age, :in =&gt; 0..17
             <para><code>:message</code></para>
 
             <para>Um eine eigene Fehlermeldung auszugeben. Default: "is
-            invalid". Beispiel:<programlisting>validates_format_of :attribute, :message =&gt; 'not the right format'
+            invalid". Beispiel:<programlisting>validates :email, 
+          :format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i,
+                       <emphasis>:message =&gt; 'is not a valid email address'</emphasis> }
 </programlisting><note>
                 <para>Bitte beachten Sie bei allen Fehlermeldungen <xref
                 linkend="i18n"/>.</para>
               </note></para>
           </listitem>
-
-          <listitem>
-            <para><code>:allow_nil</code></para>
-
-            <para>Das Attribut darf den Wert nil haben. Default: false.
-            Beispiel:<programlisting>validates_format_of :attribute, :allow_nil =&gt; true
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:allow_blank</code></para>
-
-            <para>Das Attribut darf ganz leer sein. Default: false.
-            Beispiel:<programlisting>validates_format_of :attribute, :allow_blank =&gt; true
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:with</code></para>
-
-            <para>Definiert die Regular Expression (siehe <uri
-            xlink:href="http://de.wikipedia.org/wiki/Regul%C3%A4rer_Ausdruck">http://de.wikipedia.org/wiki/Regul%C3%A4rer_Ausdruck</uri>)
-            zur Überprüfung des Formates. Beispiel:</para>
-
-            <para><programlisting>validates_format_of :email, :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:if</code></para>
-
-            <para>Definiert eine Methode, einen Proc oder einen String der
-            definiert, ob die Validierung ausgeführt werden soll.
-            Beispiel:<programlisting>validates_format_of :attribute, :if =&gt; Date.today.monday?
-</programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:unless</code></para>
-
-            <para>Wie <methodname>if</methodname>, nur das hier definiert
-            wird, wann die Validierung nicht erfolgen soll.
-            Beispiel:<programlisting>validates_format_of :attribute, :unless =&gt; Date.today.tuesday?
-</programlisting></para>
-          </listitem>
         </itemizedlist></para>
-    </section>
-
-    <section xml:id="validates_format_of_doku">
-      <title xml:id="validates_format_of_doku.title">Weitere Doku</title>
-
-      <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
-      validates_format_of</command> auf der Kommandozeile aufrufen.</para>
     </section>
   </section>
 
-  <section xml:id="method_validates">
-    <title
-    annotations="Diese Methode sollte der Standard sein und die anderen nur eine Randnotiz. Nicht andersrum."
-    xml:id="method_validates.title">validates</title>
+  <section>
+    <title>Allgemeine Validierungs-Optionen</title>
 
-    <indexterm>
-      <primary>ActiveRecord</primary>
-
-      <secondary>Methoden</secondary>
-
-      <tertiary>validates()</tertiary>
-    </indexterm>
-
-    <para>Mit der Methode <methodname>validates</methodname> können Sie ab
-    Rails 3 ebenfalls alle Validierungen vornehmen. Ich zeige Ihnen mal den
-    Unterschied an der <filename>app/models/product.rb</filename><itemizedlist>
+    <para>Es gibt einige Optionen, die bei allen Validierungen verwendet
+    werden können:<itemizedlist>
         <listitem>
-          <para>Traditionell</para>
+          <para><code>:allow_nil</code></para>
 
-          <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
-  attr_accessible :expiration_date, :in_stock, :name, :price, :weight
-
-  validates_presence_of :name
-  validates_presence_of :price
-
-  validates_length_of :name, :within =&gt; 2..255
-
-  validates_numericality_of :weight
-
-  validates_uniqueness_of :name
-
-  validates_inclusion_of :in_stock, :in =&gt; [true, false]
-end</programlisting></para>
+          <para>Erlaubt den Wert <code>nil</code>. Beispiel:<programlisting>validates :email, 
+          :format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i },
+          <emphasis>:allow_nil =&gt; true</emphasis></programlisting></para>
         </listitem>
 
         <listitem>
-          <para>mit <methodname>validates</methodname></para>
+          <para><code>:allow_blank</code></para>
 
-          <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
-  attr_accessible :expiration_date, :in_stock, :name, :price, :weight
+          <para>Wie <code>allow_nil</code>, aber zusätzlich noch mit einem
+          leeren String. Beispiel:<programlisting>validates :email, 
+          :format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i },
+          <emphasis>:allow_blank =&gt; true</emphasis></programlisting></para>
+        </listitem>
 
-  validates :name,
-            :presence =&gt; true,
-            :uniqueness =&gt; true,
-            :length =&gt; { :within =&gt; 2..255 }
+        <listitem>
+          <para><code>:on</code></para>
 
-  validates :price, :presence =&gt; true
+          <para>Eine Validierung kann mit <code>on</code> auf die Events
+          <code>create</code>, <code>update</code> oder <code>safe</code>
+          beschänkt werden. Im folgenden Beispiel greift die Validierung nur
+          beim initialen Erstellen des Datensatzes (beim
+          <code>create</code>):<programlisting>validates :email, 
+          :format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i },
+          <emphasis>:on =&gt; :create</emphasis></programlisting></para>
+        </listitem>
 
-  validates :weight, :numericality =&gt; true
+        <listitem>
+          <para><code>:if</code> und <code>:unless</code></para>
 
-  validates :in_stock,
-            :presence =&gt; true,
-            :inclusion =&gt; [true, false]
-end</programlisting></para>
+          <para><code>:if</code> oder <code>:unless</code> rufen die
+          angegebene Methode auf und führen die Validierung nur aus, wenn das
+          Ergebniss der Methode true ist:<programlisting>validates :name,
+          :presence =&gt; true,
+          :if =&gt; :today_is_monday?
+
+def today_is_monday?
+  Date.today.monday?
+end
+</programlisting></para>
+        </listitem>
+
+        <listitem>
+          <para><code>:proc</code></para>
+
+          <para><code>:</code><code>proc</code> ruft ein
+          <classname>Proc</classname> Objekt auf.<programlisting>validates :name,
+          :presence =&gt; true,
+          :if =&gt; Proc.new { |a| a.email == 'test@test.com' }
+</programlisting></para>
         </listitem>
       </itemizedlist></para>
+  </section>
 
-    <para>Man kann sich streiten, welche Variante besser lesbar ist.</para>
+  <section>
+    <title>Eigene Validations schreiben</title>
 
-    <section xml:id="method_validates_doku">
-      <title xml:id="method_validates_doku.title">Weitere Doku</title>
+    <para>Hin und wieder möchte man eine Validierung durchführen, bei der man
+    eigene Programmlogik benötigt. Für diesen Fall kann man eigene
+    Validierungen definieren.</para>
 
-      <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
-      validates</command> auf der Kommandozeile aufrufen.</para>
+    <section>
+      <title>Validierungen mit eigenen Methoden definieren</title>
+
+      <para>Nehmen wir einmal an, Sie haben eine Klasse HotelReservation und
+      dort darf das Ende der Reservierung logischerweise nicht vor dem Start
+      der Reservierung liegen. Das könnten Sie im Model mit einer eigenen
+      Methode validieren:</para>
     </section>
+  </section>
+
+  <section xml:id="method_validates_doku">
+    <title xml:id="method_validates_doku.title">Weitere Doku</title>
+
+    <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
+    validates</command> auf der Kommandozeile aufrufen.</para>
   </section>
 </section>
