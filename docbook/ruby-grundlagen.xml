@@ -26,23 +26,26 @@
     language.</quote></para>
 
     <para>Dieses Kapitel ist eine Gratwanderung zwischen falscher
-    Vereinfachung und für uns unnötiger Ausführlichkeit. Es geht ja nicht
-    darum, ein Ruby-Guru zu werden, sondern Rails zu verstehen. Ich gehe auf
-    die wichtigsten Sachen ein. Alles Weitere liegt dann an Ihnen. Wenn Sie
-    sich später mehr für Ruby interessieren, dann empfehle ich Ihnen das Ruby
-    Buch von David Flanagan und Yukihiro Matsumoto.</para>
+    Vereinfachung und für den Rails-Anfänger unnötiger Ausführlichkeit. Es
+    geht ja nicht darum, ein Ruby-Guru zu werden, sondern Ruby on Rails zu
+    verstehen. Ich gehe auf die wichtigsten Sachen ein. Alles Weitere liegt
+    dann an Ihnen. Wenn Sie sich mehr für Ruby interessieren, dann empfehle
+    ich Ihnen das Buch "The Ruby Programming Language" von David Flanagan und
+    Yukihiro Matsumoto.</para>
 
-    <para>Lange habe ich den Fehler gemacht und versucht, mit Rails zu
-    arbeiten, ohne eine Ahnung von Ruby zu haben. Ruby sah so einfach aus, und
-    deshalb habe ich mir keine Gedanken darüber gemacht. Da ich aber Ruby
-    nicht grundlegend verstand, konnte ich auch Rails nicht verstehen. Deshalb
-    habe ich es immer wieder in die virtuelle Ecke gelegt und weiter mit PHP
-    gearbeitet. Erst nachdem ich mir Ruby intensiv angeschaut hatte, fiel der
-    Groschen. <footnote>
-        <para>Heute bin ich ein so großer Ruby-on-Rails-Fan, dass ich mir
-        sogar die Mühe mache, dazu ein Buch zu schreiben, um es Ihnen
-        näherzubringen. ;-)</para>
-      </footnote></para>
+    <note>
+      <para>Lange habe ich den Fehler gemacht und versucht, Ruby on Rails zu
+      verstehen, ohne eine Ahnung von Ruby zu haben. Ruby sah so einfach aus,
+      und deshalb habe ich mir keine Gedanken darüber gemacht. Da ich aber
+      Ruby nicht grundlegend verstand, konnte ich auch Rails nicht verstehen.
+      Deshalb habe ich es immer wieder in die virtuelle Ecke gelegt und weiter
+      mit PHP gearbeitet. Erst nachdem ich mir Ruby intensiv angeschaut hatte,
+      fiel der Groschen. <footnote>
+          <para>Heute bin ich ein so großer Ruby-on-Rails-Fan, dass ich mir
+          sogar die Mühe mache, dazu ein Buch zu schreiben, um es Ihnen
+          näherzubringen. ;-)</para>
+        </footnote></para>
+    </note>
   </section>
 
   <section xml:id="ruby-ist-eine-skriptsprache">
@@ -540,13 +543,12 @@ NoMethodError: undefined method `drei_mal' for Dies_und_das:Class
 from /usr/local/bin/irb:12:in `&lt;main&gt;'
 </screen></para>
 
-      <para
-      annotations="Der Unterschied zwischen Instanz- und Klassenmethoden wurde bisher nicht erklärt.">Das
-      gibt eine Fehlermeldung, denn <classname>Dies_und_das</classname> ist
-      eine Klasse und keine Instanz. Da wir hier mit Instanz-Methoden
-      arbeiten, funktioniert es nur, wenn wir vorher ein neues Objekt (also
-      eine neue Instanz) der Klasse <classname>Dies_und_das</classname> mit
-      der Methode <methodname>new</methodname> erzeugt haben:<screen>1.9.3p194 :009:0&gt; <command>abc = Dies_und_das.new</command>
+      <para>Das gibt eine Fehlermeldung, denn
+      <classname>Dies_und_das</classname> ist eine Klasse und keine Instanz.
+      Da wir hier mit Instanz-Methoden arbeiten, funktioniert es nur, wenn wir
+      vorher ein neues Objekt (also eine neue Instanz) der Klasse
+      <classname>Dies_und_das</classname> mit der Klassen-Methode
+      <methodname>new</methodname> erzeugt haben:<screen>1.9.3p194 :009:0&gt; <command>abc = Dies_und_das.new</command>
 =&gt; #&lt;Dies_und_das:0x9ebb3f0&gt;
 1.9.3p194 :010:0&gt; <command>abc.drei_mal</command>
 Hello World!
@@ -555,6 +557,10 @@ Hello World!
 =&gt; nil
 1.9.3p194 :011:0&gt; <command>exit</command>
 </screen></para>
+
+      <para>Auf den genauen Unterschied von Instanz- und Klassen-Methoden gehe
+      ich in <xref linkend="class_methods_vs_instance_methods"/> ein. Wieder
+      so ein Henne-Ei-Problem.</para>
 
       <section xml:id="ruby-private-methods">
         <title>Private Methoden</title>
@@ -734,68 +740,63 @@ NoMethodError: undefined method `pi' for #&lt;Literatur:0x90e7098&gt;
           <secondary>in Ruby</secondary>
         </indexterm>
 
-        <para
-        annotations="Halte ich für ein Gerücht. Wer essentielle Dinge wie diese nicht versteht, wird nicht weit kommen. Auch nicht in Rails.">Es
-        gibt zwei wichtige Arten von Methoden: Klassen-Methoden (Class
-        Methods) und Instanz-Methoden (Instance Methods). Viele
-        Rails-Programmierer leben sehr glücklich ohne den Unterschied zwischen
-        beiden wirklich zu verstehen. Auf der anderen Seite kann es aber auch
-        nicht schaden.</para>
+        <para>Es gibt zwei wichtige Arten von Methoden: Klassen-Methoden
+        (Class Methods) und Instanz-Methoden (Instance Methods).</para>
 
         <para>Was eine Klasse ist, wissen Sie jetzt. Und eine Instanz einer
-        solchen Klasse wird mit der Methode <methodname>new</methodname>
-        erstellt. Eine Klassen-Methode kann nur im Zusammenhang mit der Klasse
-        aufgerufen werden (die Methode <methodname>new</methodname> ist zum
-        Beispiel eine Klassen-Methode). Eine Instanz-Methode ist eine Methode,
-        die nur mit einer Instanz funktioniert. So können Sie nicht die
-        Methode <methodname>new</methodname> auf eine Instanz anwenden.</para>
+        solchen Klasse wird mit der Klassen-Methode
+        <methodname>new</methodname> erstellt. Eine Klassen-Methode kann nur
+        im Zusammenhang mit der Klasse aufgerufen werden (die Methode
+        <methodname>new</methodname> ist zum Beispiel eine Klassen-Methode).
+        Eine Instanz-Methode ist eine Methode, die nur mit einer Instanz
+        funktioniert. So können Sie nicht die Methode
+        <methodname>new</methodname> auf eine Instanz anwenden.</para>
 
         <para>Probieren wir erstmal aus, eine Instanz-Methode als
-        Klassen-Methode aufzurufen:<screen annotations="Alte ruby version.">sw@debian:~/sandbox$ <command>irb</command>
+        Klassen-Methode aufzurufen:<screen>sw@debian:~/sandbox$ <command>irb</command>
 ruby-1.9.2-p0 &gt; <command>class Wohnung</command>
-ruby-1.9.2-p0 ?&gt;  <command>def putzen</command>
-ruby-1.9.2-p0 ?&gt;    <command>puts 'Wirklich?'</command>
-ruby-1.9.2-p0 ?&gt;    <command>end</command>
-ruby-1.9.2-p0 ?&gt;  <command>end</command>
+1.9.3p194 ?&gt;  <command>def putzen</command>
+1.9.3p194 ?&gt;    <command>puts 'Wirklich?'</command>
+1.9.3p194 ?&gt;    <command>end</command>
+1.9.3p194 ?&gt;  <command>end</command>
  =&gt; nil 
-ruby-1.9.2-p0 &gt; <command>Wohnung.putzen</command>
+1.9.3p194 &gt; <command>Wohnung.putzen</command>
 NoMethodError: undefined method `putzen' for Wohnung:Class
  from (irb):15
- from /Users/stefan/.rvm/rubies/ruby-1.9.2-p0/bin/irb:17:in `&lt;main&gt;'
-ruby-1.9.2-p0 &gt; </screen></para>
+ from /Users/stefan/.rvm/rubies/1.9.3p194/bin/irb:17:in `&lt;main&gt;'
+1.9.3p194 &gt; </screen></para>
 
         <para>Das geht also nicht. Dann erstellen wir eine neue Instanz der
-        Klasse und versuchen es erneut:<screen>ruby-1.9.2-p0 &gt; <command>apfelmus = Wohnung.new</command>
+        Klasse und versuchen es erneut:<screen>1.9.3p194 &gt; <command>apfelmus = Wohnung.new</command>
  =&gt; #&lt;Wohnung:0x00000100a06990&gt; 
-ruby-1.9.2-p0 &gt; <command>apfelmus.putzen</command>
+1.9.3p194 &gt; <command>apfelmus.putzen</command>
 Wirklich?
  =&gt; nil 
-ruby-1.9.2-p0 &gt; </screen></para>
+1.9.3p194 &gt; </screen></para>
 
         <para>Jetzt müssen wir nur noch herausfinden, wie man eine
         Klassen-Methode definiert. Rails Hardcore-Gurus würden Sie jetzt in
         die Tiefen des Quellcodes entführen und dort in ActiveRecord Beispiele
         heraussuchen. Das erspare ich Ihnen und zeige ein abstraktes
-        Beispiel:<screen>ruby-1.9.2-p0 &gt; <command>class Apfelkuchen</command>
-ruby-1.9.2-p0 ?&gt;  <command>def self.backen</command>
-ruby-1.9.2-p0 ?&gt;    <command
-              annotations="Wie wäre es mit einem sinnvollen Beispiel? Klasse: Mensch. Klassenmethode: Klasse (&quot;Säugetiere&quot;). Instanz: peter. Instanzmethode: name (&quot;Peter&quot;).">puts 'sinnfreies Beispiel'</command>
-ruby-1.9.2-p0 ?&gt;    <command>end</command>
-ruby-1.9.2-p0 ?&gt;  <command>end</command>
+        Beispiel:<screen>1.9.3p194 &gt; <command>class Apfelkuchen</command>
+1.9.3p194 ?&gt;  <command>def self.backen</command>
+1.9.3p194 ?&gt;    <command>puts 'sinnfreies Beispiel'</command>
+1.9.3p194 ?&gt;    <command>end</command>
+1.9.3p194 ?&gt;  <command>end</command>
  =&gt; nil 
-ruby-1.9.2-p0 &gt; <command>Apfelkuchen.backen</command>
+1.9.3p194 &gt; <command>Apfelkuchen.backen</command>
 sinnfreies Beispiel
  =&gt; nil 
-ruby-1.9.2-p0 &gt; 
+1.9.3p194 &gt; 
 </screen></para>
 
-        <para>Und noch der Gegenbeweis:<screen>ruby-1.9.2-p0 &gt; <command>lieblingskuchen = Apfelkuchen.new</command>
+        <para>Und noch der Gegenbeweis:<screen>1.9.3p194 &gt; <command>lieblingskuchen = Apfelkuchen.new</command>
  =&gt; #&lt;Apfelkuchen:0x0000010181a9c8&gt; 
-ruby-1.9.2-p0 &gt; <command>lieblingskuchen.backen</command>
+1.9.3p194 &gt; <command>lieblingskuchen.backen</command>
 NoMethodError: undefined method `backen' for #&lt;Apfelkuchen:0x0000010181a9c8&gt;
  from (irb):25
- from /Users/stefan/.rvm/rubies/ruby-1.9.2-p0/bin/irb:17:in `&lt;main&gt;'
-ruby-1.9.2-p0 &gt;</screen></para>
+ from /Users/stefan/.rvm/rubies/1.9.3p194/bin/irb:17:in `&lt;main&gt;'
+1.9.3p194 &gt;</screen></para>
 
         <para>Es gibt verschiedene Schreibweisen, um Klassen-Methoden zu
         definieren. Die zwei häufigsten:<itemizedlist>
@@ -2608,8 +2609,6 @@ sw@debian:~/sandbox$ </screen></para>
   <section xml:id="ruby_sonstiges">
     <title xml:id="ruby_sonstiges.title">Sonstiges</title>
 
-    <para>Hier noch ein paar Sachen, die in Ruby sehr praktisch sind.</para>
-
     <section xml:id="range_class">
       <title xml:id="range_class.title">Range</title>
 
@@ -2657,7 +2656,7 @@ sw@debian:~/sandbox$ </screen></para>
       sieht dann so aus:<screen>1.9.3p194 &gt; <command>(0..3) == Range.new(0,3)</command>
  =&gt; true 
 1.9.3p194 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.2-p0 ~$ </screen></para>
+stefan@swmbp 0 1.9.3p194 ~$ </screen></para>
     </section>
   </section>
 </chapter>
