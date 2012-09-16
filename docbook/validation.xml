@@ -7,9 +7,8 @@
          xmlns:m="http://www.w3.org/1998/Math/MathML"
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
-  <title
-  annotations="ACHTUNG: Validierungen haben in der aktuellen Rails Version eine andere Syntax."
-  xml:id="activerecord_validation.title">Validierung (Validation)</title>
+  <title xml:id="activerecord_validation.title">Validierung
+  (Validation)</title>
 
   <indexterm>
     <primary>ActiveRecord</primary>
@@ -525,8 +524,7 @@ MacBook:shop xyz$</screen></para>
   </section>
 
   <section xml:id="validates_uniqueness_of">
-    <title annotations="Diese Methode ist in Rails 3 deprecated."
-    xml:id="validates_uniqueness_of.title">uniqueness</title>
+    <title xml:id="validates_uniqueness_of.title">uniqueness</title>
 
     <indexterm>
       <primary>ActiveRecord</primary>
@@ -824,8 +822,58 @@ end
     </section>
   </section>
 
-  <section>
-    <title>Allgemeine Validierungs-Optionen</title>
+  <section xml:id="validates_allgemeine_validierungs_optionen">
+    <title
+    xml:id="validates_allgemeine_validierungs_optionen.title">Allgemeine
+    Validierungs-Optionen</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>validates</secondary>
+
+      <tertiary>allow_nil</tertiary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>validates</secondary>
+
+      <tertiary>allow_blank</tertiary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>validates</secondary>
+
+      <tertiary>on</tertiary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>validates</secondary>
+
+      <tertiary>if</tertiary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>validates</secondary>
+
+      <tertiary>unless</tertiary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>validates</secondary>
+
+      <tertiary>proc</tertiary>
+    </indexterm>
 
     <para>Es gibt einige Optionen, die bei allen Validierungen verwendet
     werden können:<itemizedlist>
@@ -885,8 +933,15 @@ end
       </itemizedlist></para>
   </section>
 
-  <section>
-    <title>Eigene Validations schreiben</title>
+  <section xml:id="validates_eigene_validations_definieren">
+    <title xml:id="validates_eigene_validations_definieren.title">Eigene
+    Validations schreiben</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>Eigene Validations schreiben</secondary>
+    </indexterm>
 
     <para>Hin und wieder möchte man eine Validierung durchführen, bei der man
     eigene Programmlogik benötigt. Für diesen Fall kann man eigene
@@ -897,15 +952,66 @@ end
 
       <para>Nehmen wir einmal an, Sie haben eine Klasse HotelReservation und
       dort darf das Ende der Reservierung logischerweise nicht vor dem Start
-      der Reservierung liegen. Das könnten Sie im Model mit einer eigenen
-      Methode validieren:</para>
+      der Reservierung liegen. Legen wir erst mal das Model an:<screen>MacBook:shop xyz$ <command>rails generate model HotelReservation start_date:date end_date:date room_type</command>
+[...]
+MacBook:shop xyz$ <command>rake db:migrate</command>
+[...]
+MacBook:shop xyz$</screen></para>
+
+      <para>Dann legen wir in der
+      <filename>app/model/hotel_reservation.rb</filename> fest, das die
+      Attribute <varname>start_date</varname> und <varname>end_date</varname>
+      auf jeden Fall ausgefühlt werden müssen und zusätzlich überprüfen wir
+      mit der Methode <methodname>start_has_to_be_before_end</methodname> das
+      das <varname>start_date</varname> vor dem <varname>end_date</varname>
+      liegt:<programlisting>class HotelReservation &lt; ActiveRecord::Base
+  attr_accessible :end_date, :room_type, :start_date
+
+  validates :start_date,
+            :presence =&gt; true
+
+  validates :end_date,
+            :presence =&gt; true
+
+<emphasis>  validate :start_has_to_be_before_end
+
+  def start_has_to_be_before_end
+    if end_date &lt; start_date
+      errors.add(:start_date, 'has to be before the end date')
+    end
+  end</emphasis>
+
+end</programlisting></para>
+
+      <para>Mit <methodname>errors.add</methodname> können wir Fehlermeldungen
+      zu einzelnen Attributen hinzufügen. Mit
+      <methodname>errors.add_to_base</methodname> können Sie Fehlermeldungen
+      zum gesamten Objekt hinzufügen.</para>
+
+      <para>Probieren wir die Validierung in der Console aus:<screen>MacBook:shop stefan$ <command>rails console</command>
+Loading development environment (Rails 3.2.8)
+1.9.3p194 :001 &gt; <command>new_reservation = HotelReservation.new(:start_date =&gt; Date.today, :end_date =&gt; Date.today - 1.day)</command>
+ =&gt; #&lt;HotelReservation id: nil, start_date: "2012-09-16", end_date: "2012-09-15", room_type: nil, created_at: nil, updated_at: nil&gt; 
+1.9.3p194 :002 &gt; <command>new_reservation.valid?</command>
+ =&gt; false 
+1.9.3p194 :003 &gt; <command>new_reservation.errors.messages</command>
+ =&gt; {:start_date=&gt;["has to be before the end date"]} 
+1.9.3p194 :004 &gt; <command>new_reservation.end_date = Date.today + 10.days</command>
+ =&gt; Wed, 26 Sep 2012 
+1.9.3p194 :005 &gt; <command>new_reservation.valid?</command>
+ =&gt; true 
+1.9.3p194 :006 &gt; <command>exit</command>
+MacBook:shop stefan$ </screen></para>
     </section>
   </section>
 
-  <section xml:id="method_validates_doku">
-    <title xml:id="method_validates_doku.title">Weitere Doku</title>
+  <section xml:id="validates_weitere_doku">
+    <title xml:id="validates_weitere_doku.title">Weitere Doku</title>
 
-    <para>Die beste Doku haben Sie bereits im System. Einfach <command>ri
-    validates</command> auf der Kommandozeile aufrufen.</para>
+    <para>Das Thema Validations wird in der offiziellen englischen Rails-Doku
+    unter <uri
+    xlink:href="http://guides.rubyonrails.org/active_record_validations_callbacks.html">http://guides.rubyonrails.org/active_record_validations_callbacks.html</uri>
+    sehr gut beschrieben. Im System können Sie mit <command>ri
+    validates</command> auf der Kommandozeile die System-Doku abrufen.</para>
   </section>
 </section>
