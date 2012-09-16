@@ -1239,8 +1239,7 @@ end</programlisting></para>
 
       <para>Bitte verändern Sie die Datei
       <filename>app/views/companies/index.html.erb</filename> wie
-      folgt:<programlisting
-      annotations="Zwar ist es vorteilhaft nur die beiden neuen Zeilen kursiv darstellen zu müssen und dadurch dem Vorgehen treu zu bleiben, alle Veränderungen zu kennzeichnen. Jedoch würde die Einrückung des gecacheten Bereiches die Lesbarkeit dieses Beispiels erhöhen.">&lt;h1&gt;Listing companies&lt;/h1&gt;
+      folgt:<programlisting>&lt;h1&gt;Listing companies&lt;/h1&gt;
 
 <emphasis>&lt;% cache('table_of_all_companies') do %&gt;</emphasis>
 &lt;table&gt;
@@ -1505,17 +1504,24 @@ MacBook:phone_book xyz$</screen></para>
 &lt;% end %&gt;</programlisting></para>
 
       <para>Über diesen Mechanismus können Sie auch Caches für einzelne User
-      realisieren. Wenn Sie ein User-Objekt mit dem Namen current_user haben,
-      so können Sie folgenden Code zum Fragment Cachen
-      benutzen:<programlisting
-      annotations="Evtl. sprengt es den Rahmen des Buches, aber ein wunderbarer Trick ist in einem Initializer den aktuellen Commit SHA aus dem git Repository auszulesen und in eine Konstante zu schreiben. Je nach Setup geht natürlich auch die Versionsnummer der letzten Migration oder einfach nur eine VERSION Datei.">&lt;% cache(['V3.23', current_user, @companies]) do %&gt;
+      realisieren. Wenn Sie ein User-Objekt mit dem Namen
+      <code>current_user</code> haben, so können Sie folgenden Code zum
+      Fragment Cachen benutzen:<programlisting>&lt;% cache(['V3.23', current_user, @companies]) do %&gt;
 
 [...]
 
 &lt;% end %&gt;</programlisting></para>
 
-      <para>Wenn kein User eingelogt ist, dann ist current_user nil und
-      funktioniert dann für alle nicht angemeldeten User.</para>
+      <para>Wenn kein User eingelogt ist, dann ist <code>current_user</code>
+      nil und funktioniert dann für alle nicht angemeldeten User.</para>
+
+      <tip>
+        <para>Es sprengt den Rahmen eines Anfänger-Buches, aber bei der
+        Benutzung einer Versionsverwaltung von Dateien (z.B. git) ist es
+        praktisch anstatt des 'V3.23' eine Konstante einzubauen und diese in
+        einem Initializer mit dem aktuellen Commit SHA aus dem benutzten
+        Repository zu setzen.</para>
+      </tip>
     </section>
 
     <section xml:id="fragment_cache_cache_store">
