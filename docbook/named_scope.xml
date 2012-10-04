@@ -7,12 +7,12 @@
          xmlns:m="http://www.w3.org/1998/Math/MathML"
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
-  <title xml:id="activerecord_named_scope.title">Named Scopes</title>
+  <title xml:id="activerecord_named_scope.title">NamedScopes</title>
 
   <indexterm>
     <primary>ActiveRecord</primary>
 
-    <secondary>Named Scopes</secondary>
+    <secondary>NamedScopes</secondary>
   </indexterm>
 
   <para>Manchmal ist es beim Programmieren von Rails-Applikationen
@@ -54,7 +54,7 @@ MacBook:shop xyz$</screen></para>
     <title xml:id="einfache_named_scopes.title">Einfache NamedScopes</title>
 
     <para>Wenn wir in unserem Online-Shop nur Produkte, die auf Lager sind
-    anzeigen wollen, so könnten wir jedesmal die folgende Abfrage
+    anzeigen wollen, so könnten wir jedes Mal die folgende Abfrage
     machen:<screen>MacBook:shop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Product.where(:in_stock =&gt; true)</command>
@@ -90,8 +90,8 @@ MacBook:shop xyz$</screen></para>
   scope :cheap, where(:price =&gt; [0..1])
 end</programlisting></para>
 
-    <para>Jetzt können wir alle günstigen (cheap) Produkte, die auf Lager sind
-    ausgeben:<screen>MacBook:shop xyz$ <command>rails console</command>
+    <para>Jetzt können wir alle günstigen (cheap) Produkte ausgeben, die auf
+    Lager sind:<screen>MacBook:shop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Product.cheap.count</command>
    (0.3ms)  SELECT COUNT(*) FROM "products" WHERE (("products"."price" BETWEEN 0 AND 1 OR "products"."price" IN (NULL)))
@@ -106,14 +106,14 @@ MacBook:shop xyz$ </screen></para>
   <section xml:id="named_scope_lambda">
     <title xml:id="named_scope_lambda.title">Lambda</title>
 
-    <para>Wenn wir einen Named Scope <methodname>consumable</methodname>
+    <para>Wenn wir einen NamedScope <methodname>consumable</methodname>
     einbauen möchten, der das heutige Datum mit dem Wert von
     <methodname>expiration_date</methodname> vergleicht, dann müssen wir dafür
-    mit Lambda arbeiten. Ein normaler Named Scope wird einmal von ActiveRecord
-    definiert und dann immer wieder benutzt. Das heißt ein
+    mit Lambda arbeiten. Ein normaler NamedScope wird einmal von ActiveRecord
+    definiert und dann immer wieder benutzt. Das heißt, ein
     <code>Date.today</code> (für das heutige Datum) würde nur einmal in ein
     Datum umgesetzt und danach immer wieder genommen. Morgen würde also immer
-    noch mit dem Datum von heute gearbeitet. Wenn wir den Named Scope mit
+    noch mit dem Datum von heute gearbeitet. Wenn wir den NamedScope mit
     Lambda definieren, so wird dieses Lambda bei jedem Aufruf neu
     aufgebaut.</para>
 
@@ -138,8 +138,9 @@ MacBook:shop xyz$</screen></para>
 
     <para>Wenn Sie einen NamedScope brauchen, der auch Parameter verarbeiten
     kann, so ist das auch kein Problem. Das folgende Beispiel gibt Produkte
-    die günstiger sind, als der angegebene Wert, aus. Die
-    <filename>app/models/product.rb</filename> sieht so aus:<programlisting>class Product &lt; ActiveRecord::Base
+    aus, die günstiger sind als der angegebene Wert. Die
+    <filename>app/models/product.rb</filename> sieht wie folgt
+    aus:<programlisting>class Product &lt; ActiveRecord::Base
   attr_accessible :in_stock, :name, :price, :weight
 
   scope :cheaper_than, lambda { |price| where('price &lt; ?', price) }
@@ -168,8 +169,8 @@ MacBook:shop xyz</screen></para>
   scope :cheaper_than, lambda { |price| where('price &lt; ?', price) }
 end</programlisting></para>
 
-    <para>Mit diesem NamedScope können wir dann nicht nur alle Produkte, die
-    auf Lager sind raussuchen, sondern auch einen neue Produkte anlegen, der
+    <para>Mit diesem NamedScope können wir dann nicht nur alle Produkte
+    heraussuchen, die auf Lager sind, sondern auch neue Produkte anlegen, die
     im Feld <varname>in_stock</varname> den Wert <code>true</code>
     enthalten:<screen>MacBook:shop xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)

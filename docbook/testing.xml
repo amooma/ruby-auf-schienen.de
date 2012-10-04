@@ -32,8 +32,8 @@
     <title xml:id="testing_einleitung.title">Einleitung</title>
 
     <para>Ich programmiere seit 30 Jahren und bin davon die meiste Zeit sehr
-    gut ohne Testing zurechtgekommen. Ich bin den EDV-Dinosaurien nicht böse,
-    wenn Sie dieses Kapitel überspringen. Sie können Rails-Applikationen auch
+    gut ohne Testing zurechtgekommen. Ich bin den EDV-Dinosauriern nicht böse,
+    wenn sie dieses Kapitel überspringen. Sie können Rails-Applikationen auch
     ohne Tests erstellen und werden deshalb kein schlechtes Karma bekommen
     (hoffentlich, sicher kann man bei der Karma-Sache ja nie sein).</para>
 
@@ -41,7 +41,7 @@
     so kann ich Ihnen versprechen, dass es eine Erleuchtung ist. Die Grundidee
     von TDD ist, dass man für jede Programmfunktion einen Test schreibt, der
     diese Funktion überprüft. In der reinen TDD-Lehre schreibt man diesen Test
-    vor dem eigentlichem Programmieren. Ja, man hat initial mehr Aufwand. Aber
+    vor dem eigentlichen Programmieren. Ja, man hat initial mehr Aufwand. Aber
     danach kann man alle Tests durchlaufen lassen und sieht, dass die
     Applikation genau so funktioniert, wie man es sich vorgestellt hat. Der
     wirkliche Vorteil stellt sich aber erst nach ein paar Wochen oder Monaten
@@ -52,7 +52,7 @@
     Besonderheit habe ich nicht gedacht“ mehr.</para>
 
     <para>Der Vorteil von TDD zeigt sich aber oft schon beim ersten Schreiben
-    eines Programmes. Oft entlarfen Test Flüchtigkeitsfehler, die sonst erst
+    eines Programmes. Oft entlarven Tests Flüchtigkeitsfehler, die sonst erst
     sehr viel später auffallen würden.</para>
 
     <para>Dieses Kapitel ist ein Kurzüberblick zum Thema
@@ -70,7 +70,7 @@
 
   <section xml:id="testing_beispiel_webshop">
     <title xml:id="testing_beispiel_webshop.title">Beispiel für einen User in
-    einem Web-Shop</title>
+    einem Webshop</title>
 
     <para>Fangen wir mit einem User-Scaffold in einem imaginären Webshop
     an:<screen>MacBook:~ xyz$ <command>rails new webshop</command>
@@ -94,7 +94,7 @@ MacBook:webshop xyz$ <command>rake db:migrate</command>
 MacBook:webshop xyz$</screen></para>
 
     <para>Sie kennen sich ja mit Scaffold aus (falls nicht, bitte erst <xref
-    linkend="scaffolding"/> lesen) und wissen, was die gerade erstellte
+    linkend="scaffolding" /> lesen) und wissen, was die gerade erstellte
     Applikation macht. Sie haben auch gesehen, dass Scaffold einige Tests
     angelegt hat (die sind immer leicht am Wort <code>test</code> im
     Dateinamen zu erkennen).</para>
@@ -128,7 +128,7 @@ MacBook:webshop xyz$</screen></para>
 
     <para>Verändern wir jetzt die <filename>app/models/user.rb</filename> und
     fügen ein paar Validierungen (falls diese nicht ganz klar sind, bitte
-    <xref linkend="activerecord_validation"/> lesen) ein:<programlisting>class User &lt; ActiveRecord::Base
+    <xref linkend="activerecord_validation" /> lesen) ein:<programlisting>class User &lt; ActiveRecord::Base
   attr_accessible :birthday, :first_name, :last_name, :login_name
 
   validates :login_name,
@@ -144,7 +144,7 @@ MacBook:webshop xyz$</screen></para>
 end
 </programlisting></para>
 
-    <para>Nachfolgend führen wir noch mal <command>rake test</command>
+    <para>Nachfolgend führen wir noch <command>rake test</command>
     aus:<screen>MacBook:webshop xyz$ <command>rake test</command>
 Run options: 
 
@@ -256,9 +256,9 @@ MacBook:webshop xyz$ </screen></para>
     <para>Wir wissen nun, dass in der
     <filename>test/fixtures/users.yml</filename> valide Daten stehen müssen,
     damit der mit Scaffold erstellte Standard-Test durchläuft. Aber auch nicht
-    mehr. Nachfolgend andern wir die
+    mehr. Nachfolgend ändern wir die
     <filename>test/fixtures/users.yml</filename> auf ein Minimum (wir brauchen
-    z.B. keinen <code>first_name</code>) und mit für Menschen leichter
+    z. B. keinen <code>first_name</code>) und mit für Menschen leichter
     lesbaren Daten ab:<programlisting>one:
   login_name: horst.meier
   last_name: Meier
@@ -390,11 +390,11 @@ end
       einzelnen Tests eine Instanz <varname>@user</varname> mit den Daten des
       Eintrages <code>one</code> aus der Datei
       <filename>test/fixtures/users.yml</filename> angelegt wird.
-      <methodname>setup</methodname> ist ein vordefinierter Callback, der -
-      falls vorhanden - von Rails vor jedem Test gestartet wird. Das
+      <methodname>setup</methodname> ist ein vordefinierter Callback, der –
+      falls vorhanden – von Rails vor jedem Test gestartet wird. Das
       Gegenstück zu <methodname>setup</methodname> ist
       <methodname>teardown</methodname>. Ein <methodname>teardown</methodname>
-      wird - falls vorhanden - nach jedem Test automatisch
+      wird – falls vorhanden – nach jedem Test automatisch
       aufgerufen.<indexterm>
           <primary>Tests</primary>
 
@@ -434,7 +434,7 @@ end
       assigns(:users)</code> stellt sicher, dass die Instanz-Variable
       <varname>@users</varname> vom Controller nicht mit dem Wert
       <code>nil</code> zum View gegeben wird (durch
-      <methodname>setup</methodname> wurde ja sichergestellt, das bereits ein
+      <methodname>setup</methodname> wurde ja sichergestellt, dass bereits ein
       Eintrag in der Datenbank ist).<footnote>
           <para>Dabei wird hier das Symbol <varname>:users</varname> genommen,
           um sicherzustellen, dass <varname>@users</varname> in der zu
@@ -442,8 +442,8 @@ end
           der Test-Klasse selbst genommen wird.</para>
         </footnote></para>
 
-      <para>Schauen wir uns mal die beiden Probleme von vorhin genauer an. Als
-      Erstes <code>should create user</code>:<programlisting>  test "should create user" do
+      <para>Schauen wir uns jetzt die beiden Probleme von vorhin genauer an.
+      Als Erstes <code>should create user</code>:<programlisting>  test "should create user" do
     assert_difference('User.count') do
       post :create, user: { birthday: @user.birthday, first_name: @user.first_name, last_name: @user.last_name, login_name: @user.login_name }
     end
@@ -697,7 +697,7 @@ Finished tests in 0.090001s, 22.2220 tests/s, 33.3330 assertions/s.
 MacBook:webshop xyz$</screen></para>
 
       <para>Fügen wir jetzt noch Tests für einige andere
-      <varname>login_name</varname> Varianten ein:<programlisting>require 'test_helper'
+      <varname>login_name</varname>-Varianten ein:<programlisting>require 'test_helper'
 
 class UserTest &lt; ActiveSupport::TestCase
 
@@ -759,11 +759,11 @@ MacBook:webshop xyz$  </screen></para>
 
     <para>Mit <foreignphrase xml:lang="en">Fixtures</foreignphrase> werden
     Beispieldaten für Tests generiert. Das Default-Format dafür ist YAML. Die
-    Dateien dafür finden sich im Verzeichnis
-    <filename>test/fixtures/</filename> und werden mit <command>rails
-    generate</command> automatisch mit erstellt. Sie können aber natürlich
-    auch eigene Dateien definieren. Alle Fixtures werden per Default bei jedem
-    Test neu in die Test-Datenbank geladen.<footnote>
+    Dateien dafür stehen im Verzeichnis <filename>test/fixtures/</filename>
+    und werden mit <command>rails generate</command> automatisch mit erstellt.
+    Sie können aber natürlich auch eigene Dateien definieren. Alle Fixtures
+    werden per Default bei jedem Test neu in die Test-Datenbank
+    geladen.<footnote>
         <para>Beispiele für Alternativformate (z. B. CSV) dazu finden Sie
         unter <link
         xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html">http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html</link>.</para>
@@ -779,7 +779,7 @@ MacBook:webshop xyz$  </screen></para>
       </indexterm>
 
       <para>Die einfachste Variante für Fixtures sind statische Daten. Das in
-      <xref linkend="testing_beispiel_webshop"/> benutzte Fixture für
+      <xref linkend="testing_beispiel_webshop" /> benutzte Fixture für
       <varname>User</varname> sieht statisch wie folgt aus:<programlisting>one:
   login_name: horst.meier
   last_name: Meier
@@ -804,7 +804,7 @@ two:
 
       <para>Statische YAML-Fixtures sind manchmal zu unintelligent. In diesen
       Fällen kann man mit ERB arbeiten (siehe <xref
-      linkend="erb-programmieren"/>).</para>
+      linkend="erb-programmieren" />).</para>
 
       <para>Wenn wir für die Geburtstage dynamisch den heutigen Tag vor 20
       Jahren eintragen möchten, so können wir das einfach mit ERB
@@ -927,9 +927,9 @@ MacBook:webshop xyz$</screen></para>
 
     <para>Wir haben in diesem Projekt in Summe 76 LOC (Lines Of Code =&gt;
     Programmzeilen) in den Controllern, Helpern und Modelen. Zusätzlich haben
-    wir insgesammt 75 LOC für Tests. Damit kommen wir auf eine Code zu Test
-    Relation von 1:1.0, was das prinzipielle Ziel sein sollte. Logischweise
-    sagt dies nichts über die Qualität von Tests aus.</para>
+    wir insgesammt 75 LOC für Tests. Damit kommen wir auf eine Test Relation
+    von 1:1.0, was das prinzipielle Ziel sein sollte. Logischweise sagt dies
+    nichts über die Qualität von Tests aus.</para>
   </section>
 
   <section xml:id="mehr_zum_thema_testing">
@@ -938,10 +938,10 @@ MacBook:webshop xyz$</screen></para>
 
     <para>Der wichtigste Link zum Thema Testing ist sicherlich die URL <link
     xlink:href="http://guides.rubyonrails.org/testing.html">http://guides.rubyonrails.org/testing.html</link>.
-    Dort finden Sie auch einige gute Beispiele zum Thema. An sonsten finden
-    Sie wie so oft bei Railscasts (<uri
+    Dort finden Sie auch einige gute Beispiele zum Thema. Ansonsten finden Sie
+    wie so oft bei Railscasts (<uri
     xlink:href="http://railscasts.com/episodes?utf8=%E2%9C%93&amp;search=test">http://railscasts.com/episodes?utf8=%E2%9C%93&amp;search=test</uri>)
-    ein paar gute Screencasts zu diesem Thema. </para>
+    ein paar gute Screencasts zu diesem Thema.</para>
 
     <para>Bei keinem anderen Thema gibt es in der Rails-Community so viel
     Diskussion wie beim Thema Testing. Es gibt sehr viele alternative

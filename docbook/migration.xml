@@ -35,7 +35,7 @@
 MacBook:~ xyz$ <command>cd shop</command>
 MacBook:shop xyz$</screen></para>
 
-  <para>Legen wir ein <classname>Product</classname> Model an:<screen>MacBook:shop xyz$ <command>rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
+  <para>Jetzt legen wir ein <classname>Product</classname>-Model an:<screen>MacBook:shop xyz$ <command>rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
       invoke  active_record
       create    db/migrate/20120508160146_create_products.rb
       create    app/models/product.rb
@@ -46,7 +46,7 @@ MacBook:shop xyz$</screen></para>
 
   <para>Es wurde die Migrations-Datei
   <filename>db/migrate/20120508160146_create_products.rb</filename> angelegt.
-  Schauen wir uns die mal genauer an:<programlisting>class CreateProducts &lt; ActiveRecord::Migration
+  Wir schauen wir uns die genauer an:<programlisting>class CreateProducts &lt; ActiveRecord::Migration
   def change
     create_table :products do |t|
       t.string :name
@@ -91,15 +91,16 @@ MacBook:shop xyz$ </screen></para>
 
   <para>Nach einiger Zeit merken wir, dass wir bei vielen Produkten nicht nur
   das Gewicht (height), sondern auch die Höhe (height) abspeichern möchten.
-  Wir benötigen also ein weiteres Datenbankfeld . Dafür gibt es eine leicht zu
-  merkende Syntax <command>rails generate migration add_*</command>:<screen>MacBook:shop xyz$ <command>rails generate migration add_height_to_product height:integer</command>
+  Wir benötigen also ein weiteres Datenbank-Feld . Dafür gibt es eine leicht
+  zu merkende Syntax <command>rails generate migration
+  add_*</command>:<screen>MacBook:shop xyz$ <command>rails generate migration add_height_to_product height:integer</command>
       invoke  active_record
       create    db/migrate/20120508160821_add_height_to_product.rb
 MacBook:shop xyz$ </screen></para>
 
   <para>In der Migrationsdatei
   <filename>db/migrate/20120508160821_add_height_to_product.rb</filename>
-  findet sich wieder eine change Methode:<programlisting>class AddHeightToProduct &lt; ActiveRecord::Migration
+  findet sich wieder eine change-Methode:<programlisting>class AddHeightToProduct &lt; ActiveRecord::Migration
   def change
     add_column :products, :height, :integer
   end
@@ -124,15 +125,16 @@ Loading development environment (Rails 3.2.3)
 MacBook:shop xyz$ </screen></para>
 
   <warning>
-    <para>Bitte beachten Sie, das Sie wahrscheinlich in
+    <para>Bitte beachten Sie, dass Sie wahrscheinlich in
     <filename>app/models/product.rb</filename> das neue Feld in
     <methodname>attr_accessible</methodname> eintragen müssen. Sonst haben Sie
     keinen Zugriff auf das <varname>height</varname> Attribute.</para>
   </warning>
 
-  <para>Was wäre im Fall, dass man noch einmal den vorherigen Stand der Dinge
-  betrachten möchten? Kein Problem. Auf die vorherige Version können wir mit
-  <command>rake db:rollback</command> leicht zurückgehen:<screen>MacBook:shop xyz$ <command>rake db:rollback</command>
+  <para>Was wäre in dem Fall, dass wir noch einmal den vorherigen Stand der
+  Dinge betrachten möchten? Das ist kein Problem. Auf die vorherige Version
+  können wir mit <command>rake db:rollback</command> leicht
+  zurückgehen:<screen>MacBook:shop xyz$ <command>rake db:rollback</command>
 ==  AddHeightToProduct: reverting =============================================
 -- remove_column("products", :height)
    -&gt; 0.0357s
@@ -142,13 +144,13 @@ MacBook:shop xyz$</screen></para>
 
   <para>Jede Migration hat eine eigene Versionsnummer. Die Versionsnummer des
   aktuellen Status können Sie mit <command>rake db:version</command>
-  rausfinden:<screen>MacBook:shop xyz$ <command>rake db:version</command>
+  herausfinden:<screen>MacBook:shop xyz$ <command>rake db:version</command>
 Current version: 20120508160146
 MacBook:shop xyz$ </screen></para>
 
   <important>
     <para>Bitte beachten Sie, dass alle Versionsnummern und Zeitstempel nur
-    für das hier abgedruckte Beispiel gelten. Wenn sie das Beispiel
+    für das hier abgedruckte Beispiel gelten. Wenn Sie das Beispiel
     nacharbeiten, bekommen Sie natürlich einen für Sie aktuellen
     Zeitstempel.</para>
   </important>
@@ -211,11 +213,11 @@ production:
     <para>Dort werden im YAML-Format (siehe <uri
     xlink:href="http://www.yaml.org/">http://www.yaml.org/</uri> bzw. <uri
     xlink:href="http://de.wikipedia.org/wiki/YAML">http://de.wikipedia.org/wiki/YAML</uri>)
-    drei verschiedene Datenbanken definiert. Für uns wichtig ist erst mal nur
-    die <literal>development</literal>-Datenbank (erster Eintrag). Per default
-    benutzt Rails dort <application>SQLite3</application>. SQLite3 mag nicht
-    die richtige Wahl für die Analyse der weltweit gesammelten Wetterdaten
-    sein, aber für die schnelle und unkomplizierte Entwicklung von
+    drei verschiedene Datenbanken definiert. Für uns ist erst mal nur die
+    <literal>development</literal>-Datenbank (erster Eintrag) wichtig. Per
+    default benutzt Rails dort <application>SQLite3</application>. SQLite3 mag
+    nicht die richtige Wahl für die Analyse der weltweit gesammelten
+    Wetterdaten sein, aber für die schnelle und unkomplizierte Entwicklung von
     Rails-Anwendungen lernt man sie schnell zu schätzen. In der
     Produktions-Umgebung kann man später immer noch auf <quote>große</quote>
     Datenbanken wie MySQL oder PostgreSQL umsteigen.<footnote>
@@ -264,7 +266,7 @@ sqlite&gt; <command>.quit</command>
 MacBook:shop xyz$ </screen></para>
 
     <para>Die Tabelle <literal>schema_migrations</literal> wird zur
-    Versionierung der Migrationen benutzt wird. Bei der ersten von Rails
+    Versionierung der Migrationen benutzt. Bei der ersten von Rails
     durchgeführten Migration wird diese Tabelle angelegt, falls sie noch nicht
     vorhanden ist.</para>
   </section>
@@ -272,8 +274,8 @@ MacBook:shop xyz$ </screen></para>
   <section xml:id="ar_migration_index">
     <title xml:id="ar_migration_index.title">Index anlegen</title>
 
-    <para>Ich gehe davon aus, dass Sie wissen was ein Index in einer Datenbank
-    ist. Falls nicht finden Sie auf <uri
+    <para>Ich gehe davon aus, dass Sie wissen, was ein Index in einer
+    Datenbank ist. Falls nicht, finden Sie auf <uri
     xlink:href="http://de.wikipedia.org/wiki/Datenbankindex">http://de.wikipedia.org/wiki/Datenbankindex</uri>
     eine kurze Einführung. Kurzversion: Damit werden Suchen für eine bestimmte
     Tabellen-Spalte schneller.</para>
@@ -328,21 +330,21 @@ MacBook:shop xyz$</screen></para>
 
     <para>In diesem Anfängerbuch kann ich das Thema Migrations nicht sehr tief
     behandeln. Es geht um das prinzipielle Verständnis der Mechanik. Es gibt
-    aber ein paar Details die so wichtig sind, dass ich sie hier besprechen
+    aber ein paar Details, die so wichtig sind, dass ich sie hier besprechen
     möchte.</para>
 
     <section xml:id="active-record-auto-felder">
       <title>Automatisch zugefügte Felder (id, created_at und
       updated_at)</title>
 
-      <para>Rails ist so freundlich uns bei der Default-Migration automatisch
+      <para>Rails ist so freundlich, uns bei der Default-Migration automatisch
       folgende Felder hinzuzufügen:<itemizedlist>
           <listitem>
             <para><literal>id:integer</literal></para>
 
             <para>Das ist die Unique-ID des Datensatzes. Das Feld wird von der
             Datenbank automatisch hochgezählt. Für alle SQL-Fans: <literal>NOT
-            NULL AUTO_INCREMENT</literal></para>
+            NULL AUTO_INCREMENT.</literal></para>
           </listitem>
 
           <listitem>
@@ -365,7 +367,7 @@ MacBook:shop xyz$</screen></para>
 
       <para>Am Anfang fragt man sich: <quote>Muss das sein? Macht das wirklich
       Sinn?</quote>. Aber mit der Zeit lernt man diese automatischen Felder zu
-      schätzen. Sie wegzulassen ist meist am falschen Ende gespart.</para>
+      schätzen. Sie wegzulassen, ist meist am falschen Ende gespart.</para>
     </section>
   </section>
 

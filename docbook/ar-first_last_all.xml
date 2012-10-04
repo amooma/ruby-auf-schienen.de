@@ -113,7 +113,7 @@ MacBook:europe xyz$</screen></para>
   <para>Selbst bei unserer Mini-Datenbank sehen wir schon einen
   Geschwindigkeitsunterschied von 0.1 Millisekunden. Bei
   <code>Country.first</code> wird per SQL in der Datenbank mit einem
-  <code>LIMIT 1</code> der erste Datensatz rausgesucht und von ActiveRecord
+  <code>LIMIT 1</code> der erste Datensatz herausgesucht und von ActiveRecord
   als einzelnes Objekt der Country-Klasse ausgegeben. Bei
   <code>Country.all.first</code> wird erst die ganze Tabelle mit <code>SELECT
   "countries".* FROM "countries"</code> als Array eingelesen und das erste
@@ -126,13 +126,14 @@ MacBook:europe xyz$</screen></para>
     der Ergebnisse eines <code>SELECT * FROM xyz</code>. Die Datenbank kann
     die Reihenfolge der Datensätze selber bestimmen. Entsprechend können wir
     bei einem <code>LIMIT 1</code> aus einer solchen Menge auch nicht 100%ig
-    sicher sein, das der für uns Menschen logisch erste Datensatz rauskommt.
-    Faktisch heißt das, das wir mit einem <code>Country.first</code> nicht
+    sicher sein, dass der für uns Menschen logisch erste Datensatz rauskommt.
+    Faktisch heißt das, dass wir mit einem <code>Country.first</code> nicht
     zwingend den ersten Datensatz bekommen müssen. Der SQL-Datenbank steht es
-    frei z.B. aus Performance-Gründen eine andere Sortierung vorzunehmen. Wenn
-    wir absolut sicher gehen wollen, das wir den für uns logisch ersten
-    Datensatz bekommen, so müssen wir mit der <methodname>order</methodname>
-    Methode (siehe <xref linkend="activerecord_order" />) arbeiten:<screen>MacBook:europe xyz$ <command>rails console</command>
+    frei, z. B. aus Performance-Gründen eine andere Sortierung vorzunehmen.
+    Wenn wir absolut sichergehen wollen, dass wir den für uns logisch ersten
+    Datensatz bekommen, so müssen wir mit der
+    <methodname>order</methodname>-Methode (siehe <xref
+    linkend="activerecord_order" />) arbeiten:<screen>MacBook:europe xyz$ <command>rails console</command>
 Loading development environment (Rails 3.2.3)
 1.9.3p194 :001 &gt; <command>Country.order(:id).first</command>
   Country Load (0.6ms)  SELECT "countries".* FROM "countries" ORDER BY id LIMIT 1
@@ -140,15 +141,15 @@ Loading development environment (Rails 3.2.3)
 1.9.3p194 :002 &gt; <command>exit</command>
 MacBook:europe xyz$</screen></para>
 
-    <para>Sie sehen im SQL, das mit <code>SELECT "countries".* FROM
+    <para>Sie sehen im SQL, dass mit <code>SELECT "countries".* FROM
     "countries" ORDER BY id LIMIT 1</code> erst die Tabelle nach der
-    <varname>id</varname> sortiert wird und dann die erste Zeile ausgegeben
+    <varname>id</varname> sortiert und dann die erste Zeile ausgegeben
     wird.</para>
 
-    <para>Meistens arbeitet die SQL-Datenbank genau so wie man es erwartet und
-    man bekommt mit <code>Country.first</code> den ersten Datensatz geliefert.
-    Wenn man aber ganz sicher sein will, dann sollte man immer mit einem
-    <methodname>order</methodname> arbeiten. </para>
+    <para>Meistens arbeitet die SQL-Datenbank genau so, wie man es erwartet
+    und man bekommt mit <code>Country.first</code> den ersten Datensatz
+    geliefert. Wenn man aber ganz sicher sein will, dann sollte man immer mit
+    einem <methodname>order</methodname> arbeiten.</para>
 
     <para>Am einfachsten geht dies mit einem default_scope.</para>
   </warning>
