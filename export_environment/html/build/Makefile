@@ -55,6 +55,7 @@ all:
 	sed 's/.xsl \"/.xsl\"/' deps.xsl  > tmp.xsl; mv tmp.xsl deps.xsl
 
 	mkdir -p $(EXPORTDIR)/html
+	rm -rf $(EXPORTDIR)/html/*
 	cp $(HTMLDIR)/default.css $(HTMLDIR)/common.css $(EXPORTDIR)/html
 	cp $(HTMLDIR)/favicon.ico $(EXPORTDIR)/html
 	cp -R ${DEPENDDIR}/custom-admons-callouts/ $(EXPORTDIR)/html
@@ -62,18 +63,11 @@ all:
 
 	xsltproc $(EXTRAPARAMS) --xinclude $(HTMLDIR)/rubyonrails-html.xsl $(DOCBOOKSRCDIR)/$(MAINFILE); \
 
-	mkdir -p $(EXPORTDIR)/html/gzip
-	cp $(EXPORTDIR)/html/*.html $(EXPORTDIR)/html/gzip/
-	find $(EXPORTDIR)/html/gzip/ -name "*.html" -exec gzip -9 {} \;
-	mv $(EXPORTDIR)/html/gzip/*.gz $(EXPORTDIR)/html/
+	# Delete stuff we don't need.
+	#
+	find $(EXPORTDIR)/html/custom-admons-callouts/ -name "*.gif" -exec rm {} \;
+	find $(EXPORTDIR)/html/custom-admons-callouts/ -name "*.svg" -exec rm {} \;
+	find $(EXPORTDIR)/html/custom-admons-callouts/ -name "*.tif" -exec rm {} \;
 
-	cp $(EXPORTDIR)/html/*.css $(EXPORTDIR)/html/gzip/
-	find $(EXPORTDIR)/html/gzip/ -name "*.css" -exec gzip -9 {} \;
-	mv $(EXPORTDIR)/html/gzip/*.gz $(EXPORTDIR)/html/
-	cp -r $(EXPORTDIR)/html/custom-admons-callouts /var/www/cdn.amooma.de/ruby-auf-schienen.de/
-
-	rmdir $(EXPORTDIR)/html/gzip
-
-	
 clean:
 	rm -rf $(EXPORTDIR)/html deps.xsl
