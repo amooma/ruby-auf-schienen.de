@@ -31,7 +31,7 @@
 	<xsl:param name="use.id.as.filename" select="1"/>
 	<xsl:param name="prod.url">http://www.wintermeyer.de/</xsl:param>
 	<xsl:param name="doc.url">http://www.wintermeyer.de/</xsl:param>
-	<xsl:param name="default.image.width" select="'700px'"/>
+	<xsl:param name="default.image.width" select="'650px'"/>
 	<xsl:param name="navig.showtitles" select="1"/>
 	<xsl:param name="generate.toc">
 set toc
