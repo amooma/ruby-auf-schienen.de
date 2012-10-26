@@ -63,11 +63,5 @@ all:
 
 	xsltproc $(EXTRAPARAMS) --xinclude $(HTMLDIR)/rubyonrails-html.xsl $(DOCBOOKSRCDIR)/$(MAINFILE); \
 
-	# Delete stuff we don't need.
-	#
-	find $(EXPORTDIR)/html/custom-admons-callouts/ -name "*.gif" -exec rm {} \;
-	find $(EXPORTDIR)/html/custom-admons-callouts/ -name "*.svg" -exec rm {} \;
-	find $(EXPORTDIR)/html/custom-admons-callouts/ -name "*.tif" -exec rm {} \;
-
 clean:
 	rm -rf $(EXPORTDIR)/html deps.xsl
