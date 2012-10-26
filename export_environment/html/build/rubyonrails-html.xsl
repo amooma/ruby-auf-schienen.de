@@ -278,6 +278,7 @@ Version:
         <xsl:with-param name="prev" select="$prev"/>
         <xsl:with-param name="next" select="$next"/>
       </xsl:call-template>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       
       <body>
         <div class="navbar navbar-inverse navbar-fixed-top">
