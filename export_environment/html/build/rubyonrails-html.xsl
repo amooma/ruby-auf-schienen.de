@@ -49,8 +49,7 @@ sect5 nop
 qandadiv nop
 qandaset nop
 </xsl:param>
-  
-  
+    
   <xsl:param name="admon.graphics" select="1"/>
   <xsl:param name="admon.graphics.extension">.png</xsl:param>
   <xsl:param name="admon.graphics.path">custom-admons-callouts/</xsl:param>
@@ -59,8 +58,11 @@ qandaset nop
   <xsl:param name="callout.graphics.extension">.png</xsl:param>
   <xsl:param name="callout.graphics.path">custom-admons-callouts/callouts/</xsl:param>
 
-
 <!--<xsl:param name="embedtoc" select="1"/>-->
+
+  <xsl:template name="user.head.content">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </xsl:template>
 
 <!--
 From: xhtml/chunk-common.xsl
@@ -247,11 +249,6 @@ Version:
           <li class="copyright">
             Copyright © 2010-2012 <a class="twitter-link" rel="me" href="https://twitter.com/wintermeyer" title="Stefan Wintermeyer"><span>Stefan Wintermeyer</span>
             </a>.
-          </li>
-          <li class="designer">
-            <a rel="colleague" class="designer-link" href="http://www.humbug.in." title="Docbook Conversion and Design by Pratik Sinha">
-              <span>Docbook Conversion and Design by Pratik Sinha</span>
-            </a>
           </li>
         </ul>
       </xsl:if>
