@@ -295,8 +295,9 @@ Version:
         <div id="container-fluid">
           <div id="row-fluid">
             <div class="span9">
-              <a href="http://www.amazon.de/gp/product/3827329892/ref=as_li_tf_il?ie=UTF8&amp;camp=1638&amp;creative=6742&amp;creativeASIN=3827329892&amp;linkCode=as2&amp;tag=wwwamoomade-21"><img border="0" src="http://ws.assoc-amazon.de/widgets/q?_encoding=UTF8&amp;ASIN=3827329892&amp;Format=_SL110_&amp;ID=AsinImage&amp;MarketPlace=DE&amp;ServiceVersion=20070822&amp;WS=1&amp;tag=wwwamoomade-21" class="pull-right" /></a><img src="http://www.assoc-amazon.de/e/ir?t=wwwamoomade-21&amp;l=as2&amp;o=3&amp;a=3827329892" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
-
+              <div class="pull-right">
+                <a href="http://www.amazon.de/gp/product/3827329892/ref=as_li_tf_il?ie=UTF8&amp;camp=1638&amp;creative=6742&amp;creativeASIN=3827329892&amp;linkCode=as2&amp;tag=wwwamoomade-21"><img border="0" src="http://ws.assoc-amazon.de/widgets/q?_encoding=UTF8&amp;ASIN=3827329892&amp;Format=_SL110_&amp;ID=AsinImage&amp;MarketPlace=DE&amp;ServiceVersion=20070822&amp;WS=1&amp;tag=wwwamoomade-21" /></a><img src="http://www.assoc-amazon.de/e/ir?t=wwwamoomade-21&amp;l=as2&amp;o=3&amp;a=3827329892" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+              </div>
               <xsl:copy-of select="$content"/>
 
             </div>
