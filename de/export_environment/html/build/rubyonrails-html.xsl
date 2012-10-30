@@ -285,7 +285,7 @@ Version:
               <a class="brand" href="index.html">Ruby on Rails 3.2</a>
               <div class="nav-collapse collapse">
                 <p class="navbar-text pull-right">
-                  <a href="http://www.amazon.de/gp/product/3827329892?tag=wwwamoomade-21" class="navbar-link">Buch kaufen</a>
+                  <a href="http://www.amazon.de/gp/product/3827329892?tag=wwwamoomade-21" class="navbar-link">Buch online kaufen</a>
                 </p>
               </div><!--/.nav-collapse -->
             </div>
@@ -295,7 +295,9 @@ Version:
         <div id="container-fluid">
           <div id="row-fluid">
             <div class="span9">
-              <iframe src="http://rcm-de.amazon.de/e/cm?lt1=_top&amp;bc1=FFFFFF&amp;IS2=1&amp;nou=1&amp;bg1=FFFFFF&amp;fc1=000000&amp;lc1=0000FF&amp;t=wwwamoomade-21&amp;o=3&amp;p=8&amp;l=as1&amp;m=amazon&amp;f=ifr&amp;ref=tf_til&amp;asins=3827329892" style="width:120px;height:240px;" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" class="pull-right"></iframe>
+              <div class="amazon-ad">
+                <iframe src="http://rcm-de.amazon.de/e/cm?lt1=_top&amp;bc1=FFFFFF&amp;IS2=1&amp;nou=1&amp;bg1=FFFFFF&amp;fc1=000000&amp;lc1=0000FF&amp;t=wwwamoomade-21&amp;o=3&amp;p=8&amp;l=as1&amp;m=amazon&amp;f=ifr&amp;ref=tf_til&amp;asins=3827329892" style="width:120px;height:240px;" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" class="pull-right"></iframe>
+              </div>
               <xsl:copy-of select="$content"/>
 
             </div>
