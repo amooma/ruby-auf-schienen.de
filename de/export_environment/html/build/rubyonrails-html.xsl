@@ -300,14 +300,6 @@ Version:
               </div>
               <xsl:copy-of select="$content"/>
 
-            </div>
-
-            <div class="span3">
-
-              <div class="well sidebar-nav">
-                <xsl:call-template name="breadcrumbs"/>                            
-              </div>
-
               <div id="adsense0" class="pull-right">
                 <script type="text/javascript">
                   <xsl:text disable-output-escaping="yes">
@@ -338,6 +330,27 @@ google_ad_height = 240;
                 <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
               </div>
 
+            </div>
+
+            <div class="span3">
+              <div class="well sidebar-nav">
+                <xsl:call-template name="breadcrumbs"/>
+              </div>
+
+              <div id="adsense">
+                <script type="text/javascript">
+                  <xsl:text disable-output-escaping="yes">
+<![CDATA[<!--]]>
+google_ad_client = "ca-pub-9538764634478220";
+/* ruby-auf-schienen.de Wide Skyscraper */
+google_ad_slot = "4912279778";
+google_ad_width = 160;
+google_ad_height = 600;
+<![CDATA[//-->]]>
+                 </xsl:text>
+                </script>
+                <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+              </div>
 
             </div>
           </div>  
