@@ -308,20 +308,36 @@ Version:
                 <xsl:call-template name="breadcrumbs"/>                            
               </div>
 
-              <div id="adsense">
+              <div id="adsense0">
                 <script type="text/javascript">
                   <xsl:text disable-output-escaping="yes">
 <![CDATA[<!--]]>
 google_ad_client = "ca-pub-9538764634478220";
-/* Ruby on Rails 3.2 (de) */
-google_ad_slot = "0519465278";
+/* ruby-auf-schienen.de Vertical Banner 0 */
+google_ad_slot = "9063938733";
 google_ad_width = 120;
-google_ad_height = 600;
+google_ad_height = 240;
 <![CDATA[//-->]]>
                  </xsl:text>
                 </script>
                 <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
               </div>
+
+              <div id="adsense1">
+                <script type="text/javascript">
+                  <xsl:text disable-output-escaping="yes">
+<![CDATA[<!--]]>
+google_ad_client = "ca-pub-9538764634478220";
+/* ruby-auf-schienen.de Vertical Banner 1 */
+google_ad_slot = "8007431332";
+google_ad_width = 120;
+google_ad_height = 240;
+<![CDATA[//-->]]>
+                 </xsl:text>
+                </script>
+                <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+              </div>
+
 
             </div>
           </div>  
