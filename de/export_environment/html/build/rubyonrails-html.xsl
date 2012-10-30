@@ -308,7 +308,7 @@ Version:
                 <xsl:call-template name="breadcrumbs"/>                            
               </div>
 
-              <div id="adsense0">
+              <div id="adsense0" class="pull-right">
                 <script type="text/javascript">
                   <xsl:text disable-output-escaping="yes">
 <![CDATA[<!--]]>
@@ -323,7 +323,7 @@ google_ad_height = 240;
                 <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
               </div>
 
-              <div id="adsense1">
+              <div id="adsense1" class="pull-right">
                 <script type="text/javascript">
                   <xsl:text disable-output-escaping="yes">
 <![CDATA[<!--]]>
