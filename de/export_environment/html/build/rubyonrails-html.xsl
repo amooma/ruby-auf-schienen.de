@@ -294,6 +294,21 @@ Version:
         
         <div id="container-fluid">
           <div id="row-fluid">
+              <div id="adsense-leaderboard" class="span12">
+                <script type="text/javascript">
+                  <xsl:text disable-output-escaping="yes">
+<![CDATA[<!--]]>
+google_ad_client = "ca-pub-9538764634478220";
+/* ruby-auf-schienen.de Leaderboard */
+google_ad_slot = "2837769471";
+google_ad_width = 728;
+google_ad_height = 90;
+<![CDATA[//-->]]>
+                 </xsl:text>
+                </script>
+                <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+              </div>
+
             <div class="span9">
               <div class="amazon-ad">
                 <iframe src="http://rcm-de.amazon.de/e/cm?lt1=_top&amp;bc1=FFFFFF&amp;IS2=1&amp;nou=1&amp;bg1=FFFFFF&amp;fc1=000000&amp;lc1=0000FF&amp;t=wwwamoomade-21&amp;o=3&amp;p=8&amp;l=as1&amp;m=amazon&amp;f=ifr&amp;ref=tf_til&amp;asins=3827329892" style="width:120px;height:240px;" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" class="pull-right"></iframe>
@@ -303,36 +318,6 @@ Version:
                     klicken, um diese kostenlose Seite am Leben zu halten.</p>
               </div>
               <xsl:copy-of select="$content"/>
-
-              <div id="adsense0" class="pull-right">
-                <script type="text/javascript">
-                  <xsl:text disable-output-escaping="yes">
-<![CDATA[<!--]]>
-google_ad_client = "ca-pub-9538764634478220";
-/* ruby-auf-schienen.de Vertical Banner 0 */
-google_ad_slot = "9063938733";
-google_ad_width = 120;
-google_ad_height = 240;
-<![CDATA[//-->]]>
-                 </xsl:text>
-                </script>
-                <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-              </div>
-
-              <div id="adsense1" class="pull-right">
-                <script type="text/javascript">
-                  <xsl:text disable-output-escaping="yes">
-<![CDATA[<!--]]>
-google_ad_client = "ca-pub-9538764634478220";
-/* ruby-auf-schienen.de Vertical Banner 1 */
-google_ad_slot = "8007431332";
-google_ad_width = 120;
-google_ad_height = 240;
-<![CDATA[//-->]]>
-                 </xsl:text>
-                </script>
-                <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-              </div>
 
             </div>
 
