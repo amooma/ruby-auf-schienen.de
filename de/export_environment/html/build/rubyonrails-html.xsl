@@ -298,6 +298,10 @@ Version:
               <div class="amazon-ad">
                 <iframe src="http://rcm-de.amazon.de/e/cm?lt1=_top&amp;bc1=FFFFFF&amp;IS2=1&amp;nou=1&amp;bg1=FFFFFF&amp;fc1=000000&amp;lc1=0000FF&amp;t=wwwamoomade-21&amp;o=3&amp;p=8&amp;l=as1&amp;m=amazon&amp;f=ifr&amp;ref=tf_til&amp;asins=3827329892" style="width:120px;height:240px;" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" class="pull-right"></iframe>
               </div>
+              <div class="note">
+                <p>Es bedarf jeden Tag ca. 20 Leser, die auf eine Anzeige
+                    klicken, um dieses kostenlose Projekt am Leben zu halten.</p>
+              </div>
               <xsl:copy-of select="$content"/>
 
               <div id="adsense0" class="pull-right">
