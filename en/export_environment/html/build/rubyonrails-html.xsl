@@ -293,8 +293,8 @@ Version:
                 <xsl:text disable-output-escaping="yes">
 <![CDATA[<!--]]>
 google_ad_client = "ca-pub-9538764634478220";
-/* ruby-auf-schienen.de Leaderboard */
-google_ad_slot = "2837769471";
+/* Ruby on Rails 3.2 - en - Leaderboard */
+google_ad_slot = "5381627926";
 google_ad_width = 728;
 google_ad_height = 90;
 <![CDATA[//-->]]>
@@ -318,8 +318,8 @@ google_ad_height = 90;
                   <xsl:text disable-output-escaping="yes">
 <![CDATA[<!--]]>
 google_ad_client = "ca-pub-9538764634478220";
-/* ruby-auf-schienen.de Wide Skyscraper */
-google_ad_slot = "4912279778";
+/* Ruby on Rails 3.2 - en - Wide Skyscraper */
+google_ad_slot = "7655076771";
 google_ad_width = 160;
 google_ad_height = 600;
 <![CDATA[//-->]]>
