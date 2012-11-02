@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="datensatz-loeschen"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title>Removing a Record</title>
+
+  <para>To remove a record, you have the methods
+  <methodname>destroy</methodname> and <methodname>delete</methodname>. It's
+  quite easy to confuse these two terms, but they are different and after a
+  while you get used to it.</para>
+
+  <para>As an example, we use the following Rails application:<screen>MacBook:~ xyz$ <command>rails new bookshelf</command>
+[...]
+MacBook:~ xyz$ <command>cd bookshelf</command> 
+MacBook:bookshelf xyz$ <command>rails generate model book title</command>
+[...]
+MacBook:bookshelf xyz$ <command>rails generate model author book_id:integer first_name last_name</command>
+[...]
+MacBook:bookshelf xyz$ <command>rake db:migrate</command>
+[...]
+MacBook:bookshelf xyz$</screen></para>
+
+  <para><filename>app/models/book.rb</filename><programlisting>class Book &lt; ActiveRecord::Base
+  attr_accessible :title
+
+  has_many :authors, :dependent =&gt; :destroy
+end</programlisting></para>
+
+  <para><filename>app/models/author.rb</filename><programlisting>class Author &lt; ActiveRecord::Base
+  attr_accessible :book_id, :first_name, :last_name
+
+  belongs_to :book
+end</programlisting></para>
+
+  <section xml:id="activerecord_destroy">
+    <title xml:id="activerecord_destroy.title">destroy</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>methods</secondary>
+
+      <tertiary>destroy()</tertiary>
+    </indexterm>
+
+    <para>With <methodname>destroy</methodname> you can remove a record and
+    any existing dependencies are also taken into account (see for example
+    <code>:dependent =&gt; :destroy</code> in <xref
+    linkend="activerecord_1n_optionen"/>). Simply put: to be on the safe side,
+    it's better to use <methodname>destroy</methodname> because then the Rails
+    system does more for you.</para>
+
+    <para>Let's create a record and then destroy it again:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>book = Book.create(:title =&gt; 'Homo faber')</command>
+   (0.1ms)  begin transaction
+  SQL (6.2ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 08 May 2012 08:10:58 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 08 May 2012 08:10:58 UTC +00:00]]
+   (1.3ms)  commit transaction
+ =&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-08 08:10:58", updated_at: "2012-05-08 08:10:58"&gt; 
+1.9.3p194 :002 &gt; <command>Book.all</command>
+  Book Load (0.3ms)  SELECT "books".* FROM "books" 
+ =&gt; [#&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-08 08:10:58", updated_at: "2012-05-08 08:10:58"&gt;] 
+1.9.3p194 :003 &gt; <command>book.destroy</command>
+   (0.1ms)  begin transaction
+  Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 1
+  SQL (0.3ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 1]]
+   (1.1ms)  commit transaction
+ =&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-08 08:10:58", updated_at: "2012-05-08 08:10:58"&gt; 
+1.9.3p194 :004 &gt; <command>Book.all</command>
+  Book Load (0.3ms)  SELECT "books".* FROM "books" 
+ =&gt; [] 
+1.9.3p194 :005 &gt;</screen></para>
+
+    <para>As we are using the option <code>:dependent =&gt; :destroy</code> in
+    the Book model, we can also automatically remove all authors:<screen>1.9.3p194 :005 &gt; <command>Book.create(:title =&gt; 'Homo faber').authors.create(:first_name =&gt; 'Max', :last_name =&gt; 'Frisch')</command>
+   (0.1ms)  begin transaction
+  SQL (0.6ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 08 May 2012 08:46:14 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 08 May 2012 08:46:14 UTC +00:00]]
+   (3.7ms)  commit transaction
+   (0.1ms)  begin transaction
+  SQL (0.6ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 2], ["created_at", Tue, 08 May 2012 08:46:14 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Tue, 08 May 2012 08:46:14 UTC +00:00]]
+   (0.8ms)  commit transaction
+ =&gt; #&lt;Author id: 1, book_id: 2, first_name: "Max", last_name: "Frisch", created_at: "2012-05-08 08:46:14", updated_at: "2012-05-08 08:46:14"&gt; 
+1.9.3p194 :006 &gt; <command>Book.all</command>
+  Book Load (0.3ms)  SELECT "books".* FROM "books" 
+ =&gt; [#&lt;Book id: 2, title: "Homo faber", created_at: "2012-05-08 08:46:14", updated_at: "2012-05-08 08:46:14"&gt;] 
+1.9.3p194 :007 &gt; <command>Author.all</command>
+  Author Load (0.2ms)  SELECT "authors".* FROM "authors" 
+ =&gt; [#&lt;Author id: 1, book_id: 2, first_name: "Max", last_name: "Frisch", created_at: "2012-05-08 08:46:14", updated_at: "2012-05-08 08:46:14"&gt;] 
+1.9.3p194 :008 &gt; <command>Book.first.destroy</command>
+  Book Load (0.3ms)  SELECT "books".* FROM "books" LIMIT 1
+   (0.1ms)  begin transaction
+  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 2
+  SQL (0.4ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
+  SQL (0.1ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 2]]
+   (2.4ms)  commit transaction
+ =&gt; #&lt;Book id: 2, title: "Homo faber", created_at: "2012-05-08 08:46:14", updated_at: "2012-05-08 08:46:14"&gt; 
+1.9.3p194 :009 &gt; <command>Author.all</command>
+  Author Load (0.3ms)  SELECT "authors".* FROM "authors" 
+ =&gt; [] 
+1.9.3p194 :010 &gt;</screen></para>
+
+    <para>When removing records, please always remember that there is a
+    difference between the content of the database and the value of the
+    currently removed object. The instance is <foreignphrase
+    xml:lang="en">frozen</foreignphrase> after removing the database field. So
+    it is no longer in the database, but still present in the program, yet it
+    can no longer be modified there. It is read-only. To check, you can use
+    the method <indexterm>
+        <primary>frozen?()</primary>
+      </indexterm><methodname>frozen?</methodname>:<screen>1.9.3p194 :010 &gt; <command>book = Book.create(:title =&gt; 'Homo faber')</command>
+   (0.1ms)  begin transaction
+  SQL (2.6ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 08 May 2012 08:15:01 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 08 May 2012 08:15:01 UTC +00:00]]
+   (3.5ms)  commit transaction
+ =&gt; #&lt;Book id: 3, title: "Homo faber", created_at: "2012-05-08 08:15:01", updated_at: "2012-05-08 08:15:01"&gt; 
+1.9.3p194 :011 &gt; <command>book.destroy</command>
+   (0.1ms)  begin transaction
+  Author Load (0.3ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 3
+  SQL (0.4ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 3]]
+   (2.5ms)  commit transaction
+ =&gt; #&lt;Book id: 3, title: "Homo faber", created_at: "2012-05-08 08:15:01", updated_at: "2012-05-08 08:15:01"&gt; 
+1.9.3p194 :012 &gt; <command>Book.all</command>
+  Book Load (0.2ms)  SELECT "books".* FROM "books" 
+ =&gt; [#&lt;Book id: 2, title: "Homo faber", created_at: "2012-05-08 08:13:09", updated_at: "2012-05-08 08:13:09"&gt;] 
+1.9.3p194 :013 &gt; <command>book</command>
+ =&gt; #&lt;Book id: 3, title: "Homo faber", created_at: "2012-05-08 08:15:01", updated_at: "2012-05-08 08:15:01"&gt; 
+1.9.3p194 :014 &gt; <command>book.frozen?</command>
+ =&gt; true 
+1.9.3p194 :015 &gt; </screen></para>
+
+    <para>The record has been removed from the database, but the object with
+    all its data is still present in the running Ruby program. So could we
+    then revive the entire record? The answer is yes, but it will then be a
+    new record:<screen>1.9.3p194 :018 &gt; <command>Book.create(:title =&gt; book.title)</command>
+   (0.1ms)  begin transaction
+  SQL (0.6ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 08 May 2012 08:34:04 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 08 May 2012 08:34:04 UTC +00:00]]
+   (3.4ms)  commit transaction
+ =&gt; #&lt;Book id: 4, title: "Homo faber", created_at: "2012-05-08 08:34:04", updated_at: "2012-05-08 08:34:04"&gt; 
+1.9.3p194 :019 &gt; <command>exit</command>
+MacBook:bookshelf xyz$ </screen></para>
+  </section>
+
+  <section xml:id="activerecord_delete">
+    <title xml:id="activerecord_delete.title">delete</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>methods</secondary>
+
+      <tertiary>delete()</tertiary>
+    </indexterm>
+
+    <para>With <methodname>delete</methodname> you can remove a record
+    directly from the database. Any dependencies to other records in the
+    <foreignphrase xml:lang="en">model</foreignphrase> are not taken into
+    account. The method <methodname>delete</methodname> only deletes that one
+    row in the database and nothing else.</para>
+
+    <para>Let's create a book with one author and then remove the book with
+    <methodname>delete</methodname>:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Book.create(:title =&gt; 'Homo faber').authors.create(:first_name =&gt; 'Max', :last_name =&gt; 'Frisch')</command>
+   (0.1ms)  begin transaction
+  SQL (0.7ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 08 May 2012 08:41:08 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 08 May 2012 08:41:08 UTC +00:00]]
+   (3.5ms)  commit transaction
+   (0.1ms)  begin transaction
+  SQL (0.4ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 6], ["created_at", Tue, 08 May 2012 08:41:08 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Tue, 08 May 2012 08:41:08 UTC +00:00]]
+   (1.0ms)  commit transaction
+ =&gt; #&lt;Author id: 3, book_id: 6, first_name: "Max", last_name: "Frisch", created_at: "2012-05-08 08:41:08", updated_at: "2012-05-08 08:41:08"&gt; 
+1.9.3p194 :002 &gt; <command>Book.last.delete</command>
+  Book Load (0.3ms)  SELECT "books".* FROM "books" ORDER BY "books"."id" DESC LIMIT 1
+  SQL (3.7ms)  DELETE FROM "books" WHERE "books"."id" = 6
+ =&gt; #&lt;Book id: 6, title: "Homo faber", created_at: "2012-05-08 08:41:08", updated_at: "2012-05-08 08:41:08"&gt; 
+1.9.3p194 :003 &gt; <command>Author.exists?(3)</command>
+  Author Exists (0.3ms)  SELECT 1 FROM "authors" WHERE "authors"."id" = 3 LIMIT 1
+ =&gt; true 
+1.9.3p194 :004 &gt; ruby-1.9.2-p0 &gt; <command>exit</command>
+MacBook:bookshelf xyz$  </screen></para>
+
+    <para>The record of the book 'Homo faber' is deleted, but the author is
+    still in the database.</para>
+
+    <para>As with <methodname>destroy</methodname>, an object also gets frozen
+    when you use <methodname>delete</methodname> (see <xref
+    linkend="activerecord_destroy"/>). The record is already removed from the
+    database, but the object itself is still there.</para>
+  </section>
+</section>

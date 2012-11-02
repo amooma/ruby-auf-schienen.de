@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="activerecord_migration"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="activerecord_migration.title">Migrations</title>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>migrations</secondary>
+  </indexterm>
+
+  <indexterm>
+    <primary>migrations</primary>
+
+    <see>ActiveRecord, migrations</see>
+  </indexterm>
+
+  <para>SQL database tables are generated in Rails with <foreignphrase
+  xml:lang="en">migrations</foreignphrase> and they can also be edited with
+  <foreignphrase xml:lang="en">migrations</foreignphrase>. If you create a
+  model with <command>rails generate model</command>, a corresponding
+  migration file is automatically created in the directory
+  <filename>db/migrate/.</filename> I am going to show you the principle using
+  the example of a shop application. Let's create one first:<screen>MacBook:~ xyz$ <command>rails new shop</command>
+[...]
+MacBook:~ xyz$ <command>cd shop</command>
+MacBook:shop xyz$</screen></para>
+
+  <para>Then we create a <classname>Product</classname> model:<screen>MacBook:shop xyz$ <command>rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
+      invoke  active_record
+      create    db/migrate/20120508160146_create_products.rb
+      create    app/models/product.rb
+      invoke    test_unit
+      create      test/unit/product_test.rb
+      create      test/fixtures/products.yml
+MacBook:shop xyz$</screen></para>
+
+  <para>The migrations file
+  <filename>db/migrate/20120508160146_create_products.rb</filename> was
+  created. Let's have a closer look at it:<programlisting>class CreateProducts &lt; ActiveRecord::Migration
+  def change
+    create_table :products do |t|
+      t.string :name
+      t.decimal :price, :precision =&gt; 7, :scale =&gt; 2
+      t.integer :weight
+      t.boolean :in_stock
+      t.date :expiration_date
+
+      t.timestamps
+    end
+  end
+end</programlisting></para>
+
+  <para>The class method <methodname>change</methodname> creates and deletes
+  the database table in case of a rollback. The migration files have embedded
+  the current time in the file name and are processed in chronological order
+  during a migration (in other words, when you call <command>rake
+  db:migrate</command>).<screen>MacBook:shop xyz$ <command>rake db:migrate</command>
+==  CreateProducts: migrating =================================================
+-- create_table(:products)
+   -&gt; 0.0017s
+==  CreateProducts: migrated (0.0018s) ========================================
+
+MacBook:shop xyz$</screen></para>
+
+  <para>Only those migrations that have not been executed yet are processed.
+  If we call <command>rake db:migrate</command> again, nothing happens,
+  because the corresponding migration has already been executed:<screen>MacBook:shop xyz$ <command>rake db:migrate</command>
+MacBook:shop xyz$</screen></para>
+
+  <para>But if we manually delete the database with <command>rm</command> and
+  then call <command>rake db:migrate</command> again, the migration is
+  repeated:<screen>MacBook:shop xyz$ <command>rm db/development.sqlite3</command> 
+MacBook:shop xyz$ <command>rake db:migrate</command>
+==  CreateProducts: migrating =================================================
+-- create_table(:products)
+   -&gt; 0.0017s
+==  CreateProducts: migrated (0.0018s) ========================================
+
+MacBook:shop xyz$ </screen></para>
+
+  <para>After a while we realise that we want to save not just the weight for
+  some products, but also the height. So we need another database field. There
+  is an easy to remember syntax for this, <command>rails generate migration
+  add_*</command>:<screen>MacBook:shop xyz$ <command>rails generate migration add_height_to_product height:integer</command>
+      invoke  active_record
+      create    db/migrate/20120508160821_add_height_to_product.rb
+MacBook:shop xyz$ </screen></para>
+
+  <para>In the migration file
+  <filename>db/migrate/20120508160821_add_height_to_product.rb</filename> we
+  once again find a change method:<programlisting>class AddHeightToProduct &lt; ActiveRecord::Migration
+  def change
+    add_column :products, :height, :integer
+  end
+end</programlisting></para>
+
+  <para>With <command>rake db:migrate</command> we can bring in the new
+  migration:<screen>MacBook:shop xyz$ <command>rake db:migrate</command>
+==  AddHeightToProduct: migrating =============================================
+-- add_column(:products, :height, :integer)
+   -&gt; 0.0049s
+==  AddHeightToProduct: migrated (0.0050s) ====================================
+
+MacBook:shop xyz$</screen></para>
+
+  <para>In the <foreignphrase xml:lang="en">console</foreignphrase> we can
+  look at the new field. It was added after the field
+  <literal>updated_at</literal>:<screen>MacBook:shop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Product</command>
+ =&gt; Product(id: integer, name: string, price: decimal, weight: integer, in_stock: boolean, expiration_date: date, created_at: datetime, updated_at: datetime, height: integer) 
+1.9.3p194 :002 &gt; <command>exit</command>
+MacBook:shop xyz$ </screen></para>
+
+  <warning>
+    <para>Please note that you probably need to enter the new field in
+    <methodname>attr_accessible</methodname> in
+    <filename>app/models/product.rb</filename>, otherwise you will not have
+    access to the <varname>height</varname> attribute..</para>
+  </warning>
+
+  <para>What if you want to look at the previous state of things? No problem.
+  You can easily go back to the previous version with <command>rake
+  db:rollback</command>:<screen>MacBook:shop xyz$ <command>rake db:rollback</command>
+==  AddHeightToProduct: reverting =============================================
+-- remove_column("products", :height)
+   -&gt; 0.0357s
+==  AddHeightToProduct: reverted (0.0358s) ====================================
+
+MacBook:shop xyz$</screen></para>
+
+  <para>Each migration has its own version number. You can find out the
+  version number of the current status via <command>rake
+  db:version</command>:<screen>MacBook:shop xyz$ <command>rake db:version</command>
+Current version: 20120508160146
+MacBook:shop xyz$ </screen></para>
+
+  <important>
+    <para>Please note that all version numbers and timestamps only apply to
+    the example printed here. If you recreate the example, you will of course
+    get a current timestamp for your own example.</para>
+  </important>
+
+  <para>You will find the corresponding version in the directory
+  <filename>db/migrate</filename>:<screen>MacBook:shop xyz$ <command>ls db/migrate</command> 
+20120508160146_create_products.rb
+20120508160821_add_height_to_product.rb
+MacBook:shop xyz$</screen></para>
+
+  <para>You can go to a specific migration via <command>rake db:migrate
+  VERSION=</command> and add the appropriate version number after the equals
+  sign. The zero represents the version zero, in other words the start. Let's
+  try it out:<screen>MacBook:shop xyz$ <command>rake db:migrate VERSION=0</command>
+==  CreateProducts: reverting =================================================
+-- drop_table("products")
+   -&gt; 0.0007s
+==  CreateProducts: reverted (0.0007s) ========================================
+
+MacBook:shop xyz$ </screen></para>
+
+  <para>The table was deleted with all data. We are back to square one.</para>
+
+  <section xml:id="activerecord_welche_datenbank">
+    <title>Which Database is Used?</title>
+
+    <para>The database table is created through the migration. As you can see,
+    the table names automatically get the plural of the <foreignphrase
+    xml:lang="en">model</foreignphrase>s (<classname>Person</classname> vs.
+    <literal>people</literal>). But in which database are the tables created?
+    This is defined in the configuration file
+    <filename>config/database.yml</filename>:<programlisting># SQLite version 3.x
+#   gem install sqlite3
+#
+#   Ensure the SQLite 3 gem is defined in your Gemfile
+#   gem 'sqlite3'
+development:
+  adapter: sqlite3
+  database: db/development.sqlite3
+  pool: 5
+  timeout: 5000
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  adapter: sqlite3
+  database: db/test.sqlite3
+  pool: 5
+  timeout: 5000
+
+production:
+  adapter: sqlite3
+  database: db/production.sqlite3
+  pool: 5
+  timeout: 5000
+</programlisting></para>
+
+    <para>Three different databases are defined there in YAML format (see <uri
+    xlink:href="http://www.yaml.org/">http://www.yaml.org/</uri> or <uri
+    xlink:href="http://de.wikipedia.org/wiki/YAML">http://en.wikipedia.org/wiki/YAML</uri>).
+    For us, only the <literal>development</literal> database is relevant for
+    now (first item). By default, Rails uses<application>
+    SQLite3</application> there. SQLite3 may not be the correct choice for the
+    analysis of the weather data collected worldwide, but for a quick and
+    straightforward development of Rails applications you will quickly learn
+    to appreciate it. In the production environment, you can later still
+    switch to "big" databases such as MySQL or PostgreSQL.<footnote>
+        <para>Some developers believe that you should always develop with the
+        same database that you are later going to use for production and
+        <foreignphrase xml:lang="en">testing</foreignphrase>. Others feel that
+        this is not necessary when using ORM abstraction layers. Please make
+        your own decision on this. I often program a Rails application with
+        SQLite and frequently use MySQL for the production.</para>
+      </footnote></para>
+
+    <para>To satisfy your curiosity, we have a quick look at the database with
+    the command line tool <literal>sqlite3</literal>:<screen>MacBook:shop xyz$ sqlite3 <command>db/development.sqlite3</command> 
+SQLite version 3.7.7 2011-06-25 16:35:41
+Enter ".help" for instructions
+Enter SQL statements terminated with a ";"
+sqlite&gt; <command>.tables</command>
+schema_migrations
+sqlite&gt; <command>.quit</command>
+MacBook:shop xyz$  </screen></para>
+
+    <para>Nothing in it. Of course not, as we have not yet run the
+    migration:<screen>MacBook:shop xyz$ <command>rake db:migrate</command>  
+==  CreateProducts: migrating =================================================
+-- create_table(:products)
+   -&gt; 0.0273s
+==  CreateProducts: migrated (0.0274s) ========================================
+
+==  AddHeightToProduct: migrating =============================================
+-- add_column(:products, :height, :integer)
+   -&gt; 0.0009s
+==  AddHeightToProduct: migrated (0.0010s) ====================================
+
+MacBook:shop xyz$ <command>sqlite3 db/development.sqlite3</command> 
+SQLite version 3.7.7 2011-06-25 16:35:41
+Enter ".help" for instructions
+Enter SQL statements terminated with a ";"
+sqlite&gt; <command>.tables</command>
+products           schema_migrations
+sqlite&gt; <command>.schema products</command>
+CREATE TABLE "products" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar(255), "price" decimal(7,2), "weight" integer, "in_stock" boolean, "expiration_date" date, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "height" integer);
+sqlite&gt; <command>.quit</command>
+MacBook:shop xyz$ </screen></para>
+
+    <para>The table <literal>schema_migrations</literal> is used for the
+    versioning of the migrations. This table is created during the first
+    migration carried out by Rails, if it does not yet exist.</para>
+  </section>
+
+  <section xml:id="ar_migration_index">
+    <title xml:id="ar_migration_index.title">Creating Index</title>
+
+    <para>I assume that you know what a database index is. If not, you will
+    find a brief introduction at <uri
+    xlink:href="http://de.wikipedia.org/wiki/Datenbankindex">http://en.wikipedia.org/wiki/Database_index</uri>.
+    In brief: you can use it to quickly search for a specific table
+    column.</para>
+
+    <para>In our production database, we should index the field
+    <literal>name</literal> in the <literal>products</literal> table. We
+    create a new migration for that purpose:<screen>MacBook:shop xyz$ <command>rails generate migration create_index</command>
+      invoke  active_record
+      create    db/migrate/20120508162243_create_index.rb
+MacBook:shop xyz$</screen></para>
+
+    <para>In the file
+    <filename>db/migrate/20101201224922_create_index.rb</filename> we create
+    the index with <methodname>add_index</methodname> in the method
+    <methodname>self.up</methodname>, and in the method
+    <methodname>self.down</methodname> we delete it again with
+    <methodname>remove_index</methodname>:<programlisting>class CreateIndex &lt; ActiveRecord::Migration
+  def up
+    add_index :products, :name
+  end
+
+  def down
+    remove_index :products, :name
+  end
+end</programlisting></para>
+
+    <para>With <command>rake db:migrate</command> we create the index:<screen>MacBook:shop xyz$ <command>rake db:migrate</command>
+==  CreateIndex: migrating ====================================================
+-- add_index(:products, :name)
+   -&gt; 0.0009s
+==  CreateIndex: migrated (0.0009s) ===========================================
+
+MacBook:shop xyz$  </screen></para>
+
+    <tip>
+      <para>You can also create an index directly when you generate the model.
+      In our case (an index for the attribute <code>name</code>) the command
+      would look like this:<screen>MacBook:shop xyz$ <command>rails generate model product name:string:index 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
+      invoke  active_record
+      create    db/migrate/20120508160146_create_products.rb
+      create    app/models/product.rb
+      invoke    test_unit
+      create      test/unit/product_test.rb
+      create      test/fixtures/products.yml
+MacBook:shop xyz$</screen></para>
+    </tip>
+  </section>
+
+  <section>
+    <title>Miscellaneous</title>
+
+    <para>This book is aimed at beginners, so I cannot discuss the topic
+    migrations in great depth. The main focus is on understanding the
+    mechanics in principle. But there are a few details that are so important
+    that I want to mention them here.</para>
+
+    <section xml:id="active-record-auto-felder">
+      <title>Automatically Added Fields (id, created_at and
+      updated_at)</title>
+
+      <para>Rails kindly adds the following fields automatically in the
+      default migration:<itemizedlist>
+          <listitem>
+            <para><literal>id:integer</literal></para>
+
+            <para>This is the unique ID of the record. The field is
+            automatically incremented by the database. For all SQL fans:
+            <literal>NOT NULL AUTO_INCREMENT</literal></para>
+          </listitem>
+
+          <listitem>
+            <para><literal>created_at:datetime</literal></para>
+
+            <para>The field is filled automatically by ActiveRecord when a
+            record is created.</para>
+          </listitem>
+
+          <listitem>
+            <para><literal>updated_at:datetime</literal></para>
+
+            <para>The field is automatically updated to the current time
+            whenever the record is edited.</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <para>So you don't have to enter these fields yourself when generating
+      the model.</para>
+
+      <para>At first you may ask yourself: "Is that really necessary? Does it
+      make sense?". But after a while you will learn to appreciate these
+      automatic fields. Omitting them would usually be false economy.</para>
+    </section>
+  </section>
+
+  <section>
+    <title>Further Documentation</title>
+
+    <para>The following webpages provide excellent further information on the
+    topic migration:<itemizedlist>
+        <listitem>
+          <para><uri
+          xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Migration.html">http://api.rubyonrails.org/classes/ActiveRecord/Migration.html</uri></para>
+        </listitem>
+
+        <listitem>
+          <para><uri
+          xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/TableDefinition.html">http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/TableDefinition.html</uri></para>
+        </listitem>
+
+        <listitem>
+          <para><uri
+          xlink:href="http://railscasts.com/episodes/107-migrations-in-rails-2-1">http://railscasts.com/episodes/107-migrations-in-rails-2-1</uri></para>
+
+          <para>This screencast is a bit dated (Rails version 2.1), but still
+          good if you are trying to understand the basics.</para>
+        </listitem>
+
+        <listitem>
+          <para><uri
+          xlink:href="http://www.dizzy.co.uk/ruby_on_rails/cheatsheets/rails-migrations">http://www.dizzy.co.uk/ruby_on_rails/cheatsheets/rails-migrations</uri></para>
+        </listitem>
+      </itemizedlist></para>
+  </section>
+</section>

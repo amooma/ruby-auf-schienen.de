@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="ar-has_one"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="ar-has_one.title">has_one – 1:1 Association</title>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>relations</secondary>
+
+    <tertiary>has_one()</tertiary>
+  </indexterm>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>relations</secondary>
+
+    <tertiary>belongs_to()</tertiary>
+  </indexterm>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>associations</secondary>
+
+    <see>ActiveRecord, relations</see>
+  </indexterm>
+
+  <para>Similar to <methodname>has_many</methodname> (see <xref
+  linkend="activerecord_has_many"/>), the method
+  <methodname>has_one</methodname> also creates a logical relation between two
+  models. But in contrast to <methodname>has_many,</methodname> one record is
+  only ever associated with exactly one other record in
+  <methodname>has_one</methodname>. <emphasis>In most practical cases of
+  application, it logically makes sense to put both into the same model and
+  therefore the same database table, but for the sake of completeness I also
+  want to discuss <methodname>has_one</methodname> here.</emphasis><tip>
+      <para>You can probably safely skip <methodname>has_one</methodname>
+      without losing any sleep.</para>
+    </tip></para>
+
+  <para>In the examples, I assume that you have already read and understood
+  <xref linkend="activerecord_has_many"/>. I am not going to explain methods
+  like <methodname>build</methodname> (<xref
+  linkend="activerecord_hinzufuegen_build"/>) again but assume that you
+  already know the basics.</para>
+
+  <section>
+    <title>Preparation</title>
+
+    <para>We use the example from the Rails documentation (see <uri
+    xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html">http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html</uri>)
+    and create an application containing employees and offices. Each employee
+    has an office. First the application:<screen>MacBook:~ xyz$ <command>rails new office-space</command>
+[...]
+MacBook:~ xyz$ <command>cd office-space</command> 
+MacBook:office-space xyz$</screen></para>
+
+    <para>And now the two models:<screen>MacBook:office-space xyz$ <command>rails generate model employee last_name</command>
+[...]
+MacBook:office-space xyz$ <command>rails generate model office location employee_id:integer</command>
+[...]
+MacBook:office-space xyz$ <command>rake db:migrate</command>
+[...]
+MacBook:office-space xyz$</screen></para>
+  </section>
+
+  <section>
+    <title>Association</title>
+
+    <para>The association in the file
+    <filename>app/model/employee.rb:</filename><programlisting>class Employee &lt; ActiveRecord::Base
+  attr_accessible :last_name
+
+  <emphasis>has_one :office</emphasis>
+end</programlisting></para>
+
+    <para>And its counterpart in the file
+    <filename>app/model/office.rb:</filename><programlisting>class Office &lt; ActiveRecord::Base
+  attr_accessible :employee_id, :location
+
+  <emphasis>belongs_to :employee</emphasis>
+end</programlisting></para>
+
+    <section>
+      <title>Options</title>
+
+      <para>The options of <methodname>has_one</methodname> are similar to
+      those of <methodname>has_many</methodname>. So for details, please refer
+      to <xref linkend="activerecord_1n_optionen"/> or <uri
+      xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-has_one">http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-has_one</uri>.
+      Here in brief a few general examples (partly from the Rails
+      docu):<programlisting>has_one :office, :dependent =&gt; :destroy  # automatically destroys the office entry as well
+has_one :office, :dependent =&gt; :nullify  # as :destroy, but the Office record is not destroyed,
+                                         # but employee_id is set to NULL
+has_one :last_comment, :class_name =&gt; "Comment", :order =&gt; "posted_on"
+has_one :project_manager, :class_name =&gt; "Person", :conditions =&gt; "role = 'project_manager'"
+has_one :boss, :readonly =&gt; :true
+has_one :club, :through =&gt; :membership
+has_one :primary_address, :through =&gt; :addressables, :conditions =&gt; ["addressable.primary = ?", true], :source =&gt; :addressable</programlisting></para>
+    </section>
+  </section>
+
+  <section>
+    <title>Console Examples</title>
+
+    <para>Let's start the console and create two employees:<screen>MacBook:office-space xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Employee</command>
+ =&gt; Employee(id: integer, last_name: string, created_at: datetime, updated_at: datetime) 
+1.9.3p194 :002 &gt; <command>Employee.create(:last_name =&gt; 'Udelhoven')</command>
+   (0.1ms)  begin transaction
+  SQL (9.3ms)  INSERT INTO "employees" ("created_at", "last_name", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 08 May 2012 06:42:43 UTC +00:00], ["last_name", "Udelhoven"], ["updated_at", Tue, 08 May 2012 06:42:43 UTC +00:00]]
+   (0.9ms)  commit transaction
+ =&gt; #&lt;Employee id: 1, last_name: "Udelhoven", created_at: "2012-05-08 06:42:43", updated_at: "2012-05-08 06:42:43"&gt; 
+1.9.3p194 :003 &gt; <command>Employee.create(:last_name =&gt; 'Meier')</command>
+   (0.1ms)  begin transaction
+  SQL (0.5ms)  INSERT INTO "employees" ("created_at", "last_name", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 08 May 2012 06:42:49 UTC +00:00], ["last_name", "Meier"], ["updated_at", Tue, 08 May 2012 06:42:49 UTC +00:00]]
+   (5.2ms)  commit transaction
+ =&gt; #&lt;Employee id: 2, last_name: "Meier", created_at: "2012-05-08 06:42:49", updated_at: "2012-05-08 06:42:49"&gt; 
+1.9.3p194 :004 &gt;</screen></para>
+
+    <para>Now an employee gets his own office:<screen>1.9.3p194 :004 &gt; <command>Office.create(:location =&gt; '2nd floor', :employee_id =&gt; 1)</command>
+   (0.1ms)  begin transaction
+  SQL (0.6ms)  INSERT INTO "offices" ("created_at", "employee_id", "location", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Tue, 08 May 2012 06:44:04 UTC +00:00], ["employee_id", 1], ["location", "2nd floor"], ["updated_at", Tue, 08 May 2012 06:44:04 UTC +00:00]]
+   (3.3ms)  commit transaction
+ =&gt; #&lt;Office id: 1, location: "2nd floor", employee_id: 1, created_at: "2012-05-08 06:44:04", updated_at: "2012-05-08 06:44:04"&gt; 
+1.9.3p194 :005 &gt; <command>Employee.first.office</command>
+  Employee Load (0.3ms)  SELECT "employees".* FROM "employees" LIMIT 1
+  Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 1 LIMIT 1
+ =&gt; #&lt;Office id: 1, location: "2nd floor", employee_id: 1, created_at: "2012-05-08 06:44:04", updated_at: "2012-05-08 06:44:04"&gt; 
+1.9.3p194 :006 &gt; <command>Office.first.employee</command>
+  Office Load (0.3ms)  SELECT "offices".* FROM "offices" LIMIT 1
+  Employee Load (0.2ms)  SELECT "employees".* FROM "employees" WHERE "employees"."id" = 1 LIMIT 1
+ =&gt; #&lt;Employee id: 1, last_name: "Udelhoven", created_at: "2012-05-08 06:42:43", updated_at: "2012-05-08 06:42:43"&gt; 
+1.9.3p194 :007 &gt;</screen></para>
+
+    <para>For the second employee, we use the automatically generated method
+    <methodname>create_office</methodname> (with
+    <methodname>has_many</methodname>, we would use
+    <methodname>offices.create</methodname> here):<screen>1.9.3p194 :007 &gt; <command>Employee.last.create_office(:location =&gt; '1st floor')</command>
+  Employee Load (0.3ms)  SELECT "employees".* FROM "employees" ORDER BY "employees"."id" DESC LIMIT 1
+   (0.1ms)  begin transaction
+  SQL (0.7ms)  INSERT INTO "offices" ("created_at", "employee_id", "location", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Tue, 08 May 2012 06:45:12 UTC +00:00], ["employee_id", 2], ["location", "1st floor"], ["updated_at", Tue, 08 May 2012 06:45:12 UTC +00:00]]
+   (2.4ms)  commit transaction
+  Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 2 LIMIT 1
+   (0.0ms)  begin transaction
+   (0.0ms)  commit transaction
+ =&gt; #&lt;Office id: 2, location: "1st floor", employee_id: 2, created_at: "2012-05-08 06:45:12", updated_at: "2012-05-08 06:45:12"&gt; 
+1.9.3p194 :008 &gt;</screen></para>
+
+    <para>Removing is intuitively done via
+    <methodname>destroy</methodname>:<screen>1.9.3p194 :008 &gt; <command>Employee.first.office</command>
+  Employee Load (0.2ms)  SELECT "employees".* FROM "employees" LIMIT 1
+  Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 1 LIMIT 1
+ =&gt; #&lt;Office id: 1, location: "2nd floor", employee_id: 1, created_at: "2012-05-08 06:44:04", updated_at: "2012-05-08 06:44:04"&gt; 
+1.9.3p194 :009 &gt; <command>Employee.first.office.destroy</command>
+  Employee Load (0.3ms)  SELECT "employees".* FROM "employees" LIMIT 1
+  Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 1 LIMIT 1
+   (0.1ms)  begin transaction
+  SQL (0.4ms)  DELETE FROM "offices" WHERE "offices"."id" = ?  [["id", 1]]
+   (3.6ms)  commit transaction
+ =&gt; #&lt;Office id: 1, location: "2nd floor", employee_id: 1, created_at: "2012-05-08 06:44:04", updated_at: "2012-05-08 06:44:04"&gt; 
+1.9.3p194 :010 &gt; <command>Office.exists?(1)</command>
+  Office Exists (0.2ms)  SELECT 1 FROM "offices" WHERE "offices"."id" = 1 LIMIT 1
+ =&gt; false 
+1.9.3p194 :011 &gt; <command>exit</command>
+MacBook:office-space xyz$</screen></para>
+
+    <warning>
+      <para>If you create a new <classname>Office</classname> for an
+      <classname>Employee</classname> with an existing
+      <classname>Office</classname> then you will not get an error
+      message:<screen>MacBook:office-space xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Employee.last.office</command>
+  Employee Load (0.1ms)  SELECT "employees".* FROM "employees" ORDER BY "employees"."id" DESC LIMIT 1
+  Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 2 LIMIT 1
+ =&gt; #&lt;Office id: 2, location: "1st floor", employee_id: 2, created_at: "2012-05-08 06:45:12", updated_at: "2012-05-08 06:45:12"&gt; 
+1.9.3p194 :002 &gt; <command>Employee.last.create_office(:location =&gt; 'Basement')</command>
+  Employee Load (0.3ms)  SELECT "employees".* FROM "employees" ORDER BY "employees"."id" DESC LIMIT 1
+   (0.1ms)  begin transaction
+  SQL (29.3ms)  INSERT INTO "offices" ("created_at", "employee_id", "location", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Tue, 08 May 2012 06:51:58 UTC +00:00], ["employee_id", 2], ["location", "Basement"], ["updated_at", Tue, 08 May 2012 06:51:58 UTC +00:00]]
+   (3.7ms)  commit transaction
+  Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 2 LIMIT 1
+   (0.0ms)  begin transaction
+   (0.3ms)  UPDATE "offices" SET "employee_id" = NULL, "updated_at" = '2012-05-08 06:51:58.969829' WHERE "offices"."id" = 2
+   (0.9ms)  commit transaction
+ =&gt; #&lt;Office id: 3, location: "Basement", employee_id: 2, created_at: "2012-05-08 06:51:58", updated_at: "2012-05-08 06:51:58"&gt; 
+1.9.3p194 :003 &gt; <command>Employee.last.office</command>
+  Employee Load (0.3ms)  SELECT "employees".* FROM "employees" ORDER BY "employees"."id" DESC LIMIT 1
+  Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 2 LIMIT 1
+ =&gt; #&lt;Office id: 3, location: "Basement", employee_id: 2, created_at: "2012-05-08 06:51:58", updated_at: "2012-05-08 06:51:58"&gt; 
+1.9.3p194 :004 &gt;</screen></para>
+
+      <para>The old <classname>Office</classname> is even still in the
+      database (the <varname>employee_id</varname> was automatically set to
+      <code>nil</code>):<screen>1.9.3p194 :004 &gt; <command>Office.all</command>
+  Office Load (0.2ms)  SELECT "offices".* FROM "offices" 
+ =&gt; [#&lt;Office id: 2, location: "1st floor", employee_id: nil, created_at: "2012-05-08 06:45:12", updated_at: "2012-05-08 06:51:58"&gt;, #&lt;Office id: 3, location: "Basement", employee_id: 2, created_at: "2012-05-08 06:51:58", updated_at: "2012-05-08 06:51:58"&gt;] 
+1.9.3p194 :005 &gt; <command>exit</command>
+MacBook:office-space xyz$</screen></para>
+    </warning>
+  </section>
+
+  <section>
+    <title>has_one vs. belongs_to</title>
+
+    <para>Both <methodname>has_one</methodname> and
+    <methodname>belongs_to</methodname> offer the option of representing a 1:1
+    relationship. The difference in practice is in the programmer's personal
+    preference and the location of the foreign key. In general,
+    <methodname>has_one</methodname> tends to be used rarely and depends on
+    the degree of normalization of the data schema.</para>
+  </section>
+</section>

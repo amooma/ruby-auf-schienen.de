@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="ar-first_last_all"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="ar-first_last_all.title">first, last and all</title>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>methods</secondary>
+
+    <tertiary>first()</tertiary>
+  </indexterm>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>methods</secondary>
+
+    <tertiary>last()</tertiary>
+  </indexterm>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>methods</secondary>
+
+    <tertiary>all()</tertiary>
+  </indexterm>
+
+  <para>In certain cases, you may need the first record, or the last one, or
+  perhaps even all records. Conveniently, there is a ready-made method for
+  each case. Let's start with the easiest ones: <methodname>first</methodname>
+  and <methodname>last</methodname>.<screen>MacBook:europe xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Country.first</command>
+  Country Load (0.2ms)  SELECT "countries".* FROM "countries" LIMIT 1
+ =&gt; #&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2012-04-26 10:26:38", updated_at: "2012-04-26 10:26:38"&gt; 
+1.9.3p194 :002 &gt; <command>Country.last</command>
+  Country Load (0.3ms)  SELECT "countries".* FROM "countries" ORDER BY "countries"."id" DESC LIMIT 1
+ =&gt; #&lt;Country id: 4, name: "Netherlands", population: 16680000, created_at: "2012-04-26 10:47:23", updated_at: "2012-04-26 10:47:23"&gt; 
+1.9.3p194 :003 &gt; <command>exit</command>
+MacBook:europe xyz$ </screen></para>
+
+  <para>And now all at once with <methodname>all</methodname>:<screen>MacBook:europe xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Country.all</command>
+  Country Load (0.2ms)  SELECT "countries".* FROM "countries" 
+ =&gt; [#&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2012-04-26 10:26:38", updated_at: "2012-04-26 10:26:38"&gt;, #&lt;Country id: 2, name: "France", population: 65447374, created_at: "2012-04-26 10:41:54", updated_at: "2012-04-26 10:41:54"&gt;, #&lt;Country id: 3, name: "Belgium", population: 10839905, created_at: "2012-04-26 10:44:49", updated_at: "2012-04-26 10:44:49"&gt;, #&lt;Country id: 4, name: "Netherlands", population: 16680000, created_at: "2012-04-26 10:47:23", updated_at: "2012-04-26 10:47:23"&gt;] 
+1.9.3p194 :002 &gt; <command>exit</command>
+MacBook:europe xyz$ </screen></para>
+
+  <para>But the objects created by <methodname>first</methodname>,
+  <methodname>last</methodname> and <methodname>all</methodname> are
+  different. <methodname>first</methodname> and <methodname>last</methodname>
+  return an object of the class <classname>Country</classname> and
+  <methodname>all</methodname> of course returns an array of such
+  objects:<screen>MacBook:europe xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Country.first</command>
+  Country Load (0.1ms)  SELECT "countries".* FROM "countries" LIMIT 1
+ =&gt; #&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2012-04-26 10:26:38", updated_at: "2012-04-26 10:26:38"&gt; 
+1.9.3p194 :002 &gt; <command>Country.first.class</command>
+  Country Load (0.3ms)  SELECT "countries".* FROM "countries" LIMIT 1
+ =&gt; Country(id: integer, name: string, population: integer, created_at: datetime, updated_at: datetime) 
+1.9.3p194 :003 &gt; <command>Country.all</command>
+  Country Load (0.3ms)  SELECT "countries".* FROM "countries" 
+ =&gt; [#&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2012-04-26 10:26:38", updated_at: "2012-04-26 10:26:38"&gt;, #&lt;Country id: 2, name: "France", population: 65447374, created_at: "2012-04-26 10:41:54", updated_at: "2012-04-26 10:41:54"&gt;, #&lt;Country id: 3, name: "Belgium", population: 10839905, created_at: "2012-04-26 10:44:49", updated_at: "2012-04-26 10:44:49"&gt;, #&lt;Country id: 4, name: "Netherlands", population: 16680000, created_at: "2012-04-26 10:47:23", updated_at: "2012-04-26 10:47:23"&gt;] 
+1.9.3p194 :004 &gt; <command>Country.all.class</command>
+  Country Load (0.3ms)  SELECT "countries".* FROM "countries" 
+ =&gt; Array 
+1.9.3p194 :005 &gt; <command>exit</command>
+MacBook:europe xyz$</screen></para>
+
+  <para>If <methodname>Country.all</methodname> returns an array, then we
+  should also be able to use iterators (see <xref linkend="iterator"/> and
+  <xref linkend="array_iterator"/>), right? Yes, of course! That is the beauty
+  of it. Here is a little experiment with
+  <methodname>each</methodname>:<screen>MacBook:europe xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Country.all.each do |country|</command>
+1.9.3p194 :002 &gt;     <command>puts country.name</command>
+1.9.3p194 :003?&gt;   <command>end</command>
+  Country Load (0.1ms)  SELECT "countries".* FROM "countries" 
+Germany
+France
+Belgium
+Netherlands
+ =&gt; [#&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2012-04-26 10:26:38", updated_at: "2012-04-26 10:26:38"&gt;, #&lt;Country id: 2, name: "France", population: 65447374, created_at: "2012-04-26 10:41:54", updated_at: "2012-04-26 10:41:54"&gt;, #&lt;Country id: 3, name: "Belgium", population: 10839905, created_at: "2012-04-26 10:44:49", updated_at: "2012-04-26 10:44:49"&gt;, #&lt;Country id: 4, name: "Netherlands", population: 16680000, created_at: "2012-04-26 10:47:23", updated_at: "2012-04-26 10:47:23"&gt;] 
+1.9.3p194 :004 &gt; <command>exit</command>
+MacBook:europe xyz$ </screen></para>
+
+  <para>So can we also use <code>.all.first</code> as an alternative for
+  <code>.first</code>? Yes, but it does not make much sense. Have a look for
+  yourself:<screen>MacBook:europe xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Country.first</command>
+  Country Load (0.2ms)  SELECT "countries".* FROM "countries" LIMIT 1
+ =&gt; #&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2012-04-26 10:26:38", updated_at: "2012-04-26 10:26:38"&gt; 
+1.9.3p194 :002 &gt; <command>Country.all.first</command>
+  Country Load (0.3ms)  SELECT "countries".* FROM "countries" 
+ =&gt; #&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2012-04-26 10:26:38", updated_at: "2012-04-26 10:26:38"&gt; 
+1.9.3p194 :003 &gt; <command>exit</command>
+MacBook:europe xyz$</screen></para>
+
+  <para>Even in our mini database, we can already see that there is a
+  difference in speed of 0.1 milliseconds. With <code>Country.first</code>,
+  the first record is retrieved via SQL in the database with a <code>LIMIT
+  1</code> and output by ActiveRecord as individual object of the country
+  class. With <code>Country.all.first</code>, the whole table is first read in
+  as array via <code>SELECT "countries".* FROM "countries"</code> and the
+  first element of this array is pulled out. This is a luxury you can afford
+  in this tiny application, but just imagine what would happen if you had a
+  database with many millions of records.</para>
+
+  <warning>
+    <para>SQL databases do not normally sort the results of a <code>SELECT *
+    FROM xyz</code> automatically. The database can determine the order of the
+    records itself. As a result, with a <code>LIMIT 1</code> and such an
+    amount of data we can not be completely sure that we get the record that
+    we humans would logically consider to be the first record. This
+    effectively means that with a <code>Country.first</code> we would also not
+    necessarily get the first record. It is up to the SQL database to decide
+    whether to sort records in a different order, for example for performance
+    reasons. If we want to be absolutely sure that we get the record that is
+    the first one in our logic, we need to work with the method
+    <methodname>order</methodname> (see <xref
+    linkend="activerecord_order"/>):<screen>MacBook:europe xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Country.order(:id).first</command>
+  Country Load (0.6ms)  SELECT "countries".* FROM "countries" ORDER BY id LIMIT 1
+ =&gt; #&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2012-04-26 10:26:38", updated_at: "2012-04-26 10:26:38"&gt; 
+1.9.3p194 :002 &gt; <command>exit</command>
+MacBook:europe xyz$</screen></para>
+
+    <para>As you can see in SQL, the <code>SELECT "countries".* FROM
+    "countries" ORDER BY id LIMIT 1</code> first sorts the table by
+    <varname>id</varname> and then outputs the first line.</para>
+
+    <para>Usually, the SQL database works exactly as you would expect and you
+    get the first record with <code>Country.first</code>. But if you want to
+    be absolutely sure, you should always use an
+    <methodname>order</methodname>.</para>
+
+    <para>The easiest way of doing this is via default_scope.</para>
+  </warning>
+</section>

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="ar_sonstiges"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="ar_sonstiges.title">Miscellaneous</title>
+
+  <para>In this section, I am going to show you some examples of topics and
+  questions that are important for your everyday work, but as a whole go
+  beyond the scope of this book aimed at beginners. They provide recipes for
+  solving specific ActiveRecord problems.</para>
+
+  <section xml:id="ar_callbacks">
+    <title xml:id="ar_callbacks.title">Callbacks</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>callback</secondary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>callback</secondary>
+
+      <tertiary>before_validation</tertiary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>callback</secondary>
+
+      <tertiary>after_validation</tertiary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>callback</secondary>
+
+      <tertiary>before_save</tertiary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>callback</secondary>
+
+      <tertiary>before_create</tertiary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>callback</secondary>
+
+      <tertiary>after_save</tertiary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>callback</secondary>
+
+      <tertiary>after_create</tertiary>
+    </indexterm>
+
+    <para>Callbacks are defined programming hooks in the life of an
+    ActiveRecord object. You can find a list of all callbacks at <uri
+    xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Callbacks.html">http://api.rubyonrails.org/classes/ActiveRecord/Callbacks.html</uri>.
+    Here are the most frequently used callbacks:<itemizedlist>
+        <listitem>
+          <para><code>before_validation</code></para>
+
+          <para>Executed before the validation.</para>
+        </listitem>
+
+        <listitem>
+          <para><code>after_validation</code></para>
+
+          <para>Executed after the validation.</para>
+        </listitem>
+
+        <listitem>
+          <para><code>before_save</code></para>
+
+          <para>Executed before each save.</para>
+        </listitem>
+
+        <listitem>
+          <para><code>before_create</code></para>
+
+          <para>Executed before the first save.</para>
+        </listitem>
+
+        <listitem>
+          <para><code>after_save</code></para>
+
+          <para>Executed after every save.</para>
+        </listitem>
+
+        <listitem>
+          <para><code>after_create</code></para>
+
+          <para>Executed after the first save.</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>A callback is always executed in the model. Let's assume you always
+    want to save an e-mail address in a <classname>User</classname> model in
+    lower case, but also give the user of the web interface the option to
+    enter upper case letters. You could use a
+    <methodname>before_save</methodname> callback to convert the attribute
+    <varname>email</varname> to lower case via the method
+    <methodname>downcase</methodname>. Here is what the model would look
+    like:<programlisting>class User &lt; ActiveRecord::Base
+  attr_accessible :email, :name
+
+  validates :name,
+            :presence =&gt; true
+
+  validates :email,
+            :presence =&gt; true,
+            :format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }
+
+  <emphasis>before_save :downcase_email</emphasis>
+
+  private
+
+<emphasis>  def downcase_email
+    self.email = self.email.downcase
+  end</emphasis>
+end</programlisting></para>
+
+    <para>Let's see in the console if it really works as we want it
+    to:<screen>MacBook:webshop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>User.create(name: 'Wintermeyer', email: 'Stefan.Wintermeyer@amooma.de')</command>
+   (0.1ms)  begin transaction
+  SQL (5.9ms)  INSERT INTO "users" ("created_at", "email", "name", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Wed, 30 May 2012 18:20:21 UTC +00:00], ["email", "stefan.wintermeyer@amooma.de"], ["name", "Wintermeyer"], ["updated_at", Wed, 30 May 2012 18:20:21 UTC +00:00]]
+   (2.8ms)  commit transaction
+ =&gt; #&lt;User id: 1, name: "Wintermeyer", email: "stefan.wintermeyer@amooma.de", created_at: "2012-05-30 18:20:21", updated_at: "2012-05-30 18:20:21"&gt; 
+1.9.3p194 :002 &gt; <command>exit</command>
+MacBook:webshop xyz$ </screen></para>
+
+    <para>Even though the e-mail address was entered with a capital 'S' and
+    'W', ActiveRecord has indeed converted all letters automatically to lower
+    case via the <methodname>before_save</methodname> callback.</para>
+
+    <para>In <xref linkend="action_mailer"/> you will find an example for the
+    same model where we use an <methodname>after_create</methodname> callback
+    to automatically send an e-mail to a newly created user. In <xref
+    linkend="ar_default_werte"/> you will find an example for defining a
+    default value for a new object via an
+    <methodname>after_initialize</methodname> callback.</para>
+  </section>
+
+  <section xml:id="ar_default_werte">
+    <title xml:id="ar_default_werte.title">Default Values</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>callback</secondary>
+
+      <tertiary>after_initialize</tertiary>
+    </indexterm>
+
+    <para>If you need specific default values for an ActiveRecord object, you
+    can easily implement this with the
+    <methodname>after_initialize</methodname> callback. This method is called
+    by ActiveRecord when a new object is created. Let's assume we have a
+    model<classname> Order</classname> and the minimum order quantity is
+    always 1, so we can enter 1 directly as default value when creating a new
+    record.</para>
+
+    <para>Let's set up a quick example:<screen>MacBook:~ xyz$ <command>rails new shop</command>
+[...]
+MacBook:~ xyz$ <command>cd shop</command>
+MacBook:shop xyz$ <command>rails generate model order product_id:integer quantity:integer</command>
+[...]
+MacBook:shop xyz$ <command>rake db:migrate</command>
+[...]
+MacBook:shop xyz$</screen></para>
+
+    <para>We write an <methodname>after_initialize</methodname> callback into
+    the file <filename>app/models/order.rb</filename>:<programlisting>class Order &lt; ActiveRecord::Base
+  attr_accessible :product_id, :quantity
+<emphasis>  after_initialize :set_defaults
+
+  private
+  def set_defaults 
+    self.quantity ||= 1
+  end</emphasis>
+end</programlisting></para>
+
+    <para>And now we check in the console if a new order object automatically
+    contains the quantity 1:<screen>MacBook:shop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>order = Order.new</command>
+ =&gt; #&lt;Order id: nil, product_id: nil, quantity: 1, created_at: nil, updated_at: nil&gt; 
+1.9.3p194 :002 &gt; <command>exit</command>
+MacBook:shop xyz$ </screen></para>
+
+    <para>That's working fine.</para>
+
+    <note>
+      <para>Some readers may ask why we have not set a default in the database
+      in the migration. As so often, there are several possible solutions for
+      this problem.</para>
+    </note>
+  </section>
+</section>

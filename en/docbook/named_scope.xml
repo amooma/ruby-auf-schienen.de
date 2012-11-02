@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="activerecord_named_scope"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="activerecord_named_scope.title">NamedScopes</title>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>NamedScopes</secondary>
+  </indexterm>
+
+  <para>When programming Rails applications, it is sometimes clearer and
+  simpler to define frequent searches as separate methods. In Rails speak,
+  these are referred to as <foreignphrase
+  xml:lang="en">NamedScope</foreignphrase>. These NamedScopes can be chained,
+  just like other methods.</para>
+
+  <section xml:id="named_scopes_vorbereitung">
+    <title xml:id="named_scopes_vorbereitung.title">Preparation</title>
+
+    <para>We are building our own little online shop:<screen>MacBook:~ xyz$ <command>rails new shop</command>
+[...]
+MacBook:~ xyz$ <command>cd shop</command>
+MacBook:shop xyz$ <command>rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
+[...]
+MacBook:shop xyz$ <command>rake db:migrate</command>
+[...]
+MacBook:shop xyz$</screen></para>
+
+    <para>Please populate the file <filename>db/seeds.rb</filename> with the
+    following content:<programlisting># ruby encoding: utf-8
+
+Product.create(:name =&gt; 'Milk (1 liter)', :weight =&gt; 1000, :in_stock =&gt; true, :price =&gt; 0.45, :expiration_date =&gt; Date.today + 14.days)
+Product.create(:name =&gt; 'Butter (250 g)', :weight =&gt; 250, :in_stock =&gt; true, :price =&gt; 0.75, :expiration_date =&gt; Date.today + 14.days)
+Product.create(:name =&gt; 'Flour (1 kg)', :weight =&gt; 1000, :in_stock =&gt; false, :price =&gt; 0.45, :expiration_date =&gt; Date.today + 100.days)
+Product.create(:name =&gt; 'Jelly Babies (6 x 300 g)', :weight =&gt; 1500, :in_stock =&gt; true, :price =&gt; 4.96, :expiration_date =&gt; Date.today + 1.year)
+Product.create(:name =&gt; 'Super-Duper Cake Mix', :in_stock =&gt; true, :price =&gt; 11.12, :expiration_date =&gt; Date.today + 1.year)
+Product.create(:name =&gt; 'Eggs (12)', :in_stock =&gt; true, :price =&gt; 2, :expiration_date =&gt; Date.today + 7.days)
+Product.create(:name =&gt; 'Peanuts (8 x 200 g bag)', :in_stock =&gt; false, :weight =&gt; 1600, :price =&gt; 17.49, :expiration_date =&gt; Date.today + 1.year)</programlisting></para>
+
+    <para>Now drop the database and repopulate it with the
+    <filename>db/seeds.rb</filename>:<screen>MacBook:shop xyz$ <command>rake db:reset</command>
+[...]
+MacBook:shop xyz$</screen></para>
+  </section>
+
+  <section xml:id="einfache_named_scopes">
+    <title xml:id="einfache_named_scopes.title">Simple NamedScopes</title>
+
+    <para>If we want to only display products that are in stock in our online
+    shop, then we can use the following query each time:<screen>MacBook:shop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Product.where(:in_stock =&gt; true)</command>
+  Product Load (0.2ms)  SELECT "products".* FROM "products" WHERE "products"."in_stock" = 't'
+ =&gt; [#&lt;Product id: 1, name: "Milk (1 liter)", price: #&lt;BigDecimal:7fd17c8cbbd0,'0.45E0',9(45)&gt;, weight: 1000, in_stock: true, expiration_date: "2012-05-22", created_at: "2012-05-08 12:43:15", updated_at: "2012-05-08 12:43:15"&gt;, #&lt;Product id: 2, name: "Butter (250 g)", price: #&lt;BigDecimal:7fd17c8ca870,'0.75E0',9(45)&gt;, weight: 250, in_stock: true, expiration_date: "2012-05-22", created_at: "2012-05-08 12:43:15", updated_at: "2012-05-08 12:43:15"&gt;, #&lt;Product id: 4, name: "Gummibärchen (6 x 300 g)", price: #&lt;BigDecimal:7fd17c8d13f0,'0.496E1',18(45)&gt;, weight: 1500, in_stock: true, expiration_date: "2013-05-08", created_at: "2012-05-08 12:43:15", updated_at: "2012-05-08 12:43:15"&gt;, #&lt;Product id: 5, name: "Super-Duper Backmischung", price: #&lt;BigDecimal:7fd17c8cfd98,'0.1112E2',18(45)&gt;, weight: nil, in_stock: true, expiration_date: "2013-05-08", created_at: "2012-05-08 12:43:15", updated_at: "2012-05-08 12:43:15"&gt;, #&lt;Product id: 6, name: "Eier (12 Stück)", price: #&lt;BigDecimal:7fd17c8d52e8,'0.2E1',9(36)&gt;, weight: nil, in_stock: true, expiration_date: "2012-05-15", created_at: "2012-05-08 12:43:15", updated_at: "2012-05-08 12:43:15"&gt;] 
+1.9.3p194 :002 &gt; <command>exit</command>
+MacBook:shop xyz$</screen></para>
+
+    <para>But we could also define a NamedScope <code>available</code> in the
+    <filename>app/models/product.rb</filename>:<programlisting>class Product &lt; ActiveRecord::Base
+  attr_accessible :in_stock, :name, :price, :weight
+
+  <emphasis>scope :available, where(:in_stock =&gt; true)</emphasis>
+end</programlisting></para>
+
+    <para>And then use it:<screen>MacBook:shop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Product.available.count</command>
+   (0.2ms)  SELECT COUNT(*) FROM "products" WHERE "products"."in_stock" = 't'
+ =&gt; 5 
+1.9.3p194 :002 &gt; <command>Product.where(:in_stock =&gt; true).count</command>
+   (0.2ms)  SELECT COUNT(*) FROM "products" WHERE "products"."in_stock" = 't'
+ =&gt; 5 
+1.9.3p194 :003 &gt; <command>exit</command>
+MacBook:shop xyz$</screen></para>
+
+    <para>Let's define a second NamedScope for this example in the
+    <filename>app/models/product.rb</filename>:<programlisting>class Product &lt; ActiveRecord::Base
+  attr_accessible :in_stock, :name, :price, :weight
+
+  scope :available, where(:in_stock =&gt; true)
+  scope :cheap, where(:price =&gt; [0..1])
+end</programlisting></para>
+
+    <para>Now we can output all cheap productst that are in stock:<screen>MacBook:shop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Product.cheap.count</command>
+   (0.3ms)  SELECT COUNT(*) FROM "products" WHERE (("products"."price" BETWEEN 0 AND 1 OR "products"."price" IN (NULL)))
+ =&gt; 3 
+1.9.3p194 :002 &gt; <command>Product.cheap.available.count</command>
+   (0.4ms)  SELECT COUNT(*) FROM "products" WHERE "products"."in_stock" = 't' AND (("products"."price" BETWEEN 0 AND 1 OR "products"."price" IN (NULL)))
+ =&gt; 2 
+1.9.3p194 :003 &gt; exit
+MacBook:shop xyz$ </screen></para>
+  </section>
+
+  <section xml:id="named_scope_lambda">
+    <title xml:id="named_scope_lambda.title">Lambda</title>
+
+    <para>If we want to set up a named scope
+    <methodname>consumable</methodname> that compares today's date with the
+    value of <methodname>expiration_date</methodname>, then we have to use
+    lambda for this. A normal named scope is defined once by ActiveRecord and
+    then reused over and over again. This means, a <code>Date.today</code>
+    (for today's date) would only be converted into a date once than then
+    reused. So tomorrow it would still be today's date. If we define the
+    NamedScope with lambda, this lambda is reconstructed with each new
+    call.</para>
+
+    <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
+  attr_accessible :expiration_date, :in_stock, :name, :price, :weight
+
+  scope :consumable, lambda { where('expiration_date &gt; ?', Date.today) }
+end</programlisting></para>
+
+    <para>This gives us correctly the food that is not yet past its expiration
+    date today:<screen>MacBook:shop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Product.consumable.count</command>
+   (0.1ms)  SELECT COUNT(*) FROM "products" WHERE (expiration_date &gt; '2012-05-08')
+ =&gt; 7 
+1.9.3p194 :002 &gt; <command>exit</command>
+MacBook:shop xyz$</screen></para>
+  </section>
+
+  <section>
+    <title>Passing Parameters</title>
+
+    <para>If you need a NamedScope that can also process parameters, then that
+    is no problem either. The following example outputs products that are
+    cheaper than the specified value. The
+    <filename>app/models/product.rb</filename> looks like
+    this:<programlisting>class Product &lt; ActiveRecord::Base
+  attr_accessible :in_stock, :name, :price, :weight
+
+  scope :cheaper_than, lambda { |price| where('price &lt; ?', price) }
+end</programlisting></para>
+
+    <para>Now we can count all products that cost less than 50 cent:<screen>MacBook:shop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>Product.cheaper_than(0.5).count</command>
+   (0.2ms)  SELECT COUNT(*) FROM "products" WHERE (price &lt; 0.5)
+ =&gt; 2 
+1.9.3p194 :002 &gt; <command>exit</command>
+MacBook:shop xyz</screen></para>
+  </section>
+
+  <section xml:id="named_scope_create">
+    <title xml:id="named_scope_create.title">Creating New Records with
+    NamedScopes</title>
+
+    <para>Let's use the following
+    <filename>app/models/product.rb</filename>:<programlisting>class Product &lt; ActiveRecord::Base
+  attr_accessible :in_stock, :name, :price, :weight
+
+  scope :available, where(:in_stock =&gt; true)
+  scope :cheap, where(:price =&gt; [0..1])
+  scope :cheaper_than, lambda { |price| where('price &lt; ?', price) }
+end</programlisting></para>
+
+    <para>With this NamedScope we can not only find all products that are in
+    stock, but also create new products that contain the value
+    <code>true</code> in the field <varname>in_stock</varname>:<screen>MacBook:shop xyz$ <command>rails console</command>
+Loading development environment (Rails 3.2.3)
+1.9.3p194 :001 &gt; <command>product = Product.available.build</command>
+ =&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: true, created_at: nil, updated_at: nil&gt; 
+1.9.3p194 :002 &gt; <command>product.in_stock</command>
+ =&gt; true 
+1.9.3p194 :003 &gt; <command>exit</command>
+MacBook:shop xyz$</screen></para>
+
+    <para>This works with the method <methodname>build</methodname> (see <xref
+    linkend="activerecord_hinzufuegen_build"/>) and
+    <methodname>create</methodname> (see <xref
+    linkend="activerecord_create"/>).</para>
+  </section>
+</section>

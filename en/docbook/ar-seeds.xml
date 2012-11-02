@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="seed_rb" xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="seed_rb.title">Populating the Database with seeds.rb</title>
+
+  <indexterm>
+    <primary>seeds.rb</primary>
+  </indexterm>
+
+  <para>With the file <filename>db/seeds.rb</filename>, the Rails gods have
+  given us a way of feeding default values easily and quickly to a fresh
+  installation. This is a normal Ruby program within the Rails environment.
+  You have full access to all classes and methods of your application.</para>
+
+  <para>So you do not need to enter everything manually with <command>rails
+  console</command> in order to make the records created in <xref
+  linkend="activerecord_create"/> available in a new Rails application, but
+  you can simply use the following file
+  <filename>db/seeds.rb</filename>:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
+# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
+#
+# Examples:
+#
+#   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
+#   Mayor.create(name: 'Emanuel', city: cities.first)
+
+Country.create({"name"=&gt;"Germany", "population"=&gt;81831000})
+Country.create({"name"=&gt;"France", "population"=&gt;65447374})
+Country.create({"name"=&gt;"Belgium", "population"=&gt;10839905})
+Country.create({"name"=&gt;"Netherlands", "population"=&gt;16680000})</programlisting></para>
+
+  <para>You then populate it with data via <command>rake db:seed</command>. To
+  be on the safe side, you should always set up the database from scratch with
+  <command>rake db:setup</command> in the context of this book and then
+  automatically populate it with the file <filename>db/seeds.rb</filename>.
+  Here is what is looks like:<screen>MacBook:europe xyz$ <command>rake db:setup</command>
+db/development.sqlite3 already exists
+-- create_table("countries", {:force=&gt;true})
+   -&gt; 0.0327s
+-- initialize_schema_migrations_table()
+   -&gt; 0.0004s
+-- assume_migrated_upto_version(20120426092916, ["/Users/xyz/europe/db/migrate"])
+   -&gt; 0.0004s
+MacBook:europe xyz$</screen>I use the file <filename>db/seeds.rb</filename> at
+  this point because it offers a simple mechanism for filling an empty
+  database with default values. In the course of this book, this will make it
+  easier for us to set up quick example scenarios.</para>
+
+  <section>
+    <title>Alternative Programming</title>
+
+    <indexterm>
+      <primary>seeds.rb</primary>
+    </indexterm>
+
+    <para>The <filename>db/seeds.rb</filename> is a Ruby program.
+    Correspondingly, we can also use the following approach as an
+    alternative:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
+# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
+#
+# Examples:
+#
+#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
+#   Mayor.create(:name =&gt; 'Daley', :city =&gt; cities.first)
+
+country_list = [
+  [ "Germany", 81831000 ],
+  [ "France", 65447374 ],
+  [ "Belgium", 10839905 ],
+  [ "Netherlands", 16680000 ]
+]
+
+country_list.each do |country|
+  Country.create( :name =&gt; country[0], :population =&gt; country[1] )
+end</programlisting></para>
+
+    <para>The result is the same. I am showing you this example to make it
+    clear that you can program completely normally within the file
+    <filename>db/seeds.rb</filename>.</para>
+  </section>
+
+  <section>
+    <title>Generating seeds.rb From Existing Data</title>
+
+    <indexterm>
+      <primary>seeds.rb, generate from existing data</primary>
+    </indexterm>
+
+    <para>Sometimes it can be useful to export the current data pool of a
+    Rails application into a <filename>db/seeds.rb</filename>. While writing
+    this book, I encountered this problem in almost every chapter.
+    Unfortunately, there is no standard approach for this. I am showing you
+    what you can do in this case. There are other, more complex scenarios that
+    can be derived from my approach.</para>
+
+    <para>Fill the file <filename>lib/tasks/export.rake</filename> with the
+    following content:<programlisting>namespace :export do
+  desc "Prints Country.all in a seeds.rb way."
+  task :seeds_format =&gt; :environment do
+    Country.order(:id).all.each do |country|
+      puts "Country.create(#{country.serializable_hash.delete_if {|key, value| ['created_at','updated_at','id'].include?(key)}.to_s.gsub(/[{}]/,'')})"
+    end
+  end
+end</programlisting></para>
+
+    <para>Then you can call the corresponding <literal>rake</literal>
+    <quote><foreignphrase xml:lang="en">task</foreignphrase></quote> with the
+    command <command>rake export:seeds_format</command>:<screen>MacBook:europe xyz$ <command>rake export:seeds_format</command>
+Country.create("name"=&gt;"Germany", "population"=&gt;81831000)
+Country.create("name"=&gt;"France", "population"=&gt;65447374)
+Country.create("name"=&gt;"Belgium", "population"=&gt;10839905)
+Country.create("name"=&gt;"Netherlands", "population"=&gt;16680000)
+MacBook:europe xyz$</screen></para>
+
+    <para>You can either expand this program so that the output is written
+    directly into the <filename>db/seeds.rb</filename> or you can simply use
+    the shell:<screen>MacBook:europe xyz$ <command>rake album:seeds_format &gt;&gt; db/seeds.rb</command>
+MacBook:europe xyz$ </screen></para>
+  </section>
+
+  <section>
+    <title>UTF-8</title>
+
+    <indexterm>
+      <primary>seeds.rb with UTF-8</primary>
+    </indexterm>
+
+    <para>If you want to use UTF-8 characters in your db/seeds.rb, then you
+    need to enter the line<programlisting># ruby encoding: utf-8</programlisting></para>
+
+    <para>at the beginning of the file.</para>
+
+    <para>Example:<programlisting># ruby encoding: utf-8
+Country.create({"name"=&gt;"Germany", "population"=&gt;81831000})
+Country.create({"name"=&gt;"France", "population"=&gt;65447374})
+Country.create({"name"=&gt;"Belgium", "population"=&gt;10839905})
+Country.create({"name"=&gt;"Netherlands", "population"=&gt;16680000})
+Country.create({"name"=&gt;"Austria", "population"=&gt;8440465})
+Country.create({"name"=&gt;"Republika e Shqipërisë", "population"=&gt;2831741})</programlisting></para>
+  </section>
+</section>
