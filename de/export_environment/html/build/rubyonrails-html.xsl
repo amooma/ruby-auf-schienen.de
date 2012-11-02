@@ -281,11 +281,10 @@ Version:
         <div class="navbar navbar-inverse navbar-fixed-top">
           <div class="navbar-inner">
             <div class="container-fluid">
-
               <a class="brand" href="index.html">Ruby on Rails 3.2</a>
               <div class="nav-collapse collapse">
                 <p class="navbar-text pull-right">
-                  <a href="http://www.amazon.de/gp/product/3827329892?tag=wwwamoomade-21" class="navbar-link">Buch online kaufen</a>
+                  <a href="http://www.amazon.de/gp/product/3827329892?tag=wwwamoomade-21" class="navbar-link">Buch bei Amazon kaufen</a>
                 </p>
               </div><!--/.nav-collapse -->
             </div>
@@ -294,9 +293,9 @@ Version:
         
         <div id="container-fluid">
           <div id="row-fluid">
-              <div id="adsense-leaderboard" class="span12">
-                <script type="text/javascript">
-                  <xsl:text disable-output-escaping="yes">
+            <div id="adsense-leaderboard" class="span12">
+              <script type="text/javascript">
+                <xsl:text disable-output-escaping="yes">
 <![CDATA[<!--]]>
 google_ad_client = "ca-pub-9538764634478220";
 /* ruby-auf-schienen.de Leaderboard */
@@ -304,29 +303,21 @@ google_ad_slot = "2837769471";
 google_ad_width = 728;
 google_ad_height = 90;
 <![CDATA[//-->]]>
-                 </xsl:text>
-                </script>
-                <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-              </div>
+               </xsl:text>
+              </script>
+            </div>
 
             <div class="span9">
-              <div class="amazon-ad">
-                <iframe src="http://rcm-de.amazon.de/e/cm?lt1=_top&amp;bc1=FFFFFF&amp;IS2=1&amp;nou=1&amp;bg1=FFFFFF&amp;fc1=000000&amp;lc1=0000FF&amp;t=wwwamoomade-21&amp;o=3&amp;p=8&amp;l=as1&amp;m=amazon&amp;f=ifr&amp;ref=tf_til&amp;asins=3827329892" style="width:120px;height:240px;" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" class="pull-right"></iframe>
-              </div>
-              <div class="note">
-                <p>Es bedarf jeden Tag 15 Leser, die auf eine Anzeige
-                    klicken, um diese kostenlose Seite am Leben zu halten.</p>
-              </div>
               <xsl:copy-of select="$content"/>
-
             </div>
 
             <div class="span3">
+
               <div class="well sidebar-nav">
                 <xsl:call-template name="breadcrumbs"/>
               </div>
 
-              <div id="adsense">
+              <div id="adsense-skyscraper">
                 <script type="text/javascript">
                   <xsl:text disable-output-escaping="yes">
 <![CDATA[<!--]]>
