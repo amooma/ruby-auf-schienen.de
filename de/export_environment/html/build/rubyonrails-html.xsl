@@ -282,6 +282,12 @@ Version:
           <div class="navbar-inner">
             <div class="container-fluid">
               <a class="brand" href="index.html">Ruby on Rails 3.2</a>
+
+              <div class="nav-collapse collapse">
+                <ul class="nav">
+                  <li><a href="http://xyzpub.com/en/ruby-on-rails/3.2/">English Version</a></li>
+                </ul>
+              </div>
               <div class="nav-collapse collapse">
                 <p class="navbar-text pull-right">
                   <a href="http://www.amazon.de/gp/product/3827329892?tag=wwwamoomade-21" class="navbar-link">Buch bei Amazon kaufen</a>
