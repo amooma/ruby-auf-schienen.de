@@ -33,6 +33,7 @@
   <xsl:param name="doc.url">http://wintermeyer.de/</xsl:param>
   <xsl:param name="default.image.width" select="'650px'"/>
   <xsl:param name="navig.showtitles" select="1"/>
+  <xsl:param name="generate.meta.abstract" select="1"/>
   <xsl:param name="generate.toc">
 set toc
 book toc
