@@ -281,7 +281,7 @@ Version:
         <div class="navbar navbar-inverse navbar-fixed-top">
           <div class="navbar-inner">
             <div class="container-fluid">
-              <a class="brand" href="index.html">Ruby on Rails 3.2</a>
+              <a class="brand" href="index.html">Ruby on Rails 3.2 - A Beginner's Guide.</a>
             </div>
           </div>
         </div>
