@@ -308,7 +308,14 @@ google_ad_height = 90;
             </div>
 
             <div class="span3">
-
+              <h3>Updates</h3>
+              <p>
+                Please follow <a href="https://twitter.com/wintermeyer">https://twitter.com/wintermeyer</a> to get updates about this book.
+              </p>
+              <h3>Mobi, PDF, ePub, ...</h3>
+              <p>
+                I'm working on it. I'll be available before christmas 2012.
+              </p>
               <div class="well sidebar-nav">
                 <xsl:call-template name="breadcrumbs"/>
               </div>
