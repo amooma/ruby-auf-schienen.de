@@ -309,13 +309,14 @@ google_ad_height = 90;
 
             <div class="span3">
               <div class="well">
-                <h3>Updates</h3>
                 <p>
-                  Please follow <a href="https://twitter.com/wintermeyer">https://twitter.com/wintermeyer</a> to get updates about this book.
+                  Please follow <a href="https://twitter.com/wintermeyer">@wintermeyer</a> to get updates about this book.
                 </p>
-                <h3>Mobi or ePub</h3>
                 <p>
-                  I'm working on it. I'll be available before christmas 2012.
+                  Many people ask for an Mobi, PDF or ePub version of this book. I'm working on it. I'll be available before christmas 2012.
+                </p>
+                <p>
+                  BTW: Thanks for your support and the visibility by mentioning it on Twitter and Facebook. That helps a lot!
                 </p>
               </div>
               <div class="well sidebar-nav">
