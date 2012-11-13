@@ -2335,54 +2335,19 @@ $</screen></para>
 
       <para>A <quote><foreignphrase xml:lang="en">Hash</foreignphrase></quote>
       is a list of <foreignphrase xml:lang="en">key/value
-      pairs</foreignphrase>. Here is an example with strings as key:<screen>sw@debian:~/sandbox$ <command>irb</command>
-1.9.3p194 :001:0&gt; <command>prices = { '6 eggs' =&gt; 1.2, '12 eggs' =&gt; 2, '500 gr butter' =&gt; 0.99 }</command>
-=&gt; {"6 eggs"=&gt;1.2, "12 eggs"=&gt;2, "500 gr butter"=&gt;0.99}
-1.9.3p194 :002:0&gt; <command>prices['12 eggs']</command>
+      pairs</foreignphrase>. Here is an example with strings as keys:<screen>$ irb --simple-prompt
+&gt;&gt; prices = { 'egg' =&gt; 0.1, 'butter' =&gt; 0.99 }
+=&gt; {"egg"=&gt;0.1, "butter"=&gt;0.99}
+&gt;&gt; prices['egg']
+=&gt; 0.1
+&gt;&gt; prices.count
 =&gt; 2
-1.9.3p194 :003:0&gt; <command>prices.count</command>
-=&gt; 3
-1.9.3p194 :004:0&gt; <command>exit</command>
-</screen></para>
+&gt;&gt; exit
+$</screen></para>
 
       <para>Of course, hashes can store not just strings as objects in the
       values, but - as with arrays - also classes that you define yourself
       (see <xref linkend="ruby_array"/>).</para>
-
-      <para>As for <classname>Array</classname>, there is also a very good
-      <literal>ri</literal> help page on <classname>Hash</classname>:<screen>sw@debian:~/sandbox$ <command>ri Hash</command>
-= Hash &lt; Object
-
-------------------------------------------------------------------------------
-= Includes:
-Enumerable (from ruby site)
-
-(from ruby site)
-------------------------------------------------------------------------------
-A Hash is a collection of key-value pairs. It is similar to an Array, except
-that indexing is done via arbitrary keys of any object type, not an integer
-index. Hashes enumerate their values in the order that the corresponding keys
-were inserted.
-
-Hashes have a default value that is returned when
-accessing keys that do not exist in the hash. By default, that value is nil.
-
-------------------------------------------------------------------------------
-= Class methods:
-
-  [], new, try_convert
-
-= Instance methods:
-  ==, [], []=, assoc, clear, compare_by_identity, compare_by_identity?,
-  default, default=, default_proc, default_proc=, delete, delete_if, each,
-  each_key, each_pair, each_value, empty?, eql?, fetch, flatten, has_key?,
-  has_value?, hash, include?, initialize_copy, inspect, invert, keep_if, key,
-  key?, keys, length, member?, merge, merge!, pretty_print,
-  pretty_print_cycle, rassoc, rehash, reject, reject!, replace, select,
-  select!, shift, size, store, to_a, to_hash, to_s, update, value?, values,
-  values_at
-
-sw@debian:~/sandbox$ </screen></para>
 
       <section xml:id="ruby_symbol">
         <title xml:id="ruby_symbol.title">Symbols</title>
@@ -2396,65 +2361,66 @@ sw@debian:~/sandbox$ </screen></para>
         <para><foreignphrase xml:lang="en">Symbols</foreignphrase> are a
         strange concept and difficult to explain. But they are very useful and
         used frequently, amongst others with hashes. Normally, variables
-        always create new objects:<screen>sw@debian:~/sandbox$ <command>irb</command>
-1.9.3p194 :001:0&gt; <command>a = 'Example 1'</command>
- =&gt; "Example 1" 
-1.9.3p194 :002:0&gt; <command>a.object_id</command>
- =&gt; 2156685080 
-1.9.3p194 :003:0&gt; <command>a = 'Example 2'</command>
- =&gt; "Example 2" 
-1.9.3p194 :004:0&gt; <command>a.object_id</command>
- =&gt; 2151901180 
-1.9.3p194 :005:0&gt; <command>exit</command>
-</screen></para>
+        always create new objects:<screen>$ irb --simple-prompt
+&gt;&gt; a = 'Example 1'
+=&gt; "Example 1"
+&gt;&gt; a.object_id
+=&gt; 70260036330560
+&gt;&gt; a = 'Example 2'
+=&gt; "Example 2"
+&gt;&gt; a.object_id
+=&gt; 70260036391520
+&gt;&gt; exit
+$</screen></para>
 
         <para>In both cases, we have the variable <varname>a</varname>, but
-        once it has the object ID <code>2156685080</code> and once the object
-        ID <code>2151901180</code>. We could carry on in this way
-        indefinitely. Each time, it would generate a different object ID and
-        therefore a new object. In principle, this is no big deal and entirely
-        logical in terms of object orientation. But it is also rather a waste
-        of memory space.</para>
+        object ID is different. We could carry on in this way indefinitely.
+        Each time, it would generate a different object ID and therefore a new
+        object. In principle, this is no big deal and entirely logical in
+        terms of object orientation. But it is also rather a waste of memory
+        space.</para>
 
         <para>A symbol is defined by a colon before the name and cannot store
         any values itself, but it always has the same object ID, so it is very
         well suited to be a <foreignphrase
-        xml:lang="en">key</foreignphrase>:<screen>sw@debian:~/sandbox$ <command>irb</command>
-1.9.3p194 :001:0&gt; <command>:a.object_id</command>
- =&gt; 373448 
-1.9.3p194 :002:0&gt; <command>exit</command>
-</screen></para>
+        xml:lang="en">key</foreignphrase>:<screen>$ irb --simple-prompt
+&gt;&gt; :a.class
+=&gt; Symbol
+&gt;&gt; :a.object_id
+=&gt; 413928
+&gt;&gt; exit
+$</screen></para>
 
         <para>Let's do another little experiment to make the difference
         clearer. We use a string object with the content
         <quote><literal>white</literal></quote> three times in a row and then
         the symbol <literal>:white</literal> three times in a row. For
         <literal>"white"</literal>, a new object is created each time. For the
-        symbol <literal>:white</literal>, only the first time:<screen>sw@debian:~/sandbox$ <command>irb</command>
-1.9.3p194 :001:0&gt; <command>'white'.object_id</command>
- =&gt; 2152156400 
-1.9.3p194 :002:0&gt; <command>'white'.object_id</command>
- =&gt; 2152152240 
-1.9.3p194 :003:0&gt; <command>'white'.object_id</command>
- =&gt; 2152164440 
-1.9.3p194 :004:0&gt; <command>:white.object_id</command>
- =&gt; 373448 
-1.9.3p194 :005:0&gt; <command>:white.object_id</command>
- =&gt; 373448 
-1.9.3p194 :006:0&gt; <command>:white.object_id</command>
- =&gt; 373448 
-1.9.3p194 :007:0&gt; <command>exit</command>
-</screen></para>
+        symbol <literal>:white</literal>, only the first time:<screen>$ irb --simple-prompt
+&gt;&gt; 'white'.object_id
+=&gt; 70209583052020
+&gt;&gt; 'white'.object_id
+=&gt; 70209583082240
+&gt;&gt; 'white'.object_id
+=&gt; 70209583088920
+&gt;&gt; :white.object_id
+=&gt; 413928
+&gt;&gt; :white.object_id
+=&gt; 413928
+&gt;&gt; :white.object_id
+=&gt; 413928
+&gt;&gt; exit
+$ </screen></para>
 
         <para>Using symbols as key for hashes is much more memory
-        efficient:<screen>sw@debian:~/sandbox$ <command>irb</command>
-1.9.3p194 :001:0&gt; <command>colors = { :black =&gt; '#000000', :white =&gt; ':FFFFFF', :green =&gt; '#00C000', :blue =&gt; '#0000FF' }
-=&gt; {:black=&gt;"#000000", :white=&gt;":FFFFFF", :green=&gt;"#00C000", :blue=&gt;"#0000FF"}</command>
-1.9.3p194 :002:0&gt; <command>puts colors[:green]</command>
-#00C000
+        efficient:<screen>$ irb --simple-prompt
+&gt;&gt; colors = { :black =&gt; '#000000', :white =&gt; '#FFFFFFFF' }
+=&gt; {:black=&gt;"#000000", :white=&gt;"#FFFFFFFF"}
+&gt;&gt; puts colors[:white]
+#FFFFFFFF
 =&gt; nil
-1.9.3p194 :003:0&gt; <command>exit</command>
-</screen></para>
+&gt;&gt; exit
+$ </screen></para>
 
         <para>You will frequently see symbols in Rails. If you want to find
         out more about symbols, go to the help page about the class
@@ -2477,22 +2443,22 @@ sw@debian:~/sandbox$ </screen></para>
 
             <secondary>Ruby</secondary>
           </indexterm><methodname>each</methodname> you can work your way
-        through a hash step by step. Example:<screen>sw@debian:~/sandbox$ <command>irb</command>
-1.9.3p194 :001:0&gt; <command>shopping = { 'eggs' =&gt; 6, 'butter' =&gt; '500 gr' }</command>
-=&gt; {"eggs"=&gt;6, "butter"=&gt;"500 gr"}
-1.9.3p194 :002:0&gt; <command>shopping.each do |key,value|</command>
-1.9.3p194 :003:1* <command>  puts "Product: #{key} - Amount: #{value}"</command>
-1.9.3p194 :004:1&gt; <command>end</command>
-Product: eggs - Amount: 6
-Product: butter - Amount: 500 gr
-=&gt; {"eggs"=&gt;6, "butter"=&gt;"500 gr"}
-1.9.3p194 :005:0&gt; <command>exit</command>
-</screen></para>
+        through a <classname>Hash</classname> step by step. Example:<screen>$ irb --simple-prompt
+&gt;&gt; colors = { :black =&gt; '#000000', :white =&gt; '#FFFFFFFF' }
+=&gt; {:black=&gt;"#000000", :white=&gt;"#FFFFFFFF"}
+&gt;&gt; colors.each do |key,value|
+?&gt;   puts "#{key} #{value}"
+&gt;&gt; end
+black #000000
+white #FFFFFFFF
+=&gt; {:black=&gt;"#000000", :white=&gt;"#FFFFFFFF"}
+&gt;&gt; exit
+$</screen></para>
 
-        <para>Again, <literal>ri</literal> offers help and an example, in case
+        <para>Again, <command>ri</command> offers help and an example, in case
         you cannot remember one day how to use
-        <methodname>each</methodname>:<screen>sw@debian:~/sandbox$ <command>ri Hash.each</command>
-= Hash.each
+        <methodname>each</methodname>:<screen>$ ri -T Hash.each
+Hash.each
 
 (from ruby site)
 ------------------------------------------------------------------------------
@@ -2500,11 +2466,12 @@ Product: butter - Amount: 500 gr
   hsh.each_pair {| key, value | block } -&gt; hsh
   hsh.each                              -&gt; an_enumerator
   hsh.each_pair                         -&gt; an_enumerator
+   
 
 ------------------------------------------------------------------------------
 
-Calls block once for each key in hsh, passing the key-value
-pair as parameters.
+Calls block once for each key in hsh, passing the key-value pair
+as parameters.
 
 If no block is given, an enumerator is returned instead.
 
@@ -2516,7 +2483,8 @@ produces:
   a is 100
   b is 200
 
-sw@debian:~/sandbox$ </screen></para>
+
+$</screen></para>
       </section>
     </section>
   </section>
@@ -2535,42 +2503,41 @@ sw@debian:~/sandbox$ </screen></para>
       start and end points of the interval are defined enclosed in normal
       brackets and separated by two dots in between them. Here is an example
       in which we use a range like an iterator with
-      <methodname>each</methodname>:<screen>stefan@swmbp 0 1.9.2-p0 ~$ <command>irb</command>
-1.9.3p194 &gt; <command>(0..3)</command>
- =&gt; 0..3 
-1.9.3p194 &gt; <command>(0..3).class</command>
- =&gt; Range 
-1.9.3p194 &gt; <command>(0..3).each do |i|</command>
-1.9.3p194 &gt;     <command>puts i</command>
-1.9.3p194 ?&gt;  <command>end</command>
+      <methodname>each</methodname>:<screen>$ irb --simple-prompt
+&gt;&gt; (0..3)
+=&gt; 0..3
+&gt;&gt; (0..3).class
+=&gt; Range
+&gt;&gt; (0..3).each do |i|
+?&gt;   puts i
+&gt;&gt; end
 0
 1
 2
 3
- =&gt; 0..3 
-1.9.3p194 &gt; </screen></para>
+=&gt; 0..3
+&gt;&gt; </screen></para>
 
       <para>Via the method <methodname>to_a</methodname> you can generate an
-      array from a <classname>Range</classname>:<screen>1.9.3p194 &gt; <command>(0..3).to_a</command>
- =&gt; [0, 1, 2, 3] 
-1.9.3p194 &gt;</screen></para>
+      array from a <classname>Range</classname>:<screen>&gt;&gt; (0..3).to_a
+=&gt; [0, 1, 2, 3]
+&gt;&gt; </screen></para>
 
       <para>A range can be generated from objects of any type. Important is
       only that the objects can be compared via
       <methodname>&lt;=&gt;</methodname> and use the method
       <methodname>succ</methodname> for counting on to the next value. So you
-      can also use Range to represent letters:<screen>1.9.3p194 &gt; <command>('a'..'h').to_a</command>
- =&gt; ["a", "b", "c", "d", "e", "f", "g", "h"] 
-1.9.3p194 &gt; 
-</screen></para>
+      can also use Range to represent letters:<screen>&gt;&gt; ('a'..'h').to_a
+=&gt; ["a", "b", "c", "d", "e", "f", "g", "h"]
+&gt;&gt;</screen></para>
 
       <para>As alternative notation, you may sometimes come across
       <methodname>Range.new()</methodname>. In this case, the start and end
       points are not separated by two dots, but by a comma. This is what it
-      looks like:<screen>1.9.3p194 &gt; <command>(0..3) == Range.new(0,3)</command>
- =&gt; true 
-1.9.3p194 &gt; <command>exit</command>
-stefan@swmbp 0 1.9.3p194 ~$ </screen></para>
+      looks like:<screen>&gt;&gt; (0..3) == Range.new(0,3)
+=&gt; true
+&gt;&gt; exit
+$</screen></para>
     </section>
   </section>
 </chapter>
