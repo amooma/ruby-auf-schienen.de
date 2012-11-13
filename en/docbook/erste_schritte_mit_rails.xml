@@ -1204,25 +1204,19 @@ the Easter Bunny.
 
     <para>The name says it all, really: <foreignphrase
     xml:lang="en">redirects</foreignphrase> are commands that you can use
-    within the controller to <quote>skip</quote>, i.e. redirect, to other
-    methods or even other web pages.<note>
+    within the controller to <quote>skip</quote>, i.e. redirect, to other to
+    other web pages.<note>
         <para>A redirect returns to the browser the response "302 Moved" with
         the new target.</para>
-      </note> Let's create a new Rails project for a suitable example:<screen>MacBook:~ xyz$ <command>rails new redirect_example</command>
-      create  
-      create  README.rdoc
-      create  Rakefile
+      </note>Let's create a new Rails project for a suitable example:<screen>$ rails new redirect_example
 
 [...]
 
-Using sqlite3 (1.3.6) 
-Using uglifier (1.2.4) 
-Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
-MacBook:~ xyz$ <command>cd redirect_example</command> 
-MacBook:redirect_example xyz$</screen></para>
+$ cd redirect_example 
+$ </screen></para>
 
     <para>Before we can redirect, we need a controller with at least two
-    different methods. Off we go then:<screen>MacBook:redirect_example xyz$ <command>rails generate controller Game ping pong</command>
+    different methods. Off we go then:<screen>$ rails generate controller Game ping pong
       create  app/controllers/game_controller.rb
        route  get "game/pong"
        route  get "game/ping"
@@ -1241,57 +1235,22 @@ MacBook:redirect_example xyz$</screen></para>
       create      app/assets/javascripts/game.js.coffee
       invoke    scss
       create      app/assets/stylesheets/game.css.scss
-MacBook:redirect_example xyz$</screen></para>
+$</screen></para>
 
-    <para>Let's launch the Rails server and use the browser to first go to
-    <uri
-    xlink:href="http://0.0.0.0:3000/game/ping">http://0.0.0.0:3000/game/ping</uri>
-    and then to <uri
-    xlink:href="http://0.0.0.0:3000/game/pong">http://0.0.0.0:3000/game/pong</uri>:<screen>MacBook:redirect_example xyz$ <command>rails server</command>
-=&gt; Booting WEBrick
-=&gt; Rails 3.2.3 application starting in development on http://0.0.0.0:3000
-=&gt; Call with -d to detach
-=&gt; Ctrl-C to shutdown server
-[2012-04-24 13:59:36] INFO  WEBrick 1.3.1
-[2012-04-24 13:59:36] INFO  ruby 1.9.3 (2012-04-20) [x86_64-darwin11.3.0]
-[2012-04-24 13:59:36] INFO  WEBrick::HTTPServer#start: pid=58476 port=3000
-
-
-Started GET "/game/ping" for 127.0.0.1 at 2012-04-24 14:00:01 +0200
-Processing by GameController#ping as HTML
-  Rendered game/ping.html.erb within layouts/application (1.9ms)
-Compiled game.css  (8ms)  (pid 58476)
-Compiled application.css  (18ms)  (pid 58476)
-Compiled jquery.js  (3ms)  (pid 58476)
-Compiled jquery_ujs.js  (0ms)  (pid 58476)
-Compiled game.js  (139ms)  (pid 58476)
-Compiled application.js  (173ms)  (pid 58476)
-Completed 200 OK in 271ms (Views: 270.4ms | ActiveRecord: 0.0ms)
-
-[...]
-
-Started GET "/game/pong" for 127.0.0.1 at 2012-04-24 14:00:07 +0200
-Processing by GameController#pong as HTML
-  Rendered game/pong.html.erb within layouts/application (1.2ms)
-Completed 200 OK in 8ms (Views: 7.8ms | ActiveRecord: 0.0ms)
-</screen></para>
-
-    <para>That's all normal. The project has two possible routes:<screen>MacBook:redirect_example xyz$ <command>rake routes</command>
+    <para>The new rails webapplication has two possible routes:<screen>$ rake routes
 game_ping GET /game/ping(.:format) game#ping
 game_pong GET /game/pong(.:format) game#pong
-MacBook:redirect_example xyz$</screen></para>
+$</screen></para>
 
     <para>The controller
     <filename>app/controllers/game_controller.rb</filename> has the following
-    content:<screen>MacBook:redirect_example xyz$ <command>cat app/controllers/game_controller.rb</command> 
-class GameController &lt; ApplicationController
+    content:<programlisting>class GameController &lt; ApplicationController
   def ping
   end
 
   def pong
   end
-end
-MacBook:redirect_example xyz$</screen></para>
+end</programlisting></para>
 
     <para>Now for the redirect: how can we achieve that we get immediately
     redirected to the method <methodname>pong</methodname> when we go to <uri
@@ -1305,7 +1264,7 @@ MacBook:redirect_example xyz$</screen></para>
     the controller
     <filename>app/controllers/game_controller.rb</filename>:<programlisting>class GameController &lt; ApplicationController
   def ping
-   logger.info '++++++++++  Example  ++++++++++'
+   logger.info '+++  Example  +++'
    redirect_to game_pong_path
   end
 
@@ -1313,38 +1272,41 @@ MacBook:redirect_example xyz$</screen></para>
   end
 end</programlisting></para>
 
+    <para>But what is <code>game_pong_path</code>? Let's have a look a the
+    routes generated for this Rails application:<screen>$ rake routes
+game_ping GET /game/ping(.:format) game#ping
+game_pong GET /game/pong(.:format) game#pong
+$</screen></para>
+
+    <note>
+      <para>As you can see, the route to the <foreignphrase
+      xml:lang="en">action </foreignphrase><literal>ping</literal> of the
+      controller <literal>GameController</literal> now gets the name
+      <literal>game_ping</literal> (see beginning of the line). We could also
+      write the redirect like this:<programlisting>redirect_to :action =&gt; 'pong'</programlisting></para>
+    </note>
+
+    <para>I will explain the details and the individual options of the
+    redirect later in the context of each specific case. For now, you just
+    need to know that you can redirect not just to another method, but also to
+    another controller or an entirely different web page.</para>
+
     <para>When we try to go to <uri
     xlink:href="http://0.0.0.0:3000/game/ping">http://0.0.0.0:3000/game/ping</uri>
     we are automatically redirected to <uri
     xlink:href="http://0.0.0.0:3000/game/pong">http://0.0.0.0:3000/game/pong</uri>
-    and in the log output we see this:<screen>Started GET "/game/ping" for 127.0.0.1 at 2012-04-24 14:24:08 +0200
+    and in the log output we see this:<screen>Started GET "/game/ping" for 127.0.0.1 at 2012-11-13 20:35:44 +0100
+Connecting to database specified by database.yml
 Processing by GameController#ping as HTML
-++++++++++  Example  ++++++++++
++++  Example  +++
 Redirected to http://0.0.0.0:3000/game/pong
 Completed 302 Found in 1ms (ActiveRecord: 0.0ms)
 
 
-Started GET "/game/pong" for 127.0.0.1 at 2012-04-24 14:24:08 +0200
+Started GET "/game/pong" for 127.0.0.1 at 2012-11-13 20:35:44 +0100
 Processing by GameController#pong as HTML
-  Rendered game/pong.html.erb within layouts/application (0.3ms)
-Completed 200 OK in 7ms (Views: 6.7ms | ActiveRecord: 0.0ms)</screen></para>
-
-    <para>But what is <code>game_pong_path</code>? Let's have a look a the
-    routes generated for this Rails application:<screen>MacBook:redirect_example xyz$ <command>rake routes</command>
-game_ping GET /game/ping(.:format) game#ping
-game_pong GET /game/pong(.:format) game#pong
-MacBook:redirect_example xyz$</screen></para>
-
-    <para>As you can see, the route to the <foreignphrase xml:lang="en">action
-    </foreignphrase><literal>ping</literal> of the controller
-    <literal>GameController</literal> now gets the name
-    <literal>game_ping</literal> (see beginning of the line). We could also
-    write the redirect like this:<programlisting>redirect_to :action =&gt; 'pong'</programlisting></para>
-
-    <para>We will explain the details and the individual options of the
-    redirect later in the context of each specific case. For now, you just
-    need to know that you can redirect not just to another method, but also to
-    another controller or an entirely different web page.</para>
+  Rendered game/pong.html.erb within layouts/application (2.4ms)
+Completed 200 OK in 35ms (Views: 34.5ms | ActiveRecord: 0.0ms)</screen></para>
   </section>
 
   <section xml:id="flash">
