@@ -51,8 +51,6 @@ qandadiv nop
 qandaset nop
 </xsl:param>
 
-  <xsl:param name="section.label.includes.component.label" select="0"/>
-
   <xsl:param name="admon.graphics" select="1"/>
   <xsl:param name="admon.graphics.extension">.png</xsl:param>
   <xsl:param name="admon.graphics.path">custom-admons-callouts/</xsl:param>
