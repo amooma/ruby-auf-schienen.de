@@ -21,38 +21,30 @@
   console</command> in order to make the records created in <xref
   linkend="activerecord_create"/> available in a new Rails application, but
   you can simply use the following file
-  <filename>db/seeds.rb</filename>:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
-#   Mayor.create(name: 'Emanuel', city: cities.first)
-
-Country.create({"name"=&gt;"Germany", "population"=&gt;81831000})
-Country.create({"name"=&gt;"France", "population"=&gt;65447374})
-Country.create({"name"=&gt;"Belgium", "population"=&gt;10839905})
-Country.create({"name"=&gt;"Netherlands", "population"=&gt;16680000})</programlisting></para>
+  <filename>db/seeds.rb</filename>:<programlisting>Country.create(name: 'Germany', population: 81831000)
+Country.create(name: 'France', population: 65447374)
+Country.create(name: 'Belgium', population: 10839905)
+Country.create(name: 'Netherlands', population: 16680000)</programlisting></para>
 
   <para>You then populate it with data via <command>rake db:seed</command>. To
   be on the safe side, you should always set up the database from scratch with
   <command>rake db:setup</command> in the context of this book and then
   automatically populate it with the file <filename>db/seeds.rb</filename>.
-  Here is what is looks like:<screen>MacBook:europe xyz$ <command>rake db:setup</command>
+  Here is what is looks like:<screen>$ rake db:setup
 db/development.sqlite3 already exists
 -- create_table("countries", {:force=&gt;true})
-   -&gt; 0.0327s
+   -&gt; 0.0175s
 -- initialize_schema_migrations_table()
-   -&gt; 0.0004s
--- assume_migrated_upto_version(20120426092916, ["/Users/xyz/europe/db/migrate"])
-   -&gt; 0.0004s
-MacBook:europe xyz$</screen>I use the file <filename>db/seeds.rb</filename> at
-  this point because it offers a simple mechanism for filling an empty
-  database with default values. In the course of this book, this will make it
-  easier for us to set up quick example scenarios.</para>
+   -&gt; 0.0005s
+-- assume_migrated_upto_version(20121114110230, ["/Users/xyz/sandbox/europe/db/migrate"])
+   -&gt; 0.0006s
+$</screen>I use the file <filename>db/seeds.rb</filename> at this point
+  because it offers a simple mechanism for filling an empty database with
+  default values. In the course of this book, this will make it easier for us
+  to set up quick example scenarios.</para>
 
   <section>
-    <title>Alternative Programming</title>
+    <title>It's all just Ruby code</title>
 
     <indexterm>
       <primary>seeds.rb</primary>
@@ -60,23 +52,15 @@ MacBook:europe xyz$</screen>I use the file <filename>db/seeds.rb</filename> at
 
     <para>The <filename>db/seeds.rb</filename> is a Ruby program.
     Correspondingly, we can also use the following approach as an
-    alternative:<programlisting># This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ :name =&gt; 'Chicago' }, { :name =&gt; 'Copenhagen' }])
-#   Mayor.create(:name =&gt; 'Daley', :city =&gt; cities.first)
-
-country_list = [
+    alternative:<programlisting>country_list = [
   [ "Germany", 81831000 ],
   [ "France", 65447374 ],
   [ "Belgium", 10839905 ],
   [ "Netherlands", 16680000 ]
 ]
 
-country_list.each do |country|
-  Country.create( :name =&gt; country[0], :population =&gt; country[1] )
+country_list.each do |name, population|
+  Country.create( name: name, population: population )
 end</programlisting></para>
 
     <para>The result is the same. I am showing you this example to make it
@@ -98,7 +82,8 @@ end</programlisting></para>
     what you can do in this case. There are other, more complex scenarios that
     can be derived from my approach.</para>
 
-    <para>Fill the file <filename>lib/tasks/export.rake</filename> with the
+    <para>We create our own little rake task for that. That can be done by
+    creating the file <filename>lib/tasks/export.rake</filename> with the
     following content:<programlisting>namespace :export do
   desc "Prints Country.all in a seeds.rb way."
   task :seeds_format =&gt; :environment do
@@ -108,19 +93,18 @@ end</programlisting></para>
   end
 end</programlisting></para>
 
-    <para>Then you can call the corresponding <literal>rake</literal>
-    <quote><foreignphrase xml:lang="en">task</foreignphrase></quote> with the
-    command <command>rake export:seeds_format</command>:<screen>MacBook:europe xyz$ <command>rake export:seeds_format</command>
+    <para>Then you can call the corresponding rake task with the command
+    <command>rake export:seeds_format</command>:<screen>$ rake export:seeds_format
 Country.create("name"=&gt;"Germany", "population"=&gt;81831000)
 Country.create("name"=&gt;"France", "population"=&gt;65447374)
 Country.create("name"=&gt;"Belgium", "population"=&gt;10839905)
 Country.create("name"=&gt;"Netherlands", "population"=&gt;16680000)
-MacBook:europe xyz$</screen></para>
+$</screen></para>
 
     <para>You can either expand this program so that the output is written
     directly into the <filename>db/seeds.rb</filename> or you can simply use
-    the shell:<screen>MacBook:europe xyz$ <command>rake export:seeds_format &gt;&gt; db/seeds.rb</command>
-MacBook:europe xyz$ </screen></para>
+    the shell:<screen>$ rake export:seeds_format &gt; db/seeds.rb
+$ </screen></para>
   </section>
 
   <section>
@@ -136,11 +120,11 @@ MacBook:europe xyz$ </screen></para>
     <para>at the beginning of the file.</para>
 
     <para>Example:<programlisting># ruby encoding: utf-8
-Country.create({"name"=&gt;"Germany", "population"=&gt;81831000})
-Country.create({"name"=&gt;"France", "population"=&gt;65447374})
-Country.create({"name"=&gt;"Belgium", "population"=&gt;10839905})
-Country.create({"name"=&gt;"Netherlands", "population"=&gt;16680000})
-Country.create({"name"=&gt;"Austria", "population"=&gt;8440465})
-Country.create({"name"=&gt;"Republika e Shqipërisë", "population"=&gt;2831741})</programlisting></para>
+Country.create(name: 'Germany', population: 81831000)
+Country.create(name: 'France', population: 65447374)
+Country.create(name: 'Belgium', population: 10839905)
+Country.create(name: 'Netherlands', population: 16680000)
+Country.create(name: 'Austria', population: 8440465)
+Country.create(name: 'Republika e Shqipërisë', population: 2831741)</programlisting></para>
   </section>
 </section>
