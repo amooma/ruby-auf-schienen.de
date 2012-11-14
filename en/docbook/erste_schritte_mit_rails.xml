@@ -1336,21 +1336,21 @@ Completed 200 OK in 35ms (Views: 34.5ms | ActiveRecord: 0.0ms)</screen></para>
     and gets the message <quote>You are now logged in.</quote></para>
 
     <para>As an example, we are once more constructing the ping pong scenario
-    from <xref linkend="redirects"/>:<screen>MacBook:~ xyz$ <command>rails new pingpong</command>
+    from <xref linkend="redirects"/>:<screen>$ rails new pingpong
 
       [...]
 
-MacBook:~ xyz$ <command>cd pingpong</command> 
-MacBook:pingpong xyz$ <command>rails generate controller Game ping pong</command>
+$ cd pingpong 
+$ rails generate controller Game ping pong
 
       [...]
 
-MacBook:pingpong xyz$</screen></para>
+$</screen></para>
 
     <para>We fill the <filename>app/controllers/game_controller.rb</filename>
     with the following content:<programlisting>class GameController &lt; ApplicationController
   def ping
-   <emphasis>redirect_to game_pong_path, notice: 'Ping-Pong!'</emphasis>
+   redirect_to game_pong_path, notice: 'Ping-Pong!'
   end
 
   def pong
@@ -1373,15 +1373,14 @@ end</programlisting></para>
 &lt;/head&gt;
 &lt;body&gt;
 
-<emphasis>&lt;%- flash.each do |name, message| %&gt;
+&lt;%- flash.each do |name, message| %&gt;
 &lt;p&gt;&lt;i&gt;&lt;%= "#{name}: #{message}" %&gt;&lt;/i&gt;&lt;/p&gt;
-&lt;% end %&gt;</emphasis>
+&lt;% end %&gt;
 
 &lt;%= yield %&gt;
 
 &lt;/body&gt;
-&lt;/html&gt;
-</programlisting></para>
+&lt;/html&gt;</programlisting></para>
 
     <para>Now we see the flash message at the top of the page when we go to
     <uri
@@ -1483,115 +1482,68 @@ redirect_to action: pong</programlisting></para>
     method without having to go and write a separate program.</para>
 
     <para>For our working environment, we again use a variation of the ping
-    pong scenario from <xref linkend="redirects"/>:<screen>MacBook:~ xyz$ <command>rails new pingpong</command>
+    pong scenario from <xref linkend="redirects"/>:<screen>$ rails new pingpong
 
       [...]
 
-MacBook:~ xyz$ <command>cd pingpong</command> 
-MacBook:pingpong xyz$ <command>rails generate controller Game ping pong</command>
+$ cd pingpong 
+$ rails generate controller Game ping pong
 
       [...]
 
-MacBook:pingpong xyz$</screen></para>
+$</screen></para>
 
     <para>Start the Rails console with the command <command>rails
-    console</command>:<screen>MacBook:pingpong xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt;</screen></para>
+    console</command>:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+1.9.3-p327 :001 &gt; </screen></para>
 
-    <para>And you can use <command>exit</command> to get back out:<screen>1.9.3p194 :001 &gt; <command>exit</command>
-MacBook:pingpong xyz$ </screen></para>
+    <para>And you can use <command>exit</command> to get back out:<screen>1.9.3-p327 :001 &gt; exit
+$ </screen></para>
+
+    <para>Many readers use this document on mobile devises. For them I try to
+    keep any code or terminal output width to a minimum. To save the real
+    estate which is by default occupied by <code>1.9.3-p327 :001 &gt;</code>
+    we can start <command>rails console</command> with the parameter
+    <parameter>-- --simple-prompt</parameter>.<screen>$ rails console -- --simple-prompt
+Loading development environment (Rails 3.2.9)
+&gt;&gt; exit
+$</screen></para>
+
+    <para>Alternativly you can change the IRB configuration in the file
+    <filename>.irbrc</filename> which is located in your home directory. If
+    you want to have the simple prompt you have to add the following line in
+    that file.<programlisting>IRB.conf[:PROMPT_MODE] = :SIMPLE</programlisting></para>
 
     <para>In the console, you have access to all variables that are also
-    available later in the proper application:<screen>MacBook:pingpong xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>Rails.env</command>
- =&gt; "development" 
-1.9.3p194 :002 &gt; <command>Rails.root</command>
- =&gt; #&lt;Pathname:/Users/xyz/pingpong&gt; 
-1.9.3p194 :003 &gt; <command>exit</command>
-MacBook:pingpong xyz$</screen></para>
+    available later in the proper application:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; Rails.env
+=&gt; "development"
+&gt;&gt; Rails.root
+=&gt; #&lt;Pathname:/Users/xyz/sandbox/pingpong&gt;
+&gt;&gt; exit
+$</screen></para>
 
     <para><indexterm>
         <primary>app</primary>
       </indexterm><indexterm>
         <primary>routing</primary>
       </indexterm>The method <command>app</command> is useful if you want to
-    analyze things to do with routing:<screen>MacBook:pingpong xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>app.url_for(:controller =&gt; 'game', :action =&gt; 'ping')</command>
- =&gt; "http://www.example.com/game/ping" 
-1.9.3p194 :002 &gt; <command>app.get 'game/ping'</command>
- =&gt; 200 
-1.9.3p194 :003 &gt; <command>app.get 'game/does_not_exist'</command>
- =&gt; 404 
-1.9.3p194 :004 &gt; <command>exit</command>
-MacBook:pingpong xyz$</screen></para>
+    analyze things to do with routing:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; app.url_for(:controller =&gt; 'game', :action =&gt; 'ping')
+=&gt; "http://www.example.com/game/ping"
+&gt;&gt; app.get 'game/ping'
+=&gt; 200
+&gt;&gt; app.get 'game/should_through_a_404'
+=&gt; 404
+&gt;&gt; exit
+$</screen></para>
 
-    <para>Already in <xref linkend="activerecord_chapter"/> you are going to
-    be working lots with the console and will soon begin to appreciate the
+    <para>Already in <xref linkend="activerecord_chapter"/> we are going to be
+    working lots with the console and will soon begin to appreciate the
     possibilities it offers.</para>
-  </section>
-
-  <section xml:id="was_ist_ein_generator">
-    <title xml:id="was_ist_ein_generator.title">What is a Generator?</title>
-
-    <indexterm>
-      <primary>Rails</primary>
-
-      <secondary>generator</secondary>
-    </indexterm>
-
-    <para>We have used the command <command>rails generate
-    controller</command> in this chapter. This starts the generator with the
-    name <code>controller</code>. There are other generators as well. You can
-    use the command <command>rails generate</command> to display a list of
-    available generators:<screen>MacBook:pingpong xyz$ <command>rails generate</command>
-Usage: rails generate GENERATOR [args] [options]
-
-General options:
-  -h, [--help]     # Print generator's options and usage
-  -p, [--pretend]  # Run but do not make any changes
-  -f, [--force]    # Overwrite files that already exist
-  -s, [--skip]     # Skip files that already exist
-  -q, [--quiet]    # Suppress status output
-
-Please choose a generator below.
-
-Rails:
-  assets
-  controller
-  generator
-  helper
-  integration_test
-  mailer
-  migration
-  model
-  observer
-  performance_test
-  resource
-  scaffold
-  scaffold_controller
-  session_migration
-  task
-
-Coffee:
-  coffee:assets
-
-Jquery:
-  jquery:install
-
-Js:
-  js:assets
-
-MacBook:pingpong xyz$</screen></para>
-
-    <para>What does a generator do? A generator makes a programmer's job
-    easier by doing some of the mindless tasks for you. It creates files and
-    fills them with content, depending on the parameters passed. You can do
-    the same manually, without the generator. So you do not have to use a
-    generator. It is primarily intended to save you work and avoid potential
-    errors that can easily arise from mindless repetitive tasks.</para>
   </section>
 
   <section xml:id="einstieg_misc">
@@ -1680,6 +1632,66 @@ MacBook:pingpong xyz$</screen></para>
       </section>
     </section>
 
+    <section xml:id="was_ist_ein_generator">
+      <title xml:id="was_ist_ein_generator.title">What is a Generator?</title>
+
+      <indexterm>
+        <primary>Rails</primary>
+
+        <secondary>generator</secondary>
+      </indexterm>
+
+      <para>We have already used the command <command>rails generate
+      controller</command>. It starts the generator with the name
+      <code>controller</code>. There are other generators as well. You can use
+      the command <command>rails generate</command> to display a list of
+      available generators:<screen>Usage: rails generate GENERATOR [args] [options]
+
+General options:
+  -h, [--help]     # Print generator's options and usage
+  -p, [--pretend]  # Run but do not make any changes
+  -f, [--force]    # Overwrite files that already exist
+  -s, [--skip]     # Skip files that already exist
+  -q, [--quiet]    # Suppress status output
+
+Please choose a generator below.
+
+Rails:
+  assets
+  controller
+  generator
+  helper
+  integration_test
+  mailer
+  migration
+  model
+  observer
+  performance_test
+  resource
+  scaffold
+  scaffold_controller
+  session_migration
+  task
+
+Coffee:
+  coffee:assets
+
+Jquery:
+  jquery:install
+
+Js:
+  js:assets
+
+$</screen></para>
+
+      <para>What does a generator do? A generator makes a programmer's job
+      easier by doing some of the mindless tasks for you. It creates files and
+      fills them with content, depending on the parameters passed. You could
+      do the same manually, without the generator. So you do not have to use a
+      generator. It is primarily intended to save you work and avoid potential
+      errors that can easily arise from mindless repetitive tasks.</para>
+    </section>
+
     <section xml:id="helper">
       <title xml:id="helper.title">Helper</title>
 
@@ -1711,12 +1723,14 @@ end
 &lt;b&gt;Rating:&lt;/b&gt; &lt;%= render_stars(5) %&gt;
 &lt;/p&gt;</programlisting></para>
 
-      <para>You can also try out the helper in the console:<screen>MacBook:webshop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.5)
-1.9.3-p194 :001 &gt; <command>helper.render_stars(5)</command>
- =&gt; "*****" 
-1.9.3-p194 :002 &gt; <command>exit</command>
-MacBook:webshop xyz$</screen></para>
+      <para>You can also try out the helper in the console:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; helper.render_stars(5)
+=&gt; "*****"
+&gt;&gt; helper.render_stars(3)
+=&gt; "***"
+&gt;&gt; exit
+$ </screen></para>
 
       <para>There are lots of predefined helpers in Rails and we will use some
       of them in the next chapters. But you can also define your own custom
