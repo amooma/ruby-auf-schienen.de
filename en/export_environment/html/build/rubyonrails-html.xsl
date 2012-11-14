@@ -23,7 +23,7 @@
   
   <xsl:param name="chunk.section.depth" select="1"/>
   <xsl:param name="chunk.first.sections" select="1"/>
-  <xsl:param name="section.autolabel.max.depth" select="2"/>
+  <xsl:param name="section.autolabel.max.depth" select="1"/>
   <xsl:param name="chunk.toc" select="''"/>
   <xsl:param name="chunk.append"/>
   <xsl:param name="chunker.output.quiet" select="0"/>
@@ -50,7 +50,9 @@ sect5 nop
 qandadiv nop
 qandaset nop
 </xsl:param>
-    
+
+  <xsl:param name="section.label.includes.component.label" select="0"/>
+
   <xsl:param name="admon.graphics" select="1"/>
   <xsl:param name="admon.graphics.extension">.png</xsl:param>
   <xsl:param name="admon.graphics.path">custom-admons-callouts/</xsl:param>
