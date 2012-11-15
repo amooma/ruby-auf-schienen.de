@@ -48,56 +48,37 @@
     xml:lang="en">relationships</foreignphrase>.</para>
   </note>
 
-  <para>First, we create the Rails application:<screen>MacBook:~ xyz$ <command>rails new bookshelf</command>
-[...]
-MacBook:~ xyz$ <command>cd bookshelf</command> 
-MacBook:bookshelf xyz$ </screen></para>
+  <para>First, we create a Rails application:<screen>$ rails new bookshelf
+  [...]
+$ cd bookshelf 
+$ </screen></para>
 
-  <para>Now we create the model for the books:<screen>MacBook:bookshelf xyz$ <command>rails generate model book title</command>
-      invoke  active_record
-      create    db/migrate/20120506132424_create_books.rb
-      create    app/models/book.rb
-      invoke    test_unit
-      create      test/unit/book_test.rb
-      create      test/fixtures/books.yml
-MacBook:bookshelf xyz$ </screen></para>
+  <para>Now we create the model for the books:<screen>$ rails generate model book title
+  [...]
+$</screen></para>
 
   <para>And finally, we create the database table for the authors. In this, we
   need an assignment field to the books table. This <foreignphrase
   xml:lang="en">foreign key</foreignphrase> is always set by default as name
   of the referenced object (here: <literal>book</literal>) with an attached
-  <literal>_id</literal>:<screen>MacBook:bookshelf xyz$ <command>rails generate model author book_id:integer first_name last_name</command>
-      invoke  active_record
-      create    db/migrate/20120506132619_create_authors.rb
-      create    app/models/author.rb
-      invoke    test_unit
-      create      test/unit/author_test.rb
-      create      test/fixtures/authors.yml
-MacBook:bookshelf xyz$</screen></para>
+  <literal>_id</literal>:<screen>$ rails generate model author book_id:integer first_name last_name
+  [...]
+$</screen></para>
 
   <para>Then execute a <command>rake db:migrate</command> so that the database
-  tables are actually created:<screen>MacBook:bookshelf xyz$ <command>rake db:migrate</command>
-==  CreateBooks: migrating ====================================================
--- create_table(:books)
-   -&gt; 0.0014s
-==  CreateBooks: migrated (0.0015s) ===========================================
-
-==  CreateAuthors: migrating ==================================================
--- create_table(:authors)
-   -&gt; 0.0015s
-==  CreateAuthors: migrated (0.0015s) =========================================
-
-MacBook:bookshelf xyz$ </screen></para>
+  tables are actually created:<screen>$  rake db:migrate
+  [...]
+$</screen></para>
 
   <para>Let's have a look at this on the <foreignphrase
-  xml:lang="en">console</foreignphrase>:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>Book</command>
- =&gt; Book(id: integer, title: string, created_at: datetime, updated_at: datetime) 
-1.9.3p194 :002 &gt; <command>Author</command>
- =&gt; Author(id: integer, book_id: integer, first_name: string, last_name: string, created_at: datetime, updated_at: datetime) 
-1.9.3p194 :003 &gt; <command>exit</command>
-MacBook:bookshelf xyz$ </screen></para>
+  xml:lang="en">console</foreignphrase>:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; Book
+=&gt; Book(id: integer, title: string, created_at: datetime, updated_at: datetime)
+&gt;&gt; Author
+=&gt; Author(id: integer, book_id: integer, first_name: string, last_name: string, created_at: datetime, updated_at: datetime)
+&gt;&gt; exit
+$</screen></para>
 
   <para>The two database tables are set up and can be used with ActiveRecord.
   But ActiveRecord does not yet know anything of the 1:n relation between
@@ -108,7 +89,7 @@ MacBook:bookshelf xyz$ </screen></para>
         <filename>app/models/book.rb</filename>:<programlisting>class Book &lt; ActiveRecord::Base
   attr_accessible :title
 
-  <emphasis>has_many :authors</emphasis>
+  has_many :authors
 end</programlisting></para>
       </listitem>
 
@@ -118,13 +99,15 @@ end</programlisting></para>
         <filename>app/models/author.rb</filename>:<programlisting>class Author &lt; ActiveRecord::Base
   attr_accessible :book_id, :first_name, :last_name
 
-  <emphasis>belongs_to :book</emphasis>
-end</programlisting></para>
+  belongs_to :book
+end
+</programlisting></para>
       </listitem>
     </itemizedlist></para>
 
   <para>These two simple definitions form the basis for a good deal of Rails
-  magic.</para>
+  magic. ActiveRecord will generate a bunch of cool new methods for us to link
+  both models.</para>
 
   <section xml:id="activerecord_1n_erstellen">
     <title xml:id="activerecord_1n_erstellen.title">Creating Records</title>
