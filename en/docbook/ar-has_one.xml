@@ -58,18 +58,18 @@
     <para>We use the example from the Rails documentation (see <uri
     xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html">http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html</uri>)
     and create an application containing employees and offices. Each employee
-    has an office. First the application:<screen>MacBook:~ xyz$ <command>rails new office-space</command>
-[...]
-MacBook:~ xyz$ <command>cd office-space</command> 
-MacBook:office-space xyz$</screen></para>
+    has an office. First the application:<screen>$ rails new office-space
+  [...]
+$ cd office-space
+$</screen></para>
 
-    <para>And now the two models:<screen>MacBook:office-space xyz$ <command>rails generate model employee last_name</command>
-[...]
-MacBook:office-space xyz$ <command>rails generate model office location employee_id:integer</command>
-[...]
-MacBook:office-space xyz$ <command>rake db:migrate</command>
-[...]
-MacBook:office-space xyz$</screen></para>
+    <para>And now the two models:<screen>$ rails generate model employee last_name
+  [...]
+$ rails generate model office location employee_id:integer
+  [...]
+$ rake db:migrate
+  [...]
+$</screen></para>
   </section>
 
   <section>
@@ -79,14 +79,14 @@ MacBook:office-space xyz$</screen></para>
     <filename>app/model/employee.rb:</filename><programlisting>class Employee &lt; ActiveRecord::Base
   attr_accessible :last_name
 
-  <emphasis>has_one :office</emphasis>
+  has_one :office
 end</programlisting></para>
 
     <para>And its counterpart in the file
     <filename>app/model/office.rb:</filename><programlisting>class Office &lt; ActiveRecord::Base
   attr_accessible :employee_id, :location
 
-  <emphasis>belongs_to :employee</emphasis>
+  belongs_to :employee
 end</programlisting></para>
 
     <section>
@@ -96,117 +96,99 @@ end</programlisting></para>
       those of <methodname>has_many</methodname>. So for details, please refer
       to <xref linkend="activerecord_1n_optionen"/> or <uri
       xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-has_one">http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-has_one</uri>.
-      Here in brief a few general examples (partly from the Rails
-      docu):<programlisting>has_one :office, :dependent =&gt; :destroy  # automatically destroys the office entry as well
-has_one :office, :dependent =&gt; :nullify  # as :destroy, but the Office record is not destroyed,
-                                         # but employee_id is set to NULL
-has_one :last_comment, :class_name =&gt; "Comment", :order =&gt; "posted_on"
-has_one :project_manager, :class_name =&gt; "Person", :conditions =&gt; "role = 'project_manager'"
-has_one :boss, :readonly =&gt; :true
-has_one :club, :through =&gt; :membership
-has_one :primary_address, :through =&gt; :addressables, :conditions =&gt; ["addressable.primary = ?", true], :source =&gt; :addressable</programlisting></para>
+      </para>
     </section>
   </section>
 
   <section>
     <title>Console Examples</title>
 
-    <para>Let's start the console and create two employees:<screen>MacBook:office-space xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>Employee</command>
- =&gt; Employee(id: integer, last_name: string, created_at: datetime, updated_at: datetime) 
-1.9.3p194 :002 &gt; <command>Employee.create(:last_name =&gt; 'Udelhoven')</command>
+    <para>Let's start the console and create two employees:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; Employee.create(last_name: 'Udelhoven')
    (0.1ms)  begin transaction
-  SQL (9.3ms)  INSERT INTO "employees" ("created_at", "last_name", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 08 May 2012 06:42:43 UTC +00:00], ["last_name", "Udelhoven"], ["updated_at", Tue, 08 May 2012 06:42:43 UTC +00:00]]
-   (0.9ms)  commit transaction
- =&gt; #&lt;Employee id: 1, last_name: "Udelhoven", created_at: "2012-05-08 06:42:43", updated_at: "2012-05-08 06:42:43"&gt; 
-1.9.3p194 :003 &gt; <command>Employee.create(:last_name =&gt; 'Meier')</command>
+  SQL (24.3ms)  INSERT INTO "employees" ("created_at", "last_name", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 14:38:58 UTC +00:00], ["last_name", "Udelhoven"], ["updated_at", Sun, 18 Nov 2012 14:38:58 UTC +00:00]]
+   (2.3ms)  commit transaction
+=&gt; #&lt;Employee id: 1, last_name: "Udelhoven", created_at: "2012-11-18 14:38:58", updated_at: "2012-11-18 14:38:58"&gt;
+&gt;&gt; Employee.create(last_name: 'Meier')
    (0.1ms)  begin transaction
-  SQL (0.5ms)  INSERT INTO "employees" ("created_at", "last_name", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 08 May 2012 06:42:49 UTC +00:00], ["last_name", "Meier"], ["updated_at", Tue, 08 May 2012 06:42:49 UTC +00:00]]
-   (5.2ms)  commit transaction
- =&gt; #&lt;Employee id: 2, last_name: "Meier", created_at: "2012-05-08 06:42:49", updated_at: "2012-05-08 06:42:49"&gt; 
-1.9.3p194 :004 &gt;</screen></para>
+  SQL (1.4ms)  INSERT INTO "employees" ("created_at", "last_name", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 14:39:06 UTC +00:00], ["last_name", "Meier"], ["updated_at", Sun, 18 Nov 2012 14:39:06 UTC +00:00]]
+   (2.2ms)  commit transaction
+=&gt; #&lt;Employee id: 2, last_name: "Meier", created_at: "2012-11-18 14:39:06", updated_at: "2012-11-18 14:39:06"&gt;
+&gt;&gt; </screen></para>
 
-    <para>Now an employee gets his own office:<screen>1.9.3p194 :004 &gt; <command>Office.create(:location =&gt; '2nd floor', :employee_id =&gt; 1)</command>
+    <para>Now an employee gets his own office:<screen>&gt;&gt; Office.create(location: '2nd floor', employee_id: 1)
    (0.1ms)  begin transaction
-  SQL (0.6ms)  INSERT INTO "offices" ("created_at", "employee_id", "location", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Tue, 08 May 2012 06:44:04 UTC +00:00], ["employee_id", 1], ["location", "2nd floor"], ["updated_at", Tue, 08 May 2012 06:44:04 UTC +00:00]]
-   (3.3ms)  commit transaction
- =&gt; #&lt;Office id: 1, location: "2nd floor", employee_id: 1, created_at: "2012-05-08 06:44:04", updated_at: "2012-05-08 06:44:04"&gt; 
-1.9.3p194 :005 &gt; <command>Employee.first.office</command>
+  SQL (0.5ms)  INSERT INTO "offices" ("created_at", "employee_id", "location", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Sun, 18 Nov 2012 14:39:47 UTC +00:00], ["employee_id", 1], ["location", "2nd floor"], ["updated_at", Sun, 18 Nov 2012 14:39:47 UTC +00:00]]
+   (3.1ms)  commit transaction
+=&gt; #&lt;Office id: 1, location: "2nd floor", employee_id: 1, created_at: "2012-11-18 14:39:47", updated_at: "2012-11-18 14:39:47"&gt;
+&gt;&gt; Employee.first.office
   Employee Load (0.3ms)  SELECT "employees".* FROM "employees" LIMIT 1
   Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 1 LIMIT 1
- =&gt; #&lt;Office id: 1, location: "2nd floor", employee_id: 1, created_at: "2012-05-08 06:44:04", updated_at: "2012-05-08 06:44:04"&gt; 
-1.9.3p194 :006 &gt; <command>Office.first.employee</command>
+=&gt; #&lt;Office id: 1, location: "2nd floor", employee_id: 1, created_at: "2012-11-18 14:39:47", updated_at: "2012-11-18 14:39:47"&gt;
+&gt;&gt; Office.first.employee
   Office Load (0.3ms)  SELECT "offices".* FROM "offices" LIMIT 1
   Employee Load (0.2ms)  SELECT "employees".* FROM "employees" WHERE "employees"."id" = 1 LIMIT 1
- =&gt; #&lt;Employee id: 1, last_name: "Udelhoven", created_at: "2012-05-08 06:42:43", updated_at: "2012-05-08 06:42:43"&gt; 
-1.9.3p194 :007 &gt;</screen></para>
+=&gt; #&lt;Employee id: 1, last_name: "Udelhoven", created_at: "2012-11-18 14:38:58", updated_at: "2012-11-18 14:38:58"&gt;
+&gt;&gt;</screen></para>
 
     <para>For the second employee, we use the automatically generated method
     <methodname>create_office</methodname> (with
     <methodname>has_many</methodname>, we would use
-    <methodname>offices.create</methodname> here):<screen>1.9.3p194 :007 &gt; <command>Employee.last.create_office(:location =&gt; '1st floor')</command>
+    <methodname>offices.create</methodname> here):<screen>&gt;&gt; Employee.last.create_office(location: '1st floor')
   Employee Load (0.3ms)  SELECT "employees".* FROM "employees" ORDER BY "employees"."id" DESC LIMIT 1
    (0.1ms)  begin transaction
-  SQL (0.7ms)  INSERT INTO "offices" ("created_at", "employee_id", "location", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Tue, 08 May 2012 06:45:12 UTC +00:00], ["employee_id", 2], ["location", "1st floor"], ["updated_at", Tue, 08 May 2012 06:45:12 UTC +00:00]]
-   (2.4ms)  commit transaction
+  SQL (0.5ms)  INSERT INTO "offices" ("created_at", "employee_id", "location", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Sun, 18 Nov 2012 14:40:51 UTC +00:00], ["employee_id", 2], ["location", "1st floor"], ["updated_at", Sun, 18 Nov 2012 14:40:51 UTC +00:00]]
+   (1.9ms)  commit transaction
   Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 2 LIMIT 1
-   (0.0ms)  begin transaction
-   (0.0ms)  commit transaction
- =&gt; #&lt;Office id: 2, location: "1st floor", employee_id: 2, created_at: "2012-05-08 06:45:12", updated_at: "2012-05-08 06:45:12"&gt; 
-1.9.3p194 :008 &gt;</screen></para>
+=&gt; #&lt;Office id: 2, location: "1st floor", employee_id: 2, created_at: "2012-11-18 14:40:51", updated_at: "2012-11-18 14:40:51"&gt;
+&gt;&gt;</screen></para>
 
     <para>Removing is intuitively done via
-    <methodname>destroy</methodname>:<screen>1.9.3p194 :008 &gt; <command>Employee.first.office</command>
-  Employee Load (0.2ms)  SELECT "employees".* FROM "employees" LIMIT 1
-  Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 1 LIMIT 1
- =&gt; #&lt;Office id: 1, location: "2nd floor", employee_id: 1, created_at: "2012-05-08 06:44:04", updated_at: "2012-05-08 06:44:04"&gt; 
-1.9.3p194 :009 &gt; <command>Employee.first.office.destroy</command>
+    <methodname>destroy</methodname>:<screen>&gt;&gt; Employee.first.office.destroy
   Employee Load (0.3ms)  SELECT "employees".* FROM "employees" LIMIT 1
-  Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 1 LIMIT 1
+  Office Load (0.1ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 1 LIMIT 1
    (0.1ms)  begin transaction
-  SQL (0.4ms)  DELETE FROM "offices" WHERE "offices"."id" = ?  [["id", 1]]
-   (3.6ms)  commit transaction
- =&gt; #&lt;Office id: 1, location: "2nd floor", employee_id: 1, created_at: "2012-05-08 06:44:04", updated_at: "2012-05-08 06:44:04"&gt; 
-1.9.3p194 :010 &gt; <command>Office.exists?(1)</command>
-  Office Exists (0.2ms)  SELECT 1 FROM "offices" WHERE "offices"."id" = 1 LIMIT 1
- =&gt; false 
-1.9.3p194 :011 &gt; <command>exit</command>
-MacBook:office-space xyz$</screen></para>
+  SQL (0.3ms)  DELETE FROM "offices" WHERE "offices"."id" = ?  [["id", 1]]
+   (2.2ms)  commit transaction
+=&gt; #&lt;Office id: 1, location: "2nd floor", employee_id: 1, created_at: "2012-11-18 14:39:47", updated_at: "2012-11-18 14:39:47"&gt;
+&gt;&gt; Office.exists?(1)
+  Office Exists (0.2ms)  SELECT 1 AS one FROM "offices" WHERE "offices"."id" = 1 LIMIT 1
+=&gt; false
+&gt;&gt; exit
+$ </screen></para>
 
     <warning>
       <para>If you create a new <classname>Office</classname> for an
       <classname>Employee</classname> with an existing
       <classname>Office</classname> then you will not get an error
-      message:<screen>MacBook:office-space xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>Employee.last.office</command>
+      message:<screen>&gt;&gt; Employee.last.office
   Employee Load (0.1ms)  SELECT "employees".* FROM "employees" ORDER BY "employees"."id" DESC LIMIT 1
-  Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 2 LIMIT 1
- =&gt; #&lt;Office id: 2, location: "1st floor", employee_id: 2, created_at: "2012-05-08 06:45:12", updated_at: "2012-05-08 06:45:12"&gt; 
-1.9.3p194 :002 &gt; <command>Employee.last.create_office(:location =&gt; 'Basement')</command>
+  Office Load (0.1ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 2 LIMIT 1
+=&gt; #&lt;Office id: 2, location: "1st floor", employee_id: 2, created_at: "2012-11-18 14:40:51", updated_at: "2012-11-18 14:40:51"&gt;
+&gt;&gt; Employee.last.create_office(location: 'Basement')
   Employee Load (0.3ms)  SELECT "employees".* FROM "employees" ORDER BY "employees"."id" DESC LIMIT 1
-   (0.1ms)  begin transaction
-  SQL (29.3ms)  INSERT INTO "offices" ("created_at", "employee_id", "location", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Tue, 08 May 2012 06:51:58 UTC +00:00], ["employee_id", 2], ["location", "Basement"], ["updated_at", Tue, 08 May 2012 06:51:58 UTC +00:00]]
-   (3.7ms)  commit transaction
+   (0.0ms)  begin transaction
+  SQL (5.8ms)  INSERT INTO "offices" ("created_at", "employee_id", "location", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Sun, 18 Nov 2012 14:42:59 UTC +00:00], ["employee_id", 2], ["location", "Basement"], ["updated_at", Sun, 18 Nov 2012 14:42:59 UTC +00:00]]
+   (3.0ms)  commit transaction
   Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 2 LIMIT 1
    (0.0ms)  begin transaction
-   (0.3ms)  UPDATE "offices" SET "employee_id" = NULL, "updated_at" = '2012-05-08 06:51:58.969829' WHERE "offices"."id" = 2
-   (0.9ms)  commit transaction
- =&gt; #&lt;Office id: 3, location: "Basement", employee_id: 2, created_at: "2012-05-08 06:51:58", updated_at: "2012-05-08 06:51:58"&gt; 
-1.9.3p194 :003 &gt; <command>Employee.last.office</command>
+   (0.2ms)  UPDATE "offices" SET "employee_id" = NULL, "updated_at" = '2012-11-18 14:42:59.648228' WHERE "offices"."id" = 2
+   (0.6ms)  commit transaction
+=&gt; #&lt;Office id: 3, location: "Basement", employee_id: 2, created_at: "2012-11-18 14:42:59", updated_at: "2012-11-18 14:42:59"&gt;
+&gt;&gt; Employee.last.office
   Employee Load (0.3ms)  SELECT "employees".* FROM "employees" ORDER BY "employees"."id" DESC LIMIT 1
   Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 2 LIMIT 1
- =&gt; #&lt;Office id: 3, location: "Basement", employee_id: 2, created_at: "2012-05-08 06:51:58", updated_at: "2012-05-08 06:51:58"&gt; 
-1.9.3p194 :004 &gt;</screen></para>
+=&gt; #&lt;Office id: 3, location: "Basement", employee_id: 2, created_at: "2012-11-18 14:42:59", updated_at: "2012-11-18 14:42:59"&gt;
+&gt;&gt;</screen></para>
 
       <para>The old <classname>Office</classname> is even still in the
       database (the <varname>employee_id</varname> was automatically set to
-      <code>nil</code>):<screen>1.9.3p194 :004 &gt; <command>Office.all</command>
-  Office Load (0.2ms)  SELECT "offices".* FROM "offices" 
- =&gt; [#&lt;Office id: 2, location: "1st floor", employee_id: nil, created_at: "2012-05-08 06:45:12", updated_at: "2012-05-08 06:51:58"&gt;, #&lt;Office id: 3, location: "Basement", employee_id: 2, created_at: "2012-05-08 06:51:58", updated_at: "2012-05-08 06:51:58"&gt;] 
-1.9.3p194 :005 &gt; <command>exit</command>
-MacBook:office-space xyz$</screen></para>
+      <code>nil</code>):<screen>&gt;&gt; Office.all
+  Office Load (0.5ms)  SELECT "offices".* FROM "offices" 
+=&gt; [#&lt;Office id: 2, location: "1st floor", employee_id: nil, created_at: "2012-11-18 14:40:51", updated_at: "2012-11-18 14:42:59"&gt;, #&lt;Office id: 3, location: "Basement", employee_id: 2, created_at: "2012-11-18 14:42:59", updated_at: "2012-11-18 14:42:59"&gt;]
+&gt;&gt; exit
+$</screen></para>
     </warning>
   </section>
 
