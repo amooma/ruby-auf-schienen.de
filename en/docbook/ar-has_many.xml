@@ -118,39 +118,32 @@ end
     <section xml:id="activerecord_hinzufuegen_manuell">
       <title xml:id="activerecord_hinzufuegen_manuell.title">Manually</title>
 
-      <para>We drop the database with <command>rake db:reset</command><screen>MacBook:bookshelf xyz$ <command>rake db:reset</command>
--- create_table("authors", {:force=&gt;true})
-   -&gt; 0.0151s
--- create_table("books", {:force=&gt;true})
-   -&gt; 0.0024s
--- initialize_schema_migrations_table()
-   -&gt; 0.0033s
--- assume_migrated_upto_version(20120506132619, ["/Users/xyz/bookshelf/db/migrate"])
-   -&gt; 0.0033s
-MacBook:bookshelf xyz$ </screen></para>
+      <para>We drop the database with <command>rake db:reset</command><screen>$ rake db:reset
+  [...]
+$  </screen></para>
 
       <para>Then we first create an object with the book data. Next, we
       remember the book ID and then create the author record with this ID in
-      the field <literal>book_id</literal>:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>book = Book.create(:title =&gt; 'Homo faber')</command>
+      the field <literal>book_id</literal>:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; book = Book.create(title: 'Homo faber')
    (0.1ms)  begin transaction
-  SQL (5.0ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 06 May 2012 13:47:45 UTC +00:00], ["title", "Homo faber"], ["updated_at", Sun, 06 May 2012 13:47:45 UTC +00:00]]
-   (1.2ms)  commit transaction
- =&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-06 13:47:45", updated_at: "2012-05-06 13:47:45"&gt; 
-1.9.3p194 :002 &gt; <command>author = Author.create(:book_id =&gt; 1, :first_name =&gt; 'Max', :last_name =&gt; 'Frisch')</command>
-   (0.1ms)  begin transaction
-  SQL (0.7ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 1], ["created_at", Sun, 06 May 2012 13:48:17 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Sun, 06 May 2012 13:48:17 UTC +00:00]]
+  SQL (24.8ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 11:31:01 UTC +00:00], ["title", "Homo faber"], ["updated_at", Sun, 18 Nov 2012 11:31:01 UTC +00:00]]
    (3.1ms)  commit transaction
- =&gt; #&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-05-06 13:48:17", updated_at: "2012-05-06 13:48:17"&gt; 
-1.9.3p194 :003 &gt; <command>Book.all</command>
+=&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-11-18 11:31:01", updated_at: "2012-11-18 11:31:01"&gt;
+&gt;&gt; author = Author.create(book_id: 1, first_name: 'Max', last_name: 'Frisch') 
+   (0.1ms)  begin transaction
+  SQL (0.6ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 1], ["created_at", Sun, 18 Nov 2012 11:31:25 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Sun, 18 Nov 2012 11:31:25 UTC +00:00]]
+   (3.0ms)  commit transaction
+=&gt; #&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-11-18 11:31:25", updated_at: "2012-11-18 11:31:25"&gt;
+&gt;&gt; Book.all
   Book Load (0.3ms)  SELECT "books".* FROM "books" 
- =&gt; [#&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-06 13:47:45", updated_at: "2012-05-06 13:47:45"&gt;] 
-1.9.3p194 :004 &gt; <command>Author.all</command>
-  Author Load (0.3ms)  SELECT "authors".* FROM "authors" 
- =&gt; [#&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-05-06 13:48:17", updated_at: "2012-05-06 13:48:17"&gt;] 
-1.9.3p194 :005 &gt; <command>exit</command>
-MacBook:bookshelf xyz$</screen></para>
+=&gt; [#&lt;Book id: 1, title: "Homo faber", created_at: "2012-11-18 11:31:01", updated_at: "2012-11-18 11:31:01"&gt;]
+&gt;&gt; Author.all
+  Author Load (0.4ms)  SELECT "authors".* FROM "authors" 
+=&gt; [#&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-11-18 11:31:25", updated_at: "2012-11-18 11:31:25"&gt;]
+&gt;&gt; exit
+$</screen></para>
 
       <indexterm>
         <primary>ActiveRecord</primary>
@@ -181,82 +174,79 @@ MacBook:bookshelf xyz$</screen></para>
       of ActiveRecord magic. We can use the method
       <methodname>create</methodname> of <literal>authors</literal> to add new
       authors to each <classname>Book</classname> object. These automatically
-      get the correct <literal>book_id</literal>:<screen>MacBook:bookshelf xyz$ <command>rake db:reset</command>
-[...]
-MacBook:bookshelf xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>book = Book.create(:title =&gt; 'Homo faber')</command>
+      get the correct <literal>book_id</literal>:<screen>$ rake db:reset
+  [...]
+$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; book = Book.create(title: 'Homo faber')
    (0.1ms)  begin transaction
-  SQL (4.9ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 06 May 2012 13:52:28 UTC +00:00], ["title", "Homo faber"], ["updated_at", Sun, 06 May 2012 13:52:28 UTC +00:00]]
-   (2.6ms)  commit transaction
- =&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-06 13:52:28", updated_at: "2012-05-06 13:52:28"&gt; 
-1.9.3p194 :002 &gt; <command>author = book.authors.create(:first_name =&gt; 'Max', :last_name =&gt; 'Frisch')</command>
+  SQL (24.8ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 11:32:39 UTC +00:00], ["title", "Homo faber"], ["updated_at", Sun, 18 Nov 2012 11:32:39 UTC +00:00]]
+   (2.5ms)  commit transaction
+=&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-11-18 11:32:39", updated_at: "2012-11-18 11:32:39"&gt;
+&gt;&gt; author = book.authors.create(first_name: 'Max', last_name: 'Frisch')
    (0.1ms)  begin transaction
-  SQL (0.6ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 1], ["created_at", Sun, 06 May 2012 13:52:52 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Sun, 06 May 2012 13:52:52 UTC +00:00]]
-   (0.8ms)  commit transaction
- =&gt; #&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-05-06 13:52:52", updated_at: "2012-05-06 13:52:52"&gt; 
-1.9.3p194 :003 &gt; <command>Book.all</command>
+  SQL (0.6ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 1], ["created_at", Sun, 18 Nov 2012 11:32:56 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Sun, 18 Nov 2012 11:32:56 UTC +00:00]]
+   (2.8ms)  commit transaction
+=&gt; #&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-11-18 11:32:56", updated_at: "2012-11-18 11:32:56"&gt;
+&gt;&gt; Book.all
   Book Load (0.3ms)  SELECT "books".* FROM "books" 
- =&gt; [#&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-06 13:52:28", updated_at: "2012-05-06 13:52:28"&gt;] 
-1.9.3p194 :004 &gt; <command>Author.all</command>
-  Author Load (0.3ms)  SELECT "authors".* FROM "authors" 
- =&gt; [#&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-05-06 13:52:52", updated_at: "2012-05-06 13:52:52"&gt;] 
-1.9.3p194 :005 &gt; <command>exit</command>
-MacBook:bookshelf xyz$</screen></para>
+=&gt; [#&lt;Book id: 1, title: "Homo faber", created_at: "2012-11-18 11:32:39", updated_at: "2012-11-18 11:32:39"&gt;]
+&gt;&gt; Author.all
+  Author Load (0.2ms)  SELECT "authors".* FROM "authors" 
+=&gt; [#&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-11-18 11:32:56", updated_at: "2012-11-18 11:32:56"&gt;]
+&gt;&gt; exit
+$</screen></para>
 
       <para>You can also place the <methodname>authors.create()</methodname>
-      directly behind the <methodname>Book.create()</methodname>:<screen>MacBook:bookshelf xyz$ <command>rake db:reset</command>
-[...]
-MacBook:bookshelf xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>Book.create(:title =&gt; 'Homo faber').authors.create(:first_name =&gt; 'Max', :last_name =&gt; 'Frisch')</command>
+      directly behind the <methodname>Book.create()</methodname>:<screen>$ rake db:reset
+  [...]
+$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; Book.create(title: 'Homo faber').authors.create(first_name: 'Max', last_name: 'Frisch')
    (0.1ms)  begin transaction
-  SQL (5.2ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 06 May 2012 13:56:38 UTC +00:00], ["title", "Homo faber"], ["updated_at", Sun, 06 May 2012 13:56:38 UTC +00:00]]
-   (3.6ms)  commit transaction
+  SQL (24.6ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 11:34:04 UTC +00:00], ["title", "Homo faber"], ["updated_at", Sun, 18 Nov 2012 11:34:04 UTC +00:00]]
+   (2.6ms)  commit transaction
    (0.1ms)  begin transaction
-  SQL (0.6ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 1], ["created_at", Sun, 06 May 2012 13:56:38 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Sun, 06 May 2012 13:56:38 UTC +00:00]]
-   (1.1ms)  commit transaction
- =&gt; #&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-05-06 13:56:38", updated_at: "2012-05-06 13:56:38"&gt; 
-1.9.3p194 :002 &gt; <command>Book.all</command>
+  SQL (0.5ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 1], ["created_at", Sun, 18 Nov 2012 11:34:04 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Sun, 18 Nov 2012 11:34:04 UTC +00:00]]
+   (0.9ms)  commit transaction
+=&gt; #&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-11-18 11:34:04", updated_at: "2012-11-18 11:34:04"&gt;
+&gt;&gt; Book.all
   Book Load (0.3ms)  SELECT "books".* FROM "books" 
- =&gt; [#&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-06 13:56:38", updated_at: "2012-05-06 13:56:38"&gt;] 
-1.9.3p194 :003 &gt; <command>Author.all</command>
+=&gt; [#&lt;Book id: 1, title: "Homo faber", created_at: "2012-11-18 11:34:04", updated_at: "2012-11-18 11:34:04"&gt;]
+&gt;&gt; Author.all
   Author Load (0.3ms)  SELECT "authors".* FROM "authors" 
- =&gt; [#&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-05-06 13:56:38", updated_at: "2012-05-06 13:56:38"&gt;] 
-1.9.3p194 :004 &gt; <command>exit</command>
-MacBook:bookshelf xyz$</screen></para>
+=&gt; [#&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-11-18 11:34:04", updated_at: "2012-11-18 11:34:04"&gt;]
+&gt;&gt; exit
+$</screen></para>
 
       <para>As <methodname>create</methodname> also accepts an array of hashes
       as an alternative to a single hash, you can also create multiple authors
-      for a book in one go:<screen>MacBook:bookshelf xyz$ <command>rake db:reset</command>
-[...]
-MacBook:bookshelf xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>Book.create(:title =&gt; 'Beispiel').authors.create([{:last_name =&gt; 'A'}, {:last_name =&gt; 'B'}, {:last_name =&gt; 'C'}])</command>
+      for a book in one go:<screen>$ rake db:reset
+  [...]
+$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; Book.create(title: 'Example').authors.create([{last_name: 'A'}, {last_name: 'B'}, {last_name: 'C'}])
    (0.1ms)  begin transaction
-  SQL (5.0ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 06 May 2012 14:03:27 UTC +00:00], ["title", "Beispiel"], ["updated_at", Sun, 06 May 2012 14:03:27 UTC +00:00]]
-   (2.7ms)  commit transaction
+  SQL (24.5ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 11:28:18 UTC +00:00], ["title", "Example"], ["updated_at", Sun, 18 Nov 2012 11:28:18 UTC +00:00]]
+   (3.0ms)  commit transaction
    (0.1ms)  begin transaction
-  SQL (0.6ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 1], ["created_at", Sun, 06 May 2012 14:03:27 UTC +00:00], ["first_name", nil], ["last_name", "A"], ["updated_at", Sun, 06 May 2012 14:03:27 UTC +00:00]]
-   (0.9ms)  commit transaction
-   (0.0ms)  begin transaction
-  SQL (0.4ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 1], ["created_at", Sun, 06 May 2012 14:03:27 UTC +00:00], ["first_name", nil], ["last_name", "B"], ["updated_at", Sun, 06 May 2012 14:03:27 UTC +00:00]]
+  SQL (0.6ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 1], ["created_at", Sun, 18 Nov 2012 11:28:18 UTC +00:00], ["first_name", nil], ["last_name", "A"], ["updated_at", Sun, 18 Nov 2012 11:28:18 UTC +00:00]]
    (0.8ms)  commit transaction
+   (0.1ms)  begin transaction
+  SQL (0.4ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 1], ["created_at", Sun, 18 Nov 2012 11:28:18 UTC +00:00], ["first_name", nil], ["last_name", "B"], ["updated_at", Sun, 18 Nov 2012 11:28:18 UTC +00:00]]
+   (0.6ms)  commit transaction
    (0.0ms)  begin transaction
-  SQL (0.4ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 1], ["created_at", Sun, 06 May 2012 14:03:27 UTC +00:00], ["first_name", nil], ["last_name", "C"], ["updated_at", Sun, 06 May 2012 14:03:27 UTC +00:00]]
-   (1.0ms)  commit transaction
- =&gt; [#&lt;Author id: 1, book_id: 1, first_name: nil, last_name: "A", created_at: "2012-05-06 14:03:27", updated_at: "2012-05-06 14:03:27"&gt;, #&lt;Author id: 2, book_id: 1, first_name: nil, last_name: "B", created_at: "2012-05-06 14:03:27", updated_at: "2012-05-06 14:03:27"&gt;, #&lt;Author id: 3, book_id: 1, first_name: nil, last_name: "C", created_at: "2012-05-06 14:03:27", updated_at: "2012-05-06 14:03:27"&gt;] 
-1.9.3p194 :002 &gt; <command>Book.all</command>
+  SQL (0.3ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 1], ["created_at", Sun, 18 Nov 2012 11:28:18 UTC +00:00], ["first_name", nil], ["last_name", "C"], ["updated_at", Sun, 18 Nov 2012 11:28:18 UTC +00:00]]
+   (0.8ms)  commit transaction
+=&gt; [#&lt;Author id: 1, book_id: 1, first_name: nil, last_name: "A", created_at: "2012-11-18 11:28:18", updated_at: "2012-11-18 11:28:18"&gt;, #&lt;Author id: 2, book_id: 1, first_name: nil, last_name: "B", created_at: "2012-11-18 11:28:18", updated_at: "2012-11-18 11:28:18"&gt;, #&lt;Author id: 3, book_id: 1, first_name: nil, last_name: "C", created_at: "2012-11-18 11:28:18", updated_at: "2012-11-18 11:28:18"&gt;]
+&gt;&gt; Book.all
   Book Load (0.3ms)  SELECT "books".* FROM "books" 
- =&gt; [#&lt;Book id: 1, title: "Beispiel", created_at: "2012-05-06 14:03:27", updated_at: "2012-05-06 14:03:27"&gt;] 
-1.9.3p194 :003 &gt; <command>Author.all</command>
+=&gt; [#&lt;Book id: 1, title: "Example", created_at: "2012-11-18 11:28:18", updated_at: "2012-11-18 11:28:18"&gt;]
+&gt;&gt; Author.all
   Author Load (0.3ms)  SELECT "authors".* FROM "authors" 
- =&gt; [#&lt;Author id: 1, book_id: 1, first_name: nil, last_name: "A", created_at: "2012-05-06 14:03:27", updated_at: "2012-05-06 14:03:27"&gt;, #&lt;Author id: 2, book_id: 1, first_name: nil, last_name: "B", created_at: "2012-05-06 14:03:27", updated_at: "2012-05-06 14:03:27"&gt;, #&lt;Author id: 3, book_id: 1, first_name: nil, last_name: "C", created_at: "2012-05-06 14:03:27", updated_at: "2012-05-06 14:03:27"&gt;] 
-1.9.3p194 :004 &gt; <command>exit</command>
-MacBook:bookshelf xyz$</screen></para>
-
-      <para>But in practice, this is only appropriate if it does not make the
-      text line too long and unclear.</para>
+=&gt; [#&lt;Author id: 1, book_id: 1, first_name: nil, last_name: "A", created_at: "2012-11-18 11:28:18", updated_at: "2012-11-18 11:28:18"&gt;, #&lt;Author id: 2, book_id: 1, first_name: nil, last_name: "B", created_at: "2012-11-18 11:28:18", updated_at: "2012-11-18 11:28:18"&gt;, #&lt;Author id: 3, book_id: 1, first_name: nil, last_name: "C", created_at: "2012-11-18 11:28:18", updated_at: "2012-11-18 11:28:18"&gt;]
+&gt;&gt; exit
+$ </screen></para>
     </section>
 
     <section xml:id="activerecord_hinzufuegen_build">
@@ -272,47 +262,47 @@ MacBook:bookshelf xyz$</screen></para>
 
       <para>The method <methodname>build</methodname> resembles
       <methodname>create</methodname>. But the record is not saved. This only
-      happens after a <methodname>save</methodname>:<screen>MacBook:bookshelf xyz$ <command>rake db:reset</command>
-[...]
-MacBook:bookshelf xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>book = Book.create(:title =&gt; 'Homo faber')</command>
+      happens after a <methodname>save</methodname>:<screen>$ rake db:reset
+  [...]
+$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; book = Book.create(title: 'Homo faber')
    (0.1ms)  begin transaction
-  SQL (4.9ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 06 May 2012 14:05:40 UTC +00:00], ["title", "Homo faber"], ["updated_at", Sun, 06 May 2012 14:05:40 UTC +00:00]]
-   (3.9ms)  commit transaction
- =&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-06 14:05:40", updated_at: "2012-05-06 14:05:40"&gt; 
-1.9.3p194 :002 &gt; <command>author = book.authors.build(:first_name =&gt; 'Max', :last_name =&gt; 'Frisch')</command>
- =&gt; #&lt;Author id: nil, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: nil, updated_at: nil&gt; 
-1.9.3p194 :003 &gt; <command>author.new_record?</command>
- =&gt; true 
-1.9.3p194 :004 &gt; <command>author.save</command>
+  SQL (24.5ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 11:35:35 UTC +00:00], ["title", "Homo faber"], ["updated_at", Sun, 18 Nov 2012 11:35:35 UTC +00:00]]
+   (3.0ms)  commit transaction
+=&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-11-18 11:35:35", updated_at: "2012-11-18 11:35:35"&gt;
+&gt;&gt; author = book.authors.build(first_name: 'Max', last_name: 'Frisch')
+=&gt; #&lt;Author id: nil, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: nil, updated_at: nil&gt;
+&gt;&gt; author.new_record?
+=&gt; true
+&gt;&gt; author.save
    (0.1ms)  begin transaction
-  SQL (1.7ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 1], ["created_at", Sun, 06 May 2012 14:06:29 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Sun, 06 May 2012 14:06:29 UTC +00:00]]
-   (3.3ms)  commit transaction
- =&gt; true 
-1.9.3p194 :005 &gt; <command>author.new_record?</command>
- =&gt; false 
-1.9.3p194 :006 &gt; <command>exit</command>
-MacBook:bookshelf xyz$</screen></para>
+  SQL (0.7ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 1], ["created_at", Sun, 18 Nov 2012 11:36:12 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Sun, 18 Nov 2012 11:36:12 UTC +00:00]]
+   (2.5ms)  commit transaction
+=&gt; true
+&gt;&gt; author.new_record?
+=&gt; false
+&gt;&gt; exit
+$ </screen></para>
 
       <warning>
         <para>When using <methodname>create</methodname> and
         <methodname>build</methodname>, you of course have to observe logical
         dependencies, otherwise there will be an error. For example, you
         cannot chain two <methodname>build</methodname> methods.
-        Example:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>Book.build(:title =&gt; 'Example').authors.build(:last_name =&gt; 'A')</command>
-NoMethodError: undefined method `build' for #&lt;Class:0x007ff8c52d2330&gt;
- from /Users/xyz/.rvm/gems/ruby-1.9.3-p194/gems/activerecord-3.2.3/lib/active_record/dynamic_matchers.rb:50:in `method_missing'
+        Example:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; Book.build(title: 'Example').authors.build(last_name: 'A')
+NoMethodError: undefined method `build' for #&lt;Class:0x007fb082f2c350&gt;
+ from /Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/activerecord-3.2.9/lib/active_record/dynamic_matchers.rb:50:in `method_missing'
  from (irb):1
- from /Users/xyz/.rvm/gems/ruby-1.9.3-p194/gems/railties-3.2.3/lib/rails/commands/console.rb:47:in `start'
- from /Users/xyz/.rvm/gems/ruby-1.9.3-p194/gems/railties-3.2.3/lib/rails/commands/console.rb:8:in `start'
- from /Users/xyz/.rvm/gems/ruby-1.9.3-p194/gems/railties-3.2.3/lib/rails/commands.rb:41:in `&lt;top (required)&gt;'
+ from /Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/railties-3.2.9/lib/rails/commands/console.rb:47:in `start'
+ from /Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/railties-3.2.9/lib/rails/commands/console.rb:8:in `start'
+ from /Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/railties-3.2.9/lib/rails/commands.rb:41:in `&lt;top (required)&gt;'
  from script/rails:6:in `require'
  from script/rails:6:in `&lt;main&gt;'
-1.9.3p194 :002 &gt; <command>exit</command>
-MacBook:bookshelf xyz$ </screen></para>
+&gt;&gt; exit
+$ </screen></para>
       </warning>
     </section>
   </section>
@@ -324,56 +314,53 @@ MacBook:bookshelf xyz$ </screen></para>
     <filename>db/seeds.rb</filename> with the following
     content:<programlisting># ruby encoding: utf-8
 
-Book.create(:title =&gt; 'Homo faber').authors.create(:first_name =&gt; 'Max', :last_name =&gt; 'Frisch')
-Book.create(:title =&gt; 'Der Besuch der alten Dame').authors.create(:first_name =&gt; 'Friedrich', :last_name =&gt; 'Dürrenmatt')
-Book.create(:title =&gt; 'Julius Shulman: The Last Decade').authors.create([
-  {:first_name =&gt; 'Thomas', :last_name =&gt; 'Schirmbock'},
-  {:first_name =&gt; 'Julius', :last_name =&gt; 'Shulman'},
-  {:first_name =&gt; 'Jürgen', :last_name =&gt; 'Nogai'}
+Book.create(title: 'Homo faber').authors.create(first_name: 'Max', last_name: 'Frisch')
+Book.create(title: 'Der Besuch der alten Dame').authors.create(first_name: 'Friedrich', last_name: 'Dürrenmatt')
+Book.create(title: 'Julius Shulman: The Last Decade').authors.create([
+  {first_name: 'Thomas', last_name: 'Schirmbock'},
+  {first_name: 'Julius', last_name: 'Shulman'},
+  {first_name: 'Jürgen', last_name: 'Nogai'}
   ])
-Book.create(:title =&gt; 'Julius Shulman: Palm Springs').authors.create([
-  {:first_name =&gt; 'Michael', :last_name =&gt; 'Stern'},
-  {:first_name =&gt; 'Alan', :last_name =&gt; 'Hess'}
+Book.create(title: 'Julius Shulman: Palm Springs').authors.create([
+  {first_name: 'Michael', last_name: 'Stern'},
+  {first_name: 'Alan', last_name: 'Hess'}
   ])
-Book.create(:title =&gt; 'Photographing Architecture and Interiors').authors.create([
-  {:first_name =&gt; 'Julius', :last_name =&gt; 'Shulman'},
-  {:first_name =&gt; 'Richard', :last_name =&gt; 'Neutra'}
+Book.create(title: 'Photographing Architecture and Interiors').authors.create([
+  {first_name: 'Julius', last_name: 'Shulman'},
+  {first_name: 'Richard', last_name: 'Neutra'}
   ])
-Book.create(:title =&gt; 'Der Zauberberg').authors.create(:first_name =&gt; 'Thomas', :last_name =&gt; 'Mann')
-Book.create(:title =&gt; 'In einer Familie').authors.create(:first_name =&gt; 'Heinrich', :last_name =&gt; 'Mann')</programlisting></para>
+Book.create(title: 'Der Zauberberg').authors.create(first_name: 'Thomas', last_name: 'Mann')
+Book.create(title: 'In einer Familie').authors.create(first_name: 'Heinrich', last_name: 'Mann')</programlisting></para>
 
     <para>Now drop the database and refill it with the
-    <filename>db/seeds.rb</filename>:<screen>MacBook:bookshelf xyz$ <command>rake db:reset</command>
-[...]
-MacBook:bookshelf xyz$</screen></para>
+    <filename>db/seeds.rb</filename>:<screen>$ rake db:reset
+  [...]
+$</screen></para>
 
     <para>The convenient feature of the 1:n assignment in ActiveRecord is the
     particularly easy access to the n instances. Let's look at the first
-    record:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>Book.first</command>
+    record:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; Book.first
   Book Load (0.1ms)  SELECT "books".* FROM "books" LIMIT 1
- =&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-06 14:23:43", updated_at: "2012-05-06 14:23:43"&gt; 
-1.9.3p194 :002 &gt; <command>Book.first.authors</command>
+=&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-11-18 11:42:22", updated_at: "2012-11-18 11:42:22"&gt;
+&gt;&gt; Book.first.authors
   Book Load (0.3ms)  SELECT "books".* FROM "books" LIMIT 1
-  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 1
- =&gt; [#&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-05-06 14:23:43", updated_at: "2012-05-06 14:23:43"&gt;] 
-1.9.3p194 :003 &gt; <command>exit</command>
-MacBook:bookshelf xyz$</screen></para>
+  Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 1
+=&gt; [#&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-11-18 11:42:23", updated_at: "2012-11-18 11:42:23"&gt;]
+&gt;&gt;</screen></para>
 
     <para>Isn't that cool?! You can access the records simply via the plural
     form of the n model. The result is returned as array. Hm, maybe it also
-    works the other way round?<screen>MacBook:bookshelf xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>Author.first</command>
-  Author Load (0.1ms)  SELECT "authors".* FROM "authors" LIMIT 1
- =&gt; #&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-05-06 14:23:43", updated_at: "2012-05-06 14:23:43"&gt; 
-1.9.3p194 :002 &gt; <command>Author.first.book</command>
+    works the other way round?<screen>&gt;&gt; Author.first
+  Author Load (0.3ms)  SELECT "authors".* FROM "authors" LIMIT 1
+=&gt; #&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-11-18 11:42:23", updated_at: "2012-11-18 11:42:23"&gt;
+&gt;&gt; Author.first.book
   Author Load (0.3ms)  SELECT "authors".* FROM "authors" LIMIT 1
   Book Load (0.2ms)  SELECT "books".* FROM "books" WHERE "books"."id" = 1 LIMIT 1
- =&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-06 14:23:43", updated_at: "2012-05-06 14:23:43"&gt; 
-1.9.3p194 :003 &gt; <command>exit</command>
-MacBook:bookshelf xyz$</screen></para>
+=&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-11-18 11:42:22", updated_at: "2012-11-18 11:42:22"&gt;
+&gt;&gt; exit
+$</screen></para>
 
     <para>Bingo! Accessing the associated <classname>Book</classname> class is
     also very easy. And as it's only a single record
@@ -393,44 +380,45 @@ MacBook:bookshelf xyz$</screen></para>
 
     <para>Before we can start searching, we again need defined example data.
     Please fill the file <filename>db/seeds.rb</filename> with the following
-    content:<programlisting># ruby encoding: utf-8
+    content (its the same as we used in <xref
+    linkend="activerecord_1n_zugreifen"/>):<programlisting># ruby encoding: utf-8
 
-Book.create(:title =&gt; 'Homo faber').authors.create(:first_name =&gt; 'Max', :last_name =&gt; 'Frisch')
-Book.create(:title =&gt; 'Der Besuch der alten Dame').authors.create(:first_name =&gt; 'Friedrich', :last_name =&gt; 'Dürrenmatt')
-Book.create(:title =&gt; 'Julius Shulman: The Last Decade').authors.create([
-  {:first_name =&gt; 'Thomas', :last_name =&gt; 'Schirmbock'},
-  {:first_name =&gt; 'Julius', :last_name =&gt; 'Shulman'},
-  {:first_name =&gt; 'Jürgen', :last_name =&gt; 'Nogai'}
+Book.create(title: 'Homo faber').authors.create(first_name: 'Max', last_name: 'Frisch')
+Book.create(title: 'Der Besuch der alten Dame').authors.create(first_name: 'Friedrich', last_name: 'Dürrenmatt')
+Book.create(title: 'Julius Shulman: The Last Decade').authors.create([
+  {first_name: 'Thomas', last_name: 'Schirmbock'},
+  {first_name: 'Julius', last_name: 'Shulman'},
+  {first_name: 'Jürgen', last_name: 'Nogai'}
   ])
-Book.create(:title =&gt; 'Julius Shulman: Palm Springs').authors.create([
-  {:first_name =&gt; 'Michael', :last_name =&gt; 'Stern'},
-  {:first_name =&gt; 'Alan', :last_name =&gt; 'Hess'}
+Book.create(title: 'Julius Shulman: Palm Springs').authors.create([
+  {first_name: 'Michael', last_name: 'Stern'},
+  {first_name: 'Alan', last_name: 'Hess'}
   ])
-Book.create(:title =&gt; 'Photographing Architecture and Interiors').authors.create([
-  {:first_name =&gt; 'Julius', :last_name =&gt; 'Shulman'},
-  {:first_name =&gt; 'Richard', :last_name =&gt; 'Neutra'}
+Book.create(title: 'Photographing Architecture and Interiors').authors.create([
+  {first_name: 'Julius', last_name: 'Shulman'},
+  {first_name: 'Richard', last_name: 'Neutra'}
   ])
-Book.create(:title =&gt; 'Der Zauberberg').authors.create(:first_name =&gt; 'Thomas', :last_name =&gt; 'Mann')
-Book.create(:title =&gt; 'In einer Familie').authors.create(:first_name =&gt; 'Heinrich', :last_name =&gt; 'Mann')</programlisting></para>
+Book.create(title: 'Der Zauberberg').authors.create(first_name: 'Thomas', last_name: 'Mann')
+Book.create(title: 'In einer Familie').authors.create(first_name: 'Heinrich', last_name: 'Mann')</programlisting></para>
 
     <para>Now drop the database and refill it with the
-    <filename>db/seeds.rb</filename>:<screen>MacBook:bookshelf xyz$ <command>rake db:reset</command>
-[...]
-MacBook:bookshelf xyz$</screen></para>
+    <filename>db/seeds.rb</filename>:<screen>$ rake db:reset
+  [...]
+$</screen></para>
 
     <para>And off we go. First we check how many books are in the
-    database:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>Book.count</command>
+    database:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; Book.count
    (0.1ms)  SELECT COUNT(*) FROM "books" 
- =&gt; 7 
-1.9.3p194 :002 &gt;</screen></para>
+=&gt; 7
+&gt;&gt;</screen></para>
 
-    <para>And how many authors?<screen>1.9.3p194 :002 &gt; <command>Author.count</command>
-   (0.2ms)  SELECT COUNT(*) FROM "authors" 
- =&gt; 11 
-1.9.3p194 :003 &gt; <command>exit</command>
-MacBook:bookshelf xyz$</screen></para>
+    <para>And how many authors?<screen>&gt;&gt; Author.count
+   (0.1ms)  SELECT COUNT(*) FROM "authors" 
+=&gt; 11
+&gt;&gt; exit
+$ </screen></para>
 
     <section xml:id="activerecord_1n_joins">
       <title xml:id="activerecord_1n_joins.title">joins</title>
@@ -459,29 +447,26 @@ MacBook:bookshelf xyz$</screen></para>
         </footnote>We can use this to join the two models in the search as
       well:</para>
 
-      <para><screen>MacBook:bookshelf xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>Book.joins(:authors).where(:authors =&gt; {:last_name =&gt; 'Mann'})</command>
-  Book Load (0.2ms)  SELECT "books".* FROM "books" INNER JOIN "authors" ON "authors"."book_id" = "books"."id" WHERE "authors"."last_name" = 'Mann'
- =&gt; [#&lt;Book id: 6, title: "Der Zauberberg", created_at: "2012-05-07 07:14:08", updated_at: "2012-05-07 07:14:08"&gt;, #&lt;Book id: 7, title: "In einer Familie", created_at: "2012-05-07 07:14:08", updated_at: "2012-05-07 07:14:08"&gt;] 
-1.9.3p194 :002 &gt; <command>Book.joins(:authors).where(:authors =&gt; {:last_name =&gt; 'Mann'}).count</command>
-   (0.4ms)  SELECT COUNT(*) FROM "books" INNER JOIN "authors" ON "authors"."book_id" = "books"."id" WHERE "authors"."last_name" = 'Mann'
- =&gt; 2 
-1.9.3p194 :003 &gt; <command>exit</command>
-MacBook:bookshelf xyz$</screen></para>
+      <para><screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; Book.joins(:authors).where(:authors =&gt; {last_name: 'Mann'})
+  Book Load (0.1ms)  SELECT "books".* FROM "books" INNER JOIN "authors" ON "authors"."book_id" = "books"."id" WHERE "authors"."last_name" = 'Mann'
+=&gt; [#&lt;Book id: 6, title: "Der Zauberberg", created_at: "2012-11-18 11:46:29", updated_at: "2012-11-18 11:46:29"&gt;, #&lt;Book id: 7, title: "In einer Familie", created_at: "2012-11-18 11:46:29", updated_at: "2012-11-18 11:46:29"&gt;]
+&gt;&gt; Book.joins(:authors).where(:authors =&gt; {last_name: 'Mann'}).count
+   (0.2ms)  SELECT COUNT(*) FROM "books" INNER JOIN "authors" ON "authors"."book_id" = "books"."id" WHERE "authors"."last_name" = 'Mann'
+=&gt; 2
+&gt;&gt;</screen></para>
 
       <para>The database contains two books with the author 'Mann'. In the
       SQL, you can see that the method <methodname>joins</methodname> executes
       an <literal>INNER JOIN</literal>.</para>
 
       <para>Of course, we can also do it the other way round. We are looking
-      for the author of the book 'Homo faber':<screen>MacBook:bookshelf xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>Author.joins(:book).where(:books =&gt; {:title =&gt; 'Homo faber'})</command>
+      for the author of the book 'Homo faber':<screen>&gt;&gt; Author.joins(:book).where(:books =&gt; {title: 'Homo faber'})
   Author Load (0.2ms)  SELECT "authors".* FROM "authors" INNER JOIN "books" ON "books"."id" = "authors"."book_id" WHERE "books"."title" = 'Homo faber'
- =&gt; [#&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-05-07 07:14:08", updated_at: "2012-05-07 07:14:08"&gt;] 
-1.9.3p194 :002 &gt; <command>exit</command>
-MacBook:bookshelf xyz$</screen></para>
+=&gt; [#&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-11-18 11:46:29", updated_at: "2012-11-18 11:46:29"&gt;]
+&gt;&gt; exit
+$</screen></para>
     </section>
 
     <section xml:id="activerecord_1n_includes">
@@ -507,13 +492,13 @@ MacBook:bookshelf xyz$</screen></para>
       <methodname>joins</methodname> (see <xref
       linkend="activerecord_1n_joins"/>). Again, you can use it to search
       within a 1:n association. Let's once more search for all books with an
-      author whose surname is 'Mann':<screen>MacBook:bookshelf xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>Book.includes(:authors).where(:authors =&gt; {:last_name =&gt; 'Mann'})</command>
-  SQL (0.4ms)  SELECT "books"."id" AS t0_r0, "books"."title" AS t0_r1, "books"."created_at" AS t0_r2, "books"."updated_at" AS t0_r3, "authors"."id" AS t1_r0, "authors"."book_id" AS t1_r1, "authors"."first_name" AS t1_r2, "authors"."last_name" AS t1_r3, "authors"."created_at" AS t1_r4, "authors"."updated_at" AS t1_r5 FROM "books" LEFT OUTER JOIN "authors" ON "authors"."book_id" = "books"."id" WHERE "authors"."last_name" = 'Mann'
- =&gt; [#&lt;Book id: 6, title: "Der Zauberberg", created_at: "2012-05-07 07:14:08", updated_at: "2012-05-07 07:14:08"&gt;, #&lt;Book id: 7, title: "In einer Familie", created_at: "2012-05-07 07:14:08", updated_at: "2012-05-07 07:14:08"&gt;] 
-1.9.3p194 :002 &gt; <command>exit</command>
-MacBook:bookshelf xyz$</screen></para>
+      author whose surname is 'Mann':<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; Book.includes(:authors).where(:authors =&gt; {last_name: 'Mann'})
+  SQL (0.3ms)  SELECT "books"."id" AS t0_r0, "books"."title" AS t0_r1, "books"."created_at" AS t0_r2, "books"."updated_at" AS t0_r3, "authors"."id" AS t1_r0, "authors"."book_id" AS t1_r1, "authors"."first_name" AS t1_r2, "authors"."last_name" AS t1_r3, "authors"."created_at" AS t1_r4, "authors"."updated_at" AS t1_r5 FROM "books" LEFT OUTER JOIN "authors" ON "authors"."book_id" = "books"."id" WHERE "authors"."last_name" = 'Mann'
+=&gt; [#&lt;Book id: 6, title: "Der Zauberberg", created_at: "2012-11-18 11:46:29", updated_at: "2012-11-18 11:46:29"&gt;, #&lt;Book id: 7, title: "In einer Familie", created_at: "2012-11-18 11:46:29", updated_at: "2012-11-18 11:46:29"&gt;]
+&gt;&gt; exit
+$ </screen></para>
 
       <para>In the console output, you can see that the SQL code is different
       from the <methodname>joins</methodname> query.</para>
@@ -521,15 +506,15 @@ MacBook:bookshelf xyz$</screen></para>
       <para><methodname>joins</methodname> only reads in the
       <literal>Book</literal> records and <methodname>includes</methodname>
       also reads the associated <literal>Authors</literal>. As you can see
-      even in our little example, this obviously takes longer (0.2 ms vs. 0.4
+      even in our little example, this obviously takes longer (0.2 ms vs. 0.3
       ms).</para>
 
       <para>So why would you want to use <methodname>includes</methodname> at
       all? Well, if you already know before the query that you will later need
       all author data, then it can make sense to use
       <methodname>includes</methodname>, because then you only need one
-      database query. The reply is <quote><foreignphrase
-      xml:lang="en">cach</foreignphrase>ed</quote> by ActiveRecord.</para>
+      database query. That is a lot faster than starten a seperate query for
+      each n.</para>
 
       <para>In that case, would it not be better to always work with
       <methodname>includes</methodname>? No, it depends on the specific case.
@@ -580,25 +565,25 @@ MacBook:bookshelf xyz$</screen></para>
     in <xref linkend="datensatz-loeschen"/>. In the context of
     <methodname>has_many</methodname>, this means that you can delete the
     <classname>Author</classname> records associated with a
-    <classname>Book</classname> in one go:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>book = Book.find_by_title('Julius Shulman: The Last Decade')</command>
-  Book Load (0.3ms)  SELECT "books".* FROM "books" WHERE "books"."title" = 'Julius Shulman: The Last Decade' LIMIT 1
- =&gt; #&lt;Book id: 3, title: "Julius Shulman: The Last Decade", created_at: "2012-05-07 07:36:41", updated_at: "2012-05-07 07:36:41"&gt; 
-1.9.3p194 :002 &gt; <command>book.authors</command>
-  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 3
- =&gt; [#&lt;Author id: 3, book_id: 3, first_name: "Thomas", last_name: "Schirmbock", created_at: "2012-05-07 07:36:41", updated_at: "2012-05-07 07:36:41"&gt;, #&lt;Author id: 4, book_id: 3, first_name: "Julius", last_name: "Shulman", created_at: "2012-05-07 07:36:41", updated_at: "2012-05-07 07:36:41"&gt;, #&lt;Author id: 5, book_id: 3, first_name: "Jürgen", last_name: "Nogai", created_at: "2012-05-07 07:36:41", updated_at: "2012-05-07 07:36:41"&gt;] 
-1.9.3p194 :003 &gt; <command>book.authors.destroy_all</command>
-   (0.1ms)  begin transaction
-  SQL (5.5ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 3]]
+    <classname>Book</classname> in one go:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; book = Book.where(title: 'Julius Shulman: The Last Decade').first
+  Book Load (0.1ms)  SELECT "books".* FROM "books" WHERE "books"."title" = 'Julius Shulman: The Last Decade' LIMIT 1
+=&gt; #&lt;Book id: 3, title: "Julius Shulman: The Last Decade", created_at: "2012-11-18 11:46:29", updated_at: "2012-11-18 11:46:29"&gt;
+&gt;&gt; book.authors
+  Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 3
+=&gt; [#&lt;Author id: 3, book_id: 3, first_name: "Thomas", last_name: "Schirmbock", created_at: "2012-11-18 11:46:29", updated_at: "2012-11-18 11:46:29"&gt;, #&lt;Author id: 4, book_id: 3, first_name: "Julius", last_name: "Shulman", created_at: "2012-11-18 11:46:29", updated_at: "2012-11-18 11:46:29"&gt;, #&lt;Author id: 5, book_id: 3, first_name: "Jürgen", last_name: "Nogai", created_at: "2012-11-18 11:46:29", updated_at: "2012-11-18 11:46:29"&gt;]
+&gt;&gt; book.authors.destroy_all
+   (0.2ms)  begin transaction
+  SQL (5.0ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 3]]
   SQL (0.0ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 4]]
   SQL (0.0ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 5]]
-   (3.2ms)  commit transaction
- =&gt; [#&lt;Author id: 3, book_id: 3, first_name: "Thomas", last_name: "Schirmbock", created_at: "2012-05-07 07:36:41", updated_at: "2012-05-07 07:36:41"&gt;, #&lt;Author id: 4, book_id: 3, first_name: "Julius", last_name: "Shulman", created_at: "2012-05-07 07:36:41", updated_at: "2012-05-07 07:36:41"&gt;, #&lt;Author id: 5, book_id: 3, first_name: "Jürgen", last_name: "Nogai", created_at: "2012-05-07 07:36:41", updated_at: "2012-05-07 07:36:41"&gt;] 
-1.9.3p194 :004 &gt; <command>book.authors</command>
- =&gt; [] 
-1.9.3p194 :005 &gt; <command>exit</command>
-MacBook:bookshelf xyz$</screen></para>
+   (2.3ms)  commit transaction
+=&gt; [#&lt;Author id: 3, book_id: 3, first_name: "Thomas", last_name: "Schirmbock", created_at: "2012-11-18 11:46:29", updated_at: "2012-11-18 11:46:29"&gt;, #&lt;Author id: 4, book_id: 3, first_name: "Julius", last_name: "Shulman", created_at: "2012-11-18 11:46:29", updated_at: "2012-11-18 11:46:29"&gt;, #&lt;Author id: 5, book_id: 3, first_name: "Jürgen", last_name: "Nogai", created_at: "2012-11-18 11:46:29", updated_at: "2012-11-18 11:46:29"&gt;]
+&gt;&gt; book.authors
+=&gt; []
+&gt;&gt; exit
+$</screen></para>
   </section>
 
   <section xml:id="activerecord_1n_optionen">
@@ -637,7 +622,7 @@ MacBook:bookshelf xyz$</screen></para>
             this:<programlisting>class Author &lt; ActiveRecord::Base
   attr_accessible :book_id, :first_name, :last_name
 
-  <emphasis>belongs_to :book, :touch =&gt; true</emphasis>
+  belongs_to :book, :touch =&gt; true
 end</programlisting></para>
           </listitem>
         </itemizedlist></para>
@@ -669,31 +654,32 @@ end</programlisting></para>
             <filename>app/models/book.rb</filename>:<programlisting>class Book &lt; ActiveRecord::Base
   attr_accessible :title
 
-  <emphasis>has_many :authors, :order =&gt; :last_name</emphasis>
+  has_many :authors, :order =&gt; :last_name
 end</programlisting></para>
 
             <para>As an example, let's create a new book with new authors and
-            see how ActiveRecord sorts them:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>Book.create(:title =&gt; 'Test').authors.create([{:last_name =&gt; 'Z'}, {:last_name =&gt; 'A'}])</command>
+            see how ActiveRecord sorts them:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; Book.create(title: 'Test').authors.create([{last_name: 'Z'}, {last_name: 'A'}]) 
    (0.1ms)  begin transaction
-  SQL (5.9ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Mon, 07 May 2012 07:45:34 UTC +00:00], ["title", "Test"], ["updated_at", Mon, 07 May 2012 07:45:34 UTC +00:00]]
-   (3.6ms)  commit transaction
+  SQL (23.5ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 12:04:31 UTC +00:00], ["title", "Test"], ["updated_at", Sun, 18 Nov 2012 12:04:31 UTC +00:00]]
+   (2.6ms)  commit transaction
    (0.1ms)  begin transaction
-  SQL (0.7ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 8], ["created_at", Mon, 07 May 2012 07:45:34 UTC +00:00], ["first_name", nil], ["last_name", "Z"], ["updated_at", Mon, 07 May 2012 07:45:34 UTC +00:00]]
-   (1.1ms)  commit transaction
+  SQL (0.6ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 8], ["created_at", Sun, 18 Nov 2012 12:04:31 UTC +00:00], ["first_name", nil], ["last_name", "Z"], ["updated_at", Sun, 18 Nov 2012 12:04:31 UTC +00:00]]
+   (0.8ms)  commit transaction
    (0.1ms)  begin transaction
-  SQL (0.4ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 8], ["created_at", Mon, 07 May 2012 07:45:34 UTC +00:00], ["first_name", nil], ["last_name", "A"], ["updated_at", Mon, 07 May 2012 07:45:34 UTC +00:00]]
-   (0.9ms)  commit transaction
- =&gt; [#&lt;Author id: 12, book_id: 8, first_name: nil, last_name: "Z", created_at: "2012-05-07 07:45:34", updated_at: "2012-05-07 07:45:34"&gt;, #&lt;Author id: 13, book_id: 8, first_name: nil, last_name: "A", created_at: "2012-05-07 07:45:34", updated_at: "2012-05-07 07:45:34"&gt;] 
-1.9.3p194 :002 &gt; <command>Book.last.authors</command>                                                Book Load (0.4ms)  SELECT "books".* FROM "books" ORDER BY "books"."id" DESC LIMIT 1
-  Author Load (0.4ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 8 ORDER BY last_name
- =&gt; [#&lt;Author id: 13, book_id: 8, first_name: nil, last_name: "A", created_at: "2012-05-07 07:45:34", updated_at: "2012-05-07 07:45:34"&gt;, #&lt;Author id: 12, book_id: 8, first_name: nil, last_name: "Z", created_at: "2012-05-07 07:45:34", updated_at: "2012-05-07 07:45:34"&gt;] 
-1.9.3p194 :003 &gt; <command>exit</command>
-MacBook:bookshelf xyz$ </screen></para>
+  SQL (0.4ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 8], ["created_at", Sun, 18 Nov 2012 12:04:31 UTC +00:00], ["first_name", nil], ["last_name", "A"], ["updated_at", Sun, 18 Nov 2012 12:04:31 UTC +00:00]]
+   (0.8ms)  commit transaction
+=&gt; [#&lt;Author id: 12, book_id: 8, first_name: nil, last_name: "Z", created_at: "2012-11-18 12:04:31", updated_at: "2012-11-18 12:04:31"&gt;, #&lt;Author id: 13, book_id: 8, first_name: nil, last_name: "A", created_at: "2012-11-18 12:04:31", updated_at: "2012-11-18 12:04:31"&gt;]
+&gt;&gt; Book.last.authors
+  Book Load (0.3ms)  SELECT "books".* FROM "books" ORDER BY "books"."id" DESC LIMIT 1
+  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 8 ORDER BY last_name
+=&gt; [#&lt;Author id: 13, book_id: 8, first_name: nil, last_name: "A", created_at: "2012-11-18 12:04:31", updated_at: "2012-11-18 12:04:31"&gt;, #&lt;Author id: 12, book_id: 8, first_name: nil, last_name: "Z", created_at: "2012-11-18 12:04:31", updated_at: "2012-11-18 12:04:31"&gt;]
+&gt;&gt; exit
+$ </screen></para>
 
             <para>And if we want to sort in descending order for a
-            change:<programlisting>has_many :authors, <emphasis role="bold">:order =&gt; 'title DESC'</emphasis></programlisting></para>
+            change:<programlisting>has_many :authors, :order =&gt; 'title DESC'</programlisting></para>
           </listitem>
 
           <listitem>
@@ -707,33 +693,33 @@ MacBook:bookshelf xyz$ </screen></para>
             <filename>app/models/book.rb</filename>:<programlisting>class Book &lt; ActiveRecord::Base
   attr_accessible :title
 
-  <emphasis>has_many :authors, :dependent =&gt; :destroy</emphasis>
+  has_many :authors, :dependent =&gt; :destroy
 end</programlisting></para>
 
             <para>In the following example, we destroy the first book in the
             database table. All authors of this book are also automatically
-            destroyed:<screen>MacBook:bookshelf xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>Book.first</command>
-  Book Load (0.2ms)  SELECT "books".* FROM "books" LIMIT 1
- =&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-07 07:44:53", updated_at: "2012-05-07 07:44:53"&gt; 
-1.9.3p194 :002 &gt; <command>Book.first.authors</command>
+            destroyed:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; Book.first
+  Book Load (0.1ms)  SELECT "books".* FROM "books" LIMIT 1
+=&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-11-18 11:46:29", updated_at: "2012-11-18 11:46:29"&gt;
+&gt;&gt; Book.first.authors
   Book Load (0.3ms)  SELECT "books".* FROM "books" LIMIT 1
-  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 1
- =&gt; [#&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-05-07 07:44:53", updated_at: "2012-05-07 07:44:53"&gt;] 
-1.9.3p194 :003 &gt; <command>Book.first.destroy</command>
+  Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 1
+=&gt; [#&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-11-18 11:46:29", updated_at: "2012-11-18 11:46:29"&gt;]
+&gt;&gt; Book.first.destroy
   Book Load (0.3ms)  SELECT "books".* FROM "books" LIMIT 1
    (0.1ms)  begin transaction
   Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 1
-  SQL (4.6ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
-  SQL (0.2ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 1]]
-   (3.8ms)  commit transaction
- =&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-07 07:44:53", updated_at: "2012-05-07 07:44:53"&gt; 
-1.9.3p194 :004 &gt; <command>Author.exists?(1)</command>
-  Author Exists (0.2ms)  SELECT 1 FROM "authors" WHERE "authors"."id" = 1 LIMIT 1
- =&gt; false 
-1.9.3p194 :005 &gt; <command>exit</command>
-MacBook:bookshelf xyz$</screen></para>
+  SQL (4.8ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
+  SQL (0.1ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 1]]
+   (3.0ms)  commit transaction
+=&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-11-18 11:46:29", updated_at: "2012-11-18 11:46:29"&gt;
+&gt;&gt; Author.exists?(1)
+  Author Exists (0.2ms)  SELECT 1 AS one FROM "authors" WHERE "authors"."id" = 1 LIMIT 1
+=&gt; false
+&gt;&gt; exit
+$</screen></para>
 
             <important>
               <indexterm>
@@ -783,164 +769,11 @@ MacBook:bookshelf xyz$</screen></para>
             <replaceable>…</replaceable>, :through =&gt;
             <replaceable>…</replaceable></code>.</para>
 
-            <para>Let's start from scratch with a new Rails
-            application:<screen>MacBook:~ xyz$ <command>rails new bookshelf2</command>
-[...]
-MacBook:~ xyz$ <command>cd bookshelf2</command>
-MacBook:bookshelf2 xyz$</screen></para>
-
-            <para>Now we create the models for <classname>Book</classname> and
-            <classname>Author</classname>. But we omit the
-            <varname>book_id</varname> for the author:<screen>MacBook:bookshelf2 xyz$ <command>rails generate model book title</command>
-      invoke  active_record
-      create    db/migrate/20120507085137_create_books.rb
-      create    app/models/book.rb
-      invoke    test_unit
-      create      test/unit/book_test.rb
-      create      test/fixtures/books.yml
-MacBook:bookshelf2 xyz$ <command>rails generate model author first_name last_name</command>
-      invoke  active_record
-      create    db/migrate/20120507085158_create_authors.rb
-      create    app/models/author.rb
-      invoke    test_unit
-      create      test/unit/author_test.rb
-      create      test/fixtures/authors.yml
-MacBook:bookshelf2 xyz$</screen></para>
-
-            <para>Finally, we create a model <classname>Authorship</classname>
-            that contains a field <varname>book_id</varname> and a field
-            <varname>author_id</varname>:<screen>MacBook:bookshelf2 xyz$ <command>rails generate model authorship book_id:integer author_id:integer</command>
-      invoke  active_record
-      create    db/migrate/20120507085358_create_authorships.rb
-      create    app/models/authorship.rb
-      invoke    test_unit
-      create      test/unit/authorship_test.rb
-      create      test/fixtures/authorships.yml
-MacBook:bookshelf2 xyz$</screen></para>
-
-            <para>Then a <command>rake db:migrate</command><screen>MacBook:bookshelf2 xyz$ <command>rake db:migrate</command>
-[...]
-MacBook:bookshelf2 xyz$ </screen></para>
-
-            <para><classname>We associate Authorship</classname> via
-            <methodname>belongs_to</methodname> with
-            <classname>Book</classname> and <classname>Author</classname> in
-            the file
-            <filename>app/models/authorship.rb</filename><programlisting>class Authorship &lt; ActiveRecord::Base
-  attr_accessible :author_id, :book_id
-
-<emphasis>  belongs_to :author
-  belongs_to :book</emphasis>
-end</programlisting></para>
-
-            <para>In the <filename>app/models/book.rb</filename> we now use
-            has_many to link the <varname>books</varname> with the
-            <varname>authorships</varname> and then via <code>has_many
-            :authors, :through =&gt; :authorships</code> the
-            <varname>authors</varname> via the <varname>authorships</varname>
-            with the <varname>books</varname>:<programlisting>class Book &lt; ActiveRecord::Base
-  attr_accessible :title
-
-  has_many :authorships
-  <emphasis>has_many :authors, :through =&gt; :authorships</emphasis>
-end</programlisting></para>
-
-            <para>To make sure it also works vice versa, we insert the same
-            construct in the
-            <filename>app/models/author.rb</filename>:<programlisting>class Author &lt; ActiveRecord::Base
-  attr_accessible :first_name, :last_name
-
-  has_many :authorships
-  <emphasis>has_many :books, :through =&gt; :authorships</emphasis>
-end
-</programlisting></para>
-
-            <para>Now we create a book:<screen>MacBook:bookshelf2 xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>book = Book.create(:title =&gt; 'Homo faber')</command>
-   (0.1ms)  begin transaction
-  SQL (4.8ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Mon, 07 May 2012 09:34:34 UTC +00:00], ["title", "Homo faber"], ["updated_at", Mon, 07 May 2012 09:34:34 UTC +00:00]]
-   (3.8ms)  commit transaction
- =&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-07 09:34:34", updated_at: "2012-05-07 09:34:34"&gt; 
-1.9.3p194 :002 &gt; </screen></para>
-
-            <para>This book does not yet have an author:<screen>1.9.3p194 :002 &gt; <command>book.authors</command>
-  Author Load (0.2ms)  SELECT "authors".* FROM "authors" INNER JOIN "authorships" ON "authors"."id" = "authorships"."author_id" WHERE "authorships"."book_id" = 1
- =&gt; [] 
-1.9.3p194 :003 &gt; </screen></para>
-
-            <para>With the methods <methodname>build</methodname> or
-            <methodname>create</methodname> I can create an author for this
-            book:<screen>1.9.3p194 :003 &gt; <command>book.authors.create(:first_name =&gt; 'Max', :last_name =&gt; 'Frisch')</command>
-   (0.1ms)  begin transaction
-  SQL (0.7ms)  INSERT INTO "authors" ("created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Mon, 07 May 2012 09:36:33 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Mon, 07 May 2012 09:36:33 UTC +00:00]]
-  SQL (0.4ms)  INSERT INTO "authorships" ("author_id", "book_id", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["author_id", 1], ["book_id", 1], ["created_at", Mon, 07 May 2012 09:36:33 UTC +00:00], ["updated_at", Mon, 07 May 2012 09:36:33 UTC +00:00]]
-   (2.6ms)  commit transaction
- =&gt; #&lt;Author id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-05-07 09:36:33", updated_at: "2012-05-07 09:36:33"&gt; 
-1.9.3p194 :004 &gt; </screen></para>
-
-            <para>Now we have the following entries in the different database
-            tables:<screen>1.9.3p194 :004 &gt; <command>Book.all</command>
-  Book Load (0.3ms)  SELECT "books".* FROM "books" 
- =&gt; [#&lt;Book id: 1, title: "Homo faber", created_at: "2012-05-07 09:34:34", updated_at: "2012-05-07 09:34:34"&gt;] 
-1.9.3p194 :005 &gt; <command>Author.all</command>
-  Author Load (0.3ms)  SELECT "authors".* FROM "authors" 
- =&gt; [#&lt;Author id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-05-07 09:36:33", updated_at: "2012-05-07 09:36:33"&gt;] 
-1.9.3p194 :006 &gt; <command>Authorship.all</command>
-  Authorship Load (0.3ms)  SELECT "authorships".* FROM "authorships" 
- =&gt; [#&lt;Authorship id: 1, book_id: 1, author_id: 1, created_at: "2012-05-07 09:36:33", updated_at: "2012-05-07 09:36:33"&gt;] 
-1.9.3p194 :007 &gt;</screen></para>
-
-            <para>ActiveRecord has automatically filled in the table
-            <varname>authorships</varname> with the associations from
-            <classname>Book</classname> to
-            <classname>Author</classname>.</para>
-
-            <para>We can display all authors of the first book via
-            <methodname>Book.first.authors:</methodname><screen>1.9.3p194 :007 &gt; <command>Book.first.authors</command>
-  Book Load (0.2ms)  SELECT "books".* FROM "books" LIMIT 1
-  Author Load (0.2ms)  SELECT "authors".* FROM "authors" INNER JOIN "authorships" ON "authors"."id" = "authorships"."author_id" WHERE "authorships"."book_id" = 1
- =&gt; [#&lt;Author id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-05-07 09:36:33", updated_at: "2012-05-07 09:36:33"&gt;] 
-1.9.3p194 :008 &gt;</screen></para>
-
-            <para>Sometimes, the create and build construct is bit
-            complicated. In that case, you can also associate individual
-            objects or an array of objects via the method
-            <methodname>&lt;&lt;</methodname>. For example, if we want to
-            switch the <filename>db/seeds.rb</filename> used in this chapter
-            to the has_many ... through association we just created, then the
-            file would look like this:<programlisting># ruby encoding: utf-8
-
-Book.create(:title =&gt; 'Homo faber').authors &lt;&lt; Author.find_or_create_by_first_name_and_last_name('Max', 'Frisch')
-Book.create(:title =&gt; 'Der Besuch der alten Dame').authors &lt;&lt; Author.find_or_create_by_first_name_and_last_name('Friedrich', 'Dürrenmatt')
-Book.create(:title =&gt; 'Julius Shulman: The Last Decade').authors  &lt;&lt; [
-  Author.find_or_create_by_first_name_and_last_name('Thomas', 'Schirmbock'),
-  Author.find_or_create_by_first_name_and_last_name('Julius', 'Shulman'),
-  Author.find_or_create_by_first_name_and_last_name('Jürgen', 'Nogai')
-  ]
-Book.create(:title =&gt; 'Julius Shulman: Palm Springs').authors &lt;&lt; [
-  Author.find_or_create_by_first_name_and_last_name('Michael', 'Stern'),
-  Author.find_or_create_by_first_name_and_last_name('Alan', 'Hess')
-  ]
-Book.create(:title =&gt; 'Photographing Architecture and Interiors').authors &lt;&lt; [
-  Author.find_or_create_by_first_name_and_last_name('Julius', 'Shulman'),
-  Author.find_or_create_by_first_name_and_last_name('Richard', 'Neutra')
-  ]
-Book.create(:title =&gt; 'Der Zauberberg').authors &lt;&lt; Author.find_or_create_by_first_name_and_last_name('Thomas', 'Mann')
-Book.create(:title =&gt; 'In einer Familie').authors &lt;&lt; Author.find_or_create_by_first_name_and_last_name('Heinrich', 'Mann')</programlisting></para>
-
-            <para>By using <methodname>find_or_create</methodname> we can make
-            sure that an author is not created twice.</para>
-
-            <para>has_many ... through is a very powerful tool in the hand of
-            a good programmer. Another example for using has_many ... through
-            can be found in <xref linkend="ar-many_to_many"/>.</para>
+            <para>This kind of association is called Many-to-Many (n:n) and
+            we'll discuss it in detail in <xref
+            linkend="ar-many_to_many"/>.</para>
           </listitem>
         </itemizedlist></para>
-
-      <para>There are of course many more options. You can output them on the
-      shell via <command>ri
-      ActiveRecord::Associations::ClassMethods#has_many</command>.</para>
     </section>
   </section>
 </section>
