@@ -40,6 +40,7 @@
 <xsl:param name="html.cleanup" select="0"/>
 <xsl:param name="html.ext" select="'.html'"/>
 <xsl:output method="xml" indent="yes"/>
+<xsl:param name="highlight.default.language">Ruby</xsl:param>
 <xsl:param name="highlight.source" select="1"/>
 <!--<xsl:param name="use.extensions" select="1"/>-->
 <!--<xsl:param name="tablecolumns.extension">0</xsl:param>-->
