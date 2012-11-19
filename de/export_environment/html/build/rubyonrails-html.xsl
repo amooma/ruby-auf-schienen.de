@@ -249,7 +249,8 @@ Version:
         <ul class="footer">
           <li class="copyright">
             Copyright © 2010-2012 <a class="twitter-link" rel="me" href="https://twitter.com/wintermeyer" title="Stefan Wintermeyer"><span>Stefan Wintermeyer</span>
-            </a>.
+            </a>. <a href="https://plus.google.com/103611530021484137163?
+   rel=author">Google</a>
           </li>
         </ul>
       </xsl:if>
