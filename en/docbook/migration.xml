@@ -22,27 +22,27 @@
   </indexterm>
 
   <para>SQL database tables are generated in Rails with <foreignphrase
-  xml:lang="en">migrations</foreignphrase> and they can also be edited with
-  <foreignphrase xml:lang="en">migrations</foreignphrase>. If you create a
-  model with <command>rails generate model</command>, a corresponding
+  xml:lang="en">migrations</foreignphrase> and they should also be changed
+  with <foreignphrase xml:lang="en">migrations</foreignphrase>. If you create
+  a model with <command>rails generate model</command>, a corresponding
   migration file is automatically created in the directory
-  <filename>db/migrate/.</filename> I am going to show you the principle using
-  the example of a shop application. Let's create one first:<screen>MacBook:~ xyz$ <command>rails new shop</command>
-[...]
-MacBook:~ xyz$ <command>cd shop</command>
-MacBook:shop xyz$</screen></para>
+  <filename>db/migrate/</filename>. I am going to show you the principle using
+  the example of a shop application. Let's create one first:<screen>$ rails new shop
+  [...]
+$ cd shop
+$</screen></para>
 
-  <para>Then we create a <classname>Product</classname> model:<screen>MacBook:shop xyz$ <command>rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
+  <para>Then we create a <classname>Product</classname> model:<screen>$ rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date
       invoke  active_record
-      create    db/migrate/20120508160146_create_products.rb
+      create    db/migrate/20121119143522_create_products.rb
       create    app/models/product.rb
       invoke    test_unit
       create      test/unit/product_test.rb
       create      test/fixtures/products.yml
-MacBook:shop xyz$</screen></para>
+$</screen></para>
 
   <para>The migrations file
-  <filename>db/migrate/20120508160146_create_products.rb</filename> was
+  <filename>db/migrate/20121119143522_create_products.rb</filename> was
   created. Let's have a closer look at it:<programlisting>class CreateProducts &lt; ActiveRecord::Migration
   def change
     create_table :products do |t|
@@ -57,113 +57,113 @@ MacBook:shop xyz$</screen></para>
   end
 end</programlisting></para>
 
-  <para>The class method <methodname>change</methodname> creates and deletes
-  the database table in case of a rollback. The migration files have embedded
-  the current time in the file name and are processed in chronological order
+  <para>The method <methodname>change</methodname> creates and deletes the
+  database table in case of a rollback. The migration files have embedded the
+  current time in the file name and are processed in chronological order
   during a migration (in other words, when you call <command>rake
-  db:migrate</command>).<screen>MacBook:shop xyz$ <command>rake db:migrate</command>
+  db:migrate</command>).<screen>$ rake db:migrate
 ==  CreateProducts: migrating =================================================
 -- create_table(:products)
    -&gt; 0.0017s
 ==  CreateProducts: migrated (0.0018s) ========================================
 
-MacBook:shop xyz$</screen></para>
+$ </screen></para>
 
   <para>Only those migrations that have not been executed yet are processed.
   If we call <command>rake db:migrate</command> again, nothing happens,
-  because the corresponding migration has already been executed:<screen>MacBook:shop xyz$ <command>rake db:migrate</command>
-MacBook:shop xyz$</screen></para>
+  because the corresponding migration has already been executed:<screen>$ rake db:migrate
+$</screen></para>
 
   <para>But if we manually delete the database with <command>rm</command> and
   then call <command>rake db:migrate</command> again, the migration is
-  repeated:<screen>MacBook:shop xyz$ <command>rm db/development.sqlite3</command> 
-MacBook:shop xyz$ <command>rake db:migrate</command>
+  repeated:<screen>$ rm db/development.sqlite3 
+$ rake db:migrate
 ==  CreateProducts: migrating =================================================
 -- create_table(:products)
-   -&gt; 0.0017s
-==  CreateProducts: migrated (0.0018s) ========================================
+   -&gt; 0.0016s
+==  CreateProducts: migrated (0.0017s) ========================================
 
-MacBook:shop xyz$ </screen></para>
+$  </screen></para>
 
   <para>After a while we realise that we want to save not just the weight for
   some products, but also the height. So we need another database field. There
   is an easy to remember syntax for this, <command>rails generate migration
-  add_*</command>:<screen>MacBook:shop xyz$ <command>rails generate migration add_height_to_product height:integer</command>
+  add_*</command>:<screen>$ rails generate migration add_height_to_product height:integer
       invoke  active_record
-      create    db/migrate/20120508160821_add_height_to_product.rb
-MacBook:shop xyz$ </screen></para>
+      create    db/migrate/20121119143758_add_height_to_product.rb
+$</screen></para>
 
   <para>In the migration file
-  <filename>db/migrate/20120508160821_add_height_to_product.rb</filename> we
+  <filename>db/migrate/20121119143758_add_height_to_product.rb</filename> we
   once again find a change method:<programlisting>class AddHeightToProduct &lt; ActiveRecord::Migration
   def change
     add_column :products, :height, :integer
   end
 end</programlisting></para>
 
-  <para>With <command>rake db:migrate</command> we can bring in the new
-  migration:<screen>MacBook:shop xyz$ <command>rake db:migrate</command>
+  <para>With <command>rake db:migrate</command> we can start in the new
+  migration:<screen>$ rake db:migrate
 ==  AddHeightToProduct: migrating =============================================
 -- add_column(:products, :height, :integer)
-   -&gt; 0.0049s
-==  AddHeightToProduct: migrated (0.0050s) ====================================
+   -&gt; 0.0007s
+==  AddHeightToProduct: migrated (0.0008s) ====================================
 
-MacBook:shop xyz$</screen></para>
+$</screen></para>
 
   <para>In the <foreignphrase xml:lang="en">console</foreignphrase> we can
   look at the new field. It was added after the field
-  <literal>updated_at</literal>:<screen>MacBook:shop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>Product</command>
- =&gt; Product(id: integer, name: string, price: decimal, weight: integer, in_stock: boolean, expiration_date: date, created_at: datetime, updated_at: datetime, height: integer) 
-1.9.3p194 :002 &gt; <command>exit</command>
-MacBook:shop xyz$ </screen></para>
+  <literal>updated_at</literal>:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; Product
+=&gt; Product(id: integer, name: string, price: decimal, weight: integer, in_stock: boolean, expiration_date: date, created_at: datetime, updated_at: datetime, height: integer)
+&gt;&gt; exit
+$</screen></para>
 
   <warning>
-    <para>Please note that you probably need to enter the new field in
+    <para>Please note that you need to add the new field in
     <methodname>attr_accessible</methodname> in
     <filename>app/models/product.rb</filename>, otherwise you will not have
-    access to the <varname>height</varname> attribute..</para>
+    access to the <varname>height</varname> attribute.</para>
   </warning>
 
   <para>What if you want to look at the previous state of things? No problem.
   You can easily go back to the previous version with <command>rake
-  db:rollback</command>:<screen>MacBook:shop xyz$ <command>rake db:rollback</command>
+  db:rollback</command>:<screen>$ rake db:rollback
 ==  AddHeightToProduct: reverting =============================================
 -- remove_column("products", :height)
-   -&gt; 0.0357s
-==  AddHeightToProduct: reverted (0.0358s) ====================================
+   -&gt; 0.0151s
+==  AddHeightToProduct: reverted (0.0152s) ====================================
 
-MacBook:shop xyz$</screen></para>
+$</screen></para>
 
   <para>Each migration has its own version number. You can find out the
   version number of the current status via <command>rake
-  db:version</command>:<screen>MacBook:shop xyz$ <command>rake db:version</command>
-Current version: 20120508160146
-MacBook:shop xyz$ </screen></para>
+  db:version</command>:<screen>$ rake db:version
+Current version: 20121119143522
+$</screen></para>
 
   <important>
     <para>Please note that all version numbers and timestamps only apply to
     the example printed here. If you recreate the example, you will of course
-    get a current timestamp for your own example.</para>
+    get a different timestamp for your own example.</para>
   </important>
 
   <para>You will find the corresponding version in the directory
-  <filename>db/migrate</filename>:<screen>MacBook:shop xyz$ <command>ls db/migrate</command> 
-20120508160146_create_products.rb
-20120508160821_add_height_to_product.rb
-MacBook:shop xyz$</screen></para>
+  <filename>db/migrate</filename>:<screen>$ ls db/migrate/
+20121119143522_create_products.rb
+20121119143758_add_height_to_product.rb
+$</screen></para>
 
   <para>You can go to a specific migration via <command>rake db:migrate
   VERSION=</command> and add the appropriate version number after the equals
   sign. The zero represents the version zero, in other words the start. Let's
-  try it out:<screen>MacBook:shop xyz$ <command>rake db:migrate VERSION=0</command>
+  try it out:<screen>$ rake db:migrate VERSION=0
 ==  CreateProducts: reverting =================================================
 -- drop_table("products")
-   -&gt; 0.0007s
-==  CreateProducts: reverted (0.0007s) ========================================
+   -&gt; 0.0005s
+==  CreateProducts: reverted (0.0006s) ========================================
 
-MacBook:shop xyz$ </screen></para>
+$</screen></para>
 
   <para>The table was deleted with all data. We are back to square one.</para>
 
