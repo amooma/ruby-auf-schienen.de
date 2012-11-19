@@ -16,48 +16,54 @@
   </indexterm>
 
   <para>Non-valid records are frequently a source of errors in programs. With
-  <methodname>validates</methodname>, ActiveRecord offers a quick and easy way
-  of validating records. That way you can be sure that only meaningful records
+  <methodname>validates</methodname>, Rails offers a quick and easy way of
+  validating records. That way you can be sure that only meaningful records
   will find their way into your database.</para>
 
   <section xml:id="validation_vorbereitung">
     <title
     xml:id="activerecord_validation_vorbereitung.title">Preparation</title>
 
-    <para>Let's create a new application for this chapter:<screen>MacBook:~ xyz$ <command>rails new shop</command>
-[...]
-MacBook:~ xyz$ <command>cd shop</command>
-MacBook:shop xyz$ <command>rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
-[...]
-MacBook:shop xyz$ <command>rake db:migrate</command>
-[...]
-MacBook:shop xyz$</screen></para>
+    <para>Let's create a new application for this chapter:<screen>$ rails new shop
+  [...]
+$ cd shop
+$ rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date
+  [...]
+$ rake db:migrate
+  [...]
+$</screen></para>
   </section>
 
   <section>
     <title>The Basic Idea</title>
 
-    <para>For each model, there is a matching file in the directory
-    <filename>app/models/</filename>. In this file, we can not only define
-    database dependencies, but also implement all validations. The advantage:
-    we have everything in one place. Convention over configuration!</para>
+    <para>For each model, there is a matching model file in the directory
+    <filename>app/models/</filename>. In this Ruby code, we can not only
+    define database dependencies, but also implement all validations. The
+    advantage: Every programmer knows where to find it.</para>
 
-    <para>Without any validation, we can create an empty record in both models
-    without any problems:<screen>SW:shop stefan$ <command>rails console</command>
-Loading development environment (Rails 3.2.8)
-1.9.3p194 :001 &gt; <command>Product.create</command>
+    <para>Without any validation, we can create an empty record in a model
+    without a problem:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; Product.count
+   (0.1ms)  SELECT COUNT(*) FROM "products" 
+=&gt; 0
+&gt;&gt; Product.create
    (0.1ms)  begin transaction
-  SQL (8.9ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Mon, 10 Sep 2012 14:45:33 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", nil], ["price", nil], ["updated_at", Mon, 10 Sep 2012 14:45:33 UTC +00:00], ["weight", nil]]
-   (0.9ms)  commit transaction
- =&gt; #&lt;Product id: 1, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: "2012-09-10 14:45:33", updated_at: "2012-09-10 14:45:33"&gt; 
-1.9.3p194 :002 &gt; <command>exit</command>
-SW:shop stefan$</screen></para>
+  SQL (24.1ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Sun, 18 Nov 2012 17:01:27 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", nil], ["price", nil], ["updated_at", Sun, 18 Nov 2012 17:01:27 UTC +00:00], ["weight", nil]]
+   (2.6ms)  commit transaction
+=&gt; #&lt;Product id: 1, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: "2012-11-18 17:01:27", updated_at: "2012-11-18 17:01:27"&gt;
+&gt;&gt; Product.count
+   (0.3ms)  SELECT COUNT(*) FROM "products" 
+=&gt; 1
+&gt;&gt; exit
+$</screen></para>
 
-    <para>But in practice, this record does not make any sense. A
-    <classname>Product</classname> needs to have a <varname>name</varname> and
-    a <methodname>price</methodname>. That's why we can define validations in
-    ActiveRecord. Then you can ensure as programmer that only records that are
-    valid for you are saved in your database.</para>
+    <para>But in practice, this record with no content doesn't make any sense.
+    A <classname>Product</classname> needs to have a <varname>name</varname>
+    and a <methodname>price</methodname>. That's why we can define validations
+    in ActiveRecord. Then you can ensure as programmer that only records that
+    are valid for you are saved in your database.</para>
 
     <para>To make the mechanism easier to understand, I am going to jump ahead
     a bit and use the <code>presence</code> helper. Please fill your
@@ -72,30 +78,29 @@ SW:shop stefan$</screen></para>
             :presence =&gt; true
 end</programlisting></para>
 
-    <para>Now we try again to create an empty record in the console:<screen>SW:shop stefan$ <command>rails console</command>
-Loading development environment (Rails 3.2.8)
-1.9.3p194 :001 &gt; <command>product = Product.create</command>
-   (0.0ms)  begin transaction
+    <para>Now we try again to create an empty record in the console:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; product = Product.create
+   (0.1ms)  begin transaction
    (0.1ms)  rollback transaction
- =&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt; 
-1.9.3p194 :002 &gt; <command>product.valid?</command>
- =&gt; false 
-1.9.3p194 :003 &gt; </screen></para>
+=&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;
+&gt;&gt;</screen></para>
 
-    <para>Although we tried to create a new record with the method
-    <methodname>create</methodname> (see <xref
-    linkend="activerecord_create"/>), this did not happen. The validation
-    method intervened before the record was saved. So validating happens
-    before saving.</para>
+    <para>Watch out for the <code>rollback transaction</code> part and the
+    misssing <varname>id</varname> of the <classname>Product</classname>
+    object! Rails began the transaction of creating a new record but for some
+    reason it couldn't do it. So it had to rollback the transaction. The
+    validation method intervened before the record was saved. So validating
+    happens before saving.</para>
 
     <para>Can we access the errors? Yes, via the method
     <methodname>errors</methodname> or with
     <methodname>errors.messages</methodname> we can look at the errors that
-    occurred:<screen>1.9.3p194 :003 &gt; <command>product.errors</command>
- =&gt; #&lt;ActiveModel::Errors:0x007ff88537fae8 @base=#&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:name=&gt;["can't be blank"], :price=&gt;["can't be blank"]}&gt; 
-1.9.3p194 :004 &gt; <command>product.errors.messages</command>
- =&gt; {:name=&gt;["can't be blank"], :price=&gt;["can't be blank"]} 
-1.9.3p194 :005 &gt;</screen></para>
+    occurred:<screen>&gt;&gt; product.errors
+=&gt; #&lt;ActiveModel::Errors:0x007ff3bd27aea8 @base=#&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:name=&gt;["can't be blank"], :price=&gt;["can't be blank"]}&gt;
+&gt;&gt; product.errors.messages
+=&gt; {:name=&gt;["can't be blank"], :price=&gt;["can't be blank"]}
+&gt;&gt;</screen></para>
 
     <para>This error message was defined for a human and English-speaking user
     (more on this and how the errors can be translated into another language
@@ -103,16 +108,16 @@ Loading development environment (Rails 3.2.8)
 
     <para>Only once we assign a value to the attributes
     <varname>name</varname> and <methodname>price</methodname>, we can save
-    the object:<screen>1.9.3p194 :005 &gt; <command>product.name = 'Milk (1 liter)'</command>
- =&gt; "Milk (1 liter)" 
-1.9.3p194 :006 &gt; <command>product.price = 0.45</command>
- =&gt; 0.45 
-1.9.3p194 :007 &gt; <command>product.save</command>
-   (0.1ms)  begin transaction
-  SQL (6.4ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Mon, 10 Sep 2012 14:52:44 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", "Milch (1 Liter)"], ["price", #&lt;BigDecimal:7ff8852ea5d8,'0.45E0',9(45)&gt;], ["updated_at", Mon, 10 Sep 2012 14:52:44 UTC +00:00], ["weight", nil]]
-   (0.8ms)  commit transaction
- =&gt; true 
-1.9.3p194 :008 &gt;</screen></para>
+    the object:<screen>&gt;&gt; product.name = 'Milk (1 liter)'
+=&gt; "Milk (1 liter)"
+&gt;&gt; product.price = 0.45
+=&gt; 0.45
+&gt;&gt; product.save
+   (0.2ms)  begin transaction
+  SQL (11.2ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Mon, 19 Nov 2012 09:24:51 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", "Milk (1 liter)"], ["price", #&lt;BigDecimal:7fe7cce8be38,'0.45E0',9(45)&gt;], ["updated_at", Mon, 19 Nov 2012 09:24:51 UTC +00:00], ["weight", nil]]
+   (4.1ms)  commit transaction
+=&gt; true
+&gt;&gt;</screen></para>
 
     <section xml:id="validation_valid">
       <title xml:id="validation_valid.title">valid?</title>
@@ -127,16 +132,16 @@ Loading development environment (Rails 3.2.8)
 
       <para>The method <methodname>valid?</methodname> indicates in boolean
       form if an object is valid. So you can check the validity already before
-      you save:<screen>1.9.3p194 :008 &gt; <command>product = Product.new</command>
- =&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt; 
-1.9.3p194 :009 &gt; <command>product.valid?</command>
- =&gt; false 
-1.9.3p194 :010 &gt;</screen></para>
+      you save:<screen>&gt;&gt; product = Product.new
+=&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;
+&gt;&gt; product.valid?
+=&gt; false
+&gt;&gt;</screen></para>
     </section>
 
     <section xml:id="validation_save_validate_false">
-      <title xml:id="validation_save_validate_false.title">save( :validate
-      =&gt; false )</title>
+      <title xml:id="validation_save_validate_false.title">save( validate:
+      false )</title>
 
       <indexterm>
         <primary>ActiveRecord</primary>
@@ -149,21 +154,21 @@ Loading development environment (Rails 3.2.8)
       <para>As so often in life, you can find a way around everything. If you
       pass the parameter <code>:validate =&gt; false</code> to the method
       <methodname>save</methodname>, the data of <code>Validation</code> is
-      saved:<screen>1.9.3p194 :010 &gt; <command>product = Product.new</command>
- =&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt; 
-1.9.3p194 :011 &gt; <command>product.save</command>
+      saved:<screen>&gt;&gt; product = Product.new
+=&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;
+&gt;&gt; product.valid?
+=&gt; false
+&gt;&gt; product.save
    (0.1ms)  begin transaction
    (0.1ms)  rollback transaction
- =&gt; false 
-1.9.3p194 :012 &gt; <command>product.valid?</command>
- =&gt; false 
-1.9.3p194 :013 &gt; <command>product.save(:validate =&gt; false)</command>
+=&gt; false
+&gt;&gt; product.save(validate: false)
    (0.1ms)  begin transaction
-  SQL (0.6ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Tue, 08 May 2012 15:20:44 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", nil], ["price", nil], ["updated_at", Tue, 08 May 2012 15:20:44 UTC +00:00], ["weight", nil]]
-   (3.5ms)  commit transaction
- =&gt; true 
-1.9.3p194 :014 &gt; <command>exit</command>
-MacBook:shop xyz$</screen></para>
+  SQL (0.8ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Mon, 19 Nov 2012 09:28:29 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", nil], ["price", nil], ["updated_at", Mon, 19 Nov 2012 09:28:29 UTC +00:00], ["weight", nil]]
+   (2.3ms)  commit transaction
+=&gt; true
+&gt;&gt; exit
+$ </screen></para>
 
       <warning>
         <para>I assume that you understand the problems involved here. Please
@@ -208,28 +213,28 @@ end
 </programlisting></para>
 
     <para>If we try to create an empty user record with this, we get lots of
-    validation errors:<screen>MacBook:shop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>product = Product.create</command>
+    validation errors:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; product = Product.create
    (0.1ms)  begin transaction
    (0.1ms)  rollback transaction
- =&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt; 
-1.9.3p194 :002 &gt; p<command>roduct.errors</command>
- =&gt; #&lt;ActiveModel::Errors:0x007ffe9189e0d0 @base=#&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:name=&gt;["can't be blank"], :price=&gt;["can't be blank"]}&gt; 
-1.9.3p194 :003 &gt;</screen></para>
+=&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;
+&gt;&gt; product.errors.messages
+=&gt; {:name=&gt;["can't be blank"], :price=&gt;["can't be blank"]}
+&gt;&gt;</screen></para>
 
     <para>Only once we have entered all the data, the record can be
-    saved:<screen>1.9.3p194 :003 &gt; <command>product.name = 'Milk (1 liter)'</command>
- =&gt; "Milch (1 Liter)" 
-1.9.3p194 :004 &gt; <command>product.price = 0.45</command>
- =&gt; 0.45 
-1.9.3p194 :005 &gt; <command>product.save</command>
-   (0.1ms)  begin transaction
-  SQL (5.2ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Tue, 08 May 2012 15:25:22 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", "Milch (1 Liter)"], ["price", #&lt;BigDecimal:7ffe91a2d270,'0.45E0',9(45)&gt;], ["updated_at", Tue, 08 May 2012 15:25:22 UTC +00:00], ["weight", nil]]
-   (3.9ms)  commit transaction
- =&gt; true 
-1.9.3p194 :006 &gt; <command>exit</command>
-MacBook:shop xyz$</screen></para>
+    saved:<screen>&gt;&gt; product.name = 'Milk (1 liter)'
+=&gt; "Milk (1 liter)"
+&gt;&gt; product.price = 0.45
+=&gt; 0.45
+&gt;&gt; product.save
+   (0.2ms)  begin transaction
+  SQL (6.3ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Mon, 19 Nov 2012 09:30:21 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", "Milk (1 liter)"], ["price", #&lt;BigDecimal:7fc7044fad08,'0.45E0',9(45)&gt;], ["updated_at", Mon, 19 Nov 2012 09:30:21 UTC +00:00], ["weight", nil]]
+   (2.5ms)  commit transaction
+=&gt; true
+&gt;&gt; exit
+$</screen></para>
   </section>
 
   <section xml:id="validates_length_of">
@@ -252,14 +257,15 @@ MacBook:shop xyz$</screen></para>
     </indexterm>
 
     <para>With <methodname>length</methodname> you can limit the length of a
-    specific attribute. It's easiest to explain using an example.</para>
+    specific attribute. It's easiest to explain using an example. Let us limit
+    the maximum length of the name to 20 and the minimum to 2.</para>
 
     <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
   attr_accessible :expiration_date, :in_stock, :name, :price, :weight
 
   validates :name,
             :presence =&gt; true,
-            <emphasis>:length =&gt; { :in =&gt; 2..20 }</emphasis>
+            :length =&gt; { in: 2..20 }
 
   validates :price,
             :presence =&gt; true
@@ -268,16 +274,16 @@ end
 
     <para>If we now try to save a <classname>Product</classname> with a
     <methodname>name</methodname> that consists in one letter, we get an error
-    message:<screen>MacBook:shop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.8)
-1.9.3p194 :001 &gt; <command>product = Product.create(:name =&gt; 'M', :price =&gt; 0.45)</command>
+    message:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; product = Product.create(:name =&gt; 'M', :price =&gt; 0.45)
    (0.1ms)  begin transaction
    (0.1ms)  rollback transaction
- =&gt; #&lt;Product id: nil, name: "M", price: #&lt;BigDecimal:7fd6ad8cec28,'0.45E0',9(45)&gt;, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt; 
-1.9.3p194 :002 &gt; <command>product.errors</command>
- =&gt; #&lt;ActiveModel::Errors:0x007fd6ad88fe38 @base=#&lt;Product id: nil, name: "M", price: #&lt;BigDecimal:7fd6ad8d19c8,'0.45E0',9(45)&gt;, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:name=&gt;["is too short (minimum is 2 characters)"]}&gt; 
-1.9.3p194 :003 &gt; <command>exit</command>
-MacBook:shop xyz$</screen></para>
+=&gt; #&lt;Product id: nil, name: "M", price: #&lt;BigDecimal:7f9f3d0943c0,'0.45E0',9(45)&gt;, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;
+&gt;&gt; product.errors.messages
+=&gt; {:name=&gt;["is too short (minimum is 2 characters)"]}
+&gt;&gt; exit
+$</screen></para>
 
     <section xml:id="validates_length_of_optionen">
       <title xml:id="validates_length_of_optionen.title">Options</title>
@@ -291,7 +297,7 @@ MacBook:shop xyz$</screen></para>
 
             <para><programlisting>validates :name,
           :presence =&gt; true,
-          <emphasis>:length =&gt; { :minimum =&gt; 2 }</emphasis></programlisting></para>
+          :length =&gt; { minimum: 2 }</programlisting></para>
           </listitem>
 
           <listitem>
@@ -299,7 +305,7 @@ MacBook:shop xyz$</screen></para>
 
             <para>The maximum length of an attribute. Example:<programlisting>validates :name,
           :presence =&gt; true,
-          <emphasis>:length =&gt; { :maximum =&gt; 20 }</emphasis></programlisting></para>
+          :length =&gt; { maximum: 20 }</programlisting></para>
           </listitem>
 
           <listitem>
@@ -308,7 +314,7 @@ MacBook:shop xyz$</screen></para>
             <para>Is exactly the specified number of characters long.
             Example:<programlisting>validates :name,
           :presence =&gt; true,
-          <emphasis>:length =&gt; { :is =&gt; 8 }</emphasis></programlisting></para>
+          :length =&gt; { is: 8 }</programlisting></para>
           </listitem>
 
           <listitem>
@@ -318,7 +324,7 @@ MacBook:shop xyz$</screen></para>
             minimum number of the range and the second the maximum.
             Example:<programlisting>validates :name,
           :presence =&gt; true,
-          <emphasis>:length =&gt; { :in =&gt; 2..20 }</emphasis></programlisting></para>
+          :length =&gt; { in: 2..20 }</programlisting></para>
           </listitem>
 
           <listitem>
@@ -329,9 +335,9 @@ MacBook:shop xyz$</screen></para>
             }</code> (individual characters are counted). Example (for
             counting words):<programlisting>validates :content,
           :presence =&gt; true,
-          :length =&gt; { :in =&gt; 2..20 },
-          <emphasis>:tokenizer =&gt; lambda {|str| str.scan(/\w+/)}
-</emphasis></programlisting></para>
+          :length =&gt; { in: 2..20 },
+          :tokenizer =&gt; lambda {|str| str.scan(/\w+/)}
+</programlisting></para>
           </listitem>
 
           <listitem>
@@ -341,8 +347,8 @@ MacBook:shop xyz$</screen></para>
             <methodname>:maximum</methodname>. Default: "is too long (maximum
             is %d characters)". Example:<programlisting>validates :name,
           :presence =&gt; true,
-          :length =&gt; { :maximum =&gt; 20 },
-          <emphasis>:too_long =&gt; "must have at most %{count} characters"</emphasis>
+          :length =&gt; { maximum: 20 },
+          :too_long =&gt; "must have at most %{count} characters"
 </programlisting><note>
                 <para>For all error messages, please note <xref
                 linkend="i18n"/>.</para>
@@ -356,8 +362,8 @@ MacBook:shop xyz$</screen></para>
             <methodname>:minimum</methodname>. Default: "is too short (min is
             %d characters)". Example:<programlisting>validates :name,
           :presence =&gt; true,
-          :length =&gt; { :minimum =&gt; 5 },
-          <emphasis>:too_short =&gt; "must have at least %{count} characters"</emphasis>
+          :length =&gt; { minimum: 5 },
+          :too_short =&gt; "must have at least %{count} characters"
 </programlisting><note>
                 <para>For all error messages, please note <xref
                 linkend="i18n"/>.</para>
@@ -394,28 +400,28 @@ MacBook:shop xyz$</screen></para>
 
   validates :name,
             :presence =&gt; true,
-            :length =&gt; { :in =&gt; 2..20 }
+            :length =&gt; { in: 2..20 }
 
   validates :price,
             :presence =&gt; true
 
   validates :weight,
-            <emphasis>:numericality =&gt; true</emphasis>
+            :numericality =&gt; true
 end
 </programlisting></para>
 
     <para>If we now use a <varname>weight</varname> that consists of letters
     or contains letters instead of numbers, we will get an error
-    message:<screen>MacBook:shop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.8)
-1.9.3p194 :001 &gt; <command>product = Product.create(:name =&gt; 'Milk (1 liter)', :price =&gt; 0.45, :weight =&gt; 'abc')</command>
+    message:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; product = Product.create(name: 'Milk (1 liter)', price: 0.45, weight: 'abc') 
    (0.1ms)  begin transaction
    (0.1ms)  rollback transaction
- =&gt; #&lt;Product id: nil, name: "Milk (1 liter)", price: #&lt;BigDecimal:7f8594def848,'0.45E0',9(45)&gt;, weight: 0, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt; 
-1.9.3p194 :002 &gt; <command>product.errors</command>
- =&gt; #&lt;ActiveModel::Errors:0x007f8594ba3878 @base=#&lt;Product id: nil, name: "Milk (1 liter)", price: #&lt;BigDecimal:7f8594df3588,'0.45E0',9(45)&gt;, weight: 0, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:weight=&gt;["is not a number"]}&gt; 
-1.9.3p194 :003 &gt; <command>exit</command>
-MacBook:shop xyz$</screen></para>
+=&gt; #&lt;Product id: nil, name: "Milk (1 liter)", price: #&lt;BigDecimal:7ff4a4380b30,'0.45E0',9(45)&gt;, weight: 0, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;
+&gt;&gt; product.errors.messages
+=&gt; {:weight=&gt;["is not a number"]}
+&gt;&gt; exit
+$ </screen></para>
 
     <tip>
       <para>You can use <methodname>numericality</methodname> to define the
@@ -433,7 +439,7 @@ MacBook:shop xyz$</screen></para>
 
             <para>The attribute can only contain an integer. Default: false.
             Example:<programlisting>validates :weight, 
-          :numericality =&gt; { :only_integer =&gt; true }
+          :numericality =&gt; { only_integer: true }
 </programlisting></para>
           </listitem>
 
@@ -442,7 +448,7 @@ MacBook:shop xyz$</screen></para>
 
             <para>The number saved in the attribute must be greater than the
             specified value. Example:<programlisting>validates :weight, 
-          :numericality =&gt; { :greater_than =&gt; 100 }
+          :numericality =&gt; { greater_than: 100 }
 </programlisting></para>
           </listitem>
 
@@ -451,7 +457,7 @@ MacBook:shop xyz$</screen></para>
 
             <para>The number saved in the attribute must be greater than or
             equal to the specified value. Example:<programlisting>validates :weight, 
-          :numericality =&gt; { :greater_than_or_equal_to =&gt; 100 }
+          :numericality =&gt; { greater_than_or_equal_to: 100 }
 </programlisting></para>
           </listitem>
 
@@ -460,7 +466,7 @@ MacBook:shop xyz$</screen></para>
 
             <para>Defines a specific value that the attribute must have.
             Example:<programlisting>validates :weight, 
-          :numericality =&gt; { :equal_to =&gt; 100 }
+          :numericality =&gt; { equal_to: 100 }
 </programlisting></para>
           </listitem>
 
@@ -469,7 +475,7 @@ MacBook:shop xyz$</screen></para>
 
             <para>The number saved in the attribute must be less than the
             specified value. Example:<programlisting>validates :weight, 
-          :numericality =&gt; { :less_than =&gt; 100 }
+          :numericality =&gt; { less_than: 100 }
 </programlisting></para>
           </listitem>
 
@@ -478,7 +484,7 @@ MacBook:shop xyz$</screen></para>
 
             <para>The number saved in the attribute must be less than or equal
             to the specified value. Example:<programlisting>validates :weight, 
-          :numericality =&gt; { :less_than_or_equal_to =&gt; 100 }
+          :numericality =&gt; { less_than_or_equal_to: 100 }
 </programlisting></para>
           </listitem>
 
@@ -487,7 +493,7 @@ MacBook:shop xyz$</screen></para>
 
             <para>the number saved in the attribute must be an odd number.
             Example:<programlisting>validates :weight, 
-          :numericality =&gt; { :odd =&gt; true }
+          :numericality =&gt; { odd: true }
 </programlisting></para>
           </listitem>
 
@@ -496,7 +502,7 @@ MacBook:shop xyz$</screen></para>
 
             <para>The number saved in the attribute must be an even number.
             Example:<programlisting>validates :weight, 
-          :numericality =&gt; { :even =&gt; true }
+          :numericality =&gt; { even: true }
 </programlisting></para>
           </listitem>
         </itemizedlist><note>
@@ -544,26 +550,26 @@ MacBook:shop xyz$</screen></para>
 
   validates :name,
             :presence =&gt; true,
-            <emphasis>:uniqueness =&gt; true</emphasis>
+            :uniqueness =&gt; true
 end
 </programlisting></para>
 
     <para>If we now try to create a new <classname>Product</classname> with a
     <methodname>name</methodname> that already exists, then we get an error
-    message:<screen>MacBook:shop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.8)
-1.9.3p194 :001 &gt; <command>Product.last</command>
-  Product Load (0.2ms)  SELECT "products".* FROM "products" ORDER BY "products"."id" DESC LIMIT 1
- =&gt; #&lt;Product id: 4, name: "Milk (1 liter)", price: #&lt;BigDecimal:7fc6e9695160,'0.45E0',9(45)&gt;, weight: nil, in_stock: nil, expiration_date: nil, created_at: "2012-05-08 15:25:22", updated_at: "2012-05-08 15:25:22"&gt; 
-1.9.3p194 :002 &gt; <command>product = Product.create(:name =&gt; 'Milk (1 liter)', :price =&gt; 0.45, :weight =&gt; 1000)</command>
+    message:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; Product.last
+  Product Load (1.9ms)  SELECT "products".* FROM "products" ORDER BY "products"."id" DESC LIMIT 1
+=&gt; #&lt;Product id: 4, name: "Milk (1 liter)", price: #&lt;BigDecimal:7f90649840a8,'0.45E0',9(45)&gt;, weight: nil, in_stock: nil, expiration_date: nil, created_at: "2012-11-19 09:30:21", updated_at: "2012-11-19 09:30:21"&gt;
+&gt;&gt; product = Product.create(name: 'Milk (1 liter)')
    (0.1ms)  begin transaction
-  Product Exists (0.2ms)  SELECT 1 FROM "products" WHERE "products"."name" = 'Milk (1 liter)' LIMIT 1
+  Product Exists (0.1ms)  SELECT 1 AS one FROM "products" WHERE "products"."name" = 'Milk (1 liter)' LIMIT 1
    (0.1ms)  rollback transaction
- =&gt; #&lt;Product id: nil, name: "Milch (1 Liter)", price: #&lt;BigDecimal:7fc6e9f7cb70,'0.45E0',9(45)&gt;, weight: 1000, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt; 
-1.9.3p194 :003 &gt; <command>product.errors</command>
- =&gt; #&lt;ActiveModel::Errors:0x007fc6e9432300 @base=#&lt;Product id: nil, name: "Milk (1 liter)", price: #&lt;BigDecimal:7fc6e9b09250,'0.45E0',9(45)&gt;, weight: 1000, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:name=&gt;["has already been taken"]}&gt; 
-1.9.3p194 :004 &gt; <command>exit</command>
-MacBook:shop xyz$</screen></para>
+=&gt; #&lt;Product id: nil, name: "Milk (1 liter)", price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;
+&gt;&gt; product.errors.messages
+=&gt; {:name=&gt;["has already been taken"]}
+&gt;&gt; exit
+$</screen></para>
 
     <warning>
       <para>The validation via <methodname>uniqueness</methodname> is no
@@ -590,7 +596,7 @@ MacBook:shop xyz$</screen></para>
 
             <para><programlisting>validates :name,
           :presence =&gt; true,
-          <emphasis>:uniqueness =&gt; { :scope =&gt; :user_id }</emphasis></programlisting></para>
+          :uniqueness =&gt; { scope: :user_id }</programlisting></para>
           </listitem>
 
           <listitem>
@@ -599,7 +605,7 @@ MacBook:shop xyz$</screen></para>
             <para>Checks for uniqueness of upper and lower case as well.
             Default: false. Example:<programlisting>validates :name,
           :presence =&gt; true,
-          <emphasis>:uniqueness =&gt; { :case_sensitive =&gt; true }</emphasis>
+          :uniqueness =&gt; { case_sensitive: true }
 </programlisting></para>
           </listitem>
         </itemizedlist></para>
@@ -634,32 +640,26 @@ MacBook:shop xyz$</screen></para>
   attr_accessible :expiration_date, :in_stock, :name, :price, :weight
 
   validates :name,
-            :presence =&gt; true,
-            :length =&gt; { :in =&gt; 2..20 }
-
-  validates :price,
             :presence =&gt; true
 
   validates :in_stock,
-            <emphasis>:inclusion =&gt; { :in =&gt; [true, false] }</emphasis>
-end
-</programlisting></para>
+            :inclusion =&gt; { in: [true, false] }
+end</programlisting></para>
 
     <para>In our data model, a <classname>Product</classname> must be either
     <code>true</code> or <code>false</code> for
     <methodname>in_stock</methodname> (there must not be a nil). If we enter a
     different value than <code>true</code> or <code>false</code>, a validation
-    error is returned:<screen>MacBook:shop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.8)
-1.9.3p194 :001 &gt; <command>product = Product.create(:name =&gt; 'Milk low-fat (1 liter)', :price =&gt; 0.45, :weight =&gt; 1000)</command>
+    error is returned:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; product = Product.create(name: 'Milk low-fat (1 liter)')
    (0.1ms)  begin transaction
-  Product Exists (0.2ms)  SELECT 1 FROM "products" WHERE "products"."name" = 'Milk low-fat (1 liter)' LIMIT 1
    (0.1ms)  rollback transaction
- =&gt; #&lt;Product id: nil, name: "Milk low-fat (1 liter)", price: #&lt;BigDecimal:7fd125470f38,'0.45E0',9(45)&gt;, weight: 1000, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt; 
-1.9.3p194 :002 &gt; <command>product.errors</command>
- =&gt; #&lt;ActiveModel::Errors:0x007fd12513a648 @base=#&lt;Product id: nil, name: "Milk low-fat (1 liter)", price: #&lt;BigDecimal:7fd125475bf0,'0.45E0',9(45)&gt;, weight: 1000, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:in_stock=&gt;["is not included in the list"]}&gt; 
-1.9.3p194 :003 &gt; <command>exit</command>
-MacBook:shop xyz$</screen></para>
+=&gt; #&lt;Product id: nil, name: "Milk low-fat (1 liter)", price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;
+&gt;&gt; product.errors.messages
+=&gt; {:in_stock=&gt;["is not included in the list"]}
+&gt;&gt; exit
+$</screen></para>
 
     <tip>
       <para>Always remember the power of Ruby! For example, you can generate
@@ -677,8 +677,8 @@ MacBook:shop xyz$</screen></para>
 
             <para>For outputting custom error messages. Default: "is not
             included in the list". Example:<programlisting>validates :in_stock,
-          :inclusion =&gt; { :in =&gt; [true, false], 
-                          <emphasis>:message =&gt; 'this one is not allowed'</emphasis> }
+          :inclusion =&gt; { in: [true, false], 
+                          message: 'this one is not allowed' }
 </programlisting><note>
                 <para>For all error messages, please note <xref
                 linkend="i18n"/>.</para>
@@ -715,14 +715,10 @@ MacBook:shop xyz$</screen></para>
   attr_accessible :expiration_date, :in_stock, :name, :price, :weight
 
   validates :name,
-            :presence =&gt; true,
-            :length =&gt; { :in =&gt; 2..20 }
-
-  validates :price,
             :presence =&gt; true
 
   validates :in_stock,
-            <emphasis>:exclusion =&gt; { :in =&gt; [nil] }</emphasis>
+            :exclusion =&gt; { in: [nil] }
 end
 </programlisting></para>
 
@@ -742,8 +738,8 @@ end
 
             <para>For outputting a custom error message. Default: "is not
             included in the list". Example:<programlisting>validates :in_stock,
-          :exclusion =&gt; { :in =&gt; [nil], 
-                          <emphasis>:message =&gt; 'xyz'</emphasis> }
+          :exclusion =&gt; { in: [nil], 
+                          message: 'xyz' }
 </programlisting><note>
                 <para>For all error messages, please note <xref
                 linkend="i18n"/>.</para>
@@ -781,7 +777,7 @@ end
     simple validation of the syntax of an e-mail address:</para>
 
     <para><programlisting>validates :email, 
-          <emphasis>:format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }</emphasis></programlisting></para>
+          :format =&gt; { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }</programlisting></para>
 
     <warning>
       <para>It should be obvious that the e-mail address validation shown here
@@ -799,8 +795,8 @@ end
 
             <para>For outputting a custom error message. Default: "is
             invalid". Example:<programlisting>validates :email, 
-          :format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i,
-                       <emphasis>:message =&gt; 'is not a valid email address'</emphasis> }
+          :format =&gt; { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i,
+                       message: 'is not a valid email address' }
 </programlisting><note>
                 <para>For all error messages, please note <xref
                 linkend="i18n"/>.</para>
@@ -868,8 +864,8 @@ end
           <para><code>:allow_nil</code></para>
 
           <para>Allows the value <code>nil</code>. Example:<programlisting>validates :email, 
-          :format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i },
-          <emphasis>:allow_nil =&gt; true</emphasis></programlisting></para>
+          :format =&gt; { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i },
+          :allow_nil =&gt; true</programlisting></para>
         </listitem>
 
         <listitem>
@@ -877,8 +873,8 @@ end
 
           <para>As <code>allow_nil</code>, but additionally with an empty
           string. Example:<programlisting>validates :email, 
-          :format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i },
-          <emphasis>:allow_blank =&gt; true</emphasis></programlisting></para>
+          :format =&gt; { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i },
+          :allow_blank =&gt; true</programlisting></para>
         </listitem>
 
         <listitem>
@@ -889,8 +885,8 @@ end
           <code>safe</code>. In the following example, the validation only
           takes effect when the record is initially created (during the
           <code>create</code>):<programlisting>validates :email, 
-          :format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i },
-          <emphasis>:on =&gt; :create</emphasis></programlisting></para>
+          :format =&gt; { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i },
+          :on =&gt; :create</programlisting></para>
         </listitem>
 
         <listitem>
@@ -958,21 +954,23 @@ end
     <section>
       <title>Defining Validations with Your Own Methods</title>
 
-      <para>Let's assume you have a class HotelReservation and the end of the
-      reservation must logically not be before the start of the reservation.
-      Let's first create the model:<screen>MacBook:shop xyz$ <command>rails generate model HotelReservation start_date:date end_date:date room_type</command>
-[...]
-MacBook:shop xyz$ <command>rake db:migrate</command>
-[...]
-MacBook:shop xyz$</screen></para>
+      <para>Let's assume you are a big shot hotel mogul and need a reservation
+      system. <screen>$ rails new my_hotel
+  [...]
+$ cd my_hotel 
+$ rails generate model reservation start_date:date end_date:date room_type
+  [...]
+$ rake db:migrate
+  [...]
+$ </screen></para>
 
       <para>Then we specify in the
-      <filename>app/model/hotel_reservation.rb</filename> that the attributes
+      <filename>app/model/reservation.rb</filename> that the attributes
       <varname>start_date</varname> and <varname>end_date</varname> must be
       present in any case, plus we use the method
-      <methodname>start_has_to_be_before_end</methodname> to make sure that
-      the <varname>start_date</varname> is before the
-      <varname>end_date</varname>:<programlisting>class HotelReservation &lt; ActiveRecord::Base
+      <methodname>reservation_dates_must_make_sense</methodname> to make sure
+      that the <varname>start_date</varname> is before the
+      <varname>end_date</varname>:<programlisting>class Reservation &lt; ActiveRecord::Base
   attr_accessible :end_date, :room_type, :start_date
 
   validates :start_date,
@@ -981,14 +979,14 @@ MacBook:shop xyz$</screen></para>
   validates :end_date,
             :presence =&gt; true
 
-<emphasis>  validate :start_has_to_be_before_end
+  validate :reservation_dates_must_make_sense
 
-  def start_has_to_be_before_end
-    if end_date &lt; start_date
+  private
+  def reservation_dates_must_make_sense
+    if end_date &lt;= start_date
       errors.add(:start_date, 'has to be before the end date')
     end
-  end</emphasis>
-
+  end
 end</programlisting></para>
 
       <para>With <methodname>errors.add</methodname> we can add error messages
@@ -996,20 +994,25 @@ end</programlisting></para>
       <methodname>errors.add_to_base</methodname> you can add error messages
       for the whole object.</para>
 
-      <para>Let's test the validation in the console:<screen>MacBook:shop stefan$ <command>rails console</command>
-Loading development environment (Rails 3.2.8)
-1.9.3p194 :001 &gt; <command>new_reservation = HotelReservation.new(:start_date =&gt; Date.today, :end_date =&gt; Date.today - 1.day)</command>
- =&gt; #&lt;HotelReservation id: nil, start_date: "2012-09-16", end_date: "2012-09-15", room_type: nil, created_at: nil, updated_at: nil&gt; 
-1.9.3p194 :002 &gt; <command>new_reservation.valid?</command>
- =&gt; false 
-1.9.3p194 :003 &gt; <command>new_reservation.errors.messages</command>
- =&gt; {:start_date=&gt;["has to be before the end date"]} 
-1.9.3p194 :004 &gt; <command>new_reservation.end_date = Date.today + 10.days</command>
- =&gt; Wed, 26 Sep 2012 
-1.9.3p194 :005 &gt; <command>new_reservation.valid?</command>
- =&gt; true 
-1.9.3p194 :006 &gt; <command>exit</command>
-MacBook:shop stefan$ </screen></para>
+      <para>Let's test the validation in the console:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; reservation = Reservation.new(start_date: Date.today, end_date: Date.today)
+=&gt; #&lt;Reservation id: nil, start_date: "2012-11-19", end_date: "2012-11-19", room_type: nil, created_at: nil, updated_at: nil&gt;
+&gt;&gt; reservation.valid?
+=&gt; false
+&gt;&gt; reservation.errors.messages
+=&gt; {:start_date=&gt;["has to be before the end date"]}
+&gt;&gt; reservation.end_date = Date.today + 1.day
+=&gt; Tue, 20 Nov 2012
+&gt;&gt; reservation.valid?
+=&gt; true
+&gt;&gt; reservation.save
+   (0.1ms)  begin transaction
+  SQL (8.7ms)  INSERT INTO "reservations" ("created_at", "end_date", "room_type", "start_date", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Mon, 19 Nov 2012 14:00:50 UTC +00:00], ["end_date", Tue, 20 Nov 2012], ["room_type", nil], ["start_date", Mon, 19 Nov 2012], ["updated_at", Mon, 19 Nov 2012 14:00:50 UTC +00:00]]
+   (3.4ms)  commit transaction
+=&gt; true
+&gt;&gt; exit
+$</screen></para>
     </section>
   </section>
 
