@@ -221,37 +221,37 @@ production:
       </footnote></para>
 
     <para>To satisfy your curiosity, we have a quick look at the database with
-    the command line tool <literal>sqlite3</literal>:<screen>MacBook:shop xyz$ sqlite3 <command>db/development.sqlite3</command> 
-SQLite version 3.7.7 2011-06-25 16:35:41
+    the command line tool <command>sqlite3</command>:<screen>$ sqlite3 db/development.sqlite3 
+SQLite version 3.7.12 2012-04-03 19:43:07
 Enter ".help" for instructions
 Enter SQL statements terminated with a ";"
-sqlite&gt; <command>.tables</command>
+sqlite&gt; .tables
 schema_migrations
-sqlite&gt; <command>.quit</command>
-MacBook:shop xyz$  </screen></para>
+sqlite&gt; .quit
+$</screen></para>
 
     <para>Nothing in it. Of course not, as we have not yet run the
-    migration:<screen>MacBook:shop xyz$ <command>rake db:migrate</command>  
+    migration:<screen>$ rake db:migrate
 ==  CreateProducts: migrating =================================================
 -- create_table(:products)
-   -&gt; 0.0273s
-==  CreateProducts: migrated (0.0274s) ========================================
+   -&gt; 0.0142s
+==  CreateProducts: migrated (0.0143s) ========================================
 
 ==  AddHeightToProduct: migrating =============================================
 -- add_column(:products, :height, :integer)
-   -&gt; 0.0009s
-==  AddHeightToProduct: migrated (0.0010s) ====================================
+   -&gt; 0.0011s
+==  AddHeightToProduct: migrated (0.0012s) ====================================
 
-MacBook:shop xyz$ <command>sqlite3 db/development.sqlite3</command> 
-SQLite version 3.7.7 2011-06-25 16:35:41
+$ sqlite3 db/development.sqlite3 
+SQLite version 3.7.12 2012-04-03 19:43:07
 Enter ".help" for instructions
 Enter SQL statements terminated with a ";"
-sqlite&gt; <command>.tables</command>
+sqlite&gt; .tables
 products           schema_migrations
-sqlite&gt; <command>.schema products</command>
+sqlite&gt; .schema products
 CREATE TABLE "products" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar(255), "price" decimal(7,2), "weight" integer, "in_stock" boolean, "expiration_date" date, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "height" integer);
-sqlite&gt; <command>.quit</command>
-MacBook:shop xyz$ </screen></para>
+sqlite&gt; .quit
+$</screen></para>
 
     <para>The table <literal>schema_migrations</literal> is used for the
     versioning of the migrations. This table is created during the first
@@ -269,13 +269,13 @@ MacBook:shop xyz$ </screen></para>
 
     <para>In our production database, we should index the field
     <literal>name</literal> in the <literal>products</literal> table. We
-    create a new migration for that purpose:<screen>MacBook:shop xyz$ <command>rails generate migration create_index</command>
+    create a new migration for that purpose:<screen>$ rails generate migration create_index
       invoke  active_record
-      create    db/migrate/20120508162243_create_index.rb
-MacBook:shop xyz$</screen></para>
+      create    db/migrate/20121120142002_create_index.rb
+$</screen></para>
 
     <para>In the file
-    <filename>db/migrate/20101201224922_create_index.rb</filename> we create
+    <filename>db/migrate/20121120142002_create_index.rb</filename> we create
     the index with <methodname>add_index</methodname> in the method
     <methodname>self.up</methodname>, and in the method
     <methodname>self.down</methodname> we delete it again with
@@ -289,25 +289,49 @@ MacBook:shop xyz$</screen></para>
   end
 end</programlisting></para>
 
-    <para>With <command>rake db:migrate</command> we create the index:<screen>MacBook:shop xyz$ <command>rake db:migrate</command>
+    <para>With <command>rake db:migrate</command> we create the index:<screen>$ rake db:migrate
 ==  CreateIndex: migrating ====================================================
 -- add_index(:products, :name)
-   -&gt; 0.0009s
-==  CreateIndex: migrated (0.0009s) ===========================================
+   -&gt; 0.0010s
+==  CreateIndex: migrated (0.0011s) ===========================================
 
-MacBook:shop xyz$  </screen></para>
+$ </screen></para>
+
+    <para>Of course we don't have to use the <methodname>up</methodname> and
+    <methodname>down</methodname> method. We can use
+    <methodname>change</methodname> too. The migration for the new index would
+    look like this:<programlisting>class CreateIndex &lt; ActiveRecord::Migration
+  def change
+    add_index :products, :name
+  end
+end</programlisting></para>
 
     <tip>
       <para>You can also create an index directly when you generate the model.
       In our case (an index for the attribute <code>name</code>) the command
-      would look like this:<screen>MacBook:shop xyz$ <command>rails generate model product name:string:index 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
+      would look like this:<screen>$ rails generate model product name:string:index 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date
       invoke  active_record
-      create    db/migrate/20120508160146_create_products.rb
+      create    db/migrate/20121120142344_create_products.rb
       create    app/models/product.rb
       invoke    test_unit
       create      test/unit/product_test.rb
       create      test/fixtures/products.yml
-MacBook:shop xyz$</screen></para>
+$ cat db/migrate/20121120142344_create_products.rb
+class CreateProducts &lt; ActiveRecord::Migration
+  def change
+    create_table :products do |t|
+      t.string :name
+      t.decimal :price, :precision =&gt; 7, :scale =&gt; 2
+      t.integer :weight
+      t.boolean :in_stock
+      t.date :expiration_date
+
+      t.timestamps
+    end
+    add_index :products, :name
+  end
+end
+$ </screen></para>
     </tip>
   </section>
 
