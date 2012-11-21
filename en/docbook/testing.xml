@@ -70,25 +70,24 @@
     <title xml:id="testing_beispiel_webshop.title">Example for a User in a Web
     Shop</title>
 
-    <para>Let's start with a user scaffold in an imaginary web shop:<screen>MacBook:~ xyz$ <command>rails new webshop</command>
-[...]
-MacBook:~ xyz$ <command>cd webshop</command>
-MacBook:webshop xyz$ <command>rails generate scaffold user login_name first_name last_name birthday:date</command>
-[...]
+    <para>Let's start with a user scaffold in an imaginary web shop:<screen>$ rails new webshop
+  [...]
+$ cd webshop
+$ rails generate scaffold user login_name first_name last_name birthday:date
+      [...]
       invoke    test_unit
       create      test/unit/user_test.rb
       create      test/fixtures/users.yml
-[...]
+      [...]
       invoke    test_unit
       create      test/functional/users_controller_test.rb
-      invoke    helper
-      create      app/helpers/users_helper.rb
+      [...]
       invoke      test_unit
       create        test/unit/helpers/users_helper_test.rb
-[...]
-MacBook:webshop xyz$ <command>rake db:migrate</command>
-[...]
-MacBook:webshop xyz$</screen></para>
+      [...]
+$ rake db:migrate
+      [...]
+$</screen></para>
 
     <para>You already know all about scaffolds (if not, please go and read
     <xref linkend="scaffolding"/> first) so you know what the application we
@@ -98,14 +97,14 @@ MacBook:webshop xyz$</screen></para>
 
     <para>The complete test suite of a Rails project is processed with the
     command <command>rake test</command>. Let's have a go and see what a test
-    produces at this stage of development:<screen>MacBook:webshop xyz$ <command>rake test</command>
+    produces at this stage of development:<screen>$ rake test
 Run options: 
 
 # Running tests:
 
 
 
-Finished tests in 0.003920s, 0.0000 tests/s, 0.0000 assertions/s.
+Finished tests in 0.003398s, 0.0000 tests/s, 0.0000 assertions/s.
 
 0 tests, 0 assertions, 0 failures, 0 errors, 0 skips
 Run options: 
@@ -114,10 +113,10 @@ Run options:
 
 .......
 
-Finished tests in 0.223761s, 31.2834 tests/s, 44.6905 assertions/s.
+Finished tests in 0.224044s, 31.2439 tests/s, 44.6341 assertions/s.
 
 7 tests, 10 assertions, 0 failures, 0 errors, 0 skips
-MacBook:webshop xyz$</screen></para>
+$ </screen></para>
 
     <para>The output "<literal>7 tests, 10 assertions, 0 failures, 0 errors, 0
     skips</literal>" looks good. By default, a test will run correctly in a
@@ -141,14 +140,14 @@ MacBook:webshop xyz$</screen></para>
 end
 </programlisting></para>
 
-    <para>Then we execute <command>rake test</command> again:<screen>MacBook:webshop xyz$ <command>rake test</command>
+    <para>Then we execute <command>rake test</command> again:<screen>$ rake test
 Run options: 
 
 # Running tests:
 
 
 
-Finished tests in 0.004409s, 0.0000 tests/s, 0.0000 assertions/s.
+Finished tests in 0.003433s, 0.0000 tests/s, 0.0000 assertions/s.
 
 0 tests, 0 assertions, 0 failures, 0 errors, 0 skips
 Run options: 
@@ -157,21 +156,21 @@ Run options:
 
 F.....F
 
-Finished tests in 0.277867s, 25.1919 tests/s, 32.3896 assertions/s.
+Finished tests in 0.226569s, 30.8957 tests/s, 39.7230 assertions/s.
 
   1) Failure:
-test_should_create_user(UsersControllerTest) [/Users/xyz/webshop/test/functional/users_controller_test.rb:20]:
+test_should_create_user(UsersControllerTest) [/Users/xyz/sandbox/webshop/test/functional/users_controller_test.rb:20]:
 "User.count" didn't change by 1.
 &lt;3&gt; expected but was
 &lt;2&gt;.
 
   2) Failure:
-test_should_update_user(UsersControllerTest) [/Users/xyz/webshop/test/functional/users_controller_test.rb:39]:
+test_should_update_user(UsersControllerTest) [/Users/xyz/sandbox/webshop/test/functional/users_controller_test.rb:39]:
 Expected response to be a &lt;:redirect&gt;, but was &lt;200&gt;
 
 7 tests, 9 assertions, 2 failures, 0 errors, 0 skips
-Errors running test:functionals! #&lt;RuntimeError: Command failed with status (2): [/Users/xyz/.rvm/rubies/ruby-1.9.3-p194/bin...]&gt;
-MacBook:webshop xyz$ </screen></para>
+Errors running test:functionals! #&lt;RuntimeError: Command failed with status (2): [ruby -I"lib:test" -I"/Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/rake-10.0.2/lib" "/Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/rake-10.0.2/lib/rake/rake_test_loader.rb" "test/functional/**/*_test.rb" ]&gt;
+$</screen></para>
 
     <para>This time we have "<literal>2 failures</literal>". The error happens
     in the "<literal>should create user</literal>" and the "<literal>should
@@ -198,43 +197,41 @@ one:
   login_name: MyString
   first_name: MyString
   last_name: MyString
-  birthday: 2012-05-29
+  birthday: 2012-11-21
 
 two:
   login_name: MyString
   first_name: MyString
   last_name: MyString
-  birthday: 2012-05-29
-</programlisting></para>
+  birthday: 2012-11-21</programlisting></para>
 
     <para>There are two example records there that do not fulfil the
     requirements of our validation. The <methodname>login_name</methodname>
     should have at least one "-_." special character. Let's amend the
     <code>login_name</code> in <filename>test/fixtures/users.yml</filename>
-    accordingly:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+    accordingly:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
 one:
   login_name: My-String
-  firstname: MyString
-  lastname: MyString
-  birthday: 1970-01-01
+  first_name: MyString
+  last_name: MyString
+  birthday: 2012-11-21
 
 two:
   login_name: My-String
-  firstname: MyString
-  lastname: MyString
-  birthday: 1970-01-01
-</programlisting></para>
+  first_name: MyString
+  last_name: MyString
+  birthday: 2012-11-21</programlisting></para>
 
     <para>Now, a <command>rake test</command> completes without any errors
-    again:<screen>MacBook:webshop xyz$ <command>rake test</command>
+    again:<screen>$ rake test
 Run options: 
 
 # Running tests:
 
 
 
-Finished tests in 0.003977s, 0.0000 tests/s, 0.0000 assertions/s.
+Finished tests in 0.003321s, 0.0000 tests/s, 0.0000 assertions/s.
 
 0 tests, 0 assertions, 0 failures, 0 errors, 0 skips
 Run options: 
@@ -243,10 +240,10 @@ Run options:
 
 .......
 
-Finished tests in 0.204496s, 34.2305 tests/s, 48.9007 assertions/s.
+Finished tests in 0.207182s, 33.7867 tests/s, 48.2667 assertions/s.
 
 7 tests, 10 assertions, 0 failures, 0 errors, 0 skips
-MacBook:webshop xyz$ </screen></para>
+$</screen></para>
 
     <para>We now know that valid data has to be contained in the
     <filename>test/fixtures/users.yml</filename> so that the standard test
@@ -264,14 +261,14 @@ two:
 
     <para>To be on the safe side, let's do another <command>rake
     test</command> after making our changes (you really can't do that often
-    enough):<screen>MacBook:webshop xyz$ <command>rake test</command>
+    enough):<screen>$ rake test
 Run options: 
 
 # Running tests:
 
 
 
-Finished tests in 0.004234s, 0.0000 tests/s, 0.0000 assertions/s.
+Finished tests in 0.003483s, 0.0000 tests/s, 0.0000 assertions/s.
 
 0 tests, 0 assertions, 0 failures, 0 errors, 0 skips
 Run options: 
@@ -280,10 +277,10 @@ Run options:
 
 .......
 
-Finished tests in 0.202971s, 34.4877 tests/s, 49.2681 assertions/s.
+Finished tests in 0.204765s, 34.1855 tests/s, 48.8365 assertions/s.
 
 7 tests, 10 assertions, 0 failures, 0 errors, 0 skips
-MacBook:webshop xyz$ </screen></para>
+$ </screen></para>
 
     <important>
       <para>All fixtures are loaded into the database when a test is started.
@@ -310,13 +307,17 @@ MacBook:webshop xyz$ </screen></para>
 
       <para>Let's take a closer look at the point where the original errors
       have occurred:<screen>  1) Failure:
-test_should_create_user(UsersControllerTest) [/Users/xyz/webshop/test/functional/users_controller_test.rb:20]:
+test_should_create_user(UsersControllerTest) [/Users/xyz/sandbox/webshop/test/functional/users_controller_test.rb:20]:
 "User.count" didn't change by 1.
 &lt;3&gt; expected but was
 &lt;2&gt;.
 
-7 tests, 9 assertions, 1 failures, 0 errors, 0 skips
-Errors running test:functionals! #&lt;RuntimeError: Command failed with status (1): [/Users/xyz/.rvm/rubies/ruby-1.9.3-p194/bin...]&gt;
+  2) Failure:
+test_should_update_user(UsersControllerTest) [/Users/xyz/sandbox/webshop/test/functional/users_controller_test.rb:39]:
+Expected response to be a &lt;:redirect&gt;, but was &lt;200&gt;
+
+7 tests, 9 assertions, 2 failures, 0 errors, 0 skips
+Errors running test:functionals! #&lt;RuntimeError: Command failed with status (2): [ruby -I"lib:test" -I"/Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/rake-10.0.2/lib" "/Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/rake-10.0.2/lib/rake/rake_test_loader.rb" "test/functional/**/*_test.rb" ]&gt;
 </screen></para>
 
       <para>In the <code>UsersControllerTest</code> the User could not be
@@ -371,8 +372,7 @@ class UsersControllerTest &lt; ActionController::TestCase
 
     assert_redirected_to users_path
   end
-end
-</programlisting></para>
+end</programlisting></para>
 
       <para>At the beginning, we find a <code>setup</code> instruction:
       <programlisting>  setup do
@@ -478,17 +478,17 @@ end
       <tip>
         <para>With <command>rake test:functionals</command> you can also run
         just the functional tests in the directory
-        <filename>test/functional/</filename>.<screen>MacBook:webshop xyz$ <command>rake test:functionals</command>
+        <filename>test/functional/</filename>.<screen>$ rake test:functionals
 Run options: 
 
 # Running tests:
 
 .......
 
-Finished tests in 0.205717s, 34.0273 tests/s, 48.6105 assertions/s.
+Finished tests in 0.207113s, 33.7980 tests/s, 48.2828 assertions/s.
 
 7 tests, 10 assertions, 0 failures, 0 errors, 0 skips
-MacBook:webshop xyz$ </screen></para>
+$ </screen></para>
       </tip>
     </section>
 
@@ -539,22 +539,22 @@ end
 
       <para>By default, scaffold only writes a commented-out dummy test. That
       is why <command>rake test:units</command> runs through without any
-      content:<screen>MacBook:webshop xyz$ <command>rake test:units</command>
+      content:<screen>$ rake test:units
 Run options: 
 
 # Running tests:
 
 
 
-Finished tests in 0.004657s, 0.0000 tests/s, 0.0000 assertions/s.
+Finished tests in 0.003531s, 0.0000 tests/s, 0.0000 assertions/s.
 
 0 tests, 0 assertions, 0 failures, 0 errors, 0 skips
-MacBook:webshop xyz$</screen></para>
+$</screen></para>
 
       <para>A unit test always consists of the following
-      structure:<programlisting>  test "<replaceable>an assertion</replaceable>" do
-    assert <replaceable>something_is_true_or_false</replaceable>
-  end</programlisting></para>
+      structure:<programlisting>test "an assertion" do
+  assert something_is_true_or_false
+end</programlisting></para>
 
       <para>The word <code>assert</code><indexterm>
           <primary>assert</primary>
@@ -626,13 +626,10 @@ MacBook:webshop xyz$</screen></para>
       <filename>test/unit/user_test.rb</filename>:<programlisting>require 'test_helper'
 
 class UserTest &lt; ActiveSupport::TestCase
-
-<emphasis>  test 'an empty user is not valid' do
+  test 'an empty user is not valid' do
     assert !User.new.valid?, 'Saved an empty user.'
   end
-</emphasis>  
-end
-</programlisting></para>
+end</programlisting></para>
 
       <para>This test checks if a newly created <classname>User</classname>
       that does not contain any data is valid. As <code>assert</code> only
@@ -641,53 +638,23 @@ end
       <code>true</code>, as an empty user cannot be valid.</para>
 
       <para>So a <command>rake test:units</command> then completes
-      immediately:<screen>MacBook:webshop xyz$ <command>rake test:units</command>
+      immediately:<screen>$ rake test:units
 Run options: 
 
 # Running tests:
 
 .
 
-Finished tests in 0.081926s, 12.2061 tests/s, 12.2061 assertions/s.
+Finished tests in 0.079557s, 12.5696 tests/s, 12.5696 assertions/s.
 
 1 tests, 1 assertions, 0 failures, 0 errors, 0 skips
-MacBook:webshop xyz$</screen></para>
+$</screen></para>
 
       <para>Now we integrate two asserts in a test to check if the two fixture
       entries in the <filename>test/fixtures/users.yml</filename> are really
       valid:<programlisting>require 'test_helper'
 
 class UserTest &lt; ActiveSupport::TestCase
-
-  test 'an empty user is not valid' do
-    assert !User.new.valid?, 'Saved an empty user.'
-  end
-
-<emphasis>  test "the two fixture users are valid" do
-    assert User.new(last_name: users(:one).last_name, login_name: users(:one).login_name ).valid?, 'First fixture is not valid.'
-    assert User.new(last_name: users(:two).last_name, login_name: users(:two).login_name ).valid?, 'Second fixture is not valid.'
-  end
-</emphasis>  
-end
-</programlisting></para>
-
-      <para>Then once more a <command>rake test:units</command>:<screen>MacBook:webshop xyz$ <command>rake test:units</command>
-Run options: 
-
-# Running tests:
-
-..
-
-Finished tests in 0.090001s, 22.2220 tests/s, 33.3330 assertions/s.
-
-2 tests, 3 assertions, 0 failures, 0 errors, 0 skips
-MacBook:webshop xyz$</screen></para>
-
-      <para>Let's now insert tests for a few other
-      <varname>login_name</varname> variations:<programlisting>require 'test_helper'
-
-class UserTest &lt; ActiveSupport::TestCase
-
   test 'an empty user is not valid' do
     assert !User.new.valid?, 'Saved an empty user.'
   end
@@ -696,8 +663,34 @@ class UserTest &lt; ActiveSupport::TestCase
     assert User.new(last_name: users(:one).last_name, login_name: users(:one).login_name ).valid?, 'First fixture is not valid.'
     assert User.new(last_name: users(:two).last_name, login_name: users(:two).login_name ).valid?, 'Second fixture is not valid.'
   end
-  
-<emphasis>  [
+end</programlisting></para>
+
+      <para>Then once more a <command>rake test:units</command>:<screen>$ rake test:units
+Run options: 
+
+# Running tests:
+
+..
+
+Finished tests in 0.085594s, 23.3661 tests/s, 35.0492 assertions/s.
+
+2 tests, 3 assertions, 0 failures, 0 errors, 0 skips
+$</screen></para>
+
+      <para>Let's now insert tests for a few other
+      <varname>login_name</varname> variations:<programlisting>require 'test_helper'
+
+class UserTest &lt; ActiveSupport::TestCase
+  test 'an empty user is not valid' do
+    assert !User.new.valid?, 'Saved an empty user.'
+  end
+
+  test "the two fixture users are valid" do
+    assert User.new(last_name: users(:one).last_name, login_name: users(:one).login_name ).valid?, 'First fixture is not valid.'
+    assert User.new(last_name: users(:two).last_name, login_name: users(:two).login_name ).valid?, 'Second fixture is not valid.'
+  end
+
+  [
     'hans.meier',
     'hans-meier',
     'h-meier',
@@ -707,22 +700,20 @@ class UserTest &lt; ActiveSupport::TestCase
     test "the login_name '#{valid_login_name}' is valid" do
       assert User.new(last_name: users(:one).last_name, login_name: valid_login_name ).valid?, "login_name '#{valid_login_name}' is not valid."
     end
-  end</emphasis>
-  
-end
-</programlisting></para>
+  end
+end</programlisting></para>
 
-      <para>Running through the test suite shows the results:<screen>MacBook:webshop xyz$ <command>rake test:units</command>
+      <para>Running through the test suite shows the results:<screen>$ rake test:units
 Run options: 
 
 # Running tests:
 
 .......
 
-Finished tests in 0.090630s, 77.2371 tests/s, 88.2710 assertions/s.
+Finished tests in 0.088988s, 78.6623 tests/s, 89.8998 assertions/s.
 
 7 tests, 8 assertions, 0 failures, 0 errors, 0 skips
-MacBook:webshop xyz$  </screen></para>
+$ </screen></para>
 
       <para>With <command>rake test</command> you could now run all tests
       again.</para>
@@ -795,16 +786,16 @@ two:
       linkend="erb-programmieren"/>).</para>
 
       <para>If we want to dynamically enter today's day 20 years ago for the
-      birthdays, then we can simply do it with ERB:<programlisting>one:
+      birthdays, then we can simply do it with ERB in
+      <filename>test/fixtures/users.yml</filename><programlisting>one:
   login_name: horst.meier
   last_name: Meier
-  <emphasis>birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;</emphasis>
+  birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;
 
 two:
   login_name: emil.stein
   last_name: Stein
-  <emphasis>birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;</emphasis>
-</programlisting></para>
+  birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;</programlisting></para>
     </section>
   </section>
 
@@ -835,10 +826,10 @@ two:
     functional tests, but not integration tests. You can either do this
     manually in the directory <filename>test/integration/</filename> or more
     comfortably with <command>rails generate integration_test</command>. So
-    let's create an integration test:<screen>MacBook:webshop xyz$ <command>rails generate integration_test invalid_new_user_workflow</command>
+    let's create an integration test:<screen>$ rails generate integration_test invalid_new_user_workflow
       invoke  test_unit
       create    test/integration/invalid_new_user_workflow_test.rb
-MacBook:webshop xyz$ </screen></para>
+$</screen></para>
 
     <para>We now populate this file
     <filename>test/integration/invalid_new_user_workflow_test.rb</filename>
@@ -854,11 +845,10 @@ class InvalidNewUserWorkflowTest &lt; ActionDispatch::IntegrationTest
 
     post_via_redirect "/users", :last_name =&gt; "Oberhuber" 
     assert_equal '/users', path
-    assert_select 'li', "Login name can't be blank"
+    assert_select 'li', "Login name can&amp;#x27;t be blank"
     assert_select 'li', "Login name must include at least one of the special characters -_."
   end
-end
-</programlisting></para>
+end</programlisting></para>
 
     <para>The magic of the integration test lies amongst others in the method
     <methodname>post_via_redirect,</methodname> with which you can carry on
@@ -866,17 +856,17 @@ end
     integration test.</para>
 
     <para>All integration tests can be executed with <command>rake
-    test:integration</command>. Let's have a go:<screen>MacBook:webshop xyz$ <command>rake test:integration</command>
+    test:integration</command>. Let's have a go:<screen>$ rake test:integration
 Run options: 
 
 # Running tests:
 
 .
 
-Finished tests in 0.238591s, 4.1913 tests/s, 16.7651 assertions/s.
+Finished tests in 0.226340s, 4.4181 tests/s, 17.6725 assertions/s.
 
 1 tests, 4 assertions, 0 failures, 0 errors, 0 skips
-MacBook:webshop xyz$</screen></para>
+$</screen></para>
 
     <para>The example clearly shows that you can program much without manually
     using a web browser to try it out. Once you have written a test for the
@@ -893,23 +883,23 @@ MacBook:webshop xyz$</screen></para>
     </indexterm>
 
     <para>With <command>rake stats</command> you get an overview of your Rails
-    project. For our example, it looks like this:<screen>MacBook:webshop xyz$ rake stats
+    project. For our example, it looks like this:<screen>$ rake stats
 +----------------------+-------+-------+---------+---------+-----+-------+
 | Name                 | Lines |   LOC | Classes | Methods | M/C | LOC/M |
 +----------------------+-------+-------+---------+---------+-----+-------+
 | Controllers          |    86 |    61 |       2 |       7 |   3 |     6 |
 | Helpers              |     4 |     4 |       0 |       0 |   0 |     0 |
-| Models               |    14 |    11 |       1 |       0 |   0 |     0 |
+| Models               |    13 |    11 |       1 |       0 |   0 |     0 |
 | Libraries            |     0 |     0 |       0 |       0 |   0 |     0 |
 | Integration tests    |    16 |    12 |       1 |       0 |   0 |     0 |
 | Functional tests     |    49 |    39 |       1 |       0 |   0 |     0 |
-| Unit tests           |    30 |    24 |       2 |       0 |   0 |     0 |
+| Unit tests           |    28 |    24 |       2 |       0 |   0 |     0 |
 +----------------------+-------+-------+---------+---------+-----+-------+
-| Total                |   199 |   151 |       7 |       7 |   1 |    19 |
+| Total                |   196 |   151 |       7 |       7 |   1 |    19 |
 +----------------------+-------+-------+---------+---------+-----+-------+
   Code LOC: 76     Test LOC: 75     Code to Test Ratio: 1:1.0
 
-MacBook:webshop xyz$</screen></para>
+$</screen></para>
 
     <para>In this project, we have a total of 76 LOC (Lines Of Code =&gt;
     program lines) in the controllers, helpers and models. Plus we have a
