@@ -22,14 +22,14 @@
 
   <para>So let's go and build an example with minimal user management for a
   web shop that automatically sends an e-mail to the user when a new user is
-  created:<screen>MacBook:~ xyz$ <command>rails new webshop</command>
-[...]
-MacBook:~ xyz$ <command>cd webshop</command> 
-MacBook:webshop xyz$ <command>rails generate scaffold User name email</command>
-[...]
-MacBook:webshop xyz$ <command>rake db:migrate</command>
-[...]
-MacBook:webshop xyz$</screen></para>
+  created:<screen>$ rails new webshop
+  [...]
+$ cd webshop 
+$ rails generate scaffold User name email
+  [...]
+$ rake db:migrate
+  [...]
+$</screen></para>
 
   <para>For the user model we create a minimal validation in the
   <filename>app/models/user.rb</filename>, so that we can be sure that each
@@ -48,7 +48,7 @@ end
   <para>There is a generator with the name <code>mailer</code> that creates
   the files required for mailing. First, we have a look at the output of the
   <command>rails generate mailer</command>, without passing any further
-  arguments:<screen>MacBook:webshop xyz$ <command>rails generate mailer</command>
+  arguments:<screen>$ rails generate mailer
 Usage:
   rails generate mailer NAME [method method] [options]
 
@@ -63,7 +63,7 @@ Options:
 Runtime options:
   -f, [--force]    # Overwrite files that already exist
   -p, [--pretend]  # Run but do not make any changes
-  -q, [--quiet]    # Supress status output
+  -q, [--quiet]    # Suppress status output
   -s, [--skip]     # Skip files that already exist
 
 Description:
@@ -84,16 +84,16 @@ Example:
         Test:       test/functional/notifications_test.rb
         Fixtures:   test/fixtures/notifications/signup [...]
 
-MacBook:webshop xyz$</screen></para>
+$</screen></para>
 
   <para>That is just what we are expecting. So let's now create the mailer
-  <classname>notification</classname>:<screen>MacBook:webshop xyz$ <command>rails generate mailer notification</command>
+  <classname>notification</classname>:<screen>$ rails generate mailer notification
       create  app/mailers/notification.rb
       invoke  erb
       create    app/views/notification
       invoke  test_unit
       create    test/functional/notification_test.rb
-MacBook:webshop xyz$ </screen></para>
+$ </screen></para>
 
   <para>In the file <filename>app/mailers/notification.rb</filename> you will
   find the controller:<programlisting>class Notification &lt; ActionMailer::Base
@@ -132,34 +132,34 @@ Have a great day!
             :presence =&gt; true,
             :format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }
 
-<emphasis>  after_create :send_welcome_email
+  after_create :send_welcome_email
   
   private
   
   def send_welcome_email
     Notification.new_account(self).deliver
-  end</emphasis>
-end
-</programlisting></para>
+  end
+end</programlisting></para>
 
-  <para>Let's create a new <classname>User</classname> in the console:<screen>MacBook:webshop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>User.create(name: 'Wintermeyer', email: 'stefan.wintermeyer@amooma.de')</command>
+  <para>Let's create a new <classname>User</classname> in the console:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; User.create(name: 'Wintermeyer', email: 'stefan.wintermeyer@amooma.de')
    (0.1ms)  begin transaction
-  SQL (7.7ms)  INSERT INTO "users" ("created_at", "email", "name", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Wed, 30 May 2012 15:30:30 UTC +00:00], ["email", "stefan.wintermeyer@amooma.de"], ["name", "Wintermeyer"], ["updated_at", Wed, 30 May 2012 15:30:30 UTC +00:00]]
-   (1.4ms)  commit transaction
- =&gt; #&lt;User id: 1, name: "Wintermeyer", email: "stefan.wintermeyer@amooma.de", created_at: "2012-05-30 15:30:30", updated_at: "2012-05-30 15:30:30"&gt; 
-1.9.3p194 :002 &gt; <command>exit</command>
-MacBook:webshop xyz$ </screen></para>
+  SQL (5.2ms)  INSERT INTO "users" ("created_at", "email", "name", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Wed, 21 Nov 2012 18:53:34 UTC +00:00], ["email", "stefan.wintermeyer@amooma.de"], ["name", "Wintermeyer"], ["updated_at", Wed, 21 Nov 2012 18:53:34 UTC +00:00]]
+   (0.6ms)  commit transaction
+=&gt; #&lt;User id: 1, name: "Wintermeyer", email: "stefan.wintermeyer@amooma.de", created_at: "2012-11-21 18:53:34", updated_at: "2012-11-21 18:53:34"&gt;
+&gt;&gt; exit
+$ </screen></para>
 
   <para>That was straightforward. Let's take a look at the log file
-  <filename>log/development.log</filename>:<programlisting>  Rendered notification/new_account.text.erb (2.5ms)
+  <filename>log/development.log</filename>:<programlisting>Connecting to database specified by database.yml
+  Rendered notification/new_account.text.erb (26.2ms)
 
-Sent mail to stefan.wintermeyer@amooma.de (58ms)
-Date: Wed, 30 May 2012 17:30:31 +0200
+Sent mail to stefan.wintermeyer@amooma.de (54ms)
+Date: Wed, 21 Nov 2012 19:53:36 +0100
 From: from@example.com
 To: stefan.wintermeyer@amooma.de
-Message-ID: &lt;4fc63d175ea71_a9f03fceda028cd8377c5@MacBook.local.mail&gt;
+Message-ID: &lt;50ad23301617a_d5233fea89c2a1d8458c8@SW.local.mail&gt;
 Subject: The new account Wintermeyer is active.
 Mime-Version: 1.0
 Content-Type: text/plain;
@@ -249,7 +249,7 @@ config.action_mailer.smtp_settings = {
 
   def new_account(user)
     @user = user
-    <emphasis>headers["X-Priority"] = '3'</emphasis>
+    headers["X-Priority"] = '3'
     mail(:to =&gt; user.email,
          :subject =&gt; "The new account #{user.name} is active.")
   end
@@ -266,7 +266,7 @@ Mime-Version: 1.0
 Content-Type: text/plain;
  charset=UTF-8
 Content-Transfer-Encoding: 7bit
-<emphasis>X-Priority: 3</emphasis>
+X-Priority: 3
 
 Hello Wintermeyer,
 
@@ -387,7 +387,7 @@ Content-ID: &lt;4fc640e928055_aa173fd61d828ce0500ea@MacBook.local.mail&gt;
 
   def new_account(user)
     @user = user
-    <emphasis>attachments['rails.png'] = File.read("#{Rails.root}/app/assets/images/rails.png")</emphasis>
+    attachments['rails.png'] = File.read("#{Rails.root}/app/assets/images/rails.png")
     mail(:to =&gt; user.email,
          :subject =&gt; "The new account #{user.name} is active.")
   end
@@ -407,7 +407,7 @@ end
 
   def new_account(user)
     @user = user
-    <emphasis>attachments.inline['rails.png'] = File.read("#{Rails.root}/app/assets/images/rails.png")</emphasis>
+    attachments.inline['rails.png'] = File.read("#{Rails.root}/app/assets/images/rails.png")
     mail(:to =&gt; user.email,
          :subject =&gt; "The new account #{user.name} is active.")
   end
@@ -424,7 +424,7 @@ end
     &lt;meta content="text/html; charset=UTF-8" http-equiv="Content-Type" /&gt;
   &lt;/head&gt;
   &lt;body&gt;
-    <emphasis>&lt;%= image_tag attachments['rails.png'].url, :alt =&gt; 'Rails Logo' %&gt;</emphasis>
+    &lt;%= image_tag attachments['rails.png'].url, :alt =&gt; 'Rails Logo' %&gt;
     &lt;p&gt;Hello &lt;%= @user.name %&gt;,&lt;/p&gt;
 
     &lt;p&gt;your new account is active.&lt;/p&gt;
