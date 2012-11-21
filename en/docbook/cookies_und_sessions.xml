@@ -301,12 +301,21 @@ end</programlisting>The content of the cookie is now saved in encrypted form
       three views. When a view is visited, the previously visited views are
       displayed in a little list.</para>
 
-      <para>The basic application:<screen>MacBook:~ xyz$ <command>rails new breadcrumbs</command>
-[...]
-MacBook:~ xyz$ <command>cd breadcrumbs</command>
-MacBook:breadcrumbs xyz$ <command>rails generate controller Home ping pong index</command>
-[...]
-MacBook:breadcrumbs xyz$</screen></para>
+      <para>The basic application:<screen>$ rails new breadcrumbs
+  [...]
+$ cd breadcrumbs 
+$ rails generate controller Home ping pong index
+      create  app/controllers/home_controller.rb
+       route  get "home/index"
+       route  get "home/pong"
+       route  get "home/ping"
+      invoke  erb
+      create    app/views/home
+      create    app/views/home/ping.html.erb
+      create    app/views/home/pong.html.erb
+      create    app/views/home/index.html.erb
+      [...]
+$ </screen></para>
 
       <para>First we create a method with which we can save the last three
       URLs in the session and set an instance variable
@@ -314,8 +323,7 @@ MacBook:breadcrumbs xyz$</screen></para>
       values in the view. To that end, we set up a
       <methodname>before_filter</methodname> in the
       <filename>app/controllers/home_controller.rb</filename>:<programlisting>class HomeController &lt; ApplicationController
-  
-  <emphasis role="bold">before_filter :set_breadcrumbs</emphasis>
+  before_filter :set_breadcrumbs
   
   def ping
   end
@@ -326,16 +334,17 @@ MacBook:breadcrumbs xyz$</screen></para>
   def index
   end
   
-<emphasis role="bold">  private
+  private
   
   def set_breadcrumbs
     @breadcrumbs = session[:breadcrumbs]
     @breadcrumbs ||= Array.new
     @breadcrumbs.push(request.url)
-    @breadcrumbs.shift if @breadcrumbs.count &gt; 3
+    if @breadcrumbs.count &gt; 3
+      @breadcrumbs.shift
+    end
     session[:breadcrumbs] = @breadcrumbs
-  end</emphasis>
-  
+  end
 end</programlisting></para>
 
       <para>Now we use the
@@ -350,14 +359,14 @@ end</programlisting></para>
 &lt;/head&gt;
 &lt;body&gt;
 
-<emphasis>&lt;% if @breadcrumbs %&gt;
+&lt;% if @breadcrumbs %&gt;
   &lt;p&gt;Last pages visited:&lt;/p&gt;
   &lt;ul&gt;
     &lt;% @breadcrumbs.each do |breadcrumb| %&gt;
       &lt;li&gt;&lt;%= link_to breadcrumb, breadcrumb %&gt;&lt;/li&gt;
     &lt;% end %&gt;
   &lt;/ul&gt;
-&lt;% end %&gt;</emphasis>
+&lt;% end %&gt;
 
 &lt;%= yield %&gt;
 
@@ -400,7 +409,7 @@ end</programlisting></para>
       a new, fresh session). For example, if you log out of a web application,
       the session will be reset. This is easily done and we can quickly
       integrate it into our breadcrumb application (see <xref
-      linkend="session_breadcrumbs"/>):<screen>MacBook:breadcrumbs xyz$ <command>rails generate controller Home reset -s</command>
+      linkend="session_breadcrumbs"/>):<screen>$ rails generate controller Home reset -s
         skip  app/controllers/home_controller.rb
        route  get "home/reset"
       invoke  erb
@@ -417,12 +426,11 @@ end</programlisting></para>
    identical      app/assets/javascripts/home.js.coffee
       invoke    scss
    identical      app/assets/stylesheets/home.css.scss
-MacBook:breadcrumbs xyz$</screen></para>
+$</screen></para>
 
       <para>The correspondingly expanded controller
       <filename>app/controllers/home_controller.rb</filename> then looks like
       this:<programlisting>class HomeController &lt; ApplicationController
-  
   before_filter :set_breadcrumbs
   
   def ping
@@ -433,11 +441,11 @@ MacBook:breadcrumbs xyz$</screen></para>
   
   def index
   end
-  
-  <emphasis role="bold">def reset
+
+  def reset
     reset_session
     @breadcrumbs = nil
-  end</emphasis>
+  end
   
   private
   
@@ -445,10 +453,11 @@ MacBook:breadcrumbs xyz$</screen></para>
     @breadcrumbs = session[:breadcrumbs]
     @breadcrumbs ||= Array.new
     @breadcrumbs.push(request.url)
-    @breadcrumbs.shift if @breadcrumbs.count &gt; 3
+    if @breadcrumbs.count &gt; 3
+      @breadcrumbs.shift
+    end
     session[:breadcrumbs] = @breadcrumbs
   end
-  
 end</programlisting></para>
 
       <para>So you can delete the current session by going to the URL <uri
@@ -482,32 +491,16 @@ end</programlisting></para>
       <para>First, we change the configuration of the session store in the
       file <filename>config/initializers/session_store.rb</filename>. We
       comment out the <code>:cookie_store</code> and take out the comment sign
-      before the <code>:active_record_store</code>.<programlisting># Be sure to restart your server when you modify this file.
-
-<emphasis># Breadcrumbs::Application.config.session_store :cookie_store, key: '_breadcrumbs_session'</emphasis>
-
-# Use the database for sessions instead of the cookie-based default,
-# which shouldn't be used to store highly confidential information
-# (create the session table with "rails generate session_migration")
-
-<emphasis>Breadcrumbs::Application.config.session_store :active_record_store</emphasis></programlisting></para>
+      before the <code>:active_record_store</code>.<programlisting>Breadcrumbs::Application.config.session_store :active_record_store
+</programlisting></para>
 
       <para>Now we still need to create the corresponding table. We do it with
       <command>rails generate session_migration</command> and <command>rake
-      db:migrate</command>:<screen>MacBook:breadcrumbs xyz$ <command>rails generate session_migration</command>
-      invoke  active_record
-      create    db/migrate/20120530145134_add_sessions_table.rb
-MacBook:breadcrumbs xyz$ <command>rake db:migrate</command>
-==  AddSessionsTable: migrating ===============================================
--- create_table(:sessions)
-   -&gt; 0.0014s
--- add_index(:sessions, :session_id)
-   -&gt; 0.0005s
--- add_index(:sessions, :updated_at)
-   -&gt; 0.0006s
-==  AddSessionsTable: migrated (0.0027s) ======================================
-
-MacBook:breadcrumbs xyz$</screen></para>
+      db:migrate</command>:<screen>$ rails generate session_migration
+  [...]
+$ rake db:migrate
+  [...]
+$</screen></para>
 
       <para>Job done. Now you need to start the server again with
       <command>rails server</command> and Rails saves all sessions in the
