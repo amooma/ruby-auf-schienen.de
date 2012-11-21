@@ -39,8 +39,8 @@
         protocol overhead becoming too big.</para>
       </tip></para>
 
-    <para>Rails offers us a hash with the name <varname>cookies[]</varname>
-    that we can use transparently. Rails then automatically takes care of the
+    <para>Rails provides a hash with the name <varname>cookies[]</varname>
+    that we can use transparently. Rails automatically takes care of the
     technological details in the background.</para>
 
     <para>To demonstrate how cookies work, we are going to build a Rails
@@ -48,17 +48,25 @@
     and displays the content, and the cookie is deleted on a third
     page.</para>
 
-    <para><screen>MacBook:~ xyz$ <command>rails new cookie_jar</command>
-[...]
-MacBook:~ xyz$ <command>cd cookie_jar</command>
-MacBook:cookie_jar xyz$ <command>rails generate controller Home set_cookies show_cookies delete_cookies</command>
-[...]
-MacBook:cookie_jar xyz$</screen></para>
+    <para><screen>$ rails new cookie_jar
+  [...]
+$ cd cookie_jar 
+$ rails generate controller Home set_cookies show_cookies delete_cookies
+      create  app/controllers/home_controller.rb
+       route  get "home/delete_cookies"
+       route  get "home/show_cookies"
+       route  get "home/set_cookies"
+      invoke  erb
+      create    app/views/home
+      create    app/views/home/set_cookies.html.erb
+      create    app/views/home/show_cookies.html.erb
+      create    app/views/home/delete_cookies.html.erb
+      [...]
+$ </screen></para>
 
     <para>We populate the controller file
     <filename>app/controllers/home_controller.rb</filename> as
     follows:<programlisting>class HomeController &lt; ApplicationController
-  
   def set_cookies
     cookies[:user_name]   = "Horst Meier" 
     cookies[:customer_number] = "1234567890" 
@@ -73,15 +81,11 @@ MacBook:cookie_jar xyz$</screen></para>
     cookies.delete :user_name
     cookies.delete :customer_number
   end
-  
 end</programlisting></para>
 
     <para>And the view file
     <filename>app/views/home/show_cookies.html.erb</filename> as
-    follows:<programlisting>&lt;h1&gt;Home#show_cookies&lt;/h1&gt;
-&lt;p&gt;Find me in app/views/home/show_cookies.html.erb&lt;/p&gt;
-
-&lt;table&gt;
+    follows:<programlisting>&lt;table&gt;
  &lt;tr&gt;&lt;td&gt;User Name:&lt;/td&gt;&lt;td&gt;&lt;%= @user_name %&gt;&lt;/td&gt;&lt;/tr&gt;
  &lt;tr&gt;&lt;td&gt;Customer Number:&lt;/td&gt;&lt;td&gt;&lt;%= @customer_number %&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;</programlisting></para>
@@ -89,12 +93,50 @@ end</programlisting></para>
     <para>Start the Rails server with <command>rails server</command> and go
     to the URL <uri
     xlink:href="http://0.0.0.0:3000/home/show_cookies">http://0.0.0.0:3000/home/show_cookies</uri>
-    in your browser. You will not see any values. Now go to the URL <uri
+    in your browser. You will not see any values. <screenshot>
+        <info>
+          <title>No cookies set</title>
+        </info>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screenshots/show_cookies_empty.jpg"/>
+          </imageobject>
+
+          <textobject>
+            <simpara>Welcome aboard</simpara>
+
+            <simpara>You're riding Ruby on Rails!</simpara>
+
+            <para>…</para>
+          </textobject>
+        </mediaobject>
+      </screenshot></para>
+
+    <para>Now go to the URL <uri
     xlink:href="http://0.0.0.0:3000/home/set_cookies">http://0.0.0.0:3000/home/set_cookies</uri>
     and then back to <uri
     xlink:href="http://0.0.0.0:3000/home/show_cookies">http://0.0.0.0:3000/home/show_cookies</uri>.
     Now you will see the values that we have set in the method
-    <methodname>set_cookies.</methodname></para>
+    <methodname>set_cookies.</methodname><screenshot>
+        <info>
+          <title>Cookies set</title>
+        </info>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screenshots/show_cookies_set.jpg"/>
+          </imageobject>
+
+          <textobject>
+            <simpara>Welcome aboard</simpara>
+
+            <simpara>You're riding Ruby on Rails!</simpara>
+
+            <para>…</para>
+          </textobject>
+        </mediaobject>
+      </screenshot></para>
 
     <para>By going to the page <uri
     xlink:href="http://0.0.0.0:3000/home/delete_cookies">http://0.0.0.0:3000/home/delete_cookies</uri>
@@ -131,10 +173,9 @@ end</programlisting></para>
       <methodname>permanent</methodname>. Our above example can be expanded by
       adding this method in the
       <filename>app/controllers/home_controller.rb</filename>:<programlisting>class HomeController &lt; ApplicationController
-  
   def set_cookies
-<emphasis role="bold">    cookies.permanent[:user_name]   = "Horst Meier" 
-    cookies.permanent[:customer_number] = "1234567890" </emphasis>
+    cookies.permanent[:user_name]   = "Horst Meier" 
+    cookies.permanent[:customer_number] = "1234567890" 
   end
   
   def show_cookies
@@ -149,7 +190,6 @@ end</programlisting></para>
   
   def debug_cookies
   end
-  
 end</programlisting></para>
 
       <important>
@@ -196,15 +236,14 @@ CookieJar::Application.config.secret_token = '85ec33910d4d57f3d3c69cb8fef20f158f
       reading the cookie. Our above example can be expanded by adding this
       method in the
       <filename>app/controllers/home_controller.rb</filename>:<programlisting>class HomeController &lt; ApplicationController
-  
   def set_cookies
-<emphasis role="bold">    cookies.permanent.signed[:user_name]   = "Horst Meier" 
-    cookies.permanent.signed[:customer_number] = "1234567890" </emphasis>
+    cookies.permanent.signed[:user_name]   = "Horst Meier" 
+    cookies.permanent.signed[:customer_number] = "1234567890" 
   end
 
   def show_cookies
-<emphasis role="bold">    @user_name    = cookies.signed[:user_name]
-    @customer_number = cookies.signed[:customer_number]</emphasis>
+    @user_name    = cookies.signed[:user_name]
+    @customer_number = cookies.signed[:customer_number]
   end
 
   def delete_cookies
@@ -214,7 +253,6 @@ CookieJar::Application.config.secret_token = '85ec33910d4d57f3d3c69cb8fef20f158f
 
   def debug_cookies
   end
-  
 end</programlisting>The content of the cookie is now saved in encrypted form
       every time you set the cookie. The name of the cookie can still be read
       by the user, but not the value.</para>
