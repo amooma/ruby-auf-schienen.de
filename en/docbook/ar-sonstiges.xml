@@ -118,40 +118,53 @@
     enter upper case letters. You could use a
     <methodname>before_save</methodname> callback to convert the attribute
     <varname>email</varname> to lower case via the method
-    <methodname>downcase</methodname>. Here is what the model would look
-    like:<programlisting>class User &lt; ActiveRecord::Base
-  attr_accessible :email, :name
+    <methodname>downcase</methodname>. </para>
 
-  validates :name,
+    <para>The Rails application:<screen>$ rails new shop
+  [...]
+$ cd shop
+$ rails generate model user email login
+  [...]
+$ rake db:migrate
+  [...]
+$</screen></para>
+
+    <para>Here is what the model <filename>app/models/user.rb</filename> would
+    look like. The interesting stuff is the <code>before_save</code>
+    part:<programlisting>class User &lt; ActiveRecord::Base
+  attr_accessible :email, :login
+
+  validates :login,
             :presence =&gt; true
 
   validates :email,
             :presence =&gt; true,
             :format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }
 
-  <emphasis>before_save :downcase_email</emphasis>
+  before_save :downcase_email
 
   private
 
-<emphasis>  def downcase_email
+  def downcase_email
     self.email = self.email.downcase
-  end</emphasis>
+  end
+
 end</programlisting></para>
 
     <para>Let's see in the console if it really works as we want it
-    to:<screen>MacBook:webshop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>User.create(name: 'Wintermeyer', email: 'Stefan.Wintermeyer@amooma.de')</command>
+    to:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; User.create(login: 'smith', email: 'SMITH@example.com')
    (0.1ms)  begin transaction
-  SQL (5.9ms)  INSERT INTO "users" ("created_at", "email", "name", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Wed, 30 May 2012 18:20:21 UTC +00:00], ["email", "stefan.wintermeyer@amooma.de"], ["name", "Wintermeyer"], ["updated_at", Wed, 30 May 2012 18:20:21 UTC +00:00]]
-   (2.8ms)  commit transaction
- =&gt; #&lt;User id: 1, name: "Wintermeyer", email: "stefan.wintermeyer@amooma.de", created_at: "2012-05-30 18:20:21", updated_at: "2012-05-30 18:20:21"&gt; 
-1.9.3p194 :002 &gt; <command>exit</command>
-MacBook:webshop xyz$ </screen></para>
+  SQL (29.9ms)  INSERT INTO "users" ("created_at", "email", "login", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Wed, 21 Nov 2012 09:14:47 UTC +00:00], ["email", "smith@example.com"], ["login", "smith"], ["updated_at", Wed, 21 Nov 2012 09:14:47 UTC +00:00]]
+   (0.7ms)  commit transaction
+=&gt; #&lt;User id: 1, email: "smith@example.com", login: "smith", created_at: "2012-11-21 09:14:47", updated_at: "2012-11-21 09:14:47"&gt;
+&gt;&gt; exit
+$ </screen></para>
 
-    <para>Even though the e-mail address was entered with a capital 'S' and
-    'W', ActiveRecord has indeed converted all letters automatically to lower
-    case via the <methodname>before_save</methodname> callback.</para>
+    <para>Even though the e-mail address was entered partly with a capital
+    letters, ActiveRecord has indeed converted all letters automatically to
+    lower case via the <methodname>before_save</methodname> callback.</para>
 
     <para>In <xref linkend="action_mailer"/> you will find an example for the
     same model where we use an <methodname>after_create</methodname> callback
@@ -180,40 +193,36 @@ MacBook:webshop xyz$ </screen></para>
     always 1, so we can enter 1 directly as default value when creating a new
     record.</para>
 
-    <para>Let's set up a quick example:<screen>MacBook:~ xyz$ <command>rails new shop</command>
-[...]
-MacBook:~ xyz$ <command>cd shop</command>
-MacBook:shop xyz$ <command>rails generate model order product_id:integer quantity:integer</command>
-[...]
-MacBook:shop xyz$ <command>rake db:migrate</command>
-[...]
-MacBook:shop xyz$</screen></para>
+    <para>Let's set up a quick example:<screen>$ rails new shop
+  [...]
+$ cd shop
+$ rails generate model order product_id:integer quantity:integer
+  [...]
+$ rake db:migrate
+  [...]
+$</screen></para>
 
     <para>We write an <methodname>after_initialize</methodname> callback into
     the file <filename>app/models/order.rb</filename>:<programlisting>class Order &lt; ActiveRecord::Base
   attr_accessible :product_id, :quantity
-<emphasis>  after_initialize :set_defaults
+  after_initialize :set_defaults
 
   private
   def set_defaults 
     self.quantity ||= 1
-  end</emphasis>
+  end
 end</programlisting></para>
 
     <para>And now we check in the console if a new order object automatically
-    contains the quantity 1:<screen>MacBook:shop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>order = Order.new</command>
- =&gt; #&lt;Order id: nil, product_id: nil, quantity: 1, created_at: nil, updated_at: nil&gt; 
-1.9.3p194 :002 &gt; <command>exit</command>
-MacBook:shop xyz$ </screen></para>
+    contains the quantity 1:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; order = Order.new
+=&gt; #&lt;Order id: nil, product_id: nil, quantity: 1, created_at: nil, updated_at: nil&gt;
+&gt;&gt; order.quantity
+=&gt; 1
+&gt;&gt; exit
+$</screen></para>
 
     <para>That's working fine.</para>
-
-    <note>
-      <para>Some readers may ask why we have not set a default in the database
-      in the migration. As so often, there are several possible solutions for
-      this problem.</para>
-    </note>
   </section>
 </section>
