@@ -25,27 +25,27 @@
     linkend="scaffolding"/> we have already come across <foreignphrase
     xml:lang="en">routes</foreignphrase>. The routes contained in
     <filename>config/routes.rb</filename> define what happens in the Rails
-    application when a user of the web page goes to a specific URL. A route
-    can be static and dynamic and pass any dynamic values with variables to
-    the controller. If several routes apply to a URL, the one that is listed
-    at the top of <filename>config/routes.rb</filename> wins.<note>
+    application when a user of a Rails application opens a URL. A route can be
+    static and dynamic and pass any dynamic values with variables to the
+    controller. If several routes apply to a URL, the one that is listed at
+    the top of <filename>config/routes.rb</filename> wins.<note>
         <para>If you do not have much time, you can skip this chapter for now
         and get back to it later if you have any specific questions.</para>
       </note></para>
 
     <para>Let's first build a test Rails application so we can
-    experiment:<screen>MacBook:~ xyz$ <command>rails new shop</command>
-[...]
-MacBook:~ xyz$ <command>cd shop</command>
-MacBook:shop xyz$</screen></para>
+    experiment:<screen>$ rails new shop
+  [...]
+$ cd shop
+$</screen></para>
 
     <para>With <command>rake routes</command> we can display the routes of a
     project. Let's try it straight away in the freshly created
-    project:<screen>MacBook:shop xyz$ <command>rake routes</command>
+    project:<screen>$ rake routes
 
-MacBook:shop xyz$</screen></para>
+$ </screen></para>
 
-    <para>Nothing. In a new Rails project, there are no routes yet.</para>
+    <para>Nothing. It's a new Rails project, there are no routes yet.</para>
 
     <important>
       <para>Even in a new Rails project you can access <uri
@@ -75,35 +75,20 @@ MacBook:shop xyz$</screen></para>
       <secondary>get</secondary>
     </indexterm>
 
-    <para>Let's next create a controller with three simple pages:<screen>MacBook:shop xyz$ <command>rails generate controller Home index ping pong</command>
-      create  app/controllers/home_controller.rb
-<emphasis>       route  get "home/pong"
+    <para>Let's next create a controller with three simple pages:<screen>$ rails generate controller Home index ping pong
+  [...]
+       route  get "home/pong"
        route  get "home/ping"
        route  get "home/index"
-</emphasis>      invoke  erb
-      create    app/views/home
-      create    app/views/home/index.html.erb
-      create    app/views/home/ping.html.erb
-      create    app/views/home/pong.html.erb
-      invoke  test_unit
-      create    test/functional/home_controller_test.rb
-      invoke  helper
-      create    app/helpers/home_helper.rb
-      invoke    test_unit
-      create      test/unit/helpers/home_helper_test.rb
-      invoke  assets
-      invoke    coffee
-      create      app/assets/javascripts/home.js.coffee
-      invoke    scss
-      create      app/assets/stylesheets/home.css.scss
-MacBook:shop xyz$</screen></para>
+  [...]
+$</screen></para>
 
     <para>Now <command>rake routes</command> lists a route for these three
-    pages:<screen>MacBook:shop xyz$ <command>rake routes</command>
+    pages:<screen>$ rake routes
 home_index GET /home/index(.:format) home#index
  home_ping GET /home/ping(.:format)  home#ping
  home_pong GET /home/pong(.:format)  home#pong
-MacBook:shop xyz$</screen></para>
+$</screen></para>
 
     <para>The pages can be accessed at the following URLs after starting the
     Rails server with <command>rails server</command>:<itemizedlist>
@@ -228,21 +213,21 @@ MacBook:shop xyz$</screen></para>
 
   get "home/pong"
 
-  <emphasis>root :to =&gt; "home#index"</emphasis>
+  root :to =&gt; "home#index"
 end</programlisting></para>
 
     <important>
       <para>After setting the <code>root</code> route please do not forget to
-      delete the file <filename>/public/index.html</filename>!<screen>MacBook:shop xyz$ <command>rm public/index.html</command> 
-MacBook:shop xyz$</screen></para>
+      delete the file <filename>/public/index.html</filename>!<screen>$ rm public/index.html 
+$</screen></para>
     </important>
 
-    <para>Our new routes:<screen>MacBook:shop xyz$ <command>rake routes</command>
+    <para>Our new routes:<screen>$ rake routes
 home_index GET /home/index(.:format) home#index
  home_ping GET /home/ping(.:format)  home#ping
  home_pong GET /home/pong(.:format)  home#pong
       root     /                     home#index
-MacBook:shop xyz$</screen></para>
+$</screen></para>
 
     <para>If we go to the root URL <uri
     xlink:href="http://0.0.0.0:3000">http://0.0.0.0:3000</uri> we now see
@@ -282,16 +267,16 @@ MacBook:shop xyz$</screen></para>
 
   root :to =&gt; "home#index"
 
-  <emphasis>match "home/applepie" =&gt; "home#ping"</emphasis>
+  match "home/applepie" =&gt; "home#ping"
 end</programlisting></para>
 
-    <para>We then have the following routes available:<screen>MacBook:shop xyz$ <command>rake routes</command>
+    <para>We then have the following routes available:<screen>$ rake routes
    home_index GET /home/index(.:format)    home#index
     home_ping GET /home/ping(.:format)     home#ping
     home_pong GET /home/pong(.:format)     home#pong
          root     /                        home#index
-<emphasis>home_applepie     /home/applepie(.:format) home#ping</emphasis>
-MacBook:shop xyz$ </screen></para>
+home_applepie     /home/applepie(.:format) home#ping
+$</screen></para>
 
     <para><screenshot>
         <info>
@@ -317,7 +302,7 @@ MacBook:shop xyz$ </screen></para>
 
   root :to =&gt; "home#index"
 
-  <emphasis>match "home/ping-ping" =&gt; "home#ping", :as =&gt; "applepie"</emphasis>
+  match "home/ping-ping" =&gt; "home#ping", :as =&gt; "applepie"
 end</programlisting></para>
 
     <para>You now have the following route names available in the
@@ -349,25 +334,25 @@ MacBook:shop xyz$</screen></para>
 
       <para>Match can not just assign fixed routes but also pass parameters. A
       typical example would be date specifications. To demonstrate this, let's
-      create a mini blog application:<screen>MacBook:~ xyz$ <command>rails new blog</command>
-[...]
-MacBook:~ xyz$ <command>cd blog</command> 
-MacBook:blog xyz$ <command>rails generate scaffold Post subject content published_at:date</command>
-[...]
-MacBook:blog xyz$ <command>rake db:migrate</command>
-[...]
-MacBook:blog xyz$</screen></para>
+      create a mini blog application:<screen>$ rails new blog
+  [...]
+$ cd blog
+$ rails generate scaffold Post subject content published_at:date
+  [...]
+$ rake db:migrate
+  [...]
+$</screen></para>
 
       <para>As example data in the <filename>db/seeds.rb</filename> we
-      take:<programlisting>Post.create(:subject =&gt; 'A test',                :published_at =&gt; '01.10.2011')
-Post.create(:subject =&gt; 'Another test',          :published_at =&gt; '01.10.2011')
-Post.create(:subject =&gt; 'And yet one more test', :published_at =&gt; '02.10.2011')
-Post.create(:subject =&gt; 'Last test',             :published_at =&gt; '01.11.2011')
-Post.create(:subject =&gt; 'Very final test',       :published_at =&gt; '01.11.2012')</programlisting></para>
+      take:<programlisting>Post.create(subject: 'A test', published_at: '01.10.2011')
+Post.create(subject: 'Another test', published_at: '01.10.2011')
+Post.create(subject: 'And yet one more test', published_at: '02.10.2011')
+Post.create(subject: 'Last test', published_at: '01.11.2011')
+Post.create(subject: 'Very final test', published_at: '01.11.2012')</programlisting></para>
 
       <para>With <command>rake db:seed</command> we populate the database with
-      this data:<screen>MacBook:blog xyz$ <command>rake db:seed</command>
-MacBook:blog xyz$</screen></para>
+      this data:<screen>$ rake db:seed
+$</screen></para>
 
       <para>If we now start the Rails server with <command>rails
       server</command> and go to the page <uri
@@ -385,7 +370,7 @@ MacBook:blog xyz$</screen></para>
         </screenshot></para>
 
       <para>For this kind of blog it would of course be very useful if you
-      could display all entries for the year 2010 with the URL <uri
+      could render all entries for the year 2010 with the URL <uri
       xlink:href="http://0.0.0.0:3000/2010/">http://0.0.0.0:3000/2010/</uri>
       and all entries for October 1st 2010 with <uri
       xlink:href="http://0.0.0.0:3000/2010/10/01">http://0.0.0.0:3000/2010/10/01</uri>.
@@ -398,34 +383,46 @@ MacBook:blog xyz$</screen></para>
 end</programlisting></para>
 
       <para>The round brackets represent optional parameters. In this case,
-      you have to specify the year, but not necessarily the month or
-      day.</para>
+      you have to specify the year, but not necessarily the month or day.
+      <command>rake routes</command> shows the new route at the last
+      line:<screen>$ rake routes
+    posts GET    /posts(.:format)                 posts#index
+          POST   /posts(.:format)                 posts#create
+ new_post GET    /posts/new(.:format)             posts#new
+edit_post GET    /posts/:id/edit(.:format)        posts#edit
+     post GET    /posts/:id(.:format)             posts#show
+          PUT    /posts/:id(.:format)             posts#update
+          DELETE /posts/:id(.:format)             posts#destroy
+                 /:year(/:month(/:day))(.:format) posts#index
+$ </screen></para>
 
       <para>If we do not change anything else, we still get the same result
       when calling <uri
-      xlink:href="http://0.0.0.0:3000/2010/">http://0.0.0.0:3000/2010/</uri>
+      xlink:href="http://0.0.0.0:3000/2011/">http://0.0.0.0:3000/2011/</uri>
       and <uri
-      xlink:href="http://0.0.0.0:3000/2010">http://0.0.0.0:3000/2010/10/01</uri>
+      xlink:href="http://0.0.0.0:3000/2011">http://0.0.0.0:3000/2011/10/01</uri>
       as we did with <uri
       xlink:href="http://0.0.0.0:3000/posts">http://0.0.0.0:3000/posts</uri>.
-      This is logical. But have a look at the output of rails server:<screen>Started GET "/2010/" for 127.0.0.1 at 2012-05-22 11:27:29 +0200
+      This is logical. But have a look at the output of rails server:<screen>Started GET "/2011" for 127.0.0.1 at 2012-11-21 17:10:50 +0100
+Connecting to database specified by database.yml
 Processing by PostsController#index as HTML
-  <emphasis>Parameters: {"year"=&gt;"2010"}</emphasis>
-  Post Load (0.2ms)  SELECT "posts".* FROM "posts" 
-  Rendered posts/index.html.erb within layouts/application (5.5ms)
-Completed 200 OK in 13ms (Views: 11.3ms | ActiveRecord: 0.2ms)</screen></para>
+  Parameters: {"year"=&gt;"2011"}
+  Post Load (0.1ms)  SELECT "posts".* FROM "posts" 
+  Rendered posts/index.html.erb within layouts/application (10.9ms)
+Completed 200 OK in 122ms (Views: 82.5ms | ActiveRecord: 2.0ms)</screen></para>
 
       <para>The route has been recognised and an element <code>"year" =&gt;
-      "2010"</code> has been assigned to the hash
+      "2011"</code> has been assigned to the hash
       <code><varname>params</varname></code> (written misleadingly as
       <code>Parameters</code> in the output). Going to the URL <uri
       xlink:href="http://0.0.0.0:3000/2010/12/24">http://0.0.0.0:3000/2010/12/24</uri>
-      results in the following output, as expected:<screen>Started GET "/2010/12/24" for 127.0.0.1 at 2012-05-22 11:30:49 +0200
+      results in the following output, as expected:<screen>Started GET "/2010/12/24" for 127.0.0.1 at 2012-11-21 17:13:55 +0100
+Connecting to database specified by database.yml
 Processing by PostsController#index as HTML
-  <emphasis>Parameters: {"year"=&gt;"2010", "month"=&gt;"12", "day"=&gt;"24"}</emphasis>
-  Post Load (0.2ms)  SELECT "posts".* FROM "posts" 
-  Rendered posts/index.html.erb within layouts/application (5.9ms)
-Completed 200 OK in 13ms (Views: 11.5ms | ActiveRecord: 0.2ms)</screen></para>
+  Parameters: {"year"=&gt;"2010", "month"=&gt;"12", "day"=&gt;"24"}
+  Post Load (0.1ms)  SELECT "posts".* FROM "posts" 
+  Rendered posts/index.html.erb within layouts/application (9.6ms)
+Completed 200 OK in 93ms (Views: 62.5ms | ActiveRecord: 1.9ms)</screen></para>
 
       <para>In case of the URL <uri
       xlink:href="http://0.0.0.0:3000/2010/12/24">http://0.0.0.0:3000/2010/12/24</uri>,
@@ -439,15 +436,23 @@ Completed 200 OK in 13ms (Views: 11.5ms | ActiveRecord: 0.2ms)</screen></para>
       <filename>app/controllers/posts_controller.rb</filename> to output the
       <varname>posts</varname> entered for the corresponding date, month or
       year:<programlisting>def index
-<emphasis>  if params[:day]
-    @posts = Post.where(:published_at =&gt; Date.parse("#{params[:day]}.#{params[:month]}.#{params[:year]}"))
+  if params[:day]
+    # Request for a specific day.
+    #
+    @posts = Post.where(published_at: Date.parse("#{params[:day]}.#{params[:month]}.#{params[:year]}"))
   elsif params[:month]
-    @posts = Post.where(:published_at =&gt; ( Date.parse("01.#{params[:month]}.#{params[:year]}") .. Date.parse("01.#{params[:month]}.#{params[:year]}").end_of_month ))
+    # Request for a specific month.
+    #
+    @posts = Post.where(published_at: ( Date.parse("01.#{params[:month]}.#{params[:year]}") .. Date.parse("01.#{params[:month]}.#{params[:year]}").end_of_month ))
   elsif params[:year]
-    @posts = Post.where(:published_at =&gt; ( Date.parse("01.01.#{params[:year]}") .. Date.parse("31.12.#{params[:year]}") ))
+    # Request for a specific year.
+    #
+    @posts = Post.where(published_at: ( Date.parse("01.01.#{params[:year]}") .. Date.parse("31.12.#{params[:year]}") ))
   else
+    # Request for all posts.
+    #
     @posts = Post.all
-  end</emphasis>
+  end
 
   respond_to do |format|
     format.html # index.html.erb
@@ -501,9 +506,10 @@ end</programlisting></para>
         </screenshot></para>
 
       <para>In the log output in<filename> log/development.log</filename> we
-      can see the following entry:<programlisting>Started GET "/just/an/example" for 127.0.0.1 at 2012-05-22 13:20:44 +0200
+      can see the following entry:<programlisting>Started GET "/just/an/example" for 127.0.0.1 at 2012-11-21 17:26:23 +0100
 Processing by PostsController#index as HTML
-  Parameters: {"year"=&gt;"just", "month"=&gt;"an", "day"=&gt;"example"}</programlisting></para>
+  Parameters: {"year"=&gt;"just", "month"=&gt;"an", "day"=&gt;"example"}
+Completed 500 Internal Server Error in 3ms</programlisting></para>
 
       <para>Obviously, <code>Date.parse( "example.an.just")</code> cannot
       work. A date is made up of numbers, not letters.</para>
@@ -514,7 +520,7 @@ Processing by PostsController#index as HTML
       this:<programlisting>Blog::Application.routes.draw do
   resources :posts
 
-  match "/:year(/:month(/:day))" =&gt; "posts#index"<emphasis role="bold">, :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{2}/, :day =&gt; /\d{2}/ }</emphasis>
+  match "/:year(/:month(/:day))" =&gt; "posts#index", :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{2}/, :day =&gt; /\d{2}/ }
 end</programlisting></para>
 
       <warning>
@@ -595,6 +601,21 @@ end
         But the URL <uri
         xlink:href="http://0.0.0.0:3000/2011/10/01">http://0.0.0.0:3000/2011/10/01</uri>
         would work fine.</para>
+
+        <para>Obviously we need to take care of the year and month rules too.
+        But that is a bit easier:<programlisting>Blog::Application.routes.draw do
+  resources :posts
+
+  match "/:year/:month/:day" =&gt; "posts#index", :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{2}/, :day =&gt; /\d{2}/ }, :constraints =&gt; ValidDateConstraint.new
+
+  match "/:year(/:month)" =&gt; "posts#index", :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /0[0-9]/ }
+  match "/:year(/:month)" =&gt; "posts#index", :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /1[0-2]/ }
+end</programlisting></para>
+
+        <note>
+          <para>By now I expect a smile on your face. Aren't these
+          possibilities awesome!? ;-)</para>
+        </note>
       </section>
     </section>
 
@@ -620,7 +641,7 @@ end
       to /2010/02, it works like this:<programlisting>match "/:year/02/31" =&gt; redirect("/%{year}/02")</programlisting></para>
 
       <para>So you could also redirect a single-digit month to a double-digit
-      month:<programlisting>match "/:year/:month/:day" =&gt; redirect("/%{year}/0%{month}/%{day}"), :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{1}/, :day =&gt; /\d{2}/ }
+      month (including a leading 0):<programlisting>match "/:year/:month/:day" =&gt; redirect("/%{year}/0%{month}/%{day}"), :constraints =&gt; { :year =&gt; /\d{4}/, :month =&gt; /\d{1}/, :day =&gt; /\d{2}/ }
 </programlisting></para>
 
       <para>The same of course applies to a one-digit day. If we take all
@@ -643,7 +664,8 @@ end</programlisting></para>
 
       <note>
         <para>Redirects in the <filename>config/routes.rb</filename> are by
-        default redirects with the code 301 ("Moved Permanently").</para>
+        default http redirects with the code 301 ("Moved Permanently"). So
+        even search engines will profit from this.</para>
       </note>
     </section>
   </section>
@@ -658,14 +680,14 @@ end</programlisting></para>
     </indexterm>
 
     <para><code>resources</code> provides routes for a RESTful resource. Let's
-    try it with the mini blog application:<screen>MacBook:~ xyz$ <command>rails new blog</command>
-[...]
-MacBook:~ xyz$ <command>cd blog</command> 
-MacBook:blog xyz$ <command>rails generate scaffold Post subject content published_at:date</command>
-[...]
-MacBook:blog xyz$ <command>rake db:migrate</command>
-[...]
-MacBook:blog xyz$</screen></para>
+    try it with the mini blog application:<screen>$ rails new blog
+  [...]
+$ cd blog
+$ rails generate scaffold Post subject content published_at:date
+  [...]
+$ rake db:migrate
+  [...]
+$</screen></para>
 
     <para>The scaffold generator automatically creates a
     <code>resources</code> route in the
@@ -678,7 +700,7 @@ end</programlisting></para>
       <filename>config/routes.rb</filename> by rails generate scripts.</para>
     </note>
 
-    <para>The resulting routes:<screen>MacBook:blog xyz$ <command>rake routes</command>
+    <para>The resulting routes:<screen>$ rake routes
     posts GET    /posts(.:format)          posts#index
           POST   /posts(.:format)          posts#create
  new_post GET    /posts/new(.:format)      posts#new
@@ -686,7 +708,7 @@ edit_post GET    /posts/:id/edit(.:format) posts#edit
      post GET    /posts/:id(.:format)      posts#show
           PUT    /posts/:id(.:format)      posts#update
           DELETE /posts/:id(.:format)      posts#destroy
-MacBook:blog xyz$</screen></para>
+$</screen></para>
 
     <para>You have already encountered these RESTful routes in <xref
     linkend="scaffolding"/>. They are required for displaying and editing
@@ -717,32 +739,28 @@ MacBook:blog xyz$</screen></para>
 
       <para>The following <filename>conf/routes.rb</filename> defines only the
       routes for <code>index</code> and <code>show</code>:<programlisting>Blog::Application.routes.draw do
-
-  <emphasis>resources :posts, :only =&gt; [:index, :show]</emphasis>
-
+  resources :posts, :only =&gt; [:index, :show]
 end</programlisting></para>
 
       <para>With <command>rake routes</command> we can check the
-      result:<screen>MacBook:blog xyz$ <command>rake routes</command>
+      result:<screen>$ rake routes
 posts GET /posts(.:format)     posts#index
  post GET /posts/:id(.:format) posts#show
-MacBook:blog xyz$</screen></para>
+$ </screen></para>
 
       <para><code>except</code> works exactly the other way
       round:<programlisting>Blog::Application.routes.draw do
-
-  <emphasis>resources :posts, :except =&gt; [:index, :show]</emphasis>
-
+  resources :posts, :except =&gt; [:index, :show]
 end</programlisting></para>
 
       <para>Now all routes except for <code>index</code> and <code>show</code>
-      are possible:<screen>MacBook:blog xyz$ <command>rake routes</command>
+      are possible:<screen>$ rake routes
     posts POST   /posts(.:format)          posts#create
  new_post GET    /posts/new(.:format)      posts#new
 edit_post GET    /posts/:id/edit(.:format) posts#edit
      post PUT    /posts/:id(.:format)      posts#update
           DELETE /posts/:id(.:format)      posts#destroy
-MacBook:blog xyz$</screen></para>
+$</screen></para>
 
       <warning>
         <para>When using only and except, please make sure you also adapt the
@@ -774,11 +792,11 @@ MacBook:blog xyz$</screen></para>
       <methodname>has_many</methodname> association (see <xref
       linkend="activerecord_has_many"/>). These can be addressed precisely via
       routes. Let's create a second resource,
-      <classname>comment</classname>:<screen>MacBook:blog xyz$ <command>rails generate scaffold comment post_id:integer content</command>
-[...]
-MacBook:blog xyz$ <command>rake db:migrate</command>
-[...]
-MacBook:blog xyz$</screen></para>
+      <classname>comment</classname>:<screen>$ rails generate scaffold comment post_id:integer content
+  [...]
+$ rake db:migrate
+  [...]
+$ </screen></para>
 
       <para>Now we associate the two resources. In the file
       <filename>app/models/post.rb</filename>, we add a
@@ -798,7 +816,7 @@ end
 </programlisting></para>
 
       <para>The routes generated by the scaffold generator look like
-      this:<screen>MacBook:blog xyz$ <command>rake routes</command>
+      this:<screen>$ rake routes
     comments GET    /comments(.:format)          comments#index
              POST   /comments(.:format)          comments#create
  new_comment GET    /comments/new(.:format)      comments#new
@@ -813,21 +831,18 @@ edit_comment GET    /comments/:id/edit(.:format) comments#edit
         post GET    /posts/:id(.:format)         posts#show
              PUT    /posts/:id(.:format)         posts#update
              DELETE /posts/:id(.:format)         posts#destroy
-MacBook:blog xyz$</screen></para>
+$ </screen></para>
 
       <para>So we can get the first post with <uri>/posts/1</uri> and all the
       comments with <uri>/comments</uri>. By using nesting, we can get all
       comments with the ID 1 via <uri>/posts/1/</uri>comments. We need to
       change the <filename>config/routes.rb</filename>:<programlisting>Blog::Application.routes.draw do
-
-<emphasis>  resources :posts do
+  resources :posts do
     resources :comments
-  end</emphasis>
+  end
+end</programlisting></para>
 
-end
-</programlisting></para>
-
-      <para>This gives us the desired routes:<screen>MacBook:blog xyz$ <command>rake routes</command>
+      <para>This gives us the desired routes:<screen>$ rake routes
     post_comments GET    /posts/:post_id/comments(.:format)          comments#index
                   POST   /posts/:post_id/comments(.:format)          comments#create
  new_post_comment GET    /posts/:post_id/comments/new(.:format)      comments#new
@@ -842,64 +857,78 @@ edit_post_comment GET    /posts/:post_id/comments/:id/edit(.:format) comments#ed
              post GET    /posts/:id(.:format)                        posts#show
                   PUT    /posts/:id(.:format)                        posts#update
                   DELETE /posts/:id(.:format)                        posts#destroy
-MacBook:blog xyz$ </screen></para>
+$ </screen></para>
 
       <para>But we still need to make some changes in the file
       <filename>app/controllers/comments_controller.rb</filename>. This
       ensures that only the <varname>Comments</varname> of the specified
       <varname>Post</varname> can be displayed or changed (to make it clearer,
       I have removed the JSON part):<programlisting>class CommentsController &lt; ApplicationController
-  before_filter :find_post
+  # We use a before_filter to find the @post.
+  #
+  before_filter :find_the_post
 
+  # GET /posts/1/comments
   def index
     @comments = @post.comments
   end
 
+  # GET /posts/1/comments/1
   def show
     @comment = @post.comments.find(params[:id])
   end
 
+  # GET /posts/1/comments/new
   def new
     @comment = @post.comments.build
   end
 
+  # GET /posts/1/comments/1/edit
   def edit
     @comment = @post.comments.find(params[:id])
   end
 
+  # POST /posts/1/comments
   def create
     @comment = @post.comments.build(params[:comment])
 
-    if @comment.save
-      redirect_to [@post, @comment], notice: 'Comment was successfully created.'
-    else
-      render action: "new"
+    respond_to do |format|
+      if @comment.save
+        format.html { redirect_to [@post, @comment], notice: 'Comment was successfully created.' }
+      else
+        format.html { render action: "new" }
+      end
     end
   end
 
+  # PUT /posts/1/comments/1
   def update
     @comment = @post.comments.find(params[:id])
 
-    if @comment.update_attributes(params[:comment])
-      redirect_to [@post, @comment], notice: 'Comment was successfully updated.'
-    else
-      render action: "edit"
+    respond_to do |format|
+      if @comment.update_attributes(params[:comment])
+        format.html { redirect_to [@post, @comment], notice: 'Comment was successfully updated.' }
+      else
+        format.html { render action: "edit" }
+      end
     end
   end
 
+  # DELETE /posts/1/comments/1
   def destroy
     @comment = @post.comments.find(params[:id])
     @comment.destroy
 
-    redirect_to post_comments_path(@post)
+    respond_to do |format|
+      format.html { redirect_to post_comments_path(@post) }
+    end
   end
 
   private
-  def find_post
+  def find_the_post
     @post = Post.find(params[:post_id])
   end
-end
-</programlisting></para>
+end</programlisting></para>
 
       <para>Unfortunately, this is only half the story, because the views
       still link to the old routes. So we need to adapt each view in
@@ -930,13 +959,14 @@ end
   &lt;div class="actions"&gt;
     &lt;%= f.submit %&gt;
   &lt;/div&gt;
-&lt;% end %&gt;
-</programlisting></para>
+&lt;% end %&gt;</programlisting></para>
 
       <para><filename>app/views/comments/edit.html.erb</filename><programlisting>&lt;h1&gt;Editing comment&lt;/h1&gt;
 
 &lt;%= render 'form' %&gt;
-</programlisting></para>
+
+&lt;%= link_to 'Show', [@post, @comment] %&gt; |
+&lt;%= link_to 'Back', post_comments_path(@post) %&gt;</programlisting></para>
 
       <para><filename>app/views/comments/index.html.erb</filename><programlisting>&lt;h1&gt;Listing comments&lt;/h1&gt;
 
@@ -955,19 +985,20 @@ end
     &lt;td&gt;&lt;%= comment.content %&gt;&lt;/td&gt;
     &lt;td&gt;&lt;%= link_to 'Show', [@post, comment] %&gt;&lt;/td&gt;
     &lt;td&gt;&lt;%= link_to 'Edit', edit_post_comment_path(@post, comment) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Destroy', [@post, comment], confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', [@post, comment], method: :delete, data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
   &lt;/tr&gt;
 &lt;% end %&gt;
 &lt;/table&gt;
 
 &lt;br /&gt;
 
-&lt;%= link_to 'New Comment', new_post_comment_path(@post) %&gt;
-</programlisting></para>
+&lt;%= link_to 'New Comment', new_post_comment_path(@post) %&gt;</programlisting></para>
 
       <para><filename>app/views/comments/new.html.erb</filename><programlisting>&lt;h1&gt;New comment&lt;/h1&gt;
 
-&lt;%= render 'form' %&gt;</programlisting></para>
+&lt;%= render 'form' %&gt;
+
+&lt;%= link_to 'Back', post_comments_path(@post) %&gt;</programlisting></para>
 
       <para><filename>app/views/comments/show.html.erb</filename><programlisting>&lt;p id="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
 
@@ -980,12 +1011,30 @@ end
   &lt;b&gt;Content:&lt;/b&gt;
   &lt;%= @comment.content %&gt;
 &lt;/p&gt;
-</programlisting></para>
+
+
+&lt;%= link_to 'Edit', edit_post_comment_path(@post, @comment) %&gt; |
+&lt;%= link_to 'Back', post_comments_path(@post) %&gt;</programlisting></para>
 
       <para>Please go ahead and have a go at experimenting with the URLs
       listed under rake routes. You can now generate a new post with
       <uri>/posts/new</uri> and a new comment for this post with
       <uri>/posts/:post_id/comments/new</uri>.</para>
+
+      <para>If you want to see all comments of the first post you can access
+      that with the URL <uri
+      xlink:href="http://0.0.0.0:3000/posts/1/comments">http://0.0.0.0:3000/posts/1/comments</uri>.
+      It would look like this:<screenshot>
+          <info>
+            <title>Nested comments</title>
+          </info>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/posts_1_comments.jpg"/>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <section xml:id="bemerkungen_nested_resources">
         <title xml:id="bemerkungen_nested_resources.title">Comments on Nested
