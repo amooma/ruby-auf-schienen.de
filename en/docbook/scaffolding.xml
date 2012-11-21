@@ -77,13 +77,13 @@
       <secondary>Rails 3.2</secondary>
     </indexterm>
 
-    <para>Let's first use scaffolding to create a list of German federal
-    chancellors. First, we need to create a new Rails application:<screen>MacBook:~ xyz$ <command>rails new history </command>
-[...]
-MacBook:~ xyz$ <command>cd history</command> 
-MacBook:history xyz$</screen></para>
+    <para>Let's first use scaffolding to create a list of products for an
+    online shop. First, we need to create a new Rails application:<screen>$ rails new shop
+  [...]
+$ cd shop
+$ </screen></para>
 
-    <para>Let's look at the scaffolding options:<screen>MacBook:history xyz$ <command>rails generate scaffold</command>
+    <para>Let's look at the scaffolding options:<screen>$ rails generate scaffold
 Usage:
   rails generate scaffold NAME [field[:type][:index] field[:type][:index]] [options]
 
@@ -93,6 +93,8 @@ Options:
   -o, --orm=NAME                                # Orm to be invoked
                                                 # Default: active_record
       [--force-plural]                          # Forces the use of a plural ModelName
+      --resource-route                          # Indicates when to generate resource route
+                                                # Default: true
   -y, [--stylesheets]                           # Generate Stylesheets
                                                 # Default: true
   -se, [--stylesheet-engine=STYLESHEET_ENGINE]  # Engine for Stylesheets
@@ -127,7 +129,7 @@ ScaffoldController options:
 Runtime options:
   -f, [--force]    # Overwrite files that already exist
   -p, [--pretend]  # Run but do not make any changes
-  -q, [--quiet]    # Supress status output
+  -q, [--quiet]    # Suppress status output
   -s, [--skip]     # Skip files that already exist
 
 Description:
@@ -165,43 +167,44 @@ Examples:
     `rails generate scaffold post`
     `rails generate scaffold post title body:text published:boolean`
     `rails generate scaffold purchase amount:decimal tracking_id:integer:uniq`
-MacBook:history xyz$</screen></para>
+$ </screen></para>
 
     <para>I'll keep it short: for our current state of knowledge, we can use
     <command>rails generate scaffold</command> just like <command>rails
     generate model</command> (see <xref
     linkend="activerecord_datenbank_anlegen"/>). Let's now create the scaffold
-    for the chancellors:<screen>MacBook:history xyz$ <command>rails generate scaffold chancellor first_name last_name birthday:date day_of_death:date inauguration:date</command>
+    for the products:<screen>$ rails generate scaffold product name 'price:decimal{7,2}' 
       invoke  active_record
-      create    db/migrate/20120508171951_create_chancellors.rb
-      create    app/models/chancellor.rb
+      create    db/migrate/20121121093040_create_products.rb
+      create    app/models/product.rb
       invoke    test_unit
-      create      test/unit/chancellor_test.rb
-      create      test/fixtures/chancellors.yml
-       route  resources :chancellors
+      create      test/unit/product_test.rb
+      create      test/fixtures/products.yml
+      invoke  resource_route
+       route    resources :products
       invoke  scaffold_controller
-      create    app/controllers/chancellors_controller.rb
+      create    app/controllers/products_controller.rb
       invoke    erb
-      create      app/views/chancellors
-      create      app/views/chancellors/index.html.erb
-      create      app/views/chancellors/edit.html.erb
-      create      app/views/chancellors/show.html.erb
-      create      app/views/chancellors/new.html.erb
-      create      app/views/chancellors/_form.html.erb
+      create      app/views/products
+      create      app/views/products/index.html.erb
+      create      app/views/products/edit.html.erb
+      create      app/views/products/show.html.erb
+      create      app/views/products/new.html.erb
+      create      app/views/products/_form.html.erb
       invoke    test_unit
-      create      test/functional/chancellors_controller_test.rb
+      create      test/functional/products_controller_test.rb
       invoke    helper
-      create      app/helpers/chancellors_helper.rb
+      create      app/helpers/products_helper.rb
       invoke      test_unit
-      create        test/unit/helpers/chancellors_helper_test.rb
+      create        test/unit/helpers/products_helper_test.rb
       invoke  assets
       invoke    coffee
-      create      app/assets/javascripts/chancellors.js.coffee
+      create      app/assets/javascripts/products.js.coffee
       invoke    scss
-      create      app/assets/stylesheets/chancellors.css.scss
+      create      app/assets/stylesheets/products.css.scss
       invoke  scss
       create    app/assets/stylesheets/scaffolds.css.scss
-MacBook:history xyz$</screen></para>
+$</screen></para>
   </section>
 
   <section xml:id="scaffold_migrate_und_seed">
@@ -209,26 +212,24 @@ MacBook:history xyz$</screen></para>
 
     <para>As you can see, <command>rails generate scaffold</command> has
     already created the model. So we can directly call <command>rake
-    db:migrate</command>:<screen>MacBook:history xyz$ <command>rake db:migrate</command>
-==  CreateChancellors: migrating ==============================================
--- create_table(:chancellors)
-   -&gt; 0.0018s
-==  CreateChancellors: migrated (0.0019s) =====================================
+    db:migrate</command>:<screen>$ rake db:migrate
+==  CreateProducts: migrating =================================================
+-- create_table(:products)
+   -&gt; 0.0021s
+==  CreateProducts: migrated (0.0023s) ========================================
 
-MacBook:history xyz$</screen></para>
+$</screen></para>
 
-    <para>Let's create the first six chancellors in the
+    <para>Let's create the first six products in the
     <filename>db/seeds.rb</filename>. I am not quite sure about Walter Scheel,
     but after all, this book is all about Rails, not German post-war
-    history.<programlisting>Chancellor.create(:first_name =&gt; 'Konrad', :last_name =&gt; 'Adenauer', :birthday =&gt; '05.01.1876', :day_of_death =&gt; '19.04.1967', :inauguration =&gt; '15.09.1949')
-Chancellor.create(:first_name =&gt; 'Ludwig', :last_name =&gt; 'Erhard', :birthday =&gt; '04.02.1897', :day_of_death =&gt; '05.05.1977', :inauguration =&gt; '16.10.1963')
-Chancellor.create(:first_name =&gt; 'Kurt Georg', :last_name =&gt; 'Kiesinger', :birthday =&gt; '06.04.1904', :day_of_death =&gt; '09.03.1988', :inauguration =&gt; '01.12.1966')
-Chancellor.create(:first_name =&gt; 'Willy', :last_name =&gt; 'Brandt', :birthday =&gt; '18.12.1913', :day_of_death =&gt; '08.10.1992', :inauguration =&gt; '21.10.1969')
-Chancellor.create(:first_name =&gt; 'Walter', :last_name =&gt; 'Scheel', :birthday =&gt; '08.09.1919', :inauguration =&gt; '07.05.1974')
-Chancellor.create(:first_name =&gt; 'Helmut', :last_name =&gt; 'Schmidt', :birthday =&gt; '23.12.1918', :inauguration =&gt; '16.05.1974')</programlisting></para>
+    history.<programlisting>Product.create(name: 'Apple', price: 1)
+Product.create(name: 'Orange', price: 1)
+Product.create(name: 'Pineapple', price: 2.4)
+Product.create(name: 'Marble cake', price: 3)</programlisting></para>
 
-    <para>Populate with the example data:<screen>MacBook:history xyz$ <command>rake db:seed</command>
-MacBook:history xyz$ </screen></para>
+    <para>Populate with the example data:<screen>$ rake db:seed
+$</screen></para>
   </section>
 
   <section xml:id="scaffold_routen">
@@ -243,26 +244,26 @@ MacBook:history xyz$ </screen></para>
 
     <para>Without diving too deeply into the topic routes, let's just have a
     quick look at the available routes for our example. You need to enter
-    <command>rake routes</command>:<screen>MacBook:history xyz$ <command>rake routes</command>
-    chancellors GET    /chancellors(.:format)          chancellors#index
-                POST   /chancellors(.:format)          chancellors#create
- new_chancellor GET    /chancellors/new(.:format)      chancellors#new
-edit_chancellor GET    /chancellors/:id/edit(.:format) chancellors#edit
-     chancellor GET    /chancellors/:id(.:format)      chancellors#show
-                PUT    /chancellors/:id(.:format)      chancellors#update
-                DELETE /chancellors/:id(.:format)      chancellors#destroy
-MacBook:history xyz$</screen></para>
+    <command>rake routes</command>:<screen>$ rake routes
+    products GET    /products(.:format)          products#index
+             POST   /products(.:format)          products#create
+ new_product GET    /products/new(.:format)      products#new
+edit_product GET    /products/:id/edit(.:format) products#edit
+     product GET    /products/:id(.:format)      products#show
+             PUT    /products/:id(.:format)      products#update
+             DELETE /products/:id(.:format)      products#destroy
+$</screen></para>
 
     <para>These are all the routes and consequently URLs available in this
     Rails application. All routes invoke actions (in other words, methods) in
-    the <classname>ChancellorsController</classname>.</para>
+    the <classname>ProductsController</classname>.</para>
   </section>
 
   <section xml:id="scaffold_controller">
     <title>The Controller</title>
 
     <para>Now it's about time we had a look at the file
-    <filename>app/controllers/chancellors_controller.rb</filename>. Scaffold
+    <filename>app/controllers/products_controller.rb</filename>. Scaffold
     automatically creates the methods <methodname>index</methodname>,
     <methodname>show</methodname>, <methodname>new</methodname>,
     <methodname>create</methodname>, <methodname>update</methodname> and
@@ -273,103 +274,103 @@ MacBook:history xyz$</screen></para>
     the controller line by line. What is important is that you know where the
     file is and that the individual methods for the calls by the routes are
     located there. Then you can go back later and look it up there if anything
-    is unclear.<programlisting>class ChancellorsController &lt; ApplicationController
-  # GET /chancellors
-  # GET /chancellors.json
+    is unclear.<programlisting>class ProductsController &lt; ApplicationController
+  # GET /products
+  # GET /products.json
   def index
-    @chancellors = Chancellor.all
+    @products = Product.all
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @chancellors }
+      format.json { render json: @products }
     end
   end
 
-  # GET /chancellors/1
-  # GET /chancellors/1.json
+  # GET /products/1
+  # GET /products/1.json
   def show
-    @chancellor = Chancellor.find(params[:id])
+    @product = Product.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render json: @chancellor }
+      format.json { render json: @product }
     end
   end
 
-  # GET /chancellors/new
-  # GET /chancellors/new.json
+  # GET /products/new
+  # GET /products/new.json
   def new
-    @chancellor = Chancellor.new
+    @product = Product.new
 
     respond_to do |format|
       format.html # new.html.erb
-      format.json { render json: @chancellor }
+      format.json { render json: @product }
     end
   end
 
-  # GET /chancellors/1/edit
+  # GET /products/1/edit
   def edit
-    @chancellor = Chancellor.find(params[:id])
+    @product = Product.find(params[:id])
   end
 
-  # POST /chancellors
-  # POST /chancellors.json
+  # POST /products
+  # POST /products.json
   def create
-    @chancellor = Chancellor.new(params[:chancellor])
+    @product = Product.new(params[:product])
 
     respond_to do |format|
-      if @chancellor.save
-        format.html { redirect_to @chancellor, notice: 'Chancellor was successfully created.' }
-        format.json { render json: @chancellor, status: :created, location: @chancellor }
+      if @product.save
+        format.html { redirect_to @product, notice: 'Product was successfully created.' }
+        format.json { render json: @product, status: :created, location: @product }
       else
         format.html { render action: "new" }
-        format.json { render json: @chancellor.errors, status: :unprocessable_entity }
+        format.json { render json: @product.errors, status: :unprocessable_entity }
       end
     end
   end
 
-  # PUT /chancellors/1
-  # PUT /chancellors/1.json
+  # PUT /products/1
+  # PUT /products/1.json
   def update
-    @chancellor = Chancellor.find(params[:id])
+    @product = Product.find(params[:id])
 
     respond_to do |format|
-      if @chancellor.update_attributes(params[:chancellor])
-        format.html { redirect_to @chancellor, notice: 'Chancellor was successfully updated.' }
+      if @product.update_attributes(params[:product])
+        format.html { redirect_to @product, notice: 'Product was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: "edit" }
-        format.json { render json: @chancellor.errors, status: :unprocessable_entity }
+        format.json { render json: @product.errors, status: :unprocessable_entity }
       end
     end
   end
 
-  # DELETE /chancellors/1
-  # DELETE /chancellors/1.json
+  # DELETE /products/1
+  # DELETE /products/1.json
   def destroy
-    @chancellor = Chancellor.find(params[:id])
-    @chancellor.destroy
+    @product = Product.find(params[:id])
+    @product.destroy
 
     respond_to do |format|
-      format.html { redirect_to chancellors_url }
+      format.html { redirect_to products_url }
       format.json { head :no_content }
     end
   end
-end
-</programlisting></para>
+end</programlisting></para>
   </section>
 
   <section xml:id="scaffold_views">
     <title>The Views</title>
 
-    <para>Now we start the Rails web server:<screen>MacBook:history xyz$ <command>rails server</command>
+    <para>Now we start the Rails web server:<screen>$ rails server
 =&gt; Booting WEBrick
-=&gt; Rails 3.2.3 application starting in development on http://0.0.0.0:3000
+=&gt; Rails 3.2.9 application starting in development on http://0.0.0.0:3000
 =&gt; Call with -d to detach
 =&gt; Ctrl-C to shutdown server
-[2012-05-08 19:26:14] INFO  WEBrick 1.3.1
-[2012-05-08 19:26:14] INFO  ruby 1.9.3 (2012-04-20) [x86_64-darwin11.3.0]
-[2012-05-08 19:26:14] INFO  WEBrick::HTTPServer#start: pid=43118 port=3000</screen></para>
+[2012-11-21 10:34:39] INFO  WEBrick 1.3.1
+[2012-11-21 10:34:39] INFO  ruby 1.9.3 (2012-11-10) [x86_64-darwin12.2.1]
+[2012-11-21 10:34:39] INFO  WEBrick::HTTPServer#start: pid=19507 port=3000
+</screen></para>
 
     <note>
       <para>If you get a warning from your built-in firewall now, this shows
@@ -379,42 +380,41 @@ end
 
     <para>Now a little drum roll... dramatic suspense... launch the web
     browser and go to the URL <uri
-    xlink:href="http://0.0.0.0:3000/chancellors">http://0.0.0.0:3000/chancellors</uri>.
-    You can see the list of chancellors as simple web page.<screenshot>
+    xlink:href="http://0.0.0.0:3000/products">http://0.0.0.0:3000/products</uri>.
+    You can see the list of products as simple web page.<screenshot>
         <info>
-          <title>Index of Listed Chancellors</title>
+          <title>Index of Listed Products</title>
         </info>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="screenshots/chancellor_index.jpg"/>
+            <imagedata fileref="screenshots/products_index.jpg"/>
           </imageobject>
         </mediaobject>
       </screenshot></para>
 
-    <para>If you now click the link "New Chancellor", you will see an input
-    form for a new record:<screenshot>
+    <para>If you now click the link "New Product", you will see an input form
+    for a new record:<screenshot>
         <info>
           <title>Input Form for New Record</title>
         </info>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="screenshots/chancellor_new.jpg"/>
+            <imagedata fileref="screenshots/product_new.jpg"/>
           </imageobject>
         </mediaobject>
       </screenshot></para>
 
     <para>Use your browser's Back button to go back and click on the "Show"
-    link in the line for Konrad Adenauer. You will then see the following
-    page:<screenshot>
+    link in the first line. You will then see the following page:<screenshot>
         <info>
           <title>Viewing an Individual Record</title>
         </info>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="screenshots/chancellor_show.jpg"/>
+            <imagedata fileref="screenshots/product_show_1.jpg"/>
           </imageobject>
         </mediaobject>
       </screenshot></para>
@@ -427,7 +427,7 @@ end
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="screenshots/chancellor_edit.jpg"/>
+            <imagedata fileref="screenshots/product_edit_1.jpg"/>
           </imageobject>
         </mediaobject>
       </screenshot></para>
@@ -441,19 +441,20 @@ end
     role="bold">d</emphasis>elete/<emphasis role="bold">d</emphasis>estroy
     records (CRUD)<indexterm>
         <primary>CRUD</primary>
-      </indexterm>. That is the scaffolding magic.</para>
+      </indexterm>. That is the scaffolding magic. You can save a lot of
+    time.</para>
 
     <section xml:id="scaffold_wo_liegen_die_views">
       <title>Where Are the Views?</title>
 
       <para>You can probably guess, but let's have a look at the directory
-      <filename>app/views/chancellors</filename> anyway:<screen>MacBook:history xyz$ <command>ls app/views/chancellors</command> 
+      <filename>app/views/products</filename> anyway:<screen>$ ls app/views/products 
 _form.html.erb
-edit.html.erb
-index.html.erb
-new.html.erb
-show.html.erb
-MacBook:history xyz$</screen></para>
+ edit.html.erb
+ index.html.erb
+ new.html.erb
+ show.html.erb
+$ </screen></para>
 
       <para>For <methodname>index</methodname>, <methodname>edit</methodname>,
       <methodname>new</methodname> and <methodname>show</methodname> the
@@ -468,38 +469,31 @@ MacBook:history xyz$</screen></para>
       %&gt;</code>.</para>
 
       <para>Let's open the file
-      <filename>app/views/chancellors/index.html.erb</filename>:<programlisting>&lt;h1&gt;Listing chancellors&lt;/h1&gt;
+      <filename>app/views/products/index.html.erb</filename>:<programlisting>&lt;h1&gt;Listing products&lt;/h1&gt;
 
 &lt;table&gt;
   &lt;tr&gt;
-    &lt;th&gt;First name&lt;/th&gt;
-    &lt;th&gt;Last name&lt;/th&gt;
-    &lt;th&gt;Birthday&lt;/th&gt;
-    &lt;th&gt;Day of death&lt;/th&gt;
-    &lt;th&gt;Inauguration&lt;/th&gt;
+    &lt;th&gt;Name&lt;/th&gt;
+    &lt;th&gt;Price&lt;/th&gt;
     &lt;th&gt;&lt;/th&gt;
     &lt;th&gt;&lt;/th&gt;
     &lt;th&gt;&lt;/th&gt;
   &lt;/tr&gt;
 
-&lt;% @chancellors.each do |chancellor| %&gt;
+&lt;% @products.each do |product| %&gt;
   &lt;tr&gt;
-    &lt;td&gt;&lt;%= chancellor.first_name %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= chancellor.last_name %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= chancellor.birthday %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= chancellor.day_of_death %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= chancellor.inauguration %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Show', chancellor %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Edit', edit_chancellor_path(chancellor) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Destroy', chancellor, confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= product.name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= product.price %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Show', product %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Edit', edit_product_path(product) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', product, method: :delete, data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
   &lt;/tr&gt;
 &lt;% end %&gt;
 &lt;/table&gt;
 
 &lt;br /&gt;
 
-&lt;%= link_to 'New Chancellor', new_chancellor_path %&gt;
-</programlisting></para>
+&lt;%= link_to 'New Product', new_product_path %&gt;</programlisting></para>
 
       <para>You are now an old hand when it comes to ERB, so you'll be able to
       read and understand the code without any problems. If in doubt, have a
@@ -519,57 +513,54 @@ MacBook:history xyz$</screen></para>
       <code>&lt;a href="..."&gt;</code> in the erb, but for links within a
       Rails project, <code>link_to</code> is more practical, because you can
       use the names of the routes as target. The code becomes much easier to
-      read. In the above example, there are the following routes:<screen>MacBook:history xyz$ <command>rake routes</command>
-    chancellors GET    /chancellors(.:format)          chancellors#index
-                POST   /chancellors(.:format)          chancellors#create
- new_chancellor GET    /chancellors/new(.:format)      chancellors#new
-edit_chancellor GET    /chancellors/:id/edit(.:format) chancellors#edit
-     chancellor GET    /chancellors/:id(.:format)      chancellors#show
-                PUT    /chancellors/:id(.:format)      chancellors#update
-                DELETE /chancellors/:id(.:format)      chancellors#destroy
-MacBook:history xyz$</screen></para>
+      read. In the above example, there are the following routes:<screen>$ rake routes
+    products GET    /products(.:format)          products#index
+             POST   /products(.:format)          products#create
+ new_product GET    /products/new(.:format)      products#new
+edit_product GET    /products/:id/edit(.:format) products#edit
+     product GET    /products/:id(.:format)      products#show
+             PUT    /products/:id(.:format)      products#update
+             DELETE /products/:id(.:format)      products#destroy
+$</screen></para>
 
       <para>The first part of this route is the name of the route. With a new
-      call, this is <code>new_chancellor</code>. A link to
-      <code>new_chancellor</code> looks like this in the erb code (you can see
-      it at the end of the file
-      <filename>app/views/chancellors/index.html.erb</filename>):<programlisting>&lt;%= link_to 'New Chancellor', new_chancellor_path %&gt;</programlisting></para>
+      call, this is <code>new_product</code>. A link to
+      <code>new_product</code> looks like this in the erb code (you can see it
+      at the end of the file
+      <filename>app/views/products/index.html.erb</filename>):<programlisting>&lt;%= link_to 'New Product', new_product_path %&gt;</programlisting></para>
 
       <para>In the HTML code of the generated page (<uri
-      xlink:href="http://0.0.0.0:3000/chancellors">http://0.0.0.0:3000/chancellors</uri>)
-      you can see the result:<programlisting>&lt;a href="/chancellors/new"&gt;New Chancellor&lt;/a&gt;</programlisting></para>
+      xlink:href="http://0.0.0.0:3000/products">http://0.0.0.0:3000/products</uri>)
+      you can see the result:<programlisting>&lt;a href="/products/new"&gt;New Product&lt;/a&gt;</programlisting></para>
 
       <para>With <code>link_to</code> you can also link to resources within a
       RESTful resource. Again, you can find examples for this in
-      <filename>app/views/chancellors/index.html.erb</filename>. In the table,
-      a <code>show</code>, an <code>edit</code> and a <code>destroy</code>
-      link is rendered for each <varname>chancellor</varname>:<programlisting>&lt;% @chancellors.each do |chancellor| %&gt;
+      <filename>app/views/products/index.html.erb</filename>. In the table, a
+      <code>show</code>, an <code>edit</code> and a <code>destroy</code> link
+      is rendered for each <varname>product</varname>:<programlisting>&lt;% @products.each do |product| %&gt;
   &lt;tr&gt;
-    &lt;td&gt;&lt;%= chancellor.first_name %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= chancellor.last_name %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= chancellor.birthday %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= chancellor.day_of_death %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= chancellor.inauguration %&gt;&lt;/td&gt;
-<emphasis>    &lt;td&gt;&lt;%= link_to 'Show', chancellor %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Edit', edit_chancellor_path(chancellor) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Destroy', chancellor, confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
-</emphasis>  &lt;/tr&gt;
+    &lt;td&gt;&lt;%= product.name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= product.price %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Show', product %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Edit', edit_product_path(product) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', product, method: :delete, data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
 &lt;% end %&gt;</programlisting></para>
 
       <para>From the resource and the selected route, Rails automatically
       determines the required URL and the required HTTP verb (in other words,
       whether it is a POST, GET, PUT or DELETE). For index and show calls, you
       need to observe the difference between singular and plural.
-      <code>link_to 'Show', chancellor</code> links to a single record and
-      <code>link_to 'Show', chancellors_path</code> links to the index
+      <code>link_to 'Show', product</code> links to a single record and
+      <code>link_to 'Show', products_path</code> links to the index
       view.</para>
 
       <para>Whether the name of the route is used with or without the suffix
       <code>_path</code> in <code>link_to</code> depends on whether Rails can
       "derive" the route from the other specified information. If only one
       object is specified (in our example, the variable
-      <varname>chancellor</varname>), then Rails automatically assumes that it
-      is a show route.</para>
+      <varname>product</varname>), then Rails automatically assumes that it is
+      a show route.</para>
 
       <para>Examples:</para>
 
@@ -577,32 +568,32 @@ MacBook:history xyz$</screen></para>
         <tgroup cols="2">
           <tbody>
             <row>
-              <entry><code>link_to 'Show', Chancellor.first</code></entry>
+              <entry><code>link_to 'Show', Product.first</code></entry>
 
-              <entry>Link to the first chancellor item.</entry>
+              <entry>Link to the first product.</entry>
             </row>
 
             <row>
-              <entry><code>link_to 'New Chancellor',
-              new_chancellor_path</code></entry>
+              <entry><code>link_to 'New Product',
+              new_product_path</code></entry>
 
-              <entry>Link to the Web interface where a new item can be
+              <entry>Link to the Web interface where a new product can be
               created.</entry>
             </row>
 
             <row>
               <entry><code>link_to 'Edit',
-              edit_chancellor_path(Chancellor.first)</code></entry>
+              edit_product_path(Product.first)</code></entry>
 
-              <entry>Link to the form where the first chancellor item can be
+              <entry>Link to the form where the first product can be
               edited.</entry>
             </row>
 
             <row>
-              <entry><code>link_to 'Destroy', Chancellor.first, method:
+              <entry><code>link_to 'Destroy', Product.first, method:
               :delete</code></entry>
 
-              <entry>Link to deleting the first chancellor item.</entry>
+              <entry>Link to deleting the first product.</entry>
             </row>
           </tbody>
         </tgroup>
@@ -617,14 +608,14 @@ MacBook:history xyz$</screen></para>
       </indexterm>
 
       <para>In the partial used by <code>new</code> and <code>edit</code>,
-      <filename>app/views/chancellors/_form.html.erb</filename>, you will find
-      the following code for the chancellor form:<programlisting>&lt;%= form_for(@chancellor) do |f| %&gt;
-  &lt;% if @chancellor.errors.any? %&gt;
+      <filename>app/views/products/_form.html.erb</filename>, you will find
+      the following code for the product form:<programlisting>&lt;%= form_for(@product) do |f| %&gt;
+  &lt;% if @product.errors.any? %&gt;
     &lt;div id="error_explanation"&gt;
-      &lt;h2&gt;&lt;%= pluralize(@chancellor.errors.count, "error") %&gt; prohibited this chancellor from being saved:&lt;/h2&gt;
+      &lt;h2&gt;&lt;%= pluralize(@product.errors.count, "error") %&gt; prohibited this product from being saved:&lt;/h2&gt;
 
       &lt;ul&gt;
-      &lt;% @chancellor.errors.full_messages.each do |msg| %&gt;
+      &lt;% @product.errors.full_messages.each do |msg| %&gt;
         &lt;li&gt;&lt;%= msg %&gt;&lt;/li&gt;
       &lt;% end %&gt;
       &lt;/ul&gt;
@@ -632,30 +623,17 @@ MacBook:history xyz$</screen></para>
   &lt;% end %&gt;
 
   &lt;div class="field"&gt;
-    &lt;%= f.label :first_name %&gt;&lt;br /&gt;
-    &lt;%= f.text_field :first_name %&gt;
+    &lt;%= f.label :name %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :name %&gt;
   &lt;/div&gt;
   &lt;div class="field"&gt;
-    &lt;%= f.label :last_name %&gt;&lt;br /&gt;
-    &lt;%= f.text_field :last_name %&gt;
-  &lt;/div&gt;
-  &lt;div class="field"&gt;
-    &lt;%= f.label :birthday %&gt;&lt;br /&gt;
-    &lt;%= f.date_select :birthday %&gt;
-  &lt;/div&gt;
-  &lt;div class="field"&gt;
-    &lt;%= f.label :day_of_death %&gt;&lt;br /&gt;
-    &lt;%= f.date_select :day_of_death %&gt;
-  &lt;/div&gt;
-  &lt;div class="field"&gt;
-    &lt;%= f.label :inauguration %&gt;&lt;br /&gt;
-    &lt;%= f.date_select :inauguration %&gt;
+    &lt;%= f.label :price %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :price %&gt;
   &lt;/div&gt;
   &lt;div class="actions"&gt;
     &lt;%= f.submit %&gt;
   &lt;/div&gt;
-&lt;% end %&gt;
-</programlisting></para>
+&lt;% end %&gt;</programlisting></para>
 
       <para>In a block, the helper <code>form_for</code> takes care of
       creating the HTML form via which the user can enter the data for the
@@ -673,20 +651,28 @@ MacBook:history xyz$</screen></para>
 
       <para>When using validations in the model, any validation errors that
       occur are displayed in the following code at the head of the
-      form:<programlisting>  &lt;% if @chancellor.errors.any? %&gt;
+      form:<programlisting>  &lt;% if @product.errors.any? %&gt;
     &lt;div id="error_explanation"&gt;
-      &lt;h2&gt;&lt;%= pluralize(@chancellor.errors.count, "error") %&gt; prohibited this chancellor from being saved:&lt;/h2&gt;
+      &lt;h2&gt;&lt;%= pluralize(@product.errors.count, "error") %&gt; prohibited this product from being saved:&lt;/h2&gt;
 
       &lt;ul&gt;
-      &lt;% @chancellor.errors.full_messages.each do |msg| %&gt;
+      &lt;% @product.errors.full_messages.each do |msg| %&gt;
         &lt;li&gt;&lt;%= msg %&gt;&lt;/li&gt;
       &lt;% end %&gt;
       &lt;/ul&gt;
     &lt;/div&gt;
   &lt;% end %&gt;</programlisting></para>
 
-      <para>This kind of error would be spotted by the controller and be
-      displayed on the web page via a flash message as follows.</para>
+      <para>Let's add a small validation to the
+      <filename>app/models/product.rb</filename> model:<programlisting>class Product &lt; ActiveRecord::Base
+  attr_accessible :name, :price
+
+  validates :name,
+            :presence =&gt; true
+end</programlisting></para>
+
+      <para>When ever somebody wants to save a product which doesn't have a
+      name Rails will show this Flash Error:</para>
 
       <para><screenshot>
           <info>
@@ -695,7 +681,7 @@ MacBook:history xyz$</screen></para>
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="screenshots/chancellor_error_flash.jpg"/>
+              <imagedata fileref="screenshots/product_error_flash.jpg"/>
             </imageobject>
           </mediaobject>
         </screenshot></para>
@@ -768,28 +754,27 @@ MacBook:history xyz$</screen></para>
         </indexterm>
 
         <para>Right at the beginning of
-        <filename>app/controllers/chancellors_controller.rb</filename> you
-        will find the entry for the <methodname>index</methodname>
-        action:<programlisting>class ChancellorsController &lt; ApplicationController
-<emphasis>  # GET /chancellors
-  # GET /chancellors.json
+        <filename>app/controllers/products_controller.rb</filename> you will
+        find the entry for the <methodname>index</methodname>
+        action:<programlisting>class ProductsController &lt; ApplicationController
+  # GET /products
+  # GET /products.json
   def index
-    @chancellors = Chancellor.all
+    @products = Product.all
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @chancellors }
+      format.json { render json: @products }
     end
-  end
-</emphasis><replaceable>[...]</replaceable></programlisting></para>
+  end</programlisting></para>
 
         <para>The code is straightforward. In the instance variable
-        <varname>@chancellors</varname>, all chancellors are saved. Then
-        something happens with a format. Hmmm… it says something about
+        <varname>@products</varname>, all products are saved. Then something
+        happens with a format. Hmmm… it says something about
         <code>json</code>. Let's try this: start the Rails server again with
         <command>rails server</command> and use your web browser to go to the
         URL <uri
-        xlink:href="http://0.0.0.0:3000/chancellors.json">http://0.0.0.0:3000/chancellors.json</uri>.
+        xlink:href="http://0.0.0.0:3000/products.json">http://0.0.0.0:3000/products.json</uri>.
         Heureka! You will see this:<screenshot>
             <info>
               <title>Index JSON View</title>
@@ -797,14 +782,14 @@ MacBook:history xyz$</screen></para>
 
             <mediaobject>
               <imageobject>
-                <imagedata fileref="screenshots/chancellors_index_json.jpg"/>
+                <imagedata fileref="screenshots/products_index_json.jpg"/>
               </imageobject>
             </mediaobject>
           </screenshot></para>
 
         <para>The URL <uri
-        xlink:href="http://0.0.0.0:3000/chancellors.json">http://0.0.0.0:3000/chancellors.json</uri>
-        gives us all chancellors in JSON format. In Rails 3.0, the default was
+        xlink:href="http://0.0.0.0:3000/products.json">http://0.0.0.0:3000/products.json</uri>
+        gives us all products in JSON format. In Rails 3.0, the default was
         still XML. But ultimately, it does not matter whether it's XML or
         JSON. The cool JavaScript programmers simply prefer JSON, and as an
         AJAX element can be found at every corner these days, it made sense to
@@ -812,7 +797,7 @@ MacBook:history xyz$</screen></para>
 
         <para>If you do not want the JSON output, you need to delete this line
         in the
-        <filename>app/controllers/chancellors_controller.rb</filename>.</para>
+        <filename>app/controllers/products_controller.rb</filename>.</para>
       </section>
 
       <section xml:id="scaffold_json_und_xml_zusammen">
@@ -821,17 +806,17 @@ MacBook:history xyz$</screen></para>
         <para>If you ever need a JSON and XML interface in a Rails
         application, you just need to specify both variants in the controller
         in the block <code>respond_to</code>. Here is an example with the
-        <filename>app/controllers/chancellors_controller.rb</filename> in the
-        <methodname>index</methodname> action:<programlisting>class ChancellorsController &lt; ApplicationController
-  # GET /chancellors
-  # GET /chancellors.json
+        <filename>app/controllers/products_controller.rb</filename> in the
+        <methodname>index</methodname> action:<programlisting>class ProductsController &lt; ApplicationController
+  # GET /products
+  # GET /products.json
   def index
-    @chancellors = Chancellor.all
+    @products = product.all
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @chancellors }
-      <emphasis>format.xml { render xml: @chancellors }</emphasis>
+      format.json { render json: @products }
+      format.xml { render xml: @products }
     end
   end
 [...]</programlisting></para>
@@ -843,15 +828,15 @@ MacBook:history xyz$</screen></para>
     <title>When Should You Use Scaffolding?</title>
 
     <para>You should never use scaffolding just for the sake of it. There are
-    many Rails developers who never use scaffolding and always build
-    everything manually. I find scaffolding quite useful for quickly getting
-    into a new project. But it is always just the beginning.</para>
+    Rails developers who never use scaffolding and always build everything
+    manually. I find scaffolding quite useful for quickly getting into a new
+    project. But it is always just the beginning.</para>
 
     <section xml:id="scaffold_minimal_beispiel_read_only">
       <title>Example for a Minimal Project</title>
 
       <para>Let's assume we need a web page quickly with which we can list
-      chancellors and represent them individually. But we do not require an
+      products and represent them individually. But we do not require an
       editing or deleting function. In that case, a large part of the code
       created via scaffold would be useless and have to be deleted. Let's try
       it out as follows:</para>
@@ -859,41 +844,41 @@ MacBook:history xyz$</screen></para>
       <para><screen>MacBook:~ xyz$ <command>rails new history2</command>  
 [...]
 MacBook:~ xyz$ <command>cd history2</command>
-MacBook:history2 xyz$ <command>rails generate scaffold chancellor first_name last_name birthday:date day_of_death:date inauguration:date</command>
+MacBook:history2 xyz$ <command>rails generate scaffold product first_name last_name birthday:date day_of_death:date inauguration:date</command>
 [...]
 MacBook:history2 xyz$ <command>rake db:migrate</command>
 [...]
 MacBook:history2 xyz$</screen></para>
 
       <para>Now create the <filename>db/seeds.rb</filename> with the first six
-      chancellors:<programlisting>Chancellor.create(:first_name =&gt; 'Konrad', :last_name =&gt; 'Adenauer', :birthday =&gt; '05.01.1876', :day_of_death =&gt; '19.04.1967', :inauguration =&gt; '15.09.1949')
-Chancellor.create(:first_name =&gt; 'Ludwig', :last_name =&gt; 'Erhard', :birthday =&gt; '04.02.1897', :day_of_death =&gt; '05.05.1977', :inauguration =&gt; '16.10.1963')
-Chancellor.create(:first_name =&gt; 'Kurt Georg', :last_name =&gt; 'Kiesinger', :birthday =&gt; '06.04.1904', :day_of_death =&gt; '09.03.1988', :inauguration =&gt; '01.12.1966')
-Chancellor.create(:first_name =&gt; 'Willy', :last_name =&gt; 'Brandt', :birthday =&gt; '18.12.1913', :day_of_death =&gt; '08.10.1992', :inauguration =&gt; '21.10.1969')
-Chancellor.create(:first_name =&gt; 'Walter', :last_name =&gt; 'Scheel', :birthday =&gt; '08.09.1919', :inauguration =&gt; '07.05.1974')
-Chancellor.create(:first_name =&gt; 'Helmut', :last_name =&gt; 'Schmidt', :birthday =&gt; '23.12.1918', :inauguration =&gt; '16.05.1974')</programlisting></para>
+      products:<programlisting>product.create(:first_name =&gt; 'Konrad', :last_name =&gt; 'Adenauer', :birthday =&gt; '05.01.1876', :day_of_death =&gt; '19.04.1967', :inauguration =&gt; '15.09.1949')
+product.create(:first_name =&gt; 'Ludwig', :last_name =&gt; 'Erhard', :birthday =&gt; '04.02.1897', :day_of_death =&gt; '05.05.1977', :inauguration =&gt; '16.10.1963')
+product.create(:first_name =&gt; 'Kurt Georg', :last_name =&gt; 'Kiesinger', :birthday =&gt; '06.04.1904', :day_of_death =&gt; '09.03.1988', :inauguration =&gt; '01.12.1966')
+product.create(:first_name =&gt; 'Willy', :last_name =&gt; 'Brandt', :birthday =&gt; '18.12.1913', :day_of_death =&gt; '08.10.1992', :inauguration =&gt; '21.10.1969')
+product.create(:first_name =&gt; 'Walter', :last_name =&gt; 'Scheel', :birthday =&gt; '08.09.1919', :inauguration =&gt; '07.05.1974')
+product.create(:first_name =&gt; 'Helmut', :last_name =&gt; 'Schmidt', :birthday =&gt; '23.12.1918', :inauguration =&gt; '16.05.1974')</programlisting></para>
 
       <para>And populate it with this data:<screen>MacBook:history2 xyz$ <command>rake db:seed</command>
 MacBook:history2 xyz$</screen></para>
 
       <para>As we only need <methodname>index</methodname> and
       <methodname>show</methodname>, we should delete the not required
-      views:<screen>MacBook:history2 xyz$ <command>rm app/views/chancellors/_form.html.erb</command> 
-MacBook:history2 xyz$ <command>rm app/views/chancellors/new.html.erb</command> 
-MacBook:history2 xyz$ <command>rm app/views/chancellors/edit.html.erb</command> 
+      views:<screen>MacBook:history2 xyz$ <command>rm app/views/products/_form.html.erb</command> 
+MacBook:history2 xyz$ <command>rm app/views/products/new.html.erb</command> 
+MacBook:history2 xyz$ <command>rm app/views/products/edit.html.erb</command> 
 MacBook:history2 xyz$</screen></para>
 
       <para>The file
-      <filename>app/controllers/chancellors_controller.rb</filename> can be
-      simplified with an editor. It should look like this:<programlisting>class ChancellorsController &lt; ApplicationController
-  # GET /chancellors
+      <filename>app/controllers/products_controller.rb</filename> can be
+      simplified with an editor. It should look like this:<programlisting>class ProductsController &lt; ApplicationController
+  # GET /products
   def index
-    @chancellors = Chancellor.all
+    @products = product.all
   end
 
-  # GET /chancellors/1
+  # GET /products/1
   def show
-    @chancellor = Chancellor.find(params[:id])
+    @product = product.find(params[:id])
   end
 end</programlisting></para>
 
@@ -905,19 +890,19 @@ end</programlisting></para>
       <methodname>show</methodname>. Please open the file
       <filename>config/routes.rb</filename> and edit it as
       follows:<programlisting>History2::Application.routes.draw do
-  resources :chancellors, :only =&gt; [ :index, :show ]
+  resources :products, :only =&gt; [ :index, :show ]
 end</programlisting></para>
 
       <para>A <command>rake routes</command> shows us that really only
       <methodname>index</methodname> and <methodname>show</methodname> are
       routed now:<screen>MacBook:history2 xyz$ <command>rake routes</command>
-chancellors GET /chancellors(.:format)     chancellors#index
- chancellor GET /chancellors/:id(.:format) chancellors#show
+products GET /products(.:format)     products#index
+ product GET /products/:id(.:format) products#show
 MacBook:history2 xyz$</screen></para>
 
       <para>If we now start the server <command>rails server</command> and go
       to the URL <uri
-      xlink:href="http://0.0.0.0:3000/chancellors">http://0.0.0.0:3000/chancellors</uri>,
+      xlink:href="http://0.0.0.0:3000/products">http://0.0.0.0:3000/products</uri>,
       we get an error message:<screen>MacBook:history2 xyz$ <command>rails server</command>
 =&gt; Booting WEBrick
 =&gt; Rails 3.2.3 application starting in development on http://0.0.0.0:3000
@@ -928,23 +913,23 @@ MacBook:history2 xyz$</screen></para>
 [2012-05-08 22:46:28] INFO  WEBrick::HTTPServer#start: pid=43440 port=3000
 
 
-Started GET "/chancellors" for 127.0.0.1 at 2012-05-08 22:46:41 +0200
-Processing by ChancellorsController#index as HTML
-  Chancellor Load (0.1ms)  SELECT "chancellors".* FROM "chancellors" 
-  Rendered chancellors/index.html.erb within layouts/application (17.6ms)
+Started GET "/products" for 127.0.0.1 at 2012-05-08 22:46:41 +0200
+Processing by ProductsController#index as HTML
+  product Load (0.1ms)  SELECT "products".* FROM "products" 
+  Rendered products/index.html.erb within layouts/application (17.6ms)
 Completed 500 Internal Server Error in 81ms
 
-ActionView::Template::Error (undefined method `edit_chancellor_path' for #&lt;#&lt;Class:0x007fc9150437c0&gt;:0x007fc915047b18&gt;):
-    20:     &lt;td&gt;&lt;%= chancellor.day_of_death %&gt;&lt;/td&gt;
-    21:     &lt;td&gt;&lt;%= chancellor.inauguration %&gt;&lt;/td&gt;
-    22:     &lt;td&gt;&lt;%= link_to 'Show', chancellor %&gt;&lt;/td&gt;
-    23:     &lt;td&gt;&lt;%= link_to 'Edit', edit_chancellor_path(chancellor) %&gt;&lt;/td&gt;
-    24:     &lt;td&gt;&lt;%= link_to 'Destroy', chancellor, confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
+ActionView::Template::Error (undefined method `edit_product_path' for #&lt;#&lt;Class:0x007fc9150437c0&gt;:0x007fc915047b18&gt;):
+    20:     &lt;td&gt;&lt;%= product.day_of_death %&gt;&lt;/td&gt;
+    21:     &lt;td&gt;&lt;%= product.inauguration %&gt;&lt;/td&gt;
+    22:     &lt;td&gt;&lt;%= link_to 'Show', product %&gt;&lt;/td&gt;
+    23:     &lt;td&gt;&lt;%= link_to 'Edit', edit_product_path(product) %&gt;&lt;/td&gt;
+    24:     &lt;td&gt;&lt;%= link_to 'Destroy', product, confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
     25:   &lt;/tr&gt;
     26: &lt;% end %&gt;
-  app/views/chancellors/index.html.erb:23:in `block in _app_views_chancellors_index_html_erb__3473545449794762094_70250803843160'
-  app/views/chancellors/index.html.erb:15:in `each'
-  app/views/chancellors/index.html.erb:15:in `_app_views_chancellors_index_html_erb__3473545449794762094_70250803843160'
+  app/views/products/index.html.erb:23:in `block in _app_views_products_index_html_erb__3473545449794762094_70250803843160'
+  app/views/products/index.html.erb:15:in `each'
+  app/views/products/index.html.erb:15:in `_app_views_products_index_html_erb__3473545449794762094_70250803843160'
 
 
   Rendered /Users/xyz/.rvm/gems/ruby-1.9.3-p194/gems/actionpack-3.2.3/lib/action_dispatch/middleware/templates/rescues/_trace.erb (27.7ms)
@@ -953,14 +938,14 @@ ActionView::Template::Error (undefined method `edit_chancellor_path' for #&lt;#&
 </screen></para>
 
       <para>The error message states that we call a method
-      <methodname>edit_chancellor_path</methodname> in the view
-      <filename>app/views/chancellors/index.html.erb</filename>. But as we
-      only route <methodname>index</methodname> and
-      <methodname>show</methodname> now, there are no more
-      <methodname>edit</methodname>, <methodname>destroy</methodname> or
-      <methodname>new</methodname> methods any more. So we need to adapt the
-      file <filename>app/views/chancellors/index.html.erb</filename> in the
-      editor as follows:<programlisting>&lt;h1&gt;Listing chancellors&lt;/h1&gt;
+      <methodname>edit_product_path</methodname> in the view
+      <filename>app/views/products/index.html.erb</filename>. But as we only
+      route <methodname>index</methodname> and <methodname>show</methodname>
+      now, there are no more <methodname>edit</methodname>,
+      <methodname>destroy</methodname> or <methodname>new</methodname> methods
+      any more. So we need to adapt the file
+      <filename>app/views/products/index.html.erb</filename> in the editor as
+      follows:<programlisting>&lt;h1&gt;Listing products&lt;/h1&gt;
 
 &lt;table&gt;
   &lt;tr&gt;
@@ -972,48 +957,48 @@ ActionView::Template::Error (undefined method `edit_chancellor_path' for #&lt;#&
     &lt;th&gt;&lt;/th&gt;
   &lt;/tr&gt;
 
-&lt;% @chancellors.each do |chancellor| %&gt;
+&lt;% @products.each do |product| %&gt;
   &lt;tr&gt;
-    &lt;td&gt;&lt;%= chancellor.first_name %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= chancellor.last_name %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= chancellor.birthday %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= chancellor.day_of_death %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= chancellor.inauguration %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Show', chancellor %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= product.first_name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= product.last_name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= product.birthday %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= product.day_of_death %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= product.inauguration %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Show', product %&gt;&lt;/td&gt;
   &lt;/tr&gt;
 &lt;% end %&gt;
 &lt;/table&gt;</programlisting></para>
 
       <para>And while we are at it, we also edit the
-      <filename>app/views/chancellors/show.html.erb</filename>
+      <filename>app/views/products/show.html.erb</filename>
       accordingly:<programlisting>&lt;p&gt;
   &lt;b&gt;First name:&lt;/b&gt;
-  &lt;%= @chancellor.first_name %&gt;
+  &lt;%= @product.first_name %&gt;
 &lt;/p&gt;
 
 &lt;p&gt;
   &lt;b&gt;Last name:&lt;/b&gt;
-  &lt;%= @chancellor.last_name %&gt;
+  &lt;%= @product.last_name %&gt;
 &lt;/p&gt;
 
 &lt;p&gt;
   &lt;b&gt;Birthday:&lt;/b&gt;
-  &lt;%= @chancellor.birthday %&gt;
+  &lt;%= @product.birthday %&gt;
 &lt;/p&gt;
 
 &lt;p&gt;
   &lt;b&gt;Day of death:&lt;/b&gt;
-  &lt;%= @chancellor.day_of_death %&gt;
+  &lt;%= @product.day_of_death %&gt;
 &lt;/p&gt;
 
 &lt;p&gt;
   &lt;b&gt;Inauguration:&lt;/b&gt;
-  &lt;%= @chancellor.inauguration %&gt;
+  &lt;%= @product.inauguration %&gt;
 &lt;/p&gt;</programlisting></para>
 
       <para>Now our application is finished. Start the Rails server with
       <command>rails server</command> and open the URL <uri
-      xlink:href="http://0.0.0.0:3000/chancellors">http://0.0.0.0:3000/chancellors</uri>
+      xlink:href="http://0.0.0.0:3000/products">http://0.0.0.0:3000/products</uri>
       in the browser.</para>
 
       <note>
@@ -1031,8 +1016,6 @@ ActionView::Template::Error (undefined method `edit_chancellor_path' for #&lt;#&
       without them the next. Then you will soon get a feel for whether it fits
       into your working method or not. I find that scaffolding makes my work
       much easier for standard applications.</para>
-
-      <para/>
     </section>
   </section>
 </chapter>
