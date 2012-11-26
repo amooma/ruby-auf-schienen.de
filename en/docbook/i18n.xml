@@ -53,21 +53,30 @@
     displayed with a decimal comma as "1.000,23" on the German page and with a
     decimal point on an English web page as "1,000.23". As example, we use the
     German and English (US) variation of this amount with currency in the
-    console:<screen>MacBook:webshop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.5)
-1.9.3-p194 :001 &gt; <command>helper.number_to_currency('1000.23', :locale =&gt; :de)</command>
- =&gt; "1.000,23 €" 
-1.9.3-p194 :002 &gt; <command>helper.number_to_currency('1000.23', :locale =&gt; :en)</command>
- =&gt; "$1,000.23" 
-1.9.3-p194 :003 &gt; <command>exit</command>
-MacBook:webshop xyz$</screen></para>
+    console:<screen>$ rails new webshop
+  [...]
+$ cd webshop 
+$ echo "gem 'rails-i18n'" &gt;&gt; Gemfile
+$ bundle
+  [...]
+$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; helper.number_to_currency('1000.23', :locale =&gt; :de)
+=&gt; "1.000,23 €"
+&gt;&gt; helper.number_to_currency('1000.23', :locale =&gt; :en)
+=&gt; "$1,000.23"
+&gt;&gt; helper.number_to_currency('1000.23', :locale =&gt; :fr)
+=&gt; "1 000,23 €"
+&gt;&gt; exit
+$</screen></para>
 
     <note>
       <para>To have a quick go at trying out the
-      <methodname>helper.number_to_currency</methodname> example, you first
-      need to insert the line <code>gem 'rails-i18n'</code> into the file
-      <filename>Gemfile</filename> and then execute <command>bundle</command>.
-      This installs all required language files for you.</para>
+      <methodname>helper.number_to_currency</methodname> in your own
+      application, you first need to insert the line <code>gem
+      'rails-i18n'</code> into the file <filename>Gemfile</filename> and then
+      execute <command>bundle</command>. This installs all required language
+      files for you.</para>
     </note>
 
     <section xml:id="i18n_i18n_t">
@@ -96,73 +105,63 @@ MacBook:webshop xyz$</screen></para>
   hello: "Hello world"</programlisting></para>
 
       <para>In the Rails console we can try out how
-      <methodname>I18n.t</methodname> works:<screen>MacBook:webshop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>I18n.t :hello</command>
- =&gt; "Hello world" 
-1.9.3p194 :002 &gt; <command>I18n.locale</command>
- =&gt; :en 
-1.9.3p194 :003 &gt; <command>exit</command>
-MacBook:webshop xyz$</screen></para>
+      <methodname>I18n.t</methodname> works:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; I18n.t :hello
+=&gt; "Hello world"
+&gt;&gt; I18n.locale
+=&gt; :en
+&gt;&gt; exit
+$</screen></para>
 
       <para>Let's first create a <filename>config/locales/de.yml</filename>
       with the following content:<programlisting>de:
   hello: "Hallo Welt"</programlisting></para>
 
-      <para>Now back to the console:<screen>MacBook:webshop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>I18n.locale</command>
- =&gt; :en 
-1.9.3p194 :002 &gt; <command>I18n.t :hello</command>
- =&gt; "Hello world" 
-1.9.3p194 :003 &gt; <command>I18n.locale = :de</command>
- =&gt; :de 
-1.9.3p194 :004 &gt; <command>I18n.t :hello</command>
- =&gt; "Hallo Welt" 
-1.9.3p194 :005 &gt; <command>exit</command>
-MacBook:webshop xyz$ </screen></para>
+      <para>Now back to the console:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; I18n.locale
+=&gt; :en
+&gt;&gt; I18n.t :hello
+=&gt; "Hello world"
+&gt;&gt; I18n.locale = :de
+=&gt; :de
+&gt;&gt; I18n.t :hello
+=&gt; "Hallo Welt"
+&gt;&gt;</screen></para>
 
       <para><methodname>I18n.t</methodname> looks by default for the entry in
       the language defined in <varname>I18n.locale</varname>. It does not
       matter if you are working with <methodname>I18n.t</methodname> or
       <methodname>I18n.translate</methodname>. Nor does it matter if you are
-      searching for a symbol or a string:<screen>MacBook:webshop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>I18n.t :hello</command>
- =&gt; "Hello world" 
-1.9.3p194 :002 &gt; <command>I18n.t 'hello'</command>
- =&gt; "Hello world" 
-1.9.3p194 :003 &gt; <command>I18n.translate 'hello'</command>
- =&gt; "Hello world" 
-1.9.3p194 :004 &gt; <command>exit</command>
-MacBook:webshop xyz$ </screen></para>
+      searching for a symbol or a string:<screen>&gt;&gt; I18n.locale = :en
+=&gt; :en
+&gt;&gt; I18n.t :hello
+=&gt; "Hello world"
+&gt;&gt; I18n.t 'hello'
+=&gt; "Hello world"
+&gt;&gt; I18n.translate 'hello'
+=&gt; "Hello world"
+&gt;&gt;</screen></para>
 
       <para>You can also specify the desired language for an individual
       <methodname>I18n.t</methodname> call with <code>:locale =&gt;
-      :de</code>.<screen>MacBook:webshop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>I18n.locale</command>
- =&gt; :en 
-1.9.3p194 :002 &gt; <command>I18n.t :hello, :locale =&gt; :de</command>
- =&gt; "Hallo Welt" 
-1.9.3p194 :003 &gt; <command>I18n.t :hello</command>
- =&gt; "Hello world" 
-1.9.3p194 :004 &gt; <command>exit</command>
-MacBook:webshop xyz$</screen></para>
+      :de</code>.<screen>=&gt; "Hallo Welt"
+&gt;&gt; I18n.t :hello
+=&gt; "Hello world"
+&gt;&gt;</screen></para>
 
       <para>If a translation does not exist, you get an error message that
       says "<code>translation missing:</code>". This also applies if a
       translation is only missing in one language (then all other languages
       will work, but for the missing translation you will get the error
       message). In that case, you can define a default with <code>:default
-      =&gt; 'any default value'</code>:<screen>MacBook:webshop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>I18n.t 'asdfasdfasdf'</command>
- =&gt; "translation missing: en.asdfasdfasdf" 
-1.9.3p194 :002 &gt; <command>I18n.t 'asdfasdfasdf', :default =&gt; 'asdfasdfasdf'</command>
- =&gt; "asdfasdfasdf" 
-1.9.3p194 :003 &gt; <command>exit</command>
-MacBook:webshop xyz$ </screen></para>
+      =&gt; 'any default value'</code>:<screen>&gt;&gt; I18n.t 'asdfasdfasdf'
+=&gt; "translation missing: en.asdfasdfasdf"
+&gt;&gt; I18n.t 'asdfasdfasdf', :default =&gt; 'asdfasdfasdf'
+=&gt; "asdfasdfasdf"
+&gt;&gt; exit
+$ </screen></para>
 
       <para>In the YAML structure you can also specify several levels. Please
       amend the <filename>config/locale/en.yml</filename> as
@@ -176,18 +175,18 @@ MacBook:webshop xyz$ </screen></para>
 
       <para>You can display the different levels within the string with dots
       or with a <code>:scope</code> for the symbols. You can also mix both
-      options.<screen>MacBook:webshop xyz$ <command>rails console</command>
-Loading development environment (Rails 3.2.3)
-1.9.3p194 :001 &gt; <command>I18n.t 'example.test'</command>
- =&gt; "A test" 
-1.9.3p194 :002 &gt; <command>I18n.t 'aaa.bbb.test'</command>
- =&gt; "An other test" 
-1.9.3p194 :003 &gt; <command>I18n.t :test, :scope =&gt; [:aaa, :bbb]</command>
- =&gt; "An other test" 
-1.9.3p194 :004 &gt; <command>I18n.t :test, :scope =&gt; 'aaa.bbb'</command>
- =&gt; "An other test" 
-1.9.3p194 :005 &gt; <command>exit</command>
-MacBook:webshop xyz$</screen></para>
+      options.<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; I18n.t 'example.test'
+=&gt; "A test"
+&gt;&gt; I18n.t 'aaa.bbb.test'
+=&gt; "An other test"
+&gt;&gt; I18n.t :test, :scope =&gt; [:aaa, :bbb]
+=&gt; "An other test"
+&gt;&gt; I18n.t :test, :scope =&gt; 'aaa.bbb'
+=&gt; "An other test"
+&gt;&gt; exit
+$</screen></para>
 
       <para>It is up to you which structure you choose to save your
       translations in the YAML files. But the structure described in <xref
@@ -274,14 +273,14 @@ MacBook:webshop xyz$</screen></para>
     Correspondingly, there will be a certain amount of repetition. I am going
     to show you the steps you need to watch out for by using a simple
     application as example. Let's go through all the changes using the example
-    of this bibliography application:<screen>MacBook:~ xyz$ <command>rails new bibliography</command>
-[...]
-MacBook:~ xyz$ <command>cd bibliography</command> 
-MacBook:bibliography xyz$ <command>rails generate scaffold book title number_of_pages:integer 'price:decimal{7,2}'</command>
-[...]
-MacBook:bibliography xyz$ <command>rake db:migrate</command>
-[...]
-MacBook:bibliography xyz$</screen></para>
+    of this bibliography application:<screen>$ rails new bibliography
+  [...]
+$ cd bibliography
+$ rails generate scaffold book title number_of_pages:integer 'price:decimal{7,2}'
+  [...]
+$ rake db:migrate
+  [...]
+$</screen></para>
 
     <para>To get examples for validation errors, please insert the following
     validations in the
@@ -306,24 +305,23 @@ end
     directories in the line above for the translations of the models and the
     views. This directory structure is not a technical requirement, but makes
     it easier to keep track of things if your application is quite
-    big:<programlisting>    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
-<emphasis>    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'models', '*', '*.yml').to_s]
-    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'views', '*', '*.yml').to_s]
-    config.i18n.default_locale = :de</emphasis></programlisting></para>
+    big:<programlisting>config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'models', '*', '*.yml').to_s]
+config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'views', '*', '*.yml').to_s]
+config.i18n.default_locale = :de</programlisting></para>
 
-    <para>You then still need to create the corresponding directories:<screen>MacBook:bibliography xyz$ <command>mkdir -p config/locales/models/book</command>
-MacBook:bibliography xyz$ <command>mkdir -p config/locales/views/book</command>
-MacBook:bibliography xyz$</screen></para>
+    <para>You then still need to create the corresponding directories:<screen>$ mkdir -p config/locales/models/book
+$ mkdir -p config/locales/views/book
+$ </screen></para>
 
     <para>Now you need to generate a language configuration file for German or
     simply download a ready-made one by Sven Fuchs from his Github repository
     at <uri
-    xlink:href="https://github.com/svenfuchs/rails-i18n">https://github.com/svenfuchs/rails-i18n</uri>:<screen>MacBook:bibliography xyz$ <command>cd config/locales</command>
-MacBook:locales xyz$ <command>curl -O https://raw.github.com/svenfuchs/rails-i18n/master/rails/locale/de.yml</command>
+    xlink:href="https://github.com/svenfuchs/rails-i18n">https://github.com/svenfuchs/rails-i18n</uri>:<screen>$ cd config/locales
+$ curl -O https://raw.github.com/svenfuchs/rails-i18n/master/rails/locale/de.yml
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
-100  4940  100  4940    0     0   9574      0 --:--:-- --:--:-- --:--:-- 11932
-MacBook:locales xyz$ </screen></para>
+100  4940  100  4940    0     0   4296      0  0:00:01  0:00:01 --:--:--  4862
+$</screen></para>
 
     <note>
       <para>If you know how Bundler works, you can also insert the line
@@ -392,7 +390,7 @@ de:
     <para><filename>app/views/books/_form.html.erb</filename><programlisting>&lt;%= form_for(@book) do |f| %&gt;
   &lt;% if @book.errors.any? %&gt;
     &lt;div id="error_explanation"&gt;
-      &lt;h2&gt;<emphasis>&lt;%= t 'activerecord.errors.template.header', :model =&gt; Book.model_name.human, :count =&gt; @book.errors.count %&gt;</emphasis>&lt;/h2&gt;
+      &lt;h2&gt;&lt;%= t 'activerecord.errors.template.header', :model =&gt; Book.model_name.human, :count =&gt; @book.errors.count %&gt;&lt;/h2&gt;
       &lt;ul&gt;
       &lt;% @book.errors.full_messages.each do |msg| %&gt;
         &lt;li&gt;&lt;%= msg %&gt;&lt;/li&gt;
@@ -419,7 +417,7 @@ de:
 &lt;% end %&gt;
 </programlisting></para>
 
-    <para><filename>app/views/books/edit.html.erb</filename><programlisting>&lt;h1&gt;<emphasis>&lt;%= t 'views.book.edit.title' %&gt;</emphasis>&lt;/h1&gt;
+    <para><filename>app/views/books/edit.html.erb</filename><programlisting>&lt;h1&gt;&lt;%= t 'views.book.edit.title' %&gt;&lt;/h1&gt;
 
 &lt;%= render 'form' %&gt;
 
