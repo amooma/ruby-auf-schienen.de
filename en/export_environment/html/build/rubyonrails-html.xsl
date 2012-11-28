@@ -282,8 +282,18 @@ Version:
         <div class="navbar navbar-inverse navbar-fixed-top">
           <div class="navbar-inner">
             <div class="container-fluid">
-              <a class="brand" href="index.html">Ruby on Rails 3.2 - Step by
-                  Step</a>
+              <a class="brand" href="index.html">Ruby on Rails 3.2 - Step by Step</a>
+
+              <div class="nav-collapse collapse">
+                <ul class="nav">
+                  <li><a href="http://ruby-auf-schienen.de/">Deutsche Version</a></li>
+                </ul>
+              </div>
+              <div class="nav-collapse collapse">
+                <p class="navbar-text pull-right">
+                  <a href="http://www.amazon.com/Ruby-Rails-3-2-Step-ebook/dp/B00AE6OJ3E?tag=wwwamoomade-21" class="navbar-link">Buy the Amazon Kindle version.</a>
+                </p>
+              </div><!--/.nav-collapse -->
             </div>
           </div>
         </div>
@@ -315,10 +325,7 @@ google_ad_height = 90;
                   Please follow <a href="https://twitter.com/wintermeyer">@wintermeyer</a> for updates.
                 </p>
                 <p>
-                  An offline version (Mobi, PDF or ePub) of this book will be available soon. I'm working on it.
-                </p>
-                <p>
-                  Thanks for your support and the visibility by mentioning it on Twitter and Facebook. That helps a lot!
+                  Thanks for your support and the visibility by linking to this website on Twitter and Facebook. That helps a lot!
                 </p>
               </div>
               <div class="well sidebar-nav">
