@@ -321,6 +321,15 @@ google_ad_height = 90;
 
             <div class="span3">
 
+              <div class="well">
+                <a href="https://twitter.com/wintermeyer" class="twitter-follow-button" data-show-count="false" data-lang="de">@wintermeyer folgen</a>
+                <script type="text/javascript">
+                  <xsl:text disable-output-escaping="yes">
+                    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                 </xsl:text>
+                </script>
+              </div>
+
               <div class="well sidebar-nav">
                 <xsl:call-template name="breadcrumbs"/>
               </div>
