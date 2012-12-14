@@ -334,12 +334,6 @@ google_ad_height = 90;
                 </p>
               </div>
 
-              <div class="well">
-                <p>
-                  Please follow <a href="https://twitter.com/wintermeyer">@wintermeyer</a> for updates.
-                </p>
-
-              </div>
               <div class="well sidebar-nav">
                 <xsl:call-template name="breadcrumbs"/>
               </div>
