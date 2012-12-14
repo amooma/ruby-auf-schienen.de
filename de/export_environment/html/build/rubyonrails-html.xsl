@@ -291,7 +291,7 @@ Version:
               </div>
               <div class="nav-collapse collapse">
                 <p class="navbar-text pull-right">
-                  <a href="http://www.amazon.de/gp/product/3827329892?tag=wwwamoomade-21" class="navbar-link">Dieses Buch bei Amazon kaufen</a>
+                  <a href="http://www.amazon.de/gp/product/3827329892?tag=wwwamoomade-21" class="navbar-link">Dieses Buch bei Amazon kaufen.</a>
                 </p>
               </div><!--/.nav-collapse -->
             </div>
