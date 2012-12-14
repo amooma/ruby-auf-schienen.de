@@ -291,7 +291,7 @@ Version:
               </div>
               <div class="nav-collapse collapse">
                 <p class="navbar-text pull-right">
-                  <a href="http://www.amazon.com/Ruby-Rails-3-2-Step-ebook/dp/B00AE6OJ3E?tag=wwwamoomade-21" class="navbar-link">Buy the Amazon Kindle version.</a>
+                  <a href="http://www.amazon.com/Ruby-Rails-3-2-Step-ebook/dp/B00AE6OJ3E?tag=wwwamoomade-21" class="navbar-link">Buy this book as a Kindle version.</a>
                 </p>
               </div><!--/.nav-collapse -->
             </div>
@@ -322,11 +322,23 @@ google_ad_height = 90;
             <div class="span3">
               <div class="well">
                 <p>
-                  Please follow <a href="https://twitter.com/wintermeyer">@wintermeyer</a> for updates.
-                </p>
-                <p>
                   Thanks for your support and the visibility by linking to this website on Twitter and Facebook. That helps a lot!
                 </p>
+                <p>
+                  <a href="https://twitter.com/wintermeyer" class="twitter-follow-button" data-show-count="false">Follow @wintermeyer</a>
+                  <script type="text/javascript">
+                    <xsl:text disable-output-escaping="yes">
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                   </xsl:text>
+                  </script>
+                </p>
+              </div>
+
+              <div class="well">
+                <p>
+                  Please follow <a href="https://twitter.com/wintermeyer">@wintermeyer</a> for updates.
+                </p>
+
               </div>
               <div class="well sidebar-nav">
                 <xsl:call-template name="breadcrumbs"/>

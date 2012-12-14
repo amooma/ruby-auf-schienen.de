@@ -323,12 +323,14 @@ google_ad_height = 90;
 
               <div class="well">
                 <p>Für den Fall der Fälle: Ich biete auch Ruby on Rails Schulungen an. Einfach eine E-Mail an sw@amooma.de schreiben.</p>
-                <a href="https://twitter.com/wintermeyer" class="twitter-follow-button" data-show-count="false" data-lang="de">@wintermeyer folgen</a>
-                <script type="text/javascript">
-                  <xsl:text disable-output-escaping="yes">
-                    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
-                 </xsl:text>
-                </script>
+                <p>
+                  <a href="https://twitter.com/wintermeyer" class="twitter-follow-button" data-show-count="false" data-lang="de">@wintermeyer folgen</a>
+                  <script type="text/javascript">
+                    <xsl:text disable-output-escaping="yes">
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                   </xsl:text>
+                  </script>
+                </p>
               </div>
 
               <div class="well sidebar-nav">
