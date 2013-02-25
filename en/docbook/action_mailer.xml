@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="action_mailer"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="action_mailer.title">Action Mailer</title>
+
+  <indexterm>
+    <primary>Action Mailer</primary>
+  </indexterm>
+
+  <indexterm>
+    <primary>E-Mail</primary>
+  </indexterm>
+
+  <para>Even if we mainly use Rails to generate web pages, it can sometimes be
+  useful to be able to send an e-mail.</para>
+
+  <para>So let's go and build an example with minimal user management for a
+  web shop that automatically sends an e-mail to the user when a new user is
+  created:<screen>$ rails new webshop
+  [...]
+$ cd webshop 
+$ rails generate scaffold User name email
+  [...]
+$ rake db:migrate
+  [...]
+$</screen></para>
+
+  <para>For the user model we create a minimal validation in the
+  <filename>app/models/user.rb</filename>, so that we can be sure that each
+  user has a name and a syntactically correct e-mail address.<programlisting>class User &lt; ActiveRecord::Base
+  attr_accessible :email, :name
+
+  validates :name,
+            :presence =&gt; true
+
+  validates :email,
+            :presence =&gt; true,
+            :format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }
+end
+</programlisting></para>
+
+  <para>There is a generator with the name <code>mailer</code> that creates
+  the files required for mailing. First, we have a look at the output of the
+  <command>rails generate mailer</command>, without passing any further
+  arguments:<screen>$ rails generate mailer
+Usage:
+  rails generate mailer NAME [method method] [options]
+
+Options:
+      [--skip-namespace]        # Skip namespace (affects only isolated applications)
+      [--old-style-hash]        # Force using old style hash (:foo =&gt; 'bar') on Ruby &gt;= 1.9
+  -e, [--template-engine=NAME]  # Template engine to be invoked
+                                # Default: erb
+  -t, [--test-framework=NAME]   # Test framework to be invoked
+                                # Default: test_unit
+
+Runtime options:
+  -f, [--force]    # Overwrite files that already exist
+  -p, [--pretend]  # Run but do not make any changes
+  -q, [--quiet]    # Suppress status output
+  -s, [--skip]     # Skip files that already exist
+
+Description:
+============
+    Stubs out a new mailer and its views. Pass the mailer name, either
+    CamelCased or under_scored, and an optional list of emails as arguments.
+
+    This generates a mailer class in app/mailers and invokes your template
+    engine and test framework generators.
+
+Example:
+========
+    rails generate mailer Notifications signup forgot_password invoice
+
+    creates a Notifications mailer class, views, test, and fixtures:
+        Mailer:     app/mailers/notifications.rb
+        Views:      app/views/notifications/signup.erb [...]
+        Test:       test/functional/notifications_test.rb
+        Fixtures:   test/fixtures/notifications/signup [...]
+
+$</screen></para>
+
+  <para>That is just what we are expecting. So let's now create the mailer
+  <classname>notification</classname>:<screen>$ rails generate mailer notification
+      create  app/mailers/notification.rb
+      invoke  erb
+      create    app/views/notification
+      invoke  test_unit
+      create    test/functional/notification_test.rb
+$ </screen></para>
+
+  <para>In the file <filename>app/mailers/notification.rb</filename> you will
+  find the controller:<programlisting>class Notification &lt; ActionMailer::Base
+  default from: "from@example.com"
+end</programlisting>In it, we create a method
+  <methodname>new_account(user)</methodname>, with which we send the
+  confirmation e-mail for a new account:<programlisting>class Notification &lt; ActionMailer::Base
+  default from: "from@example.com"
+
+  def new_account(user)
+    @user = user
+    mail(:to =&gt; user.email,
+         :subject =&gt; "The new account #{user.name} is active.")
+  end
+end</programlisting></para>
+
+  <para>Now we create the view for this method. The file name
+  <filename>app/views/notification/new_account.text.erb</filename> is composed
+  from the method name and the ending
+  <filename>text.erb</filename>.<programlisting>Hello &lt;%= @user.name %&gt;,
+
+your new account is active.
+
+Have a great day!
+  A Robot</programlisting></para>
+
+  <para>As we want to send this e-mail afer the create of a
+  <classname>User</classname>, we still need to adapt the file
+  <filename>app/models/user.rb</filename>:<programlisting>class User &lt; ActiveRecord::Base
+  attr_accessible :email, :name
+
+  validates :name,
+            :presence =&gt; true
+
+  validates :email,
+            :presence =&gt; true,
+            :format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }
+
+  after_create :send_welcome_email
+  
+  private
+  
+  def send_welcome_email
+    Notification.new_account(self).deliver
+  end
+end</programlisting></para>
+
+  <para>Let's create a new <classname>User</classname> in the console:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; User.create(name: 'Wintermeyer', email: 'stefan.wintermeyer@amooma.de')
+   (0.1ms)  begin transaction
+  SQL (5.2ms)  INSERT INTO "users" ("created_at", "email", "name", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Wed, 21 Nov 2012 18:53:34 UTC +00:00], ["email", "stefan.wintermeyer@amooma.de"], ["name", "Wintermeyer"], ["updated_at", Wed, 21 Nov 2012 18:53:34 UTC +00:00]]
+   (0.6ms)  commit transaction
+=&gt; #&lt;User id: 1, name: "Wintermeyer", email: "stefan.wintermeyer@amooma.de", created_at: "2012-11-21 18:53:34", updated_at: "2012-11-21 18:53:34"&gt;
+&gt;&gt; exit
+$ </screen></para>
+
+  <para>That was straightforward. Let's take a look at the log file
+  <filename>log/development.log</filename>:<programlisting>Connecting to database specified by database.yml
+  Rendered notification/new_account.text.erb (26.2ms)
+
+Sent mail to stefan.wintermeyer@amooma.de (54ms)
+Date: Wed, 21 Nov 2012 19:53:36 +0100
+From: from@example.com
+To: stefan.wintermeyer@amooma.de
+Message-ID: &lt;50ad23301617a_d5233fea89c2a1d8458c8@SW.local.mail&gt;
+Subject: The new account Wintermeyer is active.
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Hello Wintermeyer,
+
+your new account is active.
+
+Have a great day!
+  A Robot</programlisting></para>
+
+  <para>As we are working in "<literal>development</literal>" mode, Rails has
+  not sent the e-mail but only written the content into the
+  <filename>log/development.log</filename>.</para>
+
+  <section xml:id="konfiguration_email_server">
+    <title xml:id="konfiguration_email_server.title">Configuring the E-Mail
+    Server</title>
+
+    <para>Rails can use a local sendmail or an external SMTP server for
+    delivering the e-mails.</para>
+
+    <section xml:id="action_mailer_sendmail">
+      <title xml:id="action_mailer_sendmail.title">Sending via Local
+      Sendmail</title>
+
+      <indexterm>
+        <primary>sendmail</primary>
+      </indexterm>
+
+      <para>If you want to send the e-mails in the traditional way via local
+      <code>sendmail</code>, then you need to insert the following lines into
+      your configuration file
+      <filename>config/environments/development.rb</filename> (for the
+      development environment) or
+      <filename>config/environments/production.rb</filename> (for your
+      production environment):<programlisting>config.action_mailer.delivery_method = :sendmail
+config.action_mailer.perform_deliveries = true
+config.action_mailer.raise_delivery_errors = true
+</programlisting></para>
+    </section>
+
+    <section>
+      <title>Sending via Direct SMTP</title>
+
+      <indexterm>
+        <primary>SMTP</primary>
+      </indexterm>
+
+      <para>If you want to send the e-mail directly via a SMTP server (for
+      example Google Mail), then you need to insert the following lines into
+      your configuration file
+      <filename>config/environments/development.rb</filename> (for the
+      development environment) or
+      <filename>config/environments/production.rb</filename> (for your
+      production environment):<programlisting>config.action_mailer.delivery_method = :smtp
+config.action_mailer.smtp_settings = {
+  :address              =&gt; "smtp.gmail.com",
+  :port                 =&gt; 587,
+  :domain               =&gt; 'example.com',
+  :user_name            =&gt; '&lt;username&gt;',
+  :password             =&gt; '&lt;password&gt;',
+  :authentication       =&gt; 'plain',
+  :enable_starttls_auto =&gt; true  }</programlisting></para>
+
+      <para>Of course you need to adapt the values for <code>:domain</code>,
+      <code>:user_name</code> and <code>:password</code> in accordance with
+      your configuration.</para>
+    </section>
+  </section>
+
+  <section xml:id="x_header">
+    <title xml:id="x_header.title">Custom X-Header</title>
+
+    <indexterm>
+      <primary>e-mail</primary>
+
+      <secondary>X-header</secondary>
+    </indexterm>
+
+    <para>If you feel the urge to integrate an additional X-header then this
+    is no problem. Here is an example for expanding the file
+    <filename>app/mailers/notification.rb</filename>:<programlisting>class Notification &lt; ActionMailer::Base
+  default from: "from@example.com"
+
+  def new_account(user)
+    @user = user
+    headers["X-Priority"] = '3'
+    mail(:to =&gt; user.email,
+         :subject =&gt; "The new account #{user.name} is active.")
+  end
+end
+</programlisting></para>
+
+    <para>This means the sent e-mail would look like this:<programlisting>Sent mail to stefan.wintermeyer@amooma.de (50ms)
+Date: Wed, 30 May 2012 17:35:21 +0200
+From: from@example.com
+To: stefan.wintermeyer@amooma.de
+Message-ID: &lt;4fc63e39e356a_aa083fe366028cd8803c7@MacBook.local.mail&gt;
+Subject: The new account Wintermeyer is active.
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+
+Hello Wintermeyer,
+
+your new account is active.
+
+Have a great day!
+  A Robot</programlisting></para>
+  </section>
+
+  <section xml:id="html_emails">
+    <title xml:id="html_emails.title">HTML E-Mails</title>
+
+    <indexterm>
+      <primary>e-mail</primary>
+
+      <secondary>HTML</secondary>
+    </indexterm>
+
+    <para>Creating HTML e-mails is really easy. Please create the file
+    <filename>app/views/user_mailer/new_account_email.html.erb</filename> with
+    the following content:<programlisting>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta content="text/html; charset=UTF-8" http-equiv="Content-Type" /&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;p&gt;Hello &lt;%= @user.name %&gt;,&lt;/p&gt;
+
+    &lt;p&gt;your new account is active.&lt;/p&gt;
+
+    &lt;p&gt;&lt;i&gt;Have a great day!&lt;/i&gt;&lt;/p&gt;
+    &lt;p&gt;A Robot&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</programlisting></para>
+
+    <para>If you now create a user, the log file
+    <filename>log/development.log</filename> will show you what was rendered
+    and the e-mail that was sent:<programlisting>  Rendered notification/new_account.html.erb (2.0ms)
+  Rendered notification/new_account.text.erb (0.4ms)
+
+Sent mail to stefan.wintermeyer@amooma.de (69ms)
+Date: Wed, 30 May 2012 17:46:49 +0200
+From: from@example.com
+To: stefan.wintermeyer@amooma.de
+Message-ID: &lt;4fc640e930bff_aa173fd61d828ce0501e4@MacBook.local.mail&gt;
+Subject: The new account Wintermeyer is active.
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_4fc640e921794_aa173fd61d828ce04987d";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+
+
+----==_mimepart_4fc640e921794_aa173fd61d828ce04987d
+Date: Wed, 30 May 2012 17:46:49 +0200
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Content-ID: &lt;4fc640e926312_aa173fd61d828ce04998e@MacBook.local.mail&gt;
+
+Hello Wintermeyer,
+
+your new account is active.
+
+Have a great day!
+  A Robot
+
+----==_mimepart_4fc640e921794_aa173fd61d828ce04987d
+Date: Wed, 30 May 2012 17:46:49 +0200
+Mime-Version: 1.0
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Content-ID: &lt;4fc640e928055_aa173fd61d828ce0500ea@MacBook.local.mail&gt;
+
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta content="text/html; charset=UTF-8" http-equiv="Content-Type" /&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+  	&lt;p&gt;Hello Wintermeyer,&lt;/p&gt;
+
+    &lt;p&gt;your new account is active.&lt;/p&gt;
+
+    &lt;p&gt;&lt;i&gt;Have a great day!&lt;/i&gt;&lt;/p&gt;
+    &lt;p&gt;A Robot&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+
+----==_mimepart_4fc640e921794_aa173fd61d828ce04987d--
+</programlisting></para>
+
+    <para>Rails has automatically generated an e-mail in the MIME format
+    <literal>multipart/alternative</literal>, as the view was present both in
+    the format <filename>html.erb</filename> and
+    <filename>text.erb</filename>.</para>
+  </section>
+
+  <section xml:id="email_attachments">
+    <title xml:id="email_attachments.title">Attachments</title>
+
+    <indexterm>
+      <primary>attachments</primary>
+
+      <secondary>e-maill</secondary>
+    </indexterm>
+
+    <para>E-mail attachments are also defined in the controller.</para>
+
+    <para>As an example we add in
+    <filename>app/mailers/notification.rb</filename> the Rails image
+    <filename>app/assets/images/rails.png</filename> to an e-mail as
+    attachment:<programlisting>class Notification &lt; ActionMailer::Base
+  default from: "from@example.com"
+
+  def new_account(user)
+    @user = user
+    attachments['rails.png'] = File.read("#{Rails.root}/app/assets/images/rails.png")
+    mail(:to =&gt; user.email,
+         :subject =&gt; "The new account #{user.name} is active.")
+  end
+end
+</programlisting></para>
+
+    <section xml:id="email_inline_attachments">
+      <title xlink:href="email_inline_attachments.title">Inline
+      Attachments</title>
+
+      <para>For <foreignphrase xml:lang="en">inline
+      attachments</foreignphrase> in HTML e-mails, you need to use the method
+      <methodname>inline</methodname> when calling <code>attachments</code>.
+      In our example controller
+      <filename>app/mailers/notification.rb</filename>:<programlisting>class Notification &lt; ActionMailer::Base
+  default from: "from@example.com"
+
+  def new_account(user)
+    @user = user
+    attachments.inline['rails.png'] = File.read("#{Rails.root}/app/assets/images/rails.png")
+    mail(:to =&gt; user.email,
+         :subject =&gt; "The new account #{user.name} is active.")
+  end
+end
+</programlisting></para>
+
+      <para>In the HTML e-mail, you can access the hash
+      <code>attachments[]</code> via <methodname>image_tag</methodname>. In
+      our example the
+      <filename>app/views/notification/new_account.html.erb</filename> would
+      look like this:<programlisting>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta content="text/html; charset=UTF-8" http-equiv="Content-Type" /&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;%= image_tag attachments['rails.png'].url, :alt =&gt; 'Rails Logo' %&gt;
+    &lt;p&gt;Hello &lt;%= @user.name %&gt;,&lt;/p&gt;
+
+    &lt;p&gt;your new account is active.&lt;/p&gt;
+
+    &lt;p&gt;&lt;i&gt;Have a great day!&lt;/i&gt;&lt;/p&gt;
+    &lt;p&gt;A Robot&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</programlisting></para>
+    </section>
+  </section>
+
+  <section xml:id="action_mailer_weitere_informationen">
+    <title xml:id="action_mailer_weitere_informationen.title">Further
+    Information</title>
+
+    <para>The Rails online documentation has a very extensive entry on
+    ActionMailer at <uri
+    xlink:href="http://guides.rubyonrails.org/action_mailer_basics.html">http://guides.rubyonrails.org/action_mailer_basics.html</uri>.
+    Ryan Bates offers an excellent screencast about this topic at <uri
+    xlink:href="http://railscasts.com/episodes/206-action-mailer-in-rails-3">http://railscasts.com/episodes/206-action-mailer-in-rails-3</uri>.</para>
+  </section>
+</chapter>

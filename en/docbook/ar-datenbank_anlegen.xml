@@ -1,0 +1,615 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="activerecord_datenbank_anlegen"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="activerecord_datenbank_anlegen.title">Creating
+  Database/<quote>Model</quote></title>
+
+  <indexterm>
+    <primary>database</primary>
+  </indexterm>
+
+  <indexterm>
+    <primary>model</primary>
+  </indexterm>
+
+  <note>
+    <indexterm>
+      <primary>Model–View–Controller</primary>
+
+      <see>MVC</see>
+    </indexterm>
+
+    <indexterm>
+      <primary>MVC</primary>
+    </indexterm>
+
+    <para><foreignphrase xml:lang="en">Model</foreignphrase> in this context
+    refers to the data model of <foreignphrase
+    xml:lang="en">Model-View-Controller</foreignphrase>
+    (<acronym>MVC</acronym>).</para>
+  </note>
+
+  <para>As a first example, let's take a list of countries in Europe. First,
+  we create a new Rails project:<screen>$ rails new europe
+  [...]
+$ cd europe
+$</screen></para>
+
+  <para>Next, let's have a look at the help page for <command>rails generate
+  model</command>:<screen>$ rails generate model
+Usage:
+  rails generate model NAME [field[:type][:index] field[:type][:index]] [options]
+
+Options:
+      [--skip-namespace]  # Skip namespace (affects only isolated applications)
+      [--old-style-hash]  # Force using old style hash (:foo =&gt; 'bar') on Ruby &gt;= 1.9
+  -o, --orm=NAME          # Orm to be invoked
+                          # Default: active_record
+
+ActiveRecord options:
+      [--migration]            # Indicates when to generate migration
+                               # Default: true
+      [--timestamps]           # Indicates when to generate timestamps
+                               # Default: true
+      [--parent=PARENT]        # The parent class for the generated model
+      [--indexes]              # Add indexes for references and belongs_to columns
+                               # Default: true
+  -t, [--test-framework=NAME]  # Test framework to be invoked
+                               # Default: test_unit
+
+TestUnit options:
+      [--fixture]                   # Indicates when to generate fixture
+                                    # Default: true
+  -r, [--fixture-replacement=NAME]  # Fixture replacement to be invoked
+
+Runtime options:
+  -f, [--force]    # Overwrite files that already exist
+  -p, [--pretend]  # Run but do not make any changes
+  -q, [--quiet]    # Suppress status output
+  -s, [--skip]     # Skip files that already exist
+
+Description:
+    Stubs out a new model. Pass the model name, either CamelCased or
+    under_scored, and an optional list of attribute pairs as arguments.
+
+    Attribute pairs are field:type arguments specifying the
+    model's attributes. Timestamps are added by default, so you don't have to
+    specify them by hand as 'created_at:datetime updated_at:datetime'.
+
+    You don't have to think up every attribute up front, but it helps to
+    sketch out a few so you can start working with the model immediately.
+
+    This generator invokes your configured ORM and test framework, which
+    defaults to ActiveRecord and TestUnit.
+
+    Finally, if --parent option is given, it's used as superclass of the
+    created model. This allows you create Single Table Inheritance models.
+
+    If you pass a namespaced model name (e.g. admin/account or Admin::Account)
+    then the generator will create a module with a table_name_prefix method
+    to prefix the model's table name with the module name (e.g. admin_account)
+
+Examples:
+    `rails generate model account`
+
+        For ActiveRecord and TestUnit it creates:
+
+            Model:      app/models/account.rb
+            Test:       test/unit/account_test.rb
+            Fixtures:   test/fixtures/accounts.yml
+            Migration:  db/migrate/XXX_add_accounts.rb
+
+    `rails generate model post title:string body:text published:boolean`
+
+        Creates a Post model with a string title, text body, and published flag.
+
+    `rails generate model admin/account`
+
+        For ActiveRecord and TestUnit it creates:
+
+            Module:     app/models/admin.rb
+            Model:      app/models/admin/account.rb
+            Test:       test/unit/admin/account_test.rb
+            Fixtures:   test/fixtures/admin/accounts.yml
+            Migration:  db/migrate/XXX_add_admin_accounts.rb
+
+$</screen></para>
+
+  <para>The usage description <code>rails generate model NAME
+  [field[:type][:index] field[:type][:index]] [options]</code> tells us that
+  after <code>rails generate model</code> comes the name of the model and then
+  the table fields. If you do not put <code>:type</code> after a table field
+  name, it is assumed to be a string by default. Let's create the
+  <foreignphrase xml:lang="en">model</foreignphrase>
+  <literal>country</literal>:<screen>$ rails generate model country name population:integer
+      invoke  active_record
+      create    db/migrate/20121114110230_create_countries.rb
+      create    app/models/country.rb
+      invoke    test_unit
+      create      test/unit/country_test.rb
+      create      test/fixtures/countries.yml
+$</screen></para>
+
+  <indexterm>
+    <primary>migrations</primary>
+  </indexterm>
+
+  <indexterm>
+    <primary>database</primary>
+
+    <secondary>migrations</secondary>
+
+    <see>migrations</see>
+  </indexterm>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>migrations</secondary>
+
+    <see>migrations</see>
+  </indexterm>
+
+  <para>The generator has created a database migration file with the name
+  <filename>db/migrate/20121114110230_create_countries.rb</filename>. It
+  provides the following code:<programlisting>class CreateCountries &lt; ActiveRecord::Migration
+  def change
+    create_table :countries do |t|
+      t.string :name
+      t.integer :population
+
+      t.timestamps
+    end
+  end
+end</programlisting></para>
+
+  <para>A migration contains database changes. In this migration, a class
+  <classname>CreateCountries</classname> is defined as daughter of
+  <classname>ActiveRecord::Migration</classname>. The class method
+  <methodname>change</methodname> is used to define a migration and the
+  associated roll-back.</para>
+
+  <para>With <command>rake db:migrate</command> we can apply the migrations,
+  in other words, create the corresponding database table:<screen>$ rake db:migrate
+==  CreateCountries: migrating ================================================
+-- create_table(:countries)
+   -&gt; 0.0014s
+==  CreateCountries: migrated (0.0015s) =======================================
+
+$ </screen></para>
+
+  <note>
+    <para>You will find more details on migrations in <xref
+    linkend="activerecord_migration"/>.</para>
+  </note>
+
+  <para>Let's have a look at the file
+  <filename>app/models/country.rb</filename>:<programlisting>class Country &lt; ActiveRecord::Base
+  attr_accessible :name, :population
+end
+</programlisting></para>
+
+  <para>Hmmm … the class <classname>Country</classname> is a daughter of
+  <classname>ActiveRecord::Base</classname>. Makes sense, as we are discussing
+  ActiveRecord in this chapter. ;-)</para>
+
+  <para><methodname>attr_accessible</methodname> defines a whitelist with
+  model attributes that can be filled with values via mass
+  assignment.<footnote>
+      <para>Ryan Bates has published an excellent screencast on the topic mass
+      assignment and important security aspects at <uri
+      xlink:href="http://railscasts.com/episodes/26-hackers-love-mass-assignment-revised">http://railscasts.com/episodes/26-hackers-love-mass-assignment-revised</uri>.</para>
+    </footnote>Very simply put, these are the attributes that we can later
+  populate or change via Web interface.</para>
+
+  <note>
+    <para>The integrated help page on
+    <classname>ActiveRecord::Base</classname> is always available in case you
+    want to look something up:<screen>$ ri ActiveRecord::Base</screen></para>
+  </note>
+
+  <section>
+    <title>The Attributes id, created_at and updated_at</title>
+
+    <indexterm>
+      <primary>id</primary>
+
+      <secondary>ActiveRecord</secondary>
+    </indexterm>
+
+    <indexterm>
+      <primary>created_at</primary>
+
+      <secondary>ActiveRecord</secondary>
+    </indexterm>
+
+    <indexterm>
+      <primary>updated_at</primary>
+
+      <secondary>ActiveRecord</secondary>
+    </indexterm>
+
+    <para>Even if you cannot see it in the migration, we also get the
+    attributes <methodname>id</methodname>,
+    <methodname>created_at</methodname> und
+    <methodname>updated_at</methodname> by default for each ActiveRecord
+    model. In the Rails console, we can output the attributes of the class
+    <classname>Country</classname> by entering the class name:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; Country
+=&gt; Country(id: integer, name: string, population: integer, created_at: datetime, updated_at: datetime)
+&gt;&gt; exit
+$</screen></para>
+
+    <para>The attribute <methodname>created_at</methodname> stores the time
+    when the record was initially created. <methodname>updated_at</methodname>
+    shows the time of the last update for this record.</para>
+
+    <para><methodname>id</methodname> is used a central identification of the
+    record (primary key). The <methodname>id</methodname> is automatically
+    incremented by 1 for each record.</para>
+  </section>
+
+  <section xml:base="activerecord-types">
+    <title xml:id="activerecord-types.title">Possible Data Types in
+    ActiveRecord</title>
+
+    <indexterm>
+      <primary>data types</primary>
+
+      <secondary>ActiveRecord</secondary>
+    </indexterm>
+
+    <para>ActiveRecord is a <foreignphrase xml:lang="en">layer</foreignphrase>
+    between Ruby and various relational databases. Unfortunately, SQL
+    databases have different perspectives regarding the definition of columns
+    and their content. But you do not need to worry about this, because
+    ActiveRecord solves this problem transparently for you.<itemizedlist>
+        <listitem>
+          <para>Advantage:</para>
+
+          <para>We can replace the database behind a Rails application without
+          having to touch the program code.</para>
+        </listitem>
+
+        <listitem>
+          <para>Disadvantage:</para>
+
+          <para>We cannot use all the features of the database concerned. We
+          have to use the least common denominator, so to speak.</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>To generate a <foreignphrase xml:lang="en">model</foreignphrase>,
+    you can use the following field types:<itemizedlist>
+        <listitem>
+          <indexterm>
+            <primary>binary</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>binary</literal></para>
+
+          <para>This is a BLOB (<foreignphrase xml:lang="en">Binary Large
+          Object</foreignphrase>) in the classical sense. Never heard of it?
+          Then you probably won't need it.</para>
+
+          <para>See also <uri
+          xlink:href="http://de.wikipedia.org/wiki/Binary_Large_Object">http://en.wikipedia.org/wiki/Binary_large_object</uri></para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>boolean</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>boolean</literal></para>
+
+          <para>A Boolean value. Can be either <literal>true</literal> or
+          <literal>false</literal>.</para>
+
+          <para>See also <uri
+          xlink:href="http://de.wikipedia.org/wiki/Boolesche_Variable">http://en.wikipedia.org/wiki/Boolean_data_type</uri></para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>date</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>date</literal></para>
+
+          <para>You can store a date here.</para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>datetime</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>datetime</literal></para>
+
+          <para>Here you can store a date including a time.</para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>float</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>float</literal></para>
+
+          <para>For storing a floating point number.</para>
+
+          <para>See also <uri
+          xlink:href="http://de.wikipedia.org/wiki/Gleitkommazahl">http://en.wikipedia.org/wiki/Floating_point</uri></para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>integer</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>integer</literal></para>
+
+          <para>For storing an integer.</para>
+
+          <para>See also <uri
+          xlink:href="http://de.wikipedia.org/wiki/Integer_(Datentyp)">http://en.wikipedia.org/wiki/Integer_(computer_science)</uri></para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>decimal</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>decimal</literal></para>
+
+          <para>For storing a decimal number.</para>
+
+          <tip>
+            <para>You can also enter a decimal directly with the model
+            generator. But you need to observe the special syntax. Example for
+            creating a price with a decimal:<screen>$ rails generate model product name 'price:decimal{7,2}'
+      invoke  active_record
+      create    db/migrate/20121114110808_create_products.rb
+      create    app/models/product.rb
+      invoke    test_unit
+      create      test/unit/product_test.rb
+      create      test/fixtures/products.yml
+$</screen></para>
+
+            <para>That would generate the following migration
+            (<filename>db/migrate/20121114110808_create_products.rb</filename>):<programlisting>class CreateProducts &lt; ActiveRecord::Migration
+  def change
+    create_table :products do |t|
+      t.string :name
+      t.decimal :price, :precision =&gt; 7, :scale =&gt; 2
+
+      t.timestamps
+    end
+  end
+end</programlisting></para>
+          </tip>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>primary_key</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>primary_key</literal></para>
+
+          <para>This is an integer that is automatically incremented by 1 by
+          the database for each new entry. This field type is often used as
+          key for linking different database tables or <foreignphrase
+          xml:lang="en">models</foreignphrase>.</para>
+
+          <para>See also <uri
+          xlink:href="http://de.wikipedia.org/wiki/Schl%C3%BCssel_%28Datenbank%29">http://en.wikipedia.org/wiki/Unique_key</uri></para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>string</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>string</literal></para>
+
+          <para>A string, in other words a sequence of any characters, up to a
+          maximum of 2<superscript>8</superscript>-1 (= 255)
+          characters.</para>
+
+          <para>See also <uri
+          xlink:href="http://de.wikipedia.org/wiki/Zeichenkette">http://en.wikipedia.org/wiki/String_(computer_science)</uri></para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>text</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>text</literal></para>
+
+          <para>Also a string - but considerably bigger. By default, up to
+          2<superscript>16</superscript> (= 65536) characters can be saved
+          here.</para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>time</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>time</literal></para>
+
+          <para>A time.</para>
+        </listitem>
+
+        <listitem>
+          <indexterm>
+            <primary>timestamp</primary>
+
+            <secondary>ActiveRecord</secondary>
+          </indexterm>
+
+          <para><literal>timestamp</literal></para>
+
+          <para>A time with date, filled in automatically by the
+          database.</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>In <xref linkend="activerecord_migration"/> we will provide more
+    information on the individual data types and discuss available options.
+    Don't forget, this is a book for beginners, so this section just gives a
+    brief overview. If you want to find out more about the various datatypes,
+    please refer to the documentation listed in <xref
+    linkend="weiterfuehrende_doku"/>.</para>
+  </section>
+
+  <section xml:id="activerecord_namenskonvention">
+    <title xml:id="activerecord_namenskonvention.title">Naming Conventions
+    (Country vs. country vs. countries)</title>
+
+    <indexterm>
+      <primary>inflections</primary>
+
+      <secondary>ActiveRecord</secondary>
+
+      <see>inflections</see>
+    </indexterm>
+
+    <indexterm>
+      <primary>inflections</primary>
+
+      <secondary>ActiveSupport</secondary>
+    </indexterm>
+
+    <para>Rails newbies often find it hard to figure out when to use upper and
+    lower case, for example, <literal>Country</literal> or
+    <literal>country</literal> (one is a class, the other one a model). The
+    problem is usually not the class itself, but purely the spelling or
+    wording. For now, let's just say: it's all very logical and you will
+    quickly get the hang of it. The important thing is that you keep using
+    English words, even if you would normally be programming in another
+    language (see <xref linkend="warum_english"/>).</para>
+
+    <para>Originally, my plan was to now start philosophizing at great length
+    on naming conventions. But then I thought: <quote>Jeez, the readers want
+    to get going and not sit here for ages reading about theory.</quote> So I
+    am now going to introduce the methods with which you can find out the
+    naming conventions yourself in the Rails <foreignphrase
+    xml:lang="en">console</foreignphrase>:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; 'country'.classify
+=&gt; "Country"
+&gt;&gt; 'country'.tableize
+=&gt; "countries"
+&gt;&gt; 'country'.foreign_key
+=&gt; "country_id"
+&gt;&gt;</screen></para>
+
+    <para>ActiveRecord automatically uses the English plural forms. So for the
+    class <classname>Country</classname>, it's
+    <methodname>countries</methodname>. If you are not sure about a term, you
+    can also work with the class and method <methodname>name</methodname>.
+    <screen>&gt;&gt; Country.name.tableize
+=&gt; "countries"
+&gt;&gt; Country.name.foreign_key
+=&gt; "country_id"
+&gt;&gt; exit
+$ </screen></para>
+
+    <para>You will find a complete list of the corresponding methods at <uri
+    xlink:href="http://rails.rubyonrails.org/classes/ActiveSupport/CoreExtensions/String/Inflections.html"
+    xml:lang="en">http://rails.rubyonrails.org/classes/ActiveSupport/CoreExtensions/String/Inflections.html</uri>.
+    But I would recommend that, for now, you just go with the flow. If you are
+    not sure, you can find out the correct notation with the methods shown
+    above.</para>
+  </section>
+
+  <section>
+    <title>Database Configuration</title>
+
+    <indexterm>
+      <primary>database.yml</primary>
+    </indexterm>
+
+    <para>Which database is used by default? Let's have a quick look at the
+    configuration file for the database
+    (<filename>config/database.yml</filename>):<programlisting># SQLite version 3.x
+#   gem install sqlite3
+#
+#   Ensure the SQLite 3 gem is defined in your Gemfile
+#   gem 'sqlite3'
+development:
+  adapter: sqlite3
+  database: db/development.sqlite3
+  pool: 5
+  timeout: 5000
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  adapter: sqlite3
+  database: db/test.sqlite3
+  pool: 5
+  timeout: 5000
+
+production:
+  adapter: sqlite3
+  database: db/production.sqlite3
+  pool: 5
+  timeout: 5000</programlisting></para>
+
+    <para>As we are working in <literal>development</literal> mode, Rails has
+    created a new SQLite3 database <filename>db/development.sqlite3</filename>
+    as a result of <command>rake db:migrate</command> and saved all data
+    there.</para>
+
+    <note>
+      <para>Fans of command line clients can use <literal>sqlite3</literal>
+      for viewing this database:</para>
+
+      <para><screen>$ sqlite3 db/development.sqlite3 
+SQLite version 3.7.12 2012-04-03 19:43:07
+Enter ".help" for instructions
+Enter SQL statements terminated with a ";"
+sqlite&gt; .tables
+countries          schema_migrations
+sqlite&gt; .schema countries
+CREATE TABLE "countries" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar(255), "population" integer, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL);
+sqlite&gt; .exit
+$</screen></para>
+    </note>
+  </section>
+</section>

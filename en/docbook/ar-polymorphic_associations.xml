@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="activerecord_polymorphic"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="activerecord_polymorphic.title">Polymorphic
+  Associations</title>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>polymorphic associations</secondary>
+  </indexterm>
+
+  <para>Already the word "polymorphic" will probably make you tense up. What
+  can it mean? Here is what the website <uri
+  xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html">http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html</uri>
+  tells us: <quote>Polymorphic associations on models are not restricted on
+  what types of models they can be associated with.</quote> Well, there you go
+  - as clear as mud! ;-)</para>
+
+  <para>I am showing you an example in which we create a model for cars
+  (<classname>Car</classname>) and a model for bicycles
+  (<classname>Bike</classname>). To describe a car or bike, we use a model to
+  tag it (<classname>Tag</classname>). A car and a bike can have any number of
+  <methodname>tags</methodname>. The application:<screen>$ rails new example
+  [...]
+$ cd example 
+$</screen></para>
+
+  <para>Now the three required models:<screen>$ rails generate model car name
+  [...]
+$ rails generate model bike name
+  [...]
+$ rails generate model tag name taggable_type taggable_id:integer
+  [...]
+$ rake db:migrate
+  [...]
+$</screen></para>
+
+  <para><classname>Car</classname> and <classname>Bike</classname> are clear.
+  For <classname>Tag</classname> we use the fields
+  <methodname>taggable_type</methodname> and
+  <methodname>taggable_id</methodname>, to give ActiveRecord an opportunity to
+  save the assignment for the polymorphic association. We have to enter it
+  accordingly in the model.</para>
+
+  <para><filename>app/models/tag.rb</filename><programlisting>class Tag &lt; ActiveRecord::Base
+  attr_accessible :name, :taggable_id, :taggable_type
+
+  belongs_to :taggable, :polymorphic =&gt; true
+end</programlisting></para>
+
+  <para><filename>app/models/car.rb</filename><programlisting>class Car &lt; ActiveRecord::Base
+  attr_accessible :name
+
+  has_many :tags, :as =&gt; :taggable  
+end</programlisting></para>
+
+  <para><filename>app/models/bike.rb</filename><programlisting>class Bike &lt; ActiveRecord::Base
+  attr_accessible :name
+
+  has_many :tags, :as =&gt; :taggable
+end
+</programlisting></para>
+
+  <para>For Car and Bike we use an additional <code>:as =&gt; :taggable</code>
+  when defining has_many. For <classname>Tag</classname> we use
+  <code>belongs_to :taggable, :polymorphic =&gt; true</code> to indicate the
+  polymorphic association to ActiveRecord.</para>
+
+  <tip>
+    <para>The suffix <quote><foreignphrase
+    xml:lang="en">able</foreignphrase></quote> in the name
+    <quote><foreignphrase xml:lang="en">taggable</foreignphrase></quote> is
+    commonly used in Rails, but not obligatory. For creating the association
+    we now not only need the ID of the entry, but also need to know which
+    <foreignphrase xml:lang="en">model</foreignphrase> it actually is. So the
+    term <quote><foreignphrase
+    xml:lang="en">taggable_type</foreignphrase></quote> makes sense.</para>
+  </tip>
+
+  <para>Let's go into the <foreignphrase xml:lang="en">console</foreignphrase>
+  and create a car and a bike:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; beetle = Car.create(name: 'Beetle')
+   (0.1ms)  begin transaction
+  SQL (24.5ms)  INSERT INTO "cars" ("created_at", "name", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 15:02:35 UTC +00:00], ["name", "Beetle"], ["updated_at", Sun, 18 Nov 2012 15:02:35 UTC +00:00]]
+   (2.2ms)  commit transaction
+=&gt; #&lt;Car id: 1, name: "Beetle", created_at: "2012-11-18 15:02:35", updated_at: "2012-11-18 15:02:35"&gt;
+&gt;&gt; mountainbike = Bike.create(name: 'Mountainbike')
+   (0.1ms)  begin transaction
+  SQL (0.5ms)  INSERT INTO "bikes" ("created_at", "name", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 15:03:10 UTC +00:00], ["name", "Mountainbike"], ["updated_at", Sun, 18 Nov 2012 15:03:10 UTC +00:00]]
+   (2.0ms)  commit transaction
+=&gt; #&lt;Bike id: 1, name: "Mountainbike", created_at: "2012-11-18 15:03:10", updated_at: "2012-11-18 15:03:10"&gt;
+&gt;&gt; </screen></para>
+
+  <para>Now we define for each a tag with the color of the corresponding
+  object:<screen>&gt;&gt; beetle.tags.create(name: 'blue')
+   (0.1ms)  begin transaction
+  SQL (0.5ms)  INSERT INTO "tags" ("created_at", "name", "taggable_id", "taggable_type", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Sun, 18 Nov 2012 15:03:45 UTC +00:00], ["name", "blue"], ["taggable_id", 1], ["taggable_type", "Car"], ["updated_at", Sun, 18 Nov 2012 15:03:45 UTC +00:00]]
+   (0.7ms)  commit transaction
+=&gt; #&lt;Tag id: 1, name: "blue", taggable_type: "Car", taggable_id: 1, created_at: "2012-11-18 15:03:45", updated_at: "2012-11-18 15:03:45"&gt;
+&gt;&gt; mountainbike.tags.create(name: 'black')
+   (0.1ms)  begin transaction
+  SQL (0.5ms)  INSERT INTO "tags" ("created_at", "name", "taggable_id", "taggable_type", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Sun, 18 Nov 2012 15:04:01 UTC +00:00], ["name", "black"], ["taggable_id", 1], ["taggable_type", "Bike"], ["updated_at", Sun, 18 Nov 2012 15:04:01 UTC +00:00]]
+   (3.0ms)  commit transaction
+=&gt; #&lt;Tag id: 2, name: "black", taggable_type: "Bike", taggable_id: 1, created_at: "2012-11-18 15:04:01", updated_at: "2012-11-18 15:04:01"&gt;
+&gt;&gt;</screen></para>
+
+  <para>For the beetle, we add another <classname>Tag</classname>:<screen>&gt;&gt; beetle.tags.create(name: 'Automatic')
+   (0.1ms)  begin transaction
+  SQL (0.6ms)  INSERT INTO "tags" ("created_at", "name", "taggable_id", "taggable_type", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Sun, 18 Nov 2012 15:05:17 UTC +00:00], ["name", "Automatic"], ["taggable_id", 1], ["taggable_type", "Car"], ["updated_at", Sun, 18 Nov 2012 15:05:17 UTC +00:00]]
+   (3.0ms)  commit transaction
+=&gt; #&lt;Tag id: 3, name: "Automatic", taggable_type: "Car", taggable_id: 1, created_at: "2012-11-18 15:05:17", updated_at: "2012-11-18 15:05:17"&gt;
+&gt;&gt;  </screen></para>
+
+  <para>Let's have a look at all <classname>Tag</classname> items:<screen>&gt;&gt; Tag.all
+  Tag Load (0.3ms)  SELECT "tags".* FROM "tags" 
+=&gt; [#&lt;Tag id: 1, name: "blue", taggable_type: "Car", taggable_id: 1, created_at: "2012-11-18 15:03:45", updated_at: "2012-11-18 15:03:45"&gt;, #&lt;Tag id: 2, name: "black", taggable_type: "Bike", taggable_id: 1, created_at: "2012-11-18 15:04:01", updated_at: "2012-11-18 15:04:01"&gt;, #&lt;Tag id: 3, name: "Automatic", taggable_type: "Car", taggable_id: 1, created_at: "2012-11-18 15:05:17", updated_at: "2012-11-18 15:05:17"&gt;]
+&gt;&gt; </screen></para>
+
+  <para>And now all tags of the beetle:<screen>&gt;&gt; beetle.tags
+  Tag Load (0.3ms)  SELECT "tags".* FROM "tags" WHERE "tags"."taggable_id" = 1 AND "tags"."taggable_type" = 'Car'
+=&gt; [#&lt;Tag id: 1, name: "blue", taggable_type: "Car", taggable_id: 1, created_at: "2012-11-18 15:03:45", updated_at: "2012-11-18 15:03:45"&gt;, #&lt;Tag id: 3, name: "Automatic", taggable_type: "Car", taggable_id: 1, created_at: "2012-11-18 15:05:17", updated_at: "2012-11-18 15:05:17"&gt;]
+&gt;&gt;</screen></para>
+
+  <para>Of course you can also check which object the last
+  <classname>Tag</classname> belongs to:<screen>&gt;&gt; Tag.last.taggable
+  Tag Load (0.3ms)  SELECT "tags".* FROM "tags" ORDER BY "tags"."id" DESC LIMIT 1
+  Car Load (0.2ms)  SELECT "cars".* FROM "cars" WHERE "cars"."id" = 1 LIMIT 1
+=&gt; #&lt;Car id: 1, name: "Beetle", created_at: "2012-11-18 15:02:35", updated_at: "2012-11-18 15:02:35"&gt;
+&gt;&gt; exit
+$</screen></para>
+
+  <para>Polymorphic associations are always useful if you want to normalize
+  the database structure. In this example, we could also have defined a model
+  <classname>CarTag</classname> and <classname>BikeTag</classname>, but as
+  <classname>Tag</classname> is the same for both, a polymorphic association
+  makes more sense in this case.</para>
+
+  <note>
+    <para><foreignphrase xml:lang="en">Polymorphic
+    associations</foreignphrase> are very useful. But you should always bear
+    in mind that they cause a greater load on the database than a normal 1:n
+    association. Normally this would not make any difference, but you should
+    keep it in mind when planning.</para>
+  </note>
+</section>

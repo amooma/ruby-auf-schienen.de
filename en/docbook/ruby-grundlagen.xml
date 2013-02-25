@@ -1,0 +1,2543 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="ruby-grundlagen" xml:lang="en"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="ruby-grundlagen.title">Ruby Basics</title>
+
+  <section xml:id="ruby-grundlagen-einleitung">
+    <title>Introduction</title>
+
+    <para>This book requires basic knowledge of HTML, plus the reader - you,
+    in other words - should also have a basic understanding of programming.
+    Yet even the inventor of Ruby, Yukihiro Matsumoto, states in his book
+    <quote><citetitle>The Ruby Programming
+    Language</citetitle></quote><footnote>
+        <para>The book is highly recommended for anyone who wants to
+        understand Ruby. David Flanagan did great work together with Yukihiro
+        Matsumoto (a.k.a. Matz).</para>
+      </footnote> that:</para>
+
+    <para><quote>It is easy to program in Ruby, but Ruby is not a simple
+    language.</quote></para>
+
+    <para>This chapter is a tightrope walk between oversimplification and a
+    degree of detail that is unnecessary for a Rails newbie. After all, the
+    objective is not becoming a Ruby guru, but understanding Ruby on Rails. I
+    am going to elaborate on the most important points. The rest is then up to
+    you. If you would like to know more about Ruby, then I recommend the book
+    "The Ruby Programming Language" by David Flanagan and Yukihiro
+    Matsumoto.</para>
+
+    <note>
+      <para>For a long time I made the mistake of trying to understand Ruby on
+      Rails without knowing anything about Ruby. Ruby just looked so simple,
+      so I didn't give it another thought. But because I did not have a basic
+      understanding of Ruby, I was not able to understand Rails properly. So I
+      kept shunting it into a virtual corner and carried on working with PHP
+      instead. I only really got it after I had a closer look at Ruby.
+      <footnote>
+          <para>Today I am such a great fan of Ruby on Rails that I have even
+          made the effort of writing a book about it to introduce it to you.
+          ;-)</para>
+        </footnote></para>
+    </note>
+  </section>
+
+  <section xml:id="ruby-ist-eine-skriptsprache">
+    <title>A Scripting Language</title>
+
+    <para>Ruby is a scripting language. So it is not compiled and then
+    executed, but read by an interpreter and then processed line by
+    line.</para>
+  </section>
+
+  <section xml:id="hello-world-in-ruby">
+    <title>Hello World</title>
+
+    <indexterm>
+      <primary>Hello World</primary>
+
+      <secondary>Ruby</secondary>
+    </indexterm>
+
+    <para>A simple Ruby program <filename>hello-world.rb</filename> consist of
+    the following line:<programlisting>puts 'Hello World!'
+</programlisting></para>
+
+    <para>Use your favorite editor to open a new file with the name
+    <filename>hello-world.rb</filename> and insert the above line into this
+    file. You can then execute this Ruby program in the command line as
+    follows:<screen>$ ruby hello-world.rb 
+Hello World!
+$ </screen></para>
+
+    <para>A program line in a Ruby program does not have to end with a
+    semicolon. The Ruby interpreter is even so intelligent that is recognizes
+    if a program line was split over two or more lines for the sake of
+    readability. I will spare you the corresponding examples and am only
+    mentioning this so you don't say or think later, "is it okay like
+    this?"</para>
+
+    <para>Indenting code is also not necessary. But it does make it much
+    easier to read for human beings!</para>
+
+    <section xml:id="puts-und-print">
+      <title>puts and print</title>
+
+      <indexterm>
+        <primary>puts()</primary>
+      </indexterm>
+
+      <indexterm>
+        <primary>print()</primary>
+      </indexterm>
+
+      <para>If you go looking for examples on Ruby on the Internet, you will
+      find two typical ways of printing text on the screen:<itemizedlist>
+          <listitem>
+            <para><code>puts</code></para>
+
+            <para>Prints a string, followed by a newline.</para>
+          </listitem>
+
+          <listitem>
+            <para><code>print</code></para>
+
+            <para>Prints a string (without newline). If the string itself
+            contains a newline, this will be printed as normal.</para>
+          </listitem>
+        </itemizedlist>Example program (an extension of the program
+      <filename>hello-world.rb</filename>):<programlisting>puts 'Hello World!'
+puts
+puts '------------'
+print 'Hello World!'
+print
+puts '------------'
+</programlisting></para>
+
+      <para>On the screen, you will see this:<screen>$ ruby hello-world.rb 
+Hello World!
+
+------------
+Hello World!------------
+$ </screen></para>
+    </section>
+
+    <section xml:id="kommentare-in-ruby">
+      <title>Comments</title>
+
+      <indexterm>
+        <primary>comments</primary>
+
+        <secondary>Ruby</secondary>
+      </indexterm>
+
+      <para>A comment in a Ruby program starts with a <code>#</code>-sign and
+      ends with a newline. As an example, I can add a comment to the
+      <filename>hello-world.rb</filename> above:<programlisting><emphasis
+            role="bold"># Program for displaying "Hello World!"</emphasis>
+<emphasis role="bold"># by Stefan Wintermeyer</emphasis>
+
+puts 'Hello World!'</programlisting></para>
+
+      <para>A comment can also follow a program line:<programlisting># Program for displaying "Hello World!"
+# by Stefan Wintermeyer
+
+puts 'Hello World!'  <emphasis role="bold"># output</emphasis></programlisting></para>
+
+      <para>A <code>#</code>-sign within strings in inverted commas is not
+      treated as the start of a comment. Example program:<programlisting># Example program
+# by Stefan Wintermeyer
+
+puts 'Hello World!'
+puts <emphasis role="bold">'############'</emphasis>
+puts
+puts <emphasis role="bold">'1#2#3#4#5#6#'</emphasis>  # Comment on this
+</programlisting></para>
+
+      <para>On the screen, you will see this:<screen>$ ruby hello-world.rb 
+Hello World!
+############
+
+1#2#3#4#5#6#
+$</screen></para>
+    </section>
+
+    <section xml:id="ri">
+      <title>Help via ri</title>
+
+      <indexterm>
+        <primary>ri</primary>
+
+        <secondary><quote>Ruby Index</quote> (Ruby Help)</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>Ruby</primary>
+
+        <secondary>ri (integrated Help)</secondary>
+
+        <see>ri</see>
+      </indexterm>
+
+      <indexterm>
+        <primary>Ruby Index</primary>
+
+        <see>ri</see>
+      </indexterm>
+
+      <para>When programming, you do not always have a Ruby handbook
+      available. Fortunately, the Ruby developers thought of this and provided
+      a built-in help feature in form of the program <literal>ri</literal> (of
+      course only if you have installed this feature). <acronym>ri</acronym>
+      is the abbreviation for <quote><emphasis role="bold">R</emphasis>uby
+      <emphasis role="bold">I</emphasis>ndex</quote>. The output gets opend in
+      a so called pager (z.B. <command>less</command>). The parameter
+      <parameter>-T</parameter> sets the output directly to stdout.</para>
+
+      <para>This is a typical chicken and egg situation. How can I explain the
+      Ruby help feature, if we are only just getting started with Ruby? So I
+      am going to jump ahead a little and show you how you can search for
+      information on the class <classname>String</classname>:<screen>$ ri -T String   
+= String &lt; Object
+
+------------------------------------------------------------------------------
+= Includes:
+Comparable (from ruby site)
+
+(from ruby site)
+------------------------------------------------------------------------------
+A String object holds and manipulates an arbitrary sequence of bytes,
+typically representing characters. String objects may be created using
+[...]
+$</screen></para>
+
+      <para>If we are looking for information on a specific method
+      (chicken-egg!), then we can also use <literal>ri</literal>. Let's take
+      <methodname>gsub</methodname> as an example. This is a method for
+      replacing parts of a <classname>String</classname> (that is useful now
+      and again).<screen>$ ri -T String.size
+String.size
+
+(from ruby site)
+------------------------------------------------------------------------------
+  str.length   -&gt; integer
+  str.size     -&gt; integer
+   
+
+------------------------------------------------------------------------------
+
+Returns the character length of str.
+
+
+$ </screen></para>
+
+      <para>The program <command>ri</command> always prints the output in the
+      pager program defined by the shell (for example
+      <command>less</command>). You can also use the command option
+      <command>-T</command> to output everything directly to STDOUT. In the
+      book I am going to be using both variations.</para>
+    </section>
+  </section>
+
+  <section xml:id="irb">
+    <title>irb</title>
+
+    <indexterm>
+      <primary>irb</primary>
+
+      <secondary><quote>Interactive Ruby</quote> (Ruby shell, Ruby
+      console)</secondary>
+    </indexterm>
+
+    <indexterm>
+      <primary>Ruby shell</primary>
+
+      <see>irb</see>
+    </indexterm>
+
+    <indexterm>
+      <primary>Interactive Ruby</primary>
+
+      <see>irb</see>
+    </indexterm>
+
+    <para><acronym>irb</acronym> stands for <quote><emphasis
+    role="bold">I</emphasis>nteractive <emphasis
+    role="bold">R</emphasis>u<emphasis role="bold">b</emphasis>y</quote> and
+    is a kind of sandbox where you can play around with Ruby at your leisure.
+    irb is launched by entering <command>irb</command> on the shell and ends
+    if you enter <command>exit</command>.</para>
+
+    <para>An example is worth a thousand words:<screen>$ irb --simple-prompt
+&gt;&gt; puts 'Hello World!'
+Hello World!
+=&gt; nil
+&gt;&gt; exit
+$</screen></para>
+
+    <note>
+      <para>I use <command>irb --simple-prompt</command> to generate shorter
+      lines which make it easier to read this book on mobile devises.</para>
+    </note>
+
+    <para>In this chapter, we develop many examples within
+    <application>irb</application>. You will also often try out new things
+    within <literal>irb</literal> in the course of your work later, because it
+    is so wonderfully quick and easy.</para>
+
+    <section xml:id="kommentare-im-irb">
+      <title>Comments in irb</title>
+
+      <para>Having comments within <literal>irb</literal> would obviously
+      rarely make sense because code developed in <literal>irb</literal> is
+      more or less code for the bin. But within this book, we occasionally use
+      comments even in <literal>irb</literal> to make things clearer. You can
+      copy these comments along with everything else and insert them into the
+      <literal>irb</literal> without any problems, or you can simply omit
+      them.</para>
+    </section>
+  </section>
+
+  <section xml:id="ruby-ist-objekt-orientiert">
+    <title>Ruby is Object-Oriented</title>
+
+    <para>Ruby only knows objects. Everything is an object (sounds almost like
+    Zen). Every object is an instance of a class. You can find out the class
+    of an object via the method <methodname>.class</methodname>.</para>
+
+    <para>An object in Ruby is encapsulated and can only be reached from the
+    outside via the methods of the corresponding object. What does this mean?
+    I cannot change any property of an object directly from the outside. The
+    corresponding object has to offer a method with which I can do so.</para>
+
+    <note>
+      <para>Please do not panic if you have no idea what a class and an object
+      is. I won't tell anyone and you can still work with it just fine without
+      worrying too much. This topic alone could fill whole volumes. Roughly
+      speaking, an object is a container for something and a method changes
+      something in that container.</para>
+
+      <para>Please go on reading and have a look at the examples. The puzzle
+      will gradually get clearer.</para>
+
+      <para>BTW: I will use variable in a couple of examples but will discuss
+      variables in detail later (<xref linkend="ruby_variablen"/>).</para>
+    </note>
+
+    <section xml:id="ruby-methoden">
+      <title>Methods</title>
+
+      <indexterm>
+        <primary>methods</primary>
+
+        <secondary>Ruby</secondary>
+      </indexterm>
+
+      <para>In other programming languages, the terms you would use for Ruby
+      methods would be: functions, procedures, subroutines and of course
+      methods.</para>
+
+      <note>
+        <para>There are two kinds of methods (class methods and instance
+        methods). At this point, I do not want to make it too complicated and
+        am simply ignoring this "fine" distinction for now.</para>
+      </note>
+
+      <para>At this point you start looking for a good example, but all you
+      can think of are silly ones. The problem is the premisse that we are
+      only allowed to use knowledge that has already been described previously
+      in this book.</para>
+
+      <para>So let's assume that we use the following code sequence repeatedly
+      - for whatever reason:<screen>$ irb --simple-prompt
+&gt;&gt; puts 'Hello World!'
+Hello World!
+=&gt; nil
+&gt;&gt; puts 'Hello World!'
+Hello World!
+=&gt; nil
+&gt;&gt; puts 'Hello World!'
+Hello World!
+=&gt; nil
+&gt;&gt; exit
+$</screen></para>
+
+      <para>So we want to output the string <quote>Hello World!</quote> three
+      times in a row. As this makes our daily work routine much longer, we are
+      now going to define a method (with the meaningless name
+      <methodname>three_times</methodname>), with which this can all be done
+      in one go.<important>
+          <para>Names of methods are always written in lower case.</para>
+        </important><screen>$ irb --simple-prompt
+&gt;&gt; def three_times
+&gt;&gt;   puts 'Hello World!'
+&gt;&gt;   puts 'Hello World!'
+&gt;&gt;   puts 'Hello World!'
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; three_times
+Hello World!
+Hello World!
+Hello World!
+=&gt; nil
+&gt;&gt; exit
+$</screen></para>
+
+      <para>When defining a method, you can define required parameters and use
+      them within the method. This enables us to create a method to which we
+      pass a string as parameter and we can then output it three
+      times.<screen>$ irb --simple-prompt
+&gt;&gt; def three_times(value)
+&gt;&gt;   puts value
+&gt;&gt;   puts value
+&gt;&gt;   puts value
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; three_times('Hello World!')
+Hello World!
+Hello World!
+Hello World!
+=&gt; nil
+&gt;&gt;</screen></para>
+
+      <para>Incidentally, you can omit the brackets when calling the
+      method.<screen>&gt;&gt; three_times 'Hello World!'
+Hello World!
+Hello World!
+Hello World!
+=&gt; nil
+&gt;&gt;</screen></para>
+
+      <tip>
+        <para>Ruby gurus and would-be gurus are going to turn up their noses
+        on the subject of <quote>unnecessary</quote> brackets in your programs
+        and will probably pepper you with more or less stupid comments with
+        comparisons to Java and other programming languages.</para>
+
+        <para>There is one simple rule in the Ruby community: the fewer
+        brackets, the cooler you are! <literal>;-)</literal></para>
+
+        <para>Between you and me: you won't get a medal for using fewer
+        brackets. Decide for yourself what makes you happy.</para>
+      </tip>
+
+      <para>If you do not specify a parameter with the above method, you will
+      get the error message: <quote><literal>wrong number of arguments (0 for
+      1)</literal></quote>:<screen>&gt;&gt; three_times
+ArgumentError: wrong number of arguments (0 for 1)
+ from (irb):1:in `three_times'
+ from (irb):7
+ from /Users/xyz/.rvm/rubies/ruby-1.9.3-p327/bin/irb:16:in `&lt;main&gt;'
+&gt;&gt; exit
+$</screen></para>
+
+      <para>You can give the variable <varname>value</varname> a default value
+      and then you can also call the method without parameter:<screen>$ irb --simple-prompt
+&gt;&gt; def three_times(value = 'blue')
+&gt;&gt;   puts value
+&gt;&gt;   puts value
+&gt;&gt;   puts value
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; three_times('Hello World!')
+Hello World!
+Hello World!
+Hello World!
+=&gt; nil
+&gt;&gt; three_times
+blue
+blue
+blue
+=&gt; nil
+&gt;&gt; exit
+$</screen></para>
+    </section>
+
+    <section xml:id="ruby-class">
+      <title>Classes</title>
+
+      <indexterm>
+        <primary>classes</primary>
+
+        <secondary>Ruby</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>class</primary>
+
+        <see>classes in Ruby</see>
+      </indexterm>
+
+      <para>A class is a collection of methods. The name of a class always
+      starts with an upper case letter. Let's assume that the method belongs
+      to the new class <classname>This_and_that</classname>. It would then be
+      defined as follows in a Ruby program:<programlisting>class This_and_that
+  def three_times
+    puts 'Hello World!'
+    puts 'Hello World!'
+    puts 'Hello World!'
+  end
+end</programlisting></para>
+
+      <para>Let's play it through in <literal>irb</literal>:<screen>$ irb --simple-prompt
+&gt;&gt; class This_and_that
+&gt;&gt;   def three_times
+&gt;&gt;     puts 'Hello World!'
+&gt;&gt;     puts 'Hello World!'
+&gt;&gt;     puts 'Hello World!'
+&gt;&gt;   end
+&gt;&gt; end
+=&gt; nil
+&gt;&gt;</screen></para>
+
+      <para>Now we try to call the method
+      <methodname>three_times</methodname>:<screen>&gt;&gt; This_and_that.three_times
+NoMethodError: undefined method `three_times' for This_and_that:Class
+ from (irb):8
+ from /Users/xyz/.rvm/rubies/ruby-1.9.3-p327/bin/irb:16:in `&lt;main&gt;'
+&gt;&gt;</screen></para>
+
+      <para>This results in an error message, because
+      <classname>This_and_that</classname> is a class and not an instance. As
+      we are working with instance methods, it only works if we have first
+      created a new object (a new instance) of the class
+      <classname>This_and_that</classname> with the class method
+      <methodname>new</methodname>:<screen>&gt;&gt; abc = This_and_that.new
+=&gt; #&lt;This_and_that:0x007f819412c768&gt;
+&gt;&gt; abc.three_times
+Hello World!
+Hello World!
+Hello World!
+=&gt; nil
+&gt;&gt; exit
+$</screen></para>
+
+      <para>I will explain the difference between instance and class methods
+      in more detail in <xref linkend="class_methods_vs_instance_methods"/>.
+      Another chicken and egg problem.</para>
+
+      <section xml:id="ruby-private-methods">
+        <title>Private Methods</title>
+
+        <indexterm>
+          <primary>methods</primary>
+
+          <secondary>private, Ruby</secondary>
+        </indexterm>
+
+        <para>Quite often it makes sense to only call a method within its own
+        class or own instance. Such methods are referred to as private methods
+        (as opposed to public methods), and they are listed below the keyword
+        <literal>private</literal> within a class.</para>
+
+        <para>irb example:<screen>$ irb --simple-prompt
+&gt;&gt; class Example
+&gt;&gt;   def a
+&gt;&gt;     puts 'a'
+&gt;&gt;   end
+&gt;&gt;   private
+&gt;&gt;   def b
+&gt;&gt;     puts 'b'
+&gt;&gt;   end
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; test = Example.new
+=&gt; #&lt;Example:0x007ff1e10756b8&gt;
+&gt;&gt; test.a
+a
+=&gt; nil
+&gt;&gt; test.b
+NoMethodError: private method `b' called for #&lt;Example:0x007ff1e10756b8&gt;
+ from (irb):12
+ from /Users/xyz/.rvm/rubies/ruby-1.9.3-p327/bin/irb:16:in `&lt;main&gt;'
+&gt;&gt; exit
+$ </screen></para>
+      </section>
+
+      <section xml:id="ruby-initialize">
+        <title xml:id="ruby-initialize.title">Method initialize()</title>
+
+        <indexterm>
+          <primary>initialize()</primary>
+
+          <secondary>classes in Ruby</secondary>
+        </indexterm>
+
+        <indexterm>
+          <primary>new()</primary>
+
+          <secondary>classes in Ruby</secondary>
+
+          <see>initialize()</see>
+        </indexterm>
+
+        <indexterm>
+          <primary>constructor</primary>
+
+          <secondary>classes in Ruby</secondary>
+
+          <see>initialize()</see>
+        </indexterm>
+
+        <para>If a new instance is created (by calling the method
+        <methodname>new</methodname>), the method that is processed first and
+        automatically is the method <methodname>initialize</methodname>. The
+        method is automatically a private method, even if it not listed
+        explicitly under <literal>private</literal>.</para>
+
+        <para>irb example:<screen>$ irb --simple-prompt
+&gt;&gt; class Room
+&gt;&gt;   def initialize
+&gt;&gt;     puts 'abc'
+&gt;&gt;   end
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; kitchen = Room.new
+abc
+=&gt; #&lt;Room:0x007faec50402d8&gt;
+&gt;&gt; exit
+$</screen></para>
+
+        <para>The instance <code>kitchen</code> is created with
+        <code>Room.new</code> and the method
+        <methodname>initialize</methodname> is processed automatically.</para>
+
+        <para>The method <methodname>new</methodname> accepts the parameters
+        specified for the method <methodname>initialize</methodname>:<screen>$ irb --simple-prompt
+&gt;&gt; class Example
+&gt;&gt;   def initialize(value)
+&gt;&gt;     puts value
+&gt;&gt;   end
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; test = Example.new('Hello World!')
+Hello World!
+=&gt; #&lt;Example:0x007fa9f98ba240&gt;
+&gt;&gt; exit
+$</screen></para>
+      </section>
+
+      <section xml:id="ruby-return">
+        <title xml:id="ruby-return.title">return</title>
+
+        <indexterm>
+          <primary>return</primary>
+        </indexterm>
+
+        <para>puts is nice to demonstrate an example in this book but normally
+        you need a way to return the result of something. The
+        <code>return</code> statement can be used for that:<screen>$ irb --simple-prompt
+&gt;&gt; def area_of_a_cirle(radius)
+&gt;&gt;   pi = 3.14
+&gt;&gt;   area = pi * radius * radius
+&gt;&gt;   return area
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; area_of_a_cirle(10)
+=&gt; 314.0
+&gt;&gt; exit
+$</screen></para>
+
+        <para>But it wouldn't be Ruby if you couldn't do it shorter. You can
+        simply skip return:<screen>$ irb --simple-prompt
+&gt;&gt; def area_of_a_cirle(radius)
+&gt;&gt;   pi = 3.14
+&gt;&gt;   area = pi * radius * radius
+&gt;&gt;   area
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; area_of_a_cirle(10)
+=&gt; 314.0
+&gt;&gt; exit
+$</screen></para>
+
+        <para>You can actually even skip the last line because Ruby returns
+        the value of the last expression as a default:<screen>$ irb --simple-prompt
+&gt;&gt; def area_of_a_cirle(radius)
+&gt;&gt;   pi = 3.14
+&gt;&gt;   area = pi * radius * radius
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; area_of_a_cirle(10)
+=&gt; 314.0
+&gt;&gt; exit
+$ </screen></para>
+
+        <para><code>return</code> is sometimes useful to make a method easier
+        to read. But you don't have to use it in case you feel more
+        comfortable with out.</para>
+      </section>
+
+      <section xml:id="ruby-class-inheritance">
+        <title>Inheritance</title>
+
+        <indexterm>
+          <primary>inheritance</primary>
+
+          <secondary>classes in Ruby</secondary>
+        </indexterm>
+
+        <para>A class can inherit from another class. When defining the class,
+        the parent class must be added with a <literal>&lt;</literal> (smaller
+        than) sign:<programlisting>class Example &lt; ParentClass</programlisting>Rails
+        makes use of this approach very frequently (otherwise I would not be
+        bothering you with it).</para>
+
+        <para>In the following example, we define the class
+        <classname>Abc</classname> and which contains the methods
+        <methodname>a</methodname>, <methodname>b</methodname> and
+        <methodname>c</methodname>. Then we define a class
+        <classname>Abcd</classname> and let it inherit the class
+        <classname>Abc</classname> and add a new method
+        <methodname>d</methodname>. The new instances
+        <varname>example1</varname> and <varname>example2</varname> are
+        created with the Class-Methods new and show that
+        <varname>example2</varname> has access to the methods
+        <methodname>a</methodname>, <methodname>b</methodname>,
+        <methodname>c</methodname> and <methodname>d</methodname> but
+        <varname>example1</varname> only to <methodname>a</methodname>,
+        <methodname>b</methodname> and <methodname>c</methodname>.<screen>$ irb --simple-prompt
+&gt;&gt; class Abc
+&gt;&gt;   def a
+&gt;&gt;     'a'
+&gt;&gt;   end
+&gt;&gt;   def b
+&gt;&gt;     'b'
+&gt;&gt;   end
+&gt;&gt;   def c
+&gt;&gt;     'c'
+&gt;&gt;   end
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; class Abcd &lt; Abc
+&gt;&gt;   def d
+&gt;&gt;     'd'
+&gt;&gt;   end
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; example1 = Abc.new
+=&gt; #&lt;Abc:0x007fb463023928&gt;
+&gt;&gt; example2 = Abcd.new
+=&gt; #&lt;Abcd:0x007fb46302f020&gt;
+&gt;&gt; example2.d
+=&gt; "d"
+&gt;&gt; example2.a
+=&gt; "a"
+&gt;&gt; example1.d
+NoMethodError: undefined method `d' for #&lt;Abc:0x007fb463023928&gt;
+ from (irb):21
+ from /Users/xyz/.rvm/rubies/ruby-1.9.3-p327/bin/irb:16:in `&lt;main&gt;'
+&gt;&gt; example1.a
+=&gt; "a"
+&gt;&gt; exit
+$ </screen><tip>
+            <para>It is important to read the Error-Messages. They tell you
+            what happend and where to search for the problem. In this example
+            Ruby said that there is an <code>undefined method `d' for
+            #&lt;Abc:0x007fb463023928&gt;</code>. With that information you
+            know that the Class Abc is missing the method d which you were
+            trying to use.</para>
+          </tip></para>
+      </section>
+
+      <section xml:id="class_methods_vs_instance_methods">
+        <title>Class Methods and Instance Methods</title>
+
+        <indexterm>
+          <primary>class methods and instance methods</primary>
+
+          <secondary>Ruby</secondary>
+        </indexterm>
+
+        <para>There are two important kinds of methods: class methods and
+        instance methods.</para>
+
+        <para>You now already know what a class it. And an instance of such a
+        class is created via the class method <methodname>new</methodname>. A
+        class method can only be called in connection with the class (for
+        example, the method <methodname>new</methodname> is a class method).
+        An instance method is a method that only works with an instance. So
+        you cannot apply the method <methodname>new</methodname> to an
+        instance.</para>
+
+        <para>Let's first try to call an instance method as class
+        method:<screen>$ irb --simple-prompt
+&gt;&gt; class Knowledge
+&gt;&gt;   def pi
+&gt;&gt;     3.14
+&gt;&gt;   end
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; Knowledge.pi
+NoMethodError: undefined method `pi' for Knowledge:Class
+ from (irb):6
+ from /Users/xyz/.rvm/rubies/ruby-1.9.3-p327/bin/irb:16:in `&lt;main&gt;'
+&gt;&gt;</screen></para>
+
+        <para>So that does not work. Well, then let's create a new instance of
+        the class and try again:<screen>&gt;&gt; example = Knowledge.new
+=&gt; #&lt;Knowledge:0x007fd81b0866f0&gt;
+&gt;&gt; example.pi
+=&gt; 3.14
+&gt;&gt; exit
+$</screen></para>
+
+        <para>Now we just need to find out how to define a class method.
+        Hardcore Rails gurus would now whisk you away into the depths of the
+        source code and pick out examples from the ActiveRecord. I will spare
+        you this and show an abstract example:<screen>$ irb --simple-prompt
+&gt;&gt; class Knowledge
+&gt;&gt;   def self.pi
+&gt;&gt;     3.14
+&gt;&gt;   end
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; Knowledge.pi
+=&gt; 3.14
+&gt;&gt;</screen></para>
+
+        <para>And the proof to the contrary:<screen>&gt;&gt; example = Knowledge.new
+=&gt; #&lt;Knowledge:0x007fb339078d90&gt;
+&gt;&gt; example.pi
+NoMethodError: undefined method `pi' for #&lt;Knowledge:0x007fb339078d90&gt;
+ from (irb):8
+ from /Users/xyz/.rvm/rubies/ruby-1.9.3-p327/bin/irb:16:in `&lt;main&gt;'
+&gt;&gt; exit
+$</screen></para>
+
+        <para>There are different notations for defining class methods. The
+        two most common ones are:<itemizedlist>
+            <listitem>
+              <para><code>self.xyz</code></para>
+
+              <programlisting># Variant 1
+# with self.xyz
+#
+class Knowledge
+  def self.pi
+    3.14
+  end
+end</programlisting>
+            </listitem>
+
+            <listitem>
+              <para><code>class &lt;&lt; self</code></para>
+
+              <programlisting># Variant 2
+# with class &lt;&lt; self
+#
+class Knowledge
+  class &lt;&lt; self
+    def pi
+      3.14
+    end
+  end
+end</programlisting>
+            </listitem>
+          </itemizedlist></para>
+
+        <para>The result is always the same.</para>
+
+        <para>Of course you can use the same methodname for a class and an
+        instance method. Obviously that doesn't make any code easier to
+        understand. Here is an example with <methodname>pi</methodname> as a
+        class and an instance method:<screen>$ irb --simple-prompt
+&gt;&gt; class Knowledge
+&gt;&gt;   def pi
+&gt;&gt;     3.14
+&gt;&gt;   end
+&gt;&gt;   def self.pi
+&gt;&gt;     3.14159265359
+&gt;&gt;   end
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; Knowledge.pi
+=&gt; 3.14159265359
+&gt;&gt; example = Knowledge.new
+=&gt; #&lt;Knowledge:0x007f8ccc8786a0&gt;
+&gt;&gt; example.pi
+=&gt; 3.14
+&gt;&gt; exit
+$</screen></para>
+
+        <section xml:id="ruby-instance-methods">
+          <title>List of All Instance Methods</title>
+
+          <indexterm>
+            <primary>instance methods</primary>
+
+            <secondary>Ruby</secondary>
+          </indexterm>
+
+          <indexterm>
+            <primary>instance_methods()</primary>
+
+            <see>instance methods in Ruby</see>
+          </indexterm>
+
+          <para>You can read out all defined methods for a class with the
+          method <methodname>instance_methods</methodname>. We try it out with
+          the class <classname>This_and_that</classname> (first we create it
+          once again in the <application>irb</application>):</para>
+
+          <screen>$ irb --simple-prompt
+&gt;&gt; class Knowledge
+&gt;&gt;   def pi
+&gt;&gt;     3.14
+&gt;&gt;   end
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; Knowledge.instance_methods
+=&gt; [:pi, :nil?, :===, :=~, :!~, :eql?, :hash, :&lt;=&gt;, :class, :singleton_class, :clone, :dup, :initialize_dup, :initialize_clone, :taint, :tainted?, :untaint, :untrust, :untrusted?, :trust, :freeze, :frozen?, :to_s, :inspect, :methods, :singleton_methods, :protected_methods, :private_methods, :public_methods, :instance_variables, :instance_variable_get, :instance_variable_set, :instance_variable_defined?, :instance_of?, :kind_of?, :is_a?, :tap, :send, :public_send, :respond_to?, :respond_to_missing?, :extend, :display, :method, :public_method, :define_singleton_method, :object_id, :to_enum, :enum_for, :==, :equal?, :!, :!=, :instance_eval, :instance_exec, :__send__, :__id__]
+&gt;&gt;</screen>
+
+          <para>But that is much more than we have defined! Why? It's because
+          Ruby gives every new class a basic set of methods by default. If we
+          only want to list the methods that we have defined, then we can do
+          it like this:<screen>&gt;&gt; Knowledge.instance_methods(false)
+=&gt; [:pi]
+&gt;&gt; exit
+$</screen></para>
+        </section>
+      </section>
+    </section>
+  </section>
+
+  <section xml:id="ruby_variablen">
+    <title xml:id="ruby_variablen.title">Variables</title>
+
+    <indexterm>
+      <primary>variables</primary>
+
+      <secondary>Ruby</secondary>
+    </indexterm>
+
+    <para>You already know that everything in Ruby is an object. So a variable
+    must also be an object.</para>
+
+    <section xml:id="variablen_namenskonventionen">
+      <title xml:id="variablen_namenskonventionen.title">Naming
+      Conventions</title>
+
+      <para>Normal variables are written in lower case. <indexterm>
+          <primary>constants</primary>
+
+          <secondary>Ruby</secondary>
+        </indexterm>Constants start with an upper case letter.<important>
+          <para>A constant can also be overwritten with a new value in Ruby
+          (but you will get a warning message). So please do not rely on the
+          constancy of a constant.</para>
+        </important></para>
+
+      <para>You are on the safe side if you are using only ASCII symbols. But
+      with Ruby 1.9 and the right encoding, you could also use special
+      characters (for example German umlauts) more or less without any
+      problems in a variable name. But if you want to be polite towards other
+      programmers who probably do not have those characters directly available
+      on their keyboards, it is better to use only pure ASCII.</para>
+    </section>
+
+    <section xml:id="variablen_string">
+      <title xml:id="var_string.title">Strings</title>
+
+      <indexterm>
+        <primary>strings</primary>
+
+        <secondary>Variables</secondary>
+      </indexterm>
+
+      <para>Let's experiment a little bit in the <literal>irb</literal>. The
+      method <methodname>.class</methodname> tells us which class we are
+      dealing with.<screen>$ irb --simple-prompt
+&gt;&gt; a = 'First test'
+=&gt; "First test"
+&gt;&gt; a.class
+=&gt; String
+</screen></para>
+
+      <para>That was easy. As you can see, Ruby <quote>automagically</quote>
+      creates an object of the class <classname>String</classname>. We could
+      also do this by explicitly calling the method
+      <methodname>new</methodname>:<screen>&gt;&gt; b = String.new('Second test')
+=&gt; "Second test"
+&gt;&gt; b.class
+=&gt; String</screen></para>
+
+      <para>If we call <code>String.new</code> without a parameter, this also
+      creates an object of the class <classname>String</classname>. But it is
+      an empty String:<screen>&gt;&gt; c = String.new
+=&gt; ""
+&gt;&gt; c.class
+=&gt; String
+&gt;&gt; exit
+$ </screen></para>
+
+      <section xml:id="ruby-strings-quotes">
+        <title>Single and Double Quotations Marks</title>
+
+        <indexterm>
+          <primary>quotation marks</primary>
+
+          <secondary>for strings in Ruby</secondary>
+        </indexterm>
+
+        <indexterm>
+          <primary>quotes</primary>
+
+          <secondary>for strings in Ruby</secondary>
+
+          <see>quotation marks</see>
+        </indexterm>
+
+        <note>
+          <para>Please note: if we mention single or double quotation marks in
+          the context of strings, we do not mean typographically correct curly
+          quotation marks (see <uri
+          xlink:href="http://de.wikipedia.org/wiki/Anf%C3%BChrungszeichen">http://en.wikipedia.org/wiki/Quotation_mark</uri>),
+          but the ASCII symbols referred to as <emphasis>apostrophe</emphasis>
+          (<literal>'</literal>) or <emphasis>quotation mark</emphasis>
+          (<literal>"</literal>).</para>
+        </note>
+
+        <para>Strings can be defined either in single quotes or double quotes.
+        There is a special feature for the double quotes: you can integrate
+        expressions with the construct <code>#{}</code>. The result is then
+        automatically inserted in the corresponding place in the
+        string.</para>
+
+        <para>Example:<screen>$ irb --simple-prompt
+&gt;&gt; a = 'blue'
+=&gt; "blue"
+&gt;&gt; b = "Color: #{a}"
+=&gt; "Color: blue"
+&gt;&gt; b.class
+=&gt; String
+&gt;&gt; exit
+$</screen></para>
+
+        <para>If the result of the expression is not a string, Ruby tries to
+        apply the method <methodname>to_s</methodname> in order to convert the
+        value of the object into a string.</para>
+      </section>
+    </section>
+
+    <section xml:id="vartype_zahlen">
+      <title xml:id="vartype_string.title">Integers</title>
+
+      <indexterm>
+        <primary>integer</primary>
+
+        <secondary>Variables</secondary>
+      </indexterm>
+
+      <section xml:id="ruby-variables-fixnum-bignum">
+        <title>Fixnum and Bignum</title>
+
+        <indexterm>
+          <primary>fixnum</primary>
+
+          <secondary>Variables</secondary>
+        </indexterm>
+
+        <indexterm>
+          <primary>bignum</primary>
+
+          <secondary>Variables</secondary>
+        </indexterm>
+
+        <para><classname>Fixnum</classname> and <classname>Bignum</classname>
+        are <classname>Integer</classname> classes. A
+        <classname>Fixnum</classname> is an <classname>Integer</classname>
+        that can be saved in a <quote>Word</quote>.<footnote>
+            <para>If you do not know what a <quote>Word</quote> is: never
+            mind.</para>
+          </footnote>If a <classname>Fixnum</classname> gets bigger, it
+        automatically becomes a <classname>Bignum</classname>. Here is an
+        example where a becomes larger and by that becomes a
+        <classname>Bignum</classname>.<screen>$ irb --simple-prompt
+&gt;&gt; 20.class
+=&gt; Fixnum
+&gt;&gt; a = 20
+=&gt; 20
+&gt;&gt; a.class
+=&gt; Fixnum
+&gt;&gt; a = a * 5555555555
+=&gt; 111111111100
+&gt;&gt; a.class
+=&gt; Fixnum
+&gt;&gt; a = a * 5555555555
+=&gt; 617283950493827160500
+&gt;&gt; a.class
+=&gt; Bignum
+&gt;&gt; exit
+$ </screen></para>
+      </section>
+
+      <section xml:id="ruby-variables-float">
+        <title>Floats</title>
+
+        <indexterm>
+          <primary>float</primary>
+
+          <secondary>Variables</secondary>
+        </indexterm>
+
+        <para><classname>Float</classname> is a class for real numbers
+        (<quote>floating point numbers</quote>). The decimal separator is a
+        point (not a comma, as in some European countries).<screen>$ irb --simple-prompt
+&gt;&gt; a = 20.424
+=&gt; 20.424
+&gt;&gt; a.class
+=&gt; Float
+&gt;&gt; 42.2.class
+=&gt; Float
+&gt;&gt; exit
+$</screen></para>
+      </section>
+
+      <section xml:id="ruby-einfache-berechnungen">
+        <title>Simple Calculations</title>
+
+        <para>Calculating with integers and floats is so easy that you can
+        describe everything with just a few lines of code in the
+        <literal>irb</literal>:<screen>$ irb --simple-prompt
+&gt;&gt; a = 10
+=&gt; 10
+&gt;&gt; b = 23
+=&gt; 23
+&gt;&gt; a + b
+=&gt; 33
+&gt;&gt; (a + b).class
+=&gt; Fixnum
+&gt;&gt; c = a + b
+=&gt; 33
+&gt;&gt; c.class
+=&gt; Fixnum
+&gt;&gt; d = 3.14
+=&gt; 3.14
+&gt;&gt; e = a + d
+=&gt; 13.14
+&gt;&gt; e.class
+=&gt; Float
+&gt;&gt; a * b
+=&gt; 230
+&gt;&gt; (a * b).class
+=&gt; Fixnum
+&gt;&gt; (a * b * d).class
+=&gt; Float
+&gt;&gt; exit
+$</screen></para>
+      </section>
+    </section>
+
+    <section xml:id="vartype_boolean_und_nil">
+      <title xml:id="vartype_boolean_und_nil.title">Boolean Values and
+      nil</title>
+
+      <indexterm>
+        <primary>boolean</primary>
+
+        <secondary>Variables</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>true</primary>
+
+        <secondary>Variables</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>false</primary>
+
+        <secondary>Variables</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>nil</primary>
+
+        <secondary>Variables</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>null</primary>
+
+        <secondary>Variables</secondary>
+
+        <see>nil</see>
+      </indexterm>
+
+      <para>For boolean values (<code>true</code> and <code>false</code>) and
+      for <code>nil</code> (no value) there are separate classes:<screen>$ irb --simple-prompt
+&gt;&gt; true.class
+=&gt; TrueClass
+&gt;&gt; false.class
+=&gt; FalseClass
+&gt;&gt; nil.class
+=&gt; NilClass
+&gt;&gt; exit
+$</screen></para>
+
+      <para><literal>nil</literal> (no value <footnote>
+          <para><uri
+          xlink:href="http://de.wikipedia.org/wiki/Nullwert">http://en.wikipedia.org/wiki/Nil</uri></para>
+        </footnote>) is, by the way, the contraction of the Latin word
+      <foreignphrase xml:lang="la">nihil</foreignphrase> (nothing <footnote>
+          <para><uri
+          xlink:href="http://de.wikipedia.org/wiki/Nichts">http://www.thefreedictionary.com/nil</uri></para>
+        </footnote>) or, if you look at it in terms of programming history,
+      the term derives from <quote><foreignphrase xml:lang="en">not in
+      list</foreignphrase></quote> from the legacy of the programming language
+      Lisp (the name is an acronym of <foreignphrase xml:lang="en">List
+      Processing</foreignphrase>).</para>
+    </section>
+
+    <section xml:id="scope_von_variablen">
+      <title xml:id="scope_von_variablen.title">Scope of Variables</title>
+
+      <indexterm>
+        <primary>scope</primary>
+
+        <secondary>Variables</secondary>
+      </indexterm>
+
+      <para>Variables have a different scope (or <quote>reach</quote>) within
+      the Ruby application and therefore also within a Ruby on Rails
+      application. You need to keep this scope in mind while programming.
+      otherwise you can end up with odd effects.</para>
+
+      <section xml:id="ruby-local-variables">
+        <title>Local Variables (aaa or _aaa)</title>
+
+        <indexterm>
+          <primary>local variables</primary>
+
+          <secondary>Ruby</secondary>
+        </indexterm>
+
+        <indexterm>
+          <primary>variables</primary>
+
+          <secondary>Ruby</secondary>
+
+          <tertiary>local</tertiary>
+        </indexterm>
+
+        <para>Local variables either start with a lower case letter or an
+        underscore (<literal>_</literal>). Their scope is limited to the
+        current environment (for example the current method). The follwing
+        example defines two methods which use the same local variable radius.
+        Because they are local they don't interact with each other:<screen>$ irb --simple-prompt
+&gt;&gt; def area(radius)
+&gt;&gt;   3.14 * radius * radius
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; def circumference(radius)
+&gt;&gt;   2 * 3.14 * radius
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; area(10)
+=&gt; 314.0
+&gt;&gt; circumference(1)
+=&gt; 6.28
+&gt;&gt; exit
+$</screen></para>
+      </section>
+
+      <section xml:id="ruby-global-variables">
+        <title>Global Variables ($aaa)</title>
+
+        <indexterm>
+          <primary>global variables</primary>
+
+          <secondary>Ruby</secondary>
+        </indexterm>
+
+        <indexterm>
+          <primary>variables</primary>
+
+          <secondary>Ruby</secondary>
+
+          <tertiary>global</tertiary>
+        </indexterm>
+
+        <para>A global variable starts with a <literal>$</literal>-sign and is
+        accessible in the entire programm. Example:<screen>$ irb --simple-prompt
+&gt;&gt; $value = 10
+=&gt; 10
+&gt;&gt; puts $value
+10
+=&gt; nil
+&gt;&gt; def example
+&gt;&gt;   $value = 20
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; puts $value
+10
+=&gt; nil
+&gt;&gt; example
+=&gt; 20
+&gt;&gt; puts $value
+20
+=&gt; nil
+&gt;&gt; exit
+$</screen></para>
+
+        <para>Global variables are used very rarely.</para>
+      </section>
+
+      <section xml:id="ruby-instance-variables">
+        <title>Instance Variables (@aaa)</title>
+
+        <indexterm>
+          <primary>instance variables</primary>
+
+          <secondary>Ruby</secondary>
+        </indexterm>
+
+        <indexterm>
+          <primary>variables</primary>
+
+          <secondary>Ruby</secondary>
+
+          <tertiary>instance variables</tertiary>
+        </indexterm>
+
+        <para>Instance variables (<quote><emphasis
+        role="bold">A</emphasis>ttributes</quote>, hence the
+        <literal>@</literal>) only apply within a class, but everywhere in it
+        – a mini version of global variables, so to speak. Unlike global
+        variables, you will find instance variables all over the place in a
+        Rails application. Let's tackle them in form of an example program
+        with the name <filename>color.rb</filename>:<programlisting>class Wall
+  def initialize
+    @color = 'white'
+  end
+  
+  def color
+    @color
+  end
+
+  def paint_it(value)
+    @color = value
+  end
+end
+
+my_wall = Wall.new
+puts my_wall.color
+
+my_wall.paint_it('red')
+puts my_wall.color</programlisting>If you start this program, the following
+        output will appear:<screen>$ ruby color.rb 
+white
+red
+$</screen></para>
+
+        <para>In the method <indexterm>
+            <primary>initialize()</primary>
+          </indexterm><methodname>initialize</methodname> we set the instance
+        variable <varname>@color</varname> to the value <quote>white</quote>.
+        The method <methodname>paint_it(value)</methodname> changes this
+        instance variable.</para>
+
+        <para>With the method <methodname>color</methodname> we can access the
+        value of <varname>@color</varname> outside of the instance. This kind
+        of method is called a setter method.</para>
+      </section>
+    </section>
+  </section>
+
+  <section xml:id="noch_mal_methoden">
+    <title>Methods Once Again</title>
+
+    <para>In order to keep the amount of chicken and egg problems in this
+    chapter at a manageable level, we need to go back to the topic Methods and
+    combine what we have learned so far.</para>
+
+    <section xml:id="getter_und_setter_methoden">
+      <title>Getters and Setters</title>
+
+      <indexterm>
+        <primary>getter</primary>
+
+        <secondary>Ruby</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>setter</primary>
+
+        <secondary>Ruby</secondary>
+      </indexterm>
+
+      <para>As <indexterm>
+          <primary>instance variables</primary>
+
+          <secondary>Ruby</secondary>
+        </indexterm>instance variables (<quote>attributes</quote>) only exist
+      within the relevant instance, you always need to write a
+      <quote>getter</quote> method for exporting such a variable. If we define
+      a class <classname>Room</classname> that has the instance variables
+      <varname>@doors</varname> and <varname>@windows</varname> (for the
+      number of doors and windows in the room), then we can create the getter
+      methods <methodname>doors</methodname> und
+      <methodname>windows</methodname> (example program
+      <filename>room.rb</filename>):<programlisting>class Room
+  def initialize
+    @doors  = 1
+    @windows = 1
+  end
+  
+  def doors
+    @doors
+  end
+  
+  def windows
+    @windows
+  end
+end
+
+kitchen = Room.new
+
+puts "D: #{kitchen.doors}"
+puts "W: #{kitchen.windows}"</programlisting></para>
+
+      <para>The execution of the program:<screen>$ ruby room.rb 
+D: 1
+W: 1
+$ </screen></para>
+
+      <para>As this scenario – wanting to simply return a value in identical
+      form – is so common, there is already a ready-made getter method for it
+      with the name <indexterm>
+          <primary>attr_reader()</primary>
+        </indexterm><methodname>attr_reader</methodname>, which you would
+      apply as follows in the program
+      <filename>room.rb</filename>:<programlisting>class Room
+  def initialize
+    @doors  = 1
+    @windows = 1
+  end
+  
+  attr_reader :doors, :windows
+end
+
+kitchen = Room.new
+
+puts "D: #{kitchen.doors}"
+puts "W: #{kitchen.windows}"</programlisting></para>
+
+      <para><methodname>attr_reader</methodname> is a method which is called
+      on the <classname>Room</classname> class. That is the reason why we use
+      Symbols (e.g. :doors and :windows) instead of variables (e.g. @doors and
+      @windows) as parameter.</para>
+
+      <note>
+        <para><methodname>attr_reader</methodname> is a good example for meta
+        programming in Ruby. When working with Rails, you will frequently come
+        across meta programming and be grateful for how it works
+        automagically.</para>
+      </note>
+
+      <para>If you want to change the number of doors or windows from the
+      outside, you need a <quote>setter</quote> method. It can be implemented
+      as follows:<programlisting>class Room
+  def initialize
+    @doors  = 1
+    @windows = 1
+  end
+  
+  attr_reader :doors, :windows
+  
+  def doors=(value)       
+    @doors = value
+  end
+  
+  def windows=(value)      
+    @windows = value
+  end
+end
+
+kitchen = Room.new
+
+kitchen.windows = 2     
+
+puts "D: #{kitchen.doors}"
+puts "W: #{kitchen.windows}"</programlisting></para>
+
+      <para>The corresponding output is this:<screen>$ ruby room.rb 
+D: 1
+W: 2
+$ </screen></para>
+
+      <para>As you can probably imagine, there is of course also a ready-made
+      and easier way of doing this. Via the setter method <indexterm>
+          <primary>attr_writer()</primary>
+        </indexterm><methodname>attr_writer</methodname> you can simplify the
+      code of <filename>room.rb</filename> further:<programlisting>class Room
+  def initialize
+    @doors  = 1
+    @windows = 1
+  end
+  
+  attr_reader :doors, :windows
+  attr_writer :doors, :windows
+end
+
+kitchen = Room.new
+
+kitchen.windows = 2
+
+puts "D: #{kitchen.doors}"
+puts "W: #{kitchen.windows}"</programlisting></para>
+
+      <para>And (who would have thought!) there is even a method <indexterm>
+          <primary>attr_accessor()</primary>
+        </indexterm><methodname>attr_accessor</methodname> that combines
+      getters and setters. The code for <filename>room.rb</filename> would
+      then look like this:<screen>class Room
+  def initialize
+    @doors  = 1
+    @windows = 1
+  end
+
+  attr_accessor :doors, :windows
+end
+
+
+kitchen = Room.new
+
+kitchen.windows = 2
+
+puts "D: #{kitchen.doors}"
+puts "W: #{kitchen.windows}"</screen></para>
+    </section>
+
+    <section xml:id="ruby-string-methods">
+      <title>Built-In Methods for String</title>
+
+      <para>Most classes already come with a bundle of very useful methods.
+      These methods are always written after the relevant object, separated by
+      a point.</para>
+
+      <para>Here are a few examples for methods of the class
+      <classname>String</classname>.<screen>$ irb --simple-prompt
+&gt;&gt; a = 'A dog'
+=&gt; "A dog"
+&gt;&gt; a.class
+=&gt; String
+&gt;&gt; a.size
+=&gt; 5
+&gt;&gt; a.downcase
+=&gt; "a dog"
+&gt;&gt; a.upcase
+=&gt; "A DOG"
+&gt;&gt; a.reverse
+=&gt; "god A"
+&gt;&gt; exit
+$</screen></para>
+
+      <para>With <methodname>instance_methods(false)</methodname> you can get
+      a list of the build in methods:<screen>$ irb --simple-prompt
+&gt;&gt; String.instance_methods(false)
+=&gt; [:&lt;=&gt;, :==, :===, :eql?, :hash, :casecmp, :+, :*, :%, :[], :[]=, :insert, :length, :size, :bytesize, :empty?, :=~, :match, :succ, :succ!, :next, :next!, :upto, :index, :rindex, :replace, :clear, :chr, :getbyte, :setbyte, :byteslice, :to_i, :to_f, :to_s, :to_str, :inspect, :dump, :upcase, :downcase, :capitalize, :swapcase, :upcase!, :downcase!, :capitalize!, :swapcase!, :hex, :oct, :split, :lines, :bytes, :chars, :codepoints, :reverse, :reverse!, :concat, :&lt;&lt;, :prepend, :crypt, :intern, :to_sym, :ord, :include?, :start_with?, :end_with?, :scan, :ljust, :rjust, :center, :sub, :gsub, :chop, :chomp, :strip, :lstrip, :rstrip, :sub!, :gsub!, :chop!, :chomp!, :strip!, :lstrip!, :rstrip!, :tr, :tr_s, :delete, :squeeze, :count, :tr!, :tr_s!, :delete!, :squeeze!, :each_line, :each_byte, :each_char, :each_codepoint, :sum, :slice, :slice!, :partition, :rpartition, :encoding, :force_encoding, :valid_encoding?, :ascii_only?, :unpack, :encode, :encode!, :to_r, :to_c]
+&gt;&gt; exit
+$</screen></para>
+
+      <para>If you are not sure what one of these methods does you can use
+      <command>ri</command> to look it up:<screen>$ ri -T String.size
+String.size
+
+(from ruby site)
+------------------------------------------------------------------------------
+  str.length   -&gt; integer
+  str.size     -&gt; integer
+   
+
+------------------------------------------------------------------------------
+
+Returns the character length of str.
+
+
+$ </screen></para>
+    </section>
+
+    <section xml:id="ruby-method-chain">
+      <title>Method Chaining</title>
+
+      <indexterm>
+        <primary>methods</primary>
+
+        <secondary>in Ruby chaining</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>method chaining</primary>
+
+        <secondary>Ruby</secondary>
+      </indexterm>
+
+      <para>You may not think of it straight away, but once you have got used
+      to working with Ruby, then it makes perfect sense (and is perfectly
+      logical) to chain different methods.<screen>$ irb --simple-prompt
+&gt;&gt; a = 'A dog'
+=&gt; "A dog"
+&gt;&gt; a.upcase.reverse
+=&gt; "GOD A"
+&gt;&gt; exit
+$</screen></para>
+    </section>
+
+    <section xml:id="ruby-casting">
+      <title>Converting from One to the Other: Casting</title>
+
+      <indexterm>
+        <primary>casting</primary>
+
+        <secondary>of objects in Ruby</secondary>
+      </indexterm>
+
+      <para>There is a whole range of useful instance methods for converting
+      (<quote>casting</quote>) objects from one class to another. First, let's
+      use the method <indexterm>
+          <primary>to_s()</primary>
+
+          <secondary>Ruby</secondary>
+        </indexterm><methodname>.to_s</methodname> to convert a
+      <classname>Fixnum</classname> to a
+      <classname>String</classname>.<screen>$ irb --simple-prompt
+&gt;&gt; a = 10
+=&gt; 10
+&gt;&gt; a.class
+=&gt; Fixnum
+&gt;&gt; b = a.to_s
+=&gt; "10"
+&gt;&gt; b.class
+=&gt; String
+&gt;&gt; exit
+$</screen></para>
+
+      <note>
+        <para>Incidentally, that is exactly what <code>puts</code> does if you
+        use <code>puts</code> to output a <classname>Fixnum</classname> or a
+        <classname>Float</classname> (for non-strings, it simply implicitly
+        adds the method <methodname>.to_s</methodname> and outputs the
+        result).</para>
+      </note>
+
+      <para>Now we use the method <indexterm>
+          <primary>to_i()</primary>
+
+          <secondary>Ruby</secondary>
+        </indexterm><methodname>.to_i</methodname> to change a
+      <classname>Float</classname> to a <classname>Fixnum</classname>.<screen>$ irb --simple-prompt
+&gt;&gt; c = 10.0
+=&gt; 10.0
+&gt;&gt; c.class
+=&gt; Float
+&gt;&gt; d = c.to_i
+=&gt; 10
+&gt;&gt; d.class
+=&gt; Fixnum
+&gt;&gt; exit
+$</screen></para>
+    </section>
+
+    <section xml:id="ruby-to_s">
+      <title>Method to_s for Your Own Classes</title>
+
+      <indexterm>
+        <primary>to_s()</primary>
+
+        <secondary>Ruby</secondary>
+      </indexterm>
+
+      <para>You should always integrate a method <methodname>to_s
+      </methodname>for your own custom classes, even if it is just for the
+      sake of easier debugging. Then you can simply output a corresponding
+      object via <code>puts</code> (<code>puts</code> automatically outputs an
+      object via the method <methodname>to_s</methodname>).</para>
+
+      <para>Here is an example:<screen>$ irb --simple-prompt
+&gt;&gt; class Person
+&gt;&gt;   def initialize(first_name, last_name)
+&gt;&gt;     @first_name = first_name
+&gt;&gt;     @last_name = last_name
+&gt;&gt;   end
+&gt;&gt;   def to_s
+&gt;&gt;     "#{@first_name} #{@last_name}"
+&gt;&gt;   end
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; sw = Person.new('Stefan', 'Wintermeyer')
+=&gt; Stefan Wintermeyer
+&gt;&gt; puts sw
+Stefan Wintermeyer
+=&gt; nil
+&gt;&gt; exit
+$</screen></para>
+    </section>
+
+    <section xml:id="ruby-method-plus">
+      <title>Is <quote>+</quote> a Method?</title>
+
+      <para>Why is there also a plus symbol in the list of methods for
+      <classname>String</classname>? Let's find out by looking it up in
+      <literal>ri</literal>:<screen>$ ri -T String.+
+String.+
+
+(from ruby site)
+------------------------------------------------------------------------------
+  str + other_str   -&gt; new_str
+   
+
+------------------------------------------------------------------------------
+
+Concatenation---Returns a new String containing other_str
+concatenated to str.
+
+  "Hello from " + self.to_s   #=&gt; "Hello from main"
+
+
+$</screen></para>
+
+      <para>hmmm … Let's see what it says for
+      <classname>Fixnum</classname>:<screen>$ ri -T Fixnum.+
+Fixnum.+
+
+(from ruby site)
+------------------------------------------------------------------------------
+  fix + numeric  -&gt;  numeric_result
+   
+
+------------------------------------------------------------------------------
+
+Performs addition: the class of the resulting object depends on the class of
+numeric and on the magnitude of the result.
+
+
+$</screen></para>
+
+      <para>Let's have a go and play around with this in
+      <literal>irb</literal>. So we should be able to add the
+      <methodname>+</methodname> to an object, just as any other method,
+      separated by a dot and add the second number in brackets as
+      parameter:<screen>$ irb --simple-prompt
+&gt;&gt; 10 + 10
+=&gt; 20
+&gt;&gt; 10+10
+=&gt; 20
+&gt;&gt; 10.+10
+=&gt; 20
+&gt;&gt; 10.+(10)
+=&gt; 20
+&gt;&gt; exit
+$</screen></para>
+
+      <para>Aha! The plus symbol is indeed a method, and this method takes the
+      next value as parameter. Really we should put this value in brackets,
+      but thanks to Ruby's well thought-out syntax this is not
+      necessary.</para>
+
+      <section xml:id="ruby-method-plus-overriding">
+        <title>Can I Overwrite the Method +?</title>
+
+        <para>Yes, you can overwrite any method. Logically, this does not make
+        much sense for methods such as <methodname>+</methodname>, unless you
+        want to drive your fellow programmers mad. I am going to show you a
+        little demo in <literal>irb</literal> so you will believe me.</para>
+
+        <para>The aim is overwriting the method <methodname>+</methodname> for
+        <classname>Fixnum</classname>. We want the result of every addition to
+        be the number 42.<screen>$ irb --simple-prompt
+&gt;&gt; 10 + 10
+=&gt; 20
+&gt;&gt; class Fixnum
+&gt;&gt;   def +(name, *args, &amp;blk)
+&gt;&gt;     42
+&gt;&gt;   end
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; 10 + 10
+=&gt; 42
+&gt;&gt; exit
+$</screen></para>
+
+        <para>First we perform a normal addition. Than we redefine the method
+        <methodname>+</methodname> for the class
+        <classname>Fixnum</classname>, and after that we do the calculation
+        again. But this time, with different results.</para>
+      </section>
+    </section>
+  </section>
+
+  <section xml:id="ruby-if-condition">
+    <title>if-Condition</title>
+
+    <indexterm>
+      <primary>if</primary>
+
+      <secondary>condition in Ruby</secondary>
+    </indexterm>
+
+    <indexterm>
+      <primary>conditional statements</primary>
+
+      <secondary>Ruby</secondary>
+    </indexterm>
+
+    <para>An abstract <literal>if</literal>-condition looks like
+    this:<programlisting>if expression
+  program
+end</programlisting></para>
+
+    <para>The program between the expression and <code>end</code> is executed
+    if the result of the expression is not <literal>false</literal> and not
+    <literal>nil</literal>.<note>
+        <para>You can also use a <code>then</code> after the
+        expression:<programlisting>if expression then
+  program
+end</programlisting></para>
+      </note></para>
+
+    <para>The construct for a simple <literal>if</literal>-branch in a Ruby
+    program looks like the following example program:<programlisting>a = 10
+
+if a == 10
+  puts 'a is 10'
+end
+</programlisting></para>
+
+    <note>
+      <para>The '==' is used to compare two values. Please don't mix it up
+      with the single '='.</para>
+    </note>
+
+    <para>You can try an <foreignphrase
+    xml:lang="en">expression</foreignphrase> really well in
+    <literal>irb</literal>:<screen>$ irb --simple-prompt
+&gt;&gt; a = 10
+=&gt; 10
+&gt;&gt; a == 10
+=&gt; true
+&gt;&gt; exit
+$</screen></para>
+
+    <section xml:id="ruby-if-condition-short">
+      <title>Shorthand</title>
+
+      <indexterm>
+        <primary>if</primary>
+
+        <secondary>condition in Ruby (shorthand)</secondary>
+      </indexterm>
+
+      <para>A frequently used shorthand notation of an
+      <literal>if</literal>-condition can be found in the following
+      code:<programlisting>a = 10
+
+# long version
+#
+if a == 10 then
+  puts 'a is 10'
+end
+
+# short version
+#
+puts 'a is 10' if a == 10
+</programlisting></para>
+    </section>
+
+    <section xml:id="ruby-if-condition-else">
+      <title>else</title>
+
+      <indexterm>
+        <primary>else</primary>
+
+        <secondary>condition in Ruby (shorthand)</secondary>
+      </indexterm>
+
+      <para>You can probably imagine how this works, but for the sake of
+      completeness, here is a little example:<programlisting>a = 10
+
+if a == 10 then
+  puts 'a is 10'
+else
+  puts 'a is not 10'
+end
+</programlisting></para>
+    </section>
+
+    <section xml:id="ruby-if-condition-elsif">
+      <title>elsif</title>
+
+      <indexterm>
+        <primary>elsif</primary>
+
+        <secondary>conditon in Ruby (shorthand)</secondary>
+      </indexterm>
+
+      <para>Again, most programmers will know what this is all about.
+      Example:<programlisting>a = 10
+
+if a == 10 then
+  puts 'a is 10'
+elsif a == 20 then
+  puts 'a is 20'
+end
+</programlisting></para>
+    </section>
+  </section>
+
+  <section xml:id="ruby-schleifen">
+    <title>Loops</title>
+
+    <indexterm>
+      <primary>loops</primary>
+
+      <secondary>Ruby</secondary>
+    </indexterm>
+
+    <para>There are different ways of implementing loops in Ruby. The iterator
+    variation is used particularly often in the Rails environment.</para>
+
+    <section xml:id="ruby-loops-while-until">
+      <title>while and until</title>
+
+      <indexterm>
+        <primary>loops</primary>
+
+        <secondary>Ruby</secondary>
+
+        <tertiary>while</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>loops</primary>
+
+        <secondary>Ruby</secondary>
+
+        <tertiary>until</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>while</primary>
+
+        <secondary>loops in Ruby</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>until</primary>
+
+        <secondary>loops in Ruby</secondary>
+      </indexterm>
+
+      <para>An abstract while loop looks like this:<programlisting>while expression do
+  program
+end</programlisting></para>
+
+      <para><note>
+          <para>The <code>do</code> that follows the <code>expression</code>
+          is optional. Often you will also see this:<programlisting>while expression
+  program
+end</programlisting></para>
+        </note>Here is a practical <literal>irb</literal> example:<screen>$ irb --simple-prompt
+&gt;&gt; i = 0
+=&gt; 0
+&gt;&gt; while i &lt; 3 do
+?&gt;   puts i
+&gt;&gt;   i = i + 1
+&gt;&gt; end
+0
+1
+2
+=&gt; nil
+&gt;&gt; exit
+$</screen></para>
+
+      <para>Until loops are built similarly:<programlisting>until expression
+  program
+end</programlisting></para>
+
+      <para>Again, here is the corresponding <literal>irb</literal>
+      example:<screen>$ irb --simple-prompt
+&gt;&gt; i = 5
+=&gt; 5
+&gt;&gt; until i == 0
+&gt;&gt;   i = i - 1
+&gt;&gt;   puts i
+&gt;&gt; end
+4
+3
+2
+1
+0
+=&gt; nil
+&gt;&gt; exit
+$</screen></para>
+    </section>
+
+    <section xml:id="ruby-blocks-iterators">
+      <title>Blocks and Iterators</title>
+
+      <indexterm>
+        <primary>blocks</primary>
+
+        <secondary>Ruby</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>iterators</primary>
+
+        <secondary>Ruby</secondary>
+      </indexterm>
+
+      <para><quote>Block</quote> and <quote>iterator</quote> are some of the
+      favorite words of many Ruby programmers. Now I am going to show you
+      why.</para>
+
+      <para>In the loop<programlisting>5.times { |i| puts i }</programlisting>
+      <varname>i</varname> is the iterator and <code>puts i</code> is the
+      block.</para>
+
+      <para>You can also express the whole thing in the following
+      syntax:<programlisting>5.times do |i|
+  puts i
+end</programlisting></para>
+
+      <section xml:id="iterator">
+        <title>Iterators</title>
+
+        <indexterm>
+          <primary>iterators</primary>
+
+          <secondary>Ruby</secondary>
+        </indexterm>
+
+        <para>Iterators are just a specific type of method. As you probably
+        know, the word <quote><foreignphrase
+        xml:lang="en">iterate</foreignphrase></quote> means to repeat
+        something. For example, the class <classname>Fixnum</classname> has
+        the iterator <indexterm>
+            <primary>times()</primary>
+
+            <secondary>Ruby</secondary>
+          </indexterm><methodname>times</methodname>. Let's see what help
+        <literal>ri</literal> offers us:<screen>$ ri -T Fixnum.times
+Fixnum.times
+
+(from ruby site)
+Implementation from Integer
+------------------------------------------------------------------------------
+  int.times {|i| block }  -&gt;  self
+  int.times               -&gt;  an_enumerator
+   
+
+------------------------------------------------------------------------------
+
+Iterates block int times, passing in values from zero to int -
+1.
+
+If no block is given, an enumerator is returned instead.
+
+  5.times do |i|
+    print i, " "
+  end
+
+produces:
+
+  0 1 2 3 4
+
+
+$ </screen></para>
+
+        <para>And it also gives a nice example that we are going to try out in
+        <application>irb</application>:<screen>$ irb --simple-prompt
+&gt;&gt; 5.times do |i|
+?&gt;   puts i
+&gt;&gt; end
+0
+1
+2
+3
+4
+=&gt; 5
+&gt;&gt; exit
+$</screen></para>
+
+        <para>There is also a single-line notation for small blocks:<screen>$ irb --simple-prompt
+&gt;&gt; 5.times { |i| puts i }
+0
+1
+2
+3
+4
+=&gt; 5
+&gt;&gt; exit
+$ </screen></para>
+
+        <para>By the way, an iterator does not necessarily have to pass a
+        variable to the block:<screen>$ irb --simple-prompt
+&gt;&gt; 5.times { puts 'example' }
+example
+example
+example
+example
+example
+=&gt; 5
+&gt;&gt; exit
+$</screen></para>
+      </section>
+
+      <section xml:id="ruby-block">
+        <title>Blocks</title>
+
+        <indexterm>
+          <primary>blocks</primary>
+
+          <secondary>Ruby</secondary>
+        </indexterm>
+
+        <para>A block is the code that is triggered by an iterator. In the
+        block, you have access to the local variable(s) passed by the
+        iterator.</para>
+      </section>
+
+      <section xml:id="ruby-upto">
+        <title>Method upto</title>
+
+        <para>Apart from <methodname>times</methodname> there is also the
+        method <indexterm>
+            <primary>upto()</primary>
+
+            <secondary>Ruby</secondary>
+          </indexterm><methodname>upto</methodname>, for easily implementing a
+        loop. <literal>ri</literal> offers a nice example for this,
+        too:<screen>$ ri -T Fixnum.upto
+Fixnum.upto
+
+(from ruby site)
+Implementation from Integer
+------------------------------------------------------------------------------
+  int.upto(limit) {|i| block }  -&gt;  self
+  int.upto(limit)               -&gt;  an_enumerator
+   
+
+------------------------------------------------------------------------------
+
+Iterates block, passing in integer values from int up to and
+including limit.
+
+If no block is given, an enumerator is returned instead.
+
+  5.upto(10) { |i| print i, " " }
+
+produces:
+
+  5 6 7 8 9 10
+
+
+$</screen></para>
+      </section>
+    </section>
+  </section>
+
+  <section xml:id="ruby-array-und-hash">
+    <title>Arrays and Hashes</title>
+
+    <indexterm>
+      <primary>arrays</primary>
+
+      <secondary>Ruby</secondary>
+    </indexterm>
+
+    <indexterm>
+      <primary>hashes</primary>
+
+      <secondary>Ruby</secondary>
+    </indexterm>
+
+    <para>As in many programming languages, <foreignphrase
+    xml:lang="en">arrays</foreignphrase> and <foreignphrase
+    xml:lang="en">hashes</foreignphrase> are popular structures in Ruby for
+    storing data.</para>
+
+    <section xml:id="ruby_array">
+      <title xml:id="ruby_array.title">Arrays</title>
+
+      <indexterm>
+        <primary>arrays</primary>
+
+        <secondary>Ruby</secondary>
+      </indexterm>
+
+      <para>An array is a list of objects. Let's play around in
+      <literal>irb:</literal><screen>$ irb --simple-prompt
+&gt;&gt; a = [1,2,3,4,5]
+=&gt; [1, 2, 3, 4, 5]
+&gt;&gt; a.class
+=&gt; Array
+&gt;&gt; exit
+$</screen></para>
+
+      <para>That is simple and easy to understand.</para>
+
+      <para>Let's see if it also works with strings in the array:<screen>$ irb --simple-prompt
+&gt;&gt; a = ['Test', 'Banana', 'blue']
+=&gt; ["Test", "Banana", "blue"]
+&gt;&gt; a.class
+=&gt; Array
+&gt;&gt; a[1]
+=&gt; "Banana"
+&gt;&gt; a[1].class
+=&gt; String
+&gt;&gt; exit
+$</screen></para>
+
+      <para>That also works.</para>
+
+      <para>So all that's missing now is an array with a mixture of both.
+      Obviously that will work, too, because the array stores objects and it
+      does not matter which kind of objects they are (i.e.
+      <classname>String</classname>, <classname>Fixnum</classname>,
+      <classname>Float</classname>, …). But a little test can't hurt:<screen>$ irb --simple-prompt
+&gt;&gt; a = [1, 2.2, 'House', nil]
+=&gt; [1, 2.2, "House", nil]
+&gt;&gt; a.class
+=&gt; Array
+&gt;&gt; a[0]
+=&gt; 1
+&gt;&gt; a[0].class
+=&gt; Fixnum
+&gt;&gt; a[2]
+=&gt; "House"
+&gt;&gt; a[2].class
+=&gt; String
+&gt;&gt; exit
+$</screen></para>
+
+      <para>Next, let's have a look at what the <literal>ri</literal> help
+      page says for <classname>Array</classname>:<screen>$ ri -T Array
+Array &lt; Object
+
+------------------------------------------------------------------------------
+Includes:
+Enumerable (from ruby site)
+
+(from ruby site)
+------------------------------------------------------------------------------
+Arrays are ordered, integer-indexed collections of any object. Array indexing
+starts at 0, as in C or Java.  A negative index is assumed to be relative to
+the end of the array---that is, an index of -1 indicates the last element of
+the array, -2 is the next to last element in the array, and so on.
+------------------------------------------------------------------------------
+Class methods:
+
+  []
+  new
+  try_convert
+
+Instance methods:
+
+  &amp;
+  *
+  +
+  -
+  &lt;&lt;
+
+[...]
+
+$ </screen></para>
+
+      <para>As you can see, arrays can also be created via the method
+      <methodname>new</methodname> (like any class). Individual new elements
+      can then be added at the end of an array via the method
+      <methodname>&lt;&lt;</methodname>. Here is the corresponding
+      example:<screen>$ irb --simple-prompt
+&gt;&gt; a = Array.new
+=&gt; []
+&gt;&gt; a &lt;&lt; 'first item'
+=&gt; ["first item"]
+&gt;&gt; a &lt;&lt; 'second item'
+=&gt; ["first item", "second item"]
+&gt;&gt; exit
+$</screen></para>
+
+      <section xml:id="array_iterator">
+        <title xml:id="array_iterator.title">Iterator each</title>
+
+        <indexterm>
+          <primary>iterators</primary>
+
+          <secondary>Ruby</secondary>
+
+          <tertiary>each()</tertiary>
+        </indexterm>
+
+        <para>You can work your way through an array piece by piece via the
+        method <indexterm>
+            <primary>each()</primary>
+
+            <secondary>Ruby</secondary>
+          </indexterm><methodname>each</methodname>. Example:<screen>$ irb --simple-prompt
+&gt;&gt; cart = ['eggs', 'butter']
+=&gt; ["eggs", "butter"]
+&gt;&gt; cart.each do |item|
+?&gt;   puts item
+&gt;&gt; end
+eggs
+butter
+=&gt; ["eggs", "butter"]
+&gt;&gt; exit
+$</screen></para>
+
+        <para>Once more, <literal>ri</literal> provides help and an example in
+        case you forget how to use <methodname>each</methodname>:<screen>$ ri -T Array.each
+Array.each
+
+(from ruby site)
+------------------------------------------------------------------------------
+  ary.each {|item| block }   -&gt; ary
+  ary.each                   -&gt; an_enumerator
+   
+
+------------------------------------------------------------------------------
+
+Calls block once for each element in self, passing that element
+as a parameter.
+
+If no block is given, an enumerator is returned instead.
+
+  a = [ "a", "b", "c" ]
+  a.each {|x| print x, " -- " }
+
+produces:
+
+  a -- b -- c --
+
+
+$</screen></para>
+      </section>
+    </section>
+
+    <section xml:id="ruby_hash">
+      <title xml:id="ruby_hash.title">Hashes</title>
+
+      <indexterm>
+        <primary>hashes</primary>
+
+        <secondary>Ruby</secondary>
+      </indexterm>
+
+      <para>A <quote><foreignphrase xml:lang="en">Hash</foreignphrase></quote>
+      is a list of <foreignphrase xml:lang="en">key/value
+      pairs</foreignphrase>. Here is an example with strings as keys:<screen>$ irb --simple-prompt
+&gt;&gt; prices = { 'egg' =&gt; 0.1, 'butter' =&gt; 0.99 }
+=&gt; {"egg"=&gt;0.1, "butter"=&gt;0.99}
+&gt;&gt; prices['egg']
+=&gt; 0.1
+&gt;&gt; prices.count
+=&gt; 2
+&gt;&gt; exit
+$</screen></para>
+
+      <para>Of course, hashes can store not just strings as objects in the
+      values, but - as with arrays - also classes that you define yourself
+      (see <xref linkend="ruby_array"/>).</para>
+
+      <section xml:id="ruby_symbol">
+        <title xml:id="ruby_symbol.title">Symbols</title>
+
+        <indexterm>
+          <primary>symbols</primary>
+
+          <secondary>Ruby</secondary>
+        </indexterm>
+
+        <para><foreignphrase xml:lang="en">Symbols</foreignphrase> are a
+        strange concept and difficult to explain. But they are very useful and
+        used frequently, amongst others with hashes. Normally, variables
+        always create new objects:<screen>$ irb --simple-prompt
+&gt;&gt; a = 'Example 1'
+=&gt; "Example 1"
+&gt;&gt; a.object_id
+=&gt; 70260036330560
+&gt;&gt; a = 'Example 2'
+=&gt; "Example 2"
+&gt;&gt; a.object_id
+=&gt; 70260036391520
+&gt;&gt; exit
+$</screen></para>
+
+        <para>In both cases, we have the variable <varname>a</varname>, but
+        object ID is different. We could carry on in this way indefinitely.
+        Each time, it would generate a different object ID and therefore a new
+        object. In principle, this is no big deal and entirely logical in
+        terms of object orientation. But it is also rather a waste of memory
+        space.</para>
+
+        <para>A symbol is defined by a colon before the name and cannot store
+        any values itself, but it always has the same object ID, so it is very
+        well suited to be a <foreignphrase
+        xml:lang="en">key</foreignphrase>:<screen>$ irb --simple-prompt
+&gt;&gt; :a.class
+=&gt; Symbol
+&gt;&gt; :a.object_id
+=&gt; 413928
+&gt;&gt; exit
+$</screen></para>
+
+        <para>Let's do another little experiment to make the difference
+        clearer. We use a string object with the content
+        <quote><literal>white</literal></quote> three times in a row and then
+        the symbol <literal>:white</literal> three times in a row. For
+        <literal>"white"</literal>, a new object is created each time. For the
+        symbol <literal>:white</literal>, only the first time:<screen>$ irb --simple-prompt
+&gt;&gt; 'white'.object_id
+=&gt; 70209583052020
+&gt;&gt; 'white'.object_id
+=&gt; 70209583082240
+&gt;&gt; 'white'.object_id
+=&gt; 70209583088920
+&gt;&gt; :white.object_id
+=&gt; 413928
+&gt;&gt; :white.object_id
+=&gt; 413928
+&gt;&gt; :white.object_id
+=&gt; 413928
+&gt;&gt; exit
+$ </screen></para>
+
+        <para>Using symbols as key for hashes is much more memory
+        efficient:<screen>$ irb --simple-prompt
+&gt;&gt; colors = { :black =&gt; '#000000', :white =&gt; '#FFFFFFFF' }
+=&gt; {:black=&gt;"#000000", :white=&gt;"#FFFFFFFF"}
+&gt;&gt; puts colors[:white]
+#FFFFFFFF
+=&gt; nil
+&gt;&gt; exit
+$ </screen></para>
+
+        <para>You will frequently see symbols in Rails. If you want to find
+        out more about symbols, go to the help page about the class
+        <classname>Symbol</classname> via <command>ri Symbol</command>.</para>
+      </section>
+
+      <section xml:id="ruby-hash-iterator-each">
+        <title>Iterator each</title>
+
+        <indexterm>
+          <primary>iterators</primary>
+
+          <secondary>Ruby</secondary>
+
+          <tertiary>each()</tertiary>
+        </indexterm>
+
+        <para>With the method <indexterm>
+            <primary>each()</primary>
+
+            <secondary>Ruby</secondary>
+          </indexterm><methodname>each</methodname> you can work your way
+        through a <classname>Hash</classname> step by step. Example:<screen>$ irb --simple-prompt
+&gt;&gt; colors = { :black =&gt; '#000000', :white =&gt; '#FFFFFFFF' }
+=&gt; {:black=&gt;"#000000", :white=&gt;"#FFFFFFFF"}
+&gt;&gt; colors.each do |key,value|
+?&gt;   puts "#{key} #{value}"
+&gt;&gt; end
+black #000000
+white #FFFFFFFF
+=&gt; {:black=&gt;"#000000", :white=&gt;"#FFFFFFFF"}
+&gt;&gt; exit
+$</screen></para>
+
+        <para>Again, <command>ri</command> offers help and an example, in case
+        you cannot remember one day how to use
+        <methodname>each</methodname>:<screen>$ ri -T Hash.each
+Hash.each
+
+(from ruby site)
+------------------------------------------------------------------------------
+  hsh.each      {| key, value | block } -&gt; hsh
+  hsh.each_pair {| key, value | block } -&gt; hsh
+  hsh.each                              -&gt; an_enumerator
+  hsh.each_pair                         -&gt; an_enumerator
+   
+
+------------------------------------------------------------------------------
+
+Calls block once for each key in hsh, passing the key-value pair
+as parameters.
+
+If no block is given, an enumerator is returned instead.
+
+  h = { "a" =&gt; 100, "b" =&gt; 200 }
+  h.each {|key, value| puts "#{key} is #{value}" }
+
+produces:
+
+  a is 100
+  b is 200
+
+
+$</screen></para>
+      </section>
+    </section>
+  </section>
+
+  <section xml:id="ruby_sonstiges">
+    <title xml:id="ruby_sonstiges.title">Miscellaneous</title>
+
+    <section xml:id="range_class">
+      <title xml:id="range_class.title">Range</title>
+
+      <indexterm>
+        <primary>range</primary>
+      </indexterm>
+
+      <para>The class <classname>Range</classname> represents an interval. The
+      start and end points of the interval are defined enclosed in normal
+      brackets and separated by two dots in between them. Here is an example
+      in which we use a range like an iterator with
+      <methodname>each</methodname>:<screen>$ irb --simple-prompt
+&gt;&gt; (0..3)
+=&gt; 0..3
+&gt;&gt; (0..3).class
+=&gt; Range
+&gt;&gt; (0..3).each do |i|
+?&gt;   puts i
+&gt;&gt; end
+0
+1
+2
+3
+=&gt; 0..3
+&gt;&gt; </screen></para>
+
+      <para>Via the method <methodname>to_a</methodname> you can generate an
+      array from a <classname>Range</classname>:<screen>&gt;&gt; (0..3).to_a
+=&gt; [0, 1, 2, 3]
+&gt;&gt; </screen></para>
+
+      <para>A range can be generated from objects of any type. Important is
+      only that the objects can be compared via
+      <methodname>&lt;=&gt;</methodname> and use the method
+      <methodname>succ</methodname> for counting on to the next value. So you
+      can also use Range to represent letters:<screen>&gt;&gt; ('a'..'h').to_a
+=&gt; ["a", "b", "c", "d", "e", "f", "g", "h"]
+&gt;&gt;</screen></para>
+
+      <para>As alternative notation, you may sometimes come across
+      <methodname>Range.new()</methodname>. In this case, the start and end
+      points are not separated by two dots, but by a comma. This is what it
+      looks like:<screen>&gt;&gt; (0..3) == Range.new(0,3)
+=&gt; true
+&gt;&gt; exit
+$</screen></para>
+    </section>
+  </section>
+</chapter>

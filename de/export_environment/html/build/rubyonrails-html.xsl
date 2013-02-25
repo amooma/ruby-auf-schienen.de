@@ -23,7 +23,7 @@
   
   <xsl:param name="chunk.section.depth" select="1"/>
   <xsl:param name="chunk.first.sections" select="1"/>
-  <xsl:param name="section.autolabel.max.depth" select="2"/>
+  <xsl:param name="section.autolabel.max.depth" select="1"/>
   <xsl:param name="chunk.toc" select="''"/>
   <xsl:param name="chunk.append"/>
   <xsl:param name="chunker.output.quiet" select="0"/>
@@ -33,6 +33,7 @@
   <xsl:param name="doc.url">http://wintermeyer.de/</xsl:param>
   <xsl:param name="default.image.width" select="'650px'"/>
   <xsl:param name="navig.showtitles" select="1"/>
+  <xsl:param name="generate.meta.abstract" select="1"/>
   <xsl:param name="generate.toc">
 set toc
 book toc
@@ -49,7 +50,7 @@ sect5 nop
 qandadiv nop
 qandaset nop
 </xsl:param>
-    
+
   <xsl:param name="admon.graphics" select="1"/>
   <xsl:param name="admon.graphics.extension">.png</xsl:param>
   <xsl:param name="admon.graphics.path">custom-admons-callouts/</xsl:param>
@@ -248,7 +249,8 @@ Version:
         <ul class="footer">
           <li class="copyright">
             Copyright © 2010-2012 <a class="twitter-link" rel="me" href="https://twitter.com/wintermeyer" title="Stefan Wintermeyer"><span>Stefan Wintermeyer</span>
-            </a>.
+            </a>. <a href="https://plus.google.com/103611530021484137163?
+   rel=author">Google+</a>
           </li>
         </ul>
       </xsl:if>
@@ -275,17 +277,21 @@ Version:
         <xsl:with-param name="prev" select="$prev"/>
         <xsl:with-param name="next" select="$next"/>
       </xsl:call-template>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       
       <body>
         <div class="navbar navbar-inverse navbar-fixed-top">
           <div class="navbar-inner">
             <div class="container-fluid">
-
               <a class="brand" href="index.html">Ruby on Rails 3.2</a>
+
+              <div class="nav-collapse collapse">
+                <ul class="nav">
+                  <li><a href="http://xyzpub.com/en/ruby-on-rails/3.2/">English Version</a></li>
+                </ul>
+              </div>
               <div class="nav-collapse collapse">
                 <p class="navbar-text pull-right">
-                  <a href="http://www.amazon.de/gp/product/3827329892?tag=wwwamoomade-21" class="navbar-link">Buch kaufen</a>
+                  <a href="http://www.amazon.de/gp/product/3827329892?tag=wwwamoomade-21" class="navbar-link">Dieses Buch bei Amazon kaufen.</a>
                 </p>
               </div><!--/.nav-collapse -->
             </div>
@@ -294,26 +300,51 @@ Version:
         
         <div id="container-fluid">
           <div id="row-fluid">
-            <div class="span9">
-              <iframe src="http://rcm-de.amazon.de/e/cm?lt1=_top&amp;bc1=FFFFFF&amp;IS2=1&amp;nou=1&amp;bg1=FFFFFF&amp;fc1=000000&amp;lc1=0000FF&amp;t=wwwamoomade-21&amp;o=3&amp;p=8&amp;l=as1&amp;m=amazon&amp;f=ifr&amp;ref=tf_til&amp;asins=3827329892" style="width:120px;height:240px;" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" class="pull-right"></iframe>
-              <xsl:copy-of select="$content"/>
+            <div id="adsense-leaderboard" class="span12">
+              <script type="text/javascript">
+                <xsl:text disable-output-escaping="yes">
+<![CDATA[<!--]]>
+google_ad_client = "ca-pub-9538764634478220";
+/* ruby-auf-schienen.de Leaderboard */
+google_ad_slot = "2837769471";
+google_ad_width = 728;
+google_ad_height = 90;
+<![CDATA[//-->]]>
+               </xsl:text>
+              </script>
+              <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+            </div>
 
+            <div class="span9">
+              <xsl:copy-of select="$content"/>
             </div>
 
             <div class="span3">
 
-              <div class="well sidebar-nav">
-                <xsl:call-template name="breadcrumbs"/>                            
+              <div class="well">
+                <p>Für den Fall der Fälle: Ich biete auch Ruby on Rails Schulungen an. Einfach eine E-Mail an sw@amooma.de schreiben.</p>
+                <p>
+                  <a href="https://twitter.com/wintermeyer" class="twitter-follow-button" data-show-count="false" data-lang="de">@wintermeyer folgen</a>
+                  <script type="text/javascript">
+                    <xsl:text disable-output-escaping="yes">
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                   </xsl:text>
+                  </script>
+                </p>
               </div>
 
-              <div id="adsense">
+              <div class="well sidebar-nav">
+                <xsl:call-template name="breadcrumbs"/>
+              </div>
+
+              <div id="adsense-skyscraper">
                 <script type="text/javascript">
                   <xsl:text disable-output-escaping="yes">
 <![CDATA[<!--]]>
 google_ad_client = "ca-pub-9538764634478220";
-/* Ruby on Rails 3.2 (de) */
-google_ad_slot = "0519465278";
-google_ad_width = 120;
+/* ruby-auf-schienen.de Wide Skyscraper */
+google_ad_slot = "4912279778";
+google_ad_width = 160;
 google_ad_height = 600;
 <![CDATA[//-->]]>
                  </xsl:text>

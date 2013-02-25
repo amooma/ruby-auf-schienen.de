@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="activerecord_transaction"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="activerecord_transaction.title">Transactions</title>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>transactions</secondary>
+  </indexterm>
+
+  <indexterm>
+    <primary>transactions</primary>
+
+    <see>ActiveRecord, transactions</see>
+  </indexterm>
+
+  <indexterm>
+    <primary>database</primary>
+
+    <secondary>transactions</secondary>
+
+    <see>ActiveRecord, transactions</see>
+  </indexterm>
+
+  <indexterm>
+    <primary>ActiveRecord</primary>
+
+    <secondary>methods</secondary>
+
+    <tertiary>transaction()</tertiary>
+  </indexterm>
+
+  <para>In the world of databases, the term transaction refers to a block of
+  SQL statements that must be executed together and without interruption. If
+  an error should occur within the transaction, the database is reset to the
+  state before the start of the transaction.</para>
+
+  <para>Now and again, there are areas of application where you need to carry
+  out a database transaction. The classic example is transferring money from
+  one account to another. That only makes sense if both actions (debiting one
+  account and crediting the recipient's account) are executed.</para>
+
+  <para>A transaction follows this pattern:<programlisting><emphasis
+        role="bold">ActiveRecord::Base.transaction do</emphasis>
+  Book.create(:title =&gt; 'A')
+  Book.create(:title =&gt; 'B')
+  Book.create(:title =&gt; 'C').authors.create(:last_name =&gt; 'Z')
+<emphasis role="bold">end</emphasis></programlisting></para>
+
+  <para>Transactions are a complex topic. If you want to find out more, you
+  can consult the ri help on the shell via <command>ri
+  ActiveRecord::Transactions::ClassMethods</command>.<important>
+      <para>The methods <methodname>save</methodname> and
+      <methodname>destroy</methodname> are automatically executed within the
+      transaction <foreignphrase xml:lang="en">wrapper</foreignphrase>. That
+      way, Rails ensures that no undefined state can arise for these two
+      methods.</para>
+    </important><warning>
+      <para>Transactions are not natively supported by all databases. In that
+      case, the code will still work, but you no longer have the security of
+      the transaction.</para>
+    </warning></para>
+</section>

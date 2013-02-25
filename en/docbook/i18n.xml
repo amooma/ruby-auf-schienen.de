@@ -1,0 +1,1631 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="i18n" xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="i18n.title">Internationalization</title>
+
+  <section xml:id="i18n_einfuehrung">
+    <title xml:id="i18n_einfuehrung.title">Introduction</title>
+
+    <para>If you are in the lucky situation of only creating web pages in
+    English, then you can skip this chapter completely. For you, everything is
+    set up correctly by default. But even if you want to create a web page
+    that only uses one language (other than English), you will need to dive
+    into this chapter. It is not enough to just translate the views. Because
+    already if you use scaffolding, you will need to take care of the English
+    and therefore not yet translated validation errors.</para>
+
+    <para>The class <classname>I18n</classname> is responsible for anything to
+    do with translation in the Rails application. It offers two important
+    methods for this purpose:<itemizedlist>
+        <listitem>
+          <para><methodname>I18n.translate</methodname> or
+          <methodname>I18n.t</methodname></para>
+
+          <para>Takes care of inserting previously defined text blocks. These
+          can contain variables.</para>
+        </listitem>
+
+        <listitem>
+          <para><methodname>I18n.localize</methodname> or
+          <methodname>I18n.l</methodname></para>
+
+          <para>Takes care of adapting time and date specifications to the
+          local format.</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>With <methodname>I18n.locale</methodname> you define the language
+    you want to use in the current call. In the configuration file
+    <filename>config/application.rb</filename>, the entry
+    <varname>config.i18n.default_locale</varname> sets the default value for
+    <methodname>I18n.locale</methodname>. If you do not make any changes
+    there, this value is set by default to <varname>:en</varname> for
+    English.</para>
+
+    <para>For special cases such as displaying numbers, currencies and times,
+    there are special helpers available. For example, if you want to create a
+    German web page, you can ensure that the number 1000.23 can be correctly
+    displayed with a decimal comma as "1.000,23" on the German page and with a
+    decimal point on an English web page as "1,000.23". As example, we use the
+    German and English (US) variation of this amount with currency in the
+    console:<screen>$ rails new webshop
+  [...]
+$ cd webshop 
+$ echo "gem 'rails-i18n'" &gt;&gt; Gemfile
+$ bundle
+  [...]
+$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; helper.number_to_currency('1000.23', :locale =&gt; :de)
+=&gt; "1.000,23 €"
+&gt;&gt; helper.number_to_currency('1000.23', :locale =&gt; :en)
+=&gt; "$1,000.23"
+&gt;&gt; helper.number_to_currency('1000.23', :locale =&gt; :fr)
+=&gt; "1 000,23 €"
+&gt;&gt; exit
+$</screen></para>
+
+    <note>
+      <para>To have a quick go at trying out the
+      <methodname>helper.number_to_currency</methodname> in your own
+      application, you first need to insert the line <code>gem
+      'rails-i18n'</code> into the file <filename>Gemfile</filename> and then
+      execute <command>bundle</command>. This installs all required language
+      files for you.</para>
+    </note>
+
+    <section xml:id="i18n_i18n_t">
+      <title xml:id="i18n_i18n_t.title">I18n.t</title>
+
+      <indexterm>
+        <primary>I18n</primary>
+
+        <secondary>I18n.t</secondary>
+      </indexterm>
+
+      <indexterm>
+        <primary>I18n</primary>
+
+        <secondary>I18n.translate</secondary>
+      </indexterm>
+
+      <para>With <methodname>I18n.t</methodname> you can retrieve previously
+      defined translations. The translations are saved by default in YAML
+      format in the directory <filename>config/locales/</filename>.
+      Technically, you do not have to use YAML as format.</para>
+
+      <para>In <filename>config/locales/</filename> you can find an example
+      file <filename>config/locales/en.yml</filename> with the following
+      content:<programlisting>en:
+  hello: "Hello world"</programlisting></para>
+
+      <para>In the Rails console we can try out how
+      <methodname>I18n.t</methodname> works:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; I18n.t :hello
+=&gt; "Hello world"
+&gt;&gt; I18n.locale
+=&gt; :en
+&gt;&gt; exit
+$</screen></para>
+
+      <para>Let's first create a <filename>config/locales/de.yml</filename>
+      with the following content:<programlisting>de:
+  hello: "Hallo Welt"</programlisting></para>
+
+      <para>Now back to the console:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; I18n.locale
+=&gt; :en
+&gt;&gt; I18n.t :hello
+=&gt; "Hello world"
+&gt;&gt; I18n.locale = :de
+=&gt; :de
+&gt;&gt; I18n.t :hello
+=&gt; "Hallo Welt"
+&gt;&gt;</screen></para>
+
+      <para><methodname>I18n.t</methodname> looks by default for the entry in
+      the language defined in <varname>I18n.locale</varname>. It does not
+      matter if you are working with <methodname>I18n.t</methodname> or
+      <methodname>I18n.translate</methodname>. Nor does it matter if you are
+      searching for a symbol or a string:<screen>&gt;&gt; I18n.locale = :en
+=&gt; :en
+&gt;&gt; I18n.t :hello
+=&gt; "Hello world"
+&gt;&gt; I18n.t 'hello'
+=&gt; "Hello world"
+&gt;&gt; I18n.translate 'hello'
+=&gt; "Hello world"
+&gt;&gt;</screen></para>
+
+      <para>You can also specify the desired language for an individual
+      <methodname>I18n.t</methodname> call with <code>:locale =&gt;
+      :de</code>.<screen>=&gt; "Hallo Welt"
+&gt;&gt; I18n.t :hello
+=&gt; "Hello world"
+&gt;&gt;</screen></para>
+
+      <para>If a translation does not exist, you get an error message that
+      says "<code>translation missing:</code>". This also applies if a
+      translation is only missing in one language (then all other languages
+      will work, but for the missing translation you will get the error
+      message). In that case, you can define a default with <code>:default
+      =&gt; 'any default value'</code>:<screen>&gt;&gt; I18n.t 'asdfasdfasdf'
+=&gt; "translation missing: en.asdfasdfasdf"
+&gt;&gt; I18n.t 'asdfasdfasdf', :default =&gt; 'asdfasdfasdf'
+=&gt; "asdfasdfasdf"
+&gt;&gt; exit
+$ </screen></para>
+
+      <para>In the YAML structure you can also specify several levels. Please
+      amend the <filename>config/locale/en.yml</filename> as
+      follows:<programlisting>en:
+  hello: "Hello world"
+  example:
+    test: "A test"
+  aaa:
+    bbb:
+      test: "An other test"</programlisting></para>
+
+      <para>You can display the different levels within the string with dots
+      or with a <code>:scope</code> for the symbols. You can also mix both
+      options.<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; I18n.t 'example.test'
+=&gt; "A test"
+&gt;&gt; I18n.t 'aaa.bbb.test'
+=&gt; "An other test"
+&gt;&gt; I18n.t :test, :scope =&gt; [:aaa, :bbb]
+=&gt; "An other test"
+&gt;&gt; I18n.t :test, :scope =&gt; 'aaa.bbb'
+=&gt; "An other test"
+&gt;&gt; exit
+$</screen></para>
+
+      <para>It is up to you which structure you choose to save your
+      translations in the YAML files. But the structure described in <xref
+      linkend="i18n_einsprachig_deutsch"/> does make some things easier and
+      that's why we are going to use it for this application as well.</para>
+
+      <section>
+        <title>Using I18n.t in the View</title>
+
+        <para>In the view, you can use <methodname>I18n.t</methodname> as
+        follows:<programlisting>&lt;%= t :hello-world %&gt;
+
+&lt;%= I18n.t :hello-world %&gt;
+
+&lt;%= I18n.translate :hello-world %&gt;
+
+&lt;%= I18n.t 'hello-world' %&gt;
+
+&lt;%= I18n.t 'aaa.bbb.test' %&gt;
+
+&lt;%= link_to I18n.t('views.destroy'), book, confirm: I18n.t('views.are_you_sure'), method: :delete %&gt;</programlisting></para>
+      </section>
+    </section>
+
+    <section xml:id="i18n_localized_views">
+      <title xml:id="i18n_localized_views.title">Localized Views</title>
+
+      <indexterm>
+        <primary>I18n</primary>
+
+        <secondary>localized views</secondary>
+      </indexterm>
+
+      <para>In Rails, there is a useful option of saving several variations of
+      a view as "localized views", each of which represents a different
+      language. This technique is independent of the potential use of
+      <methodname>I18n.t</methodname> in these views. The file name results
+      from the view name, the language code (for example,
+      <filename>de</filename> for German) and <filename>html.erb</filename>
+      for ERB pages. Each of these are separated by a dot. So the German
+      variation of the <filename>index.html.erb</filename> page would get the
+      file name <filename>index.de.html.erb</filename>.</para>
+
+      <para>Your views directory could then look like this:<screen>|-app
+|---views
+|-----products
+|-------_form.html.erb
+|-------_form.de.html.erb
+|-------edit.html.erb
+|-------edit.de.html.erb
+|-------index.html.erb
+|-------index.de.html.erb
+|-------new.html.erb
+|-------new.de.html.erb
+|-------show.html.erb
+|-------show.de.html.erb
+|-------
+|-----page
+|-------index.html.erb
+|-------index.de.html.erb
+</screen></para>
+
+      <para>The language saved in
+      <varname>config.i18n.default_locale</varname> is used automatically if
+      no language was encoded in the file name. In a new and not yet
+      configured Rails project, this will be English.</para>
+    </section>
+  </section>
+
+  <section xml:id="i18n_einsprachig_deutsch">
+    <title xml:id="i18n_einsprachig_deutsch.title">A Rails Application in Only
+    One Language: German</title>
+
+    <indexterm>
+      <primary>I18n</primary>
+
+      <secondary>German only</secondary>
+    </indexterm>
+
+    <para>In a Rails application aimed only at German users, it is
+    unfortunately not enough to just translate all the views into German. The
+    approach is in many respects similar to a multi-lingual Rails application
+    (see <xref linkend="i18n_mehrsprachige_rails_applikation"/>).
+    Correspondingly, there will be a certain amount of repetition. I am going
+    to show you the steps you need to watch out for by using a simple
+    application as example. Let's go through all the changes using the example
+    of this bibliography application:<screen>$ rails new bibliography
+  [...]
+$ cd bibliography
+$ rails generate scaffold book title number_of_pages:integer 'price:decimal{7,2}'
+  [...]
+$ rake db:migrate
+  [...]
+$</screen></para>
+
+    <para>To get examples for validation errors, please insert the following
+    validations in the
+    <filename>app/models/book.rb</filename>:<programlisting>class Book &lt; ActiveRecord::Base
+  attr_accessible :number_of_pages, :price, :title
+
+  validates :title,
+            :presence =&gt; true,
+            :uniqueness =&gt; true,
+            :length =&gt; { :within =&gt; 2..255 }
+
+  validates :price,
+            :presence =&gt; true,
+            :numericality =&gt; { :greater_than =&gt; 0 }
+end
+</programlisting></para>
+
+    <para>Please search the configuration file
+    <filename>config/application.rb</filename> for the value
+    <varname>config.i18n.default_locale</varname> and set it to
+    <code>:de</code> for German. In the same context, we then also insert two
+    directories in the line above for the translations of the models and the
+    views. This directory structure is not a technical requirement, but makes
+    it easier to keep track of things if your application is quite
+    big:<programlisting>config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'models', '*', '*.yml').to_s]
+config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'views', '*', '*.yml').to_s]
+config.i18n.default_locale = :de</programlisting></para>
+
+    <para>You then still need to create the corresponding directories:<screen>$ mkdir -p config/locales/models/book
+$ mkdir -p config/locales/views/book
+$ </screen></para>
+
+    <para>Now you need to generate a language configuration file for German or
+    simply download a ready-made one by Sven Fuchs from his Github repository
+    at <uri
+    xlink:href="https://github.com/svenfuchs/rails-i18n">https://github.com/svenfuchs/rails-i18n</uri>:<screen>$ cd config/locales
+$ curl -O https://raw.github.com/svenfuchs/rails-i18n/master/rails/locale/de.yml
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  4940  100  4940    0     0   4296      0  0:00:01  0:00:01 --:--:--  4862
+$</screen></para>
+
+    <note>
+      <para>If you know how Bundler works, you can also insert the line
+      <code>gem 'rails-i18n'</code> into the file <filename>Gemfile</filename>
+      and then execute <command>bundle</command>. This gives you all language
+      files from the repository.</para>
+    </note>
+
+    <para>In the file <filename>config/locales/de.yml</filename>, you have all
+    required formats and generic wordings for German that you need for a
+    normal Rails application (for example, days of the week, currency symbols,
+    etc). Have a look at it with your favorite editor to get a first
+    impression.</para>
+
+    <para>Next, we need to tell Rails that a model 'book' is not called 'book'
+    in German, but 'Buch'. The same applies to all attributes. So we create
+    the file <filename>config/locales/models/book/de.yml</filename> with the
+    following structure. As side effect, we get the methods
+    <methodname>Model.model_name.human</methodname> and
+    <methodname>Model.human_attribute_name(attribute)</methodname>, with which
+    we can insert the model and attribute names in the view.<programlisting># ruby encoding: utf-8
+
+de:
+  activerecord:
+    models:
+      book: 'Buch'
+    attributes:
+      book:
+        title: 'Titel'
+        number_of_pages: 'Seitenanzahl'
+        price: 'Preis'
+</programlisting></para>
+
+    <para>In the file <filename>config/locales/views/book/de.yml</filename> we
+    insert a few values for the scaffold views:<programlisting># ruby encoding: utf-8
+
+de:
+  views:
+    show: Anzeigen
+    edit: Editieren
+    destroy: Löschen
+    are_you_sure: Sind Sie sicher?
+    back: Zurück
+    edit: Editieren
+    book:
+      index:
+        title: Bücherliste
+        new: Neues Buch
+      edit:
+        title: Buch editieren
+      new:
+        title: Neues Buch
+      flash_messages:
+        book_was_successfully_created: 'Das Buch wurde erfolgreich angelegt.'
+        book_was_successfully_updated: 'Das Buch wurde erfolgreich aktualisiert.'</programlisting></para>
+
+    <para>Now we still need to integrate a "few" changes into the views. We
+    use the <methodname>I18n.t</methodname> helper that can also be
+    abbreviated with <methodname>t</methodname> in the view.
+    <methodname>I18n.t</methodname> reads out the corresponding item from the
+    YAML file. In the case of a purely monolingual German application, we
+    could also write the German text directly into the view, but with this
+    method we can more easily switch to multilingual use if required. You can
+    find more information on I18n.t in <xref linkend="i18n_i18n_t"/>.</para>
+
+    <para><filename>app/views/books/_form.html.erb</filename><programlisting>&lt;%= form_for(@book) do |f| %&gt;
+  &lt;% if @book.errors.any? %&gt;
+    &lt;div id="error_explanation"&gt;
+      &lt;h2&gt;&lt;%= t 'activerecord.errors.template.header', :model =&gt; Book.model_name.human, :count =&gt; @book.errors.count %&gt;&lt;/h2&gt;
+      &lt;ul&gt;
+      &lt;% @book.errors.full_messages.each do |msg| %&gt;
+        &lt;li&gt;&lt;%= msg %&gt;&lt;/li&gt;
+      &lt;% end %&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;% end %&gt;
+
+  &lt;div class="field"&gt;
+    &lt;%= f.label :title %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :title %&gt;
+  &lt;/div&gt;
+  &lt;div class="field"&gt;
+    &lt;%= f.label :number_of_pages %&gt;&lt;br /&gt;
+    &lt;%= f.number_field :number_of_pages %&gt;
+  &lt;/div&gt;
+  &lt;div class="field"&gt;
+    &lt;%= f.label :price %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :price %&gt;
+  &lt;/div&gt;
+  &lt;div class="actions"&gt;
+    &lt;%= f.submit %&gt;
+  &lt;/div&gt;
+&lt;% end %&gt;
+</programlisting></para>
+
+    <para><filename>app/views/books/edit.html.erb</filename><programlisting>&lt;h1&gt;&lt;%= t 'views.book.edit.title' %&gt;&lt;/h1&gt;
+
+&lt;%= render 'form' %&gt;
+
+&lt;%= link_to I18n.t('views.show'), @book %&gt; |
+&lt;%= link_to I18n.t('views.back'), books_path %&gt;</programlisting></para>
+
+    <para><filename>app/views/books/index.html.erb</filename><programlisting>&lt;h1&gt;&lt;%= t 'views.book.index.title' %&gt;&lt;/h1&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;&lt;%= Book.human_attribute_name(:title) %&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;%= Book.human_attribute_name(:number_of_pages) %&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;%= Book.human_attribute_name(:price) %&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @books.each do |book| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= book.title %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= number_with_delimiter(book.number_of_pages) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= number_to_currency(book.price) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to I18n.t('views.show'), book %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to I18n.t('views.edit'), edit_book_path(book) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to I18n.t('views.destroy'), book, confirm: I18n.t('views.are_you_sure'), method: :delete %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+
+&lt;br /&gt;
+
+&lt;%= link_to I18n.t('views.book.index.new'), new_book_path %&gt;</programlisting></para>
+
+    <para><filename>app/views/books/new.html.erb</filename><programlisting>&lt;h1&gt;&lt;%= t 'views.book.new.title' %&gt;&lt;/h1&gt;
+
+&lt;%= render 'form' %&gt;
+
+&lt;%= link_to I18n.t('views.back'), books_path %&gt;</programlisting></para>
+
+    <para><filename>app/views/books/show.html.erb</filename><programlisting>&lt;p id="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;&lt;%= Book.human_attribute_name(:title) %&gt;:&lt;/b&gt;
+  &lt;%= @book.title %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;&lt;%= Book.human_attribute_name(:number_of_pages) %&gt;:&lt;/b&gt;
+  &lt;%= number_with_delimiter(@book.number_of_pages) %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;&lt;%= Book.human_attribute_name(:price) %&gt;:&lt;/b&gt;
+  &lt;%= number_to_currency(@book.price) %&gt;
+&lt;/p&gt;
+
+
+&lt;%= link_to I18n.t('views.edit'), edit_book_path(@book) %&gt; |
+&lt;%= link_to I18n.t('views.back'), books_path %&gt;</programlisting></para>
+
+    <note>
+      <para>In the show and index view, I have integrated the helpers
+      <methodname>number_with_delimiter</methodname> and
+      <methodname>number_to_currency</methodname> so the numbers are
+      represented more attractively for the end user.</para>
+    </note>
+
+    <para>Right at the end, we still need to adapt a few flash messages in the
+    controller
+    <filename>app/controllers/books_controller.rb</filename>:<programlisting>class BooksController &lt; ApplicationController
+  # GET /books
+  # GET /books.json
+  def index
+    @books = Book.all
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @books }
+    end
+  end
+
+  # GET /books/1
+  # GET /books/1.json
+  def show
+    @book = Book.find(params[:id])
+
+    respond_to do |format|
+      format.html # show.html.erb
+      format.json { render json: @book }
+    end
+  end
+
+  # GET /books/new
+  # GET /books/new.json
+  def new
+    @book = Book.new
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.json { render json: @book }
+    end
+  end
+
+  # GET /books/1/edit
+  def edit
+    @book = Book.find(params[:id])
+  end
+
+  # POST /books
+  # POST /books.json
+  def create
+    @book = Book.new(params[:book])
+
+    respond_to do |format|
+      if @book.save
+        format.html { redirect_to @book, notice: I18n.t('views.book.flash_messages.book_was_successfully_created') }
+        format.json { render json: @book, status: :created, location: @book }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @book.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # PUT /books/1
+  # PUT /books/1.json
+  def update
+    @book = Book.find(params[:id])
+
+    respond_to do |format|
+      if @book.update_attributes(params[:book])
+        format.html { redirect_to @book, notice: I18n.t('views.book.flash_messages.book_was_successfully_updated') }
+        format.json { head :no_content }
+      else
+        format.html { render action: "edit" }
+        format.json { render json: @book.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # DELETE /books/1
+  # DELETE /books/1.json
+  def destroy
+    @book = Book.find(params[:id])
+    @book.destroy
+
+    respond_to do |format|
+      format.html { redirect_to books_url }
+      format.json { head :no_content }
+    end
+  end
+end</programlisting></para>
+
+    <para>Now you can use the views generated by the scaffold generator
+    entirely in German. The structure of the YAML files shown here can of
+    course be adapted to your own preferences. The texts in the views and the
+    controller are displayed with <methodname>I18n.t</methodname>. At this
+    point you could of course also integrate the German text directly if the
+    application is purely in German.</para>
+
+    <section xml:id="i18n_deutschsprachige_pfade">
+      <title xml:id="i18n_deutschsprachige_pfade.title">Paths in
+      German</title>
+
+      <indexterm>
+        <primary>I18n</primary>
+
+        <secondary>paths in German</secondary>
+      </indexterm>
+
+      <para>Our bibliography is completely in German, but the URLs are still
+      in English. If we want to make all books available at the URL <uri
+      xlink:href="http://0.0.0.0:3000/buecher">http://0.0.0.0:3000/buecher</uri>
+      instead of the URL <uri
+      xlink:href="http://0.0.0.0:3000/books">http://0.0.0.0:3000/books</uri>
+      then we need to add the following entry to the
+      <filename>config/routes.rb</filename>:<programlisting>Bibliography::Application.routes.draw do
+  scope(:path_names =&gt; { :new =&gt; "neu", :edit =&gt; "bearbeiten" }) do
+    resources :books, :path =&gt; "buecher"
+  end
+end</programlisting></para>
+
+      <para>As a result, we then have the following new paths:<screen>$ rake routes
+    books GET    /buecher(.:format)                books#index
+          POST   /buecher(.:format)                books#create
+ new_book GET    /buecher/neu(.:format)            books#new
+edit_book GET    /buecher/:id/bearbeiten(.:format) books#edit
+     book GET    /buecher/:id(.:format)            books#show
+          PUT    /buecher/:id(.:format)            books#update
+          DELETE /buecher/:id(.:format)            books#destroy
+$</screen></para>
+
+      <para>The brilliant thing with Rails routes is that you do not need to
+      do anything else. The rest is managed transparently by the
+      routes.</para>
+    </section>
+  </section>
+
+  <section xml:id="i18n_mehrsprachige_rails_applikation">
+    <title xml:id="i18n_mehrsprachige_rails_applikation.title">Multilingual
+    Rails Application</title>
+
+    <para>The approach for multilingual Rails applications is very similar to
+    the monoligual, all-German Rails application described in <xref
+    linkend="i18n_einsprachig_deutsch"/>. But we need to define YAML language
+    files for all required languages and tell the Rails application which
+    language it should currently use. We do this via
+    <varname>I18n.locale</varname>.</para>
+
+    <section xml:id="i18n_sprache_einstellen">
+      <title xml:id="i18n_sprache_einstellen.title">Using I18n.locale for
+      Defining the Desired Language</title>
+
+      <indexterm>
+        <primary>I18n</primary>
+
+        <secondary>I18n.locale</secondary>
+      </indexterm>
+
+      <para>Of course, a Rails application has to know in which language a web
+      page should be represented. <code>I18n.locale</code> saves the current
+      language and can be read by the application. I am going to show you this
+      with a mini web shop example:<screen>$ rails new webshop
+  [...]
+$ cd webshop
+$</screen></para>
+
+      <para>This web shop gets a homepage:<screen>$ rails generate controller Page index
+  [...]
+$ rm public/index.html
+$ </screen></para>
+
+      <para>We still need to enter it as root page in the
+      <filename>config/routes.rb</filename>:<programlisting>Webshop::Application.routes.draw do
+  root :to =&gt; 'page#index'
+  get "page/index"
+end</programlisting></para>
+
+      <para>We populate the <filename>app/views/page/index.html.erb</filename>
+      with the following example: <programlisting>&lt;h1&gt;Example Webshop&lt;/h1&gt;
+&lt;p&gt;Welcome to this webshop.&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;I18n.locale:&lt;/b&gt; 
+&lt;%= I18n.locale %&gt;
+&lt;/p&gt;</programlisting></para>
+
+      <para>If we start the Rails server with <command>rails server</command>
+      and go to <uri
+      xlink:href="http://0.0.0.0:3000/">http://0.0.0.0:3000/</uri> in the
+      browser, then we see the following web page:<screenshot>
+          <info>
+            <title>Index Page page#index</title>
+          </info>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/i18n_ganze_seite_page_index.jpg"/>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
+
+      <para>As you can see, the default is set to "en" for English. Stop the
+      Rails server with <keycap>CTRL-C</keycap> and change the setting for the
+      default language to German in the file
+      <filename>config/application.rb</filename>:<programlisting># The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
+# config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
+
+config.i18n.default_locale = :de</programlisting></para>
+
+      <para>If you then start the Rails server and again go to <uri
+      xlink:href="http://0.0.0.0:3000/">http://0.0.0.0:3000/</uri> in the web
+      browser, you will see the following web page:<screenshot>
+          <info>
+            <title>Index Page page#index with config.i18n.default_locale =
+            :de</title>
+          </info>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/i18n_ganze_seite_page_index_default_locale_de.jpg"/>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
+
+      <para>The web page has not changed, but as output of <code>&lt;%=
+      I18n.locale %&gt;</code> you now get '<code>de</code>' for German
+      (Deutsch), not '<code>en</code>' for English as before.</para>
+
+      <para>Please stop the Rails server with <keycap>CTRL-C</keycap> and
+      change the setting for the default language to <code>en</code> for
+      English in the file
+      <filename>config/application.rb</filename>:<programlisting># The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
+# config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
+
+config.i18n.default_locale = :en</programlisting></para>
+
+      <para>We now know how to set the default for
+      <varname>I18n.locale</varname> in the entire application, but that only
+      gets half the job done. A user wants to be able to choose his own
+      language. There are various ways of achieving this. To make things
+      clearer, we need a second page that displays a German text. Please
+      create the file <filename>app/views/page/index.de.html.erb</filename>
+      with the following content:<programlisting>&lt;h1&gt;Beispiel Webshop&lt;/h1&gt;
+&lt;p&gt;Willkommen in diesem Webshop.&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;I18n.locale:&lt;/b&gt; 
+&lt;%= I18n.locale %&gt;
+&lt;/p&gt;</programlisting></para>
+
+      <section xml:id="i18n_url_path_prefix">
+        <title xml:id="i18n_url_path_prefix.title">Setting I18n.locale via URL
+        Path Prefix</title>
+
+        <indexterm>
+          <primary>I18n.locale</primary>
+
+          <secondary>path prefix</secondary>
+        </indexterm>
+
+        <indexterm>
+          <primary>default_url_options</primary>
+        </indexterm>
+
+        <para>The more stylish way of setting the language is to add it as
+        prefix to the URL. This enables search engines to manage different
+        language versions better. We want <uri
+        xlink:href="http://0.0.0.0:3000/de">http://0.0.0.0:3000/de</uri> to
+        display the German version of our homepage and <uri
+        xlink:href="http://0.0.0.0:3000/en">http://0.0.0.0:3000/en</uri> the
+        English version. The first step is adapting the
+        <filename>config/routes.rb</filename><programlisting>Webshop::Application.routes.draw do
+
+  scope "(:locale)", :locale =&gt; /en|de/ do
+    root :to =&gt; 'page#index'
+    get "page/index"
+  <emphasis>end</emphasis>
+
+end</programlisting></para>
+
+        <para>Next, we need to set a <methodname>before_filter</methodname> in
+        the <filename>app/controllers/application_controller.rb</filename>.
+        This filter sets the parameter locale set by the route as
+        <varname>I18n.locale</varname>:<programlisting>class ApplicationController &lt; ActionController::Base
+  protect_from_forgery
+
+  before_filter :set_locale
+ 
+  private
+  def set_locale
+    I18n.locale = params[:locale] || I18n.default_locale
+  end
+end</programlisting></para>
+
+        <para>To test it, start Rails with <command>rails server</command> and
+        go to the URL <uri
+        xlink:href="http://0.0.0.0:3000/de">http://0.0.0.0:3000/de</uri>.
+        <screenshot>
+            <info>
+              <title>http://0.0.0.0:3000/de</title>
+            </info>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/i18n_path_prefix_de_root.jpg"/>
+              </imageobject>
+            </mediaobject>
+          </screenshot></para>
+
+        <para>Of course we can also go to <uri
+        xlink:href="http://0.0.0.0:3000/de/page/index">http://0.0.0.0:3000/de/page/index</uri>:<screenshot>
+            <info>
+              <title>http://0.0.0.0:3000/de/page/index</title>
+            </info>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/i18n_path_prefix_de_page_index.jpg"/>
+              </imageobject>
+            </mediaobject>
+          </screenshot></para>
+
+        <para>If we go to <uri
+        xlink:href="http://0.0.0.0:3000/de">http://0.0.0.0:3000/en</uri> and
+        <uri
+        xlink:href="http://0.0.0.0:3000/de/page/index">http://0.0.0.0:3000/en/page/index</uri>
+        we get the English version of each page.</para>
+
+        <para>But now we have a problem: by using the prefix, we initially get
+        to a page with the correct language, but what if we want to link from
+        that page to another page in our Rails project? Then we would need to
+        manually insert the prefix into the link. Who wants that? That's why
+        there is a solution in form of
+        <code>Rails.application.routes.default_url_options</code>. We just
+        need to expand our <methodname>set_locale</methodname> method
+        accordingly in
+        <filename>app/controllers/application_controller.rb</filename>:<programlisting>class ApplicationController &lt; ActionController::Base
+  protect_from_forgery
+
+  before_filter :set_locale
+ 
+  private
+  def set_locale
+    I18n.locale = params[:locale] || I18n.default_locale
+    Rails.application.routes.default_url_options[:locale]= I18n.locale 
+  end
+end</programlisting></para>
+
+        <para>As a result, all links created with
+        <methodname>link_to</methodname> and <methodname>url_for</methodname>
+        (on which <methodname>link_to</methodname> is based) are automatically
+        expanded by the parameter <varname>locale</varname>. You do not need
+        to do anything else. All links generated via the scaffold generator
+        are automatically changed accordingly.</para>
+
+        <section>
+          <title>Navigation Example</title>
+
+          <para>To give the user the option of switching easily between the
+          different language versions, it makes sense to offer two links at
+          the top of the web page. We don't want the current language to be
+          displayed as active link. This can be achieved as follows for all
+          views in the file
+          <filename>app/views/layouts/application.html.erb</filename>:<programlisting>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Webshop&lt;/title&gt;
+  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
+  &lt;%= javascript_include_tag "application" %&gt;
+  &lt;%= csrf_meta_tags %&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;p&gt;
+&lt;%= link_to_unless I18n.locale == :en, "English", locale: :en %&gt;
+|
+&lt;%= link_to_unless I18n.locale == :de, "Deutsch", locale: :de %&gt;
+&lt;/p&gt;
+
+&lt;%= yield %&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</programlisting></para>
+
+          <para>The navigation is then displayed at the top of the
+          page.</para>
+
+          <screenshot>
+            <info>
+              <title>Language Selection at Top of Page</title>
+            </info>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/I18n_locale_url_prefix_navigation.jpg"/>
+              </imageobject>
+            </mediaobject>
+          </screenshot>
+        </section>
+      </section>
+
+      <section>
+        <title>Setting I18n.locale via Accept Language HTTP Header of
+        Browser</title>
+
+        <indexterm>
+          <primary>I18n.locale</primary>
+
+          <secondary>accept language HTTP header</secondary>
+        </indexterm>
+
+        <para>When a user goes to your web page for the first time, you
+        ideally want to immediately display the web page in the correct
+        language for that user. To do this, you can read out the accept
+        language field in the HTTP header. In every web browser, the user can
+        set his preferred language (see <uri
+        xlink:href="http://www.w3.org/International/questions/qa-lang-priorities">http://www.w3.org/International/questions/qa-lang-priorities</uri>).
+        The browser automatically informs the web server and consequently
+        Rails of this value.</para>
+
+        <para>Please edit the
+        <filename>app/controllers/application_controller.rb</filename> as
+        follows:<programlisting>class ApplicationController &lt; ActionController::Base
+  protect_from_forgery
+
+  before_filter :set_locale
+ 
+  private
+  def extract_locale_from_accept_language_header
+    request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first
+  end
+
+  def set_locale
+    I18n.locale = extract_locale_from_accept_language_header || I18n.default_locale
+  end
+end</programlisting></para>
+
+        <para>And please do not forget to clean the settings in <xref
+        linkend="i18n_url_path_prefix"/> out of the
+        <filename>config/routes.rb</filename>:<programlisting>Webshop::Application.routes.draw do
+  get "page/index"
+  root :to =&gt; 'page#index'
+end</programlisting></para>
+
+        <para>Now you always get the output in the language defined in the web
+        browser. Please note that
+        <code>request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first</code>
+        does not catch all cases. For example, you should make sure that you
+        support the specified language in your Rails application in the first
+        place. There are some ready-made gems that can easily do this job for
+        you. Just use the search engine of your choice to go online and look
+        for them.</para>
+      </section>
+
+      <section xml:id="i18n_local_session">
+        <title xml:id="i18n_local_session.title">Saving I18n.locale in a
+        Session</title>
+
+        <indexterm>
+          <primary>I18n.locale</primary>
+
+          <secondary>session</secondary>
+        </indexterm>
+
+        <para>Often you want to save the value of
+        <varname>I18n.locale</varname> in a session (see <xref
+        linkend="sessions"/>).<tip>
+            <para>The approach described here for sessions will of course work
+            just the same with cookies. See <xref linkend="cookies"/>.</para>
+          </tip> To set the value, let's create a controller in our web shop
+        as example: the controller <classname>SetLanguage</classname> with the
+        two actions <methodname>english</methodname> and
+        <methodname>german</methodname>:<screen>$ rails generate controller SetLanguage english german
+  [...]
+$ </screen></para>
+
+        <para>In the file
+        <filename>app/controllers/set_language_controller.rb</filename> we
+        populate the two actions as follows:<programlisting>class SetLanguageController &lt; ApplicationController
+  def english
+    I18n.locale = :en
+    set_session_and_redirect
+  end
+
+  def german
+    I18n.locale = :de
+    set_session_and_redirect
+  end
+
+  private
+  def set_session_and_redirect
+    session[:locale] = I18n.locale
+    redirect_to :back
+    rescue ActionController::RedirectBackError
+      redirect_to :root
+  end
+end</programlisting></para>
+
+        <para>Finally, we also want to adapt the
+        <methodname>set_locale</methodname> methods in the file
+        <filename>app/controllers/application_controller.rb</filename>:<programlisting>class ApplicationController &lt; ActionController::Base
+  protect_from_forgery
+
+  before_filter :set_locale
+ 
+  private
+  def set_locale
+    I18n.locale = session[:locale] || I18n.default_locale
+    session[:locale] = I18n.locale
+  end
+end</programlisting></para>
+
+        <para>After starting Rails with <command>rails server</command>, you
+        can now set the language to German by going to the URL <uri
+        xlink:href="http://0.0.0.0:3000/set_language/german">http://0.0.0.0:3000/set_language/german</uri>
+        and to English by going to <uri
+        xlink:href="http://0.0.0.0:3000/set_language/english">http://0.0.0.0:3000/set_language/english</uri>.</para>
+
+        <section>
+          <title>Navigation Example</title>
+
+          <para>To give the user the option of switching easily between the
+          different language versions, it makes sense to offer two links at
+          the top of the web page. We don't want the current language to be
+          displayed as active link. This can be achieved as follows for all
+          views in the file
+          <filename>app/views/layouts/application.html.erb</filename>:<programlisting>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Webshop&lt;/title&gt;
+  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
+  &lt;%= javascript_include_tag "application" %&gt;
+  &lt;%= csrf_meta_tags %&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;p&gt;
+&lt;%= link_to_unless I18n.locale == :en, "English", set_language_english_path %&gt;
+|
+&lt;%= link_to_unless I18n.locale == :de, "Deutsch", set_language_german_path %&gt;
+&lt;/p&gt;
+
+&lt;%= yield %&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</programlisting></para>
+
+          <para>The navigation is then displayed at the top of the
+          page.</para>
+
+          <screenshot>
+            <info>
+              <title>Language Selection at Top of Page</title>
+            </info>
+
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/I18n_locale_url_prefix_navigation.jpg"/>
+              </imageobject>
+            </mediaobject>
+          </screenshot>
+        </section>
+      </section>
+
+      <section xml:id="i18n_locale_per_domain_endung">
+        <title xml:id="i18n_locale_per_domain_endung.title">Setting
+        I18n.locale via Domain Extension</title>
+
+        <indexterm>
+          <primary>I18n.locale</primary>
+
+          <secondary>domain extension</secondary>
+        </indexterm>
+
+        <para>If you have several domains with the extensions typical for the
+        corresponding languages, you can of course also use these extensions
+        to set the language. For example, if a user visits the page <uri
+        xlink:href="http://www.example.com">http://www.example.com</uri> he
+        would see the English version, if he goes to <uri
+        xlink:href="http://www.example.de">http://www.example.de</uri> then
+        the German version would be displayed.</para>
+
+        <para>To achieve this, we would need to go into the
+        <filename>app/controllers/application_controller.rb</filename> and
+        insert a <methodname>before_filter</methodname> that analyses the
+        accessed domain and sets the <varname>I18n.locale</varname>
+        :<programlisting>class ApplicationController &lt; ActionController::Base
+  protect_from_forgery
+
+  before_filter :set_locale
+ 
+  private
+  def set_locale
+    case request.host.split('.').last
+    when 'de'
+      I18n.locale = :de
+    when 'com'
+      I18n.locale = :en
+    else
+      I18n.locale = I18n.default_locale
+    end 
+  end
+end</programlisting></para>
+
+        <tip>
+          <para>To test this functionality, you can add the following items on
+          your Linux or Mac OS X development system in the file
+          <filename>/etc/hosts</filename>:<programlisting>0.0.0.0 www.example.com
+0.0.0.0 www.example.de
+</programlisting></para>
+
+          <para>Then you can go to the URL <uri
+          xlink:href="http://www.example.com:3000">http://www.example.com:3000</uri>
+          and <uri
+          xlink:href="http://www.example.de:3000">http://www.example.de:3000</uri>
+          and you will see the corresponding language versions.</para>
+        </tip>
+      </section>
+
+      <section xml:id="i18n_welcher_weg">
+        <title xml:id="i18n_welcher_weg.title">Which Approach is the
+        Best?</title>
+
+        <para>I believe that a combination of the approaches described above
+        will lead to the best result. When I first visit a web page I am happy
+        if I find that the accept language HTTP header of my browser is read
+        and implemented correctly. But it is also nice to be able to change
+        the language later on in the user configuration (in particular for
+        badly translated pages, English language is often better). And
+        ultimately it has to be said that a page that is easy to represent is
+        worth a lot for a search engine, and this also goes for the languages.
+        Rails gives you the option of easily using all variations and even
+        enables you to combine them together.</para>
+      </section>
+    </section>
+
+    <section xml:id="i18n_mehrsprachiges_scaffold">
+      <title xml:id="i18n_mehrsprachiges_scaffold.title">Multilingual
+      Scaffolds</title>
+
+      <para>As an example, we use a mini webshop in which we translate a
+      product scaffold. The aim is to make the application available in German
+      and English. The Rails application:<screen>$ rails new webshop
+  [...]
+$ cd webshop
+$ rails generate scaffold Product name description 'price:decimal{7,2}'
+  [...]
+$ rake db:migrate
+  [...]
+$ </screen></para>
+
+      <para>We define the product model in the
+      <filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
+  attr_accessible :description, :name, :price
+
+  validates :name,
+            :presence =&gt; true,
+            :uniqueness =&gt; true,
+            :length =&gt; { :within =&gt; 2..255 }
+
+  validates :price,
+            :presence =&gt; true,
+            :numericality =&gt; { :greater_than =&gt; 0 }
+end</programlisting></para>
+
+      <para>When selecting the language for the user, we use the URL prefix
+      variation described in <xref linkend="i18n_url_path_prefix"/>. We use
+      the following
+      <filename>app/controllers/application_controller.rb</filename><programlisting>class ApplicationController &lt; ActionController::Base
+  protect_from_forgery
+
+  before_filter :set_locale
+ 
+  private
+  def set_locale
+    I18n.locale = params[:locale] || I18n.default_locale
+    Rails.application.routes.default_url_options[:locale]= I18n.locale
+  end
+end</programlisting></para>
+
+      <para>This is the <filename>config/routes.rb</filename><programlisting>Webshop::Application.routes.draw do
+  scope "(:locale)", :locale =&gt; /en|de/ do
+    root :to =&gt; 'products#index'
+    resources :products
+  end
+end</programlisting></para>
+
+      <para>Then we insert the links for the navigation in the
+      <filename>app/views/layouts/application.html.erb</filename>:<programlisting>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Webshop&lt;/title&gt;
+  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
+  &lt;%= javascript_include_tag "application" %&gt;
+  &lt;%= csrf_meta_tags %&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;p&gt;
+&lt;%= link_to_unless I18n.locale == :en, "English", locale: :en %&gt;
+|
+&lt;%= link_to_unless I18n.locale == :de, "Deutsch", locale: :de %&gt;
+&lt;/p&gt;
+
+&lt;%= yield %&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</programlisting></para>
+
+      <para>And before we start Rails with <command>rails server</command>, we
+      delete the file <filename>public/index.html</filename> so the root page
+      displayed shows the list of all products.<screen>$ rm public/index.html 
+$ rails server
+=&gt; Booting WEBrick
+=&gt; Rails 3.2.3 application starting in development on http://0.0.0.0:3000
+=&gt; Call with -d to detach
+=&gt; Ctrl-C to shutdown server
+[2012-06-01 10:43:06] INFO  WEBrick 1.3.1
+[2012-06-01 10:43:06] INFO  ruby 1.9.3 (2012-04-20) [x86_64-darwin11.3.0]
+[2012-06-01 10:43:06] INFO  WEBrick::HTTPServer#start: pid=51412 port=3000</screen></para>
+
+      <para>If we go to <uri
+      xlink:href="http://0.0.0.0:3000">http://0.0.0.0:3000</uri> we see the
+      normal English page. <screenshot>
+          <info>
+            <title>Basic version</title>
+          </info>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/i18n_webshop_base_version.jpg"/>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
+
+      <para>If we click the option German, nothing changes on the page, apart
+      from the language navigation right at the top.<screenshot>
+          <info>
+            <title>Basic version de</title>
+          </info>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screenshots/i18n_webshop_base_version_de.jpg"/>
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
+
+      <para>For both languages, the file
+      <filename>app/views/products/index.html.erb</filename> is rendered. It
+      contains the following code:<programlisting>&lt;h1&gt;Listing products&lt;/h1&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Name&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+    &lt;th&gt;Price&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @products.each do |product| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= product.name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= product.description %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= product.price %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Show', product %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Edit', edit_product_path(product) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', product, confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+
+&lt;br /&gt;
+
+&lt;%= link_to 'New Product', new_product_path %&gt;</programlisting></para>
+
+      <para>Now we still need to find a way of translating the individual
+      elements of this page appropriately and as generically as
+      possible.</para>
+
+      <section>
+        <title>Text Blocks in YAML Format</title>
+
+        <para>Now we need to define the individual text blocks for
+        <methodname>I18n.t</methodname>. The corresponding directories still
+        have to be created first:<screen>$ mkdir -p config/locales/models/product
+$ mkdir -p config/locales/views/product
+$</screen></para>
+
+        <para>To make sure that the YAML files created there are indeed read
+        in automatically, you need to insert the following lines in the file
+        <filename>config/application.rb</filename>:<programlisting># The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
+config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'models', '*', '*.yml').to_s]
+config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'views', '*', '*.yml').to_s]
+config.i18n.default_locale = :en</programlisting></para>
+
+        <section>
+          <title>German</title>
+
+          <para>Please create the file
+          <filename>config/locales/models/product/de.yml</filename> with the
+          following content.<programlisting># ruby encoding: utf-8
+
+de:
+  activerecord:
+    models:
+      product: 'Produkt'
+    attributes:
+      product:
+        name: 'Name'
+        description: 'Beschreibung'
+        price: 'Preis'
+</programlisting></para>
+
+          <para>In the file
+          <filename>config/locales/views/product/de.yml</filename> we insert a
+          few values for the scaffold views:<programlisting># ruby encoding: utf-8
+
+de:
+  views:
+    show: Anzeigen
+    edit: Editieren
+    destroy: Löschen
+    are_you_sure: Sind Sie sicher?
+    back: Zurück
+    edit: Editieren
+    product:
+      index:
+        title: Liste aller Produkte
+        new_product: Neues Produkt
+      edit:
+        title: Produkt editieren
+      new:
+        title: Neues Produkt
+      flash_messages:
+        product_was_successfully_created: 'Das Produkt wurde erfolgreich angelegt.'
+        product_was_successfully_updated: 'Das Produkt wurde erfolgreich aktualisiert.'</programlisting></para>
+
+          <para>Finally, we copy a ready-made default translation by Sven
+          Fuchs from his github repository <uri
+          xlink:href="https://github.com/svenfuchs/rails-i18n">https://github.com/svenfuchs/rails-i18n</uri>:<screen>$ cd config/locales
+$ curl -O https://raw.github.com/svenfuchs/rails-i18n/master/rails/locale/de.yml
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  4940  100  4940    0     0   9574      0 --:--:-- --:--:-- --:--:-- 11932
+$ cd ../..
+$ </screen></para>
+
+          <note>
+            <para>If you know how Bundler works you can also insert the line
+            <code>gem 'rails-i18n'</code> into the file
+            <filename>Gemfile</filename> and then execute
+            <command>bundle</command>. This gives you all language files from
+            the repository.</para>
+          </note>
+
+          <para>The file <filename>config/locales/de.yml</filename> contains
+          all required formats and generic phrases for German that we need for
+          a normal Rails application (for example days of the week, currency
+          symbols, etc). Use your favorite editor to have a look in there to
+          get an impression.</para>
+        </section>
+
+        <section>
+          <title>English</title>
+
+          <para>As most things are already present in the system for English,
+          we just need to insert a few values for the scaffold views in the
+          file
+          <filename>config/locales/views/product/en.yml</filename>:<programlisting>en:
+  views:
+    show: Show
+    edit: Edit
+    destroy: Delete
+    are_you_sure: Are you sure?
+    back: Back
+    edit: Edit
+    product:
+      index:
+        title: List of all products
+        new_product: New product
+      edit:
+        title: Edit Product
+      new:
+        title: New product
+      flash_messages:
+        product_was_successfully_created: 'Product was successfully created.'
+        product_was_successfully_updated: 'Product was successfully updated.'</programlisting></para>
+        </section>
+      </section>
+
+      <section>
+        <title>Equipping Views with I18n.t</title>
+
+        <para>Please edit the listed view files as specified.</para>
+
+        <section>
+          <title>_form.html.erb</title>
+
+          <para>In the file
+          <filename>app/views/products/_form.html.erb</filename> we need to
+          change the display of the validation errors in the top section to
+          <methodname>I18n.t</methodname>. The names of form errors are
+          automatically read in from
+          <varname>activerecord.attributes.product</varname>:<programlisting>&lt;%= form_for(@product) do |f| %&gt;
+  &lt;% if @product.errors.any? %&gt;
+    &lt;div id="error_explanation"&gt;
+      &lt;h2&gt;&lt;%= t 'activerecord.errors.template.header', :model =&gt; Product.model_name.human, :count =&gt; @product.errors.count %&gt;&lt;/h2&gt;
+
+      &lt;ul&gt;
+      &lt;% @product.errors.full_messages.each do |msg| %&gt;
+        &lt;li&gt;&lt;%= msg %&gt;&lt;/li&gt;
+      &lt;% end %&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;% end %&gt;
+
+  &lt;div class="field"&gt;
+    &lt;%= f.label :name %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :name %&gt;
+  &lt;/div&gt;
+  &lt;div class="field"&gt;
+    &lt;%= f.label :description %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :description %&gt;
+  &lt;/div&gt;
+  &lt;div class="field"&gt;
+    &lt;%= f.label :price %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :price %&gt;
+  &lt;/div&gt;
+  &lt;div class="actions"&gt;
+    &lt;%= f.submit %&gt;
+  &lt;/div&gt;
+&lt;% end %&gt;
+</programlisting></para>
+        </section>
+
+        <section>
+          <title>edit.html.erb</title>
+
+          <para>In the file
+          <filename>app/views/products/edit.html.erb</filename> we need to
+          integrate the heading and the links at the bottom of the page with
+          <methodname>I18n.t</methodname>:<programlisting>&lt;h1&gt;&lt;%= t 'views.product.edit.title' %&gt;&lt;/h1&gt;
+
+&lt;%= render 'form' %&gt;
+
+&lt;%= link_to I18n.t('views.show'), @product %&gt; |
+&lt;%= link_to I18n.t('views.back'), products_path %&gt;</programlisting></para>
+        </section>
+
+        <section>
+          <title>index.html.erb</title>
+
+          <para>In the file
+          <filename>app/views/products/index.html.erb</filename> we need to
+          change practically every line. In the table header I use
+          <methodname>human_attribute_name()</methodname>, but you could also
+          do it directly with <methodname>I18n.t</methodname>. The price of
+          the product is specified with the helper number_to_currency. In a
+          real application, we would have to specify a defined currency at
+          this point as well.<programlisting>&lt;h1&gt;&lt;%= t 'views.product.index.listing_products' %&gt;&lt;/h1&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;&lt;%= Product.human_attribute_name(:name) %&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;%= Product.human_attribute_name(:description) %&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;%= Product.human_attribute_name(:price) %&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @products.each do |product| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;%= product.name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= product.description %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= number_to_currency(product.price) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to I18n.t('views.show'), product %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to I18n.t('views.edit'), edit_product_path(product) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to I18n.t('views.destroy'), product, confirm: I18n.t('views.are_you_sure'), method: :delete %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+
+&lt;br /&gt;
+
+&lt;%= link_to I18n.t('views.product.index.new_product'), new_product_path %&gt;
+</programlisting></para>
+        </section>
+
+        <section>
+          <title>new.html.erb</title>
+
+          <para>In the <filename>app/views/products/new.html.erb</filename> we
+          need to adapt the heading and the link:<programlisting>&lt;h1&gt;&lt;%= t 'views.product.new.title' %&gt;&lt;/h1&gt;
+
+&lt;%= render 'form' %&gt;
+
+&lt;%= link_to I18n.t('views.back'), products_path %&gt;</programlisting></para>
+        </section>
+
+        <section>
+          <title>show.html.erb</title>
+
+          <para>In the <filename>app/views/products/show.html.erb</filename>
+          we again use <methodname>human_attribute_name()</methodname> for the
+          attributes. Plus the links need to be translated with
+          <methodname>I18n.t</methodname>. As with the index view, we again
+          use <methodname>number_to_currency()</methodname> to show the price
+          in formatted form:<programlisting>&lt;p id="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;&lt;%= Product.human_attribute_name(:name) %&gt;:&lt;/b&gt;
+  &lt;%= @product.name %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;&lt;%= Product.human_attribute_name(:description) %&gt;:&lt;/b&gt;
+  &lt;%= @product.description %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;&lt;%= Product.human_attribute_name(:price) %&gt;:&lt;/b&gt;
+  &lt;%= number_to_currency(@product.price) %&gt;
+&lt;/p&gt;
+
+&lt;%= link_to I18n.t('views.edit'), edit_product_path(@product) %&gt; |
+&lt;%= link_to I18n.t('views.back'), products_path %&gt;</programlisting></para>
+        </section>
+      </section>
+
+      <section>
+        <title>Translating Flash Messages in the Controller</title>
+
+        <para>Finally, we need to translate the two flash messages in the
+        <filename>app/controllers/products_controller.rb</filename> for
+        creating (create) and updating (update) records, again via
+        <methodname>I18n.t</methodname>:<programlisting>class ProductsController &lt; ApplicationController
+  # GET /products
+  # GET /products.json
+  def index
+    @products = Product.all
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @products }
+    end
+  end
+
+  # GET /products/1
+  # GET /products/1.json
+  def show
+    @product = Product.find(params[:id])
+
+    respond_to do |format|
+      format.html # show.html.erb
+      format.json { render json: @product }
+    end
+  end
+
+  # GET /products/new
+  # GET /products/new.json
+  def new
+    @product = Product.new
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.json { render json: @product }
+    end
+  end
+
+  # GET /products/1/edit
+  def edit
+    @product = Product.find(params[:id])
+  end
+
+  # POST /products
+  # POST /products.json
+  def create
+    @product = Product.new(params[:product])
+
+    respond_to do |format|
+      if @product.save
+        format.html { redirect_to @product, notice: I18n.t('views.product.flash_messages.product_was_successfully_created') }
+        format.json { render json: @product, status: :created, location: @product }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @product.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # PUT /products/1
+  # PUT /products/1.json
+  def update
+    @product = Product.find(params[:id])
+
+    respond_to do |format|
+      if @product.update_attributes(params[:product])
+        format.html { redirect_to @product, notice: I18n.t('views.product.flash_messages.product_was_successfully_updated') }
+        format.json { head :no_content }
+      else
+        format.html { render action: "edit" }
+        format.json { render json: @product.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # DELETE /products/1
+  # DELETE /products/1.json
+  def destroy
+    @product = Product.find(params[:id])
+    @product.destroy
+
+    respond_to do |format|
+      format.html { redirect_to products_url }
+      format.json { head :no_content }
+    end
+  end
+end
+</programlisting></para>
+      </section>
+
+      <section>
+        <title>The Result</title>
+
+        <para>Now you can use the scaffold products both in German and in
+        English. You can switch the language via the link at the top of the
+        page.</para>
+      </section>
+    </section>
+  </section>
+
+  <section xml:id="i18n_weiterfuehrende_informationen">
+    <title xml:id="i18n_weiterfuehrende_informationen.title">Further
+    Information</title>
+
+    <para>The best source of information on this topic can be found in the
+    Rails documentation at <uri
+    xlink:href="http://guides.rubyonrails.org/i18n.html">http://guides.rubyonrails.org/i18n.html</uri>.
+    This also shows how you can operate other backends for defining the
+    translations.</para>
+
+    <para>As so often, <uri
+    xlink:href="http://railscasts.com">Railscasts.com</uri> offers a whole
+    range of Railscasts on the topic I18n: <uri
+    xlink:href="http://railscasts.com/episodes?utf8=%E2%9C%93&amp;search=i18n">http://railscasts.com/episodes?utf8=%E2%9C%93&amp;search=i18n</uri></para>
+  </section>
+</chapter>

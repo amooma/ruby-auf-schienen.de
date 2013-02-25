@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="activerecord_datensatz_veraendern"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title xml:id="activerecord_datensatz_veraendern.title">Editing a
+  Record</title>
+
+  <para>Adding data is quite nice, but often you want to edit a record. To
+  show how that's done I use the album database from <xref
+  linkend="queries"/>.</para>
+
+  <section xml:id="activerecord_einfaches_editieren">
+    <title xml:id="activerecord_einfaches_editieren.title">Simple
+    Editing</title>
+
+    <para>Simple editing of a record takes place in the following
+    steps:<orderedlist>
+        <listitem>
+          <para>Finding the record and creating a corresponding
+          instance</para>
+        </listitem>
+
+        <listitem>
+          <para>Changing the attribute</para>
+        </listitem>
+
+        <listitem>
+          <para>Saving the record via the method <indexterm>
+              <primary>ActiveRecord</primary>
+
+              <secondary>methods</secondary>
+
+              <tertiary>save()</tertiary>
+            </indexterm><methodname>save</methodname></para>
+        </listitem>
+      </orderedlist></para>
+
+    <para>We are now searching for the album <quote>The Beatles</quote> and
+    changing its name to <quote>A Test</quote>:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; album = Album.where(:name =&gt; 'The Beatles').first
+  Album Load (0.1ms)  SELECT "albums".* FROM "albums" WHERE "albums"."name" = 'The Beatles' LIMIT 1
+=&gt; #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;
+&gt;&gt; album.name
+=&gt; "The Beatles"
+&gt;&gt; album.name = 'A Test'
+=&gt; "A Test"
+&gt;&gt; album.save
+   (0.1ms)  begin transaction
+   (0.4ms)  UPDATE "albums" SET "name" = 'A Test', "updated_at" = '2012-11-14 18:51:46.694219' WHERE "albums"."id" = 10
+   (3.9ms)  commit transaction
+=&gt; true
+&gt;&gt; Album.last
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
+=&gt; #&lt;Album id: 13, name: "I Got a Woman", release_year: 1955, created_at: "2012-11-14 13:39:49", updated_at: "2012-11-14 13:39:49"&gt;
+&gt;&gt; exit
+$</screen></para>
+  </section>
+
+  <section xml:id="activerecord_changed">
+    <title xml:id="activerecord_changed.title">changed?</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>methods</secondary>
+
+      <tertiary>changed?()</tertiary>
+    </indexterm>
+
+    <para>If you are not sure if a record has been changed and not yet saved,
+    you can check via the method <methodname>changed?</methodname>:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; album = Album.last
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
+=&gt; #&lt;Album id: 13, name: "I Got a Woman", release_year: 1955, created_at: "2012-11-14 13:39:49", updated_at: "2012-11-14 13:39:49"&gt;
+&gt;&gt; album.changed?
+=&gt; false
+&gt;&gt; album.name = 'The Beatles'
+=&gt; "The Beatles"
+&gt;&gt; album.changed?
+=&gt; true
+&gt;&gt; album.save
+   (0.1ms)  begin transaction
+   (0.5ms)  UPDATE "albums" SET "name" = 'The Beatles', "updated_at" = '2012-11-14 18:55:35.410521' WHERE "albums"."id" = 13
+   (0.7ms)  commit transaction
+=&gt; true
+&gt;&gt; album.changed?
+=&gt; false
+&gt;&gt; exit
+$</screen></para>
+  </section>
+
+  <section xml:id="activerecord_update_attributes">
+    <title
+    xml:id="activerecord_update_attributes.title">update_attributes</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>methods</secondary>
+
+      <tertiary>update_attributes()</tertiary>
+    </indexterm>
+
+    <para>With the method <methodname>update_attributes</methodname> you can
+    change several attributes of an object in one go and then immediately save
+    them automatically.</para>
+
+    <para>Let's use this method within the example used in <xref
+    linkend="activerecord_einfaches_editieren"/>:<screen>$ rails console
+Loading development environment (Rails 3.2.9)
+&gt;&gt; album = Album.last
+  Album Load (0.1ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
+=&gt; #&lt;Album id: 13, name: "The Beatles", release_year: 1955, created_at: "2012-11-14 13:39:49", updated_at: "2012-11-14 18:55:35"&gt;
+&gt;&gt; album.changed?
+=&gt; false
+&gt;&gt; album.update_attributes(:name =&gt; 'Another Test')
+   (0.1ms)  begin transaction
+   (0.4ms)  UPDATE "albums" SET "name" = 'Another Test', "updated_at" = '2012-11-14 18:56:52.466887' WHERE "albums"."id" = 13
+   (1.7ms)  commit transaction
+=&gt; true
+&gt;&gt; album.changed?
+=&gt; false
+&gt;&gt; Album.last
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
+=&gt; #&lt;Album id: 13, name: "Another Test", release_year: 1955, created_at: "2012-11-14 13:39:49", updated_at: "2012-11-14 18:56:52"&gt;
+&gt;&gt; </screen></para>
+
+    <para>This kind of update can also be directly combined with a
+    <methodname>where</methodname> method and then becomes almost
+    atomic:<screen>&gt;&gt; Album.where(:name =&gt; 'Another Test').first.update_attributes(:name =&gt; 'The Beatles')
+  Album Load (0.1ms)  SELECT "albums".* FROM "albums" WHERE "albums"."name" = 'Another Test' LIMIT 1
+   (0.1ms)  begin transaction
+   (0.3ms)  UPDATE "albums" SET "name" = 'The Beatles', "updated_at" = '2012-11-14 18:57:59.415265' WHERE "albums"."id" = 13
+   (0.7ms)  commit transaction
+=&gt; true
+&gt;&gt; Album.last
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
+=&gt; #&lt;Album id: 13, name: "The Beatles", release_year: 1955, created_at: "2012-11-14 13:39:49", updated_at: "2012-11-14 18:57:59"&gt;
+&gt;&gt; exit
+$</screen></para>
+  </section>
+
+  <section xml:id="activerecord_locking">
+    <title xml:id="activerecord_locking.title">Locking</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>locking</secondary>
+    </indexterm>
+
+    <para>By default, Rails uses <quote>optimistic locking</quote> of records.
+    But you can turn this off. </para>
+
+    <para>As optimistic locking is ideal for most users and chances are you
+    never thought about the problem before reading this paragraph, I will not
+    dive into it in any more detail and simply point you towards the
+    <literal>ri</literal> help which includes good examples. If you require
+    pessimistic locking, you will find the required parameters there.</para>
+
+    <para><screen>$ ri -T ActiveRecord::Locking::Optimistic
+ActiveRecord::Locking::Optimistic
+
+(from gem activerecord-3.2.9)
+------------------------------------------------------------------------------
+What is Optimistic Locking
+
+Optimistic locking allows multiple users to access the same record for edits,
+and assumes a minimum of conflicts with the data. It does this by checking
+whether another process has made changes to a record since it was opened, an
+ActiveRecord::StaleObjectError exception is thrown if that has occurred
+and the update is ignored.
+
+Check out ActiveRecord::Locking::Pessimistic for an alternative.
+
+Usage
+
+Active Records support optimistic locking if the field lock_version is
+present. Each update to the record increments the lock_version column
+and the locking facilities ensure that records instantiated twice will let the
+last one saved raise a StaleObjectError if the first was also updated.
+Example:
+
+  p1 = Person.find(1)
+  p2 = Person.find(1)
+
+  p1.first_name = "Michael"
+  p1.save
+
+  p2.first_name = "should fail"
+  p2.save # Raises a ActiveRecord::StaleObjectError
+
+Optimistic locking will also check for stale data when objects are destroyed.
+Example:
+
+  p1 = Person.find(1)
+  p2 = Person.find(1)
+
+  p1.first_name = "Michael"
+  p1.save
+
+  p2.destroy # Raises a ActiveRecord::StaleObjectError
+
+You're then responsible for dealing with the conflict by rescuing the
+exception and either rolling back, merging, or otherwise apply the business
+logic needed to resolve the conflict.
+
+This locking mechanism will function inside a single Ruby process. To make it
+work across all web requests, the recommended approach is to add
+lock_version as a hidden field to your form.
+
+You must ensure that your database schema defaults the lock_version
+column to 0.
+
+This behavior can be turned off by setting
+ActiveRecord::Base.lock_optimistically = false. To override the name of
+the lock_version column, invoke the set_locking_column method.
+This method uses the same syntax as set_table_name
+------------------------------------------------------------------------------
+$</screen></para>
+  </section>
+</section>
