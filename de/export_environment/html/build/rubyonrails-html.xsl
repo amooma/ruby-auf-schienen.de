@@ -339,7 +339,7 @@ Version:
             <div class="span3">
 
               <div class="well">
-                <p>Für den Fall der Fälle: Ich biete auch Ruby on Rails Schulungen an. Einfach eine E-Mail an sw@amooma.de schreiben.</p>
+                <p>Ich biete auf Grundlage dieses Buches <a href="http://amooma.de/training/ruby_on_rails">Ruby on Rails Schulungen</a> an.</p>
                 <p>
                   <a href="https://twitter.com/wintermeyer" class="twitter-follow-button" data-show-count="false" data-lang="de">@wintermeyer folgen</a>
                   <script type="text/javascript">
