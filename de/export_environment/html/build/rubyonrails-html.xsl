@@ -300,19 +300,46 @@ Version:
         
         <div id="container-fluid">
           <div id="row-fluid">
-            <div id="adsense-leaderboard" class="span12">
-              <script type="text/javascript">
-                <xsl:text disable-output-escaping="yes">
-<![CDATA[<!--]]>
-google_ad_client = "ca-pub-9538764634478220";
-/* ruby-auf-schienen.de Leaderboard */
-google_ad_slot = "2837769471";
-google_ad_width = 728;
-google_ad_height = 90;
-<![CDATA[//-->]]>
-               </xsl:text>
-              </script>
-              <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+            <div id="rails-training" class="span12">
+              <div class="well">
+                  <table class='table table-striped'>
+                      <theader>
+                          <tr>
+                              <td>Termin</td>
+                              <td>Schulung</td>
+                              <td>Ort</td>
+                              <td>Dauer</td>
+                              <td>Preis (plus MwSt.)</td>
+                          </tr>
+                      </theader>
+                      <tbody>
+                          <tr>
+                              <td>01.06.2013</td>
+                              <td><a href="http://amooma.de/training/ruby_on_rails">Ruby on
+                                      Rails</a></td>
+                              <td>
+                                  Berlin
+                                  <br>
+                                      Regus am Potsdamer Platz
+                                  </td>
+                                  <td>3 Tage</td>
+                                  <td>1.500 Euro</td>
+                              </tr>
+                              <tr>
+                                  <td>04.06.2013</td>
+                                  <td><a
+                                          href="http://amooma.de/training/emberjs">Ember.js</a></td>
+                                  <td>
+                                      Berlin
+                                      <br>
+                                          Regus am Potsdamer Platz
+                                      </td>
+                                      <td>2 Tage</td>
+                                      <td>1.000 Euro</td>
+                                  </tr>
+                              </tbody>
+                          </table>
+              </div>
             </div>
 
             <div class="span9">
