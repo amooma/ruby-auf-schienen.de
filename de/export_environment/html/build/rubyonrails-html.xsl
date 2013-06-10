@@ -302,43 +302,33 @@ Version:
           <div id="row-fluid">
             <div id="rails-training" class="span12">
               <div class="well">
-                  <table class='table table-striped'>
-                      <theader>
-                          <tr>
-                              <td>Termin</td>
-                              <td>Schulung</td>
-                              <td>Ort</td>
-                              <td>Dauer</td>
-                              <td>Preis (plus MwSt.)</td>
-                          </tr>
-                      </theader>
-                      <tbody>
-                          <tr>
-                              <td>01.06.2013</td>
-                              <td><a href="http://amooma.de/training/ruby_on_rails">Ruby on
-                                      Rails</a></td>
-                              <td>
-                                  Berlin
-                                  <br>
-                                      Regus am Potsdamer Platz
-                                  </td>
-                                  <td>3 Tage</td>
-                                  <td>1.500 Euro</td>
-                              </tr>
-                              <tr>
-                                  <td>04.06.2013</td>
-                                  <td><a
-                                          href="http://amooma.de/training/emberjs">Ember.js</a></td>
-                                  <td>
-                                      Berlin
-                                      <br>
-                                          Regus am Potsdamer Platz
-                                      </td>
-                                      <td>2 Tage</td>
-                                      <td>1.000 Euro</td>
-                                  </tr>
-                              </tbody>
-                          </table>
+                <table class='table table-striped'>
+                  <theader>
+                    <tr>
+                      <td>Termin</td>
+                      <td>Schulung</td>
+                      <td>Ort</td>
+                      <td>Dauer</td>
+                      <td>Preis (plus MwSt.)</td>
+                    </tr>
+                  </theader>
+                  <tbody>
+                    <tr>
+                      <td>01.06.2013</td>
+                      <td><a href="http://amooma.de/training/ruby_on_rails">Ruby on Rails</a></td>
+                      <td>Berlin</td>
+                      <td>3 Tage</td>
+                      <td>1.500 Euro</td>
+                    </tr>
+                    <tr>
+                      <td>04.06.2013</td>
+                      <td><a href="http://amooma.de/training/emberjs">Ember.js</a></td>
+                      <td>Berlin</td>
+                      <td>2 Tage</td>
+                      <td>1.000 Euro</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
 
