@@ -314,14 +314,14 @@ Version:
                   </theader>
                   <tbody>
                     <tr>
-                      <td>01.06.2013</td>
+                      <td>01.07.2013</td>
                       <td><a href="http://amooma.de/training/ruby_on_rails">Ruby on Rails</a></td>
                       <td>Berlin</td>
                       <td>3 Tage</td>
                       <td>1.500 Euro</td>
                     </tr>
                     <tr>
-                      <td>04.06.2013</td>
+                      <td>04.07.2013</td>
                       <td><a href="http://amooma.de/training/emberjs">Ember.js</a></td>
                       <td>Berlin</td>
                       <td>2 Tage</td>
