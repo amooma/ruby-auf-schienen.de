@@ -48,7 +48,6 @@ Usage:
 
 Options:
       [--skip-namespace]  # Skip namespace (affects only isolated applications)
-      [--old-style-hash]  # Force using old style hash (:foo =&gt; 'bar') on Ruby &gt;= 1.9
   -o, --orm=NAME          # Orm to be invoked
                           # Default: active_record
 
@@ -95,15 +94,70 @@ Description:
     then the generator will create a module with a table_name_prefix method
     to prefix the model's table name with the module name (e.g. admin_account)
 
+Available field types:
+
+    Just after the field name you can specify a type like text or boolean.
+    It will generate the column with the associated SQL type. For instance:
+
+        `rails generate model post title:string body:text`
+
+    will generate a title column with a varchar type and a body column with a text
+    type. You can use the following types:
+
+        integer
+        primary_key
+        decimal
+        float
+        boolean
+        binary
+        string
+        text
+        date
+        time
+        datetime
+        timestamp
+
+    You can also consider `references` as a kind of type. For instance, if you run:
+
+        `rails generate model photo title:string album:references`
+
+    It will generate an album_id column. You should generate this kind of fields when
+    you will use a `belongs_to` association for instance. `references` also support
+    the polymorphism, you could enable the polymorphism like this:
+
+        `rails generate model product supplier:references{polymorphic}`
+
+    For integer, string, text and binary fields an integer in curly braces will
+    be set as the limit:
+
+        `rails generate model user pseudo:string{30}`
+
+    For decimal two integers separated by a comma in curly braces will be used
+    for precision and scale:
+
+        `rails generate model product price:decimal{10,2}`
+
+    You can add a `:uniq` or `:index` suffix for unique or standard indexes
+    respectively:
+
+        `rails generate model user pseudo:string:uniq`
+        `rails generate model user pseudo:string:index`
+
+    You can combine any single curly brace option with the index options:
+
+        `rails generate model user username:string{30}:uniq`
+        `rails generate model product supplier:references{polymorphic}:index`
+
+
 Examples:
     `rails generate model account`
 
         For ActiveRecord and TestUnit it creates:
 
             Model:      app/models/account.rb
-            Test:       test/unit/account_test.rb
+            Test:       test/models/account_test.rb
             Fixtures:   test/fixtures/accounts.yml
-            Migration:  db/migrate/XXX_add_accounts.rb
+            Migration:  db/migrate/XXX_create_accounts.rb
 
     `rails generate model post title:string body:text published:boolean`
 
@@ -115,9 +169,9 @@ Examples:
 
             Module:     app/models/admin.rb
             Model:      app/models/admin/account.rb
-            Test:       test/unit/admin/account_test.rb
+            Test:       test/models/admin/account_test.rb
             Fixtures:   test/fixtures/admin/accounts.yml
-            Migration:  db/migrate/XXX_add_admin_accounts.rb
+            Migration:  db/migrate/XXX_create_admin_accounts.rb
 
 $</screen></para>
 
@@ -127,12 +181,12 @@ $</screen></para>
   the table fields. If you do not put <code>:type</code> after a table field
   name, it is assumed to be a string by default. Let's create the
   <foreignphrase xml:lang="en">model</foreignphrase>
-  <literal>country</literal>:<screen>$ rails generate model country name population:integer
+  <literal>country</literal>:<screen>$ rails generate model Country name population:integer
       invoke  active_record
-      create    db/migrate/20121114110230_create_countries.rb
+      create    db/migrate/20130715174248_create_countries.rb
       create    app/models/country.rb
       invoke    test_unit
-      create      test/unit/country_test.rb
+      create      test/models/country_test.rb
       create      test/fixtures/countries.yml
 $</screen></para>
 
@@ -157,7 +211,7 @@ $</screen></para>
   </indexterm>
 
   <para>The generator has created a database migration file with the name
-  <filename>db/migrate/20121114110230_create_countries.rb</filename>. It
+  <filename>db/migrate/20130715174248_create_countries.rb</filename>. It
   provides the following code:<programlisting>class CreateCountries &lt; ActiveRecord::Migration
   def change
     create_table :countries do |t|
@@ -170,7 +224,7 @@ $</screen></para>
 end</programlisting></para>
 
   <para>A migration contains database changes. In this migration, a class
-  <classname>CreateCountries</classname> is defined as daughter of
+  <classname>CreateCountries</classname> is defined as a child of
   <classname>ActiveRecord::Migration</classname>. The class method
   <methodname>change</methodname> is used to define a migration and the
   associated roll-back.</para>
@@ -179,8 +233,8 @@ end</programlisting></para>
   in other words, create the corresponding database table:<screen>$ rake db:migrate
 ==  CreateCountries: migrating ================================================
 -- create_table(:countries)
-   -&gt; 0.0014s
-==  CreateCountries: migrated (0.0015s) =======================================
+   -&gt; 0.0010s
+==  CreateCountries: migrated (0.0011s) =======================================
 
 $ </screen></para>
 
@@ -191,28 +245,11 @@ $ </screen></para>
 
   <para>Let's have a look at the file
   <filename>app/models/country.rb</filename>:<programlisting>class Country &lt; ActiveRecord::Base
-  attr_accessible :name, :population
-end
-</programlisting></para>
+end</programlisting></para>
 
-  <para>Hmmm … the class <classname>Country</classname> is a daughter of
+  <para>Hmmm … the class <classname>Country</classname> is a child of
   <classname>ActiveRecord::Base</classname>. Makes sense, as we are discussing
   ActiveRecord in this chapter. ;-)</para>
-
-  <para><methodname>attr_accessible</methodname> defines a whitelist with
-  model attributes that can be filled with values via mass
-  assignment.<footnote>
-      <para>Ryan Bates has published an excellent screencast on the topic mass
-      assignment and important security aspects at <uri
-      xlink:href="http://railscasts.com/episodes/26-hackers-love-mass-assignment-revised">http://railscasts.com/episodes/26-hackers-love-mass-assignment-revised</uri>.</para>
-    </footnote>Very simply put, these are the attributes that we can later
-  populate or change via Web interface.</para>
-
-  <note>
-    <para>The integrated help page on
-    <classname>ActiveRecord::Base</classname> is always available in case you
-    want to look something up:<screen>$ ri ActiveRecord::Base</screen></para>
-  </note>
 
   <section>
     <title>The Attributes id, created_at and updated_at</title>
@@ -241,7 +278,7 @@ end
     <methodname>updated_at</methodname> by default for each ActiveRecord
     model. In the Rails console, we can output the attributes of the class
     <classname>Country</classname> by entering the class name:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Country
 =&gt; Country(id: integer, name: string, population: integer, created_at: datetime, updated_at: datetime)
 &gt;&gt; exit
@@ -267,7 +304,7 @@ $</screen></para>
     </indexterm>
 
     <para>ActiveRecord is a <foreignphrase xml:lang="en">layer</foreignphrase>
-    between Ruby and various relational databases. Unfortunately, SQL
+    between Ruby and various relational databases. Unfortunately, many SQL
     databases have different perspectives regarding the definition of columns
     and their content. But you do not need to worry about this, because
     ActiveRecord solves this problem transparently for you.<itemizedlist>
@@ -528,7 +565,7 @@ end</programlisting></para>
     am now going to introduce the methods with which you can find out the
     naming conventions yourself in the Rails <foreignphrase
     xml:lang="en">console</foreignphrase>:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; 'country'.classify
 =&gt; "Country"
 &gt;&gt; 'country'.tableize
@@ -607,7 +644,7 @@ Enter SQL statements terminated with a ";"
 sqlite&gt; .tables
 countries          schema_migrations
 sqlite&gt; .schema countries
-CREATE TABLE "countries" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar(255), "population" integer, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL);
+CREATE TABLE "countries" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar(255), "population" integer, "created_at" datetime, "updated_at" datetime);
 sqlite&gt; .exit
 $</screen></para>
     </note>

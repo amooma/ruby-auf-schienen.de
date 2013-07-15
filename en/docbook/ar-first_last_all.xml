@@ -37,18 +37,18 @@
   perhaps even all records. Conveniently, there is a ready-made method for
   each case. Let's start with the easiest ones: <methodname>first</methodname>
   and <methodname>last</methodname>.<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Country.first
-  Country Load (0.1ms)  SELECT "countries".* FROM "countries" LIMIT 1
-=&gt; #&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2012-11-14 11:14:55", updated_at: "2012-11-14 11:14:55"&gt;
+  Country Load (0.1ms)  SELECT "countries".* FROM "countries" ORDER BY "countries"."id" ASC LIMIT 1
+=&gt; #&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2013-07-15 18:03:20", updated_at: "2013-07-15 18:03:20"&gt;
 &gt;&gt; Country.last
   Country Load (0.3ms)  SELECT "countries".* FROM "countries" ORDER BY "countries"."id" DESC LIMIT 1
-=&gt; #&lt;Country id: 4, name: "Netherlands", population: 16680000, created_at: "2012-11-14 11:19:51", updated_at: "2012-11-14 11:19:51"&gt;
+=&gt; #&lt;Country id: 4, name: "Netherlands", population: nil, created_at: "2013-07-15 18:08:52", updated_at: "2013-07-15 18:08:52"&gt;
 &gt;&gt;</screen></para>
 
   <para>And now all at once with <methodname>all</methodname>:<screen>&gt;&gt; Country.all
-  Country Load (0.4ms)  SELECT "countries".* FROM "countries" 
-=&gt; [#&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2012-11-14 11:14:55", updated_at: "2012-11-14 11:14:55"&gt;, #&lt;Country id: 2, name: "France", population: 65447374, created_at: "2012-11-14 11:16:49", updated_at: "2012-11-14 11:16:49"&gt;, #&lt;Country id: 3, name: "Belgium", population: 10839905, created_at: "2012-11-14 11:18:21", updated_at: "2012-11-14 11:18:21"&gt;, #&lt;Country id: 4, name: "Netherlands", population: 16680000, created_at: "2012-11-14 11:19:51", updated_at: "2012-11-14 11:19:51"&gt;]
+  Country Load (0.2ms)  SELECT "countries".* FROM "countries"
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2013-07-15 18:03:20", updated_at: "2013-07-15 18:03:20"&gt;, #&lt;Country id: 2, name: "France", population: 65447374, created_at: "2013-07-15 18:07:03", updated_at: "2013-07-15 18:07:03"&gt;, #&lt;Country id: 3, name: "Belgium", population: 10839905, created_at: "2013-07-15 18:08:07", updated_at: "2013-07-15 18:08:07"&gt;, #&lt;Country id: 4, name: "Netherlands", population: nil, created_at: "2013-07-15 18:08:52", updated_at: "2013-07-15 18:08:52"&gt;]&gt;
 &gt;&gt;</screen></para>
 
   <para>But the objects created by <methodname>first</methodname>,
@@ -57,93 +57,84 @@ Loading development environment (Rails 3.2.9)
   return an object of the class <classname>Country</classname> and
   <methodname>all</methodname> of course returns an array of such
   objects:<screen>&gt;&gt; Country.first.class
-  Country Load (0.3ms)  SELECT "countries".* FROM "countries" LIMIT 1
+  Country Load (0.3ms)  SELECT "countries".* FROM "countries" ORDER BY "countries"."id" ASC LIMIT 1
 =&gt; Country(id: integer, name: string, population: integer, created_at: datetime, updated_at: datetime)
 &gt;&gt; Country.all.class
-  Country Load (0.3ms)  SELECT "countries".* FROM "countries" 
-=&gt; Array
+=&gt; ActiveRecord::Relation::ActiveRecord_Relation_Country
 &gt;&gt;</screen></para>
+
+  <para>So <code>Country.first</code> is a <classname>Country</classname>
+  which makes sense. But <code>Country.all</code> is something we haven't had
+  yet. Let's use the console to get a better idea of it:<screen>&gt;&gt; puts Country.all.to_yaml
+  Country Load (0.4ms)  SELECT "countries".* FROM "countries"
+---
+- !ruby/object:Country
+  attributes:
+    id: 1
+    name: Germany
+    population: 81831000
+    created_at: 2013-07-15 18:03:20.814776000 Z
+    updated_at: 2013-07-15 18:03:20.814776000 Z
+- !ruby/object:Country
+  attributes:
+    id: 2
+    name: France
+    population: 65447374
+    created_at: 2013-07-15 18:07:03.227571000 Z
+    updated_at: 2013-07-15 18:07:03.227571000 Z
+- !ruby/object:Country
+  attributes:
+    id: 3
+    name: Belgium
+    population: 10839905
+    created_at: 2013-07-15 18:08:07.125974000 Z
+    updated_at: 2013-07-15 18:08:07.125974000 Z
+- !ruby/object:Country
+  attributes:
+    id: 4
+    name: Netherlands
+    population: 
+    created_at: 2013-07-15 18:08:52.736007000 Z
+    updated_at: 2013-07-15 18:08:52.736007000 Z
+=&gt; nil
+&gt;&gt;</screen></para>
+
+  <para>hmmm... by using the <methodname>to_yaml</methodname> method suddenly
+  the database has work to do. The reason for this behavior is optimization.
+  Let's assume that you want to chain a couple of methods. Than it might be
+  better for ActiveRecord to wait till the very last second which it does. It
+  only requests the data from the SQL database when it has to do it. Until
+  than it stores the request in a
+  <classname>ActiveRecord::Relation</classname>. </para>
+
+  <para>The result of <code>Country.all</code> is actually an
+  <classname>Array</classname> of <classname>Country</classname>.</para>
 
   <para>If <methodname>Country.all</methodname> returns an array, then we
   should also be able to use iterators (see <xref linkend="iterator"/> and
   <xref linkend="array_iterator"/>), right? Yes, of course! That is the beauty
   of it. Here is a little experiment with
   <methodname>each</methodname>:<screen>&gt;&gt; Country.all.each do |country|
-?&gt;   puts country.name
+?&gt; puts country.name
 &gt;&gt; end
-  Country Load (0.3ms)  SELECT "countries".* FROM "countries" 
+  Country Load (0.3ms)  SELECT "countries".* FROM "countries"
 Germany
 France
 Belgium
 Netherlands
-=&gt; [#&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2012-11-14 11:14:55", updated_at: "2012-11-14 11:14:55"&gt;, #&lt;Country id: 2, name: "France", population: 65447374, created_at: "2012-11-14 11:16:49", updated_at: "2012-11-14 11:16:49"&gt;, #&lt;Country id: 3, name: "Belgium", population: 10839905, created_at: "2012-11-14 11:18:21", updated_at: "2012-11-14 11:18:21"&gt;, #&lt;Country id: 4, name: "Netherlands", population: 16680000, created_at: "2012-11-14 11:19:51", updated_at: "2012-11-14 11:19:51"&gt;]
-&gt;&gt;</screen></para>
+=&gt; [#&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2013-07-15 18:03:20", updated_at: "2013-07-15 18:03:20"&gt;, #&lt;Country id: 2, name: "France", population: 65447374, created_at: "2013-07-15 18:07:03", updated_at: "2013-07-15 18:07:03"&gt;, #&lt;Country id: 3, name: "Belgium", population: 10839905, created_at: "2013-07-15 18:08:07", updated_at: "2013-07-15 18:08:07"&gt;, #&lt;Country id: 4, name: "Netherlands", population: nil, created_at: "2013-07-15 18:08:52", updated_at: "2013-07-15 18:08:52"&gt;]
+&gt;&gt; </screen></para>
 
   <para>So can we also use <code>.all.first</code> as an alternative for
   <code>.first</code>? Yes, but it does not make much sense. Have a look for
   yourself:<screen>&gt;&gt; Country.first
-  Country Load (0.2ms)  SELECT "countries".* FROM "countries" LIMIT 1
-=&gt; #&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2012-11-14 11:14:55", updated_at: "2012-11-14 11:14:55"&gt;
+  Country Load (0.3ms)  SELECT "countries".* FROM "countries" ORDER BY "countries"."id" ASC LIMIT 1
+=&gt; #&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2013-07-15 18:03:20", updated_at: "2013-07-15 18:03:20"&gt;
 &gt;&gt; Country.all.first
-  Country Load (0.3ms)  SELECT "countries".* FROM "countries" 
-=&gt; #&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2012-11-14 11:14:55", updated_at: "2012-11-14 11:14:55"&gt;
-&gt;&gt; exit
-$ </screen></para>
+  Country Load (0.4ms)  SELECT "countries".* FROM "countries" ORDER BY "countries"."id" ASC LIMIT 1
+=&gt; #&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2013-07-15 18:03:20", updated_at: "2013-07-15 18:03:20"&gt;
+&gt;&gt; </screen></para>
 
-  <para>Even in our mini database, we can already see that there is a
-  difference in speed of 0.1 milliseconds. With <code>Country.first</code>,
-  the first record is retrieved via SQL in the database with a <code>LIMIT
-  1</code> and output by ActiveRecord as individual object of the country
-  class. With <code>Country.all.first</code>, the whole table is first read in
-  as array via <code>SELECT "countries".* FROM "countries"</code> and the
-  first element of this array is pulled out. This is a luxury you can afford
-  in this tiny application, but just imagine what would happen if you had a
-  database with many millions of records.</para>
-
-  <warning>
-    <para>SQL databases do not normally sort the results of a <code>SELECT *
-    FROM xyz</code> automatically. The database can determine the order of the
-    records itself. As a result, with a <code>LIMIT 1</code> and such an
-    amount of data we can not be completely sure that we get the record that
-    we humans would logically consider to be the first record. This
-    effectively means that with a <code>Country.first</code> we would also not
-    necessarily get the first record. It is up to the SQL database to decide
-    whether to sort records in a different order, for example for performance
-    reasons. If we want to be absolutely sure that we get the record that is
-    the first one in our logic, we need to work with the method
-    <methodname>order</methodname> (see <xref
-    linkend="activerecord_order"/>):<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; Country.order(:id).first
-  Country Load (0.1ms)  SELECT "countries".* FROM "countries" ORDER BY id LIMIT 1
-=&gt; #&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2012-11-14 11:14:55", updated_at: "2012-11-14 11:14:55"&gt;
-&gt;&gt; exit
-$</screen></para>
-
-    <para>As you can see in SQL, the <code>SELECT "countries".* FROM
-    "countries" ORDER BY id LIMIT 1</code> first sorts the table by
-    <varname>id</varname> and then outputs the first line.</para>
-
-    <para>Usually, the SQL database works exactly as you would expect and you
-    get the first record with <code>Country.first</code>. But if you want to
-    be absolutely sure, you should always use an
-    <methodname>order</methodname>.</para>
-
-    <para>The easiest way of doing this is via default_scope. For that you
-    have to declare a default_scope in the model file
-    <filename>app/models/country.rb</filename><programlisting>class Country &lt; ActiveRecord::Base
-  attr_accessible :name, :population
-
-  default_scope order(:id)
-end</programlisting></para>
-
-    <para>Once that is done ActiveRecord takes care of it
-    automatically:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; Country.first
-  Country Load (0.1ms)  SELECT "countries".* FROM "countries" ORDER BY id LIMIT 1
-=&gt; #&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2012-11-14 11:14:55", updated_at: "2012-11-14 11:14:55"&gt;
-&gt;&gt; exit
-$</screen></para>
-  </warning>
+  <para><code>Country.first</code> and <code>Country.all.first</code> result
+  in exact the same SQL query.</para>
 </section>

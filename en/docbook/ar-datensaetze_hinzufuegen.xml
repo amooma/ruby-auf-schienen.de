@@ -26,61 +26,16 @@
     </indexterm>
 
     <para>The most frequently used method for creating a new record is
-    <methodname>create</methodname>. As usual, there is a separate help page
-    on this topic available in the system:<screen>$ ri -T ActiveRecord::Persistence::ClassMethods#create
-ActiveRecord::Persistence::ClassMethods#create
-
-(from gem activerecord-3.2.9)
-------------------------------------------------------------------------------
-  create(attributes = nil, options = {}, &amp;block)
-
-------------------------------------------------------------------------------
-
-Creates an object (or multiple objects) and saves it to the database, if
-validations pass. The resulting object is returned whether the object was
-saved successfully to the database or not.
-
-The attributes parameter can be either be a Hash or an Array of Hashes.
-These Hashes describe the attributes on the objects that are to be created.
-
-create respects mass-assignment security and accepts either :as
-or :without_protection options in the options parameter.
-
-Examples
-  # Create a single new object
-  User.create(:first_name =&gt; 'Jamie')
-
-  # Create a single new object using the :admin mass-assignment security role
-  User.create({ :first_name =&gt; 'Jamie', :is_admin =&gt; true }, :as =&gt; :admin)
-
-  # Create a single new object bypassing mass-assignment security
-  User.create({ :first_name =&gt; 'Jamie', :is_admin =&gt; true }, :without_protection =&gt; true)
-
-  # Create an Array of new objects
-  User.create([{ :first_name =&gt; 'Jamie' }, { :first_name =&gt; 'Jeremy' }])
-
-  # Create a single object and pass it into a block to set other attributes.
-  User.create(:first_name =&gt; 'Jamie') do |u|
-    u.is_admin = false
-  end
-
-  # Creating an Array of new objects using a block, where the block is executed for each object:
-  User.create([{ :first_name =&gt; 'Jamie' }, { :first_name =&gt; 'Jeremy' }]) do |u|
-    u.is_admin = false
-  end
-
-
-$</screen></para>
-
-    <para>Wonderful, it even gives you examples! What more could we want?
-    Let's try creating a country in the <foreignphrase
-    xml:lang="en">console</foreignphrase> using this method:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; Country.create(:name =&gt; 'Germany', :population =&gt; 81831000)
+    <methodname>create</methodname>. Let's try creating a country in the
+    <foreignphrase xml:lang="en">console</foreignphrase> with the command
+    <command>Country.create(name: 'Germany', population:
+    81831000)</command><screen>$ rails console
+Loading development environment (Rails 4.0.0)
+&gt;&gt; Country.create(name: 'Germany', population: 81831000)
    (0.1ms)  begin transaction
-  SQL (29.6ms)  INSERT INTO "countries" ("created_at", "name", "population", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Wed, 14 Nov 2012 11:14:55 UTC +00:00], ["name", "Germany"], ["population", 81831000], ["updated_at", Wed, 14 Nov 2012 11:14:55 UTC +00:00]]
-   (0.9ms)  commit transaction
-=&gt; #&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2012-11-14 11:14:55", updated_at: "2012-11-14 11:14:55"&gt;
+  SQL (5.8ms)  INSERT INTO "countries" ("created_at", "name", "population", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Mon, 15 Jul 2013 17:58:19 UTC +00:00], ["name", "Germany"], ["population", 81831000], ["updated_at", Mon, 15 Jul 2013 17:58:19 UTC +00:00]]
+   (1.0ms)  commit transaction
+=&gt; #&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2013-07-15 17:58:19", updated_at: "2013-07-15 17:58:19"&gt;
 &gt;&gt; exit
 $</screen></para>
 
@@ -94,7 +49,7 @@ SQLite version 3.7.12 2012-04-03 19:43:07
 Enter ".help" for instructions
 Enter SQL statements terminated with a ";"
 sqlite&gt; SELECT * FROM countries;
-1|Germany|81831000|2012-11-14 11:14:55.281497|2012-11-14 11:14:55.281497
+1|Germany|81831000|2013-07-15 17:58:19.600948|2013-07-15 17:58:19.600948
 sqlite&gt; .exit
 $</screen></para>
 
@@ -106,13 +61,13 @@ $</screen></para>
       can do this with or without {}-brackets within the the
       ()-brackets:<itemizedlist>
           <listitem>
-            <para><code>Country.create(:name =&gt; 'Germany', :population
-            =&gt; 81831000)</code></para>
+            <para><code>Country.create(name: 'Germany', population:
+            81831000)</code></para>
           </listitem>
 
           <listitem>
-            <para><code>Country.create( {:name =&gt; 'Germany', :population
-            =&gt; 81831000} )</code></para>
+            <para><code>Country.create({name: 'Germany', population:
+            81831000})</code></para>
           </listitem>
         </itemizedlist></para>
 
@@ -136,7 +91,7 @@ $</screen></para>
 
       <para>You can also pass an array of hashes to
       <methodname>create</methodname> and use this approach to create several
-      records at once:<programlisting>Country.create( [ {:name =&gt; 'Germany', :population =&gt; 81831000}, {"name"=&gt;"France", "population"=&gt;65447374} ] )</programlisting></para>
+      records at once:<programlisting>Country.create([{name: 'Germany'}, {name: 'France'}])</programlisting></para>
     </section>
   </section>
 
@@ -164,7 +119,7 @@ $</screen></para>
     <methodname>save</methodname> to save an object created with
     <methodname>new</methodname> (which has both advantages and
     disadvantages):<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; france = Country.new
 =&gt; #&lt;Country id: nil, name: nil, population: nil, created_at: nil, updated_at: nil&gt;
 &gt;&gt; france.name = 'France'
@@ -173,21 +128,21 @@ Loading development environment (Rails 3.2.9)
 =&gt; 65447374
 &gt;&gt; france.save
    (0.2ms)  begin transaction
-  SQL (25.3ms)  INSERT INTO "countries" ("created_at", "name", "population", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Wed, 14 Nov 2012 11:16:49 UTC +00:00], ["name", "France"], ["population", 65447374], ["updated_at", Wed, 14 Nov 2012 11:16:49 UTC +00:00]]
-   (2.4ms)  commit transaction
+  SQL (2.3ms)  INSERT INTO "countries" ("created_at", "name", "population", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Mon, 15 Jul 2013 18:07:03 UTC +00:00], ["name", "France"], ["population", 65447374], ["updated_at", Mon, 15 Jul 2013 18:07:03 UTC +00:00]]
+   (3.0ms)  commit transaction
 =&gt; true
 &gt;&gt; france
-=&gt; #&lt;Country id: 2, name: "France", population: 65447374, created_at: "2012-11-14 11:16:49", updated_at: "2012-11-14 11:16:49"&gt;
+=&gt; #&lt;Country id: 2, name: "France", population: 65447374, created_at: "2013-07-15 18:07:03", updated_at: "2013-07-15 18:07:03"&gt;
 &gt;&gt; </screen></para>
 
     <para>You can also pass parameters for the new record directly to the
     method <methodname>new</methodname>, just as with
-    <methodname>create</methodname>:<screen>&gt;&gt; belgium = Country.new(:name =&gt; 'Belgium', :population =&gt; 10839905)
+    <methodname>create</methodname>:<screen>&gt;&gt; belgium = Country.new(name: 'Belgium', population: 10839905)
 =&gt; #&lt;Country id: nil, name: "Belgium", population: 10839905, created_at: nil, updated_at: nil&gt;
 &gt;&gt; belgium.save
    (0.2ms)  begin transaction
-  SQL (28.6ms)  INSERT INTO "countries" ("created_at", "name", "population", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Wed, 14 Nov 2012 11:18:21 UTC +00:00], ["name", "Belgium"], ["population", 10839905], ["updated_at", Wed, 14 Nov 2012 11:18:21 UTC +00:00]]
-   (2.4ms)  commit transaction
+  SQL (1.3ms)  INSERT INTO "countries" ("created_at", "name", "population", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Mon, 15 Jul 2013 18:08:07 UTC +00:00], ["name", "Belgium"], ["population", 10839905], ["updated_at", Mon, 15 Jul 2013 18:08:07 UTC +00:00]]
+   (2.1ms)  commit transaction
 =&gt; true
 &gt;&gt; exit
 $</screen></para>
@@ -212,15 +167,15 @@ $</screen></para>
     <literal>false</literal>.</para>
 
     <para>Example:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; netherlands = Country.new(:name =&gt; 'Netherlands', :population =&gt; 16680000)
-=&gt; #&lt;Country id: nil, name: "Netherlands", population: 16680000, created_at: nil, updated_at: nil&gt;
+Loading development environment (Rails 4.0.0)
+&gt;&gt; netherlands = Country.new(name: 'Netherlands')
+=&gt; #&lt;Country id: nil, name: "Netherlands", population: nil, created_at: nil, updated_at: nil&gt;
 &gt;&gt; netherlands.new_record?
 =&gt; true
 &gt;&gt; netherlands.save
    (0.2ms)  begin transaction
-  SQL (5.9ms)  INSERT INTO "countries" ("created_at", "name", "population", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Wed, 14 Nov 2012 11:19:51 UTC +00:00], ["name", "Netherlands"], ["population", 16680000], ["updated_at", Wed, 14 Nov 2012 11:19:51 UTC +00:00]]
-   (2.3ms)  commit transaction
+  SQL (2.3ms)  INSERT INTO "countries" ("created_at", "name", "updated_at") VALUES (?, ?, ?)  [["created_at", Mon, 15 Jul 2013 18:08:52 UTC +00:00], ["name", "Netherlands"], ["updated_at", Mon, 15 Jul 2013 18:08:52 UTC +00:00]]
+   (3.1ms)  commit transaction
 =&gt; true
 &gt;&gt; netherlands.new_record?
 =&gt; false

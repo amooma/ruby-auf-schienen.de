@@ -15,7 +15,7 @@
   <para>For describing queries, we create a new Rails project:<screen>$ rails new jukebox
   [...]
 $ cd jukebox 
-$ rails generate model album name release_year:integer
+$ rails generate model Album name release_year:integer
   [...]
 $ rake db:migrate
   [...]
@@ -37,52 +37,19 @@ Album.create(name: "The Beatles", release_year: 1968)</programlisting></para>
   db:setup</command>:<screen>$ rake db:setup
 db/development.sqlite3 already exists
 -- create_table("albums", {:force=&gt;true})
-   -&gt; 0.0140s
+   -&gt; 0.0085s
 -- initialize_schema_migrations_table()
-   -&gt; 0.0002s
--- assume_migrated_upto_version(20121114132302, ["/Users/xyz/sandbox/jukebox/db/migrate"])
-   -&gt; 0.0004s
+   -&gt; 0.0010s
 $ </screen></para>
 
-  <section xml:id="find_vs_where">
-    <title xml:id="find_vs_where.title">find vs. where</title>
+  <section>
+    <title>Opinionated </title>
 
-    <indexterm>
-      <primary>ActiveRecord</primary>
-
-      <secondary>methods</secondary>
-
-      <tertiary>find()</tertiary>
-    </indexterm>
-
-    <indexterm>
-      <primary>ActiveRecord</primary>
-
-      <secondary>methods</secondary>
-
-      <tertiary>where()</tertiary>
-    </indexterm>
-
-    <indexterm>
-      <primary>ActiveRecord</primary>
-
-      <secondary>lazy loading</secondary>
-    </indexterm>
-
-    <para>In ActiveRecord, there are mainly two search methods:
-    <methodname>find</methodname> and <methodname>where</methodname>.
-    Obviously, the Rails beginner will ask immediately: "Which method should I
-    use?". In preperation for Rails 4.0 you should use
-    <methodname>where</methodname>. Many <methodname>find</methodname> related
-    methods will be deprecated in Rails 4.0.</para>
-
-    <tip>
-      <para>Please read <xref linkend="activerecord_where"/> and <xref
-      linkend="activerecord_find"/>. I would particularly recommend <xref
-      linkend="lazy_loading"/>, so that you can fully understand the
-      optimizations and an important concept of
-      <methodname>where</methodname>.</para>
-    </tip>
+    <para>Over the last couple of years there have been many changes in the
+    way queries can be placed in ActiveRecord. Many of those became deprecated
+    or will become deprecated in Rails 5.0. In this chapter I'll show you the
+    way to search for results which will not get you into trouble when you
+    want to upgrade later.</para>
   </section>
 
   <section xml:id="activerecord_find">
@@ -100,21 +67,21 @@ $ </screen></para>
     default, the <varname>id</varname> field in the database table). If I know
     the ID of an object (here: a record line), then I can search for the
     individual object or several objects at once via the ID:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Album.find(2)
-  Album Load (4.1ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = ? LIMIT 1  [["id", 2]]
-=&gt; #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;
+  Album Load (1.7ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = ? LIMIT 1  [["id", 2]]
+=&gt; #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;
 &gt;&gt; Album.find([1,3,7])
   Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" IN (1, 3, 7)
-=&gt; [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;]
-&gt;&gt; </screen></para>
+=&gt; [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;]
+&gt;&gt;  </screen></para>
 
     <para>If you always want to have an array as result, you also always have
     to pass an array as parameter:<screen>&gt;&gt; Album.find(5).class
-  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = ? LIMIT 1  [["id", 5]]
+  Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = ? LIMIT 1  [["id", 5]]
 =&gt; Album(id: integer, name: string, release_year: integer, created_at: datetime, updated_at: datetime)
 &gt;&gt; Album.find([5]).class
-  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = ? LIMIT 1  [["id", 5]]
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = ? LIMIT 1  [["id", 5]]
 =&gt; Array
 &gt;&gt; exit
 $ </screen></para>
@@ -122,341 +89,9 @@ $ </screen></para>
     <warning>
       <para>The method<methodname> find</methodname> generates an exception if
       the ID you are searching for does not have a record in the database. If
-      in doubt, you can/must use <methodname>where</methodname> (see <xref
-      linkend="activerecord_where"/>), <methodname>find_by_*</methodname> (see
-      <xref linkend="activerecord_find_by"/>) or first check with the method
-      <indexterm>
-          <primary>ActiveRecord</primary>
-
-          <secondary>methods</secondary>
-
-          <tertiary>exists?()</tertiary>
-        </indexterm><methodname>exists?</methodname> (see <xref
-      linkend="activerecord_exists"/>) if the record actually exists:<footnote>
-          <para>You can also intercept an exception via
-          <methodname>rescue</methodname>, but as this book is aimed at
-          beginners, I am not going into more detail on this topic.</para>
-        </footnote><screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; Album.last
-  Album Load (0.1ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
-=&gt; #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;
-&gt;&gt; Album.find(50)
-  Album Load (23.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = ? LIMIT 1  [["id", 50]]
-ActiveRecord::RecordNotFound: Couldn't find Album with id=50
- from /Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/activerecord-3.2.9/lib/active_record/relation/finder_methods.rb:341:in `find_one'
- from /Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/activerecord-3.2.9/lib/active_record/relation/finder_methods.rb:312:in `find_with_ids'
- from /Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/activerecord-3.2.9/lib/active_record/relation/finder_methods.rb:107:in `find'
- from /Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/activerecord-3.2.9/lib/active_record/querying.rb:5:in `find'
- from (irb):2
- from /Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/railties-3.2.9/lib/rails/commands/console.rb:47:in `start'
- from /Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/railties-3.2.9/lib/rails/commands/console.rb:8:in `start'
- from /Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/railties-3.2.9/lib/rails/commands.rb:41:in `&lt;top (required)&gt;'
- from script/rails:6:in `require'
- from script/rails:6:in `&lt;main&gt;'
-&gt;&gt; Album.exists?(50)
-  Album Exists (0.2ms)  SELECT 1 AS one FROM "albums" WHERE "albums"."id" = 50 LIMIT 1
-=&gt; false
-&gt;&gt; exit
-$</screen></para>
+      in doubt, you should use <methodname>where</methodname> (see <xref
+      linkend="activerecord_where"/>).</para>
     </warning>
-
-    <section xml:id="activerecord_find_by">
-      <title xml:id="activerecord_find_by.title">Attribute Based find_by_*,
-      find_last_by_* and find_all_by_* (find_by_attributes)</title>
-
-      <indexterm>
-        <primary>ActiveRecord</primary>
-
-        <secondary>methods</secondary>
-
-        <tertiary>find_by_*()</tertiary>
-      </indexterm>
-
-      <indexterm>
-        <primary>ActiveRecord</primary>
-
-        <secondary>methods</secondary>
-
-        <tertiary>find_last_by_*()</tertiary>
-      </indexterm>
-
-      <indexterm>
-        <primary>ActiveRecord</primary>
-
-        <secondary>methods</secondary>
-
-        <tertiary>find_all_by_*()</tertiary>
-      </indexterm>
-
-      <indexterm>
-        <primary>ActiveRecord</primary>
-
-        <secondary>methods</secondary>
-
-        <tertiary>find_by_attributes</tertiary>
-      </indexterm>
-
-      <para>The attribute based
-      <methodname>find_by_<replaceable>*</replaceable></methodname> is a
-      <quote>magical</quote> method because you can dynamically expand it
-      (that's why these methods are also referred to as "dynamic finders").
-      The functionality is the same as that of the method
-      <methodname>where</methodname> (see <xref
-      linkend="activerecord_where"/>), but the code is easier to read (at
-      least if there are not many parameters). You could of course argue for
-      or against this approach. Just try it for yourself and decide which way
-      you would like to go.</para>
-
-      <para>An example on the <foreignphrase
-      xml:lang="en">console</foreignphrase> says more than a thousand words. I
-      am first using <methodname>where</methodname> and then
-      <methodname>find_by_<replaceable>*</replaceable></methodname> and
-      <methodname>find_last_by_*</methodname> for the same queries:</para>
-
-      <para><screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; Album.where(:release_year =&gt; 1966).first
-  Album Load (0.1ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1966 LIMIT 1
-=&gt; #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;
-&gt;&gt; Album.find_by_release_year(1966)
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1966 LIMIT 1
-=&gt; #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;
-&gt;&gt; Album.where(:release_year =&gt; 1966).last
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1966 ORDER BY "albums"."id" DESC LIMIT 1
-=&gt; #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;
-&gt;&gt; Album.find_last_by_release_year(1966)
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1966 ORDER BY "albums"."id" DESC LIMIT 1
-=&gt; #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;
-&gt;&gt;</screen></para>
-
-      <important>
-        <para>In contrast to <methodname>where</methodname>, the method
-        <methodname>find_by_<replaceable>*</replaceable></methodname> either
-        returns an object of the searched class (here
-        <classname>Album</classname>) or <literal>nil</literal>.
-        <methodname>where</methodname> <emphasis>always</emphasis> returns an
-        array! If you do not watch out for this difference while programming,
-        you will sooner or later get an error at this point.<screen>&gt;&gt; Album.find_by_release_year(1972)
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1972 LIMIT 1
-=&gt; #&lt;Album id: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;
-&gt;&gt; Album.find_by_release_year(1972).class
-  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1972 LIMIT 1
-=&gt; Album(id: integer, name: string, release_year: integer, created_at: datetime, updated_at: datetime)
-&gt;&gt; Album.find_by_release_year(2010)
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 2010 LIMIT 1
-=&gt; nil
-&gt;&gt; Album.find_by_release_year(2010).class
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 2010 LIMIT 1
-=&gt; NilClass
-&gt;&gt; </screen></para>
-      </important>
-
-      <para>The method
-      <methodname>find_all_by_<replaceable>*</replaceable></methodname> always
-      returns an array, just like <methodname>where</methodname>:<screen>&gt;&gt; Album.find_by_release_year(2010).class
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 2010 LIMIT 1
-=&gt; NilClass
-&gt;&gt; Album.find_all_by_release_year(2020).class
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 2020
-=&gt; Array
-&gt;&gt; Album.find_all_by_release_year(1966).class
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1966
-=&gt; Array
-&gt;&gt; exit
-$</screen></para>
-
-      <section xml:id="activerecord_find_by_and_verkettung">
-        <title xml:id="activerecord_find_by_and_verkettung.title">Chaining
-        Several Attributes</title>
-
-        <para>With the methods
-        <methodname>find_by_<replaceable>*</replaceable></methodname>,
-        <methodname>find_last_by_<replaceable>*</replaceable></methodname> and
-        <methodname>find_all_by_<replaceable>*</replaceable></methodname>, you
-        can also chain several search attributes via <literal>and</literal>.
-        Our current records do not really provide the best examples for this.
-        So here I am chaining several attributes together via
-        <literal>and</literal>, just to show you how the method works, even
-        though the queries do not really make much sense:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; Album.find_by_id_and_release_year(1, 1967)
-  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = 1 AND "albums"."release_year" = 1967 LIMIT 1
-=&gt; #&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;
-&gt;&gt; Album.find_all_by_id_and_release_year(1, 1967)
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = 1 AND "albums"."release_year" = 1967
-=&gt; [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;]
-&gt;&gt; Album.find_by_id_and_name(5, 'The Beatles')
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = 5 AND "albums"."name" = 'The Beatles' LIMIT 1
-=&gt; nil
-&gt;&gt; Album.find_all_by_id_and_name(5, 'The Beatles')
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = 5 AND "albums"."name" = 'The Beatles'
-=&gt; []
-&gt;&gt;</screen></para>
-      </section>
-
-      <section>
-        <title>find_or_create_by_*</title>
-
-        <indexterm>
-          <primary>ActiveRecord</primary>
-
-          <secondary>methods</secondary>
-
-          <tertiary>find_or_create_by_*()</tertiary>
-        </indexterm>
-
-        <para>When you are programming, you are often faced with the task of
-        finding a particular record and create it if it does not yet exist.
-        This can be done beautifully in one step with
-        <methodname>find_or_create_by_<replaceable>*</replaceable></methodname>
-        (note the SQL code):<screen>&gt;&gt; beatles = Album.find_or_create_by_name('The Beatles')
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."name" = 'The Beatles' LIMIT 1
-=&gt; #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;
-&gt;&gt; ray_charles = Album.find_or_create_by_name('Crying Time')
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."name" = 'Crying Time' LIMIT 1
-   (0.1ms)  begin transaction
-  SQL (5.8ms)  INSERT INTO "albums" ("created_at", "name", "release_year", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Wed, 14 Nov 2012 13:37:51 UTC +00:00], ["name", "Crying Time"], ["release_year", nil], ["updated_at", Wed, 14 Nov 2012 13:37:51 UTC +00:00]]
-   (2.5ms)  commit transaction
-=&gt; #&lt;Album id: 11, name: "Crying Time", release_year: nil, created_at: "2012-11-14 13:37:51", updated_at: "2012-11-14 13:37:51"&gt;
-&gt;&gt; </screen></para>
-
-        <warning>
-          <para>When you are using
-          <methodname>find_or_create_by_<replaceable>*</replaceable></methodname>,
-          you should always ensure that the record you are potentially
-          creating is valid in itself. You can easily check this via the
-          method <indexterm>
-              <primary>ActiveRecord</primary>
-
-              <secondary>methods</secondary>
-
-              <tertiary>valid?()</tertiary>
-            </indexterm><methodname>valid?</methodname> (see <xref
-          linkend="activerecord_validation"/>). A non-valid record will not be
-          saved by <methodname>find_or_create_by_*</methodname>!</para>
-        </warning>
-
-        <para>If you want to search for the album name but also specify the
-        <varname>release_year</varname> for a potential
-        <methodname>create</methodname>, then you can do this with
-        <methodname>find_or_create_by_<replaceable>*</replaceable></methodname>:<screen>&gt;&gt; crying_time = Album.find_or_create_by_name('Genius Loves Company', :release_year =&gt; 2004)
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."name" = 'Genius Loves Company' LIMIT 1
-   (0.1ms)  begin transaction
-  SQL (0.5ms)  INSERT INTO "albums" ("created_at", "name", "release_year", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Wed, 14 Nov 2012 13:38:26 UTC +00:00], ["name", "Genius Loves Company"], ["release_year", 2004], ["updated_at", Wed, 14 Nov 2012 13:38:26 UTC +00:00]]
-   (2.9ms)  commit transaction
-=&gt; #&lt;Album id: 12, name: "Genius Loves Company", release_year: 2004, created_at: "2012-11-14 13:38:26", updated_at: "2012-11-14 13:38:26"&gt;
-&gt;&gt;</screen></para>
-      </section>
-
-      <section>
-        <title>find_or_initialize_by_*</title>
-
-        <indexterm>
-          <primary>ActiveRecord</primary>
-
-          <secondary>methods</secondary>
-
-          <tertiary>find_or_initialize_by_*()</tertiary>
-        </indexterm>
-
-        <para>The method
-        <methodname>find_or_initialize_by_<replaceable>*</replaceable></methodname>
-        works like
-        <methodname>find_or_create_by_<replaceable>*</replaceable></methodname>.
-        But there is one important difference:
-        <methodname>find_or_initialize_by_<replaceable>*</replaceable></methodname>
-        does not save a new record. You have to do this later via
-        <methodname>save</methodname>. Example:<screen>&gt;&gt; i_got_a_woman = Album.find_or_initialize_by_name('I Got a Woman', :release_year =&gt; 1955)
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."name" = 'I Got a Woman' LIMIT 1
-=&gt; #&lt;Album id: nil, name: "I Got a Woman", release_year: 1955, created_at: nil, updated_at: nil&gt;
-&gt;&gt; Album.last
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
-=&gt; #&lt;Album id: 12, name: "Genius Loves Company", release_year: 2004, created_at: "2012-11-14 13:38:26", updated_at: "2012-11-14 13:38:26"&gt;
-&gt;&gt; i_got_a_woman.save
-   (0.1ms)  begin transaction
-  SQL (0.7ms)  INSERT INTO "albums" ("created_at", "name", "release_year", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Wed, 14 Nov 2012 13:39:49 UTC +00:00], ["name", "I Got a Woman"], ["release_year", 1955], ["updated_at", Wed, 14 Nov 2012 13:39:49 UTC +00:00]]
-   (1.9ms)  commit transaction
-=&gt; true
-&gt;&gt; Album.last
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
-=&gt; #&lt;Album id: 13, name: "I Got a Woman", release_year: 1955, created_at: "2012-11-14 13:39:49", updated_at: "2012-11-14 13:39:49"&gt;
-&gt;&gt; </screen></para>
-      </section>
-
-      <section xml:id="activerecord_find_by_all_performance">
-        <title
-        xml:id="activerecord_find_by_all_performance.title">Performance</title>
-
-        <indexterm>
-          <primary>ActiveRecord</primary>
-
-          <secondary>methods</secondary>
-
-          <tertiary>where()</tertiary>
-        </indexterm>
-
-        <indexterm>
-          <primary>ActiveRecord</primary>
-
-          <secondary>methods</secondary>
-
-          <tertiary>find_all_by_*()</tertiary>
-        </indexterm>
-
-        <indexterm>
-          <primary>ActiveRecord</primary>
-
-          <secondary>methods</secondary>
-
-          <tertiary>count()</tertiary>
-        </indexterm>
-
-        <indexterm>
-          <primary>ActiveRecord</primary>
-
-          <secondary>lazy loading</secondary>
-        </indexterm>
-
-        <indexterm>
-          <primary>lazy loading</primary>
-
-          <see>ActiveRecord, lazy loading</see>
-        </indexterm>
-
-        <para>Even if the methods <methodname>where</methodname> and
-        <methodname>find_all_by_<replaceable>*</replaceable></methodname>
-        often feel the same, there are clear differences in terms of
-        performance in some scenarios. Simply put: with
-        <methodname>where</methodname> you will never go wrong, because it
-        uses <quote><foreignphrase xml:lang="en">lazy
-        loading</foreignphrase></quote>. You will find out more on this topic
-        in the section <xref linkend="lazy_loading"/>. Here a quick taste of
-        it:<screen>&gt;&gt; Album.where(:release_year =&gt; 1966).count
-   (0.2ms)  SELECT COUNT(*) FROM "albums" WHERE "albums"."release_year" = 1966
-=&gt; 3
-&gt;&gt; Album.find_all_by_release_year(1966).count
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1966
-=&gt; 3
-&gt;&gt; exit
-$</screen></para>
-
-        <para>The combination of the methods <methodname>where</methodname>
-        and <methodname>count</methodname> creates a SQL query that leaves the
-        calculation of the result up to the SQL database. The combination of
-        the methods
-        <methodname>find_all_by_<replaceable>*</replaceable></methodname> and
-        <methodname>count</methodname> first queries all records in the
-        database, then saves these in an array and finally counts the item in
-        this array. This hardly makes any difference in our mini database
-        (0.1ms). But if you are working with a very large database, then you
-        want to make use of the maximum performance of the SQL database and
-        not push data around all over the place first.</para>
-
-        <para>As mentioned above: this topic will be discussed in more detail
-        in <xref linkend="lazy_loading"/>.</para>
-      </section>
-    </section>
   </section>
 
   <section xml:id="activerecord_where">
@@ -473,56 +108,48 @@ $</screen></para>
     <para>With the method <methodname>where</methodname>, you can search for
     specific values in the database. Let's search for all albums from the year
     1966:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; Album.where(:release_year =&gt; 1966)
+Loading development environment (Rails 4.0.0)
+&gt;&gt; Album.where(release_year: 1966)
   Album Load (0.1ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1966
-=&gt; [#&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;]
-&gt;&gt; Album.where( :release_year =&gt; 1966 ).count
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;]&gt;
+&gt;&gt; Album.where(release_year: 1966).count
    (0.3ms)  SELECT COUNT(*) FROM "albums" WHERE "albums"."release_year" = 1966
 =&gt; 3
-&gt;&gt;</screen></para>
+&gt;&gt; </screen></para>
 
     <para>You can also use <methodname>where</methodname> to search for
     <foreignphrase xml:lang="en">ranges</foreignphrase> (see <xref
-    linkend="range_class"/>):<screen>&gt;&gt; Album.where( :release_year =&gt; 1960..1966 )
+    linkend="range_class"/>):<screen>&gt;&gt; Album.where(release_year: 1960..1966)
   Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1966)
-=&gt; [#&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;]
-&gt;&gt; Album.where( :release_year =&gt; 1960..1966 ).count
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;]&gt;
+&gt;&gt; Album.where(release_year: 1960..1966).count
    (0.3ms)  SELECT COUNT(*) FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1966)
 =&gt; 5
 &gt;&gt;</screen></para>
 
     <para>And you can also specify several search factors simultaneously,
-    separated by commas:<screen>&gt;&gt; Album.where( :release_year =&gt; 1960..1966, :id =&gt; 1..5 )
-  Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1966) AND ("albums"."id" BETWEEN 1 AND 5)
-=&gt; [#&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;]
-&gt;&gt; Album.where( :release_year =&gt; 1960..1966, :id =&gt; 1..5 ).count
-   (0.3ms)  SELECT COUNT(*) FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1966) AND ("albums"."id" BETWEEN 1 AND 5)
-=&gt; 4
-&gt;&gt; </screen></para>
-
-    <para>Or an array of parameters:<screen>&gt;&gt; Album.where( :release_year =&gt; [1966, 1968] )
-  Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" IN (1966, 1968)
-=&gt; [#&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;]
-&gt;&gt; Album.where( :release_year =&gt; [1966, 1968] ).count
-   (0.3ms)  SELECT COUNT(*) FROM "albums" WHERE "albums"."release_year" IN (1966, 1968)
-=&gt; 4
+    separated by commas:<screen>&gt;&gt; Album.where(release_year: 1960..1966, id: 1..5)
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1966) AND ("albums"."id" BETWEEN 1 AND 5)
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;]&gt;
 &gt;&gt;</screen></para>
 
-    <important>
-      <para>The result of <methodname>where</methodname> is always an array.
-      Even if it only contains one hit or if no hits are returned. If you are
-      looking for the first hit, you need to combine the method
-      <methodname>where</methodname> with the method
-      <methodname>first</methodname>:<screen>&gt;&gt; Album.where( :release_year =&gt; [1966, 1968] ).first
-  Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" IN (1966, 1968) LIMIT 1
-=&gt; #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;
-&gt;&gt; Album.where( :release_year =&gt; [1966, 1968] ).first.class
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" IN (1966, 1968) LIMIT 1
+    <para>Or an array of parameters:<screen>&gt;&gt; Album.where(release_year: [1966, 1968])
+  Album Load (0.5ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" IN (1966, 1968)
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;]&gt;
+&gt;&gt;</screen></para>
+
+    <para>The result of <methodname>where</methodname> is always an array.
+    Even if it only contains one hit or if no hits are returned. If you are
+    looking for the first hit, you need to combine the method
+    <methodname>where</methodname> with the method
+    <methodname>first</methodname>:<screen>&gt;&gt; Album.where(release_year: [1966, 1968]).first
+  Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" IN (1966, 1968) ORDER BY "albums"."id" ASC LIMIT 1
+=&gt; #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;
+&gt;&gt; Album.where(release_year: [1966, 1968]).first.class
+  Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" IN (1966, 1968) ORDER BY "albums"."id" ASC LIMIT 1
 =&gt; Album(id: integer, name: string, release_year: integer, created_at: datetime, updated_at: datetime)
 &gt;&gt; exit
 $ </screen></para>
-    </important>
 
     <section xml:id="activerecord_sql">
       <title xml:id="activerecord_sql.title">SQL Queries with where</title>
@@ -549,32 +176,30 @@ $ </screen></para>
 
         <para>In this example, we are searching for all albums whose name
         contains the string <quote>on</quote>:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Album.where( 'name like ?', '%on%' )
-  Album Load (0.6ms)  SELECT "albums".* FROM "albums" WHERE (name like '%on%')
-=&gt; [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 6, name: "What's Going On", release_year: 1971, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 8, name: "London Calling", release_year: 1979, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;]
-&gt;&gt; Album.where( 'name like ?', '%on%' ).count
-   (0.3ms)  SELECT COUNT(*) FROM "albums" WHERE (name like '%on%')
-=&gt; 5
+  Album Load (0.1ms)  SELECT "albums".* FROM "albums" WHERE (name like '%on%')
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 6, name: "What's Going On", release_year: 1971, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 8, name: "London Calling", release_year: 1979, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;]&gt;
 &gt;&gt;</screen></para>
 
-        <para>Now all albums that were published from 1965 onwards:<screen>&gt;&gt; Album.where( 'release_year &gt; ?', 1964 ).count
+        <para>Now the number of albums that were published from 1965
+        onwards:<screen>&gt;&gt; Album.where( 'release_year &gt; ?', 1964 ).count
    (0.2ms)  SELECT COUNT(*) FROM "albums" WHERE (release_year &gt; 1964)
-=&gt; 11
-&gt;&gt;</screen></para>
+=&gt; 10
+&gt;&gt; </screen></para>
 
-        <para>All albums that are more recent than 1970 and whose name
-        contains the string <quote>on</quote>:<screen>&gt;&gt; Album.where( 'name like ? AND release_year &gt; ?', '%on%', 1970 ).count
+        <para>The number of albums that are more recent than 1970 and whose
+        name contains the string <quote>on</quote>:<screen>&gt;&gt; Album.where( 'name like ? AND release_year &gt; ?', '%on%', 1970 ).count
    (0.3ms)  SELECT COUNT(*) FROM "albums" WHERE (name like '%on%' AND release_year &gt; 1970)
 =&gt; 3
 &gt;&gt;</screen></para>
 
-        <para>If the variable <varname>applepie</varname> contains the desired
-        string, you can search for it as follows:<screen>&gt;&gt; search_string = 'ing'
+        <para>If the variable <varname>search_string</varname> contains the
+        desired string, you can search for it as follows:<screen>&gt;&gt; search_string = 'ing'
 =&gt; "ing"
 &gt;&gt; Album.where( 'name like ?', "%#{search_string}%").count
    (0.3ms)  SELECT COUNT(*) FROM "albums" WHERE (name like '%ing%')
-=&gt; 3
+=&gt; 2
 &gt;&gt; exit
 $</screen></para>
       </section>
@@ -588,7 +213,7 @@ $</screen></para>
 
         <para>Let's count all albums whose name contain the string
         <quote>on</quote>:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Album.where( "name like '%on%'" ).count
    (0.1ms)  SELECT COUNT(*) FROM "albums" WHERE (name like '%on%')
 =&gt; 5
@@ -617,50 +242,13 @@ $ </screen></para>
         <see>ActiveRecord, lazy loading</see>
       </indexterm>
 
-      <para>As of Rails 3.0, ActiveRecord uses the method <indexterm>
-          <primary>ActiveRecord</primary>
-
-          <secondary>methods</secondary>
-
-          <tertiary>where()</tertiary>
-        </indexterm><methodname>where</methodname> and so it involves
-      <foreignphrase xml:lang="en">lazy loading</foreignphrase>. This is a
-      mechanism that only carries out a database query if the program flow
-      cannot be realised without the result of this query. Until then, the
-      query is saved as <classname>ActiveRecord::Relation</classname>.
-      (Incidentally, the opposite of <foreignphrase xml:lang="en">lazy
-      loading</foreignphrase> is referred to as <foreignphrase
-      xml:lang="en">eager loading</foreignphrase>.)</para>
-
-      <para>Let's have a look at the search for all albums of the year
-      1966.</para>
-
-      <para><screen>Loading development environment (Rails 3.2.9)
-&gt;&gt; Album.where(:release_year =&gt; 1966)
-  Album Load (0.1ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1966
-=&gt; [#&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;]
-&gt;&gt; Album.where(:release_year =&gt; 1966).class
-=&gt; ActiveRecord::Relation
-&gt;&gt; Album.where(:release_year =&gt; 1966).to_sql
-=&gt; "SELECT \"albums\".* FROM \"albums\"  WHERE \"albums\".\"release_year\" = 1966"
-&gt;&gt;</screen></para>
-
-      <para>But if <code>Album.where(:release_year =&gt; 1966)</code> is an
-      <classname>ActiveRecord::Relation</classname>, why do we get an array as
-      output in the <foreignphrase xml:lang="en">console</foreignphrase>?
-      Rails wants to make our life as developers easier and shows us
-      automatically the result of the method <indexterm>
-          <primary>ActiveRecord</primary>
-
-          <secondary>Methoden</secondary>
-
-          <tertiary>all()</tertiary>
-        </indexterm><methodname>all</methodname>:<screen>&gt;&gt; Album.where(:release_year =&gt; 1966).class
-=&gt; ActiveRecord::Relation
-&gt;&gt; Album.where(:release_year =&gt; 1966).all.class
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."release_year" = 1966
-=&gt; Array
-&gt;&gt;</screen></para>
+      <para>Lazy Loading is a mechanism that only carries out a database query
+      if the program flow cannot be realised without the result of this query.
+      Until then, the query is saved as
+      <classname>ActiveRecord::Relation</classname>. (Incidentally, the
+      opposite of <foreignphrase xml:lang="en">lazy loading</foreignphrase> is
+      referred to as <foreignphrase xml:lang="en">eager
+      loading</foreignphrase>.)</para>
 
       <para>Does it make sense in principle, but you are not sure what the
       point of it all is? Then let's cobble together a query where we nest
@@ -674,19 +262,25 @@ $ </screen></para>
 
           <tertiary>to_sql()</tertiary>
         </indexterm><methodname>to_sql</methodname> you can display the
-      current SQL query.<screen>&gt;&gt; a = Album.where(:release_year =&gt; 1965..1968)
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1965 AND 1968)
-=&gt; [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;]
+      current SQL query.<screen>$ rails console
+Loading development environment (Rails 4.0.0)
+&gt;&gt; a = Album.where(release_year: 1965..1968)
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1965 AND 1968)
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;]&gt;
 &gt;&gt; a.class
-=&gt; ActiveRecord::Relation
+=&gt; ActiveRecord::Relation::ActiveRecord_Relation_Album
 &gt;&gt; a = a.order(:release_year)
-  Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1965 AND 1968) ORDER BY release_year
-=&gt; [#&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;]
+  Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1965 AND 1968) ORDER BY "albums".release_year ASC
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;]&gt;
 &gt;&gt; a = a.limit(3)
-  Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1965 AND 1968) ORDER BY release_year LIMIT 3
-=&gt; [#&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;]
+  Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1965 AND 1968) ORDER BY "albums".release_year ASC LIMIT 3
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;]&gt;
 &gt;&gt; exit
 $ </screen></para>
+
+      <para>The console can be a bit tricky about this. It tries to help the
+      developer by actually showing the result but in a non-console
+      environment this would would only happen at the very last time.</para>
 
       <section xml:id="activerecord_lazyloading_automatische_optimierung">
         <title
@@ -700,12 +294,12 @@ $ </screen></para>
         <para>Let's take the sum of all release years of the albums that came
         out in the 70s. Then we sort the albums alphabetically and then
         calculate the sum.<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; Album.where(:release_year =&gt; 1970..1979).sum(:release_year)
-   (0.1ms)  SELECT SUM("albums"."release_year") AS sum_id FROM "albums" WHERE ("albums"."release_year" BETWEEN 1970 AND 1979)
+Loading development environment (Rails 4.0.0)
+&gt;&gt; Album.where(release_year: 1970..1979).sum(:release_year)
+   (2.7ms)  SELECT SUM("albums"."release_year") AS sum_id FROM "albums" WHERE ("albums"."release_year" BETWEEN 1970 AND 1979)
 =&gt; 5922
-&gt;&gt; Album.where(:release_year =&gt; 1970..1979).order(:name).sum(:release_year)
-   (0.3ms)  SELECT SUM("albums"."release_year") AS sum_id FROM "albums" WHERE ("albums"."release_year" BETWEEN 1970 AND 1979)
+&gt;&gt; Album.where(release_year: 1970..1979).order(:name).sum(:release_year)
+   (0.2ms)  SELECT SUM("albums"."release_year") AS sum_id FROM "albums" WHERE ("albums"."release_year" BETWEEN 1970 AND 1979)
 =&gt; 5922
 &gt;&gt; exit
 $</screen></para>
@@ -717,45 +311,12 @@ $</screen></para>
         taken it out altogether.</para>
 
         <note>
-          <para>In case you are asking yourself why the first query took 3.1ms
-          and the second 0.3ms: ActiveRecord cached the results of a SQL
-          request within a web page request.</para>
+          <para>In case you are asking yourself why the first query took 2.7ms
+          and the second 0.2ms: ActiveRecord cached the results of the first
+          SQL request.</para>
         </note>
       </section>
     </section>
-  </section>
-
-  <section xml:id="activerecord_exists">
-    <title xml:id="activerecord_exists.title">exists?</title>
-
-    <indexterm>
-      <primary>ActiveRecord</primary>
-
-      <secondary>methods</secondary>
-
-      <tertiary>exists?()</tertiary>
-    </indexterm>
-
-    <para>Sometimes you need to know if a specific record exists, and that's
-    exactly what the method <methodname>exists?</methodname> is for. It
-    returns the result <literal>true</literal> or
-    <literal>false</literal>:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; Album.first
-  Album Load (0.1ms)  SELECT "albums".* FROM "albums" LIMIT 1
-=&gt; #&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;
-&gt;&gt; Album.exists?(1)
-  Album Exists (0.1ms)  SELECT 1 AS one FROM "albums" WHERE "albums"."id" = 1 LIMIT 1
-=&gt; true
-&gt;&gt; Album.exists?(10000)
-  Album Exists (0.2ms)  SELECT 1 AS one FROM "albums" WHERE "albums"."id" = 10000 LIMIT 1
-=&gt; false
-&gt;&gt; exit
-$</screen></para>
-
-    <para>You can display all the available help on the method
-    <methodname>exists?</methodname> via <command>ri
-    ActiveRecord::FinderMethods.exists?</command>.</para>
   </section>
 
   <section xml:id="activerecord_order">
@@ -780,16 +341,16 @@ $</screen></para>
     <para>To sort a database query, you can use the method
     <methodname>order</methodname>. Example: all albums from the 60s, sorted
     by name:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; Album.where( :release_year =&gt; 1960..1969 ).order(:name)
-  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969) ORDER BY name
-=&gt; [#&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;]
-&gt;&gt;</screen></para>
+Loading development environment (Rails 4.0.0)
+&gt;&gt; Album.where(release_year: 1960..1969).order(:name)
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969) ORDER BY "albums".name ASC
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;]&gt;
+&gt;&gt; </screen></para>
 
     <para>With the method reverse_order you can reverse an order previously
-    defined via <methodname>order</methodname>:<screen>&gt;&gt; Album.where(:release_year =&gt; 1960..1969).order(:name).reverse_order
-  Album Load (0.4ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969) ORDER BY name DESC
-=&gt; [#&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;]
+    defined via <methodname>order</methodname>:<screen>&gt;&gt; Album.where(release_year: 1960..1969).order(:name).reverse_order
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969) ORDER BY "albums".name DESC
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;]&gt;
 &gt;&gt; exit
 $ </screen></para>
   </section>
@@ -809,15 +370,15 @@ $ </screen></para>
     method <methodname>limit</methodname>.</para>
 
     <para>The first 5 albums from the 60s:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; Album.where( :release_year =&gt; 1960..1969).limit(5)
+Loading development environment (Rails 4.0.0)
+&gt;&gt; Album.where(release_year: 1960..1969).limit(5)
   Album Load (0.1ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969) LIMIT 5
-=&gt; [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;]
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;]&gt;
 &gt;&gt;</screen></para>
 
     <para>All albums sorted by name, then the first 5 of those:<screen>&gt;&gt; Album.order(:name).limit(5)
-  Album Load (0.4ms)  SELECT "albums".* FROM "albums" ORDER BY name LIMIT 5
-=&gt; [#&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 11, name: "Crying Time", release_year: nil, created_at: "2012-11-14 13:37:51", updated_at: "2012-11-14 13:37:51"&gt;, #&lt;Album id: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 12, name: "Genius Loves Company", release_year: 2004, created_at: "2012-11-14 13:38:26", updated_at: "2012-11-14 13:38:26"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;]
+  Album Load (0.4ms)  SELECT "albums".* FROM "albums" ORDER BY "albums".name ASC LIMIT 5
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 8, name: "London Calling", release_year: 1979, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;]&gt;
 &gt;&gt; exit
 $ </screen></para>
 
@@ -838,13 +399,13 @@ $ </screen></para>
 
       <para>First, we return the first two records and then the first two
       records with an offset of 5:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Album.limit(2)
   Album Load (0.1ms)  SELECT "albums".* FROM "albums" LIMIT 2
-=&gt; [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;]
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;]&gt;
 &gt;&gt; Album.limit(2).offset(5)
   Album Load (0.3ms)  SELECT "albums".* FROM "albums" LIMIT 2 OFFSET 5
-=&gt; [#&lt;Album id: 6, name: "What's Going On", release_year: 1971, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;]
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Album id: 6, name: "What's Going On", release_year: 1971, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;]&gt;
 &gt;&gt; exit
 $</screen></para>
     </section>
@@ -865,10 +426,10 @@ $</screen></para>
     result of a query in grouped form.</para>
 
     <para>Let's return all albums, grouped by their release year:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Album.group(:release_year)
-  Album Load (0.2ms)  SELECT "albums".* FROM "albums" GROUP BY release_year
-=&gt; [#&lt;Album id: 11, name: "Crying Time", release_year: nil, created_at: "2012-11-14 13:37:51", updated_at: "2012-11-14 13:37:51"&gt;, #&lt;Album id: 13, name: "I Got a Woman", release_year: 1955, created_at: "2012-11-14 13:39:49", updated_at: "2012-11-14 13:39:49"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 6, name: "What's Going On", release_year: 1971, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 8, name: "London Calling", release_year: 1979, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 12, name: "Genius Loves Company", release_year: 2004, created_at: "2012-11-14 13:38:26", updated_at: "2012-11-14 13:38:26"&gt;]
+  Album Load (0.1ms)  SELECT "albums".* FROM "albums" GROUP BY release_year
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 6, name: "What's Going On", release_year: 1971, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 7, name: "Exile on Main St.", release_year: 1972, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 8, name: "London Calling", release_year: 1979, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;]&gt;
 &gt;&gt; exit
 $</screen></para>
   </section>
@@ -884,21 +445,23 @@ $</screen></para>
       <tertiary>pluck()</tertiary>
     </indexterm>
 
-    <para>Normally, ActiveRecord always pulls all table columns from the
-    database and leaves it up to the programmer to later pick out the
-    components he is interested in. But in case of large amounts of data, it
-    can be useful and above all much quicker to define a specific database
-    field directly for the query. You can do this via the method
-    <methodname>pluck</methodname>. You want all name entries for all albums
-    from the 60s?<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; Album.where(:release_year =&gt; 1960..1969).pluck(:name)
-   (0.2ms)  SELECT name FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
+    <para>Normally, ActiveRecord pulls all table columns from the database and
+    leaves it up to the programmer to later pick out the components he is
+    interested in. But in case of large amounts of data, it can be useful and
+    above all much quicker to define a specific database field directly for
+    the query. You can do this via the method <methodname>pluck</methodname>.
+    <screen>$ rails console
+Loading development environment (Rails 4.0.0)
+&gt;&gt; Album.where(release_year: 1960..1969).pluck(:name)
+   (0.1ms)  SELECT "albums"."name" FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
 =&gt; ["Sgt. Pepper's Lonely Hearts Club Band", "Pet Sounds", "Revolver", "Highway 61 Revisited", "Rubber Soul", "Blonde on Blonde", "The Beatles"]
+&gt;&gt; Album.where(release_year: 1960..1969).pluck(:name, :release_year)
+   (0.1ms)  SELECT "albums"."name", "albums"."release_year" FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
+=&gt; [["Sgt. Pepper's Lonely Hearts Club Band", 1967], ["Pet Sounds", 1966], ["Revolver", 1966], ["Highway 61 Revisited", 1965], ["Rubber Soul", 1965], ["Blonde on Blonde", 1966], ["The Beatles", 1968]]
 &gt;&gt; exit
 $</screen></para>
 
-    <para>As result, <methodname>pluck</methodname> returns an array.</para>
+    <para>As a result, <methodname>pluck</methodname> returns an array.</para>
   </section>
 
   <section xml:id="activerecord_berechnungen">
@@ -926,16 +489,16 @@ $</screen></para>
       Our data material is of course not really suited to this. But as an
       example, let's calculate the average release year of all albums and then
       the same for albums from the 60s:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Album.average(:release_year)
-   (0.1ms)  SELECT AVG("albums"."release_year") AS avg_id FROM "albums" 
-=&gt; #&lt;BigDecimal:7fdc4c0ee810,'0.1970333333 333333E4',27(45)&gt;
+   (0.1ms)  SELECT AVG("albums"."release_year") AS avg_id FROM "albums"
+=&gt; #&lt;BigDecimal:7fbf9bbe1fb0,'0.19685E4',18(45)&gt;
 &gt;&gt; Album.average(:release_year).to_s
-   (0.3ms)  SELECT AVG("albums"."release_year") AS avg_id FROM "albums" 
-=&gt; "1970.333333333333"
+   (0.4ms)  SELECT AVG("albums"."release_year") AS avg_id FROM "albums"
+=&gt; "1968.5"
 &gt;&gt; Album.where( :release_year =&gt; 1960..1969 ).average(:release_year)
    (0.2ms)  SELECT AVG("albums"."release_year") AS avg_id FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
-=&gt; #&lt;BigDecimal:7fdc499f1af0,'0.1966142857 142857E4',27(45)&gt;
+=&gt; #&lt;BigDecimal:7fbf9f002510,'0.1966142857 142857E4',27(45)&gt;
 &gt;&gt; Album.where( :release_year =&gt; 1960..1969 ).average(:release_year).to_s
    (0.3ms)  SELECT AVG("albums"."release_year") AS avg_id FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
 =&gt; "1966.142857142857"
@@ -959,11 +522,11 @@ $</screen></para>
 
       <para>First, we return the number of all albums in the database and then
       the number of albums from the 60s:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Album.count
-   (0.1ms)  SELECT COUNT(*) FROM "albums" 
-=&gt; 13
-&gt;&gt; Album.where( :release_year =&gt; 1960..1969 ).count
+   (0.1ms)  SELECT COUNT(*) FROM "albums"
+=&gt; 10
+&gt;&gt; Album.where(release_year: 1960..1969).count
    (0.2ms)  SELECT COUNT(*) FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
 =&gt; 7
 &gt;&gt; exit
@@ -985,10 +548,10 @@ $</screen></para>
       the item with the highest value within a query.</para>
 
       <para>Let's look for the highest release year:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Album.maximum(:release_year)
-   (0.1ms)  SELECT MAX("albums"."release_year") AS max_id FROM "albums" 
-=&gt; 2004
+   (0.1ms)  SELECT MAX("albums"."release_year") AS max_id FROM "albums"
+=&gt; 1979
 &gt;&gt; exit
 $</screen></para>
     </section>
@@ -1008,10 +571,10 @@ $</screen></para>
       the item with the lowest value within a query.</para>
 
       <para>Let's find the lowest release year:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Album.minimum(:release_year)
-   (0.1ms)  SELECT MIN("albums"."release_year") AS min_id FROM "albums" 
-=&gt; 1955
+   (0.1ms)  SELECT MIN("albums"."release_year") AS min_id FROM "albums"
+=&gt; 1965
 &gt;&gt; exit
 $</screen></para>
     </section>
@@ -1031,10 +594,10 @@ $</screen></para>
       specific column of the database query.</para>
 
       <para>Let's find the sum of all release years:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Album.sum(:release_year)
-   (0.1ms)  SELECT SUM("albums"."release_year") AS sum_id FROM "albums" 
-=&gt; 23644
+   (0.1ms)  SELECT SUM("albums"."release_year") AS sum_id FROM "albums"
+=&gt; 19685
 &gt;&gt; exit
 $ </screen></para>
     </section>
@@ -1050,20 +613,15 @@ $ </screen></para>
     an index. SQL EXPLAIN can be called with the method
     <methodname>explain</methodname> (it will be displayed in prettier form if
     you add a <code>puts</code>):<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; Album.where(:release_year =&gt; 1960..1969)
-  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
-=&gt; [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;, #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;]
-&gt;&gt; Album.where(:release_year =&gt; 1960..1969).explain
+Loading development environment (Rails 4.0.0)
+&gt;&gt; Album.where(release_year: 1960..1969)
+  Album Load (0.1ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 2, name: "Pet Sounds", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 3, name: "Revolver", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 4, name: "Highway 61 Revisited", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 5, name: "Rubber Soul", release_year: 1965, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 9, name: "Blonde on Blonde", release_year: 1966, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;, #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;]&gt;
+&gt;&gt; Album.where(release_year: 1960..1969).explain
   Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
-  EXPLAIN (0.1ms)  EXPLAIN QUERY PLAN SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
-=&gt; "EXPLAIN for: SELECT \"albums\".* FROM \"albums\"  WHERE (\"albums\".\"release_year\" BETWEEN 1960 AND 1969)\n0|0|0|SCAN TABLE albums (~500000 rows)\n"
-&gt;&gt; puts Album.where(:release_year =&gt; 1960..1969).explain
-  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
-  EXPLAIN (0.1ms)  EXPLAIN QUERY PLAN SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
-EXPLAIN for: SELECT "albums".* FROM "albums"  WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
+=&gt; EXPLAIN for: SELECT "albums".* FROM "albums"  WHERE ("albums"."release_year" BETWEEN 1960 AND 1969)
 0|0|0|SCAN TABLE albums (~500000 rows)
-=&gt; nil
+
 &gt;&gt; exit
 $ </screen></para>
   </section>
