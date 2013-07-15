@@ -625,4 +625,38 @@ Loading development environment (Rails 4.0.0)
 &gt;&gt; exit
 $ </screen></para>
   </section>
+
+  <section>
+    <title>Batches</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>methods</secondary>
+
+      <tertiary>find_each</tertiary>
+    </indexterm>
+
+    <para>ActiveRecord stores the results of a query in Memory. With very
+    large tables and results that can become a performance issue. To address
+    this you can use the find_each method which splits up the query into
+    batches with the size of 1,000 (can be configured with the
+    <code>:batch_size</code> option). Our example Album table is too small to
+    show the effect but the method would be used like this:<screen>$ rails console
+Loading development environment (Rails 4.0.0)
+&gt;&gt; Album.where(release_year: 1960..1969).find_each do |album|
+?&gt; puts album.name.upcase
+&gt;&gt; end
+  Album Load (0.1ms)  SELECT "albums".* FROM "albums" WHERE ("albums"."release_year" BETWEEN 1960 AND 1969) ORDER BY "albums"."id" ASC LIMIT 1000
+SGT. PEPPER'S LONELY HEARTS CLUB BAND
+PET SOUNDS
+REVOLVER
+HIGHWAY 61 REVISITED
+RUBBER SOUL
+BLONDE ON BLONDE
+THE BEATLES
+=&gt; nil
+&gt;&gt; exit
+$</screen> </para>
+  </section>
 </section>
