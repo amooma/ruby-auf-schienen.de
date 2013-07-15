@@ -1167,7 +1167,8 @@ the Easter Bunny.
     within the controller to <quote>skip</quote>, i.e. redirect, to other to
     other web pages.<note>
         <para>A redirect returns to the browser the response "302 Moved" with
-        the new target.</para>
+        the new target. So each redirect does a roundtrip to the browser and
+        back.</para>
       </note>Let's create a new Rails project for a suitable example:<screen>$ rails new redirect_example
 
 [...]
@@ -1185,21 +1186,16 @@ $ </screen></para>
       create    app/views/game/ping.html.erb
       create    app/views/game/pong.html.erb
       invoke  test_unit
-      create    test/functional/game_controller_test.rb
+      create    test/controllers/game_controller_test.rb
       invoke  helper
       create    app/helpers/game_helper.rb
       invoke    test_unit
-      create      test/unit/helpers/game_helper_test.rb
+      create      test/helpers/game_helper_test.rb
       invoke  assets
       invoke    coffee
       create      app/assets/javascripts/game.js.coffee
       invoke    scss
       create      app/assets/stylesheets/game.css.scss
-$</screen></para>
-
-    <para>The new rails webapplication has two possible routes:<screen>$ rake routes
-game_ping GET /game/ping(.:format) game#ping
-game_pong GET /game/pong(.:format) game#pong
 $</screen></para>
 
     <para>The controller
@@ -1234,6 +1230,7 @@ end</programlisting></para>
 
     <para>But what is <code>game_pong_path</code>? Let's have a look a the
     routes generated for this Rails application:<screen>$ rake routes
+   Prefix Verb URI Pattern          Controller#Action
 game_ping GET /game/ping(.:format) game#ping
 game_pong GET /game/pong(.:format) game#pong
 $</screen></para>
@@ -1255,18 +1252,26 @@ $</screen></para>
     xlink:href="http://0.0.0.0:3000/game/ping">http://0.0.0.0:3000/game/ping</uri>
     we are automatically redirected to <uri
     xlink:href="http://0.0.0.0:3000/game/pong">http://0.0.0.0:3000/game/pong</uri>
-    and in the log output we see this:<screen>Started GET "/game/ping" for 127.0.0.1 at 2012-11-13 20:35:44 +0100
-Connecting to database specified by database.yml
+    and in the log output we see this:<screen>Started GET "/game/ping" for 127.0.0.1 at 2013-07-15 18:49:01 +0200
 Processing by GameController#ping as HTML
 +++  Example  +++
 Redirected to http://0.0.0.0:3000/game/pong
-Completed 302 Found in 1ms (ActiveRecord: 0.0ms)
+Completed 302 Found in 19ms (ActiveRecord: 0.0ms)
 
 
-Started GET "/game/pong" for 127.0.0.1 at 2012-11-13 20:35:44 +0100
+Started GET "/game/pong" for 127.0.0.1 at 2013-07-15 18:49:01 +0200
 Processing by GameController#pong as HTML
-  Rendered game/pong.html.erb within layouts/application (2.4ms)
-Completed 200 OK in 35ms (Views: 34.5ms | ActiveRecord: 0.0ms)</screen></para>
+  Rendered game/pong.html.erb within layouts/application (1.3ms)
+Completed 200 OK in 743ms (Views: 741.9ms | ActiveRecord: 0.0ms)</screen></para>
+
+    <section>
+      <title>redirect_to :back</title>
+
+      <para>If you want to redirect the user of your webapplication to the
+      page he has just been you can use <code>redirect_to :back</code>. This
+      is very useful in a scenario where your user first has to login to get
+      access to a specific page.</para>
+    </section>
   </section>
 
   <section xml:id="flash">
@@ -1285,7 +1290,7 @@ Completed 200 OK in 35ms (Views: 34.5ms | ActiveRecord: 0.0ms)</screen></para>
     would associate the term <quote><foreignphrase
     xml:lang="en">Flash</foreignphrase></quote> with more or less colorful web
     pages that were implemented with the Adobe Shockwave Flash Plug-in. But in
-    Rails, flash messages are something completely different. They are
+    Ruby on Rails, flash messages are something completely different. They are
     messages that are displayed, for example on the new page after a redirect
     (see <xref linkend="redirects"/>).</para>
 
@@ -1323,12 +1328,11 @@ end</programlisting></para>
     We are redirected from <methodname>ping</methodname> to
     <methodname>pong</methodname>. But the flash message "Ping-Pong!" is
     nowhere to be seen. We first need to expand
-    <filename>app/views/layouts/application.html.erb</filename>:<programlisting>&lt;!DOCTYPE html&gt;
-&lt;html&gt;
+    <filename>app/views/layouts/application.html.erb</filename>:<programlisting>&lt;html&gt;
 &lt;head&gt;
   &lt;title&gt;Pingpong&lt;/title&gt;
-  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
-  &lt;%= javascript_include_tag "application" %&gt;
+  &lt;%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" =&gt; true %&gt;
+  &lt;%= javascript_include_tag "application", "data-turbolinks-track" =&gt; true %&gt;
   &lt;%= csrf_meta_tags %&gt;
 &lt;/head&gt;
 &lt;body&gt;
@@ -1404,6 +1408,10 @@ end</programlisting></para>
 redirect_to action: pong</programlisting></para>
           </listitem>
         </itemizedlist></para>
+
+      <para>Please have a look at the official documentation at <uri
+      xlink:href="http://guides.rubyonrails.org/action_controller_overview.html#the-flash">http://guides.rubyonrails.org/action_controller_overview.html#the-flash</uri>
+      for more information.</para>
     </section>
 
     <section>
@@ -1438,8 +1446,7 @@ redirect_to action: pong</programlisting></para>
     nothing more than an <literal>irb</literal> (see <xref linkend="irb"/>)
     built around the Rails environment. The console is very useful both for
     developing and for administration purposes, because the whole Rails
-    environment is represented and available. So you can quickly try out a
-    method without having to go and write a separate program.</para>
+    environment is represented and available.</para>
 
     <para>For our working environment, we again use a variation of the ping
     pong scenario from <xref linkend="redirects"/>:<screen>$ rails new pingpong
@@ -1455,18 +1462,18 @@ $</screen></para>
 
     <para>Start the Rails console with the command <command>rails
     console</command>:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-1.9.3-p327 :001 &gt; </screen></para>
+Loading development environment (Rails 4.0.0)
+2.0.0-p247 :001 &gt; </screen></para>
 
-    <para>And you can use <command>exit</command> to get back out:<screen>1.9.3-p327 :001 &gt; exit
+    <para>And you can use <command>exit</command> to get back out:<screen>2.0.0-p247 :001 &gt; exit
 $ </screen></para>
 
     <para>Many readers use this document on mobile devises. For them I try to
     keep any code or terminal output width to a minimum. To save the real
-    estate which is by default occupied by <code>1.9.3-p327 :001 &gt;</code>
+    estate which is by default occupied by <code>2.0.0-p247 :001 &gt;</code>
     we can start <command>rails console</command> with the parameter
     <parameter>-- --simple-prompt</parameter>.<screen>$ rails console -- --simple-prompt
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; exit
 $</screen></para>
 
@@ -1477,33 +1484,49 @@ $</screen></para>
 
     <para>In the console, you have access to all variables that are also
     available later in the proper application:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Rails.env
 =&gt; "development"
 &gt;&gt; Rails.root
-=&gt; #&lt;Pathname:/Users/xyz/sandbox/pingpong&gt;
-&gt;&gt; exit
-$</screen></para>
-
-    <para><indexterm>
-        <primary>app</primary>
-      </indexterm><indexterm>
-        <primary>routing</primary>
-      </indexterm>The method <command>app</command> is useful if you want to
-    analyze things to do with routing:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; app.url_for(:controller =&gt; 'game', :action =&gt; 'ping')
-=&gt; "http://www.example.com/game/ping"
-&gt;&gt; app.get 'game/ping'
-=&gt; 200
-&gt;&gt; app.get 'game/should_through_a_404'
-=&gt; 404
+=&gt; #&lt;Pathname:/Users/xyz/pingpong&gt;
 &gt;&gt; exit
 $</screen></para>
 
     <para>Already in <xref linkend="activerecord_chapter"/> we are going to be
     working lots with the console and will soon begin to appreciate the
     possibilities it offers.</para>
+
+    <section>
+      <title>app</title>
+
+      <para><indexterm>
+          <primary>app</primary>
+        </indexterm><indexterm>
+          <primary>routing</primary>
+        </indexterm><command>app</command> is useful if you want to analyze
+      things to do with routing:<screen>$ rails console
+Loading development environment (Rails 4.0.0)
+&gt;&gt; app.url_for(:controller =&gt; 'game', :action =&gt; 'ping')
+=&gt; "http://www.example.com/game/ping"
+&gt;&gt; app.get 'game/ping'
+
+
+Started GET "/game/ping" for 127.0.0.1 at 2013-07-15 19:19:36 +0200
+Processing by GameController#ping as HTML
+Redirected to http://www.example.com/game/pong
+Completed 302 Found in 16ms (ActiveRecord: 0.0ms)
+=&gt; 302
+&gt;&gt; app.get 'game/pong'
+
+
+Started GET "/game/pong" for 127.0.0.1 at 2013-07-15 19:19:39 +0200
+Processing by GameController#pong as HTML
+  Rendered game/pong.html.erb within layouts/application (0.9ms)
+Completed 200 OK in 50ms (Views: 49.2ms | ActiveRecord: 0.0ms)
+=&gt; 200
+&gt;&gt; exit
+$</screen></para>
+    </section>
   </section>
 
   <section xml:id="einstieg_misc">
@@ -1605,7 +1628,8 @@ $</screen></para>
       controller</command>. It starts the generator with the name
       <code>controller</code>. There are other generators as well. You can use
       the command <command>rails generate</command> to display a list of
-      available generators:<screen>Usage: rails generate GENERATOR [args] [options]
+      available generators:<screen>$ rails generate
+Usage: rails generate GENERATOR [args] [options]
 
 General options:
   -h, [--help]     # Print generator's options and usage
@@ -1622,15 +1646,13 @@ Rails:
   generator
   helper
   integration_test
+  jbuilder
   mailer
   migration
   model
-  observer
-  performance_test
   resource
   scaffold
   scaffold_controller
-  session_migration
   task
 
 Coffee:
@@ -1642,6 +1664,9 @@ Jquery:
 Js:
   js:assets
 
+TestUnit:
+  test_unit:plugin
+
 $</screen></para>
 
       <para>What does a generator do? A generator makes a programmer's job
@@ -1650,6 +1675,13 @@ $</screen></para>
       do the same manually, without the generator. So you do not have to use a
       generator. It is primarily intended to save you work and avoid potential
       errors that can easily arise from mindless repetitive tasks.</para>
+
+      <tip>
+        <para>Someday you might want to create your own generator. Have a look
+        at <uri
+        xlink:href="http://guides.rubyonrails.org/generators.html">http://guides.rubyonrails.org/generators.html</uri>
+        to find a description of how to do that.</para>
+      </tip>
     </section>
 
     <section xml:id="helper">
@@ -1684,7 +1716,7 @@ end
 &lt;/p&gt;</programlisting></para>
 
       <para>You can also try out the helper in the console:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; helper.render_stars(5)
 =&gt; "*****"
 &gt;&gt; helper.render_stars(3)
@@ -1707,16 +1739,23 @@ $ </screen></para>
       <filename>app/helpers/.</filename></para>
     </section>
 
-    <section xml:id="dry">
-      <title xml:id="dry.title">DRY - Don't repeat yourself</title>
+    <section>
+      <title>Rails Lingo</title>
 
-      <indexterm>
-        <primary>DRY</primary>
-      </indexterm>
+      <para>Here you find a couple of words which you'll often find in the
+      Ruby on Rails universe.</para>
 
-      <para>Many Rails programmers are big fans of DRY. DRY means purely and
-      simply that you should try to place repeated programming logic into
-      separate methods.</para>
+      <section xml:id="dry">
+        <title xml:id="dry.title">DRY - Don't repeat yourself</title>
+
+        <indexterm>
+          <primary>DRY</primary>
+        </indexterm>
+
+        <para>Many Rails programmers are big fans of DRY. DRY means purely and
+        simply that you should try to place repeated programming logic into
+        separate methods.</para>
+      </section>
 
       <section xml:id="refactoring">
         <title xml:id="refactoring.title">Refactoring</title>
@@ -1730,25 +1769,25 @@ $ </screen></para>
         application in itself remains unchanged in its interface. But its core
         is optimized, amongst others through DRY.</para>
       </section>
-    </section>
 
-    <section xml:id="convention_over_configuration">
-      <title xml:id="convention_over_configuration.title">Convention Over
-      Configuration</title>
+      <section xml:id="convention_over_configuration">
+        <title xml:id="convention_over_configuration.title">Convention Over
+        Configuration</title>
 
-      <indexterm>
-        <primary>convention over configuration</primary>
-      </indexterm>
+        <indexterm>
+          <primary>convention over configuration</primary>
+        </indexterm>
 
-      <para>Convention over configuration (also known as coding by convention,
-      see <uri
-      xlink:href="http://de.wikipedia.org/wiki/Konvention_vor_Konfiguration">http://en.wikipedia.org/wiki/Convention_over_configuration</uri>)
-      is an important pillar of a Rails application. It states that the
-      programmer does not need to decide in favour of certain features when
-      starting a project and set these via configuration parameters. It
-      specifies an underlying basic consensus and this is set by default. But
-      if you want to work outside of this conventional basic consensus, then
-      you will need to change the corresponding parameters.</para>
+        <para>Convention over configuration (also known as coding by
+        convention, see <uri
+        xlink:href="http://de.wikipedia.org/wiki/Konvention_vor_Konfiguration">http://en.wikipedia.org/wiki/Convention_over_configuration</uri>)
+        is an important pillar of a Rails application. It states that the
+        programmer does not need to decide in favour of certain features when
+        starting a project and set these via configuration parameters. It
+        specifies an underlying basic consensus and this is set by default.
+        But if you want to work outside of this conventional basic consensus,
+        then you will need to change the corresponding parameters.</para>
+      </section>
     </section>
   </section>
 </chapter>
