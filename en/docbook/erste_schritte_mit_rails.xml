@@ -26,17 +26,23 @@
     <title>Introduction</title>
 
     <para>Now that you have painstakingly read your way through <xref
-    linkend="ruby-grundlagen"/> and know a bit more what it's all about, we
-    can move on to a more exciting bit. In this chapter, we will start our
-    first Rails project and find our way into the topic step by step.</para>
+    linkend="ruby-grundlagen"/> we can move on to a more exciting bit. In this
+    chapter, we will start our first Ruby on Rails project and find our way
+    into the topic step by step.</para>
 
-    <para>In this chapter, we will also move on the double in some cases. Once
-    more, there will be some typical chicken and egg problems.</para>
+    <para>We will use Ruby on Rails version 4.0. Please update to this version
+    in case have installed an older one. </para>
+
+    <note>
+      <para>In this chapter, we will also move on the double in some cases.
+      Once more, there will be some typical chicken and egg problems.</para>
+    </note>
 
     <section xml:id="arbeits-umgebung-development">
       <title>Environment (Development)</title>
 
-      <para>Rails knows three different environments<indexterm>
+      <para>By default a Rails project offers three different
+      environments<indexterm>
           <primary>environments</primary>
         </indexterm><indexterm>
           <primary>Rails</primary>
@@ -85,7 +91,8 @@
       to install a special web server, but can use the integrated Rails web
       server. It does not exactly have extremely high performance, but you do
       not need that for developing. Later, you can switch to big web servers
-      like <application>Apache</application>. The same applies to the
+      like <application>Apache</application> or
+      <application>Nginx</application>. The same applies to the
       database.</para>
 
       <para>In order to work in the Development environment, you do not need
@@ -111,15 +118,11 @@
       <title xml:id="warum_english.title">Why Is It All in English?</title>
 
       <para>If you are a native English speaker, you may not find it
-      surprising that Rails apparently loves the English language. Yet it is
-      almost a bit ironic, because its inventor David Heinemeier Hansson
-      (<quote>DHH</quote>) originates from Denmark (he now lives and works in
-      Chicago).</para>
-
-      <para>Even if you are not a native English speaker, you should try to
-      accept and even adopt Rails' love for the English language. Much of it
-      will then be much easier and more logical. Most of the code then reads
-      just like a normal English sentence. <indexterm>
+      surprising that Rails apparently loves the English language. Even if you
+      are not a native English speaker, you should try to accept and even
+      adopt Rails' love for the English language. Much of it will then be much
+      easier and more logical. Most of the code then reads just like a normal
+      English sentence. <indexterm>
           <primary>inflections</primary>
         </indexterm><indexterm>
           <primary>inflector</primary>
@@ -178,17 +181,17 @@
       </indexterm>
 
       <para>Before we even get going, please check that you are using Ruby
-      version 1.9.3:<screen>$ ruby -v
-ruby 1.9.3p327 (2012-11-10 revision 37606) [x86_64-darwin12.2.1]
+      version 2.0:<screen>$ ruby -v
+ruby 2.0.0p247 (2013-06-27 revision 41674) [x86_64-darwin12.4.0]
 $</screen></para>
 
-      <para>Next, check if Rails 3.2 is also installed:<screen>$ rails -v
-Rails 3.2.9
+      <para>Next, check if Rails 4.0 is also installed:<screen>$ rails -v
+Rails 4.0.0
 $</screen></para>
 
       <para>That's looking good. If you have an older version of Ruby or Rails
-      installed, please install the current version before you read any
-      further (see <xref linkend="installation-und-versionsauswahl"/>).</para>
+      installed, please install the 4.0 version before you read any
+      further.</para>
 
       <para>Now we start by creating a new Rails project with the name
       <literal>testproject</literal>. Ruby on Rails is a framework, so we
@@ -199,25 +202,25 @@ $</screen></para>
       create  README.rdoc
       create  Rakefile
       create  config.ru
-
       [...]
-
 $ </screen></para>
 
-      <para><indexterm>
-          <primary>bundle</primary>
-        </indexterm><indexterm>
-          <primary>bundler</primary>
-        </indexterm><indexterm>
-          <primary>gems</primary>
-        </indexterm>In previous versions of Rails, you had to do a
-      <command>bundle install</command> first. With Rails 3.2 onwards, this is
-      done automatically when you create a new Rails project. The Rails
-      project then has all required <foreignphrase
-      xml:lang="en">gems</foreignphrase> available. A <foreignphrase
-      xml:lang="en">gem</foreignphrase> is a kind of software library. You can
-      integrate certain ready-made functionalities with it, without having to
-      reinvent the wheel.</para>
+      <note>
+        <para><indexterm>
+            <primary>bundle</primary>
+          </indexterm><indexterm>
+            <primary>bundler</primary>
+          </indexterm><indexterm>
+            <primary>gems</primary>
+          </indexterm>In previous versions of Rails, you had to do a
+        <command>bundle install</command> first. With Rails 3.2 onwards, this
+        is done automatically when you create a new Rails project. The Rails
+        project then has all required <foreignphrase
+        xml:lang="en">gems</foreignphrase> available. A <foreignphrase
+        xml:lang="en">gem</foreignphrase> is a kind of software library. You
+        can integrate certain ready-made functionalities with it, without
+        having to reinvent the wheel.</para>
+      </note>
 
       <para><indexterm>
           <primary>Webrick</primary>
@@ -226,7 +229,7 @@ $ </screen></para>
 
           <secondary>integrated</secondary>
         </indexterm>Next, we check if the new Rails application is working by
-      launching the little integrated web server.<tip>
+      launching the integrated web server.<tip>
           <para>Depending on the operating system (for example, Mac OS X) and
           on your firewall settings, you may see a popup window when first
           starting a Rails application, asking you if the firewall should
@@ -235,15 +238,15 @@ $ </screen></para>
         </tip><screen>$ cd testproject 
 $ rails server
 =&gt; Booting WEBrick
-=&gt; Rails 3.2.9 application starting in development on http://0.0.0.0:3000
-=&gt; Call with -d to detach
+=&gt; Rails 4.0.0 application starting in development on http://0.0.0.0:3000
+=&gt; Run `rails server -h` for more startup options
 =&gt; Ctrl-C to shutdown server
-[2012-11-13 18:48:39] INFO  WEBrick 1.3.1
-[2012-11-13 18:48:39] INFO  ruby 1.9.3 (2012-11-10) [x86_64-darwin12.2.1]
-[2012-11-13 18:48:39] INFO  WEBrick::HTTPServer#start: pid=73258 port=3000</screen></para>
+[2013-07-15 13:58:48] INFO  WEBrick 1.3.1
+[2013-07-15 13:58:48] INFO  ruby 2.0.0 (2013-06-27) [x86_64-darwin12.4.0]
+[2013-07-15 13:58:48] INFO  WEBrick::HTTPServer#start: pid=98552 port=3000</screen></para>
 
       <para>The start of the Rails application is looking good. It tells
-      us:<screen>=&gt; Rails 3.2.9 application starting in development on http://0.0.0.0:3000</screen></para>
+      us:<screen>Rails 4.0.0 application starting in development on http://0.0.0.0:3000</screen></para>
 
       <para>So let's go to the URL <uri
       xlink:href="http://0.0.0.0:3000">http://0.0.0.0:3000</uri> or <uri
@@ -268,38 +271,23 @@ $ rails server
           </mediaobject>
         </screenshot></para>
 
-      <para>Looks good. Rails seems to be working fine. If we now click the
-      link <quote><foreignphrase xml:lang="en">About your application's
-      environment</foreignphrase></quote>, we can get information on the
-      current environment.<screenshot>
-          <info>
-            <title>About the start environment of the Rails
-            application.</title>
-          </info>
+      <para>Looks good. Rails seems to be working fine. The log of it tells
+      what just happend:<screen>Started GET "/" for 127.0.0.1 at 2013-07-15 13:59:35 +0200
+Processing by Rails::WelcomeController#index as HTML
+  Rendered /Users/xyz/.rvm/gems/ruby-2.0.0-p247/gems/railties-4.0.0/lib/rails/templates/rails/welcome/index.html.erb (1.1ms)
+Completed 200 OK in 21ms (Views: 5.3ms | ActiveRecord: 0.0ms)</screen></para>
 
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screenshots/virgin_rails_app_env_info.jpg"/>
-            </imageobject>
-          </mediaobject>
-        </screenshot></para>
+      <para>If we now click the link <quote><foreignphrase xml:lang="en">About
+      your application's environment</foreignphrase></quote>, we can more
+      information on the current environment.</para>
 
-      <para>At the same time, the log of the web server will display
-      this:<screen>Started GET "/rails/info/properties" for 127.0.0.1 at 2012-11-13 18:50:57 +0100
-Processing by Rails::InfoController#properties as */*
-  Rendered inline template (23.5ms)
-Completed 200 OK in 35ms (Views: 34.6ms | ActiveRecord: 0.0ms)</screen></para>
+      <important>
+        <para>With <keycombo>
+            <keycap function="control">Ctrl</keycap>
 
-      <para>When we accessed the first start page, no such entry appeared, so
-      there must be two different pages. The first page is in fact a static
-      HTML page stored under <filename>public/index.html</filename>, and the
-      link we clicked executes a Rails program.</para>
-
-      <para>With <keycombo>
-          <keycap function="control">Ctrl</keycap>
-
-          <keycap>C</keycap>
-        </keycombo> you can stop the web server again.</para>
+            <keycap>C</keycap>
+          </keycombo> you can stop the web server.</para>
+      </important>
     </section>
 
     <section xml:id="rails-statische-inhalte">
@@ -317,22 +305,15 @@ Completed 200 OK in 35ms (Views: 34.6ms | ActiveRecord: 0.0ms)</screen></para>
         <secondary>directory</secondary>
       </indexterm>
 
-      <para>As we have just seen, there are certain static pages, images and
-      JavaScript files that are automatically output by Rails. Remember part
-      of the output of the command <command>rails new testproject</command>:
-      <screen>$ rails new testproject
-      create  
-
+      <para>There are certain static pages, images and JavaScript files that
+      are automatically output by Rails. Remember part of the output of the
+      command <command>rails new testproject</command>: <screen>$ rails new testproject
       [...]
-
-      create  public
       create  public/404.html
       create  public/422.html
       create  public/500.html
       create  public/favicon.ico
-      create  public/index.html
       create  public/robots.txt
-
       [...]
 </screen></para>
 
@@ -344,25 +325,24 @@ Completed 200 OK in 35ms (Views: 34.6ms | ActiveRecord: 0.0ms)</screen></para>
         </indexterm> Let's have a go and create the file
       <filename>public/hello-world.html</filename> with the following
       content:<programlisting>&lt;html&gt;
-&lt;title&gt;Hello World!&lt;/title&gt;
+&lt;head&gt;
+  &lt;title&gt;Hello World!&lt;/title&gt;
+&lt;/head&gt;
 &lt;body&gt;
   &lt;h1&gt;Hello World!&lt;/h1&gt;
   &lt;p&gt;An example page.&lt;/p&gt;
 &lt;/body&gt;
 &lt;/html&gt;</programlisting></para>
 
-      <note>
-        <para>I assume that you have rudimentary knowledge of HTML.</para>
-      </note>
-
-      <para>Now start the Rails web server:<screen>$ rails server
+      <para>Now start the Rails web server with <command>rails
+      server</command><screen>$ rails server
 =&gt; Booting WEBrick
-=&gt; Rails 3.2.9 application starting in development on http://0.0.0.0:3000
-=&gt; Call with -d to detach
+=&gt; Rails 4.0.0 application starting in development on http://0.0.0.0:3000
+=&gt; Run `rails server -h` for more startup options
 =&gt; Ctrl-C to shutdown server
-[2012-11-13 18:58:17] INFO  WEBrick 1.3.1
-[2012-11-13 18:58:17] INFO  ruby 1.9.3 (2012-11-10) [x86_64-darwin12.2.1]
-[2012-11-13 18:58:17] INFO  WEBrick::HTTPServer#start: pid=73455 port=3000</screen></para>
+[2013-07-15 14:05:57] INFO  WEBrick 1.3.1
+[2013-07-15 14:05:57] INFO  ruby 2.0.0 (2013-06-27) [x86_64-darwin12.4.0]
+[2013-07-15 14:05:57] INFO  WEBrick::HTTPServer#start: pid=98564 port=3000</screen></para>
 
       <para>We can have a look at this web page at the URL <uri
       xlink:href="http://0.0.0.0:3000/hello-world">http://0.0.0.0:3000/hello-world</uri>:<screenshot>
@@ -381,17 +361,23 @@ Completed 200 OK in 35ms (Views: 34.6ms | ActiveRecord: 0.0ms)</screen></para>
           </mediaobject>
         </screenshot></para>
 
-      <para>We can of course also use the URL <uri
-      xlink:href="http://0.0.0.0:3000/hello-world.html">http://0.0.0.0:3000/hello-world.html</uri>.
-      But Rails regards HTML and therefore the file ending
-      <literal>.html</literal> as standard output format, so you can omit the
-      <quote><literal>.html</literal></quote> here.</para>
+      <para>No output in the log means: This page was not handled by the Rails
+      framework. It was delivered directly from the webserver.</para>
+
+      <note>
+        <para>We can of course also use the URL <uri
+        xlink:href="http://0.0.0.0:3000/hello-world.html">http://0.0.0.0:3000/hello-world.html</uri>.
+        But Rails regards HTML and therefore the file ending
+        <literal>.html</literal> as standard output format, so you can omit
+        the <quote><literal>.html</literal></quote> here.</para>
+      </note>
 
       <para>Now you know how you can integrate fully static pages in Rails.
       This is useful for pages that never change and that you want to work
       even if Rails is not currently working, for example because of an
       update. In a production environment, you would usually put a classic web
-      server such as Apache or Nginx infront of the Rails server. This is
+      server such as <application>Apache</application> or
+      <application>Nginx</application> infront of the Rails server. Which is
       capable of autonomously delivering static files from the
       <filename>public</filename> directory. You'll learn how to set up a
       production webserver in <xref
@@ -401,7 +387,7 @@ Completed 200 OK in 35ms (Views: 34.6ms | ActiveRecord: 0.0ms)</screen></para>
           <keycap function="control">Ctrl</keycap>
 
           <keycap>C</keycap>
-        </keycombo> you can stop the Rails server again.</para>
+        </keycombo> you can stop the Rails server.</para>
     </section>
   </section>
 
@@ -429,16 +415,13 @@ Completed 200 OK in 35ms (Views: 34.6ms | ActiveRecord: 0.0ms)</screen></para>
       <seealso>layouts</seealso>
     </indexterm>
 
-    <para>Do you know PHP (without any additional framework)? Then the content
-    of an <literal>erb</literal> file will seem very familiar to you. It is a
-    mixture of HTML and Ruby code (<literal>erb</literal> stands for
-    <foreignphrase xml:lang="en"><emphasis role="bold">e</emphasis>mbedded
-    <emphasis role="bold">R</emphasis>u<emphasis
-    role="bold">b</emphasis>y</foreignphrase>). But we cannot simply put such
-    an <literal>erb</literal> web page into the <filename>public</filename>
-    directory, as pages stored in this directory are delivered 1:1 without
-    first passing through an <literal>erb</literal> parser. This is the first
-    time for us to get in touch with the <indexterm>
+    <para>The the content of an <literal>erb</literal> file will propably seem
+    familiar to you. It is a mixture of HTML and Ruby code
+    (<literal>erb</literal> stands for <foreignphrase xml:lang="en"><emphasis
+    role="bold">e</emphasis>mbedded <emphasis
+    role="bold">R</emphasis>u<emphasis
+    role="bold">b</emphasis>y</foreignphrase>). erb pages are rendered as
+    Views. This is the first time for us to get in touch with the <indexterm>
         <primary>Model-View-Controller</primary>
 
         <see>MVC</see>
@@ -449,15 +432,14 @@ Completed 200 OK in 35ms (Views: 34.6ms | ActiveRecord: 0.0ms)</screen></para>
         xlink:href="http://de.wikipedia.org/wiki/Model_View_Controller">http://en.wikipedia.org/wiki/Model-view-controller</uri></para>
       </footnote> We need a <indexterm>
         <primary>controller</primary>
-      </indexterm>controller and a view. We can create it via the command
-    <command>rails generate controller</command>. Let's have a look at the
-    help:<screen>$ rails generate controller
+      </indexterm>controller to use a view. That can be created it via the
+    generator <command>rails generate controller</command>. Let's have a look
+    at the onboard help of this generator:<screen>$ rails generate controller
 Usage:
   rails generate controller NAME [action action] [options]
 
 Options:
       [--skip-namespace]        # Skip namespace (affects only isolated applications)
-      [--old-style-hash]        # Force using old style hash (:foo =&gt; 'bar') on Ruby &gt;= 1.9
   -e, [--template-engine=NAME]  # Template engine to be invoked
                                 # Default: erb
   -t, [--test-framework=NAME]   # Test framework to be invoked
@@ -481,33 +463,34 @@ Description:
     path like 'parent_module/controller_name'.
 
     This generates a controller class in app/controllers and invokes helper,
-    template engine and test framework generators.
+    template engine, assets, and test framework generators.
 
 Example:
-    `rails generate controller CreditCard open debit credit close`
+    `rails generate controller CreditCards open debit credit close`
 
-    Credit card controller with URLs like /credit_card/debit.
-        Controller:      app/controllers/credit_card_controller.rb
-        Functional Test: test/functional/credit_card_controller_test.rb
-        Views:           app/views/credit_card/debit.html.erb [...]
-        Helper:          app/helpers/credit_card_helper.rb
+    CreditCards controller with URLs like /credit_cards/debit.
+        Controller: app/controllers/credit_cards_controller.rb
+        Test:       test/controllers/credit_cards_controller_test.rb
+        Views:      app/views/credit_cards/debit.html.erb [...]
+        Helper:     app/helpers/credit_cards_helper.rb
 $</screen></para>
 
     <para>Nice! We are kindly provided with an example further
     down:<programlisting>rails generate controller CreditCard open debit credit close</programlisting>Doesn't
     really fit the bill for our case but I am feeling brave and suggest that
-    we simply try this:<screen>$ rails generate controller Example test
+    we simply try <command>rails generate controller Example
+    test</command><screen>$ rails generate controller Example test
       create  app/controllers/example_controller.rb
        route  get "example/test"
       invoke  erb
       create    app/views/example
       create    app/views/example/test.html.erb
       invoke  test_unit
-      create    test/functional/example_controller_test.rb
+      create    test/controllers/example_controller_test.rb
       invoke  helper
       create    app/helpers/example_helper.rb
       invoke    test_unit
-      create      test/unit/helpers/example_helper_test.rb
+      create      test/helpers/example_helper_test.rb
       invoke  assets
       invoke    coffee
       create      app/assets/javascripts/example.js.coffee
@@ -543,47 +526,23 @@ $</screen></para>
     <para>In the <indexterm>
         <primary>Log</primary>
       </indexterm>log <filename>log/development.log</filename> we find the
-    following lines:<programlisting>Started GET "/example/test" for 127.0.0.1 at 2012-11-13 19:06:55 +0100
-Connecting to database specified by database.yml
+    following lines:<programlisting>Started GET "/example/test" for 127.0.0.1 at 2013-07-15 14:32:07 +0200
 Processing by ExampleController#test as HTML
-  Rendered example/test.html.erb within layouts/application (2.7ms)
-Compiled example.css  (15ms)  (pid 73491)
-Compiled application.css  (25ms)  (pid 73491)
-Compiled jquery.js  (9ms)  (pid 73491)
-Compiled jquery_ujs.js  (0ms)  (pid 73491)
-Compiled example.js  (118ms)  (pid 73491)
-Compiled application.js  (166ms)  (pid 73491)
-Completed 200 OK in 321ms (Views: 320.4ms | ActiveRecord: 0.0ms)
+  Rendered example/test.html.erb within layouts/application (0.8ms)
+Completed 200 OK in 768ms (Views: 751.0ms | ActiveRecord: 0.0ms)
 
-
-Started GET "/assets/application.css?body=1" for 127.0.0.1 at 2012-11-13 19:06:55 +0100
-Served asset /application.css - 200 OK (8ms)
-
-
-Started GET "/assets/jquery.js?body=1" for 127.0.0.1 at 2012-11-13 19:06:55 +0100
-Served asset /jquery.js - 200 OK (4ms)
-
-
-Started GET "/assets/example.css?body=1" for 127.0.0.1 at 2012-11-13 19:06:55 +0100
-Served asset /example.css - 200 OK (2ms)
-
-
-Started GET "/assets/example.js?body=1" for 127.0.0.1 at 2012-11-13 19:06:55 +0100
-Served asset /example.js - 200 OK (2ms)
-
-
-Started GET "/assets/application.js?body=1" for 127.0.0.1 at 2012-11-13 19:06:55 +0100
-Served asset /application.js - 200 OK (33ms)
-
-
-Started GET "/assets/jquery_ujs.js?body=1" for 127.0.0.1 at 2012-11-13 19:06:55 +0100
-Served asset /jquery_ujs.js - 200 OK (2ms)</programlisting></para>
+Started GET "/assets/example.css?body=1" for 127.0.0.1 at 2013-07-15 14:32:08 +0200
+Started GET "/assets/example.js?body=1" for 127.0.0.1 at 2013-07-15 14:32:08 +0200
+Started GET "/assets/application.css?body=1" for 127.0.0.1 at 2013-07-15 14:32:08 +0200
+Started GET "/assets/jquery_ujs.js?body=1" for 127.0.0.1 at 2013-07-15 14:32:08 +0200
+Started GET "/assets/jquery.js?body=1" for 127.0.0.1 at 2013-07-15 14:32:08 +0200
+Started GET "/assets/application.js?body=1" for 127.0.0.1 at 2013-07-15 14:32:08 +0200
+Started GET "/assets/turbolinks.js?body=1" for 127.0.0.1 at 2013-07-15 14:32:08 +0200</programlisting></para>
 
     <para>That almost reads like normal English. Let us analyse the first
-    part:<programlisting>Started GET "/example/test" for 127.0.0.1 at 2012-11-13 19:06:55 +0100
-Connecting to database specified by database.yml
+    part:<programlisting>Started GET "/example/test" for 127.0.0.1 at 2013-07-15 14:32:07 +0200
 Processing by ExampleController#test as HTML
-  Rendered example/test.html.erb within layouts/application (2.7ms)</programlisting></para>
+  Rendered example/test.html.erb within layouts/application (0.8ms)</programlisting></para>
 
     <para><literal>localhost</literal> (127.0.0.1) sent in an HTTP GET request
     for the URI <quote><literal>/example/test</literal></quote>. That was then
@@ -591,20 +550,26 @@ Processing by ExampleController#test as HTML
     <code>ExampleController</code> using the method
     <methodname>test</methodname>.</para>
 
-    <para>The other lines tell us that a bunch of CSS and JavaScript files are
-    compiled and than delivered.</para>
+    <note>
+      <para>The other lines tell us that a bunch of CSS and JavaScript files
+      are compiled and than delivered. In production mode these would be
+      precompiled and delivered as one CSS and one J</para>
+    </note>
 
-    <para>Now we just need to find the controller. But you are in luck... I
-    know the answer. ;-) All controllers are in the directory
+    <para>Now we just need to find the controller. Good thing you bough this
+    book. ;-) All controllers are in the directory
     <filename>app/controllers</filename>, and there you go, we indeed find the
     corresponding file
     <filename>app/controllers/example_controller.rb.</filename><screen>$ ls -l app/controllers/
 total 16
--rw-r--r--  1 xyz  staff  80 Nov 13 18:46 application_controller.rb
--rw-r--r--  1 xyz  staff  69 Nov 13 19:05 example_controller.rb
+-rw-r--r--  1 xyz  staff  204 15 Jul 13:56 application_controller.rb
+drwxr-xr-x  3 xyz  staff  102 15 Jul 13:56 concerns
+-rw-r--r--  1 xyz  staff   69 15 Jul 14:31 example_controller.rb
 $</screen></para>
 
-    <para>Please open the file with your favorite editor:<programlisting>class ExampleController &lt; ApplicationController
+    <para>Please open the file
+    <filename>app/controllers/example_controller.rb</filename> with your
+    favorite editor:<programlisting>class ExampleController &lt; ApplicationController
   def test
   end
 end</programlisting></para>
@@ -624,22 +589,23 @@ end</programlisting></para>
     URL path <uri>/example/test</uri> it should process the controller
     <code>ExampleController</code> and the method <code>test</code>. This is
     not determined by some magical logic, but by a <foreignphrase
-    xml:lang="en">routing</foreignphrase> configuration. You can find this in
-    the file <filename>config/routes.rb</filename> in the second line:<screen>MacBook:testproject xyz$ <command>cat config/routes.rb | grep example</command>
-  get "example/test"
-MacBook:testproject xyz$ </screen></para>
+    xml:lang="en">routing</foreignphrase> configuration. The current routings
+    can be listed with the command <command>rake routes</command><screen>$ rake routes
+      Prefix Verb URI Pattern             Controller#Action
+example_test GET /example/test(.:format) example#test
+$ </screen></para>
 
-    <para>This line has been automatically inserted by the command
-    <command>rails generate controller</command>. In the routing file, you can
-    also carry out any <foreignphrase xml:lang="en">mapping</foreignphrase>.
-    But more on this later. Currently, our routes look very simple. With the
-    command <command>rake routes</command> we can get them. The file contains
-    quite a few examples. But we'll dive into that later (<xref
-    linkend="routes"/>). For now we have a look at the first two lines of that
-    file:<screen>$ cat config/routes.rb | head -n 2
+    <para>These routes are configured in the file
+    <filename>config/routes.rb</filename> which has been auto-filled by the
+    controller generator with a route to <code>example/test</code>. The one
+    line which is important for us right now is the second one:<screen>$ head -n 2 config/routes.rb 
 Testproject::Application.routes.draw do
   get "example/test"
 $ </screen></para>
+
+    <para>The <filename>config/routes.rb</filename> file includes a lot of
+    examples. Give it a read when you have time. We'll dive into that later
+    (<xref linkend="routes"/>).</para>
 
     <important>
       <para>A static file in the directory <filename>public</filename> always
@@ -689,19 +655,19 @@ $</screen></para>
           </mediaobject>
         </screenshot></para>
 
-      <para>If you want to output the result of Ruby code, enclose the code
-      within a <code>&lt;%=</code> ... <code>%&gt;</code>.</para>
+      <important>
+        <para>If you want to output the result of Ruby code, enclose the code
+        within a <code>&lt;%=</code> ... <code>%&gt;</code>.</para>
+      </important>
 
       <para>You may ask yourself: how can the result of adding two
-      <classname>Fixnums</classname> be displayed as text? Let's first look up
-      in <literal>irb</literal> if it really is a
+      <classname>Fixnums</classname> be displayed as a String? Let's first
+      look up in <literal>irb</literal> if it really is a
       <classname>Fixnum</classname>:<screen>$ irb --simple-prompt
 &gt;&gt; 1.class
 =&gt; Fixnum
 &gt;&gt; (1 + 1).class
-=&gt; Fixnum
-&gt;&gt; exit
-$ </screen></para>
+=&gt; Fixnum </screen></para>
 
       <para>Yes, both the number 1 and the result of 1 + 1 is a
       <classname>Fixnum</classname>. What happened? Rails is so intelligent
@@ -712,85 +678,91 @@ $ </screen></para>
           <primary>to_s()</primary>
         </indexterm><methodname>.to_s</methodname>, which always converts the
       content of the object to a string (<xref linkend="ruby-to_s"/>). Once
-      more, a brief trip to <literal>irb</literal>:<screen>$ irb --simple-prompt
-&gt;&gt; (1 + 1).to_s
+      more, a brief trip to <literal>irb</literal>:<screen>&gt;&gt; (1 + 1).to_s
 =&gt; "2"
 &gt;&gt; (1 + 1).to_s.class
 =&gt; String
 &gt;&gt; exit
 $</screen></para>
 
-      <para>We will now have a closer look at the Ruby code. In a
-      <filename>.html.erb </filename>file, there are two kinds of Ruby code
-      instructions in addition to the HTML elements:<itemizedlist>
-          <listitem>
-            <para><emphasis role="bold"><code>&lt;%
-            <replaceable>…</replaceable> %&gt;</code></emphasis></para>
+      <para>You are now going to learn the finer points of
+      <literal>erb</literal> step by step. Don't worry, it's neither magic nor
+      rocket science.</para>
 
-            <para>Executes the Ruby code it contains, but does not output
-            anything (unless you explicitly use something like
-            <code>print</code> or <code>puts</code>).</para>
-          </listitem>
+      <section>
+        <title>&lt;% ... %&gt; vs. &lt;%= ... %&gt;</title>
 
-          <listitem>
-            <para><emphasis role="bold"><code>&lt;%=
-            <replaceable>…</replaceable> %&gt;</code></emphasis></para>
+        <para>In a <filename>.html.erb </filename>file, there are two kinds of
+        Ruby code instructions in addition to the HTML elements:<itemizedlist>
+            <listitem>
+              <para>&lt;% … %&gt;</para>
 
-            <para>Executes the Ruby code it contains and outputs the result as
-            text. Certain characters are automatically <quote>escaped</quote>.
-            If you do not want to output escaped text in a specific case, you
-            need to realise this with <code>raw(string)</code>.</para>
+              <para>Executes the Ruby code it contains, but does not output
+              anything (unless you explicitly use something like
+              <code>print</code> or <code>puts</code>).</para>
+            </listitem>
 
-            <para>So provided an object has a method
-            <methodname>.to_s</methodname> or the object itself is already a
-            string, you can output it as result in the view, encapsulated
-            within <code>&lt;%= <replaceable>…</replaceable>
-            %&gt;</code>.</para>
-          </listitem>
-        </itemizedlist>Let's use an example, to make sure it all makes sense.
-      We edit the <filename>app/views/example/test.html.erb</filename> as
-      follows:<programlisting>&lt;p&gt;Loop from 0 to 5:
+            <listitem>
+              <para>&lt;%= … %&gt;</para>
+
+              <para>Executes the Ruby code it contains and outputs the result
+              as a String. If is is not a String the methode
+              <methodname>to_s</methodname> will be called.</para>
+            </listitem>
+          </itemizedlist></para>
+
+        <important>
+          <para>The output of &lt;%= ... %&gt; is automatically escaped. So
+          you don't need to worry about "dangerous" HTML.</para>
+        </important>
+
+        <para>Let's use an example, to make sure it all makes sense. We use
+        <methodname>each</methodname> to iterate through the
+        <classname>Range</classname> <code>(0..5)</code>. Edit the
+        <filename>app/views/example/test.html.erb</filename> as
+        follows:<programlisting>&lt;p&gt;Loop from 0 to 5:
 &lt;% (0..5).each do |i| %&gt;
 &lt;%= "#{i}, " %&gt;
 &lt;% end %&gt;
 &lt;/p&gt;
 </programlisting></para>
 
-      <para>In the browser, it now looks like this:<screenshot>
-          <info>
-            <title>Simple addition</title>
-          </info>
+        <para>Open this view In the browser:<screenshot>
+            <info>
+              <title>Simple addition</title>
+            </info>
 
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screenshots/erb_einfache_schleife.jpg"/>
-            </imageobject>
-          </mediaobject>
-        </screenshot></para>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screenshots/erb_einfache_schleife.jpg"/>
+              </imageobject>
+            </mediaobject>
+          </screenshot></para>
 
-      <para>Let's now have a look at the HTML source code in the
-      browser:<programlisting>&lt;!DOCTYPE html&gt;
+        <para>Let's now have a look at the HTML source code in the
+        browser:<programlisting>&lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
   &lt;title&gt;Testproject&lt;/title&gt;
-  &lt;link href="/assets/application.css?body=1" media="all" rel="stylesheet" type="text/css" /&gt;
-&lt;link href="/assets/example.css?body=1" media="all" rel="stylesheet" type="text/css" /&gt;
-  &lt;script src="/assets/jquery.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
-&lt;script src="/assets/jquery_ujs.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
-&lt;script src="/assets/example.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
-&lt;script src="/assets/application.js?body=1" type="text/javascript"&gt;&lt;/script&gt;
+  &lt;link data-turbolinks-track="true" href="/assets/application.css?body=1" media="all" rel="stylesheet" /&gt;
+&lt;link data-turbolinks-track="true" href="/assets/example.css?body=1" media="all" rel="stylesheet" /&gt;
+  &lt;script data-turbolinks-track="true" src="/assets/jquery.js?body=1"&gt;&lt;/script&gt;
+&lt;script data-turbolinks-track="true" src="/assets/jquery_ujs.js?body=1"&gt;&lt;/script&gt;
+&lt;script data-turbolinks-track="true" src="/assets/turbolinks.js?body=1"&gt;&lt;/script&gt;
+&lt;script data-turbolinks-track="true" src="/assets/example.js?body=1"&gt;&lt;/script&gt;
+&lt;script data-turbolinks-track="true" src="/assets/application.js?body=1"&gt;&lt;/script&gt;
   &lt;meta content="authenticity_token" name="csrf-param" /&gt;
-&lt;meta content="lLKYshSWHLMrlvQOqxF2i8fk4+2eSOPYpg6scBB0wJM=" name="csrf-token" /&gt;
+&lt;meta content="FjIAd8nQGbKSAdbXdY47d3dhW1ZNLhe4eWJYYOgVdes=" name="csrf-token" /&gt;
 &lt;/head&gt;
 &lt;body&gt;
 
 &lt;p&gt;Loop from 0 to 5:
-0, 
-1, 
-2, 
-3, 
-4, 
-5, 
+  0, 
+  1, 
+  2, 
+  3, 
+  4, 
+  5, 
 &lt;/p&gt;
 
 
@@ -798,42 +770,45 @@ $</screen></para>
 &lt;/html&gt;
 </programlisting></para>
 
-      <para>Does it all make sense to you? Potentially, there are still two
-      open questions:<qandaset>
-          <qandadiv>
-            <qandaentry>
-              <question>
-                <para>I don't understand anything. I can't cope with the Ruby
-                code. Could you please explain that again?</para>
-              </question>
+        <para>Now you have the important tools to use Ruby code in a
+        view.</para>
+      </section>
 
-              <answer>
-                <para>Is it possible that you have not completely worked your
-                way through <xref linkend="ruby-grundlagen"/>? Please do take
-                your time with it and have another thorough look. Otherwise,
-                the rest won't make any sense here.</para>
-              </answer>
-            </qandaentry>
+      <section>
+        <title>Q &amp; A</title>
 
-            <qandaentry>
-              <question>
-                <para>I can understand the Ruby code and the HTML output. But
-                I don't get why some HTML code was rendered around it if I
-                didn't even write that HTML code. Where does it come from, and
-                can I influence it?</para>
-              </question>
+        <para>Potentially, there are two open questions:<qandaset>
+            <qandadiv>
+              <qandaentry>
+                <question>
+                  <para>I don't understand anything. I can't cope with the
+                  Ruby code. Could you please explain that again?</para>
+                </question>
 
-              <answer>
-                <para>Excellent question! We will get to that next (see <xref
-                linkend="erb_layouts"/>).</para>
-              </answer>
-            </qandaentry>
-          </qandadiv>
-        </qandaset></para>
+                <answer>
+                  <para>Is it possible that you have not completely worked
+                  your way through <xref linkend="ruby-grundlagen"/>? Please
+                  do take your time with it and have another thorough look.
+                  Otherwise, the rest won't make any sense here.</para>
+                </answer>
+              </qandaentry>
 
-      <para>You are now going to learn the finer points of
-      <literal>erb</literal> step by step. Don't worry, it's neither magic nor
-      rocket science.</para>
+              <qandaentry>
+                <question>
+                  <para>I can understand the Ruby code and the HTML output.
+                  But I don't get why some HTML code was rendered around it if
+                  I didn't even write that HTML code. Where does it come from,
+                  and can I influence it?</para>
+                </question>
+
+                <answer>
+                  <para>Excellent question! We will get to that next (see
+                  <xref linkend="erb_layouts"/>).</para>
+                </answer>
+              </qandaentry>
+            </qandadiv>
+          </qandaset></para>
+      </section>
     </section>
 
     <section xml:id="erb_layouts">
@@ -863,8 +838,8 @@ $</screen></para>
 &lt;html&gt;
 &lt;head&gt;
   &lt;title&gt;Testproject&lt;/title&gt;
-  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
-  &lt;%= javascript_include_tag "application" %&gt;
+  &lt;%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" =&gt; true %&gt;
+  &lt;%= javascript_include_tag "application", "data-turbolinks-track" =&gt; true %&gt;
   &lt;%= csrf_meta_tags %&gt;
 &lt;/head&gt;
 &lt;body&gt;
@@ -879,9 +854,9 @@ $</screen></para>
       <para>With <code>&lt;%= yield %&gt;</code> the View file is included
       here<indexterm>
           <primary>yield()</primary>
-        </indexterm>. The three lines with the stylesheets, the JavaScript and
-      the csrf_meta_tags can stay as they are for now. They integrate default
-      CSS and JavaScript files. We'll have a look into that in <xref
+        </indexterm>. The lines with the stylesheets, the JavaScript and the
+      csrf_meta_tags can stay as they are for now. They integrate default CSS
+      and JavaScript files. We'll have a look into that in <xref
       linkend="asset_pipeline"/>. No need to bother with that right
       now.</para>
 
@@ -900,7 +875,7 @@ $</screen></para>
 &lt;/head&gt;
 &lt;body&gt;
 
-&lt;p&gt;My Header&lt;/p&gt;
+&lt;h1&gt;My Header&lt;/h1&gt;
 &lt;hr&gt;
 
 &lt;%= yield %&gt;
@@ -944,14 +919,14 @@ $</screen></para>
           xlink:href="http://de.wikipedia.org/wiki/Model_View_Controller">http://en.wikipedia.org/wiki/Model–view–controller</uri></para>
         </footnote>is to put too much program logic into the view. That's more
       or less what used to be done frequently in PHP programming in the past.
-      But one of the aims of MVC is that any HTML designer can create a view
-      without having to worry about the programming. Yeah, yeah, … if only it
-      was always that easy. But let's just play it through in our minds: if I
-      have a value in the controller that I want to display in the view, then
-      I need a mechanism for this. This is referred to as <foreignphrase
-      xml:lang="en">instance variable</foreignphrase> and always starts with a
-      <code>@</code>. If you are not 100 % sure any more which variable has
-      which <indexterm>
+      I'm guilty of having done it myself. But one of the aims of MVC is that
+      any HTML designer can create a view without having to worry about the
+      programming. Yeah, yeah, … if only it was always that easy. But let's
+      just play it through in our minds: if I have a value in the controller
+      that I want to display in the view, then I need a mechanism for this.
+      This is referred to as <foreignphrase xml:lang="en">instance
+      variable</foreignphrase> and always starts with a <code>@</code>. If you
+      are not 100 % sure any more which variable has which <indexterm>
           <primary>Scope</primary>
         </indexterm><foreignphrase xml:lang="en">scope</foreignphrase>, then
       please have another quick look at <xref
@@ -1007,19 +982,13 @@ The current time is
           <primary>footer</primary>
         </indexterm><foreignphrase xml:lang="en">footer</foreignphrase> on the
       page with contact info or a menu. Rails gives us the option of
-      encapsulate this HTML code in form of <quote><foreignphrase
-      xml:lang="en">partials</foreignphrase></quote> and then integrating it
-      within a <indexterm>
+      encapsulate this HTML code in form of
+      <foreignphrase>partials</foreignphrase> and then integrating it within a
+      <indexterm>
           <primary>view</primary>
         </indexterm>view. A partial is also stored in the directory
       <filename>app/views/example/</filename>. But the file name must start
       with an underscore (<literal>_</literal>).</para>
-
-      <note>
-        <para>The term <foreignphrase xml:lang="en">partial</foreignphrase>
-        indicates that these are parts of something, in other words, smaller
-        chunks of a template, a partial template.</para>
-      </note>
 
       <para>As an example, we now add a mini footer to our page in a separate
       partial. Copy the following content into the new file
@@ -1029,10 +998,9 @@ Copyright 2009 - &lt;%= Date.today.year %&gt; the Easter Bunny.
 &lt;/p&gt;</programlisting></para>
 
       <note>
-        <para>Yes, we should use an instance variable and put the programming
-        logic into the controller. But to keep it simpler I do it the dirty
-        way which is putting this little <code>Date.today.year</code>
-        programming in the view.</para>
+        <para>Yes, this is not the MVC way of doing it. Date.today.year should
+        be defined in the Controller. I'm glad that you caught this mistake. I
+        made it to show the use of a partial.</para>
       </note>
 
       <para>We edit the file
@@ -1083,14 +1051,6 @@ $ </screen></para>
       <literal>erb</literal> code via the line:<indexterm>
           <primary>render()</primary>
         </indexterm><programlisting>&lt;%= render "shared/footer" %&gt;</programlisting></para>
-
-      <note>
-        <para>In a real-world project, you would - depending on your
-        programming preferences - not normally solve the footer problem by
-        using a partial that is called locally everywhere, but rather take
-        care of it centrally in the
-        <filename>app/views/layouts/application.html.erb</filename>.</para>
-      </note>
 
       <section xml:id="partials_locale_variables">
         <title xml:id="partials_locale_variables.title">Passing Variables to a

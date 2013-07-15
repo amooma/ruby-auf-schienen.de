@@ -14,7 +14,17 @@
 
     <para>This book requires basic knowledge of HTML, plus the reader - you,
     in other words - should also have a basic understanding of programming.
-    Yet even the inventor of Ruby, Yukihiro Matsumoto, states in his book
+    </para>
+
+    <para>A couple of years ago I made the mistake of trying to understand
+    Ruby on Rails without knowing anything about Ruby. Ruby just looked so
+    simple, so I didn't give it another thought. But because I did not have a
+    basic understanding of Ruby, I was not able to understand Rails properly.
+    So I kept shunting it into a virtual corner and carried on working with
+    PHP instead. One can only feel the magic of Rails after understanding the
+    basics of Ruby.</para>
+
+    <para>The inventor of Ruby, Yukihiro Matsumoto, states in his book
     <quote><citetitle>The Ruby Programming
     Language</citetitle></quote><footnote>
         <para>The book is highly recommended for anyone who wants to
@@ -33,27 +43,17 @@
     "The Ruby Programming Language" by David Flanagan and Yukihiro
     Matsumoto.</para>
 
-    <note>
-      <para>For a long time I made the mistake of trying to understand Ruby on
-      Rails without knowing anything about Ruby. Ruby just looked so simple,
-      so I didn't give it another thought. But because I did not have a basic
-      understanding of Ruby, I was not able to understand Rails properly. So I
-      kept shunting it into a virtual corner and carried on working with PHP
-      instead. I only really got it after I had a closer look at Ruby.
-      <footnote>
-          <para>Today I am such a great fan of Ruby on Rails that I have even
-          made the effort of writing a book about it to introduce it to you.
-          ;-)</para>
-        </footnote></para>
-    </note>
-  </section>
+    <para>Because Ruby version 2.0 is the way to go we use it. Please take
+    care to update your current Ruby if you are running older versions. The
+    command <command>ruby -v</command> will print the current running Ruby
+    version:<screen>$ ruby -v
+ruby 2.0.0p247 (2013-06-27 revision 41674) [x86_64-darwin12.4.0]
+$</screen></para>
 
-  <section xml:id="ruby-ist-eine-skriptsprache">
-    <title>A Scripting Language</title>
-
-    <para>Ruby is a scripting language. So it is not compiled and then
-    executed, but read by an interpreter and then processed line by
-    line.</para>
+    <warning>
+      <para>The beginning of this chaper is going to be a bit boring. Bear
+      with me. It is worth it.</para>
+    </warning>
   </section>
 
   <section xml:id="hello-world-in-ruby">
@@ -65,14 +65,17 @@
       <secondary>Ruby</secondary>
     </indexterm>
 
+    <para>Ruby is a scripting language. So it is not compiled and then
+    executed, but read by an interpreter and then processed line by
+    line.</para>
+
     <para>A simple Ruby program <filename>hello-world.rb</filename> consist of
     the following line:<programlisting>puts 'Hello World!'
 </programlisting></para>
 
-    <para>Use your favorite editor to open a new file with the name
-    <filename>hello-world.rb</filename> and insert the above line into this
-    file. You can then execute this Ruby program in the command line as
-    follows:<screen>$ ruby hello-world.rb 
+    <para>Use your favorite editor to open a new file with the filename
+    <filename>hello-world.rb</filename> and insert the above line into it. You
+    can then execute this Ruby program in the command line as follows:<screen>$ ruby hello-world.rb 
 Hello World!
 $ </screen></para>
 
@@ -90,11 +93,11 @@ $ </screen></para>
       <title>puts and print</title>
 
       <indexterm>
-        <primary>puts()</primary>
+        <primary>puts</primary>
       </indexterm>
 
       <indexterm>
-        <primary>print()</primary>
+        <primary>print</primary>
       </indexterm>
 
       <para>If you go looking for examples on Ruby on the Internet, you will
@@ -194,26 +197,39 @@ $</screen></para>
       <para>When programming, you do not always have a Ruby handbook
       available. Fortunately, the Ruby developers thought of this and provided
       a built-in help feature in form of the program <literal>ri</literal> (of
-      course only if you have installed this feature). <acronym>ri</acronym>
-      is the abbreviation for <quote><emphasis role="bold">R</emphasis>uby
-      <emphasis role="bold">I</emphasis>ndex</quote>. The output gets opend in
-      a so called pager (z.B. <command>less</command>). The parameter
+      course only if you have installed the documentation).
+      <acronym>ri</acronym> is the abbreviation for <quote><emphasis
+      role="bold">R</emphasis>uby <emphasis
+      role="bold">I</emphasis>ndex</quote>. The output gets opend in a so
+      called pager (z.B. <command>less</command>). The parameter
       <parameter>-T</parameter> sets the output directly to stdout.</para>
 
       <para>This is a typical chicken and egg situation. How can I explain the
       Ruby help feature, if we are only just getting started with Ruby? So I
       am going to jump ahead a little and show you how you can search for
-      information on the class <classname>String</classname>:<screen>$ ri -T String   
-= String &lt; Object
+      information on the class <classname>String</classname>:<screen>$ ri String
+String &lt; Object
 
 ------------------------------------------------------------------------------
-= Includes:
+Includes:
 Comparable (from ruby site)
 
 (from ruby site)
 ------------------------------------------------------------------------------
+
+
+Rake extension methods for String.
+
 A String object holds and manipulates an arbitrary sequence of bytes,
 typically representing characters. String objects may be created using
+String::new or as literals.
+
+Because of aliasing issues, users of strings should be aware of the methods
+that modify the contents of a String object.  Typically, methods with
+names ending in ``!'' modify their receiver, while those without a ``!''
+return a new String.  However, there are exceptions, such as
+String#[]=.
+------------------------------------------------------------------------------
 [...]
 $</screen></para>
 
@@ -221,19 +237,16 @@ $</screen></para>
       (chicken-egg!), then we can also use <literal>ri</literal>. Let's take
       <methodname>gsub</methodname> as an example. This is a method for
       replacing parts of a <classname>String</classname> (that is useful now
-      and again).<screen>$ ri -T String.size
-String.size
+      and again).<screen>$ ri String.size
+= String.size
 
 (from ruby site)
 ------------------------------------------------------------------------------
-  str.length   -&gt; integer
   str.size     -&gt; integer
-   
 
 ------------------------------------------------------------------------------
 
 Returns the character length of str.
-
 
 $ </screen></para>
 
@@ -287,9 +300,8 @@ $</screen></para>
     </note>
 
     <para>In this chapter, we develop many examples within
-    <application>irb</application>. You will also often try out new things
-    within <literal>irb</literal> in the course of your work later, because it
-    is so wonderfully quick and easy.</para>
+    <application>irb</application>. It is so wonderfully quick and
+    easy.</para>
 
     <section xml:id="kommentare-im-irb">
       <title>Comments in irb</title>
@@ -325,9 +337,6 @@ $</screen></para>
 
       <para>Please go on reading and have a look at the examples. The puzzle
       will gradually get clearer.</para>
-
-      <para>BTW: I will use variable in a couple of examples but will discuss
-      variables in detail later (<xref linkend="ruby_variablen"/>).</para>
     </note>
 
     <section xml:id="ruby-methoden">
@@ -344,9 +353,11 @@ $</screen></para>
       methods.</para>
 
       <note>
-        <para>There are two kinds of methods (class methods and instance
-        methods). At this point, I do not want to make it too complicated and
-        am simply ignoring this "fine" distinction for now.</para>
+        <para>Here we go with the oversimplification. We can not compare
+        non-Object oriented programming languages with OO onces. Plus there
+        are two kinds of methods (class methods and instance methods). At this
+        point, I do not want to make it too complicated and am simply ignoring
+        this "fine" distinctions for now.</para>
       </note>
 
       <para>At this point you start looking for a good example, but all you
@@ -423,8 +434,8 @@ Hello World!
         <para>There is one simple rule in the Ruby community: the fewer
         brackets, the cooler you are! <literal>;-)</literal></para>
 
-        <para>Between you and me: you won't get a medal for using fewer
-        brackets. Decide for yourself what makes you happy.</para>
+        <para>But you won't get a medal for using fewer brackets. Decide for
+        yourself what makes you happy.</para>
       </tip>
 
       <para>If you do not specify a parameter with the above method, you will
@@ -433,7 +444,7 @@ Hello World!
 ArgumentError: wrong number of arguments (0 for 1)
  from (irb):1:in `three_times'
  from (irb):7
- from /Users/xyz/.rvm/rubies/ruby-1.9.3-p327/bin/irb:16:in `&lt;main&gt;'
+ from /Users/xyz/.rvm/rubies/ruby-2.0.0-p247/bin/irb:16:in `&lt;main&gt;'
 &gt;&gt; exit
 $</screen></para>
 
@@ -500,7 +511,7 @@ end</programlisting></para>
       <methodname>three_times</methodname>:<screen>&gt;&gt; This_and_that.three_times
 NoMethodError: undefined method `three_times' for This_and_that:Class
  from (irb):8
- from /Users/xyz/.rvm/rubies/ruby-1.9.3-p327/bin/irb:16:in `&lt;main&gt;'
+ from /Users/xyz/.rvm/rubies/ruby-2.0.0-p247/bin/irb:16:in `&lt;main&gt;'
 &gt;&gt;</screen></para>
 
       <para>This results in an error message, because
@@ -555,7 +566,7 @@ a
 &gt;&gt; test.b
 NoMethodError: private method `b' called for #&lt;Example:0x007ff1e10756b8&gt;
  from (irb):12
- from /Users/xyz/.rvm/rubies/ruby-1.9.3-p327/bin/irb:16:in `&lt;main&gt;'
+ from /Users/xyz/.rvm/rubies/ruby-2.0.0-p247/bin/irb:16:in `&lt;main&gt;'
 &gt;&gt; exit
 $ </screen></para>
       </section>
@@ -732,7 +743,7 @@ $ </screen></para>
 &gt;&gt; example1.d
 NoMethodError: undefined method `d' for #&lt;Abc:0x007fb463023928&gt;
  from (irb):21
- from /Users/xyz/.rvm/rubies/ruby-1.9.3-p327/bin/irb:16:in `&lt;main&gt;'
+ from /Users/xyz/.rvm/rubies/ruby-2.0.0-p247/bin/irb:16:in `&lt;main&gt;'
 &gt;&gt; example1.a
 =&gt; "a"
 &gt;&gt; exit
@@ -777,7 +788,7 @@ $ </screen><tip>
 &gt;&gt; Knowledge.pi
 NoMethodError: undefined method `pi' for Knowledge:Class
  from (irb):6
- from /Users/xyz/.rvm/rubies/ruby-1.9.3-p327/bin/irb:16:in `&lt;main&gt;'
+ from /Users/xyz/.rvm/rubies/ruby-2.0.0-p247/bin/irb:16:in `&lt;main&gt;'
 &gt;&gt;</screen></para>
 
         <para>So that does not work. Well, then let's create a new instance of
@@ -807,7 +818,7 @@ $</screen></para>
 &gt;&gt; example.pi
 NoMethodError: undefined method `pi' for #&lt;Knowledge:0x007fb339078d90&gt;
  from (irb):8
- from /Users/xyz/.rvm/rubies/ruby-1.9.3-p327/bin/irb:16:in `&lt;main&gt;'
+ from /Users/xyz/.rvm/rubies/ruby-2.0.0-p247/bin/irb:16:in `&lt;main&gt;'
 &gt;&gt; exit
 $</screen></para>
 
@@ -1208,8 +1219,12 @@ $</screen></para>
 
       <para>Variables have a different scope (or <quote>reach</quote>) within
       the Ruby application and therefore also within a Ruby on Rails
-      application. You need to keep this scope in mind while programming.
-      otherwise you can end up with odd effects.</para>
+      application.</para>
+
+      <important>
+        <para>You need to keep this scope in mind while programming. Otherwise
+        you can end up with odd effects.</para>
+      </important>
 
       <section xml:id="ruby-local-variables">
         <title>Local Variables (aaa or _aaa)</title>
