@@ -32,46 +32,48 @@
 $ cd example 
 $</screen></para>
 
-  <para>Now the three required models:<screen>$ rails generate model car name
+  <para>Now the three required models:<screen>$ rails generate model Car name
   [...]
-$ rails generate model bike name
+$ rails generate model Bike name
   [...]
-$ rails generate model tag name taggable_type taggable_id:integer
+$ rails generate model Tag name taggable:references{polymorphic}
   [...]
 $ rake db:migrate
   [...]
 $</screen></para>
 
   <para><classname>Car</classname> and <classname>Bike</classname> are clear.
-  For <classname>Tag</classname> we use the fields
+  For <classname>Tag</classname> we use the migration shortcut
+  <code>taggable:references{polymorphic}</code> to generate the fields
   <methodname>taggable_type</methodname> and
   <methodname>taggable_id</methodname>, to give ActiveRecord an opportunity to
   save the assignment for the polymorphic association. We have to enter it
   accordingly in the model.</para>
 
-  <para><filename>app/models/tag.rb</filename><programlisting>class Tag &lt; ActiveRecord::Base
-  attr_accessible :name, :taggable_id, :taggable_type
+  <para>The model generator already filed the
+  <filename>app/models/tag.rb</filename> file with the configuration for the
+  polymorphic association:</para>
 
-  belongs_to :taggable, :polymorphic =&gt; true
+  <para><filename>app/models/tag.rb</filename><programlisting>class Tag &lt; ActiveRecord::Base
+  belongs_to :taggable, polymorphic: true
 end</programlisting></para>
 
-  <para><filename>app/models/car.rb</filename><programlisting>class Car &lt; ActiveRecord::Base
-  attr_accessible :name
+  <para>For the other models we have to add the polymorphic association
+  manually:</para>
 
-  has_many :tags, :as =&gt; :taggable  
+  <para><filename>app/models/car.rb</filename><programlisting>class Car &lt; ActiveRecord::Base
+  has_many :tags, as: :taggable
 end</programlisting></para>
 
   <para><filename>app/models/bike.rb</filename><programlisting>class Bike &lt; ActiveRecord::Base
-  attr_accessible :name
-
-  has_many :tags, :as =&gt; :taggable
+  has_many :tags, as: :taggable
 end
 </programlisting></para>
 
-  <para>For Car and Bike we use an additional <code>:as =&gt; :taggable</code>
-  when defining has_many. For <classname>Tag</classname> we use
-  <code>belongs_to :taggable, :polymorphic =&gt; true</code> to indicate the
-  polymorphic association to ActiveRecord.</para>
+  <para>For Car and Bike we use an additional <code>:as: :taggable</code> when
+  defining has_many. For <classname>Tag</classname> we use <code>belongs_to
+  :taggable, polymorphic: true</code> to indicate the polymorphic association
+  to ActiveRecord.</para>
 
   <tip>
     <para>The suffix <quote><foreignphrase
@@ -86,54 +88,55 @@ end
 
   <para>Let's go into the <foreignphrase xml:lang="en">console</foreignphrase>
   and create a car and a bike:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; beetle = Car.create(name: 'Beetle')
    (0.1ms)  begin transaction
-  SQL (24.5ms)  INSERT INTO "cars" ("created_at", "name", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 15:02:35 UTC +00:00], ["name", "Beetle"], ["updated_at", Sun, 18 Nov 2012 15:02:35 UTC +00:00]]
-   (2.2ms)  commit transaction
-=&gt; #&lt;Car id: 1, name: "Beetle", created_at: "2012-11-18 15:02:35", updated_at: "2012-11-18 15:02:35"&gt;
+  SQL (2.2ms)  INSERT INTO "cars" ("created_at", "name", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:04:50 UTC +00:00], ["name", "Beetle"], ["updated_at", Tue, 16 Jul 2013 13:04:50 UTC +00:00]]
+   (0.9ms)  commit transaction
+=&gt; #&lt;Car id: 1, name: "Beetle", created_at: "2013-07-16 13:04:50", updated_at: "2013-07-16 13:04:50"&gt;
 &gt;&gt; mountainbike = Bike.create(name: 'Mountainbike')
    (0.1ms)  begin transaction
-  SQL (0.5ms)  INSERT INTO "bikes" ("created_at", "name", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 15:03:10 UTC +00:00], ["name", "Mountainbike"], ["updated_at", Sun, 18 Nov 2012 15:03:10 UTC +00:00]]
-   (2.0ms)  commit transaction
-=&gt; #&lt;Bike id: 1, name: "Mountainbike", created_at: "2012-11-18 15:03:10", updated_at: "2012-11-18 15:03:10"&gt;
-&gt;&gt; </screen></para>
+  SQL (0.4ms)  INSERT INTO "bikes" ("created_at", "name", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:04:57 UTC +00:00], ["name", "Mountainbike"], ["updated_at", Tue, 16 Jul 2013 13:04:57 UTC +00:00]]
+   (2.5ms)  commit transaction
+=&gt; #&lt;Bike id: 1, name: "Mountainbike", created_at: "2013-07-16 13:04:57", updated_at: "2013-07-16 13:04:57"&gt;
+&gt;&gt;</screen></para>
 
   <para>Now we define for each a tag with the color of the corresponding
   object:<screen>&gt;&gt; beetle.tags.create(name: 'blue')
-   (0.1ms)  begin transaction
-  SQL (0.5ms)  INSERT INTO "tags" ("created_at", "name", "taggable_id", "taggable_type", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Sun, 18 Nov 2012 15:03:45 UTC +00:00], ["name", "blue"], ["taggable_id", 1], ["taggable_type", "Car"], ["updated_at", Sun, 18 Nov 2012 15:03:45 UTC +00:00]]
-   (0.7ms)  commit transaction
-=&gt; #&lt;Tag id: 1, name: "blue", taggable_type: "Car", taggable_id: 1, created_at: "2012-11-18 15:03:45", updated_at: "2012-11-18 15:03:45"&gt;
+   (0.0ms)  begin transaction
+  SQL (0.5ms)  INSERT INTO "tags" ("created_at", "name", "taggable_id", "taggable_type", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:05:19 UTC +00:00], ["name", "blue"], ["taggable_id", 1], ["taggable_type", "Car"], ["updated_at", Tue, 16 Jul 2013 13:05:19 UTC +00:00]]
+   (3.0ms)  commit transaction
+=&gt; #&lt;Tag id: 1, name: "blue", taggable_id: 1, taggable_type: "Car", created_at: "2013-07-16 13:05:19", updated_at: "2013-07-16 13:05:19"&gt;
 &gt;&gt; mountainbike.tags.create(name: 'black')
    (0.1ms)  begin transaction
-  SQL (0.5ms)  INSERT INTO "tags" ("created_at", "name", "taggable_id", "taggable_type", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Sun, 18 Nov 2012 15:04:01 UTC +00:00], ["name", "black"], ["taggable_id", 1], ["taggable_type", "Bike"], ["updated_at", Sun, 18 Nov 2012 15:04:01 UTC +00:00]]
-   (3.0ms)  commit transaction
-=&gt; #&lt;Tag id: 2, name: "black", taggable_type: "Bike", taggable_id: 1, created_at: "2012-11-18 15:04:01", updated_at: "2012-11-18 15:04:01"&gt;
-&gt;&gt;</screen></para>
-
-  <para>For the beetle, we add another <classname>Tag</classname>:<screen>&gt;&gt; beetle.tags.create(name: 'Automatic')
-   (0.1ms)  begin transaction
-  SQL (0.6ms)  INSERT INTO "tags" ("created_at", "name", "taggable_id", "taggable_type", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Sun, 18 Nov 2012 15:05:17 UTC +00:00], ["name", "Automatic"], ["taggable_id", 1], ["taggable_type", "Car"], ["updated_at", Sun, 18 Nov 2012 15:05:17 UTC +00:00]]
-   (3.0ms)  commit transaction
-=&gt; #&lt;Tag id: 3, name: "Automatic", taggable_type: "Car", taggable_id: 1, created_at: "2012-11-18 15:05:17", updated_at: "2012-11-18 15:05:17"&gt;
-&gt;&gt;  </screen></para>
-
-  <para>Let's have a look at all <classname>Tag</classname> items:<screen>&gt;&gt; Tag.all
-  Tag Load (0.3ms)  SELECT "tags".* FROM "tags" 
-=&gt; [#&lt;Tag id: 1, name: "blue", taggable_type: "Car", taggable_id: 1, created_at: "2012-11-18 15:03:45", updated_at: "2012-11-18 15:03:45"&gt;, #&lt;Tag id: 2, name: "black", taggable_type: "Bike", taggable_id: 1, created_at: "2012-11-18 15:04:01", updated_at: "2012-11-18 15:04:01"&gt;, #&lt;Tag id: 3, name: "Automatic", taggable_type: "Car", taggable_id: 1, created_at: "2012-11-18 15:05:17", updated_at: "2012-11-18 15:05:17"&gt;]
+  SQL (0.4ms)  INSERT INTO "tags" ("created_at", "name", "taggable_id", "taggable_type", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:05:27 UTC +00:00], ["name", "black"], ["taggable_id", 1], ["taggable_type", "Bike"], ["updated_at", Tue, 16 Jul 2013 13:05:27 UTC +00:00]]
+   (2.3ms)  commit transaction
+=&gt; #&lt;Tag id: 2, name: "black", taggable_id: 1, taggable_type: "Bike", created_at: "2013-07-16 13:05:27", updated_at: "2013-07-16 13:05:27"&gt;
 &gt;&gt; </screen></para>
 
+  <para>For the <varname>beetle</varname>, we add another
+  <classname>Tag</classname>:<screen>&gt;&gt; beetle.tags.create(name: 'Automatic')
+   (0.1ms)  begin transaction
+  SQL (0.6ms)  INSERT INTO "tags" ("created_at", "name", "taggable_id", "taggable_type", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:05:56 UTC +00:00], ["name", "Automatic"], ["taggable_id", 1], ["taggable_type", "Car"], ["updated_at", Tue, 16 Jul 2013 13:05:56 UTC +00:00]]
+   (2.1ms)  commit transaction
+=&gt; #&lt;Tag id: 3, name: "Automatic", taggable_id: 1, taggable_type: "Car", created_at: "2013-07-16 13:05:56", updated_at: "2013-07-16 13:05:56"&gt;
+&gt;&gt;</screen></para>
+
+  <para>Let's have a look at all <classname>Tag</classname> items:<screen>&gt;&gt; Tag.all
+  Tag Load (0.3ms)  SELECT "tags".* FROM "tags"
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Tag id: 1, name: "blue", taggable_id: 1, taggable_type: "Car", created_at: "2013-07-16 13:05:19", updated_at: "2013-07-16 13:05:19"&gt;, #&lt;Tag id: 2, name: "black", taggable_id: 1, taggable_type: "Bike", created_at: "2013-07-16 13:05:27", updated_at: "2013-07-16 13:05:27"&gt;, #&lt;Tag id: 3, name: "Automatic", taggable_id: 1, taggable_type: "Car", created_at: "2013-07-16 13:05:56", updated_at: "2013-07-16 13:05:56"&gt;]&gt;
+&gt;&gt;</screen></para>
+
   <para>And now all tags of the beetle:<screen>&gt;&gt; beetle.tags
-  Tag Load (0.3ms)  SELECT "tags".* FROM "tags" WHERE "tags"."taggable_id" = 1 AND "tags"."taggable_type" = 'Car'
-=&gt; [#&lt;Tag id: 1, name: "blue", taggable_type: "Car", taggable_id: 1, created_at: "2012-11-18 15:03:45", updated_at: "2012-11-18 15:03:45"&gt;, #&lt;Tag id: 3, name: "Automatic", taggable_type: "Car", taggable_id: 1, created_at: "2012-11-18 15:05:17", updated_at: "2012-11-18 15:05:17"&gt;]
+  Tag Load (0.4ms)  SELECT "tags".* FROM "tags" WHERE "tags"."taggable_id" = ? AND "tags"."taggable_type" = ?  [["taggable_id", 1], ["taggable_type", "Car"]]
+=&gt; #&lt;ActiveRecord::Associations::CollectionProxy [#&lt;Tag id: 1, name: "blue", taggable_id: 1, taggable_type: "Car", created_at: "2013-07-16 13:05:19", updated_at: "2013-07-16 13:05:19"&gt;, #&lt;Tag id: 3, name: "Automatic", taggable_id: 1, taggable_type: "Car", created_at: "2013-07-16 13:05:56", updated_at: "2013-07-16 13:05:56"&gt;]&gt;
 &gt;&gt;</screen></para>
 
   <para>Of course you can also check which object the last
   <classname>Tag</classname> belongs to:<screen>&gt;&gt; Tag.last.taggable
   Tag Load (0.3ms)  SELECT "tags".* FROM "tags" ORDER BY "tags"."id" DESC LIMIT 1
-  Car Load (0.2ms)  SELECT "cars".* FROM "cars" WHERE "cars"."id" = 1 LIMIT 1
-=&gt; #&lt;Car id: 1, name: "Beetle", created_at: "2012-11-18 15:02:35", updated_at: "2012-11-18 15:02:35"&gt;
+  Car Load (0.2ms)  SELECT "cars".* FROM "cars" WHERE "cars"."id" = ? ORDER BY "cars"."id" ASC LIMIT 1  [["id", 1]]
+=&gt; #&lt;Car id: 1, name: "Beetle", created_at: "2013-07-16 13:04:50", updated_at: "2013-07-16 13:04:50"&gt;
 &gt;&gt; exit
 $</screen></para>
 
@@ -143,11 +146,10 @@ $</screen></para>
   <classname>Tag</classname> is the same for both, a polymorphic association
   makes more sense in this case.</para>
 
-  <note>
-    <para><foreignphrase xml:lang="en">Polymorphic
-    associations</foreignphrase> are very useful. But you should always bear
-    in mind that they cause a greater load on the database than a normal 1:n
-    association. Normally this would not make any difference, but you should
-    keep it in mind when planning.</para>
-  </note>
+  <section>
+    <title>Options</title>
+
+    <para>Polymorphic associations can be configured with the same options as
+    a normal <xref linkend="activerecord_has_many"/> model.</para>
+  </section>
 </section>

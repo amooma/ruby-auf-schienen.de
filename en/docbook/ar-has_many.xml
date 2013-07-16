@@ -38,7 +38,7 @@
   bookshelf application. In this database, there is a model with books and a
   model with authors. As a book can have multiple authors, we need a 1:n
   association (<foreignphrase xml:lang="en">one-to-many
-  association</foreignphrase>) to represent it. </para>
+  association</foreignphrase>) to represent it.</para>
 
   <note>
     <para>Associations are also sometimes referred to as <foreignphrase
@@ -561,14 +561,14 @@ $</screen></para>
       is.</para>
 
       <section>
-        <title>:touch =&gt; :true</title>
+        <title>touch: true</title>
 
         <para>It automatically sets the field <literal>updated_at</literal> of
         the entry in the table <classname>Book</classname> to the current time
         when an <classname>Author</classname> is edited. In the
         <filename>app/models/author.rb</filename>, it would look like
         this:<programlisting>class Author &lt; ActiveRecord::Base
-  belongs_to :book, :touch =&gt; true
+  belongs_to :book, touch: true
 end</programlisting></para>
       </section>
     </section>
@@ -587,11 +587,11 @@ end</programlisting></para>
       <para>The most important options for <code>has_many are</code>.</para>
 
       <section>
-        <title>:order =&gt; :last_name</title>
+        <title>order: :last_name</title>
 
         <para>If you want to sort the authors by surname, you can do this via
         the following <filename>app/models/book.rb</filename>:<programlisting>class Book &lt; ActiveRecord::Base
-  has_many :authors, :order =&gt; :last_name
+  has_many :authors, order: :last_name
 end</programlisting></para>
 
         <para>As an example, let's create a new book with new authors and see
@@ -620,13 +620,13 @@ $ </screen></para>
       </section>
 
       <section>
-        <title>:dependent =&gt; :destroy</title>
+        <title>dependent: :destroy</title>
 
         <para>If a book is removed, then it usually makes sense to also
         automatically remove all authors dependent on this book. This can be
         done via <code>:dependent =&gt; :destroy</code> in the
         <filename>app/models/book.rb</filename>:<programlisting>class Book &lt; ActiveRecord::Base
-  has_many :authors, :dependent =&gt; :destroy
+  has_many :authors, dependent: :destroy
 end</programlisting></para>
 
         <para>In the following example, we destroy the first book in the
@@ -681,7 +681,7 @@ $</screen></para>
       </section>
 
       <section>
-        <title>:has_many .. :through ..</title>
+        <title>has_many .., through: ..</title>
 
         <para>Here I need to elaborate a bit: you will probably have noticed
         that in our book-author example we have sometimes been entering
@@ -690,7 +690,7 @@ $</screen></para>
         each author only once in the authors table and take care of the
         association with the books via an intermediary table. For this
         purpose, there is <code>has_many <replaceable>…</replaceable>,
-        :through =&gt; <replaceable>…</replaceable></code>.</para>
+        through: =&gt; <replaceable>…</replaceable></code>.</para>
 
         <para>This kind of association is called Many-to-Many (n:n) and we'll
         discuss it in detail in <xref linkend="ar-many_to_many"/>.</para>
