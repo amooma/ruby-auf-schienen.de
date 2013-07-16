@@ -7,7 +7,7 @@
          xmlns:m="http://www.w3.org/1998/Math/MathML"
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
-  <title xml:id="activerecord_named_scope.title">NamedScopes</title>
+  <title xml:id="activerecord_named_scope.title">Scopes</title>
 
   <indexterm>
     <primary>ActiveRecord</primary>
@@ -34,9 +34,7 @@ $ rake db:migrate
 $</screen></para>
 
     <para>Please populate the file <filename>db/seeds.rb</filename> with the
-    following content:<programlisting># ruby encoding: utf-8
-
-Product.create(name: 'Milk (1 liter)', weight: 1000, in_stock: true, price: 0.45, expiration_date: Date.today + 14.days)
+    following content:<programlisting>Product.create(name: 'Milk (1 liter)', weight: 1000, in_stock: true, price: 0.45, expiration_date: Date.today + 14.days)
 Product.create(name: 'Butter (250 g)', weight: 250, in_stock: true, price: 0.75, expiration_date: Date.today + 14.days)
 Product.create(name: 'Flour (1 kg)', weight: 1000, in_stock: false, price: 0.45, expiration_date: Date.today + 100.days)
 Product.create(name: 'Jelly Babies (6 x 300 g)', weight: 1500, in_stock: true, price: 4.96, expiration_date: Date.today + 1.year)
@@ -51,43 +49,39 @@ $ </screen></para>
   </section>
 
   <section xml:id="einfache_named_scopes">
-    <title xml:id="einfache_named_scopes.title">Simple NamedScopes</title>
+    <title xml:id="einfache_named_scopes.title">Defining a Scope</title>
 
     <para>If we want to count products that are in stock in our online shop,
     then we can use the following query each time:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Product.where(in_stock: true).count
-   (0.2ms)  SELECT COUNT(*) FROM "products" WHERE "products"."in_stock" = 't'
+   (0.1ms)  SELECT COUNT(*) FROM "products" WHERE "products"."in_stock" = 't'
 =&gt; 5
 &gt;&gt; exit
 $</screen></para>
 
     <para>But we could also define a NamedScope <code>available</code> in the
     <filename>app/models/product.rb</filename>:<programlisting>class Product &lt; ActiveRecord::Base
-  attr_accessible :in_stock, :name, :price, :weight
-
-  scope :available, where(in_stock: true)
+  scope :available, -&gt; { where(in_stock: true) }
 end</programlisting></para>
 
     <para>And then use it:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Product.available.count
-   (0.1ms)  SELECT COUNT(*) FROM "products" WHERE "products"."in_stock" = 't'
+   (0.2ms)  SELECT COUNT(*) FROM "products" WHERE "products"."in_stock" = 't'
 =&gt; 5
 &gt;&gt; exit
 $</screen></para>
 
     <para>Let's define a second NamedScope for this example in the
     <filename>app/models/product.rb</filename>:<programlisting>class Product &lt; ActiveRecord::Base
-  attr_accessible :in_stock, :name, :price, :weight
-
-  scope :available, where(:in_stock =&gt; true)
-  scope :cheap, where(price: 0..1)
+  scope :available, -&gt; { where(in_stock: true) }
+  scope :cheap, -&gt; { where(price: 0..1) }
 end</programlisting></para>
 
     <para>Now we can chain both named scopes to output all cheap products that
     are in stock:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Product.cheap.count
    (0.1ms)  SELECT COUNT(*) FROM "products" WHERE ("products"."price" BETWEEN 0 AND 1)
 =&gt; 3
@@ -95,55 +89,25 @@ Loading development environment (Rails 3.2.9)
    (0.2ms)  SELECT COUNT(*) FROM "products" WHERE "products"."in_stock" = 't' AND ("products"."price" BETWEEN 0 AND 1)
 =&gt; 2
 &gt;&gt; exit
-$</screen></para>
-  </section>
-
-  <section xml:id="named_scope_lambda">
-    <title xml:id="named_scope_lambda.title">Lambda</title>
-
-    <para>If we want to set up a named scope
-    <methodname>consumable</methodname> that compares today's date with the
-    value of <methodname>expiration_date</methodname>, then we have to use
-    lambda for this. A normal named scope is defined at the start time of your
-    Rails application by ActiveRecord and then reused over and over again.
-    This means, a <code>Date.today</code> (for today's date) would only be
-    converted into a date once than then reused. So tomorrow and next week it
-    would still be today's date. If we define the NamedScope with lambda, this
-    lambda is reconstructed with each new call.</para>
-
-    <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
-  attr_accessible :expiration_date, :in_stock, :name, :price, :weight
-
-  scope :consumable, lambda { where('expiration_date &gt; ?', Date.today) }
-end</programlisting></para>
-
-    <para>This gives us correctly the food that is not yet past its expiration
-    date today:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; Product.consumable.count
-   (0.1ms)  SELECT COUNT(*) FROM "products" WHERE (expiration_date &gt; '2012-11-18')
-=&gt; 7
 &gt;&gt; exit
 $</screen></para>
   </section>
 
   <section>
-    <title>Passing Parameters</title>
+    <title>Passing in Arguments</title>
 
     <para>If you need a NamedScope that can also process parameters, then that
     is no problem either. The following example outputs products that are
     cheaper than the specified value. The
     <filename>app/models/product.rb</filename> looks like
     this:<programlisting>class Product &lt; ActiveRecord::Base
-  attr_accessible :in_stock, :name, :price, :weight
-
-  scope :cheaper_than, lambda { |price| where('price &lt; ?', price) }
+  scope :cheaper_than, -&gt;(price) { where("price &lt; ?", price) }
 end</programlisting></para>
 
     <para>Now we can count all products that cost less than 50 cent:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Product.cheaper_than(0.5).count
-   (0.1ms)  SELECT COUNT(*) FROM "products" WHERE (price &lt; 0.5)
+   (0.2ms)  SELECT COUNT(*) FROM "products" WHERE (price &lt; 0.5)
 =&gt; 2
 &gt;&gt; exit
 $</screen></para>
@@ -151,19 +115,17 @@ $</screen></para>
 
   <section xml:id="named_scope_create">
     <title xml:id="named_scope_create.title">Creating New Records with
-    NamedScopes</title>
+    Scopes</title>
 
     <para>Let's use the following
     <filename>app/models/product.rb</filename>:<programlisting>class Product &lt; ActiveRecord::Base
-  attr_accessible :in_stock, :name, :price, :weight
-
-  scope :available, where(:in_stock =&gt; true)
+  scope :available, -&gt; { where(in_stock: true) }
 end</programlisting></para>
 
     <para>With this NamedScope we can not only find all products that are in
     stock, but also create new products that contain the value
     <code>true</code> in the field <varname>in_stock</varname>:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; product = Product.available.build
 =&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: true, expiration_date: nil, created_at: nil, updated_at: nil&gt;
 &gt;&gt; product.in_stock
