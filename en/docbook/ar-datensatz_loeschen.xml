@@ -7,9 +7,9 @@
          xmlns:m="http://www.w3.org/1998/Math/MathML"
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
-  <title>Removing a Record</title>
+  <title>Delete/Destroy a Record</title>
 
-  <para>To remove a database record, you have the methods
+  <para>To remove a database record, you can use the methods
   <methodname>destroy</methodname> and <methodname>delete</methodname>. It's
   quite easy to confuse these two terms, but they are different and after a
   while you get used to it.</para>
@@ -26,14 +26,10 @@ $ rake db:migrate
 $</screen></para>
 
   <para><filename>app/models/book.rb</filename><programlisting>class Book &lt; ActiveRecord::Base
-  attr_accessible :title
-
-  has_many :authors, :dependent =&gt; :destroy
+  has_many :authors, dependent: :destroy
 end</programlisting></para>
 
   <para><filename>app/models/author.rb</filename><programlisting>class Author &lt; ActiveRecord::Base
-  attr_accessible :book_id, :first_name, :last_name
-
   belongs_to :book
 end</programlisting></para>
 
@@ -56,57 +52,54 @@ end</programlisting></para>
     system does more for you.</para>
 
     <para>Let's create a record and then destroy it again:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; book = Book.create(title: 'Homo faber')
    (0.1ms)  begin transaction
-  SQL (25.8ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 15:11:41 UTC +00:00], ["title", "Homo faber"], ["updated_at", Sun, 18 Nov 2012 15:11:41 UTC +00:00]]
-   (2.1ms)  commit transaction
-=&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-11-18 15:11:41", updated_at: "2012-11-18 15:11:41"&gt;
+  SQL (2.2ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:30:24 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 16 Jul 2013 13:30:24 UTC +00:00]]
+   (2.2ms)  commit transaction
+=&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2013-07-16 13:30:24", updated_at: "2013-07-16 13:30:24"&gt;
 &gt;&gt; Book.count
-   (0.3ms)  SELECT COUNT(*) FROM "books" 
+   (0.3ms)  SELECT COUNT(*) FROM "books"
 =&gt; 1
 &gt;&gt; book.destroy
-   (0.1ms)  begin transaction
-  Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 1
+   (0.2ms)  begin transaction
+  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = ?  [["book_id", 1]]
   SQL (0.3ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 1]]
-   (3.0ms)  commit transaction
-=&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-11-18 15:11:41", updated_at: "2012-11-18 15:11:41"&gt;
+   (0.6ms)  commit transaction
+=&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2013-07-16 13:30:24", updated_at: "2013-07-16 13:30:24"&gt;
 &gt;&gt; Book.count
-   (0.2ms)  SELECT COUNT(*) FROM "books" 
+   (0.4ms)  SELECT COUNT(*) FROM "books"
 =&gt; 0
 &gt;&gt;</screen></para>
 
-    <para>As we are using the option <code>:dependent =&gt; :destroy</code> in
-    the Book model, we can also automatically remove all authors:<screen>&gt;&gt; Book.create(title: 'Homo faber').authors.create(first_name: 'Max', last_name: 'Frisch')
+    <para>As we are using the option <code>dependent: :destroy</code> in the
+    Book model, we can also automatically remove all authors:<screen>&gt;&gt; Book.create(title: 'Homo faber').authors.create(first_name: 'Max', last_name: 'Frisch')
    (0.1ms)  begin transaction
-  SQL (0.6ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 15:12:57 UTC +00:00], ["title", "Homo faber"], ["updated_at", Sun, 18 Nov 2012 15:12:57 UTC +00:00]]
-   (2.6ms)  commit transaction
+  SQL (0.6ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:31:11 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 16 Jul 2013 13:31:11 UTC +00:00]]
+   (1.9ms)  commit transaction
    (0.1ms)  begin transaction
-  SQL (0.6ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 2], ["created_at", Sun, 18 Nov 2012 15:12:57 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Sun, 18 Nov 2012 15:12:57 UTC +00:00]]
-   (0.9ms)  commit transaction
-=&gt; #&lt;Author id: 1, book_id: 2, first_name: "Max", last_name: "Frisch", created_at: "2012-11-18 15:12:57", updated_at: "2012-11-18 15:12:57"&gt;
-&gt;&gt; Book.count
-   (0.3ms)  SELECT COUNT(*) FROM "books" 
-=&gt; 1
+  SQL (0.5ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 2], ["created_at", Tue, 16 Jul 2013 13:31:11 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Tue, 16 Jul 2013 13:31:11 UTC +00:00]]
+   (1.0ms)  commit transaction
+=&gt; #&lt;Author id: 1, book_id: 2, first_name: "Max", last_name: "Frisch", created_at: "2013-07-16 13:31:11", updated_at: "2013-07-16 13:31:11"&gt;
 &gt;&gt; Author.count
-   (0.3ms)  SELECT COUNT(*) FROM "authors" 
+   (0.4ms)  SELECT COUNT(*) FROM "authors"
 =&gt; 1
 &gt;&gt; Book.first.destroy
-  Book Load (0.2ms)  SELECT "books".* FROM "books" LIMIT 1
+  Book Load (0.3ms)  SELECT "books".* FROM "books" ORDER BY "books"."id" ASC LIMIT 1
    (0.1ms)  begin transaction
-  Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 2
-  SQL (0.2ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
+  Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = ?  [["book_id", 2]]
+  SQL (0.3ms)  DELETE FROM "authors" WHERE "authors"."id" = ?  [["id", 1]]
   SQL (0.1ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 2]]
-   (2.2ms)  commit transaction
-=&gt; #&lt;Book id: 2, title: "Homo faber", created_at: "2012-11-18 15:12:57", updated_at: "2012-11-18 15:12:57"&gt;
+   (2.1ms)  commit transaction
+=&gt; #&lt;Book id: 2, title: "Homo faber", created_at: "2013-07-16 13:31:11", updated_at: "2013-07-16 13:31:11"&gt;
 &gt;&gt; Author.count
-   (0.3ms)  SELECT COUNT(*) FROM "authors" 
+   (0.4ms)  SELECT COUNT(*) FROM "authors"
 =&gt; 0
 &gt;&gt;</screen></para>
 
-    <para>When removing records, please always remember that there is a
-    difference between the content of the database and the value of the
-    currently removed object. The instance is <foreignphrase
+    <para>When removing records, please always consider the difference between
+    the content of the database table and the value of the currently removed
+    object. The instance is <foreignphrase
     xml:lang="en">frozen</foreignphrase> after removing the database field. So
     it is no longer in the database, but still present in the program, yet it
     can no longer be modified there. It is read-only. To check, you can use
@@ -114,20 +107,20 @@ Loading development environment (Rails 3.2.9)
         <primary>frozen?()</primary>
       </indexterm><methodname>frozen?</methodname>:<screen>&gt;&gt; book = Book.create(title: 'Homo faber')
    (0.1ms)  begin transaction
-  SQL (1.2ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 15:14:04 UTC +00:00], ["title", "Homo faber"], ["updated_at", Sun, 18 Nov 2012 15:14:04 UTC +00:00]]
-   (2.5ms)  commit transaction
-=&gt; #&lt;Book id: 3, title: "Homo faber", created_at: "2012-11-18 15:14:04", updated_at: "2012-11-18 15:14:04"&gt;
+  SQL (0.6ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:32:30 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 16 Jul 2013 13:32:30 UTC +00:00]]
+   (2.0ms)  commit transaction
+=&gt; #&lt;Book id: 3, title: "Homo faber", created_at: "2013-07-16 13:32:30", updated_at: "2013-07-16 13:32:30"&gt;
 &gt;&gt; book.destroy
    (0.1ms)  begin transaction
-  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = 3
-  SQL (0.2ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 3]]
+  Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = ?  [["book_id", 3]]
+  SQL (0.4ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 3]]
    (1.9ms)  commit transaction
-=&gt; #&lt;Book id: 3, title: "Homo faber", created_at: "2012-11-18 15:14:04", updated_at: "2012-11-18 15:14:04"&gt;
+=&gt; #&lt;Book id: 3, title: "Homo faber", created_at: "2013-07-16 13:32:30", updated_at: "2013-07-16 13:32:30"&gt;
 &gt;&gt; Book.count
-   (0.3ms)  SELECT COUNT(*) FROM "books" 
+   (0.2ms)  SELECT COUNT(*) FROM "books"
 =&gt; 0
 &gt;&gt; book
-=&gt; #&lt;Book id: 3, title: "Homo faber", created_at: "2012-11-18 15:14:04", updated_at: "2012-11-18 15:14:04"&gt;
+=&gt; #&lt;Book id: 3, title: "Homo faber", created_at: "2013-07-16 13:32:30", updated_at: "2013-07-16 13:32:30"&gt;
 &gt;&gt; book.frozen?
 =&gt; true
 &gt;&gt; </screen></para>
@@ -137,9 +130,9 @@ Loading development environment (Rails 3.2.9)
     then revive the entire record? The answer is yes, but it will then be a
     new record:<screen>&gt;&gt; Book.create(title: book.title)
    (0.1ms)  begin transaction
-  SQL (0.6ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 15:15:06 UTC +00:00], ["title", "Homo faber"], ["updated_at", Sun, 18 Nov 2012 15:15:06 UTC +00:00]]
+  SQL (0.5ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:33:31 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 16 Jul 2013 13:33:31 UTC +00:00]]
    (1.7ms)  commit transaction
-=&gt; #&lt;Book id: 4, title: "Homo faber", created_at: "2012-11-18 15:15:06", updated_at: "2012-11-18 15:15:06"&gt;
+=&gt; #&lt;Book id: 4, title: "Homo faber", created_at: "2013-07-16 13:33:31", updated_at: "2013-07-16 13:33:31"&gt;
 &gt;&gt; exit
 $</screen></para>
   </section>
@@ -162,35 +155,31 @@ $</screen></para>
     row in the database and nothing else.</para>
 
     <para>Let's create a book with one author and then remove the book with
-    <methodname>delete</methodname>:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+    <methodname>delete</methodname>:<screen>$ rake db:reset
+  [...]
+$ rails console
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Book.create(title: 'Homo faber').authors.create(first_name: 'Max', last_name: 'Frisch')
    (0.1ms)  begin transaction
-  SQL (24.4ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 15:27:59 UTC +00:00], ["title", "Homo faber"], ["updated_at", Sun, 18 Nov 2012 15:27:59 UTC +00:00]]
-   (3.0ms)  commit transaction
-   (0.1ms)  begin transaction
-  SQL (0.6ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 1], ["created_at", Sun, 18 Nov 2012 15:27:59 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Sun, 18 Nov 2012 15:27:59 UTC +00:00]]
-   (1.0ms)  commit transaction
-=&gt; #&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-11-18 15:27:59", updated_at: "2012-11-18 15:27:59"&gt;
-&gt;&gt; Book.count
-   (0.3ms)  SELECT COUNT(*) FROM "books" 
-=&gt; 1
+  SQL (2.2ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:35:49 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 16 Jul 2013 13:35:49 UTC +00:00]]
+   (2.5ms)  commit transaction
+   (0.0ms)  begin transaction
+  SQL (0.4ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 1], ["created_at", Tue, 16 Jul 2013 13:35:49 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Tue, 16 Jul 2013 13:35:49 UTC +00:00]]
+   (0.9ms)  commit transaction
+=&gt; #&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2013-07-16 13:35:49", updated_at: "2013-07-16 13:35:49"&gt;
 &gt;&gt; Author.count
-   (0.3ms)  SELECT COUNT(*) FROM "authors" 
+   (0.3ms)  SELECT COUNT(*) FROM "authors"
 =&gt; 1
 &gt;&gt; Book.last.delete
-  Book Load (0.3ms)  SELECT "books".* FROM "books" ORDER BY "books"."id" DESC LIMIT 1
-  SQL (2.8ms)  DELETE FROM "books" WHERE "books"."id" = 1
-=&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2012-11-18 15:27:59", updated_at: "2012-11-18 15:27:59"&gt;
-&gt;&gt; Book.count
-   (0.3ms)  SELECT COUNT(*) FROM "books" 
-=&gt; 0
+  Book Load (0.2ms)  SELECT "books".* FROM "books" ORDER BY "books"."id" DESC LIMIT 1
+  SQL (2.9ms)  DELETE FROM "books" WHERE "books"."id" = 1
+=&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2013-07-16 13:35:49", updated_at: "2013-07-16 13:35:49"&gt;
 &gt;&gt; Author.count
-   (0.3ms)  SELECT COUNT(*) FROM "authors" 
+   (0.4ms)  SELECT COUNT(*) FROM "authors"
 =&gt; 1
-&gt;&gt; Author.last
-  Author Load (0.3ms)  SELECT "authors".* FROM "authors" ORDER BY "authors"."id" DESC LIMIT 1
-=&gt; #&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2012-11-18 15:27:59", updated_at: "2012-11-18 15:27:59"&gt;
+&gt;&gt; Book.count
+   (0.4ms)  SELECT COUNT(*) FROM "books"
+=&gt; 0
 &gt;&gt; exit
 $</screen></para>
 
