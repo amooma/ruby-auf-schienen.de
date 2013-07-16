@@ -38,10 +38,10 @@
   <methodname>has_one</methodname> also creates a logical relation between two
   models. But in contrast to <methodname>has_many,</methodname> one record is
   only ever associated with exactly one other record in
-  <methodname>has_one</methodname>. <emphasis>In most practical cases of
-  application, it logically makes sense to put both into the same model and
-  therefore the same database table, but for the sake of completeness I also
-  want to discuss <methodname>has_one</methodname> here.</emphasis><tip>
+  <methodname>has_one</methodname>. In most practical cases of application, it
+  logically makes sense to put both into the same model and therefore the same
+  database table, but for the sake of completeness I also want to discuss
+  has_one here.<tip>
       <para>You can probably safely skip <methodname>has_one</methodname>
       without losing any sleep.</para>
     </tip></para>
@@ -77,15 +77,11 @@ $</screen></para>
 
     <para>The association in the file
     <filename>app/model/employee.rb:</filename><programlisting>class Employee &lt; ActiveRecord::Base
-  attr_accessible :last_name
-
   has_one :office
 end</programlisting></para>
 
     <para>And its counterpart in the file
     <filename>app/model/office.rb:</filename><programlisting>class Office &lt; ActiveRecord::Base
-  attr_accessible :employee_id, :location
-
   belongs_to :employee
 end</programlisting></para>
 
@@ -95,8 +91,7 @@ end</programlisting></para>
       <para>The options of <methodname>has_one</methodname> are similar to
       those of <methodname>has_many</methodname>. So for details, please refer
       to <xref linkend="activerecord_1n_optionen"/> or <uri
-      xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-has_one">http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-has_one</uri>.
-      </para>
+      xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-has_one">http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-has_one</uri>.</para>
     </section>
   </section>
 
@@ -104,89 +99,88 @@ end</programlisting></para>
     <title>Console Examples</title>
 
     <para>Let's start the console and create two employees:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Employee.create(last_name: 'Udelhoven')
    (0.1ms)  begin transaction
-  SQL (24.3ms)  INSERT INTO "employees" ("created_at", "last_name", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 14:38:58 UTC +00:00], ["last_name", "Udelhoven"], ["updated_at", Sun, 18 Nov 2012 14:38:58 UTC +00:00]]
-   (2.3ms)  commit transaction
-=&gt; #&lt;Employee id: 1, last_name: "Udelhoven", created_at: "2012-11-18 14:38:58", updated_at: "2012-11-18 14:38:58"&gt;
+  SQL (2.3ms)  INSERT INTO "employees" ("created_at", "last_name", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 12:44:24 UTC +00:00], ["last_name", "Udelhoven"], ["updated_at", Tue, 16 Jul 2013 12:44:24 UTC +00:00]]
+   (1.0ms)  commit transaction
+=&gt; #&lt;Employee id: 1, last_name: "Udelhoven", created_at: "2013-07-16 12:44:24", updated_at: "2013-07-16 12:44:24"&gt;
 &gt;&gt; Employee.create(last_name: 'Meier')
-   (0.1ms)  begin transaction
-  SQL (1.4ms)  INSERT INTO "employees" ("created_at", "last_name", "updated_at") VALUES (?, ?, ?)  [["created_at", Sun, 18 Nov 2012 14:39:06 UTC +00:00], ["last_name", "Meier"], ["updated_at", Sun, 18 Nov 2012 14:39:06 UTC +00:00]]
+   (0.2ms)  begin transaction
+  SQL (0.7ms)  INSERT INTO "employees" ("created_at", "last_name", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 12:44:32 UTC +00:00], ["last_name", "Meier"], ["updated_at", Tue, 16 Jul 2013 12:44:32 UTC +00:00]]
    (2.2ms)  commit transaction
-=&gt; #&lt;Employee id: 2, last_name: "Meier", created_at: "2012-11-18 14:39:06", updated_at: "2012-11-18 14:39:06"&gt;
+=&gt; #&lt;Employee id: 2, last_name: "Meier", created_at: "2013-07-16 12:44:32", updated_at: "2013-07-16 12:44:32"&gt;
+&gt;&gt;</screen></para>
+
+    <para>Now the first employee gets his own office:<screen>&gt;&gt; Office.create(location: '2nd floor', employee_id: Employee.first.id)
+  Employee Load (0.2ms)  SELECT "employees".* FROM "employees" ORDER BY "employees"."id" ASC LIMIT 1
+   (0.1ms)  begin transaction
+  SQL (0.4ms)  INSERT INTO "offices" ("created_at", "employee_id", "location", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Tue, 16 Jul 2013 12:45:13 UTC +00:00], ["employee_id", 1], ["location", "2nd floor"], ["updated_at", Tue, 16 Jul 2013 12:45:13 UTC +00:00]]
+   (2.2ms)  commit transaction
+=&gt; #&lt;Office id: 1, location: "2nd floor", employee_id: 1, created_at: "2013-07-16 12:45:13", updated_at: "2013-07-16 12:45:13"&gt;
 &gt;&gt; </screen></para>
 
-    <para>Now an employee gets his own office:<screen>&gt;&gt; Office.create(location: '2nd floor', employee_id: 1)
-   (0.1ms)  begin transaction
-  SQL (0.5ms)  INSERT INTO "offices" ("created_at", "employee_id", "location", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Sun, 18 Nov 2012 14:39:47 UTC +00:00], ["employee_id", 1], ["location", "2nd floor"], ["updated_at", Sun, 18 Nov 2012 14:39:47 UTC +00:00]]
-   (3.1ms)  commit transaction
-=&gt; #&lt;Office id: 1, location: "2nd floor", employee_id: 1, created_at: "2012-11-18 14:39:47", updated_at: "2012-11-18 14:39:47"&gt;
-&gt;&gt; Employee.first.office
-  Employee Load (0.3ms)  SELECT "employees".* FROM "employees" LIMIT 1
-  Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 1 LIMIT 1
-=&gt; #&lt;Office id: 1, location: "2nd floor", employee_id: 1, created_at: "2012-11-18 14:39:47", updated_at: "2012-11-18 14:39:47"&gt;
+    <para>Both directions can be accessed the normal way:<screen>&gt;&gt; Employee.first.office
+  Employee Load (0.4ms)  SELECT "employees".* FROM "employees" ORDER BY "employees"."id" ASC LIMIT 1
+  Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = ? ORDER BY "offices"."id" ASC LIMIT 1  [["employee_id", 1]]
+=&gt; #&lt;Office id: 1, location: "2nd floor", employee_id: 1, created_at: "2013-07-16 12:45:13", updated_at: "2013-07-16 12:45:13"&gt;
 &gt;&gt; Office.first.employee
-  Office Load (0.3ms)  SELECT "offices".* FROM "offices" LIMIT 1
-  Employee Load (0.2ms)  SELECT "employees".* FROM "employees" WHERE "employees"."id" = 1 LIMIT 1
-=&gt; #&lt;Employee id: 1, last_name: "Udelhoven", created_at: "2012-11-18 14:38:58", updated_at: "2012-11-18 14:38:58"&gt;
+  Office Load (0.3ms)  SELECT "offices".* FROM "offices" ORDER BY "offices"."id" ASC LIMIT 1
+  Employee Load (0.2ms)  SELECT "employees".* FROM "employees" WHERE "employees"."id" = ? ORDER BY "employees"."id" ASC LIMIT 1  [["id", 1]]
+=&gt; #&lt;Employee id: 1, last_name: "Udelhoven", created_at: "2013-07-16 12:44:24", updated_at: "2013-07-16 12:44:24"&gt;
 &gt;&gt;</screen></para>
 
     <para>For the second employee, we use the automatically generated method
     <methodname>create_office</methodname> (with
     <methodname>has_many</methodname>, we would use
     <methodname>offices.create</methodname> here):<screen>&gt;&gt; Employee.last.create_office(location: '1st floor')
-  Employee Load (0.3ms)  SELECT "employees".* FROM "employees" ORDER BY "employees"."id" DESC LIMIT 1
+  Employee Load (0.2ms)  SELECT "employees".* FROM "employees" ORDER BY "employees"."id" DESC LIMIT 1
    (0.1ms)  begin transaction
-  SQL (0.5ms)  INSERT INTO "offices" ("created_at", "employee_id", "location", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Sun, 18 Nov 2012 14:40:51 UTC +00:00], ["employee_id", 2], ["location", "1st floor"], ["updated_at", Sun, 18 Nov 2012 14:40:51 UTC +00:00]]
-   (1.9ms)  commit transaction
-  Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 2 LIMIT 1
-=&gt; #&lt;Office id: 2, location: "1st floor", employee_id: 2, created_at: "2012-11-18 14:40:51", updated_at: "2012-11-18 14:40:51"&gt;
-&gt;&gt;</screen></para>
+  SQL (0.5ms)  INSERT INTO "offices" ("created_at", "employee_id", "location", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Tue, 16 Jul 2013 12:46:58 UTC +00:00], ["employee_id", 2], ["location", "1st floor"], ["updated_at", Tue, 16 Jul 2013 12:46:58 UTC +00:00]]
+   (2.3ms)  commit transaction
+  Office Load (0.1ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = ? ORDER BY "offices"."id" ASC LIMIT 1  [["employee_id", 2]]
+=&gt; #&lt;Office id: 2, location: "1st floor", employee_id: 2, created_at: "2013-07-16 12:46:58", updated_at: "2013-07-16 12:46:58"&gt;
+&gt;&gt; </screen></para>
 
     <para>Removing is intuitively done via
     <methodname>destroy</methodname>:<screen>&gt;&gt; Employee.first.office.destroy
-  Employee Load (0.3ms)  SELECT "employees".* FROM "employees" LIMIT 1
-  Office Load (0.1ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 1 LIMIT 1
+  Employee Load (0.3ms)  SELECT "employees".* FROM "employees" ORDER BY "employees"."id" ASC LIMIT 1
+  Office Load (0.1ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = ? ORDER BY "offices"."id" ASC LIMIT 1  [["employee_id", 1]]
    (0.1ms)  begin transaction
   SQL (0.3ms)  DELETE FROM "offices" WHERE "offices"."id" = ?  [["id", 1]]
-   (2.2ms)  commit transaction
-=&gt; #&lt;Office id: 1, location: "2nd floor", employee_id: 1, created_at: "2012-11-18 14:39:47", updated_at: "2012-11-18 14:39:47"&gt;
-&gt;&gt; Office.exists?(1)
-  Office Exists (0.2ms)  SELECT 1 AS one FROM "offices" WHERE "offices"."id" = 1 LIMIT 1
-=&gt; false
-&gt;&gt; exit
-$ </screen></para>
+   (2.4ms)  commit transaction
+=&gt; #&lt;Office id: 1, location: "2nd floor", employee_id: 1, created_at: "2013-07-16 12:45:13", updated_at: "2013-07-16 12:45:13"&gt;
+&gt;&gt;&gt;&gt; Employee.first.office
+  Employee Load (0.4ms)  SELECT "employees".* FROM "employees" ORDER BY "employees"."id" ASC LIMIT 1
+  Office Load (0.1ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = ? ORDER BY "offices"."id" ASC LIMIT 1  [["employee_id", 1]]
+=&gt; nil
+&gt;&gt;&gt;&gt;</screen></para>
 
     <warning>
       <para>If you create a new <classname>Office</classname> for an
       <classname>Employee</classname> with an existing
       <classname>Office</classname> then you will not get an error
-      message:<screen>&gt;&gt; Employee.last.office
-  Employee Load (0.1ms)  SELECT "employees".* FROM "employees" ORDER BY "employees"."id" DESC LIMIT 1
-  Office Load (0.1ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 2 LIMIT 1
-=&gt; #&lt;Office id: 2, location: "1st floor", employee_id: 2, created_at: "2012-11-18 14:40:51", updated_at: "2012-11-18 14:40:51"&gt;
-&gt;&gt; Employee.last.create_office(location: 'Basement')
+      message:<screen>&gt;&gt; Employee.last.create_office(location: 'Basement')
   Employee Load (0.3ms)  SELECT "employees".* FROM "employees" ORDER BY "employees"."id" DESC LIMIT 1
-   (0.0ms)  begin transaction
-  SQL (5.8ms)  INSERT INTO "offices" ("created_at", "employee_id", "location", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Sun, 18 Nov 2012 14:42:59 UTC +00:00], ["employee_id", 2], ["location", "Basement"], ["updated_at", Sun, 18 Nov 2012 14:42:59 UTC +00:00]]
-   (3.0ms)  commit transaction
-  Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 2 LIMIT 1
-   (0.0ms)  begin transaction
-   (0.2ms)  UPDATE "offices" SET "employee_id" = NULL, "updated_at" = '2012-11-18 14:42:59.648228' WHERE "offices"."id" = 2
-   (0.6ms)  commit transaction
-=&gt; #&lt;Office id: 3, location: "Basement", employee_id: 2, created_at: "2012-11-18 14:42:59", updated_at: "2012-11-18 14:42:59"&gt;
+   (0.1ms)  begin transaction
+  SQL (0.4ms)  INSERT INTO "offices" ("created_at", "employee_id", "location", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Tue, 16 Jul 2013 12:48:44 UTC +00:00], ["employee_id", 2], ["location", "Basement"], ["updated_at", Tue, 16 Jul 2013 12:48:44 UTC +00:00]]
+   (1.9ms)  commit transaction
+  Office Load (0.1ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = ? ORDER BY "offices"."id" ASC LIMIT 1  [["employee_id", 2]]
+   (0.1ms)  begin transaction
+  SQL (0.4ms)  UPDATE "offices" SET "employee_id" = ?, "updated_at" = ? WHERE "offices"."id" = 2  [["employee_id", nil], ["updated_at", Tue, 16 Jul 2013 12:48:44 UTC +00:00]]
+   (0.8ms)  commit transaction
+=&gt; #&lt;Office id: 3, location: "Basement", employee_id: 2, created_at: "2013-07-16 12:48:44", updated_at: "2013-07-16 12:48:44"&gt;
 &gt;&gt; Employee.last.office
-  Employee Load (0.3ms)  SELECT "employees".* FROM "employees" ORDER BY "employees"."id" DESC LIMIT 1
-  Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = 2 LIMIT 1
-=&gt; #&lt;Office id: 3, location: "Basement", employee_id: 2, created_at: "2012-11-18 14:42:59", updated_at: "2012-11-18 14:42:59"&gt;
+  Employee Load (0.2ms)  SELECT "employees".* FROM "employees" ORDER BY "employees"."id" DESC LIMIT 1
+  Office Load (0.2ms)  SELECT "offices".* FROM "offices" WHERE "offices"."employee_id" = ? ORDER BY "offices"."id" ASC LIMIT 1  [["employee_id", 2]]
+=&gt; #&lt;Office id: 3, location: "Basement", employee_id: 2, created_at: "2013-07-16 12:48:44", updated_at: "2013-07-16 12:48:44"&gt;
 &gt;&gt;</screen></para>
 
       <para>The old <classname>Office</classname> is even still in the
       database (the <varname>employee_id</varname> was automatically set to
       <code>nil</code>):<screen>&gt;&gt; Office.all
-  Office Load (0.5ms)  SELECT "offices".* FROM "offices" 
-=&gt; [#&lt;Office id: 2, location: "1st floor", employee_id: nil, created_at: "2012-11-18 14:40:51", updated_at: "2012-11-18 14:42:59"&gt;, #&lt;Office id: 3, location: "Basement", employee_id: 2, created_at: "2012-11-18 14:42:59", updated_at: "2012-11-18 14:42:59"&gt;]
+  Office Load (0.3ms)  SELECT "offices".* FROM "offices"
+=&gt; #&lt;ActiveRecord::Relation [#&lt;Office id: 2, location: "1st floor", employee_id: nil, created_at: "2013-07-16 12:46:58", updated_at: "2013-07-16 12:48:44"&gt;, #&lt;Office id: 3, location: "Basement", employee_id: 2, created_at: "2013-07-16 12:48:44", updated_at: "2013-07-16 12:48:44"&gt;]&gt;
 &gt;&gt; exit
 $</screen></para>
     </warning>
@@ -199,7 +193,7 @@ $</screen></para>
     <methodname>belongs_to</methodname> offer the option of representing a 1:1
     relationship. The difference in practice is in the programmer's personal
     preference and the location of the foreign key. In general,
-    <methodname>has_one</methodname> tends to be used rarely and depends on
-    the degree of normalization of the data schema.</para>
+    <methodname>has_one</methodname> tends to be used very rarely and depends
+    on the degree of normalization of the data schema.</para>
   </section>
 </section>
