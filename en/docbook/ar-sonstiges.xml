@@ -118,7 +118,7 @@
     enter upper case letters. You could use a
     <methodname>before_save</methodname> callback to convert the attribute
     <varname>email</varname> to lower case via the method
-    <methodname>downcase</methodname>. </para>
+    <methodname>downcase</methodname>.</para>
 
     <para>The Rails application:<screen>$ rails new shop
   [...]
@@ -132,14 +132,12 @@ $</screen></para>
     <para>Here is what the model <filename>app/models/user.rb</filename> would
     look like. The interesting stuff is the <code>before_save</code>
     part:<programlisting>class User &lt; ActiveRecord::Base
-  attr_accessible :email, :login
-
   validates :login,
-            :presence =&gt; true
+            presence: true
 
   validates :email,
-            :presence =&gt; true,
-            :format =&gt; { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }
+            presence: true,
+            format: { :with =&gt; /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }
 
   before_save :downcase_email
 
@@ -153,7 +151,7 @@ end</programlisting></para>
 
     <para>Let's see in the console if it really works as we want it
     to:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; User.create(login: 'smith', email: 'SMITH@example.com')
    (0.1ms)  begin transaction
   SQL (29.9ms)  INSERT INTO "users" ("created_at", "email", "login", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Wed, 21 Nov 2012 09:14:47 UTC +00:00], ["email", "smith@example.com"], ["login", "smith"], ["updated_at", Wed, 21 Nov 2012 09:14:47 UTC +00:00]]
@@ -204,7 +202,6 @@ $</screen></para>
 
     <para>We write an <methodname>after_initialize</methodname> callback into
     the file <filename>app/models/order.rb</filename>:<programlisting>class Order &lt; ActiveRecord::Base
-  attr_accessible :product_id, :quantity
   after_initialize :set_defaults
 
   private
@@ -215,7 +212,7 @@ end</programlisting></para>
 
     <para>And now we check in the console if a new order object automatically
     contains the quantity 1:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; order = Order.new
 =&gt; #&lt;Order id: nil, product_id: nil, quantity: 1, created_at: nil, updated_at: nil&gt;
 &gt;&gt; order.quantity
