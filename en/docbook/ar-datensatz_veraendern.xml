@@ -72,22 +72,22 @@ $</screen></para>
 
     <para>If you are not sure if a record has been changed and not yet saved,
     you can check via the method <methodname>changed?</methodname>:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; album = Album.last
-  Album Load (0.2ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
-=&gt; #&lt;Album id: 13, name: "I Got a Woman", release_year: 1955, created_at: "2012-11-14 13:39:49", updated_at: "2012-11-14 13:39:49"&gt;
-&gt;&gt; album.changed?
+Loading development environment (Rails 4.0.0)
+&gt;&gt; beatles_album = Album.where(id: 10).first
+  Album Load (0.1ms)  SELECT "albums".* FROM "albums" WHERE "albums"."id" = 10 ORDER BY "albums"."id" ASC LIMIT 1
+=&gt; #&lt;Album id: 10, name: "A Test", release_year: 1968, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-16 08:08:00"&gt;
+&gt;&gt; beatles_album.changed?
 =&gt; false
-&gt;&gt; album.name = 'The Beatles'
+&gt;&gt; beatles_album.name = 'The Beatles'
 =&gt; "The Beatles"
-&gt;&gt; album.changed?
+&gt;&gt; beatles_album.changed?
 =&gt; true
-&gt;&gt; album.save
-   (0.1ms)  begin transaction
-   (0.5ms)  UPDATE "albums" SET "name" = 'The Beatles', "updated_at" = '2012-11-14 18:55:35.410521' WHERE "albums"."id" = 13
-   (0.7ms)  commit transaction
+&gt;&gt; beatles_album.save
+   (0.2ms)  begin transaction
+  SQL (2.3ms)  UPDATE "albums" SET "name" = ?, "updated_at" = ? WHERE "albums"."id" = 10  [["name", "The Beatles"], ["updated_at", Tue, 16 Jul 2013 08:23:52 UTC +00:00]]
+   (2.9ms)  commit transaction
 =&gt; true
-&gt;&gt; album.changed?
+&gt;&gt; beatles_album.changed?
 =&gt; false
 &gt;&gt; exit
 $</screen></para>
@@ -111,35 +111,31 @@ $</screen></para>
 
     <para>Let's use this method within the example used in <xref
     linkend="activerecord_einfaches_editieren"/>:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; album = Album.last
-  Album Load (0.1ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
-=&gt; #&lt;Album id: 13, name: "The Beatles", release_year: 1955, created_at: "2012-11-14 13:39:49", updated_at: "2012-11-14 18:55:35"&gt;
-&gt;&gt; album.changed?
+Loading development environment (Rails 4.0.0)
+&gt;&gt; first_album = Album.first
+  Album Load (0.1ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" ASC LIMIT 1
+=&gt; #&lt;Album id: 1, name: "Sgt. Pepper's Lonely Hearts Club Band", release_year: 1967, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;
+&gt;&gt; first_album.changed?
 =&gt; false
-&gt;&gt; album.update_attributes(:name =&gt; 'Another Test')
-   (0.1ms)  begin transaction
-   (0.4ms)  UPDATE "albums" SET "name" = 'Another Test', "updated_at" = '2012-11-14 18:56:52.466887' WHERE "albums"."id" = 13
-   (1.7ms)  commit transaction
+&gt;&gt; first_album.update_attributes(name: 'Another Test')
+   (0.2ms)  begin transaction
+  SQL (2.2ms)  UPDATE "albums" SET "name" = ?, "updated_at" = ? WHERE "albums"."id" = 1  [["name", "Another Test"], ["updated_at", Tue, 16 Jul 2013 08:25:24 UTC +00:00]]
+   (3.0ms)  commit transaction
 =&gt; true
-&gt;&gt; album.changed?
+&gt;&gt; first_album.changed?
 =&gt; false
-&gt;&gt; Album.last
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
-=&gt; #&lt;Album id: 13, name: "Another Test", release_year: 1955, created_at: "2012-11-14 13:39:49", updated_at: "2012-11-14 18:56:52"&gt;
+&gt;&gt; Album.first
+  Album Load (0.5ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" ASC LIMIT 1
+=&gt; #&lt;Album id: 1, name: "Another Test", release_year: 1967, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-16 08:25:24"&gt;
 &gt;&gt; </screen></para>
 
-    <para>This kind of update can also be directly combined with a
-    <methodname>where</methodname> method and then becomes almost
-    atomic:<screen>&gt;&gt; Album.where(:name =&gt; 'Another Test').first.update_attributes(:name =&gt; 'The Beatles')
-  Album Load (0.1ms)  SELECT "albums".* FROM "albums" WHERE "albums"."name" = 'Another Test' LIMIT 1
+    <para>This kind of update can also be chained with a
+    <methodname>where</methodname> method:<screen>&gt;&gt; Album.where(name: 'Another Test').first.update_attributes(name: "Sgt. Pepper's Lonely Hearts Club Band")
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE "albums"."name" = 'Another Test' ORDER BY "albums"."id" ASC LIMIT 1
    (0.1ms)  begin transaction
-   (0.3ms)  UPDATE "albums" SET "name" = 'The Beatles', "updated_at" = '2012-11-14 18:57:59.415265' WHERE "albums"."id" = 13
-   (0.7ms)  commit transaction
+  SQL (0.9ms)  UPDATE "albums" SET "name" = ?, "updated_at" = ? WHERE "albums"."id" = 1  [["name", "Sgt. Pepper's Lonely Hearts Club Band"], ["updated_at", Tue, 16 Jul 2013 08:27:25 UTC +00:00]]
+   (3.0ms)  commit transaction
 =&gt; true
-&gt;&gt; Album.last
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
-=&gt; #&lt;Album id: 13, name: "The Beatles", release_year: 1955, created_at: "2012-11-14 13:39:49", updated_at: "2012-11-14 18:57:59"&gt;
 &gt;&gt; exit
 $</screen></para>
   </section>
@@ -153,74 +149,59 @@ $</screen></para>
       <secondary>locking</secondary>
     </indexterm>
 
-    <para>By default, Rails uses <quote>optimistic locking</quote> of records.
-    But you can turn this off.</para>
+    <para>There are many ways of locking a database. By default, Rails uses
+    <quote>optimistic locking</quote> of records. To activate locking you need
+    to have an attribute with the name <varname>lock_version</varname> which
+    has to be an integer. To show how it works I'll create a new Rails project
+    with a <classname>Product</classname> model. Than I'll try to change the
+    price of the first <classname>Product</classname> on two different
+    instances. The second change will raise an
+    <errorname>ActiveRecord::StaleObjectError</errorname>.</para>
 
-    <para>As optimistic locking is ideal for most users and chances are you
-    never thought about the problem before reading this paragraph, I will not
-    dive into it in any more detail and simply point you towards the
-    <literal>ri</literal> help which includes good examples. If you require
-    pessimistic locking, you will find the required parameters there.</para>
-
-    <para><screen>$ ri -T ActiveRecord::Locking::Optimistic
-ActiveRecord::Locking::Optimistic
-
-(from gem activerecord-3.2.9)
-------------------------------------------------------------------------------
-What is Optimistic Locking
-
-Optimistic locking allows multiple users to access the same record for edits,
-and assumes a minimum of conflicts with the data. It does this by checking
-whether another process has made changes to a record since it was opened, an
-ActiveRecord::StaleObjectError exception is thrown if that has occurred
-and the update is ignored.
-
-Check out ActiveRecord::Locking::Pessimistic for an alternative.
-
-Usage
-
-Active Records support optimistic locking if the field lock_version is
-present. Each update to the record increments the lock_version column
-and the locking facilities ensure that records instantiated twice will let the
-last one saved raise a StaleObjectError if the first was also updated.
-Example:
-
-  p1 = Person.find(1)
-  p2 = Person.find(1)
-
-  p1.first_name = "Michael"
-  p1.save
-
-  p2.first_name = "should fail"
-  p2.save # Raises a ActiveRecord::StaleObjectError
-
-Optimistic locking will also check for stale data when objects are destroyed.
-Example:
-
-  p1 = Person.find(1)
-  p2 = Person.find(1)
-
-  p1.first_name = "Michael"
-  p1.save
-
-  p2.destroy # Raises a ActiveRecord::StaleObjectError
-
-You're then responsible for dealing with the conflict by rescuing the
-exception and either rolling back, merging, or otherwise apply the business
-logic needed to resolve the conflict.
-
-This locking mechanism will function inside a single Ruby process. To make it
-work across all web requests, the recommended approach is to add
-lock_version as a hidden field to your form.
-
-You must ensure that your database schema defaults the lock_version
-column to 0.
-
-This behavior can be turned off by setting
-ActiveRecord::Base.lock_optimistically = false. To override the name of
-the lock_version column, invoke the set_locking_column method.
-This method uses the same syntax as set_table_name
-------------------------------------------------------------------------------
+    <para>Example setup:<screen>$ rails new shop
+  [...]
+$ cd shop
+$ rails generate model Product name 'price:decimal{8,2}' lock_version:integer 
+  [...]
+$ rake db:migrate
+  [...]
 $</screen></para>
+
+    <para>Raising an
+    <errorname>ActiveRecord::StaleObjectError</errorname>:<screen>$ rails console
+Loading development environment (Rails 4.0.0)
+&gt;&gt; Product.create(name: 'Orange', price: 0.5)
+   (0.1ms)  begin transaction
+  SQL (4.7ms)  INSERT INTO "products" ("created_at", "lock_version", "name", "price", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Tue, 16 Jul 2013 11:24:56 UTC +00:00], ["lock_version", 0], ["name", "Orange"], ["price", #&lt;BigDecimal:7f958e0f5de0,'0.5E0',9(45)&gt;], ["updated_at", Tue, 16 Jul 2013 11:24:56 UTC +00:00]]
+   (3.2ms)  commit transaction
+=&gt; #&lt;Product id: 1, name: "Orange", price: #&lt;BigDecimal:7f958e0f5de0,'0.5E0',9(45)&gt;, lock_version: 0, created_at: "2013-07-16 11:24:56", updated_at: "2013-07-16 11:24:56"&gt;
+&gt;&gt; a = Product.first
+  Product Load (0.3ms)  SELECT "products".* FROM "products" ORDER BY "products"."id" ASC LIMIT 1
+=&gt; #&lt;Product id: 1, name: "Orange", price: #&lt;BigDecimal:7f958d098768,'0.5E0',9(45)&gt;, lock_version: 0, created_at: "2013-07-16 11:24:56", updated_at: "2013-07-16 11:24:56"&gt;
+&gt;&gt; b = Product.first
+  Product Load (0.4ms)  SELECT "products".* FROM "products" ORDER BY "products"."id" ASC LIMIT 1
+=&gt; #&lt;Product id: 1, name: "Orange", price: #&lt;BigDecimal:7f958e1268a0,'0.5E0',9(45)&gt;, lock_version: 0, created_at: "2013-07-16 11:24:56", updated_at: "2013-07-16 11:24:56"&gt;
+&gt;&gt; a.price = 0.6
+=&gt; 0.6
+&gt;&gt; a.save
+   (0.2ms)  begin transaction
+   (0.5ms)  UPDATE "products" SET "price" = 0.6, "updated_at" = '2013-07-16 11:25:41.931401', "lock_version" = 1 WHERE ("products"."id" = 1 AND "products"."lock_version" = 0)
+   (2.0ms)  commit transaction
+=&gt; true
+&gt;&gt; b.price = 0.7
+=&gt; 0.7
+&gt;&gt; b.save
+   (0.1ms)  begin transaction
+   (0.2ms)  UPDATE "products" SET "price" = 0.7, "updated_at" = '2013-07-16 11:25:49.170722', "lock_version" = 1 WHERE ("products"."id" = 1 AND "products"."lock_version" = 0)
+   (0.1ms)  rollback transaction
+ActiveRecord::StaleObjectError: Attempted to update a stale object: Product
+[...]
+&gt;&gt; exit
+$</screen></para>
+
+    <para>You have to deal with the conflict by rescuing the exception and fix
+    the conflict depending on your business logic. Please make sure to add a
+    <varname>lock_version</varname> hidden field in your forms while using
+    this mechanism with a WebGUI.</para>
   </section>
 </section>
