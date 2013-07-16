@@ -42,16 +42,6 @@ db/development.sqlite3 already exists
    -&gt; 0.0010s
 $ </screen></para>
 
-  <section>
-    <title>Opinionated </title>
-
-    <para>Over the last couple of years there have been many changes in the
-    way queries can be placed in ActiveRecord. Many of those became deprecated
-    or will become deprecated in Rails 5.0. In this chapter I'll show you the
-    way to search for results which will not get you into trouble when you
-    want to upgrade later.</para>
-  </section>
-
   <section xml:id="activerecord_find">
     <title xml:id="activerecord_find.title">find</title>
 
@@ -464,6 +454,44 @@ $</screen></para>
     <para>As a result, <methodname>pluck</methodname> returns an array.</para>
   </section>
 
+  <section>
+    <title xml:id="activerecord_first_or_create.title">first_or_create and
+    first_or_initialize</title>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>methods</secondary>
+
+      <tertiary>first_or_create</tertiary>
+    </indexterm>
+
+    <indexterm>
+      <primary>ActiveRecord</primary>
+
+      <secondary>methods</secondary>
+
+      <tertiary>first_or_initialize</tertiary>
+    </indexterm>
+
+    <para>The methods <methodname>first_or_create</methodname> and
+    <methodname>first_or_initialize</methodname> are create ways to search for
+    a specific entry in your database or create one if the entry doesn't exist
+    already. Both can be chained to a where search. <screen>$ rails console
+Loading development environment (Rails 4.0.0)
+&gt;&gt; Album.where(name: 'Test')
+  Album Load (0.5ms)  SELECT "albums".* FROM "albums" WHERE "albums"."name" = 'Test'
+=&gt; #&lt;ActiveRecord::Relation []&gt;
+&gt;&gt; test = Album.where(name: 'Test').first_or_create
+  Album Load (0.2ms)  SELECT "albums".* FROM "albums" WHERE "albums"."name" = 'Test' ORDER BY "albums"."id" ASC LIMIT 1
+   (0.1ms)  begin transaction
+  SQL (5.0ms)  INSERT INTO "albums" ("created_at", "name", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 08:00:59 UTC +00:00], ["name", "Test"], ["updated_at", Tue, 16 Jul 2013 08:00:59 UTC +00:00]]
+   (3.7ms)  commit transaction
+=&gt; #&lt;Album id: 11, name: "Test", release_year: nil, created_at: "2013-07-16 08:00:59", updated_at: "2013-07-16 08:00:59"&gt;
+&gt;&gt; exit
+$</screen></para>
+  </section>
+
   <section xml:id="activerecord_berechnungen">
     <title xml:id="activerecord_berechnungen.title">Calculations</title>
 
@@ -635,7 +663,7 @@ $ </screen></para>
   </section>
 
   <section>
-    <title>Batches</title>
+    <title xml:id="activerecord_batches.title">Batches</title>
 
     <indexterm>
       <primary>ActiveRecord</primary>
@@ -665,6 +693,6 @@ BLONDE ON BLONDE
 THE BEATLES
 =&gt; nil
 &gt;&gt; exit
-$</screen> </para>
+$</screen></para>
   </section>
 </section>
