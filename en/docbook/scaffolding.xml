@@ -26,11 +26,6 @@
   <section xml:id="scaffolding_einleitung">
     <title xml:id="scaffolding_einleitung.title">Introduction</title>
 
-    <para>In this chapter, we will move on to scaffolding. I am going to show
-    you a simple scaffold and you will then need to apply the previously
-    gained knowledge on your own (in other words, work through the controller
-    and the views).</para>
-
     <para>Scaffolding means purely and simply that a basic <foreignphrase
     xml:lang="en">scaffold</foreignphrase> for an application is created via a
     generator. This scaffold not only contains the <foreignphrase
@@ -55,14 +50,14 @@
     <para>I think the greatest frustration with Rail arises regularly from the
     fact that many beginners use scaffolding to get quick results without
     having proper basic knowledge of Ruby and without knowing what
-    ActiveRecord is. But then they don't know what to do next. Fortunately,
-    you have worked your way through <xref linkend="ruby-grundlagen"/>, <xref
+    ActiveRecord is. They don't know what to do next. Fortunately, you have
+    worked your way through <xref linkend="ruby-grundlagen"/>, <xref
     linkend="erste_schritte_mit_rails"/> and <xref
     linkend="activerecord_chapter"/>, so you will be able to understand and
     use scaffolding straight away.</para>
 
     <note>
-      <para>This chapter is only an introduction to scaffolding, not an
+      <para>This chapter is an introduction to scaffolding, not an
       encyclopedia that covers all variations. Our focus is on the basic idea
       and on getting beginners started. The same applies to REST.</para>
     </note>
@@ -74,7 +69,7 @@
     <indexterm>
       <primary>scaffolding</primary>
 
-      <secondary>Rails 3.2</secondary>
+      <secondary>Rails 4.0</secondary>
     </indexterm>
 
     <para>Let's first use scaffolding to create a list of products for an
@@ -89,7 +84,6 @@ Usage:
 
 Options:
       [--skip-namespace]                        # Skip namespace (affects only isolated applications)
-      [--old-style-hash]                        # Force using old style hash (:foo =&gt; 'bar') on Ruby &gt;= 1.9
   -o, --orm=NAME                                # Orm to be invoked
                                                 # Default: active_record
       [--force-plural]                          # Forces the use of a plural ModelName
@@ -124,6 +118,8 @@ ScaffoldController options:
   -e, [--template-engine=NAME]  # Template engine to be invoked
                                 # Default: erb
       [--helper]                # Indicates when to generate helper
+                                # Default: true
+      [--jbuilder]              # Indicates when to generate jbuilder
                                 # Default: true
 
 Runtime options:
@@ -175,10 +171,10 @@ $ </screen></para>
     linkend="activerecord_datenbank_anlegen"/>). Let's now create the scaffold
     for the products:<screen>$ rails generate scaffold product name 'price:decimal{7,2}' 
       invoke  active_record
-      create    db/migrate/20121121093040_create_products.rb
+      create    db/migrate/20130716185952_create_products.rb
       create    app/models/product.rb
       invoke    test_unit
-      create      test/unit/product_test.rb
+      create      test/models/product_test.rb
       create      test/fixtures/products.yml
       invoke  resource_route
        route    resources :products
@@ -192,11 +188,14 @@ $ </screen></para>
       create      app/views/products/new.html.erb
       create      app/views/products/_form.html.erb
       invoke    test_unit
-      create      test/functional/products_controller_test.rb
+      create      test/controllers/products_controller_test.rb
       invoke    helper
       create      app/helpers/products_helper.rb
       invoke      test_unit
-      create        test/unit/helpers/products_helper_test.rb
+      create        test/helpers/products_helper_test.rb
+      invoke    jbuilder
+      create      app/views/products/index.json.jbuilder
+      create      app/views/products/show.json.jbuilder
       invoke  assets
       invoke    coffee
       create      app/assets/javascripts/products.js.coffee
@@ -214,8 +213,8 @@ $</screen></para>
       db:migrate</command>:<screen>$ rake db:migrate
 ==  CreateProducts: migrating =================================================
 -- create_table(:products)
-   -&gt; 0.0021s
-==  CreateProducts: migrated (0.0023s) ========================================
+   -&gt; 0.0016s
+==  CreateProducts: migrated (0.0017s) ========================================
 
 $</screen></para>
 
@@ -242,13 +241,15 @@ $</screen></para>
       assuming that you always want to view, create and delete records.</para>
 
       <para>Without diving too deeply into the topic routes, let's just have a
-      quick look at the available routes for our example. You need to enter
+      quick look at the available routes for our example. You need to run
       <command>rake routes</command>:<screen>$ rake routes
+      Prefix Verb   URI Pattern                  Controller#Action
     products GET    /products(.:format)          products#index
              POST   /products(.:format)          products#create
  new_product GET    /products/new(.:format)      products#new
 edit_product GET    /products/:id/edit(.:format) products#edit
      product GET    /products/:id(.:format)      products#show
+             PATCH  /products/:id(.:format)      products#update
              PUT    /products/:id(.:format)      products#update
              DELETE /products/:id(.:format)      products#destroy
 $</screen></para>
@@ -269,76 +270,57 @@ $</screen></para>
       <methodname>destroy</methodname>. These methods or actions are called by
       the routes.</para>
 
-      <para>Before we go any further: you do not need to work your way through
-      the controller line by line. What is important is that you know where
-      the file is and that the individual methods for the calls by the routes
-      are located there. Then you can go back later and look it up there if
-      anything is unclear.<programlisting>class ProductsController &lt; ApplicationController
+      <para>Here is the content of
+      <filename>app/controllers/products_controller.rb</filename></para>
+
+      <para><programlisting>class ProductsController &lt; ApplicationController
+  before_action :set_product, only: [:show, :edit, :update, :destroy]
+
   # GET /products
   # GET /products.json
   def index
     @products = Product.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @products }
-    end
   end
 
   # GET /products/1
   # GET /products/1.json
   def show
-    @product = Product.find(params[:id])
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @product }
-    end
   end
 
   # GET /products/new
-  # GET /products/new.json
   def new
     @product = Product.new
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.json { render json: @product }
-    end
   end
 
   # GET /products/1/edit
   def edit
-    @product = Product.find(params[:id])
   end
 
   # POST /products
   # POST /products.json
   def create
-    @product = Product.new(params[:product])
+    @product = Product.new(product_params)
 
     respond_to do |format|
       if @product.save
         format.html { redirect_to @product, notice: 'Product was successfully created.' }
-        format.json { render json: @product, status: :created, location: @product }
+        format.json { render action: 'show', status: :created, location: @product }
       else
-        format.html { render action: "new" }
+        format.html { render action: 'new' }
         format.json { render json: @product.errors, status: :unprocessable_entity }
       end
     end
   end
 
-  # PUT /products/1
-  # PUT /products/1.json
+  # PATCH/PUT /products/1
+  # PATCH/PUT /products/1.json
   def update
-    @product = Product.find(params[:id])
-
     respond_to do |format|
-      if @product.update_attributes(params[:product])
+      if @product.update(product_params)
         format.html { redirect_to @product, notice: 'Product was successfully updated.' }
         format.json { head :no_content }
       else
-        format.html { render action: "edit" }
+        format.html { render action: 'edit' }
         format.json { render json: @product.errors, status: :unprocessable_entity }
       end
     end
@@ -347,15 +329,181 @@ $</screen></para>
   # DELETE /products/1
   # DELETE /products/1.json
   def destroy
-    @product = Product.find(params[:id])
     @product.destroy
-
     respond_to do |format|
       format.html { redirect_to products_url }
       format.json { head :no_content }
     end
   end
+
+  private
+    # Use callbacks to share common setup or constraints between actions.
+    def set_product
+      @product = Product.find(params[:id])
+    end
+
+    # Never trust parameters from the scary internet, only allow the white list through.
+    def product_params
+      params.require(:product).permit(:name, :price)
+    end
 end</programlisting></para>
+
+      <para>Let us take a moment and go through this controller.</para>
+
+      <section>
+        <title>set_product</title>
+
+        <para>A <methodname>before_action</methodname> calls a private method
+        to set an instance variable <varname>@product</varname> for the
+        actions :show, :edit, :update and :destroy. That DRYs it up
+        nicely:<programlisting>before_action :set_product, only: [:show, :edit, :update, :destroy]
+
+[...]
+
+private
+  # Use callbacks to share common setup or constraints between actions.
+  def set_product
+    @product = Product.find(params[:id])
+  end
+[...]</programlisting></para>
+      </section>
+
+      <section>
+        <title>index</title>
+
+        <para>The <methodname>index</methodname> method sets the instance
+        variable <varname>@products</varname>. It contains the result of
+        <code>Product.all</code>.<programlisting># GET /products
+# GET /products.json
+def index
+  @products = Product.all
+end</programlisting></para>
+      </section>
+
+      <section>
+        <title>show</title>
+
+        <para>The <methodname>show</methodname> method doesn't do anything.
+        the <code>set_product</code> <code>before_action</code> already set
+        the instance variable <varname>@product</varname>. So there is not
+        more to do.<programlisting># GET /products/1
+# GET /products/1.json
+def show
+end</programlisting></para>
+      </section>
+
+      <section>
+        <title>new</title>
+
+        <para>The <methodname>new</methodname> method creates a new instance
+        of <classname>Product</classname> and saves it in the instance
+        variable <varname>@product</varname>.<programlisting># GET /products/new
+def new
+  @product = Product.new
+end</programlisting></para>
+      </section>
+
+      <section>
+        <title>edit</title>
+
+        <para>The <methodname>edit</methodname> method doesn't do anything.
+        the <code>set_product</code> <code>before_action</code> already set
+        the instance variable <varname>@product</varname>. So there is not
+        more to do.<programlisting># GET /products/1/edit
+def edit
+end</programlisting></para>
+      </section>
+
+      <section>
+        <title>create</title>
+
+        <para>The <methodname>create</methodname> method uses
+        <code>Product.new</code> to create a new instance of
+        <classname>Product</classname> and stores it in
+        <varname>@product</varname>. The private method
+        <methodname>product_params</methodname> is used to filter the trusted
+        parameters with a white list. When <varname>@product</varname> was
+        successfully saved a <code>redirect</code> to the
+        <methodname>show</methodname> action is initiated for html requests.
+        If a validation error occured the <methodname>new</methodname> action
+        will be rendered.<programlisting># POST /products
+# POST /products.json
+def create
+  @product = Product.new(product_params)
+
+  respond_to do |format|
+    if @product.save
+      format.html { redirect_to @product, notice: 'Product was successfully created.' }
+      format.json { render action: 'show', status: :created, location: @product }
+    else
+      format.html { render action: 'new' }
+      format.json { render json: @product.errors, status: :unprocessable_entity }
+    end
+  end
+end
+
+[...]
+
+# Never trust parameters from the scary internet, only allow the white list through.
+def product_params
+  params.require(:product).permit(:name, :price)
+end</programlisting></para>
+      </section>
+
+      <section>
+        <title>update</title>
+
+        <para>The <methodname>update</methodname> method tries to update
+        @product with the product_params. The private method
+        <methodname>product_params</methodname> is used to filter the trusted
+        parameters with a white list. When <varname>@product</varname> was
+        successfully updated a <code>redirect</code> to the
+        <methodname>show</methodname> action is initiated for html requests.
+        If a validation error occured the <methodname>edit</methodname> action
+        will be rendered.<programlisting># PATCH/PUT /products/1
+# PATCH/PUT /products/1.json
+def update
+  respond_to do |format|
+    if @product.update(product_params)
+      format.html { redirect_to @product, notice: 'Product was successfully updated.' }
+      format.json { head :no_content }
+    else
+      format.html { render action: 'edit' }
+      format.json { render json: @product.errors, status: :unprocessable_entity }
+    end
+  end
+end
+
+[...]
+
+# Never trust parameters from the scary internet, only allow the white list through.
+def product_params
+  params.require(:product).permit(:name, :price)
+end</programlisting></para>
+      </section>
+
+      <section>
+        <title>destroy</title>
+
+        <para>The <methodname>destroy</methodname> method destroys
+        <varname>@product</varname> and redirects an html request to the
+        <methodname>index</methodname> action.<programlisting># DELETE /products/1
+# DELETE /products/1.json
+def destroy
+  @product.destroy
+  respond_to do |format|
+    format.html { redirect_to products_url }
+    format.json { head :no_content }
+  end
+end</programlisting></para>
+      </section>
+
+      <section>
+        <title>JSON</title>
+
+        <para>The default scaffold generator creates a setup for HTML and JSON
+        requests.</para>
+      </section>
     </section>
 
     <section xml:id="scaffold_views">
@@ -363,18 +511,18 @@ end</programlisting></para>
 
       <para>Now we start the Rails web server:<screen>$ rails server
 =&gt; Booting WEBrick
-=&gt; Rails 3.2.9 application starting in development on http://0.0.0.0:3000
-=&gt; Call with -d to detach
+=&gt; Rails 4.0.0 application starting in development on http://0.0.0.0:3000
+=&gt; Run `rails server -h` for more startup options
 =&gt; Ctrl-C to shutdown server
-[2012-11-21 10:34:39] INFO  WEBrick 1.3.1
-[2012-11-21 10:34:39] INFO  ruby 1.9.3 (2012-11-10) [x86_64-darwin12.2.1]
-[2012-11-21 10:34:39] INFO  WEBrick::HTTPServer#start: pid=19507 port=3000
+[2013-07-16 21:31:19] INFO  WEBrick 1.3.1
+[2013-07-16 21:31:19] INFO  ruby 2.0.0 (2013-06-27) [x86_64-darwin12.4.0]
+[2013-07-16 21:31:19] INFO  WEBrick::HTTPServer#start: pid=9939 port=3000
 </screen></para>
 
       <note>
         <para>If you get a warning from your built-in firewall now, this shows
-        that you have not read <xref linkend="erste_schritte_mit_rails"/>
-        properly. ;-)</para>
+        that you have worked through <xref
+        linkend="erste_schritte_mit_rails"/> properly. ;-)</para>
       </note>
 
       <para>Now a little drum roll... dramatic suspense... launch the web
@@ -447,13 +595,20 @@ end</programlisting></para>
         <title>Where Are the Views?</title>
 
         <para>You can probably guess, but let's have a look at the directory
-        <filename>app/views/products</filename> anyway:<screen>$ ls app/views/products 
-_form.html.erb
- edit.html.erb
- index.html.erb
- new.html.erb
- show.html.erb
+        <filename>app/views/products</filename> anyway:<screen>$ tree app/views/products/
+app/views/products/
+├── _form.html.erb
+├── edit.html.erb
+├── index.html.erb
+├── index.json.jbuilder
+├── new.html.erb
+├── show.html.erb
+└── show.json.jbuilder
 $ </screen></para>
+
+        <para>There are two different file extensions. The
+        <filename>html.erb</filename> is for HTML requests and the
+        <filename>json.jbuilder</filename> is for JSON requests.</para>
 
         <para>For <methodname>index</methodname>,
         <methodname>edit</methodname>, <methodname>new</methodname> and
@@ -473,26 +628,30 @@ $ </screen></para>
         <filename>app/views/products/index.html.erb</filename>:<programlisting>&lt;h1&gt;Listing products&lt;/h1&gt;
 
 &lt;table&gt;
-  &lt;tr&gt;
-    &lt;th&gt;Name&lt;/th&gt;
-    &lt;th&gt;Price&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-  &lt;/tr&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Name&lt;/th&gt;
+      &lt;th&gt;Price&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
 
-&lt;% @products.each do |product| %&gt;
-  &lt;tr&gt;
-    &lt;td&gt;&lt;%= product.name %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= product.price %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Show', product %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Edit', edit_product_path(product) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Destroy', product, method: :delete, data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
-  &lt;/tr&gt;
-&lt;% end %&gt;
+  &lt;tbody&gt;
+    &lt;% @products.each do |product| %&gt;
+      &lt;tr&gt;
+        &lt;td&gt;&lt;%= product.name %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= product.price %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to 'Show', product %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to 'Edit', edit_product_path(product) %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to 'Destroy', product, method: :delete, data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;% end %&gt;
+  &lt;/tbody&gt;
 &lt;/table&gt;
 
-&lt;br /&gt;
+&lt;br&gt;
 
 &lt;%= link_to 'New Product', new_product_path %&gt;</programlisting></para>
 
@@ -513,13 +672,15 @@ $ </screen></para>
         ...&gt;</code> links. You can of course also enter a link manually via
         <code>&lt;a href="..."&gt;</code> in the erb, but for links within a
         Rails project, <code>link_to</code> is more practical, because you can
-        use the names of the routes as target. The code becomes much easier to
-        read. In the above example, there are the following routes:<screen>$ rake routes
+        use the names of the routes as a target. The code becomes much easier
+        to read. In the above example, there are the following routes:<screen>$ rake routes
+      Prefix Verb   URI Pattern                  Controller#Action
     products GET    /products(.:format)          products#index
              POST   /products(.:format)          products#create
  new_product GET    /products/new(.:format)      products#new
 edit_product GET    /products/:id/edit(.:format) products#edit
      product GET    /products/:id(.:format)      products#show
+             PATCH  /products/:id(.:format)      products#update
              PUT    /products/:id(.:format)      products#update
              DELETE /products/:id(.:format)      products#destroy
 $</screen></para>
@@ -538,15 +699,17 @@ $</screen></para>
         a RESTful resource. Again, you can find examples for this in
         <filename>app/views/products/index.html.erb</filename>. In the table,
         a <code>show</code>, an <code>edit</code> and a <code>destroy</code>
-        link is rendered for each <varname>product</varname>:<programlisting>&lt;% @products.each do |product| %&gt;
-  &lt;tr&gt;
-    &lt;td&gt;&lt;%= product.name %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= product.price %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Show', product %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Edit', edit_product_path(product) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Destroy', product, method: :delete, data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
-  &lt;/tr&gt;
-&lt;% end %&gt;</programlisting></para>
+        link is rendered for each <varname>product</varname>:<programlisting>&lt;tbody&gt;
+  &lt;% @products.each do |product| %&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;%= product.name %&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;%= product.price %&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;%= link_to 'Show', product %&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;%= link_to 'Edit', edit_product_path(product) %&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;%= link_to 'Destroy', product, method: :delete, data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;% end %&gt;
+&lt;/tbody&gt;</programlisting></para>
 
         <para>From the resource and the selected route, Rails automatically
         determines the required URL and the required HTTP verb (in other
@@ -624,11 +787,11 @@ $</screen></para>
   &lt;% end %&gt;
 
   &lt;div class="field"&gt;
-    &lt;%= f.label :name %&gt;&lt;br /&gt;
+    &lt;%= f.label :name %&gt;&lt;br&gt;
     &lt;%= f.text_field :name %&gt;
   &lt;/div&gt;
   &lt;div class="field"&gt;
-    &lt;%= f.label :price %&gt;&lt;br /&gt;
+    &lt;%= f.label :price %&gt;&lt;br&gt;
     &lt;%= f.text_field :price %&gt;
   &lt;/div&gt;
   &lt;div class="actions"&gt;
@@ -638,7 +801,7 @@ $</screen></para>
 
         <para>In a block, the helper <code>form_for</code> takes care of
         creating the HTML form via which the user can enter the data for the
-        record or edit it. If you delete a <code>&lt;div
+        record or edit it. If you delete a complete <code>&lt;div
         class="field"&gt;</code> element here, this can no longer be used for
         input in the web interface. I am not going to comment on all possible
         form field variations at this point. The most frequently used ones
@@ -652,24 +815,22 @@ $</screen></para>
 
         <para>When using validations in the model, any validation errors that
         occur are displayed in the following code at the head of the
-        form:<programlisting>  &lt;% if @product.errors.any? %&gt;
-    &lt;div id="error_explanation"&gt;
-      &lt;h2&gt;&lt;%= pluralize(@product.errors.count, "error") %&gt; prohibited this product from being saved:&lt;/h2&gt;
+        form:<programlisting>&lt;% if @product.errors.any? %&gt;
+  &lt;div id="error_explanation"&gt;
+    &lt;h2&gt;&lt;%= pluralize(@product.errors.count, "error") %&gt; prohibited this product from being saved:&lt;/h2&gt;
 
-      &lt;ul&gt;
-      &lt;% @product.errors.full_messages.each do |msg| %&gt;
-        &lt;li&gt;&lt;%= msg %&gt;&lt;/li&gt;
-      &lt;% end %&gt;
-      &lt;/ul&gt;
-    &lt;/div&gt;
-  &lt;% end %&gt;</programlisting></para>
+    &lt;ul&gt;
+    &lt;% @product.errors.full_messages.each do |msg| %&gt;
+      &lt;li&gt;&lt;%= msg %&gt;&lt;/li&gt;
+    &lt;% end %&gt;
+    &lt;/ul&gt;
+  &lt;/div&gt;
+&lt;% end %&gt;</programlisting></para>
 
         <para>Let's add a small validation to the
         <filename>app/models/product.rb</filename> model:<programlisting>class Product &lt; ActiveRecord::Base
-  attr_accessible :name, :price
-
   validates :name,
-            :presence =&gt; true
+            presence: true
 end</programlisting></para>
 
         <para>When ever somebody wants to save a product which doesn't have a
@@ -689,24 +850,12 @@ end</programlisting></para>
       </section>
 
       <section xml:id="scaffold_json_und_xml">
-        <title>Access via XML or JSON</title>
-
-        <indexterm>
-          <primary>web API</primary>
-
-          <secondary>XML format</secondary>
-        </indexterm>
+        <title>Access via JSON</title>
 
         <indexterm>
           <primary>web API</primary>
 
           <secondary>JSON format</secondary>
-        </indexterm>
-
-        <indexterm>
-          <primary>XML</primary>
-
-          <see>web API</see>
         </indexterm>
 
         <indexterm>
@@ -733,17 +882,16 @@ end</programlisting></para>
         removed (<methodname>destroy</methodname>) or edited
         (<methodname>update</methodname>).</para>
 
-        <para>Currently popular formats are XML (see <link
-        xlink:href="http://de.wikipedia.org/wiki/Extensible_Markup_Language">http://en.wikipedia.org/wiki/Xml</link>)
-        and JSON (see <link
-        xlink:href="http://de.wikipedia.org/wiki/JavaScript_Object_Notation">http://en.wikipedia.org/wiki/Json</link>).</para>
+        <para>JSON (see <link
+        xlink:href="http://de.wikipedia.org/wiki/JavaScript_Object_Notation">http://en.wikipedia.org/wiki/Json</link>)
+        seems to be the new cool kid. So we use JSON.</para>
 
         <para>If you do not require machine-readable access to data, you can
         skip these examples. But then you should also delete all lines with
-        <code>format.xml</code> or <code>format.json</code> in the
-        <code>respond_to</code> blocks of your controllers, to be on the safe
-        side. Otherwise you still have an interface to the data that you may
-        just forget and that constitutes a potential security gap.</para>
+        <code>format.json</code> in the <code>respond_to</code> blocks of your
+        controllers, to be on the safe side. Otherwise you still have an
+        interface to the data that you may just forget and that constitutes a
+        potential security gap.</para>
 
         <section xml:id="scaffold_json">
           <title xml:id="scaffold_json_default.title">JSON as Default</title>
@@ -757,26 +905,25 @@ end</programlisting></para>
           <para>Right at the beginning of
           <filename>app/controllers/products_controller.rb</filename> you will
           find the entry for the <methodname>index</methodname>
-          action:<programlisting>class ProductsController &lt; ApplicationController
-  # GET /products
-  # GET /products.json
-  def index
-    @products = Product.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @products }
-    end
-  end</programlisting></para>
+          action:<programlisting># GET /products
+# GET /products.json
+def index
+  @products = Product.all
+end</programlisting></para>
 
           <para>The code is straightforward. In the instance variable
-          <varname>@products</varname>, all products are saved. Then something
-          happens with a format. Hmmm… it says something about
-          <code>json</code>. Let's try this: start the Rails server again with
-          <command>rails server</command> and use your web browser to go to
-          the URL <uri
-          xlink:href="http://0.0.0.0:3000/products.json">http://0.0.0.0:3000/products.json</uri>.
-          Heureka! You will see this:<screenshot>
+          <varname>@products</varname>, all products are saved. The view
+          <filename>app/views/products/index.json.jbuilder</filename> contains
+          the following code to render the JSON:<programlisting>json.array!(@products) do |product|
+  json.extract! product, :name, :price
+  json.url product_url(product, format: :json)
+end</programlisting></para>
+
+          <para>You can use your browser to fetch the JSON output. Just open
+          <uri
+          xlink:href="http://0.0.0.0:3000/products.json">http://0.0.0.0:3000/products.json</uri>
+          and view the result. I installed a JSON view extension in my Chrome
+          browser to get a nicer format.<screenshot>
               <info>
                 <title>Index JSON View</title>
               </info>
@@ -788,17 +935,8 @@ end</programlisting></para>
               </mediaobject>
             </screenshot></para>
 
-          <para>The URL <uri
-          xlink:href="http://0.0.0.0:3000/products.json">http://0.0.0.0:3000/products.json</uri>
-          gives us all products in JSON format. In Rails 3.0, the default was
-          still XML. But ultimately, it does not matter whether it's XML or
-          JSON. The cool JavaScript programmers simply prefer JSON, and as an
-          AJAX element can be found at every corner these days, it made sense
-          to change the default from XML to JSON.</para>
-
-          <para>If you do not want the JSON output, you need to delete this
-          line in the
-          <filename>app/controllers/products_controller.rb</filename>.</para>
+          <para>If you do not want the JSON output, you need to delete the
+          <filename>json.jbuilder</filename> files.</para>
         </section>
 
         <section xml:id="scaffold_json_und_xml_zusammen">
@@ -808,19 +946,19 @@ end</programlisting></para>
           application, you just need to specify both variants in the
           controller in the block <code>respond_to</code>. Here is an example
           with the <filename>app/controllers/products_controller.rb</filename>
-          in the <methodname>index</methodname> action:<programlisting>class ProductsController &lt; ApplicationController
-  # GET /products
-  # GET /products.json
-  def index
-    @products = product.all
+          in the <methodname>index</methodname> action:<programlisting># GET /products
+# GET /products.json
+# GET /products.xml
+def index
+  @products = product.all
 
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @products }
-      format.xml { render xml: @products }
-    end
+  respond_to do |format|
+    format.html # index.html.erb
+    format.json { render json: @products }
+    format.xml { render xml: @products }
   end
-[...]</programlisting></para>
+end
+</programlisting></para>
         </section>
       </section>
     </section>
@@ -846,12 +984,12 @@ end</programlisting></para>
       <para><screen>$ rails new read-only-shop
   [...]
 $ cd read-only-shop 
-$ rails generate scaffold product name 'price:decimal{7,2}'
+$ rails generate scaffold product name 'price:decimal{7,2}' 
       invoke  active_record
-      create    db/migrate/20121121115005_create_products.rb
+      create    db/migrate/20130716202340_create_products.rb
       create    app/models/product.rb
       invoke    test_unit
-      create      test/unit/product_test.rb
+      create      test/models/product_test.rb
       create      test/fixtures/products.yml
       invoke  resource_route
        route    resources :products
@@ -865,18 +1003,21 @@ $ rails generate scaffold product name 'price:decimal{7,2}'
       create      app/views/products/new.html.erb
       create      app/views/products/_form.html.erb
       invoke    test_unit
-      create      test/functional/products_controller_test.rb
+      create      test/controllers/products_controller_test.rb
       invoke    helper
       create      app/helpers/products_helper.rb
       invoke      test_unit
-      create        test/unit/helpers/products_helper_test.rb
+      create        test/helpers/products_helper_test.rb
+      invoke    jbuilder
+      create      app/views/products/index.json.jbuilder
+      create      app/views/products/show.json.jbuilder
       invoke  assets
       invoke    coffee
       create      app/assets/javascripts/products.js.coffee
       invoke    scss
       create      app/assets/stylesheets/products.css.scss
       invoke  scss
-      create    app/assets/stylesheets/scaffolds.css.scss
+   identical    app/assets/stylesheets/scaffolds.css.scss
 $ rake db:migrate
   [...]
 $</screen></para>
@@ -897,6 +1038,10 @@ $ rm app/views/products/new.html.erb
 $ rm app/views/products/edit.html.erb 
 $ </screen></para>
 
+      <para>The <filename>json.jbuilder</filename> views are not needed
+      either:<screen>$ rm app/views/products/*.json.jbuilder
+$</screen></para>
+
       <para>The file
       <filename>app/controllers/products_controller.rb</filename> can be
       simplified with an editor. It should look like this:<programlisting>class ProductsController &lt; ApplicationController
@@ -911,20 +1056,17 @@ $ </screen></para>
   end
 end</programlisting></para>
 
-      <para>As we only need HTML and not JSON output, we can manage without
-      the <code>respond_to do |format|</code> construct. Rails then
-      automatically renders HTML.</para>
-
       <para>We only need the routes for <methodname>index</methodname> and
       <methodname>show</methodname>. Please open the file
       <filename>config/routes.rb</filename> and edit it as
       follows:<programlisting>ReadOnlyShop::Application.routes.draw do
-  resources :products, :only =&gt; [:index, :show]
+  resources :products, only: [:index, :show]
 end </programlisting></para>
 
       <para>A <command>rake routes</command> shows us that really only
       <methodname>index</methodname> and <methodname>show</methodname> are
       routed now:<screen>$ rake routes
+  Prefix Verb URI Pattern             Controller#Action
 products GET /products(.:format)     products#index
  product GET /products/:id(.:format) products#show
 $ </screen></para>
@@ -948,37 +1090,34 @@ $ </screen></para>
 
       <para>The same message will be displayed in the log:<screen>$ rails server
 =&gt; Booting WEBrick
-=&gt; Rails 3.2.9 application starting in development on http://0.0.0.0:3000
-=&gt; Call with -d to detach
+=&gt; Rails 4.0.0 application starting in development on http://0.0.0.0:3000
+=&gt; Run `rails server -h` for more startup options
 =&gt; Ctrl-C to shutdown server
-[2012-11-21 12:56:21] INFO  WEBrick 1.3.1
-[2012-11-21 12:56:21] INFO  ruby 1.9.3 (2012-11-10) [x86_64-darwin12.2.1]
-[2012-11-21 12:56:21] INFO  WEBrick::HTTPServer#start: pid=51640 port=3000
+[2013-07-16 22:29:42] INFO  WEBrick 1.3.1
+[2013-07-16 22:29:42] INFO  ruby 2.0.0 (2013-06-27) [x86_64-darwin12.4.0]
+[2013-07-16 22:29:42] INFO  WEBrick::HTTPServer#start: pid=10182 port=3000
 
 
-Started GET "/products" for 127.0.0.1 at 2012-11-21 12:56:24 +0100
-Connecting to database specified by database.yml
+Started GET "/products" for 127.0.0.1 at 2013-07-16 22:29:47 +0200
+  ActiveRecord::SchemaMigration Load (0.1ms)  SELECT "schema_migrations".* FROM "schema_migrations"
 Processing by ProductsController#index as HTML
-  Product Load (0.1ms)  SELECT "products".* FROM "products" 
-  Rendered products/index.html.erb within layouts/application (18.8ms)
-Completed 500 Internal Server Error in 82ms
+  Product Load (0.1ms)  SELECT "products".* FROM "products"
+  Rendered products/index.html.erb within layouts/application (21.7ms)
+Completed 500 Internal Server Error in 61ms
 
-ActionView::Template::Error (undefined method `edit_product_path' for #&lt;#&lt;Class:0x007f832f282698&gt;:0x007f832f287af8&gt;):
-    14:     &lt;td&gt;&lt;%= product.name %&gt;&lt;/td&gt;
-    15:     &lt;td&gt;&lt;%= product.price %&gt;&lt;/td&gt;
-    16:     &lt;td&gt;&lt;%= link_to 'Show', product %&gt;&lt;/td&gt;
-    17:     &lt;td&gt;&lt;%= link_to 'Edit', edit_product_path(product) %&gt;&lt;/td&gt;
-    18:     &lt;td&gt;&lt;%= link_to 'Destroy', product, method: :delete, data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
-    19:   &lt;/tr&gt;
-    20: &lt;% end %&gt;
-  app/views/products/index.html.erb:17:in `block in _app_views_products_index_html_erb__2795156989031928261_70100690456940'
-  app/views/products/index.html.erb:12:in `each'
-  app/views/products/index.html.erb:12:in `_app_views_products_index_html_erb__2795156989031928261_70100690456940'
+ActionView::Template::Error (undefined method `edit_product_path' for #&lt;#&lt;Class:0x007f94e6baab08&gt;:0x007f94e6ba9ed8&gt;):
+    17:         &lt;td&gt;&lt;%= product.name %&gt;&lt;/td&gt;
+    18:         &lt;td&gt;&lt;%= product.price %&gt;&lt;/td&gt;
+    19:         &lt;td&gt;&lt;%= link_to 'Show', product %&gt;&lt;/td&gt;
+    20:         &lt;td&gt;&lt;%= link_to 'Edit', edit_product_path(product) %&gt;&lt;/td&gt;
+    21:         &lt;td&gt;&lt;%= link_to 'Destroy', product, method: :delete, data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
+    22:       &lt;/tr&gt;
+    23:     &lt;% end %&gt;
+  app/views/products/index.html.erb:20:in `block in _app_views_products_index_html_erb__535216393559089744_70138729102480'
+  app/views/products/index.html.erb:15:in `_app_views_products_index_html_erb__535216393559089744_70138729102480'
 
-
-  Rendered /Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/actionpack-3.2.9/lib/action_dispatch/middleware/templates/rescues/_trace.erb (1.9ms)
-  Rendered /Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/actionpack-3.2.9/lib/action_dispatch/middleware/templates/rescues/_request_and_response.erb (1.3ms)
-  Rendered /Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/actionpack-3.2.9/lib/action_dispatch/middleware/templates/rescues/template_error.erb within rescues/layout (13.9ms)</screen></para>
+[...]
+</screen></para>
 
       <para>The error message states that we call an undefined method
       <methodname>edit_product_path</methodname> in the view
@@ -991,32 +1130,34 @@ ActionView::Template::Error (undefined method `edit_product_path' for #&lt;#&lt;
       follows:<programlisting>&lt;h1&gt;Listing products&lt;/h1&gt;
 
 &lt;table&gt;
-  &lt;tr&gt;
-    &lt;th&gt;Name&lt;/th&gt;
-    &lt;th&gt;Price&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-  &lt;/tr&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Name&lt;/th&gt;
+      &lt;th&gt;Price&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
 
-&lt;% @products.each do |product| %&gt;
-  &lt;tr&gt;
-    &lt;td&gt;&lt;%= product.name %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= product.price %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Show', product %&gt;&lt;/td&gt;
-  &lt;/tr&gt;
-&lt;% end %&gt;
+  &lt;tbody&gt;
+    &lt;% @products.each do |product| %&gt;
+      &lt;tr&gt;
+        &lt;td&gt;&lt;%= product.name %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= product.price %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to 'Show', product %&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;% end %&gt;
+  &lt;/tbody&gt;
 &lt;/table&gt;</programlisting></para>
 
       <para>And while we are at it, we also edit the
       <filename>app/views/products/show.html.erb</filename>
-      accordingly:<programlisting>&lt;p id="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
-
-&lt;p&gt;
-  &lt;b&gt;Name:&lt;/b&gt;
+      accordingly:<programlisting>&lt;p&gt;
+  &lt;strong&gt;Name:&lt;/strong&gt;
   &lt;%= @product.name %&gt;
 &lt;/p&gt;
 
 &lt;p&gt;
-  &lt;b&gt;Price:&lt;/b&gt;
+  &lt;strong&gt;Price:&lt;/strong&gt;
   &lt;%= @product.price %&gt;
 &lt;/p&gt;
 
