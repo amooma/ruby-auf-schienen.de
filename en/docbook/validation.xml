@@ -17,8 +17,8 @@
 
   <para>Non-valid records are frequently a source of errors in programs. With
   <methodname>validates</methodname>, Rails offers a quick and easy way of
-  validating records. That way you can be sure that only meaningful records
-  will find their way into your database.</para>
+  validating them. That way you can be sure that only meaningful records will
+  find their way into your database.</para>
 
   <section xml:id="validation_vorbereitung">
     <title
@@ -44,18 +44,25 @@ $</screen></para>
 
     <para>Without any validation, we can create an empty record in a model
     without a problem:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; Product.count
-   (0.1ms)  SELECT COUNT(*) FROM "products" 
-=&gt; 0
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Product.create
    (0.1ms)  begin transaction
-  SQL (24.1ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Sun, 18 Nov 2012 17:01:27 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", nil], ["price", nil], ["updated_at", Sun, 18 Nov 2012 17:01:27 UTC +00:00], ["weight", nil]]
-   (2.6ms)  commit transaction
-=&gt; #&lt;Product id: 1, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: "2012-11-18 17:01:27", updated_at: "2012-11-18 17:01:27"&gt;
-&gt;&gt; Product.count
-   (0.3ms)  SELECT COUNT(*) FROM "products" 
-=&gt; 1
+  SQL (2.6ms)  INSERT INTO "products" ("created_at", "updated_at") VALUES (?, ?)  [["created_at", Tue, 16 Jul 2013 17:50:34 UTC +00:00], ["updated_at", Tue, 16 Jul 2013 17:50:34 UTC +00:00]]
+   (3.4ms)  commit transaction
+=&gt; #&lt;Product id: 1, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: "2013-07-16 17:50:34", updated_at: "2013-07-16 17:50:34"&gt;
+&gt;&gt; puts Product.first.to_yaml
+  Product Load (0.3ms)  SELECT "products".* FROM "products" ORDER BY "products"."id" ASC LIMIT 1
+--- !ruby/object:Product
+attributes:
+  id: 1
+  name: 
+  price: 
+  weight: 
+  in_stock: 
+  expiration_date: 
+  created_at: 2013-07-16 17:50:34.791368000 Z
+  updated_at: 2013-07-16 17:50:34.791368000 Z
+=&gt; nil
 &gt;&gt; exit
 $</screen></para>
 
@@ -69,22 +76,20 @@ $</screen></para>
     a bit and use the <code>presence</code> helper. Please fill your
     <filename>app/model/product.rb</filename> with the following
     content:<programlisting>class Product &lt; ActiveRecord::Base
-  attr_accessible :expiration_date, :in_stock, :name, :price, :weight
-
   validates :name,
-            :presence =&gt; true
+            presence: true
 
   validates :price,
-            :presence =&gt; true
+            presence: true
 end</programlisting></para>
 
     <para>Now we try again to create an empty record in the console:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; product = Product.create
    (0.1ms)  begin transaction
    (0.1ms)  rollback transaction
 =&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;
-&gt;&gt;</screen></para>
+&gt;&gt; </screen></para>
 
     <para>Watch out for the <code>rollback transaction</code> part and the
     misssing <varname>id</varname> of the <classname>Product</classname>
@@ -97,10 +102,10 @@ Loading development environment (Rails 3.2.9)
     <methodname>errors</methodname> or with
     <methodname>errors.messages</methodname> we can look at the errors that
     occurred:<screen>&gt;&gt; product.errors
-=&gt; #&lt;ActiveModel::Errors:0x007ff3bd27aea8 @base=#&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:name=&gt;["can't be blank"], :price=&gt;["can't be blank"]}&gt;
+=&gt; #&lt;ActiveModel::Errors:0x007fec75067a20 @base=#&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:name=&gt;["can't be blank"], :price=&gt;["can't be blank"]}&gt;
 &gt;&gt; product.errors.messages
 =&gt; {:name=&gt;["can't be blank"], :price=&gt;["can't be blank"]}
-&gt;&gt;</screen></para>
+&gt;&gt; </screen></para>
 
     <para>This error message was defined for a human and English-speaking user
     (more on this and how the errors can be translated into another language
@@ -114,10 +119,10 @@ Loading development environment (Rails 3.2.9)
 =&gt; 0.45
 &gt;&gt; product.save
    (0.2ms)  begin transaction
-  SQL (11.2ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Mon, 19 Nov 2012 09:24:51 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", "Milk (1 liter)"], ["price", #&lt;BigDecimal:7fe7cce8be38,'0.45E0',9(45)&gt;], ["updated_at", Mon, 19 Nov 2012 09:24:51 UTC +00:00], ["weight", nil]]
-   (4.1ms)  commit transaction
+  SQL (2.9ms)  INSERT INTO "products" ("created_at", "name", "price", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Tue, 16 Jul 2013 17:52:50 UTC +00:00], ["name", "Milk (1 liter)"], ["price", #&lt;BigDecimal:7fec739394c0,'0.45E0',9(45)&gt;], ["updated_at", Tue, 16 Jul 2013 17:52:50 UTC +00:00]]
+   (2.9ms)  commit transaction
 =&gt; true
-&gt;&gt;</screen></para>
+&gt;&gt; </screen></para>
 
     <section xml:id="validation_valid">
       <title xml:id="validation_valid.title">valid?</title>
@@ -202,19 +207,17 @@ $ </screen></para>
     <methodname>presence</methodname>.</para>
 
     <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
-  attr_accessible :expiration_date, :in_stock, :name, :price, :weight
-
   validates :name,
-            :presence =&gt; true
+            presence: true
 
   validates :price,
-            :presence =&gt; true
+            presence: true
 end
 </programlisting></para>
 
     <para>If we try to create an empty user record with this, we get lots of
     validation errors:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; product = Product.create
    (0.1ms)  begin transaction
    (0.1ms)  rollback transaction
@@ -261,11 +264,9 @@ $</screen></para>
     the maximum length of the name to 20 and the minimum to 2.</para>
 
     <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
-  attr_accessible :expiration_date, :in_stock, :name, :price, :weight
-
   validates :name,
-            :presence =&gt; true,
-            :length =&gt; { in: 2..20 }
+            presence: true,
+            length: { in: 2..20 }
 
   validates :price,
             :presence =&gt; true
@@ -275,7 +276,7 @@ end
     <para>If we now try to save a <classname>Product</classname> with a
     <methodname>name</methodname> that consists in one letter, we get an error
     message:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; product = Product.create(:name =&gt; 'M', :price =&gt; 0.45)
    (0.1ms)  begin transaction
    (0.1ms)  rollback transaction
@@ -289,87 +290,87 @@ $</screen></para>
       <title xml:id="validates_length_of_optionen.title">Options</title>
 
       <para><methodname>length</methodname> can be called with the following
-      options:<itemizedlist>
-          <listitem>
-            <para><code>:minimum</code></para>
+      options.</para>
 
-            <para>The minimum length of an attribute. Example:</para>
+      <section>
+        <title>minimum</title>
 
-            <para><programlisting>validates :name,
-          :presence =&gt; true,
-          :length =&gt; { minimum: 2 }</programlisting></para>
-          </listitem>
+        <para>The minimum length of an attribute. Example:</para>
 
-          <listitem>
-            <para><methodname>:maximum</methodname></para>
+        <para><programlisting>validates :name,
+          presence: true,
+          length: { minimum: 2 }</programlisting></para>
 
-            <para>The maximum length of an attribute. Example:<programlisting>validates :name,
-          :presence =&gt; true,
-          :length =&gt; { maximum: 20 }</programlisting></para>
-          </listitem>
+        <section>
+          <title>too_short</title>
 
-          <listitem>
-            <para><code>:is</code></para>
+          <para>Defines the error message of
+          <methodname>:minimum</methodname>. Default: "is too short (min is %d
+          characters)". Example:<programlisting>validates :name,
+          presence: true,
+          length: { minimum: 5 ,
+          too_short: "must have at least %{count} characters"}
+</programlisting><note>
+              <para>For all error messages, please note <xref
+              linkend="i18n"/>.</para>
+            </note></para>
+        </section>
+      </section>
 
-            <para>Is exactly the specified number of characters long.
-            Example:<programlisting>validates :name,
-          :presence =&gt; true,
-          :length =&gt; { is: 8 }</programlisting></para>
-          </listitem>
+      <section>
+        <title>maximum</title>
 
-          <listitem>
-            <para><code>:in oder :within</code></para>
+        <para>The maximum length of an attribute. Example:<programlisting>validates :name,
+          presence: true,
+          length: { maximum: 20 }</programlisting></para>
 
-            <para>Defines a length interval. The first number specifies the
-            minimum number of the range and the second the maximum.
-            Example:<programlisting>validates :name,
-          :presence =&gt; true,
-          :length =&gt; { in: 2..20 }</programlisting></para>
-          </listitem>
+        <section>
+          <title>too_long</title>
 
-          <listitem>
-            <para><code>:tokenizer</code></para>
+          <para>Defines the error message of
+          <methodname>:maximum</methodname>. Default: "is too long (maximum is
+          %d characters)". Example:<programlisting>validates :name,
+          presence: true,
+          length: { maximum: 20 ,
+          too_long: "must have at most %{count} characters" }
+</programlisting><note>
+              <para>For all error messages, please note <xref
+              linkend="i18n"/>.</para>
+            </note></para>
+        </section>
+      </section>
 
-            <para>You can use this to define how the attribute should be split
-            for counting. Default: <code>lambda{ |value| value.split(//)
-            }</code> (individual characters are counted). Example (for
-            counting words):<programlisting>validates :content,
-          :presence =&gt; true,
-          :length =&gt; { in: 2..20 },
-          :tokenizer =&gt; lambda {|str| str.scan(/\w+/)}
+      <section>
+        <title>is</title>
+
+        <para>Is exactly the specified number of characters long.
+        Example:<programlisting>validates :name,
+          presence: true,
+          length: { is: 8 }</programlisting></para>
+      </section>
+
+      <section>
+        <title>:in or :within</title>
+
+        <para>Defines a length interval. The first number specifies the
+        minimum number of the range and the second the maximum.
+        Example:<programlisting>validates :name,
+          presence: true,
+          length: { in: 2..20 }</programlisting></para>
+      </section>
+
+      <section>
+        <title>tokenizer</title>
+
+        <para>You can use this to define how the attribute should be split for
+        counting. Default: <code>lambda{ |value| value.split(//) }</code>
+        (individual characters are counted). Example (for counting
+        words):<programlisting>validates :content,
+          presence: true,
+          length: { in: 2..20 },
+          tokenizer: lambda {|str| str.scan(/\w+/)}
 </programlisting></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:too_long</code></para>
-
-            <para>Defines the error message of
-            <methodname>:maximum</methodname>. Default: "is too long (maximum
-            is %d characters)". Example:<programlisting>validates :name,
-          :presence =&gt; true,
-          :length =&gt; { maximum: 20 },
-          :too_long =&gt; "must have at most %{count} characters"
-</programlisting><note>
-                <para>For all error messages, please note <xref
-                linkend="i18n"/>.</para>
-              </note></para>
-          </listitem>
-
-          <listitem>
-            <para><code>:too_short</code></para>
-
-            <para>Defines the error message of
-            <methodname>:minimum</methodname>. Default: "is too short (min is
-            %d characters)". Example:<programlisting>validates :name,
-          :presence =&gt; true,
-          :length =&gt; { minimum: 5 },
-          :too_short =&gt; "must have at least %{count} characters"
-</programlisting><note>
-                <para>For all error messages, please note <xref
-                linkend="i18n"/>.</para>
-              </note></para>
-          </listitem>
-        </itemizedlist></para>
+      </section>
     </section>
   </section>
 
@@ -396,24 +397,22 @@ $</screen></para>
     attribute is a number. It's easier to explain if we use an example.</para>
 
     <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
-  attr_accessible :expiration_date, :in_stock, :name, :price, :weight
-
   validates :name,
-            :presence =&gt; true,
-            :length =&gt; { in: 2..20 }
+            presence: true,
+            length: { in: 2..20 }
 
   validates :price,
-            :presence =&gt; true
+            presence: true
 
   validates :weight,
-            :numericality =&gt; true
+            numericality: true
 end
 </programlisting></para>
 
     <para>If we now use a <varname>weight</varname> that consists of letters
     or contains letters instead of numbers, we will get an error
     message:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; product = Product.create(name: 'Milk (1 liter)', price: 0.45, weight: 'abc') 
    (0.1ms)  begin transaction
    (0.1ms)  rollback transaction
@@ -433,91 +432,79 @@ $ </screen></para>
       <title xml:id="validates_numericality_of_optionen.title">Options</title>
 
       <para><methodname>numericality</methodname> can be called with the
-      following options:<itemizedlist>
-          <listitem>
-            <para><code>:only_integer</code></para>
+      following options.</para>
 
-            <para>The attribute can only contain an integer. Default: false.
-            Example:<programlisting>validates :weight, 
-          :numericality =&gt; { only_integer: true }
+      <section>
+        <title>only_integer</title>
+
+        <para>The attribute can only contain an integer. Default: false.
+        Example:<programlisting>validates :weight, 
+          numericality: { only_integer: true }
 </programlisting></para>
-          </listitem>
+      </section>
 
-          <listitem>
-            <para><code>:greater_than</code></para>
+      <section>
+        <title>greater_than</title>
 
-            <para>The number saved in the attribute must be greater than the
-            specified value. Example:<programlisting>validates :weight, 
-          :numericality =&gt; { greater_than: 100 }
+        <para>The number saved in the attribute must be greater than the
+        specified value. Example:<programlisting>validates :weight, 
+          numericality: { greater_than: 100 }
 </programlisting></para>
-          </listitem>
+      </section>
 
-          <listitem>
-            <para><code>:greater_than_or_equal_to</code></para>
+      <section>
+        <title>greater_than_or_equal_to</title>
 
-            <para>The number saved in the attribute must be greater than or
-            equal to the specified value. Example:<programlisting>validates :weight, 
-          :numericality =&gt; { greater_than_or_equal_to: 100 }
+        <para>The number saved in the attribute must be greater than or equal
+        to the specified value. Example:<programlisting>validates :weight, 
+          numericality: { greater_than_or_equal_to: 100 }
 </programlisting></para>
-          </listitem>
+      </section>
 
-          <listitem>
-            <para><code>:equal_to</code></para>
+      <section>
+        <title>equal_to</title>
 
-            <para>Defines a specific value that the attribute must have.
-            Example:<programlisting>validates :weight, 
-          :numericality =&gt; { equal_to: 100 }
+        <para>Defines a specific value that the attribute must have.
+        Example:<programlisting>validates :weight, 
+          numericality: { equal_to: 100 }
 </programlisting></para>
-          </listitem>
+      </section>
 
-          <listitem>
-            <para><code>:less_than</code></para>
+      <section>
+        <title>less_than</title>
 
-            <para>The number saved in the attribute must be less than the
-            specified value. Example:<programlisting>validates :weight, 
-          :numericality =&gt; { less_than: 100 }
+        <para>The number saved in the attribute must be less than the
+        specified value. Example:<programlisting>validates :weight, 
+          numericality: { less_than: 100 }
 </programlisting></para>
-          </listitem>
+      </section>
 
-          <listitem>
-            <para><code>:less_than_or_equal_to</code></para>
+      <section>
+        <title>less_than_or_equal_to</title>
 
-            <para>The number saved in the attribute must be less than or equal
-            to the specified value. Example:<programlisting>validates :weight, 
-          :numericality =&gt; { less_than_or_equal_to: 100 }
+        <para>The number saved in the attribute must be less than or equal to
+        the specified value. Example:<programlisting>validates :weight, 
+          numericality: { less_than_or_equal_to: 100 }
 </programlisting></para>
-          </listitem>
+      </section>
 
-          <listitem>
-            <para><code>:odd</code></para>
+      <section>
+        <title>odd</title>
 
-            <para>the number saved in the attribute must be an odd number.
-            Example:<programlisting>validates :weight, 
-          :numericality =&gt; { odd: true }
+        <para>The number saved in the attribute must be an odd number.
+        Example:<programlisting>validates :weight, 
+          numericality: { odd: true }
 </programlisting></para>
-          </listitem>
+      </section>
 
-          <listitem>
-            <para><code>:even</code></para>
+      <section>
+        <title>even</title>
 
-            <para>The number saved in the attribute must be an even number.
-            Example:<programlisting>validates :weight, 
-          :numericality =&gt; { even: true }
+        <para>The number saved in the attribute must be an even number.
+        Example:<programlisting>validates :weight, 
+          numericality: { even: true }
 </programlisting></para>
-          </listitem>
-        </itemizedlist><note>
-          <para>The following validations can also contain a proc or symbol
-          that corresponds to a method:
-          <methodname>:greater_than</methodname>,
-          <methodname>:greater_than_or_equal_to</methodname>,
-          <methodname>:equal_to</methodname>,
-          <methodname>:less_than</methodname>,
-          <methodname>:less_than_or_equal_to</methodname></para>
-
-          <para>Example from <command>ri
-          validates_numericality_of</command>:<programlisting>validates_numericality_of :width, :less_than =&gt; Proc.new { |person| person.height }
-</programlisting></para>
-        </note></para>
+      </section>
     </section>
   </section>
 
@@ -546,18 +533,16 @@ $ </screen></para>
     then you can use this validation:</para>
 
     <para><filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
-  attr_accessible :expiration_date, :in_stock, :name, :price, :weight
-
   validates :name,
-            :presence =&gt; true,
-            :uniqueness =&gt; true
+            presence: true,
+            uniqueness: true
 end
 </programlisting></para>
 
     <para>If we now try to create a new <classname>Product</classname> with a
     <methodname>name</methodname> that already exists, then we get an error
     message:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; Product.last
   Product Load (1.9ms)  SELECT "products".* FROM "products" ORDER BY "products"."id" DESC LIMIT 1
 =&gt; #&lt;Product id: 4, name: "Milk (1 liter)", price: #&lt;BigDecimal:7f90649840a8,'0.45E0',9(45)&gt;, weight: nil, in_stock: nil, expiration_date: nil, created_at: "2012-11-19 09:30:21", updated_at: "2012-11-19 09:30:21"&gt;
@@ -584,31 +569,31 @@ $</screen></para>
       <title xml:id="validates_uniqueness_of_optionen.title">Options</title>
 
       <para><methodname>uniqueness</methodname> can be called with the
-      following options:<itemizedlist>
-          <listitem>
-            <para><code>:scope</code></para>
+      following options.</para>
 
-            <para>Defines a scope for the uniqueness. If we had a differently
-            structured phone number database (with just one field for the
-            phone number), then we could use this option to specify that a
-            phone number must only be saved once per user. Here is what it
-            would look like:</para>
+      <section>
+        <title>scope</title>
 
-            <para><programlisting>validates :name,
-          :presence =&gt; true,
-          :uniqueness =&gt; { scope: :user_id }</programlisting></para>
-          </listitem>
+        <para>Defines a scope for the uniqueness. If we had a differently
+        structured phone number database (with just one field for the phone
+        number), then we could use this option to specify that a phone number
+        must only be saved once per user. Here is what it would look
+        like:</para>
 
-          <listitem>
-            <para><methodname>:case_sensitive</methodname></para>
+        <para><programlisting>validates :name,
+          presence: true,
+          uniqueness: { scope: :user_id }</programlisting></para>
+      </section>
 
-            <para>Checks for uniqueness of upper and lower case as well.
-            Default: false. Example:<programlisting>validates :name,
-          :presence =&gt; true,
-          :uniqueness =&gt; { case_sensitive: true }
+      <section>
+        <title>case_sensitive</title>
+
+        <para>Checks for uniqueness of upper and lower case as well. Default:
+        false. Example:<programlisting>validates :name,
+          presence: true,
+          uniqueness: { case_sensitive: true }
 </programlisting></para>
-          </listitem>
-        </itemizedlist></para>
+      </section>
     </section>
   </section>
 
@@ -640,10 +625,10 @@ $</screen></para>
   attr_accessible :expiration_date, :in_stock, :name, :price, :weight
 
   validates :name,
-            :presence =&gt; true
+            presence: true
 
   validates :in_stock,
-            :inclusion =&gt; { in: [true, false] }
+            inclusion: { in: [true, false] }
 end</programlisting></para>
 
     <para>In our data model, a <classname>Product</classname> must be either
@@ -651,7 +636,7 @@ end</programlisting></para>
     <methodname>in_stock</methodname> (there must not be a nil). If we enter a
     different value than <code>true</code> or <code>false</code>, a validation
     error is returned:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; product = Product.create(name: 'Milk low-fat (1 liter)')
    (0.1ms)  begin transaction
    (0.1ms)  rollback transaction
@@ -671,20 +656,20 @@ $</screen></para>
       <title xml:id="validates_inclusion_of_optionen.title">Options</title>
 
       <para><methodname>inclusion</methodname> can be called with the
-      following options:<itemizedlist>
-          <listitem>
-            <para><code>:message</code></para>
+      following option.</para>
 
-            <para>For outputting custom error messages. Default: "is not
-            included in the list". Example:<programlisting>validates :in_stock,
-          :inclusion =&gt; { in: [true, false], 
+      <section>
+        <title>message</title>
+
+        <para>For outputting custom error messages. Default: "is not included
+        in the list". Example:<programlisting>validates :in_stock,
+          inclusion: { in: [true, false], 
                           message: 'this one is not allowed' }
 </programlisting><note>
-                <para>For all error messages, please note <xref
-                linkend="i18n"/>.</para>
-              </note></para>
-          </listitem>
-        </itemizedlist></para>
+            <para>For all error messages, please note <xref
+            linkend="i18n"/>.</para>
+          </note></para>
+      </section>
     </section>
   </section>
 
@@ -715,10 +700,10 @@ $</screen></para>
   attr_accessible :expiration_date, :in_stock, :name, :price, :weight
 
   validates :name,
-            :presence =&gt; true
+            presence: true
 
   validates :in_stock,
-            :exclusion =&gt; { in: [nil] }
+            exclusion: { in: [nil] }
 end
 </programlisting></para>
 
@@ -732,20 +717,19 @@ end
       <title xml:id="validates_exclusion_of_optionen.title">Options</title>
 
       <para><methodname>exclusion</methodname> can be called with the
-      following options:<itemizedlist>
-          <listitem>
-            <para><code>:message</code></para>
+      following option.</para>
 
-            <para>For outputting a custom error message. Default: "is not
-            included in the list". Example:<programlisting>validates :in_stock,
-          :exclusion =&gt; { in: [nil], 
-                          message: 'xyz' }
+      <section>
+        <title>message</title>
+
+        <para>For outputting custom error messages. Example:<programlisting>validates :in_stock,
+          inclusion: { in: [nil], 
+                          message: 'this one is not allowed' }
 </programlisting><note>
-                <para>For all error messages, please note <xref
-                linkend="i18n"/>.</para>
-              </note></para>
-          </listitem>
-        </itemizedlist></para>
+            <para>For all error messages, please note <xref
+            linkend="i18n"/>.</para>
+          </note></para>
+      </section>
     </section>
   </section>
 
@@ -777,7 +761,7 @@ end
     simple validation of the syntax of an e-mail address:</para>
 
     <para><programlisting>validates :email, 
-          :format =&gt; { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }</programlisting></para>
+          format: { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }</programlisting></para>
 
     <warning>
       <para>It should be obvious that the e-mail address validation shown here
@@ -795,7 +779,7 @@ end
 
             <para>For outputting a custom error message. Default: "is
             invalid". Example:<programlisting>validates :email, 
-          :format =&gt; { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i,
+          format: { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i,
                        message: 'is not a valid email address' }
 </programlisting><note>
                 <para>For all error messages, please note <xref
@@ -858,62 +842,60 @@ end
       <tertiary>proc</tertiary>
     </indexterm>
 
-    <para>There are some options that can be used for all
-    validations:<itemizedlist>
-        <listitem>
-          <para><code>:allow_nil</code></para>
+    <para>There are some options that can be used for all validations.</para>
 
-          <para>Allows the value <code>nil</code>. Example:<programlisting>validates :email, 
-          :format =&gt; { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i },
-          :allow_nil =&gt; true</programlisting></para>
-        </listitem>
+    <section>
+      <title>allow_nil</title>
 
-        <listitem>
-          <para><code>:allow_blank</code></para>
+      <para>Allows the value <code>nil</code>. Example:<programlisting>validates :email, 
+          format: { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i },
+          allow_nil: true</programlisting></para>
+    </section>
 
-          <para>As <code>allow_nil</code>, but additionally with an empty
-          string. Example:<programlisting>validates :email, 
-          :format =&gt; { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i },
-          :allow_blank =&gt; true</programlisting></para>
-        </listitem>
+    <section>
+      <title>allow_blank</title>
 
-        <listitem>
-          <para><code>:on</code></para>
+      <para>As <code>allow_nil</code>, but additionally with an empty string.
+      Example:<programlisting>validates :email, 
+          format: { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i },
+          allow_blank: true</programlisting></para>
+    </section>
 
-          <para>With <code>on</code>, a validation can be limited to the
-          events <code>create</code>, <code>update</code> or
-          <code>safe</code>. In the following example, the validation only
-          takes effect when the record is initially created (during the
-          <code>create</code>):<programlisting>validates :email, 
-          :format =&gt; { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i },
-          :on =&gt; :create</programlisting></para>
-        </listitem>
+    <section>
+      <title>on</title>
 
-        <listitem>
-          <para><code>:if</code> and <code>:unless</code></para>
+      <para>With <code>on</code>, a validation can be limited to the events
+      <code>create</code>, <code>update</code> or <code>safe</code>. In the
+      following example, the validation only takes effect when the record is
+      initially created (during the <code>create</code>):<programlisting>validates :email, 
+          format: { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i },
+          on: :create</programlisting></para>
+    </section>
 
-          <para><code>:if</code> or <code>:unless</code> call the specified
-          method and only execute the validation if the result of the method
-          is true:<programlisting>validates :name,
-          :presence =&gt; true,
-          :if =&gt; :today_is_monday?
+    <section>
+      <title><code>if</code> and <code>unless</code></title>
+
+      <para><code>if</code> or <code>unless</code> call the specified method
+      and only execute the validation if the result of the method is
+      true:<programlisting>validates :name,
+          presence: true,
+          if: :today_is_monday?
 
 def today_is_monday?
   Date.today.monday?
 end
 </programlisting></para>
-        </listitem>
 
-        <listitem>
-          <para><code>:proc</code></para>
+      <section>
+        <title>proc</title>
 
-          <para><code>:</code><code>proc</code> calls a
-          <classname>Proc</classname> object.<programlisting>validates :name,
-          :presence =&gt; true,
-          :if =&gt; Proc.new { |a| a.email == 'test@test.com' }
+        <para><code>:</code><code>proc</code> calls a
+        <classname>Proc</classname> object.<programlisting>validates :name,
+          presence: true,
+          if: Proc.new { |a| a.email == 'test@test.com' }
 </programlisting></para>
-        </listitem>
-      </itemizedlist></para>
+      </section>
+    </section>
   </section>
 
   <section xml:id="validates_eigene_validations_definieren">
@@ -971,13 +953,11 @@ $ </screen></para>
       <methodname>reservation_dates_must_make_sense</methodname> to make sure
       that the <varname>start_date</varname> is before the
       <varname>end_date</varname>:<programlisting>class Reservation &lt; ActiveRecord::Base
-  attr_accessible :end_date, :room_type, :start_date
-
   validates :start_date,
-            :presence =&gt; true
+            presence: true
 
   validates :end_date,
-            :presence =&gt; true
+            presence: true
 
   validate :reservation_dates_must_make_sense
 
@@ -995,7 +975,7 @@ end</programlisting></para>
       for the whole object.</para>
 
       <para>Let's test the validation in the console:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; reservation = Reservation.new(start_date: Date.today, end_date: Date.today)
 =&gt; #&lt;Reservation id: nil, start_date: "2012-11-19", end_date: "2012-11-19", room_type: nil, created_at: nil, updated_at: nil&gt;
 &gt;&gt; reservation.valid?
@@ -1021,8 +1001,6 @@ $</screen></para>
 
     <para>The topic validations is described very well in the official Rails
     documentation at <uri
-    xlink:href="http://guides.rubyonrails.org/active_record_validations_callbacks.html">http://guides.rubyonrails.org/active_record_validations_callbacks.html</uri>.
-    In the system, you can access the system documentation with <command>ri
-    validates</command> on the command line.</para>
+    xlink:href="http://guides.rubyonrails.org/active_record_validations.html">http://guides.rubyonrails.org/active_record_validations.html</uri>.</para>
   </section>
 </section>
