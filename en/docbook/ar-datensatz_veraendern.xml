@@ -42,22 +42,19 @@
 
     <para>We are now searching for the album <quote>The Beatles</quote> and
     changing its name to <quote>A Test</quote>:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; album = Album.where(:name =&gt; 'The Beatles').first
-  Album Load (0.1ms)  SELECT "albums".* FROM "albums" WHERE "albums"."name" = 'The Beatles' LIMIT 1
-=&gt; #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2012-11-14 13:26:01", updated_at: "2012-11-14 13:26:01"&gt;
-&gt;&gt; album.name
+Loading development environment (Rails 4.0.0)
+&gt;&gt; beatles_album = Album.where(name: 'The Beatles').first
+  Album Load (0.3ms)  SELECT "albums".* FROM "albums" WHERE "albums"."name" = 'The Beatles' ORDER BY "albums"."id" ASC LIMIT 1
+=&gt; #&lt;Album id: 10, name: "The Beatles", release_year: 1968, created_at: "2013-07-15 18:59:50", updated_at: "2013-07-15 18:59:50"&gt;
+&gt;&gt; beatles_album.name
 =&gt; "The Beatles"
-&gt;&gt; album.name = 'A Test'
+&gt;&gt; beatles_album.name = 'A Test'
 =&gt; "A Test"
-&gt;&gt; album.save
-   (0.1ms)  begin transaction
-   (0.4ms)  UPDATE "albums" SET "name" = 'A Test', "updated_at" = '2012-11-14 18:51:46.694219' WHERE "albums"."id" = 10
-   (3.9ms)  commit transaction
+&gt;&gt; beatles_album.save
+   (0.2ms)  begin transaction
+  SQL (2.1ms)  UPDATE "albums" SET "name" = ?, "updated_at" = ? WHERE "albums"."id" = 10  [["name", "A Test"], ["updated_at", Tue, 16 Jul 2013 08:08:00 UTC +00:00]]
+   (2.6ms)  commit transaction
 =&gt; true
-&gt;&gt; Album.last
-  Album Load (0.3ms)  SELECT "albums".* FROM "albums" ORDER BY "albums"."id" DESC LIMIT 1
-=&gt; #&lt;Album id: 13, name: "I Got a Woman", release_year: 1955, created_at: "2012-11-14 13:39:49", updated_at: "2012-11-14 13:39:49"&gt;
 &gt;&gt; exit
 $</screen></para>
   </section>
@@ -157,7 +154,7 @@ $</screen></para>
     </indexterm>
 
     <para>By default, Rails uses <quote>optimistic locking</quote> of records.
-    But you can turn this off. </para>
+    But you can turn this off.</para>
 
     <para>As optimistic locking is ideal for most users and chances are you
     never thought about the problem before reading this paragraph, I will not
