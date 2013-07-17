@@ -32,24 +32,23 @@
     <title xml:id="testing_einleitung.title">Introduction</title>
 
     <para>I have been programming for 30 years and most of the time I have
-    managed quite well without testing. I am not going to be mad at the IT
-    dinosaurs if they decide to just skip this chapter. You can create Rails
-    applications without tests and are not likely to get any bad karma as a
-    result (at least, I hope not - but you can never be entirely sure with the
-    whole karma thing).</para>
+    managed quite well without test-driven development (TDD). I am not going
+    to be mad at IT dinosaurs if they decide to just skip this chapter. You
+    can create Rails applications without tests and are not likely to get any
+    bad karma as a result (at least, I hope not - but you can never be
+    entirely sure with the whole karma thing).</para>
 
-    <para>But if you should decide to go for test-driven development (TDD),
-    then I can promise you that it is an enlightenment. The basic idea of TDD
-    is that you write a test for each programming function to check this
-    function. In the pure TDD teaching, this test is written before the actual
-    programming. Yes, you will have a lot more to do initially. But later, you
-    can run all the tests and see that the application works exactly as you
-    wanted it to. The read advantage only becomes apparent after a few weeks
-    or months, when you look at the project again and write an extension or
-    new variation. Then you can safely change the code and check it still
-    works properly by running the tests. This avoids a situation where you
-    find yourself saying "oops, that went a bit wrong, I just didn't think of
-    this particular problem".</para>
+    <para>But if you should decide to go for TDD, then I can promise you that
+    it is an enlightenment. The basic idea of TDD is that you write a test for
+    each programming function to check this function. In the pure TDD
+    teaching, this test is written before the actual programming. Yes, you
+    will have a lot more to do initially. But later, you can run all the tests
+    and see that the application works exactly as you wanted it to. The read
+    advantage only becomes apparent after a few weeks or months, when you look
+    at the project again and write an extension or new variation. Then you can
+    safely change the code and check it still works properly by running the
+    tests. This avoids a situation where you find yourself saying "oops, that
+    went a bit wrong, I just didn't think of this particular problem".</para>
 
     <para>Often, the advantage of TDD already becomes evident when writing a
     program. Tests can reveal many careless mistakes that you would otherwise
@@ -61,7 +60,7 @@
     xlink:href="http://guides.rubyonrails.org/testing.html">http://guides.rubyonrails.org/testing.html</uri>.</para>
 
     <note>
-      <para>Testing is just like driving a car. The only way to learn it is by
+      <para>TDD is just like driving a car. The only way to learn it is by
       doing it.</para>
     </note>
   </section>
@@ -76,14 +75,15 @@ $ cd webshop
 $ rails generate scaffold user login_name first_name last_name birthday:date
       [...]
       invoke    test_unit
-      create      test/unit/user_test.rb
+      create      test/models/user_test.rb
       create      test/fixtures/users.yml
       [...]
       invoke    test_unit
-      create      test/functional/users_controller_test.rb
+      create      test/controllers/users_controller_test.rb
+      invoke    helper
       [...]
       invoke      test_unit
-      create        test/unit/helpers/users_helper_test.rb
+      create        test/helpers/users_helper_test.rb
       [...]
 $ rake db:migrate
       [...]
@@ -91,93 +91,67 @@ $</screen></para>
 
     <para>You already know all about scaffolds (if not, please go and read
     <xref linkend="scaffolding"/> first) so you know what the application we
-    have just created does. You have already seen that scaffold has created a
-    few tests (they are easy to recognise because the word <code>test</code>
-    is in the file name).</para>
+    have just created does. The scaffold created a few tests (they are easy to
+    recognise because the word <code>test</code> is in the file name).</para>
 
     <para>The complete test suite of a Rails project is processed with the
     command <command>rake test</command>. Let's have a go and see what a test
     produces at this stage of development:<screen>$ rake test
-Run options: 
-
-# Running tests:
-
-
-
-Finished tests in 0.003398s, 0.0000 tests/s, 0.0000 assertions/s.
-
-0 tests, 0 assertions, 0 failures, 0 errors, 0 skips
-Run options: 
+Run options: --seed 23117
 
 # Running tests:
 
 .......
 
-Finished tests in 0.224044s, 31.2439 tests/s, 44.6341 assertions/s.
+Finished tests in 0.696922s, 10.0442 tests/s, 18.6535 assertions/s.
 
-7 tests, 10 assertions, 0 failures, 0 errors, 0 skips
+7 tests, 13 assertions, 0 failures, 0 errors, 0 skips
 $ </screen></para>
 
-    <para>The output "<literal>7 tests, 10 assertions, 0 failures, 0 errors, 0
+    <para>The output "<literal>7 tests, 13 assertions, 0 failures, 0 errors, 0
     skips</literal>" looks good. By default, a test will run correctly in a
     standard scaffold.</para>
 
     <para>Let's now edit the <filename>app/models/user.rb</filename> and
     insert a few validations (if these are not entirely clear to you, please
     read <xref linkend="activerecord_validation"/>):<programlisting>class User &lt; ActiveRecord::Base
-  attr_accessible :birthday, :first_name, :last_name, :login_name
-
   validates :login_name,
-            :presence =&gt; true,
-            :format =&gt; { 
-                         :with =&gt; /^.*(?=.*[\-_.]).*$/,
-                         :message =&gt; "must include at least one of the special characters -_."
-                       }
+            presence: true,
+            length: { minimum: 10 }
 
   validates :last_name, 
-            :presence =&gt; true
-
+            presence: true
 end
 </programlisting></para>
 
     <para>Then we execute <command>rake test</command> again:<screen>$ rake test
-Run options: 
-
-# Running tests:
-
-
-
-Finished tests in 0.003433s, 0.0000 tests/s, 0.0000 assertions/s.
-
-0 tests, 0 assertions, 0 failures, 0 errors, 0 skips
-Run options: 
+Run options: --seed 51265
 
 # Running tests:
 
 F.....F
 
-Finished tests in 0.226569s, 30.8957 tests/s, 39.7230 assertions/s.
+Finished tests in 0.178619s, 39.1896 tests/s, 55.9851 assertions/s.
 
   1) Failure:
-test_should_create_user(UsersControllerTest) [/Users/xyz/sandbox/webshop/test/functional/users_controller_test.rb:20]:
+UsersControllerTest#test_should_create_user [/Users/stefan/webshop/test/controllers/users_controller_test.rb:20]:
 "User.count" didn't change by 1.
-&lt;3&gt; expected but was
-&lt;2&gt;.
+Expected: 3
+  Actual: 2
 
   2) Failure:
-test_should_update_user(UsersControllerTest) [/Users/xyz/sandbox/webshop/test/functional/users_controller_test.rb:39]:
-Expected response to be a &lt;:redirect&gt;, but was &lt;200&gt;
+UsersControllerTest#test_should_update_user [/Users/stefan/webshop/test/controllers/users_controller_test.rb:39]:
+Expected response to be a &lt;redirect&gt;, but was &lt;200&gt;
 
-7 tests, 9 assertions, 2 failures, 0 errors, 0 skips
-Errors running test:functionals! #&lt;RuntimeError: Command failed with status (2): [ruby -I"lib:test" -I"/Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/rake-10.0.2/lib" "/Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/rake-10.0.2/lib/rake/rake_test_loader.rb" "test/functional/**/*_test.rb" ]&gt;
+7 tests, 10 assertions, 2 failures, 0 errors, 0 skips
 $</screen></para>
 
-    <para>This time we have "<literal>2 failures</literal>". The error happens
-    in the "<literal>should create user</literal>" and the "<literal>should
-    update user</literal>". The explanation for this is in our validation. The
-    example data created by the scaffold generator went through in the first
-    <command>rake test</command> (without validation). The errors only
-    occurred the second time (with validation).</para>
+    <para>Boom! This time we have "<literal>2 failures</literal>". The error
+    happens in the "<literal>should create user</literal>" and the
+    "<literal>should update user</literal>". The explanation for this is in
+    our validation. The example data created by the scaffold generator went
+    through in the first <command>rake test</command> (without validation).
+    The errors only occurred the second time (with validation).</para>
 
     <para>This example data is created as <foreignphrase
     xml:lang="en">fixtures</foreignphrase><indexterm>
@@ -191,95 +165,71 @@ $</screen></para>
       </indexterm> in YAML format in the directory
     <filename>test/fixtures/</filename>. Let's have a look at the example data
     for <classname>User</classname> in the file
-    <filename>test/fixtures/users.yml</filename>:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
-
-one:
+    <filename>test/fixtures/users.yml</filename>:<programlisting>one:
   login_name: MyString
   first_name: MyString
   last_name: MyString
-  birthday: 2012-11-21
+  birthday: 2013-07-17
 
 two:
   login_name: MyString
   first_name: MyString
   last_name: MyString
-  birthday: 2012-11-21</programlisting></para>
+  birthday: 2013-07-17</programlisting></para>
 
     <para>There are two example records there that do not fulfil the
     requirements of our validation. The <methodname>login_name</methodname>
-    should have at least one "-_." special character. Let's amend the
+    should have a length of at least 10. Let's change the
     <code>login_name</code> in <filename>test/fixtures/users.yml</filename>
-    accordingly:<programlisting># Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
-
-one:
-  login_name: My-String
+    accordingly:<programlisting>one:
+  login_name: MyString12
   first_name: MyString
   last_name: MyString
-  birthday: 2012-11-21
+  birthday: 2013-07-17
 
 two:
-  login_name: My-String
+  login_name: MyString12
   first_name: MyString
   last_name: MyString
-  birthday: 2012-11-21</programlisting></para>
+  birthday: 2013-07-17</programlisting></para>
 
     <para>Now, a <command>rake test</command> completes without any errors
     again:<screen>$ rake test
-Run options: 
-
-# Running tests:
-
-
-
-Finished tests in 0.003321s, 0.0000 tests/s, 0.0000 assertions/s.
-
-0 tests, 0 assertions, 0 failures, 0 errors, 0 skips
-Run options: 
+Run options: --seed 2058
 
 # Running tests:
 
 .......
 
-Finished tests in 0.207182s, 33.7867 tests/s, 48.2667 assertions/s.
+Finished tests in 0.150927s, 46.3800 tests/s, 86.1344 assertions/s.
 
-7 tests, 10 assertions, 0 failures, 0 errors, 0 skips
+7 tests, 13 assertions, 0 failures, 0 errors, 0 skips
 $</screen></para>
 
     <para>We now know that valid data has to be contained in the
     <filename>test/fixtures/users.yml</filename> so that the standard test
     created via scaffold will succeed. But nothing more. We now change the
     <filename>test/fixtures/users.yml</filename> to a minimum (for example, we
-    do not need a <code>first_name</code>) and with data that is easier to
-    read for humans:<programlisting>one:
-  login_name: horst.meier
-  last_name: Meier
+    do not need a <code>first_name</code>):<programlisting>one:
+  login_name: MyString12
+  last_name: Obama
 
 two:
-  login_name: emil.stein
-  last_name: Stein
-</programlisting></para>
+  login_name: MyString12
+  last_name: Bush</programlisting></para>
 
     <para>To be on the safe side, let's do another <command>rake
     test</command> after making our changes (you really can't do that often
     enough):<screen>$ rake test
-Run options: 
-
-# Running tests:
-
-
-
-Finished tests in 0.003483s, 0.0000 tests/s, 0.0000 assertions/s.
-
-0 tests, 0 assertions, 0 failures, 0 errors, 0 skips
-Run options: 
+Run options: --seed 1554
 
 # Running tests:
 
 .......
 
-Finished tests in 0.204765s, 34.1855 tests/s, 48.8365 assertions/s.
+Finished tests in 0.141682s, 49.4064 tests/s, 91.7548 assertions/s.
 
-7 tests, 10 assertions, 0 failures, 0 errors, 0 skips
+7 tests, 13 assertions, 0 failures, 0 errors, 0 skips
 $ </screen></para>
 
     <important>
@@ -306,25 +256,22 @@ $ </screen></para>
       </indexterm>
 
       <para>Let's take a closer look at the point where the original errors
-      have occurred:<screen>  1) Failure:
-test_should_create_user(UsersControllerTest) [/Users/xyz/sandbox/webshop/test/functional/users_controller_test.rb:20]:
+      occurred:<screen>  1) Failure:
+UsersControllerTest#test_should_create_user [/Users/stefan/webshop/test/controllers/users_controller_test.rb:20]:
 "User.count" didn't change by 1.
-&lt;3&gt; expected but was
-&lt;2&gt;.
+Expected: 3
+  Actual: 2
 
   2) Failure:
-test_should_update_user(UsersControllerTest) [/Users/xyz/sandbox/webshop/test/functional/users_controller_test.rb:39]:
-Expected response to be a &lt;:redirect&gt;, but was &lt;200&gt;
-
-7 tests, 9 assertions, 2 failures, 0 errors, 0 skips
-Errors running test:functionals! #&lt;RuntimeError: Command failed with status (2): [ruby -I"lib:test" -I"/Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/rake-10.0.2/lib" "/Users/xyz/.rvm/gems/ruby-1.9.3-p327/gems/rake-10.0.2/lib/rake/rake_test_loader.rb" "test/functional/**/*_test.rb" ]&gt;
+UsersControllerTest#test_should_update_user [/Users/stefan/webshop/test/controllers/users_controller_test.rb:39]:
+Expected response to be a &lt;redirect&gt;, but was &lt;200&gt;
 </screen></para>
 
       <para>In the <code>UsersControllerTest</code> the User could not be
       created nor changed. The controller tests are located in the directory
       <filename>test/functional/</filename>. Let's now take a good look at the
       file
-      <filename>test/functional/users_controller_test.rb</filename>:<programlisting>require 'test_helper'
+      <filename>test/controllers/users_controller_test.rb</filename><programlisting>require 'test_helper'
 
 class UsersControllerTest &lt; ActionController::TestCase
   setup do
@@ -361,7 +308,7 @@ class UsersControllerTest &lt; ActionController::TestCase
   end
 
   test "should update user" do
-    put :update, id: @user, user: { birthday: @user.birthday, first_name: @user.first_name, last_name: @user.last_name, login_name: @user.login_name }
+    patch :update, id: @user, user: { birthday: @user.birthday, first_name: @user.first_name, last_name: @user.last_name, login_name: @user.login_name }
     assert_redirected_to user_path(assigns(:user))
   end
 
@@ -372,13 +319,13 @@ class UsersControllerTest &lt; ActionController::TestCase
 
     assert_redirected_to users_path
   end
-end</programlisting></para>
+end
+</programlisting></para>
 
       <para>At the beginning, we find a <code>setup</code> instruction:
-      <programlisting>  setup do
-    @user = users(:one)
-  end
-</programlisting></para>
+      <programlisting>setup do
+  @user = users(:one)
+end</programlisting></para>
 
       <para>These three lines of code mean that for the start of each
       individual test, an instance <varname>@user</varname> with the data of
@@ -402,7 +349,7 @@ end</programlisting></para>
           <tertiary>teardown</tertiary>
         </indexterm></para>
 
-      <important>
+      <note>
         <para>For every test (in other words, at each run of <command>rake
         test</command>), a fresh and therefore empty test database is created
         automatically. This is a different database than the one that you
@@ -411,14 +358,14 @@ end</programlisting></para>
         file <filename>config/database.yml</filename>. If you want to do
         debugging, you can access the test database with <command>rails
         console test</command>.</para>
-      </important>
+      </note>
 
       <para>This functional test then tests various web page functions. First,
-      accessing the index page:<programlisting>  test "should get index" do
-    get :index
-    assert_response :success
-    assert_not_nil assigns(:users)
-  end</programlisting></para>
+      accessing the index page:<programlisting>test "should get index" do
+  get :index
+  assert_response :success
+  assert_not_nil assigns(:users)
+end</programlisting></para>
 
       <para>The command <code>get :index</code> accesses the page
       <uri>/users</uri>. <code>assert_response :success</code> means that the
@@ -426,30 +373,25 @@ end</programlisting></para>
       ensures that the controller does not pass the instance variable
       <varname>@users</varname> to the view with the value <code>nil</code>
       (<methodname>setup</methodname> ensures that there is already an entry
-      in the database).<footnote>
+      in the database).<note>
           <para>The symbol <varname>:users</varname> is used here to make sure
           that <varname>@users</varname> in the controller class to be tested
           is used, not <varname>@users</varname> in the test class
           itself.</para>
-        </footnote></para>
+        </note></para>
 
       <para>Let's look more closely at the two problems from earlier. First,
-      <code>should create user</code>:<programlisting>  test "should create user" do
-    assert_difference('User.count') do
-      post :create, user: { birthday: @user.birthday, first_name: @user.first_name, last_name: @user.last_name, login_name: @user.login_name }
-    end
+      <code>should create user</code>:<programlisting>test "should create user" do
+  assert_difference('User.count') do
+    post :create, user: { birthday: @user.birthday, first_name: @user.first_name, last_name: @user.last_name, login_name: @user.login_name }
+  end
 
-    assert_redirected_to user_path(assigns(:user))
-  end</programlisting></para>
+  assert_redirected_to user_path(assigns(:user))
+end</programlisting></para>
 
       <para>The block <code>assert_difference('User.count') do ... end</code>
       expects a change by the code contained within it.
-      <code>User.count</code> would have to result in 1 at the beginning and 2
-      at the end. But as we had an invalid set of data in the first
-      <filename>test/fixtures/users.yml</filename> variation, the result of
-      <code>User.count</code> was 0 at the beginning and at the end. 0 and not
-      1 at the beginning, because the <code>setup do ... end</code> was not
-      able to work either.</para>
+      <code>User.count</code> after should result in +1.</para>
 
       <para>The last line <code>assert_redirected_to
       user_path(assigns(:user))</code> checks if after the newly created
@@ -457,10 +399,10 @@ end</programlisting></para>
       occurs.</para>
 
       <para>The second error occurred with <code>should update
-      user</code>:<programlisting>  test "should update user" do
-    put :update, id: @user, user: { birthday: @user.birthday, first_name: @user.first_name, last_name: @user.last_name, login_name: @user.login_name }
-    assert_redirected_to user_path(assigns(:user))
-  end</programlisting></para>
+      user</code>:<programlisting>test "should update user" do
+  patch :update, id: @user, user: { birthday: @user.birthday, first_name: @user.first_name, last_name: @user.last_name, login_name: @user.login_name }
+  assert_redirected_to user_path(assigns(:user))
+end</programlisting></para>
 
       <para>Here, the record with the <code>id</code> of the
       <varname>@user</varname> record was supposed to be updated with the
@@ -479,15 +421,15 @@ end</programlisting></para>
         <para>With <command>rake test:functionals</command> you can also run
         just the functional tests in the directory
         <filename>test/functional/</filename>.<screen>$ rake test:functionals
-Run options: 
+Run options: --seed 59879
 
 # Running tests:
 
 .......
 
-Finished tests in 0.207113s, 33.7980 tests/s, 48.2828 assertions/s.
+Finished tests in 0.152887s, 45.7854 tests/s, 85.0301 assertions/s.
 
-7 tests, 10 assertions, 0 failures, 0 errors, 0 skips
+7 tests, 13 assertions, 0 failures, 0 errors, 0 skips
 $ </screen></para>
       </tip>
     </section>
@@ -521,32 +463,31 @@ $ </screen></para>
       <tip>
         <para>With <command>rake test</command>, all tests present in the
         Rails project are executed. With <command>rake test:units</command>,
-        only the unit tests in the directory <filename>test/unit/</filename>
+        only the unit tests in the directory <filename>test/models/</filename>
         are executed.</para>
       </tip>
 
       <para>The unit tests are located in the directory
-      <filename>test/unit/</filename>. But a look into the file
-      <filename>test/unit/user_test.rb</filename> is rather
+      <filename>test/models/</filename>. But a look into the file
+      <filename>test/models/user_test.rb</filename> is rather
       sobering:<programlisting>require 'test_helper'
 
 class UserTest &lt; ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end
-end
-</programlisting></para>
+end</programlisting></para>
 
       <para>By default, scaffold only writes a commented-out dummy test. That
       is why <command>rake test:units</command> runs through without any
       content:<screen>$ rake test:units
-Run options: 
+Run options: --seed 30150
 
 # Running tests:
 
 
 
-Finished tests in 0.003531s, 0.0000 tests/s, 0.0000 assertions/s.
+Finished tests in 0.002333s, 0.0000 tests/s, 0.0000 assertions/s.
 
 0 tests, 0 assertions, 0 failures, 0 errors, 0 skips
 $</screen></para>
@@ -626,26 +567,28 @@ end</programlisting></para>
       <filename>test/unit/user_test.rb</filename>:<programlisting>require 'test_helper'
 
 class UserTest &lt; ActiveSupport::TestCase
-  test 'an empty user is not valid' do
-    assert !User.new.valid?, 'Saved an empty user.'
+  test 'a user with no attributes is not valid' do
+    user = User.new
+    assert !user.save, 'Saved a user with no attributes.'                       
   end
 end</programlisting></para>
 
       <para>This test checks if a newly created <classname>User</classname>
-      that does not contain any data is valid. As <code>assert</code> only
-      reacts to <code>true</code>, I placed a"<code>!</code>" before
-      <code>User.new.valid?</code> to turn the <code>false</code> into a
-      <code>true</code>, as an empty user cannot be valid.</para>
+      that does not contain any data is valid (it should not). As
+      <code>assert</code> only reacts to <code>true</code>, I placed
+      a"<code>!</code>" before <code>User.new.valid?</code> to turn the
+      <code>false</code> into a <code>true</code>, as an empty user cannot be
+      valid.</para>
 
       <para>So a <command>rake test:units</command> then completes
       immediately:<screen>$ rake test:units
-Run options: 
+Run options: --seed 43622
 
 # Running tests:
 
 .
 
-Finished tests in 0.079557s, 12.5696 tests/s, 12.5696 assertions/s.
+Finished tests in 0.051971s, 19.2415 tests/s, 19.2415 assertions/s.
 
 1 tests, 1 assertions, 0 failures, 0 errors, 0 skips
 $</screen></para>
@@ -666,57 +609,16 @@ class UserTest &lt; ActiveSupport::TestCase
 end</programlisting></para>
 
       <para>Then once more a <command>rake test:units</command>:<screen>$ rake test:units
-Run options: 
+Run options: --seed 10228
 
 # Running tests:
 
 ..
 
-Finished tests in 0.085594s, 23.3661 tests/s, 35.0492 assertions/s.
+Finished tests in 0.054056s, 36.9987 tests/s, 55.4980 assertions/s.
 
 2 tests, 3 assertions, 0 failures, 0 errors, 0 skips
 $</screen></para>
-
-      <para>Let's now insert tests for a few other
-      <varname>login_name</varname> variations:<programlisting>require 'test_helper'
-
-class UserTest &lt; ActiveSupport::TestCase
-  test 'an empty user is not valid' do
-    assert !User.new.valid?, 'Saved an empty user.'
-  end
-
-  test "the two fixture users are valid" do
-    assert User.new(last_name: users(:one).last_name, login_name: users(:one).login_name ).valid?, 'First fixture is not valid.'
-    assert User.new(last_name: users(:two).last_name, login_name: users(:two).login_name ).valid?, 'Second fixture is not valid.'
-  end
-
-  [
-    'hans.meier',
-    'hans-meier',
-    'h-meier',
-    'h_meier',
-    'h.meier2',
-  ].each do |valid_login_name|
-    test "the login_name '#{valid_login_name}' is valid" do
-      assert User.new(last_name: users(:one).last_name, login_name: valid_login_name ).valid?, "login_name '#{valid_login_name}' is not valid."
-    end
-  end
-end</programlisting></para>
-
-      <para>Running through the test suite shows the results:<screen>$ rake test:units
-Run options: 
-
-# Running tests:
-
-.......
-
-Finished tests in 0.088988s, 78.6623 tests/s, 89.8998 assertions/s.
-
-7 tests, 8 assertions, 0 failures, 0 errors, 0 skips
-$ </screen></para>
-
-      <para>With <command>rake test</command> you could now run all tests
-      again.</para>
     </section>
   </section>
 
@@ -739,13 +641,13 @@ $ </screen></para>
     generate example data for tests. The default format for this is YAML. The
     files for this can be found in the directory
     <filename>test/fixtures/</filename> and are automatically created with
-    <command>rails generate</command>. But of course you can also define your
-    own files. All fixtures are loaded anew into the test database by default
-    with every test.<footnote>
+    <command>rails generate scaffold</command>. But of course you can also
+    define your own files. All fixtures are loaded anew into the test database
+    by default with every test.<note>
         <para>Examples for alternative formats (e.g. CSV) can be found at
         <link
         xlink:href="http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html">http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html</link>.</para>
-      </footnote></para>
+      </note></para>
 
     <section xml:id="statische_fixtures">
       <title xml:id="statische_fixtures.title">Static Fixtures</title>
@@ -760,12 +662,12 @@ $ </screen></para>
       <varname>User</varname> used in <xref
       linkend="testing_beispiel_webshop"/> statically looks as
       follows:<programlisting>one:
-  login_name: horst.meier
-  last_name: Meier
+  login_name: barak.obama
+  last_name: Obama
 
 two:
-  login_name: emil.stein
-  last_name: Stein
+  login_name: george.w.bush
+  last_name: Bush
 </programlisting></para>
 
       <para>You simple write the data in YAML format into the corresponding
@@ -788,13 +690,13 @@ two:
       <para>If we want to dynamically enter today's day 20 years ago for the
       birthdays, then we can simply do it with ERB in
       <filename>test/fixtures/users.yml</filename><programlisting>one:
-  login_name: horst.meier
-  last_name: Meier
+  login_name: barak.obama
+  last_name: Obama
   birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;
 
 two:
-  login_name: emil.stein
-  last_name: Stein
+  login_name: george.w.bush
+  last_name: Bush
   birthday: &lt;%= 20.years.ago.to_s(:db) %&gt;</programlisting></para>
     </section>
   </section>
@@ -836,17 +738,16 @@ $</screen></para>
     with the following test:<programlisting>require 'test_helper'
 
 class InvalidNewUserWorkflowTest &lt; ActionDispatch::IntegrationTest
-
   fixtures :all
 
   test 'try to create a new empty user and check for flash error messages' do
     get '/users/new'
     assert_response :success
 
-    post_via_redirect "/users", :last_name =&gt; "Oberhuber" 
+    post_via_redirect "/users", user: {:last_name =&gt; users(:one).last_name} 
     assert_equal '/users', path
-    assert_select 'li', "Login name can&amp;#x27;t be blank"
-    assert_select 'li', "Login name must include at least one of the special characters -_."
+    assert_select 'li', "Login name can&amp;#39;t be blank"
+    assert_select 'li', "Login name is too short (minimum is 10 characters)"
   end
 end</programlisting></para>
 
@@ -857,13 +758,13 @@ end</programlisting></para>
 
     <para>All integration tests can be executed with <command>rake
     test:integration</command>. Let's have a go:<screen>$ rake test:integration
-Run options: 
+Run options: --seed 61457
 
 # Running tests:
 
 .
 
-Finished tests in 0.226340s, 4.4181 tests/s, 17.6725 assertions/s.
+Finished tests in 0.146213s, 6.8393 tests/s, 27.3573 assertions/s.
 
 1 tests, 4 assertions, 0 failures, 0 errors, 0 skips
 $</screen></para>
@@ -887,25 +788,29 @@ $</screen></para>
 +----------------------+-------+-------+---------+---------+-----+-------+
 | Name                 | Lines |   LOC | Classes | Methods | M/C | LOC/M |
 +----------------------+-------+-------+---------+---------+-----+-------+
-| Controllers          |    86 |    61 |       2 |       7 |   3 |     6 |
+| Controllers          |    79 |    53 |       2 |       9 |   4 |     3 |
 | Helpers              |     4 |     4 |       0 |       0 |   0 |     0 |
-| Models               |    13 |    11 |       1 |       0 |   0 |     0 |
+| Models               |     8 |     7 |       1 |       0 |   0 |     0 |
+| Mailers              |     0 |     0 |       0 |       0 |   0 |     0 |
+| Javascripts          |    19 |     0 |       0 |       0 |   0 |     0 |
 | Libraries            |     0 |     0 |       0 |       0 |   0 |     0 |
-| Integration tests    |    16 |    12 |       1 |       0 |   0 |     0 |
-| Functional tests     |    49 |    39 |       1 |       0 |   0 |     0 |
-| Unit tests           |    28 |    24 |       2 |       0 |   0 |     0 |
+| Controller tests     |    49 |    39 |       1 |       0 |   0 |     0 |
+| Helper tests         |     4 |     3 |       1 |       0 |   0 |     0 |
+| Model tests          |    13 |    11 |       1 |       0 |   0 |     0 |
+| Mailer tests         |     0 |     0 |       0 |       0 |   0 |     0 |
+| Integration tests    |    15 |    12 |       1 |       0 |   0 |     0 |
 +----------------------+-------+-------+---------+---------+-----+-------+
-| Total                |   196 |   151 |       7 |       7 |   1 |    19 |
+| Total                |   191 |   129 |       7 |       9 |   1 |    12 |
 +----------------------+-------+-------+---------+---------+-----+-------+
-  Code LOC: 76     Test LOC: 75     Code to Test Ratio: 1:1.0
+  Code LOC: 64     Test LOC: 65     Code to Test Ratio: 1:1.0
 
 $</screen></para>
 
-    <para>In this project, we have a total of 76 LOC (Lines Of Code =&gt;
-    program lines) in the controllers, helpers and models. Plus we have a
-    total of 75 LOC for tests. This gives us a test relation of 1:1.0, which
-    should be the principal objective. Logically, this does not say anything
-    about the quality of tests.</para>
+    <para>In this project, we have a total of 64 LOC (Lines Of Code) in the
+    controllers, helpers and models. Plus we have a total of 65 LOC for tests.
+    This gives us a test relation of 1:1.0, which should be the principal
+    objective. Logically, this does not say anything about the quality of
+    tests.</para>
   </section>
 
   <section xml:id="mehr_zum_thema_testing">
