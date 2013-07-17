@@ -24,14 +24,14 @@
     browser nor by restarting the whole system. Of course, the browser's user
     can manually delete the cookie.</para>
 
-    <para><important>
+    <para><note>
         <para>A browser does not have to accept cookies and it does not have
         to save them either. But we live in a world where almost every page
         uses cookies. So most users will have enabled the cookie
         functionality. For more information on cookies, please visit Wikipedia
         at <uri
         xlink:href="http://de.wikipedia.org/wiki/HTTP-Cookie">http://en.wikipedia.org/wiki/Http_cookie.</uri></para>
-      </important><tip>
+      </note><tip>
         <para>A cookie can only have a limited size (the maximum is 4 kB). You
         should remember that the information of the saved cookies is sent from
         the browser to the server. So you should only use cookies for storing
@@ -51,16 +51,7 @@
     <para><screen>$ rails new cookie_jar
   [...]
 $ cd cookie_jar 
-$ rails generate controller Home set_cookies show_cookies delete_cookies
-      create  app/controllers/home_controller.rb
-       route  get "home/delete_cookies"
-       route  get "home/show_cookies"
-       route  get "home/set_cookies"
-      invoke  erb
-      create    app/views/home
-      create    app/views/home/set_cookies.html.erb
-      create    app/views/home/show_cookies.html.erb
-      create    app/views/home/delete_cookies.html.erb
+$ rails generate controller home set_cookies show_cookies delete_cookies
       [...]
 $ </screen></para>
 
@@ -68,15 +59,15 @@ $ </screen></para>
     <filename>app/controllers/home_controller.rb</filename> as
     follows:<programlisting>class HomeController &lt; ApplicationController
   def set_cookies
-    cookies[:user_name]   = "Horst Meier" 
+    cookies[:user_name]   = "Smith" 
     cookies[:customer_number] = "1234567890" 
   end
-  
+      
   def show_cookies
     @user_name    = cookies[:user_name]
     @customer_number = cookies[:customer_number]
   end
-  
+        
   def delete_cookies
     cookies.delete :user_name
     cookies.delete :customer_number
@@ -86,8 +77,14 @@ end</programlisting></para>
     <para>And the view file
     <filename>app/views/home/show_cookies.html.erb</filename> as
     follows:<programlisting>&lt;table&gt;
- &lt;tr&gt;&lt;td&gt;User Name:&lt;/td&gt;&lt;td&gt;&lt;%= @user_name %&gt;&lt;/td&gt;&lt;/tr&gt;
- &lt;tr&gt;&lt;td&gt;Customer Number:&lt;/td&gt;&lt;td&gt;&lt;%= @customer_number %&gt;&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;User Name:&lt;/td&gt;
+    &lt;td&gt;&lt;%= @user_name %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Customer Number:&lt;/td&gt;
+    &lt;td&gt;&lt;%= @customer_number %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
 &lt;/table&gt;</programlisting></para>
 
     <para>Start the Rails server with <command>rails server</command> and go
@@ -102,14 +99,6 @@ end</programlisting></para>
           <imageobject>
             <imagedata fileref="screenshots/show_cookies_empty.jpg"/>
           </imageobject>
-
-          <textobject>
-            <simpara>Welcome aboard</simpara>
-
-            <simpara>You're riding Ruby on Rails!</simpara>
-
-            <para>…</para>
-          </textobject>
         </mediaobject>
       </screenshot></para>
 
@@ -127,33 +116,25 @@ end</programlisting></para>
           <imageobject>
             <imagedata fileref="screenshots/show_cookies_set.jpg"/>
           </imageobject>
-
-          <textobject>
-            <simpara>Welcome aboard</simpara>
-
-            <simpara>You're riding Ruby on Rails!</simpara>
-
-            <para>…</para>
-          </textobject>
         </mediaobject>
       </screenshot></para>
 
-    <para>By going to the page <uri
+    <para>By requesting the page <uri
     xlink:href="http://0.0.0.0:3000/home/delete_cookies">http://0.0.0.0:3000/home/delete_cookies</uri>
     you can delete the cookies again.</para>
 
-    <important>
+    <note>
       <para>The cookies you have placed in this way stay "alive" in the
       browser until you close the browser completely.</para>
-    </important>
+    </note>
 
     <warning>
-      <para>The content of a normally placed cookie in the browser is easy to
-      read and does not pose any problems to the user. It is not encrypted, so
-      it should not contain any passwords or similar data. Nor is it advisable
-      to save shopping baskets in an unsigned (see <xref
-      linkend="cookies_signed"/>) cookie, otherwise the user could change the
-      prices in this shopping basket himself.</para>
+      <para>The content of a normally cookie in the browser is easy to read
+      and to be manipulated by the user. It is not encrypted, so it should not
+      contain any passwords or similar data. Nor is it advisable to save
+      shopping baskets in an unsigned (see <xref linkend="cookies_signed"/>)
+      cookie, otherwise the user could change the prices in this shopping
+      basket himself.</para>
     </warning>
 
     <section xml:id="cookies_permanent">
@@ -166,29 +147,25 @@ end</programlisting></para>
       </indexterm>
 
       <para>Cookies are normally set to give the application a way of
-      recognizing users when they visit again later or of saving shopping
-      baskets. Between these visits to the website, much time can go by and
-      the user may well close the browser in the meantime. To store cookies
-      for longer than the current browser session, you can use the method
-      <methodname>permanent</methodname>. Our above example can be expanded by
-      adding this method in the
+      recognizing users when they visit again later. Between these visits to
+      the website, much time can go by and the user may well close the browser
+      in the meantime. To store cookies for longer than the current browser
+      session, you can use the method <methodname>permanent</methodname>. Our
+      above example can be expanded by adding this method in the
       <filename>app/controllers/home_controller.rb</filename>:<programlisting>class HomeController &lt; ApplicationController
   def set_cookies
-    cookies.permanent[:user_name]   = "Horst Meier" 
-    cookies.permanent[:customer_number] = "1234567890" 
+    cookies.permanent[:user_name]   = "Smith" 
+    cookies.permanent[:customer_number] = "1234567890"                         
   end
-  
+
   def show_cookies
     @user_name    = cookies[:user_name]
     @customer_number = cookies[:customer_number]
   end
-  
+
   def delete_cookies
     cookies.delete :user_name
     cookies.delete :customer_number
-  end
-  
-  def debug_cookies
   end
 end</programlisting></para>
 
@@ -217,13 +194,7 @@ end</programlisting></para>
       signing the cookies with a key that is only known to us. This key is
       automatically created via a random generator with each <command>rails
       new</command> and is located in the file
-      <filename>config/initializers/secret_token.rb</filename>:<programlisting># Be sure to restart your server when you modify this file.
-
-# Your secret key for verifying the integrity of signed cookies.
-# If you change this key, all old signed cookies will become invalid!
-# Make sure the secret is at least 30 characters and all random,
-# no regular words or you'll be exposed to dictionary attacks.
-CookieJar::Application.config.secret_token = '85ec33910d4d57f3d3c69cb8fef20f158f68a219a76db71280779454a523330874fc4e42c7e62ecb25b8e4f5fcce1dcad88c7dcc9671a9922f675d770270a25a'</programlisting></para>
+      <filename>config/initializers/secret_token.rb</filename>:<programlisting>CookieJar::Application.config.secret_key_base = '85ec675d7702707667a25a'</programlisting></para>
 
       <para><warning>
           <para>If you want to set up your Rails application from scratch
@@ -237,21 +208,18 @@ CookieJar::Application.config.secret_token = '85ec33910d4d57f3d3c69cb8fef20f158f
       method in the
       <filename>app/controllers/home_controller.rb</filename>:<programlisting>class HomeController &lt; ApplicationController
   def set_cookies
-    cookies.permanent.signed[:user_name]   = "Horst Meier" 
+    cookies.permanent.signed[:user_name]   = "Smith" 
     cookies.permanent.signed[:customer_number] = "1234567890" 
   end
-
+      
   def show_cookies
-    @user_name    = cookies.signed[:user_name]
+    @user_name       = cookies.signed[:user_name]
     @customer_number = cookies.signed[:customer_number]
   end
-
+        
   def delete_cookies
     cookies.delete :user_name
     cookies.delete :customer_number
-  end
-
-  def debug_cookies
   end
 end</programlisting>The content of the cookie is now saved in encrypted form
       every time you set the cookie. The name of the cookie can still be read
@@ -267,23 +235,18 @@ end</programlisting>The content of the cookie is now saved in encrypted form
     </indexterm>
 
     <para>As HTTP is a stateless protocol, we encounter special problems when
-    developing applications. An individual web page has nothing to do with
-    another web page and they do not know of one another. But as you want to
+    developing applications. An individual web page has no connection to the
+    next web page and they do not know of one another. But as you want to
     register only once on many websites, not over and over again on each
     individual page, this can pose a problem. The solution is called session
-    and Rails offers it to the programmer transparently as
+    and Rails offers it to the programmer transparently as a
     <varname>session[]</varname> hash. Rails automatically creates a new
     session for each new visitor of the web page. This session is saved by
     default as cookie (see <xref linkend="cookies"/>) and so it is subject to
     the 4 kB limit. But you can also store the sessions in the database (see
     <xref linkend="sessions_datenbank"/>). An independent and unique session
     ID is created automatically and the cookie is deleted by default when the
-    web browser is closed.<warning>
-        <para>Please note that only pages generated by Rails work in the
-        session management. If you go to a static HTML page from
-        <filename>/public</filename>, this takes place outside of the session
-        management.</para>
-      </warning></para>
+    web browser is closed.</para>
 
     <para>The beauty of a Rails session is that we can not just save strings
     there as with cookies, but also hashes and arrays. So you can for example
@@ -305,15 +268,6 @@ end</programlisting>The content of the cookie is now saved in encrypted form
   [...]
 $ cd breadcrumbs 
 $ rails generate controller Home ping pong index
-      create  app/controllers/home_controller.rb
-       route  get "home/index"
-       route  get "home/pong"
-       route  get "home/ping"
-      invoke  erb
-      create    app/views/home
-      create    app/views/home/ping.html.erb
-      create    app/views/home/pong.html.erb
-      create    app/views/home/index.html.erb
       [...]
 $ </screen></para>
 
@@ -324,45 +278,50 @@ $ </screen></para>
       <methodname>before_filter</methodname> in the
       <filename>app/controllers/home_controller.rb</filename>:<programlisting>class HomeController &lt; ApplicationController
   before_filter :set_breadcrumbs
-  
+    
   def ping
   end
-  
+      
   def pong
   end
-  
+        
   def index
   end
-  
+          
   private
-  
   def set_breadcrumbs
-    @breadcrumbs = session[:breadcrumbs]
-    @breadcrumbs ||= Array.new
+    if session[:breadcrumbs]
+      @breadcrumbs = session[:breadcrumbs]
+    else
+      @breadcrumbs = Array.new
+    end
+
     @breadcrumbs.push(request.url)
-    if @breadcrumbs.count &gt; 3
+
+    if @breadcrumbs.count &gt; 4
+      # shift removes the first element
       @breadcrumbs.shift
     end
+
     session[:breadcrumbs] = @breadcrumbs
   end
 end</programlisting></para>
 
       <para>Now we use the
       <filename>app/views/layouts/application.html.erb</filename> to display
-      these last entries at the top of each page:<programlisting>&lt;!DOCTYPE html&gt;
-&lt;html&gt;
+      these last entries at the top of each page:<programlisting>&lt;html&gt;
 &lt;head&gt;
   &lt;title&gt;Breadcrumbs&lt;/title&gt;
-  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
-  &lt;%= javascript_include_tag "application" %&gt;
+  &lt;%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" =&gt; true %&gt;
+  &lt;%= javascript_include_tag "application", "data-turbolinks-track" =&gt; true %&gt;
   &lt;%= csrf_meta_tags %&gt;
 &lt;/head&gt;
 &lt;body&gt;
 
-&lt;% if @breadcrumbs %&gt;
-  &lt;p&gt;Last pages visited:&lt;/p&gt;
+&lt;% if @breadcrumbs &amp;&amp; @breadcrumbs.count &gt; 1 %&gt;
+  &lt;h3&gt;Surf History&lt;/h3&gt;
   &lt;ul&gt;
-    &lt;% @breadcrumbs.each do |breadcrumb| %&gt;
+    &lt;% @breadcrumbs[0..2].each do |breadcrumb| %&gt;
       &lt;li&gt;&lt;%= link_to breadcrumb, breadcrumb %&gt;&lt;/li&gt;
     &lt;% end %&gt;
   &lt;/ul&gt;
@@ -416,11 +375,11 @@ end</programlisting></para>
        exist    app/views/home
       create    app/views/home/reset.html.erb
       invoke  test_unit
-        skip    test/functional/home_controller_test.rb
+        skip    test/controllers/home_controller_test.rb
       invoke  helper
    identical    app/helpers/home_helper.rb
       invoke    test_unit
-   identical      test/unit/helpers/home_helper_test.rb
+   identical      test/helpers/home_helper_test.rb
       invoke  assets
       invoke    coffee
    identical      app/assets/javascripts/home.js.coffee
@@ -432,13 +391,13 @@ $</screen></para>
       <filename>app/controllers/home_controller.rb</filename> then looks like
       this:<programlisting>class HomeController &lt; ApplicationController
   before_filter :set_breadcrumbs
-  
+    
   def ping
   end
-  
+      
   def pong
   end
-  
+        
   def index
   end
 
@@ -446,16 +405,22 @@ $</screen></para>
     reset_session
     @breadcrumbs = nil
   end
-  
+          
   private
-  
   def set_breadcrumbs
-    @breadcrumbs = session[:breadcrumbs]
-    @breadcrumbs ||= Array.new
+    if session[:breadcrumbs]
+      @breadcrumbs = session[:breadcrumbs]
+    else
+      @breadcrumbs = Array.new
+    end
+
     @breadcrumbs.push(request.url)
-    if @breadcrumbs.count &gt; 3
+
+    if @breadcrumbs.count &gt; 4
+      # shift removes the first element
       @breadcrumbs.shift
     end
+
     session[:breadcrumbs] = @breadcrumbs
   end
 end</programlisting></para>
@@ -463,12 +428,12 @@ end</programlisting></para>
       <para>So you can delete the current session by going to the URL <uri
       xlink:href="http://0.0.0.0:3000/home/reset">http://0.0.0.0:3000/home/reset</uri>.</para>
 
-      <important>
+      <note>
         <para>It is not just important to invoke
         <methodname>reset_session</methodname>, but you need to also set the
         instance variable <varname>@breadcrumbs</varname> to <code>nil</code>.
         Otherwise, the old breadcrumbs would still appear in the view..</para>
-      </important>
+      </note>
     </section>
 
     <section xml:id="sessions_datenbank">
@@ -484,23 +449,49 @@ end</programlisting></para>
       <para>Saving the entire session data in a cookie on the user's browser
       is not always the best solution. Amongst others, the limit of 4 kB can
       pose a problem. But it's no big obstacle, we can relocate the storing of
-      the session from the cookie to the database. Then the session ID is of
-      course still saved in a cookie, but the whole other session data is
-      stored in the database on the server.</para>
+      the session from the cookie to the database with the Active Record
+      Session Store gem (<uri
+      xlink:href="https://github.com/rails/activerecord-session_store">https://github.com/rails/activerecord-session_store</uri>).
+      Then the session ID is of course still saved in a cookie, but the whole
+      other session data is stored in the database on the server.</para>
 
-      <para>First, we change the configuration of the session store in the
-      file <filename>config/initializers/session_store.rb</filename>. We
-      comment out the <code>:cookie_store</code> and take out the comment sign
-      before the <code>:active_record_store</code>.<programlisting>Breadcrumbs::Application.config.session_store :active_record_store
-</programlisting></para>
+      <para>To install the gem we have to add the following line at the end of
+      the file <filename>Gemfile</filename><programlisting>gem 'activerecord-session_store', github: 'rails/activerecord-session_store'</programlisting></para>
 
-      <para>Now we still need to create the corresponding table. We do it with
-      <command>rails generate session_migration</command> and <command>rake
-      db:migrate</command>:<screen>$ rails generate session_migration
-  [...]
-$ rake db:migrate
-  [...]
+      <para>After that we have to run <command>bundle
+      install</command><screen>$ bundle install
+Fetching git://github.com/rails/activerecord-session_store.git
+remote: Counting objects: 134, done.
+remote: Compressing objects: 100% (89/89), done.
+remote: Total 134 (delta 48), reused 112 (delta 32)
+Receiving objects: 100% (134/134), 24.33 KiB, done.
+Resolving deltas: 100% (48/48), done.
+Fetching gem metadata from https://rubygems.org/..........
+Fetching gem metadata from https://rubygems.org/..
+Resolving dependencies...
+Using rake (10.1.0) 
+[...]
+$ </screen></para>
+
+      <para>After that we have to run <command>rails generate
+      active_record:session_migration</command> and <command>rake
+      db:migrate</command> to create the needed table in the database.<screen>$ rails generate active_record:session_migration
+      create  db/migrate/20130717160101_add_sessions_table.rb
+SW:breadcrumbs stefan$ rake db:migrate
+==  AddSessionsTable: migrating ===============================================
+-- create_table(:sessions)
+   -&gt; 0.0014s
+-- add_index(:sessions, :session_id)
+   -&gt; 0.0003s
+-- add_index(:sessions, :updated_at)
+   -&gt; 0.0004s
+==  AddSessionsTable: migrated (0.0023s) ======================================
+
 $</screen></para>
+
+      <para>After that we'll have to change the <code>session_store</code> in
+      the file <filename>config/initializers/session_store.rb</filename> to
+      <code>:active_record_store</code>.<programlisting>Breadcrumbs::Application.config.session_store :active_record_store</programlisting></para>
 
       <para>Job done. Now you need to start the server again with
       <command>rails server</command> and Rails saves all sessions in the
