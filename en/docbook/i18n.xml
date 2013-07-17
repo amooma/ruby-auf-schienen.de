@@ -51,33 +51,35 @@
     there are special helpers available. For example, if you want to create a
     German web page, you can ensure that the number 1000.23 can be correctly
     displayed with a decimal comma as "1.000,23" on the German page and with a
-    decimal point on an English web page as "1,000.23". As example, we use the
-    German and English (US) variation of this amount with currency in the
-    console:<screen>$ rails new webshop
+    decimal point on an English web page as "1,000.23".</para>
+
+    <para>Let's create an example application which includes the rails-i18n
+    gem by Sven Fuchs (<uri
+    xlink:href="https://github.com/svenfuchs/i18n">https://github.com/svenfuchs/i18n</uri>).
+    The gem provides a couple of language files with translations and format
+    info.<screen>$ rails new webshop
   [...]
 $ cd webshop 
 $ echo "gem 'rails-i18n'" &gt;&gt; Gemfile
-$ bundle
+$ bundle install
   [...]
-$ rails console
-Loading development environment (Rails 3.2.9)
-&gt;&gt; helper.number_to_currency('1000.23', :locale =&gt; :de)
+$</screen></para>
+
+    <para>In the console we can see the different output of a number depending
+    on the language setting:<screen>$ rails console
+Loading development environment (Rails 4.0.0)
+&gt;&gt; price = 1000.23
+=&gt; 1000.23
+&gt;&gt; helper.number_to_currency(price, locale: :de)
 =&gt; "1.000,23 €"
-&gt;&gt; helper.number_to_currency('1000.23', :locale =&gt; :en)
+&gt;&gt; helper.number_to_currency(price, locale: :en)
 =&gt; "$1,000.23"
-&gt;&gt; helper.number_to_currency('1000.23', :locale =&gt; :fr)
+&gt;&gt; helper.number_to_currency(price, locale: :fr)
 =&gt; "1 000,23 €"
 &gt;&gt; exit
 $</screen></para>
 
-    <note>
-      <para>To have a quick go at trying out the
-      <methodname>helper.number_to_currency</methodname> in your own
-      application, you first need to insert the line <code>gem
-      'rails-i18n'</code> into the file <filename>Gemfile</filename> and then
-      execute <command>bundle</command>. This installs all required language
-      files for you.</para>
-    </note>
+    <para>You see it is not just about translating some views.</para>
 
     <section xml:id="i18n_i18n_t">
       <title xml:id="i18n_i18n_t.title">I18n.t</title>
@@ -106,7 +108,7 @@ $</screen></para>
 
       <para>In the Rails console we can try out how
       <methodname>I18n.t</methodname> works:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; I18n.t :hello
 =&gt; "Hello world"
 &gt;&gt; I18n.locale
@@ -118,12 +120,11 @@ $</screen></para>
       with the following content:<programlisting>de:
   hello: "Hallo Welt"</programlisting></para>
 
-      <para>Now back to the console:<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+      <para>In the console we can set the system language with
+      <code>I18n.locale = :de</code> to German.<screen>$ rails console
+Loading development environment (Rails 4.0.0)
 &gt;&gt; I18n.locale
 =&gt; :en
-&gt;&gt; I18n.t :hello
-=&gt; "Hello world"
 &gt;&gt; I18n.locale = :de
 =&gt; :de
 &gt;&gt; I18n.t :hello
@@ -141,13 +142,6 @@ Loading development environment (Rails 3.2.9)
 &gt;&gt; I18n.t 'hello'
 =&gt; "Hello world"
 &gt;&gt; I18n.translate 'hello'
-=&gt; "Hello world"
-&gt;&gt;</screen></para>
-
-      <para>You can also specify the desired language for an individual
-      <methodname>I18n.t</methodname> call with <code>:locale =&gt;
-      :de</code>.<screen>=&gt; "Hallo Welt"
-&gt;&gt; I18n.t :hello
 =&gt; "Hello world"
 &gt;&gt;</screen></para>
 
@@ -176,14 +170,14 @@ $ </screen></para>
       <para>You can display the different levels within the string with dots
       or with a <code>:scope</code> for the symbols. You can also mix both
       options.<screen>$ rails console
-Loading development environment (Rails 3.2.9)
+Loading development environment (Rails 4.0.0)
 &gt;&gt; I18n.t 'example.test'
 =&gt; "A test"
 &gt;&gt; I18n.t 'aaa.bbb.test'
 =&gt; "An other test"
-&gt;&gt; I18n.t :test, :scope =&gt; [:aaa, :bbb]
+&gt;&gt; I18n.t :test, scope: [:aaa, :bbb]
 =&gt; "An other test"
-&gt;&gt; I18n.t :test, :scope =&gt; 'aaa.bbb'
+&gt;&gt; I18n.t :test, scope: 'aaa.bbb'
 =&gt; "An other test"
 &gt;&gt; exit
 $</screen></para>
@@ -249,10 +243,11 @@ $</screen></para>
 |-------index.de.html.erb
 </screen></para>
 
-      <para>The language saved in
+      <para>The language set with
       <varname>config.i18n.default_locale</varname> is used automatically if
       no language was encoded in the file name. In a new and not yet
-      configured Rails project, this will be English.</para>
+      configured Rails project, this will be English. You can configure it in
+      the file <filename>config/application.rb</filename>.</para>
     </section>
   </section>
 
@@ -272,8 +267,10 @@ $</screen></para>
     (see <xref linkend="i18n_mehrsprachige_rails_applikation"/>).
     Correspondingly, there will be a certain amount of repetition. I am going
     to show you the steps you need to watch out for by using a simple
-    application as example. Let's go through all the changes using the example
-    of this bibliography application:<screen>$ rails new bibliography
+    application as example.</para>
+
+    <para>Let's go through all the changes using the example of this
+    bibliography application:<screen>$ rails new bibliography
   [...]
 $ cd bibliography
 $ rails generate scaffold book title number_of_pages:integer 'price:decimal{7,2}'
@@ -285,18 +282,15 @@ $</screen></para>
     <para>To get examples for validation errors, please insert the following
     validations in the
     <filename>app/models/book.rb</filename>:<programlisting>class Book &lt; ActiveRecord::Base
-  attr_accessible :number_of_pages, :price, :title
-
   validates :title,
-            :presence =&gt; true,
-            :uniqueness =&gt; true,
-            :length =&gt; { :within =&gt; 2..255 }
+            presence: true,
+            uniqueness: true,
+            length: { within: 2..255 }
 
   validates :price,
-            :presence =&gt; true,
-            :numericality =&gt; { :greater_than =&gt; 0 }
-end
-</programlisting></para>
+            presence: true,
+            numericality: { greater_than: 0 }
+end</programlisting></para>
 
     <para>Please search the configuration file
     <filename>config/application.rb</filename> for the value
@@ -304,7 +298,7 @@ end
     <code>:de</code> for German. In the same context, we then also insert two
     directories in the line above for the translations of the models and the
     views. This directory structure is not a technical requirement, but makes
-    it easier to keep track of things if your application is quite
+    it easier to keep track of things if your application becomes
     big:<programlisting>config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'models', '*', '*.yml').to_s]
 config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'views', '*', '*.yml').to_s]
 config.i18n.default_locale = :de</programlisting></para>
@@ -326,8 +320,8 @@ $</screen></para>
     <note>
       <para>If you know how Bundler works, you can also insert the line
       <code>gem 'rails-i18n'</code> into the file <filename>Gemfile</filename>
-      and then execute <command>bundle</command>. This gives you all language
-      files from the repository.</para>
+      and then execute <command>bundle install</command>. This gives you all
+      language files from the repository.</para>
     </note>
 
     <para>In the file <filename>config/locales/de.yml</filename>, you have all
@@ -342,9 +336,7 @@ $</screen></para>
     following structure. As side effect, we get the methods
     <methodname>Model.model_name.human</methodname> and
     <methodname>Model.human_attribute_name(attribute)</methodname>, with which
-    we can insert the model and attribute names in the view.<programlisting># ruby encoding: utf-8
-
-de:
+    we can insert the model and attribute names in the view.<programlisting>de:
   activerecord:
     models:
       book: 'Buch'
@@ -356,9 +348,7 @@ de:
 </programlisting></para>
 
     <para>In the file <filename>config/locales/views/book/de.yml</filename> we
-    insert a few values for the scaffold views:<programlisting># ruby encoding: utf-8
-
-de:
+    insert a few values for the scaffold views:<programlisting>de:
   views:
     show: Anzeigen
     edit: Editieren
@@ -400,15 +390,15 @@ de:
   &lt;% end %&gt;
 
   &lt;div class="field"&gt;
-    &lt;%= f.label :title %&gt;&lt;br /&gt;
+    &lt;%= f.label :title %&gt;&lt;br&gt;
     &lt;%= f.text_field :title %&gt;
   &lt;/div&gt;
   &lt;div class="field"&gt;
-    &lt;%= f.label :number_of_pages %&gt;&lt;br /&gt;
+    &lt;%= f.label :number_of_pages %&gt;&lt;br&gt;
     &lt;%= f.number_field :number_of_pages %&gt;
   &lt;/div&gt;
   &lt;div class="field"&gt;
-    &lt;%= f.label :price %&gt;&lt;br /&gt;
+    &lt;%= f.label :price %&gt;&lt;br&gt;
     &lt;%= f.text_field :price %&gt;
   &lt;/div&gt;
   &lt;div class="actions"&gt;
@@ -427,30 +417,35 @@ de:
     <para><filename>app/views/books/index.html.erb</filename><programlisting>&lt;h1&gt;&lt;%= t 'views.book.index.title' %&gt;&lt;/h1&gt;
 
 &lt;table&gt;
-  &lt;tr&gt;
-    &lt;th&gt;&lt;%= Book.human_attribute_name(:title) %&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;%= Book.human_attribute_name(:number_of_pages) %&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;%= Book.human_attribute_name(:price) %&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-  &lt;/tr&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;&lt;%= Book.human_attribute_name(:title) %&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;%= Book.human_attribute_name(:number_of_pages) %&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;%= Book.human_attribute_name(:price) %&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
 
-&lt;% @books.each do |book| %&gt;
-  &lt;tr&gt;
-    &lt;td&gt;&lt;%= book.title %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= number_with_delimiter(book.number_of_pages) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= number_to_currency(book.price) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to I18n.t('views.show'), book %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to I18n.t('views.edit'), edit_book_path(book) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to I18n.t('views.destroy'), book, confirm: I18n.t('views.are_you_sure'), method: :delete %&gt;&lt;/td&gt;
-  &lt;/tr&gt;
-&lt;% end %&gt;
+  &lt;tbody&gt;
+    &lt;% @books.each do |book| %&gt;
+      &lt;tr&gt;
+        &lt;td&gt;&lt;%= book.title %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= number_with_delimiter(book.number_of_pages) %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= number_to_currency(book.price) %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to I18n.t('views.show'), book %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to I18n.t('views.edit'), edit_book_path(book) %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to I18n.t('views.destroy'), book, method: :delete, data: { confirm: I18n.t('views.are_you_sure')} %&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;% end %&gt;
+  &lt;/tbody&gt;
 &lt;/table&gt;
 
-&lt;br /&gt;
+&lt;br&gt;
 
-&lt;%= link_to I18n.t('views.book.index.new'), new_book_path %&gt;</programlisting></para>
+&lt;%= link_to I18n.t('views.book.index.new'), new_book_path %&gt;
+</programlisting></para>
 
     <para><filename>app/views/books/new.html.erb</filename><programlisting>&lt;h1&gt;&lt;%= t 'views.book.new.title' %&gt;&lt;/h1&gt;
 
@@ -461,99 +456,81 @@ de:
     <para><filename>app/views/books/show.html.erb</filename><programlisting>&lt;p id="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
 
 &lt;p&gt;
-  &lt;b&gt;&lt;%= Book.human_attribute_name(:title) %&gt;:&lt;/b&gt;
+  &lt;strong&gt;&lt;%= Book.human_attribute_name(:title) %&gt;:&lt;/strong&gt;
   &lt;%= @book.title %&gt;
 &lt;/p&gt;
 
 &lt;p&gt;
-  &lt;b&gt;&lt;%= Book.human_attribute_name(:number_of_pages) %&gt;:&lt;/b&gt;
+  &lt;strong&gt;&lt;%= Book.human_attribute_name(:number_of_pages) %&gt;:&lt;/strong&gt;
   &lt;%= number_with_delimiter(@book.number_of_pages) %&gt;
 &lt;/p&gt;
 
 &lt;p&gt;
-  &lt;b&gt;&lt;%= Book.human_attribute_name(:price) %&gt;:&lt;/b&gt;
+  &lt;strong&gt;&lt;%= Book.human_attribute_name(:price) %&gt;:&lt;/strong&gt;
   &lt;%= number_to_currency(@book.price) %&gt;
 &lt;/p&gt;
 
-
 &lt;%= link_to I18n.t('views.edit'), edit_book_path(@book) %&gt; |
-&lt;%= link_to I18n.t('views.back'), books_path %&gt;</programlisting></para>
+&lt;%= link_to I18n.t('views.back'), books_path %&gt;
+</programlisting></para>
 
     <note>
       <para>In the show and index view, I have integrated the helpers
       <methodname>number_with_delimiter</methodname> and
       <methodname>number_to_currency</methodname> so the numbers are
-      represented more attractively for the end user.</para>
+      represented more attractively for the user.</para>
     </note>
 
     <para>Right at the end, we still need to adapt a few flash messages in the
     controller
     <filename>app/controllers/books_controller.rb</filename>:<programlisting>class BooksController &lt; ApplicationController
+  before_action :set_book, only: [:show, :edit, :update, :destroy]
+
   # GET /books
   # GET /books.json
   def index
     @books = Book.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @books }
-    end
   end
 
   # GET /books/1
   # GET /books/1.json
   def show
-    @book = Book.find(params[:id])
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @book }
-    end
   end
 
   # GET /books/new
-  # GET /books/new.json
   def new
     @book = Book.new
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.json { render json: @book }
-    end
   end
 
   # GET /books/1/edit
   def edit
-    @book = Book.find(params[:id])
   end
 
   # POST /books
   # POST /books.json
   def create
-    @book = Book.new(params[:book])
+    @book = Book.new(book_params)
 
     respond_to do |format|
       if @book.save
         format.html { redirect_to @book, notice: I18n.t('views.book.flash_messages.book_was_successfully_created') }
-        format.json { render json: @book, status: :created, location: @book }
+        format.json { render action: 'show', status: :created, location: @book }
       else
-        format.html { render action: "new" }
+        format.html { render action: 'new' }
         format.json { render json: @book.errors, status: :unprocessable_entity }
       end
     end
   end
 
-  # PUT /books/1
-  # PUT /books/1.json
+  # PATCH/PUT /books/1
+  # PATCH/PUT /books/1.json
   def update
-    @book = Book.find(params[:id])
-
     respond_to do |format|
-      if @book.update_attributes(params[:book])
+      if @book.update(book_params)
         format.html { redirect_to @book, notice: I18n.t('views.book.flash_messages.book_was_successfully_updated') }
         format.json { head :no_content }
       else
-        format.html { render action: "edit" }
+        format.html { render action: 'edit' }
         format.json { render json: @book.errors, status: :unprocessable_entity }
       end
     end
@@ -562,15 +539,25 @@ de:
   # DELETE /books/1
   # DELETE /books/1.json
   def destroy
-    @book = Book.find(params[:id])
     @book.destroy
-
     respond_to do |format|
       format.html { redirect_to books_url }
       format.json { head :no_content }
     end
   end
-end</programlisting></para>
+
+  private
+    # Use callbacks to share common setup or constraints between actions.
+    def set_book
+      @book = Book.find(params[:id])
+    end
+
+    # Never trust parameters from the scary internet, only allow the white list through.
+    def book_params
+      params.require(:book).permit(:title, :number_of_pages, :price)
+    end
+end
+</programlisting></para>
 
     <para>Now you can use the views generated by the scaffold generator
     entirely in German. The structure of the YAML files shown here can of
@@ -596,24 +583,24 @@ end</programlisting></para>
       xlink:href="http://0.0.0.0:3000/books">http://0.0.0.0:3000/books</uri>
       then we need to add the following entry to the
       <filename>config/routes.rb</filename>:<programlisting>Bibliography::Application.routes.draw do
-  scope(:path_names =&gt; { :new =&gt; "neu", :edit =&gt; "bearbeiten" }) do
-    resources :books, :path =&gt; "buecher"
-  end
+  resources :books, path: 'buecher', path_names: { new: 'neu', edit: 'editieren' }
 end</programlisting></para>
 
       <para>As a result, we then have the following new paths:<screen>$ rake routes
-    books GET    /buecher(.:format)                books#index
-          POST   /buecher(.:format)                books#create
- new_book GET    /buecher/neu(.:format)            books#new
-edit_book GET    /buecher/:id/bearbeiten(.:format) books#edit
-     book GET    /buecher/:id(.:format)            books#show
-          PUT    /buecher/:id(.:format)            books#update
-          DELETE /buecher/:id(.:format)            books#destroy
+   Prefix Verb   URI Pattern                      Controller#Action
+    books GET    /buecher(.:format)               books#index
+          POST   /buecher(.:format)               books#create
+ new_book GET    /buecher/neu(.:format)           books#new
+edit_book GET    /buecher/:id/editieren(.:format) books#edit
+     book GET    /buecher/:id(.:format)           books#show
+          PATCH  /buecher/:id(.:format)           books#update
+          PUT    /buecher/:id(.:format)           books#update
+          DELETE /buecher/:id(.:format)           books#destroy
 $</screen></para>
 
       <para>The brilliant thing with Rails routes is that you do not need to
-      do anything else. The rest is managed transparently by the
-      routes.</para>
+      do anything else. The rest is managed transparently by the routing
+      engine.</para>
     </section>
   </section>
 
@@ -630,7 +617,7 @@ $</screen></para>
 
     <section xml:id="i18n_sprache_einstellen">
       <title xml:id="i18n_sprache_einstellen.title">Using I18n.locale for
-      Defining the Desired Language</title>
+      Defining the Default Language</title>
 
       <indexterm>
         <primary>I18n</primary>
@@ -648,20 +635,20 @@ $</screen></para>
 
       <para>This web shop gets a homepage:<screen>$ rails generate controller Page index
   [...]
-$ rm public/index.html
 $ </screen></para>
 
       <para>We still need to enter it as root page in the
       <filename>config/routes.rb</filename>:<programlisting>Webshop::Application.routes.draw do
-  root :to =&gt; 'page#index'
   get "page/index"
+  root 'page#index'
 end</programlisting></para>
 
       <para>We populate the <filename>app/views/page/index.html.erb</filename>
       with the following example: <programlisting>&lt;h1&gt;Example Webshop&lt;/h1&gt;
 &lt;p&gt;Welcome to this webshop.&lt;/p&gt;
 
-&lt;p&gt;&lt;b&gt;I18n.locale:&lt;/b&gt; 
+&lt;p&gt;
+&lt;strong&gt;I18n.locale:&lt;/strong&gt; 
 &lt;%= I18n.locale %&gt;
 &lt;/p&gt;</programlisting></para>
 
@@ -683,10 +670,7 @@ end</programlisting></para>
       <para>As you can see, the default is set to "en" for English. Stop the
       Rails server with <keycap>CTRL-C</keycap> and change the setting for the
       default language to German in the file
-      <filename>config/application.rb</filename>:<programlisting># The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
-# config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
-
-config.i18n.default_locale = :de</programlisting></para>
+      <filename>config/application.rb</filename>:<programlisting>config.i18n.default_locale = :de</programlisting></para>
 
       <para>If you then start the Rails server and again go to <uri
       xlink:href="http://0.0.0.0:3000/">http://0.0.0.0:3000/</uri> in the web
@@ -719,12 +703,15 @@ config.i18n.default_locale = :en</programlisting></para>
       <varname>I18n.locale</varname> in the entire application, but that only
       gets half the job done. A user wants to be able to choose his own
       language. There are various ways of achieving this. To make things
-      clearer, we need a second page that displays a German text. Please
-      create the file <filename>app/views/page/index.de.html.erb</filename>
-      with the following content:<programlisting>&lt;h1&gt;Beispiel Webshop&lt;/h1&gt;
+      clearer, we need a second page that displays a German text.</para>
+
+      <para>Please create the file
+      <filename>app/views/page/index.de.html.erb</filename> with the following
+      content:<programlisting>&lt;h1&gt;Beispiel Webshop&lt;/h1&gt;
 &lt;p&gt;Willkommen in diesem Webshop.&lt;/p&gt;
 
-&lt;p&gt;&lt;b&gt;I18n.locale:&lt;/b&gt; 
+&lt;p&gt;
+&lt;strong&gt;I18n.locale:&lt;/strong&gt; 
 &lt;%= I18n.locale %&gt;
 &lt;/p&gt;</programlisting></para>
 
@@ -750,22 +737,24 @@ config.i18n.default_locale = :en</programlisting></para>
         xlink:href="http://0.0.0.0:3000/en">http://0.0.0.0:3000/en</uri> the
         English version. The first step is adapting the
         <filename>config/routes.rb</filename><programlisting>Webshop::Application.routes.draw do
-
-  scope "(:locale)", :locale =&gt; /en|de/ do
-    root :to =&gt; 'page#index'
+  scope ':locale', locale: /en|de/ do
     get "page/index"
-  <emphasis>end</emphasis>
+    get '/', to: 'page#index'
+  end
 
+  root 'page#index'
 end</programlisting></para>
 
         <para>Next, we need to set a <methodname>before_filter</methodname> in
         the <filename>app/controllers/application_controller.rb</filename>.
         This filter sets the parameter locale set by the route as
         <varname>I18n.locale</varname>:<programlisting>class ApplicationController &lt; ActionController::Base
-  protect_from_forgery
+  # Prevent CSRF attacks by raising an exception.
+  # For APIs, you may want to use :null_session instead.
+  protect_from_forgery with: :exception
 
   before_filter :set_locale
- 
+   
   private
   def set_locale
     I18n.locale = params[:locale] || I18n.default_locale
@@ -809,20 +798,26 @@ end</programlisting></para>
         <para>But now we have a problem: by using the prefix, we initially get
         to a page with the correct language, but what if we want to link from
         that page to another page in our Rails project? Then we would need to
-        manually insert the prefix into the link. Who wants that? That's why
-        there is a solution in form of
-        <code>Rails.application.routes.default_url_options</code>. We just
-        need to expand our <methodname>set_locale</methodname> method
-        accordingly in
+        manually insert the prefix into the link. Who wants that? Obviously
+        there is a clever solution for this problem. We can set global default
+        parameters for URL generation by defining a method called
+        <methodname>default_url_options</methodname> in our controller.</para>
+
+        <para>So we just need to add this method in
         <filename>app/controllers/application_controller.rb</filename>:<programlisting>class ApplicationController &lt; ActionController::Base
-  protect_from_forgery
+  # Prevent CSRF attacks by raising an exception.
+  # For APIs, you may want to use :null_session instead.
+  protect_from_forgery with: :exception
 
   before_filter :set_locale
- 
+
+  def default_url_options
+    { locale: I18n.locale }
+  end
+   
   private
   def set_locale
     I18n.locale = params[:locale] || I18n.default_locale
-    Rails.application.routes.default_url_options[:locale]= I18n.locale 
   end
 end</programlisting></para>
 
@@ -845,8 +840,8 @@ end</programlisting></para>
 &lt;html&gt;
 &lt;head&gt;
   &lt;title&gt;Webshop&lt;/title&gt;
-  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
-  &lt;%= javascript_include_tag "application" %&gt;
+  &lt;%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" =&gt; true %&gt;
+  &lt;%= javascript_include_tag "application", "data-turbolinks-track" =&gt; true %&gt;
   &lt;%= csrf_meta_tags %&gt;
 &lt;/head&gt;
 &lt;body&gt;
@@ -895,19 +890,26 @@ end</programlisting></para>
         language field in the HTTP header. In every web browser, the user can
         set his preferred language (see <uri
         xlink:href="http://www.w3.org/International/questions/qa-lang-priorities">http://www.w3.org/International/questions/qa-lang-priorities</uri>).
-        The browser automatically informs the web server and consequently
-        Rails of this value.</para>
+        The browser automatically informs the web server and consequently Ruby
+        on Rails of this value.</para>
 
         <para>Please edit the
         <filename>app/controllers/application_controller.rb</filename> as
         follows:<programlisting>class ApplicationController &lt; ActionController::Base
-  protect_from_forgery
+  # Prevent CSRF attacks by raising an exception.
+  # For APIs, you may want to use :null_session instead.
+  protect_from_forgery with: :exception
 
   before_filter :set_locale
- 
+   
   private
   def extract_locale_from_accept_language_header
-    request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first
+    http_accept_language = request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first
+    if ['de', 'en'].include? http_accept_language
+      http_accept_language
+    else
+      'en'
+    end
   end
 
   def set_locale
@@ -919,7 +921,7 @@ end</programlisting></para>
         linkend="i18n_url_path_prefix"/> out of the
         <filename>config/routes.rb</filename>:<programlisting>Webshop::Application.routes.draw do
   get "page/index"
-  root :to =&gt; 'page#index'
+  root 'page#index'
 end</programlisting></para>
 
         <para>Now you always get the output in the language defined in the web
@@ -928,8 +930,9 @@ end</programlisting></para>
         does not catch all cases. For example, you should make sure that you
         support the specified language in your Rails application in the first
         place. There are some ready-made gems that can easily do this job for
-        you. Just use the search engine of your choice to go online and look
-        for them.</para>
+        you. Have a look at <uri
+        xlink:href="https://www.ruby-toolbox.com/categories/i18n#http_accept_language">https://www.ruby-toolbox.com/categories/i18n#http_accept_language</uri>
+        to find them.</para>
       </section>
 
       <section xml:id="i18n_local_session">
@@ -944,10 +947,10 @@ end</programlisting></para>
 
         <para>Often you want to save the value of
         <varname>I18n.locale</varname> in a session (see <xref
-        linkend="sessions"/>).<tip>
+        linkend="sessions"/>).<note>
             <para>The approach described here for sessions will of course work
             just the same with cookies. See <xref linkend="cookies"/>.</para>
-          </tip> To set the value, let's create a controller in our web shop
+          </note> To set the value, let's create a controller in our web shop
         as example: the controller <classname>SetLanguage</classname> with the
         two actions <methodname>english</methodname> and
         <methodname>german</methodname>:<screen>$ rails generate controller SetLanguage english german
@@ -979,10 +982,12 @@ end</programlisting></para>
         <para>Finally, we also want to adapt the
         <methodname>set_locale</methodname> methods in the file
         <filename>app/controllers/application_controller.rb</filename>:<programlisting>class ApplicationController &lt; ActionController::Base
-  protect_from_forgery
+  # Prevent CSRF attacks by raising an exception.
+  # For APIs, you may want to use :null_session instead.
+  protect_from_forgery with: :exception
 
   before_filter :set_locale
- 
+   
   private
   def set_locale
     I18n.locale = session[:locale] || I18n.default_locale
@@ -1008,8 +1013,8 @@ end</programlisting></para>
 &lt;html&gt;
 &lt;head&gt;
   &lt;title&gt;Webshop&lt;/title&gt;
-  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
-  &lt;%= javascript_include_tag "application" %&gt;
+  &lt;%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" =&gt; true %&gt;
+  &lt;%= javascript_include_tag "application", "data-turbolinks-track" =&gt; true %&gt;
   &lt;%= csrf_meta_tags %&gt;
 &lt;/head&gt;
 &lt;body&gt;
@@ -1065,7 +1070,9 @@ end</programlisting></para>
         insert a <methodname>before_filter</methodname> that analyses the
         accessed domain and sets the <varname>I18n.locale</varname>
         :<programlisting>class ApplicationController &lt; ActionController::Base
-  protect_from_forgery
+  # Prevent CSRF attacks by raising an exception.
+  # For APIs, you may want to use :null_session instead.
+  protect_from_forgery with: :exception
 
   before_filter :set_locale
  
@@ -1120,7 +1127,9 @@ end</programlisting></para>
 
       <para>As an example, we use a mini webshop in which we translate a
       product scaffold. The aim is to make the application available in German
-      and English. The Rails application:<screen>$ rails new webshop
+      and English. </para>
+
+      <para>The Rails application:<screen>$ rails new webshop
   [...]
 $ cd webshop
 $ rails generate scaffold Product name description 'price:decimal{7,2}'
@@ -1131,38 +1140,43 @@ $ </screen></para>
 
       <para>We define the product model in the
       <filename>app/models/product.rb</filename><programlisting>class Product &lt; ActiveRecord::Base
-  attr_accessible :description, :name, :price
-
   validates :name,
-            :presence =&gt; true,
-            :uniqueness =&gt; true,
-            :length =&gt; { :within =&gt; 2..255 }
+            presence: true,
+            uniqueness: true,
+            length: { within: 2..255 }
 
   validates :price,
-            :presence =&gt; true,
-            :numericality =&gt; { :greater_than =&gt; 0 }
+            presence: true,
+            numericality: { greater_than: 0 }
 end</programlisting></para>
 
       <para>When selecting the language for the user, we use the URL prefix
       variation described in <xref linkend="i18n_url_path_prefix"/>. We use
       the following
       <filename>app/controllers/application_controller.rb</filename><programlisting>class ApplicationController &lt; ActionController::Base
-  protect_from_forgery
-
+  # Prevent CSRF attacks by raising an exception.
+  # For APIs, you may want to use :null_session instead.
+  protect_from_forgery with: :exception
+  
   before_filter :set_locale
- 
+
+  def default_url_options
+    { locale: I18n.locale }
+  end
+                  
   private
   def set_locale
     I18n.locale = params[:locale] || I18n.default_locale
-    Rails.application.routes.default_url_options[:locale]= I18n.locale
   end
 end</programlisting></para>
 
       <para>This is the <filename>config/routes.rb</filename><programlisting>Webshop::Application.routes.draw do
-  scope "(:locale)", :locale =&gt; /en|de/ do
-    root :to =&gt; 'products#index'
+  scope ':locale', locale: /en|de/ do
     resources :products
+    get '/', to: 'products#index'
   end
+
+  root 'products#index'
 end</programlisting></para>
 
       <para>Then we insert the links for the navigation in the
@@ -1170,8 +1184,8 @@ end</programlisting></para>
 &lt;html&gt;
 &lt;head&gt;
   &lt;title&gt;Webshop&lt;/title&gt;
-  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
-  &lt;%= javascript_include_tag "application" %&gt;
+  &lt;%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" =&gt; true %&gt;
+  &lt;%= javascript_include_tag "application", "data-turbolinks-track" =&gt; true %&gt;
   &lt;%= csrf_meta_tags %&gt;
 &lt;/head&gt;
 &lt;body&gt;
@@ -1187,17 +1201,15 @@ end</programlisting></para>
 &lt;/body&gt;
 &lt;/html&gt;</programlisting></para>
 
-      <para>And before we start Rails with <command>rails server</command>, we
-      delete the file <filename>public/index.html</filename> so the root page
-      displayed shows the list of all products.<screen>$ rm public/index.html 
-$ rails server
+      <para>Start the Rails server with <command>rails
+      server.</command><screen>$ rails server
 =&gt; Booting WEBrick
-=&gt; Rails 3.2.3 application starting in development on http://0.0.0.0:3000
-=&gt; Call with -d to detach
+=&gt; Rails 4.0.0 application starting in development on http://0.0.0.0:3000
+=&gt; Run `rails server -h` for more startup options
 =&gt; Ctrl-C to shutdown server
-[2012-06-01 10:43:06] INFO  WEBrick 1.3.1
-[2012-06-01 10:43:06] INFO  ruby 1.9.3 (2012-04-20) [x86_64-darwin11.3.0]
-[2012-06-01 10:43:06] INFO  WEBrick::HTTPServer#start: pid=51412 port=3000</screen></para>
+[2013-07-17 22:16:19] INFO  WEBrick 1.3.1
+[2013-07-17 22:16:19] INFO  ruby 2.0.0 (2013-06-27) [x86_64-darwin12.4.0]
+[2013-07-17 22:16:19] INFO  WEBrick::HTTPServer#start: pid=42806 port=3000</screen></para>
 
       <para>If we go to <uri
       xlink:href="http://0.0.0.0:3000">http://0.0.0.0:3000</uri> we see the
@@ -1226,36 +1238,6 @@ $ rails server
           </mediaobject>
         </screenshot></para>
 
-      <para>For both languages, the file
-      <filename>app/views/products/index.html.erb</filename> is rendered. It
-      contains the following code:<programlisting>&lt;h1&gt;Listing products&lt;/h1&gt;
-
-&lt;table&gt;
-  &lt;tr&gt;
-    &lt;th&gt;Name&lt;/th&gt;
-    &lt;th&gt;Description&lt;/th&gt;
-    &lt;th&gt;Price&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-  &lt;/tr&gt;
-
-&lt;% @products.each do |product| %&gt;
-  &lt;tr&gt;
-    &lt;td&gt;&lt;%= product.name %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= product.description %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= product.price %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Show', product %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Edit', edit_product_path(product) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Destroy', product, confirm: 'Are you sure?', method: :delete %&gt;&lt;/td&gt;
-  &lt;/tr&gt;
-&lt;% end %&gt;
-&lt;/table&gt;
-
-&lt;br /&gt;
-
-&lt;%= link_to 'New Product', new_product_path %&gt;</programlisting></para>
-
       <para>Now we still need to find a way of translating the individual
       elements of this page appropriately and as generically as
       possible.</para>
@@ -1281,9 +1263,7 @@ config.i18n.default_locale = :en</programlisting></para>
 
           <para>Please create the file
           <filename>config/locales/models/product/de.yml</filename> with the
-          following content.<programlisting># ruby encoding: utf-8
-
-de:
+          following content.<programlisting>de:
   activerecord:
     models:
       product: 'Produkt'
@@ -1296,9 +1276,7 @@ de:
 
           <para>In the file
           <filename>config/locales/views/product/de.yml</filename> we insert a
-          few values for the scaffold views:<programlisting># ruby encoding: utf-8
-
-de:
+          few values for the scaffold views:<programlisting>de:
   views:
     show: Anzeigen
     edit: Editieren
@@ -1331,9 +1309,9 @@ $ </screen></para>
           <note>
             <para>If you know how Bundler works you can also insert the line
             <code>gem 'rails-i18n'</code> into the file
-            <filename>Gemfile</filename> and then execute
-            <command>bundle</command>. This gives you all language files from
-            the repository.</para>
+            <filename>Gemfile</filename> and then execute <command>bundle
+            install</command>. This gives you all language files from the
+            repository.</para>
           </note>
 
           <para>The file <filename>config/locales/de.yml</filename> contains
@@ -1387,7 +1365,7 @@ $ </screen></para>
           <varname>activerecord.attributes.product</varname>:<programlisting>&lt;%= form_for(@product) do |f| %&gt;
   &lt;% if @product.errors.any? %&gt;
     &lt;div id="error_explanation"&gt;
-      &lt;h2&gt;&lt;%= t 'activerecord.errors.template.header', :model =&gt; Product.model_name.human, :count =&gt; @product.errors.count %&gt;&lt;/h2&gt;
+      &lt;h2&gt;&lt;%= t 'activerecord.errors.template.header', model: Product.model_name.human, count: @product.errors.count %&gt;&lt;/h2&gt;
 
       &lt;ul&gt;
       &lt;% @product.errors.full_messages.each do |msg| %&gt;
@@ -1398,15 +1376,15 @@ $ </screen></para>
   &lt;% end %&gt;
 
   &lt;div class="field"&gt;
-    &lt;%= f.label :name %&gt;&lt;br /&gt;
+    &lt;%= f.label :name %&gt;&lt;br&gt;
     &lt;%= f.text_field :name %&gt;
   &lt;/div&gt;
   &lt;div class="field"&gt;
-    &lt;%= f.label :description %&gt;&lt;br /&gt;
+    &lt;%= f.label :description %&gt;&lt;br&gt;
     &lt;%= f.text_field :description %&gt;
   &lt;/div&gt;
   &lt;div class="field"&gt;
-    &lt;%= f.label :price %&gt;&lt;br /&gt;
+    &lt;%= f.label :price %&gt;&lt;br&gt;
     &lt;%= f.text_field :price %&gt;
   &lt;/div&gt;
   &lt;div class="actions"&gt;
@@ -1427,7 +1405,8 @@ $ </screen></para>
 &lt;%= render 'form' %&gt;
 
 &lt;%= link_to I18n.t('views.show'), @product %&gt; |
-&lt;%= link_to I18n.t('views.back'), products_path %&gt;</programlisting></para>
+&lt;%= link_to I18n.t('views.back'), products_path %&gt;
+</programlisting></para>
         </section>
 
         <section>
@@ -1443,30 +1422,35 @@ $ </screen></para>
           this point as well.<programlisting>&lt;h1&gt;&lt;%= t 'views.product.index.listing_products' %&gt;&lt;/h1&gt;
 
 &lt;table&gt;
-  &lt;tr&gt;
-    &lt;th&gt;&lt;%= Product.human_attribute_name(:name) %&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;%= Product.human_attribute_name(:description) %&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;%= Product.human_attribute_name(:price) %&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-  &lt;/tr&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;&lt;%= Product.human_attribute_name(:name) %&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;%= Product.human_attribute_name(:description) %&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;%= Product.human_attribute_name(:price) %&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
 
-&lt;% @products.each do |product| %&gt;
-  &lt;tr&gt;
-    &lt;td&gt;&lt;%= product.name %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= product.description %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= number_to_currency(product.price) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to I18n.t('views.show'), product %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to I18n.t('views.edit'), edit_product_path(product) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to I18n.t('views.destroy'), product, confirm: I18n.t('views.are_you_sure'), method: :delete %&gt;&lt;/td&gt;
-  &lt;/tr&gt;
-&lt;% end %&gt;
+  &lt;tbody&gt;
+    &lt;% @products.each do |product| %&gt;
+      &lt;tr&gt;
+        &lt;td&gt;&lt;%= product.name %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= product.description %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= number_to_currency(product.price) %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to I18n.t('views.show'), product %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to I18n.t('views.edit'), edit_product_path(product) %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to I18n.t('views.destroy'), product, method: :delete, data: { confirm: I18n.t('views.are_you_sure')} %&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;% end %&gt;
+  &lt;/tbody&gt;
 &lt;/table&gt;
 
-&lt;br /&gt;
+&lt;br&gt;
 
 &lt;%= link_to I18n.t('views.product.index.new_product'), new_product_path %&gt;
+
 </programlisting></para>
         </section>
 
@@ -1478,7 +1462,8 @@ $ </screen></para>
 
 &lt;%= render 'form' %&gt;
 
-&lt;%= link_to I18n.t('views.back'), products_path %&gt;</programlisting></para>
+&lt;%= link_to I18n.t('views.back'), products_path %&gt;
+</programlisting></para>
         </section>
 
         <section>
@@ -1492,22 +1477,23 @@ $ </screen></para>
           in formatted form:<programlisting>&lt;p id="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
 
 &lt;p&gt;
-  &lt;b&gt;&lt;%= Product.human_attribute_name(:name) %&gt;:&lt;/b&gt;
+  &lt;strong&gt;&lt;%= Product.human_attribute_name(:name) %&gt;:&lt;/strong&gt;
   &lt;%= @product.name %&gt;
 &lt;/p&gt;
 
 &lt;p&gt;
-  &lt;b&gt;&lt;%= Product.human_attribute_name(:description) %&gt;:&lt;/b&gt;
+  &lt;strong&gt;&lt;%= Product.human_attribute_name(:description) %&gt;:&lt;/strong&gt;
   &lt;%= @product.description %&gt;
 &lt;/p&gt;
 
 &lt;p&gt;
-  &lt;b&gt;&lt;%= Product.human_attribute_name(:price) %&gt;:&lt;/b&gt;
+  &lt;strong&gt;&lt;%= Product.human_attribute_name(:price) %&gt;:&lt;/strong&gt;
   &lt;%= number_to_currency(@product.price) %&gt;
 &lt;/p&gt;
 
 &lt;%= link_to I18n.t('views.edit'), edit_product_path(@product) %&gt; |
-&lt;%= link_to I18n.t('views.back'), products_path %&gt;</programlisting></para>
+&lt;%= link_to I18n.t('views.back'), products_path %&gt;
+</programlisting></para>
         </section>
       </section>
 
@@ -1518,71 +1504,53 @@ $ </screen></para>
         <filename>app/controllers/products_controller.rb</filename> for
         creating (create) and updating (update) records, again via
         <methodname>I18n.t</methodname>:<programlisting>class ProductsController &lt; ApplicationController
+  before_action :set_product, only: [:show, :edit, :update, :destroy]
+
   # GET /products
   # GET /products.json
   def index
     @products = Product.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @products }
-    end
   end
 
   # GET /products/1
   # GET /products/1.json
   def show
-    @product = Product.find(params[:id])
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @product }
-    end
   end
 
   # GET /products/new
-  # GET /products/new.json
   def new
     @product = Product.new
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.json { render json: @product }
-    end
   end
 
   # GET /products/1/edit
   def edit
-    @product = Product.find(params[:id])
   end
 
   # POST /products
   # POST /products.json
   def create
-    @product = Product.new(params[:product])
+    @product = Product.new(product_params)
 
     respond_to do |format|
       if @product.save
         format.html { redirect_to @product, notice: I18n.t('views.product.flash_messages.product_was_successfully_created') }
-        format.json { render json: @product, status: :created, location: @product }
+        format.json { render action: 'show', status: :created, location: @product }
       else
-        format.html { render action: "new" }
+        format.html { render action: 'new' }
         format.json { render json: @product.errors, status: :unprocessable_entity }
       end
     end
   end
 
-  # PUT /products/1
-  # PUT /products/1.json
+  # PATCH/PUT /products/1
+  # PATCH/PUT /products/1.json
   def update
-    @product = Product.find(params[:id])
-
     respond_to do |format|
-      if @product.update_attributes(params[:product])
+      if @product.update(product_params)
         format.html { redirect_to @product, notice: I18n.t('views.product.flash_messages.product_was_successfully_updated') }
         format.json { head :no_content }
       else
-        format.html { render action: "edit" }
+        format.html { render action: 'edit' }
         format.json { render json: @product.errors, status: :unprocessable_entity }
       end
     end
@@ -1591,14 +1559,23 @@ $ </screen></para>
   # DELETE /products/1
   # DELETE /products/1.json
   def destroy
-    @product = Product.find(params[:id])
     @product.destroy
-
     respond_to do |format|
       format.html { redirect_to products_url }
       format.json { head :no_content }
     end
   end
+
+  private
+    # Use callbacks to share common setup or constraints between actions.
+    def set_product
+      @product = Product.find(params[:id])
+    end
+
+    # Never trust parameters from the scary internet, only allow the white list through.
+    def product_params
+      params.require(:product).permit(:name, :description, :price)
+    end
 end
 </programlisting></para>
       </section>
