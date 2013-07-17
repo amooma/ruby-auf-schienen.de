@@ -16,14 +16,13 @@
   <section xml:id="asset_pipeline_einleitung">
     <title xml:id="asset_pipeline_einleitung.title">Introduction</title>
 
-    <para>The asset pipeline is integrated and used by default as of Rails
-    3.1. It offers the Rails developer the opportunity of delivering CSS,
-    JavaScript and image files to the browser more optimally - in other words,
-    in a more compressed form and therefore more quickly. Different CSS files
-    are combined into one big file and delivered to the browser with a
-    fingerprint in the file name. This fingerprinting enables the browser and
-    any proxy in between to optimally cache the data, so the browser can load
-    these files more quickly.</para>
+    <para>The asset pipeline offers the Rails developer the opportunity of
+    delivering CSS, JavaScript and image files to the browser more optimally -
+    in other words, in a more compressed form and therefore more quickly.
+    Different CSS files are combined into one big file and delivered to the
+    browser with a fingerprint in the file name. This fingerprinting enables
+    the browser and any proxy in between to optimally cache the data, so the
+    browser can load these files more quickly.</para>
 
     <para>Within the asset pipeline, you can program CSS, SASS, JavaScript and
     CoffeeScript extensively and clearly, in order to let them be delivered
@@ -41,15 +40,14 @@ $</screen></para>
 
     <para>In the directory <filename>app/assets</filename> you will then find
     the following files:<screen>app/assets
-|-- images
-|   `-- rails.png
-|-- javascripts
-|   |-- application.js
-|   `-- products.js.coffee
-`-- stylesheets
-    |-- application.css
-    |-- products.css.scss
-    `-- scaffolds.css.scss</screen></para>
+├── images
+├── javascripts
+│   ├── application.js
+│   └── products.js.coffee
+└── stylesheets
+    ├── application.css
+    ├── products.css.scss
+    └── scaffolds.css.scss</screen></para>
 
     <para>The files <filename>app/assets/javascripts/application.js</filename>
     and <filename>app/assets/stylesheets/application.css</filename> are what
@@ -84,13 +82,14 @@ $</screen></para>
 // or vendor/assets/javascripts of plugins, if any, can be referenced here using a relative path.
 //
 // It's not advisable to add code directly here, but if you do, it'll appear at the bottom of the
-// the compiled file.
+// compiled file.
 //
-// WARNING: THE FIRST BLANK LINE MARKS THE END OF WHAT'S TO BE PROCESSED, ANY BLANK LINE SHOULD
-// GO AFTER THE REQUIRES BELOW.
+// Read Sprockets README (https://github.com/sstephenson/sprockets#sprockets-directives) for details
+// about supported directives.
 //
 //= require jquery
 //= require jquery_ujs
+//= require turbolinks
 //= require_tree .</programlisting></para>
 
         <para>In the <filename>application.js</filename>, the jQuery files
@@ -126,8 +125,7 @@ $</screen></para>
  *
  *= require_self
  *= require_tree .
- */
-</programlisting></para>
+ */</programlisting></para>
 
         <para>With the command <code>require_tree .</code> all files in this
         directory are automatically integrated.</para>
@@ -145,7 +143,8 @@ $</screen></para>
       to precompile the assets before starting the Rails server in the
       production environment. This happens via the command <command>rake
       assets:precompile:</command><screen>$ rake assets:precompile
-/Users/xyz/.rvm/rubies/ruby-1.9.3-p194/bin/ruby /Users/xyz/.rvm/gems/ruby-1.9.3-p194@global/bin/rake assets:precompile:all RAILS_ENV=production RAILS_GROUPS=assets
+I, [2013-07-17T22:58:32.807148 #42981]  INFO -- : Writing /Users/xyz/webshop/public/assets/application-723d1be6cc741a3aabb1cec24276d681.js
+I, [2013-07-17T22:58:32.880512 #42981]  INFO -- : Writing /Users/xyz/webshop/public/assets/application-12b3c7dd74d2e9df37e7cbb1efa76a6d.css
 $</screen></para>
 
       <note>
@@ -154,18 +153,12 @@ $</screen></para>
       </note>
 
       <para>The files created by <command>rake assets:precompile</command>
-      appear in the directory <filename>public/assets</filename><screen>public/assets
-|-- application-0149f820dbdd285aa65e241569d8c256.css
-|-- application-0149f820dbdd285aa65e241569d8c256.css.gz
-|-- application-f8ca698e63b86d217c88772a65d2d20e.js
-|-- application-f8ca698e63b86d217c88772a65d2d20e.js.gz
-|-- application.css
-|-- application.css.gz
-|-- application.js
-|-- application.js.gz
-|-- manifest.yml
-|-- rails-be8732dac73d845ac5b142c8fb5f9fb0.png
-`-- rails.png</screen></para>
+      appear in the directory <filename>public/assets</filename><screen>public/assets/
+├── application-12b3c7dd74d2e9df37e7cbb1efa76a6d.css
+├── application-12b3c7dd74d2e9df37e7cbb1efa76a6d.css.gz
+├── application-723d1be6cc741a3aabb1cec24276d681.js
+├── application-723d1be6cc741a3aabb1cec24276d681.js.gz
+└── manifest-720d2116dee3d83d194ffd9d0957c21c.json</screen></para>
 
       <para>Go ahead and use your favorite editor to have a look at the
       created <filename>css</filename> and <filename>js</filename> files. You
@@ -176,9 +169,9 @@ $</screen></para>
       <note>
         <para>The difference in file size is enormous. The file
         <filename>application.js</filename> created in the development
-        environment has a file size of 100 KB. The file
+        environment has a file size of 296 KB. The file
         <filename>js.gz</filename> created by <command>rake
-        assets:precompile</command> is only 36 KB. Users of cellphones in
+        assets:precompile</command> is only 88 KB. Users of cellphones in
         particular will be grateful for smaller file sizes.</para>
 
         <para>The speed advantage incidentally lies not just in the file size,
@@ -304,8 +297,8 @@ $</screen></para>
 &lt;html&gt;
 &lt;head&gt;
   &lt;title&gt;Webshop&lt;/title&gt;
-  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
-  &lt;%= javascript_include_tag "application" %&gt;
+  &lt;%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" =&gt; true %&gt;
+  &lt;%= javascript_include_tag "application", "data-turbolinks-track" =&gt; true %&gt;
   &lt;%= csrf_meta_tags %&gt;
 &lt;/head&gt;
 &lt;body&gt;
