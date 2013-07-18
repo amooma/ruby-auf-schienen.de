@@ -106,13 +106,11 @@ $</screen></para>
         <para>We insert a few rudimentary rules in the two models.</para>
 
         <para><filename>app/models/company.rb</filename><programlisting>class Company &lt; ActiveRecord::Base
-  attr_accessible :name
-
   validates :name,
-            :presence =&gt; true,
-            :uniqueness =&gt; true
+            presence: true,
+            uniqueness: true
 
-  has_many :employees, :dependent =&gt; :destroy
+  has_many :employees, dependent: :destroy
 
   def to_s
     name
@@ -121,18 +119,16 @@ end
 </programlisting></para>
 
         <para><filename>app/models/employee.rb</filename><programlisting>class Employee &lt; ActiveRecord::Base
-  attr_accessible :company_id, :first_name, :last_name, :phone_number
-
-  belongs_to :company, :touch =&gt; true
+  belongs_to :company, touch: true
 
   validates :first_name,
-            :presence =&gt; true
+            presence: true
 
   validates :last_name,
-            :presence =&gt; true
+            presence: true
 
   validates :company,
-            :presence =&gt; true
+            presence: true
 
   def to_s
     "#{first_name} #{last_name}"
@@ -150,26 +146,30 @@ end</programlisting></para>
         <para><filename>app/views/companies/index.html.erb</filename><programlisting>&lt;h1&gt;Listing companies&lt;/h1&gt;
 
 &lt;table&gt;
-  &lt;tr&gt;
-    &lt;th&gt;Name&lt;/th&gt;
-    &lt;th&gt;Number of employees&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-  &lt;/tr&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Name&lt;/th&gt;
+      &lt;th&gt;Number of employees&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
 
-&lt;% @companies.each do |company| %&gt;
-  &lt;tr&gt;
-    &lt;td&gt;&lt;%= company.name %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= company.employees.count %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Show', company %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Edit', edit_company_path(company) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Destroy', company, method: :delete, data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
-  &lt;/tr&gt;
-&lt;% end %&gt;
+  &lt;tbody&gt;
+    &lt;% @companies.each do |company| %&gt;
+      &lt;tr&gt;
+        &lt;td&gt;&lt;%= company.name %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= company.employees.count %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to 'Show', company %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to 'Edit', edit_company_path(company) %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to 'Destroy', company, method: :delete, data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;% end %&gt;
+  &lt;/tbody&gt;
 &lt;/table&gt;
 
-&lt;br /&gt;
+&lt;br&gt;
 
 &lt;%= link_to 'New Company', new_company_path %&gt;
 </programlisting></para>
@@ -177,30 +177,33 @@ end</programlisting></para>
         <para><filename>app/views/companies/show.html.erb</filename><programlisting>&lt;p id="notice"&gt;&lt;%= notice %&gt;&lt;/p&gt;
 
 &lt;p&gt;
-  &lt;b&gt;Name:&lt;/b&gt;
+  &lt;strong&gt;Name:&lt;/strong&gt;
   &lt;%= @company.name %&gt;
 &lt;/p&gt;
-
 
 &lt;%= link_to 'Edit', edit_company_path(@company) %&gt; |
 &lt;%= link_to 'Back', companies_path %&gt;
 
-&lt;h2&gt;Listing employees&lt;/h2&gt;
+&lt;h1&gt;Listing employees&lt;/h1&gt;
 
 &lt;table&gt;
-  &lt;tr&gt;
-    &lt;th&gt;Last name&lt;/th&gt;
-    &lt;th&gt;First name&lt;/th&gt;
-    &lt;th&gt;Phone number&lt;/th&gt;
-  &lt;/tr&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Last name&lt;/th&gt;
+      &lt;th&gt;First name&lt;/th&gt;
+      &lt;th&gt;Phone number&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
 
-&lt;% @company.employees.each do |employee| %&gt;
-  &lt;tr&gt;
-    &lt;td&gt;&lt;%= employee.last_name %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= employee.first_name %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= employee.phone_number %&gt;&lt;/td&gt;
-  &lt;/tr&gt;
-&lt;% end %&gt;
+  &lt;tbody&gt;
+    &lt;% @company.employees.each do |employee| %&gt;
+      &lt;tr&gt;
+        &lt;td&gt;&lt;%= employee.last_name %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= employee.first_name %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= employee.phone_number %&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;% end %&gt;
+  &lt;/tbody&gt;
 &lt;/table&gt;</programlisting></para>
       </section>
 
@@ -223,9 +226,9 @@ $</screen></para>
   if company.save
     SecureRandom.random_number(100).times do
       company.employees.create(
-                               :first_name =&gt; Faker::Name.first_name, 
-                               :last_name =&gt; Faker::Name.last_name, 
-                               :phone_number =&gt; Faker::PhoneNumber.phone_number
+                               first_name:   Faker::Name.first_name, 
+                               last_name:    Faker::Name.last_name, 
+                               phone_number: Faker::PhoneNumber.phone_number
                               )
     end
   end
@@ -252,12 +255,12 @@ $</screen></para>
       server</command>. The relevant numbers of course depend on the hardware
       you are using.<screen>$ rails server
 =&gt; Booting WEBrick
-=&gt; Rails 3.2.9 application starting in development on http://0.0.0.0:3000
-=&gt; Call with -d to detach
+=&gt; Rails 4.0.0 application starting in development on http://0.0.0.0:3000
+=&gt; Run `rails server -h` for more startup options
 =&gt; Ctrl-C to shutdown server
-[2012-07-13 14:31:45] INFO  WEBrick 1.3.1
-[2012-07-13 14:31:45] INFO  ruby 1.9.3 (2012-04-20) [x86_64-darwin11.4.0]
-[2012-07-13 14:31:45] INFO  WEBrick::HTTPServer#start: pid=14357 port=3000</screen></para>
+[2013-07-17 23:50:11] INFO  WEBrick 1.3.1
+[2013-07-17 23:50:11] INFO  ruby 2.0.0 (2013-06-27) [x86_64-darwin12.4.0]
+[2013-07-17 23:50:11] INFO  WEBrick::HTTPServer#start: pid=43210 port=3000</screen></para>
 
       <para>To access the web pages, we use the command line tool curl (<uri
       xlink:href="http://curl.haxx.se/">http://curl.haxx.se/</uri>). Of course
@@ -276,7 +279,7 @@ $</screen></para>
         the user can see a list of all saved companies with the relevant
         number of employees.</para>
 
-        <para>Generating the page takes 85ms.<screen>Completed 200 OK in 85ms (Views: 71.9ms | ActiveRecord: 12.5ms)</screen></para>
+        <para>Generating the page takes 48ms.<screen>Completed 200 OK in 48ms (Views: 38.9ms | ActiveRecord: 8.3ms)</screen></para>
       </section>
 
       <section xml:id="caching_einleitung_normale_geschwindigkeit_show_view">
@@ -289,7 +292,7 @@ $</screen></para>
         the user can see the details of the first company with all
         employees.</para>
 
-        <para>Generating the page takes 21ms.<screen>Completed 200 OK in 21ms (Views: 19.1ms | ActiveRecord: 1.1ms)</screen></para>
+        <para>Generating the page takes 11ms.<screen>Completed 200 OK in 11ms (Views: 8.6ms | ActiveRecord: 0.8ms)</screen></para>
       </section>
     </section>
   </section>
@@ -314,11 +317,8 @@ $</screen></para>
 
     <para>Within the Rails framework, our aim is answering the question "Has a
     page changed?" already in the controller. Because normally, most of the
-    time is spent on rendering the page in a view. You can see this really
-    well in <xref
-    linkend="caching_einleitung_normale_geschwindigkeit_index_view"/>: of the
-    total 85ms, a massive 71.9ms and therefore 80% of the overall time are
-    spent on rendering the view.</para>
+    time is spent on rendering the page in the view. I'd like to repeat that:
+    Most of the time is spent on rendering the page in the view!</para>
 
     <section xml:id="http_caching_last_modified">
       <title xml:id="http_caching_last_modified.title">Last-Modified</title>
@@ -347,33 +347,24 @@ $</screen></para>
       companies." Ah, but you are underestimating what Rails can do.
       ;-)</para>
 
-      <para>Please edit the <methodname>index</methodname> and
-      <methodname>show</methodname> methods in the controller file
+      <para>Please edit the <methodname>show</methodname> method in the
+      controller file
       <filename>app/controllers/companies_controller.rb</filename> as follows
-      :<programlisting>  def index
-    @companies = Company.order(:id)
-
-    fresh_when last_modified: @companies.maximum(:updated_at)
-  end
-
-  def show
-    @company = Company.find(params[:id])
-
-    fresh_when last_modified: @company.updated_at
-  end</programlisting></para>
-
-      <note>
-        <para>We use <code>@companies = Company.order(:id)</code> instead of
-        <code>@companies = Company.all</code> in order to be able to use
-        ActiveRecord's lazy loading (see <xref
-        linkend="lazy_loading"/>).</para>
-      </note>
+      :<programlisting># GET /companies/1
+# GET /companies/1.json
+def show
+  fresh_when last_modified: @company.updated_at                               
+end</programlisting></para>
 
       <para>After restarting the Rails application, we have a look at the HTTP
       header of <uri
-      xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>:<screen>$ curl -I http://0.0.0.0:3000/companies
+      xlink:href="http://0.0.0.0:3000/companies/1">http://0.0.0.0:3000/companies/1</uri>:<screen>$ curl -I http://0.0.0.0:3000/companies/1
 HTTP/1.1 200 OK 
-Last-Modified: Fri, 13 Jul 2012 12:14:50 GMT
+X-Frame-Options: SAMEORIGIN
+X-Xss-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+X-Ua-Compatible: chrome=1
+Last-Modified: Wed, 17 Jul 2013 21:50:01 GMT
 [...]
 $</screen></para>
 
@@ -381,37 +372,21 @@ $</screen></para>
       generated by <methodname>fresh_when</methodname> in the controller. If
       we later go to the same web page and specify this time as well, then we
       do not get the web page back, but a <code>304 Not Modified</code>
-      message:<screen>$ curl -I http://0.0.0.0:3000/companies --header 'If-Modified-Since: Fri, 13 Jul 2012 12:14:50 GMT'
+      message:<screen>$ $ curl -I http://0.0.0.0:3000/companies/1 --header 'If-Modified-Since: Wed, 17 Jul 2013 21:50:01 GMT'
 HTTP/1.1 304 Not Modified 
-Last-Modified: Fri, 13 Jul 2012 12:14:50 GMT
-Cache-Control: max-age=0, private, must-revalidate
-X-Ua-Compatible: IE=Edge
-X-Request-Id: 7802f078add46dc372adaec92f343fe2
-X-Runtime: 0.008647
-Server: WEBrick/1.3.1 (Ruby/1.9.3/2012-04-20)
-Date: Fri, 13 Jul 2012 14:27:15 GMT
-Connection: close
-
+[...]
 $</screen></para>
 
-      <para>In the Rails log, we find this:<screen>Started HEAD "/companies" for 127.0.0.1 at 2012-07-13 16:29:53 +0200
-Processing by CompaniesController#index as */*
-   (0.2ms)  SELECT MAX("companies"."updated_at") AS max_id FROM "companies" 
-Completed 304 Not Modified in 2ms (ActiveRecord: 0.2ms)</screen></para>
+      <para>In the Rails log, we find this:<screen>Started HEAD "/companies/1" for 127.0.0.1 at 2013-07-18 08:27:10 +0200
+Processing by CompaniesController#show as */*
+  Parameters: {"id"=&gt;"1"}
+  Company Load (0.1ms)  SELECT "companies".* FROM "companies" WHERE "companies"."id" = ? LIMIT 1  [["id", "1"]]
+Completed 304 Not Modified in 2ms (ActiveRecord: 0.1ms)</screen></para>
 
-      <para>Rails took 2ms to answer this request, compared to the 67ms of the
-      standard variation. This is more than 40 times faster! So you have used
-      around 40 times less resources on the server. And saved a massive amount
-      of bandwidth. The user will be able to see the page much more
-      quickly.</para>
-
-      <para>This result was achieved through
-      <code>@companies.maximum(:updated_at)</code> in the controller. We only
-      had to check when the last update was done in the database. As soon as a
-      single company record changes, the value is set to the then current time
-      and the whole web page is delivered once more. With this method, you can
-      also deliver generically generated web pages via
-      <code>Last-Modified</code> headers.</para>
+      <para>Rails took 2ms to answer this request, compared to the 11ms of the
+      standard variation. This is way faster! So you have used less resources
+      on the server. And saved a massive amount of bandwidth. The user will be
+      able to see the page much more quickly.</para>
     </section>
 
     <section xml:id="http_caching_etag">
@@ -442,15 +417,16 @@ Completed 304 Not Modified in 2ms (ActiveRecord: 0.2ms)</screen></para>
       <para>Please edit the <methodname>index</methodname> and
       <methodname>show</methodname> methods in the controller file
       <filename>app/controllers/companies_controller.rb</filename> as
-      follows:<programlisting>def index
+      follows:<programlisting># GET /companies
+# GET /companies.json
+def index                                                                     
   @companies = Company.all
-
   fresh_when etag: @companies
 end
 
+# GET /companies/1
+# GET /companies/1.json
 def show
-  @company = Company.find(params[:id])
-
   fresh_when etag: @company
 end</programlisting></para>
 
@@ -469,9 +445,11 @@ end</programlisting></para>
       <para>For saving, we use the <code>-c cookies.txt</code>
       parameter.<screen>$ curl -I http://0.0.0.0:3000/companies -c cookies.txt
 HTTP/1.1 200 OK 
-Etag: "b5f711016cb2e5fce352230e607ceffe"
-Content-Type: text/html; charset=utf-8
-Cache-Control: max-age=0, private, must-revalidate
+X-Frame-Options: SAMEORIGIN
+X-Xss-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+X-Ua-Compatible: chrome=1
+Etag: "e57e45d14a0afc4377c81fc5ecc951b0"
 [...]
 
 $</screen></para>
@@ -480,32 +458,44 @@ $</screen></para>
       cookies to the web server when a request arrives. Now we get the same
       etag for two subsequent requests:<screen>$ curl -I http://0.0.0.0:3000/companies -b cookies.txt
 HTTP/1.1 200 OK 
-Etag: "132c1be24595b9b5f7b2c08b300592b1"
+X-Frame-Options: SAMEORIGIN
+X-Xss-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+X-Ua-Compatible: chrome=1
+Etag: "e57e45d14a0afc4377c81fc5ecc951b0"
 [...]
 
 $ curl -I http://0.0.0.0:3000/companies -b cookies.txt
 HTTP/1.1 200 OK 
-Etag: "132c1be24595b9b5f7b2c08b300592b1"
+X-Frame-Options: SAMEORIGIN
+X-Xss-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+X-Ua-Compatible: chrome=1
+Etag: "e57e45d14a0afc4377c81fc5ecc951b0"
 [...]
 
 $</screen></para>
 
-      <para>We now use this etag to find out in the request with If-None-Match
-      if the version we have cached is still up to date:<screen>$ curl -I http://0.0.0.0:3000/companies -b cookies.txt --header 'If-None-Match: "132c1be24595b9b5f7b2c08b300592b1"'
+      <para>We now use this etag to find out in the request with
+      <code>If-None-Match</code> if the version we have cached is still up to
+      date:<screen>$ curl -I http://0.0.0.0:3000/companies -b cookies.txt --header 'If-None-Match: "e57e45d14a0afc4377c81fc5ecc951b0"'
 HTTP/1.1 304 Not Modified 
-Etag: "132c1be24595b9b5f7b2c08b300592b1"
-Cache-Control: max-age=0, private, must-revalidate
+X-Frame-Options: SAMEORIGIN
+X-Xss-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+X-Ua-Compatible: chrome=1
+Etag: "e57e45d14a0afc4377c81fc5ecc951b0"
 [...]
 
 $</screen></para>
 
       <para>We get a <code>304 Not Modified</code> in response. Let's look at
-      the Rails log:<screen>Started HEAD "/companies" for 127.0.0.1 at 2012-07-13 18:45:38 +0200
+      the Rails log:<screen>Started HEAD "/companies" for 127.0.0.1 at 2013-07-18 08:32:43 +0200
 Processing by CompaniesController#index as */*
-  Company Load (0.3ms)  SELECT "companies".* FROM "companies" 
-Completed 304 Not Modified in 3ms (ActiveRecord: 0.3ms)</screen></para>
+  Company Load (0.3ms)  SELECT "companies".* FROM "companies"
+Completed 304 Not Modified in 4ms (ActiveRecord: 0.3ms)</screen></para>
 
-      <para>Rails only took 3ms to process the request. Almost 30 times as
+      <para>Rails only took 4ms to process the request. Almost 10 times as
       fast as the variation without cache! Plus we have saved bandwidth again.
       The user will be happy with the speedy web application.</para>
 
@@ -516,49 +506,23 @@ Completed 304 Not Modified in 3ms (ActiveRecord: 0.3ms)</screen></para>
         <para>As basis for generating an etag, we can not just pass an object,
         but also an array of objects. This way, we can solve the problem with
         the logged-in user. Let's assume that a logged-in user is output with
-        the method <methodname>current_user</methodname>. The methods
-        <methodname>index</methodname> and <methodname>show</methodname> would
-        then look like this in the
-        <filename>app/controllers/companies_controller.rb</filename>
-        controller:<programlisting>  def index
-    @companies = Company.all
+        the method <methodname>current_user</methodname>. </para>
 
-    fresh_when etag: [@companies, current_user]
-  end
+        <para>We only have to add <code>etag { current_user.try :id }</code>
+        in the <filename>app/controllers/application_controller.rb</filename>
+        to make sure that all etags in the application include the
+        current_user.id which is nil in case nobody is logged
+        in.<programlisting>class ApplicationController &lt; ActionController::Base
+  # Prevent CSRF attacks by raising an exception.
+  # For APIs, you may want to use :null_session instead.
+  protect_from_forgery with: :exception
 
-  def show
-    @company = Company.find(params[:id])
+  etag { current_user.try :id }
+end</programlisting></para>
 
-    fresh_when etag: [@company, current_user]
-  end</programlisting></para>
-
-        <para>You can accommodate any number of objects in this array and use
-        this approach to define when a page has not changed.</para>
+        <para>You can chain other objects in this array too and use this
+        approach to define when a page has not changed.</para>
       </section>
-    </section>
-
-    <section xml:id="http_caching_etag_and_last_modified">
-      <title xml:id="http_caching_etag_and_last_modified.title">Combining Etag
-      and Last-Modified</title>
-
-      <para>You can also use <code>Etag</code> and <code>Last-Modified</code>
-      together. Here is what it looks like:<programlisting>  def index
-    @companies = Company.order(:id)
-
-    fresh_when :etag =&gt; @companies.all, 
-               :last_modified =&gt; @companies.maximum(:updated_at)
-  end
-
-  def show
-    @company = Company.find(params[:id])
-
-    fresh_when @company
-  end</programlisting></para>
-
-      <para>As you can see, there is an abbreviated form for the show view.
-      That is because <varname>@company</varname> has a method
-      <methodname>updated_at</methodname>. This is then used automatically by
-      <methodname>fresh_when</methodname>.</para>
     </section>
 
     <section xml:id="http_caching_touch">
@@ -566,16 +530,15 @@ Completed 304 Not Modified in 3ms (ActiveRecord: 0.3ms)</screen></para>
 
       <para>What happens if an <classname>Employee</classname> is edited or
       deleted? Then the show view and potentially also the index view would
-      have to change as well. That is the reason for the line <programlisting>belongs_to :company, :touch =&gt; true</programlisting>
+      have to change as well. That is the reason for the line <programlisting>belongs_to :company, touch: true</programlisting>
       in the employee model. Every time an object of the class
       <classname>Employee</classname> is saved in edited form, and if
-      <code>:touch =&gt; true</code> is used, ActiveRecord updates the
-      superordinate <classname>Company</classname> element in the database.
-      The <varname>updated_at</varname> field is set to the current time. It
-      is "touched".</para>
+      <code>touch: true</code> is used, ActiveRecord updates the superordinate
+      <classname>Company</classname> element in the database. The
+      <varname>updated_at</varname> field is set to the current time. It is
+      "touched".</para>
 
-      <para>This approach ensures that a correct web page is once more
-      delivered.</para>
+      <para>This approach ensures that a correct content is delivered.</para>
     </section>
 
     <section xml:id="http_caching_stale">
@@ -599,19 +562,7 @@ Completed 304 Not Modified in 3ms (ActiveRecord: 0.3ms)</screen></para>
       <methodname>fresh_when</methodname>. The example of <xref
       linkend="http_caching_etag_and_last_modified"/> would then look like
       this if we use <methodname>stale?</methodname> and additionally render
-      JSON:<programlisting>def index
-  @companies = Company.order(:id)
-
-  if stale? :etag =&gt; @companies.all, 
-            :last_modified =&gt; @companies.maximum(:updated_at)
-    respond_to do |format|
-      format.html
-      format.json { render json: @companies }
-    end
-  end
-end
-
-def show
+      JSON:<programlisting>def show
   @company = Company.find(params[:id])
 
   if stale? @company
@@ -643,24 +594,22 @@ end</programlisting></para>
       <methodname>fresh_when</methodname> or <methodname>stale?</methodname>.
       The example of <xref linkend="http_caching_etag_and_last_modified"/>
       would then look like this if using <code>public:
-      true</code>:<programlisting>def index
-  @companies = Company.order(:id)
-
-  fresh_when :etag =&gt; @companies.all, 
-             :last_modified =&gt; @companies.maximum(:updated_at),
-             :public =&gt; true
-end
-
+      true</code>:<programlisting># GET /companies/1
+# GET /companies/1.json
 def show
   @company = Company.find(params[:id])
 
   fresh_when @company, public: true
 end</programlisting></para>
 
-      <para>We go to the web page and get the output:<screen>$ curl -I http://0.0.0.0:3000/companies
+      <para>We go to the web page and get the output:<screen>$ curl -I http://0.0.0.0:3000/companies/1
 HTTP/1.1 200 OK 
-Etag: "d45a37972109e8ccea1160d81a6ff79d"
-Last-Modified: Sat, 14 Jul 2012 12:40:25 GMT
+X-Frame-Options: SAMEORIGIN
+X-Xss-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+X-Ua-Compatible: chrome=1
+Etag: "81cfb867cac24fad7ff1a7721bfb529a"
+Last-Modified: Wed, 17 Jul 2013 21:50:01 GMT
 Content-Type: text/html; charset=utf-8
 Cache-Control: public
 [...]</screen></para>
@@ -730,29 +679,26 @@ Cache-Control: public
       linkend="http_caching_etag_and_last_modified"/> by adding the method
       <methodname>expires_in</methodname>. The controller
       <filename>app/controllers/companies.rb</filename> would then contain the
-      following code for the method <methodname>index</methodname> and
-      <methodname>show</methodname>:<programlisting>def index
-  @companies = Company.order(:id)
-
-  expires_in 2.minutes
-  fresh_when :etag =&gt; @companies.all, :last_modified =&gt; @companies.maximum(:updated_at)
-end
-
+      following code for the method
+      <methodname>show</methodname>:<programlisting># GET /companies/1
+# GET /companies/1.json
 def show
-  @company = Company.find(params[:id])
-
   expires_in 2.minutes
-  fresh_when @company
-end
-</programlisting></para>
+  fresh_when @company, public: true
+end</programlisting></para>
 
       <para>Now we get a different cache control information in response to a
-      request:<screen>$ curl -I http://0.0.0.0:3000/companies
+      request:<screen>$ curl -I http://0.0.0.0:3000/companies/1
 HTTP/1.1 200 OK 
-Etag: "d45a37972109e8ccea1160d81a6ff79d"
-Last-Modified: Sat, 14 Jul 2012 12:40:25 GMT
+X-Frame-Options: SAMEORIGIN
+X-Xss-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+X-Ua-Compatible: chrome=1
+Date: Thu, 18 Jul 2013 06:55:30 GMT
+Etag: "81cfb867cac24fad7ff1a7721bfb529a"
+Last-Modified: Wed, 17 Jul 2013 21:50:01 GMT
 Content-Type: text/html; charset=utf-8
-Cache-Control: max-age=120, private
+Cache-Control: max-age=120, public
 [...]</screen></para>
 
       <para>The two minutes are specified in seconds
@@ -776,6 +722,363 @@ Cache-Control: max-age=120, private
     </section>
   </section>
 
+  <section xml:id="fragment_caching">
+    <title xml:id="fragment_caching.title">Fragment Caching</title>
+
+    <indexterm>
+      <primary>caching</primary>
+
+      <secondary>fragment caching</secondary>
+    </indexterm>
+
+    <para>With fragment caching you can cache individual parts of a view. You
+    can safely use it in combination with <xref linkend="http_caching"/> and
+    <xref linkend="page_caching"/>. The advantages once again are a reduction
+    of server load and faster web page generation, which means increased
+    usability.</para>
+
+    <para>Please install a new example application (see <xref
+    linkend="caching_beispielapplikation"/>).</para>
+
+    <section xml:id="fragment_caching_im_devel_modus_aktivieren">
+      <title
+      xml:id="fragment_caching_im_devel_modus_aktivieren.title">Enabling
+      Fragment Caching in Development Mode</title>
+
+      <para>First, we need to go to the file
+      <filename>config/environments/development.rb</filename> and set the item
+      <code>config.action_controller.perform_caching</code> to
+      <code>true</code>:<programlisting>config.action_controller.perform_caching = true</programlisting></para>
+
+      <para>Otherwise, we cannot try out the fragment caching in development
+      mode. In production mode, fragment caching is enabled by default.</para>
+    </section>
+
+    <section xml:id="fragment_caching_tabelle_cachen">
+      <title xml:id="fragment_caching_tabelle_cachen.title">Caching Table of
+      Index View</title>
+
+      <para>On the page <uri
+      xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>,
+      a very computationally intensive table with all companies is rendered.
+      We can cache this table as a whole. To do so, we need to enclose the
+      table in a <code>&lt;% cache('name_of_cache') do %&gt; ... &lt;% end
+      %&gt;</code> block:<programlisting>&lt;% cache('name_of_cache') do %&gt;
+
+[...]
+
+&lt;% end %&gt;</programlisting></para>
+
+      <para>Please edit the file
+      <filename>app/views/companies/index.html.erb</filename> as
+      follows:<programlisting>&lt;h1&gt;Listing companies&lt;/h1&gt;
+
+&lt;% cache('table_of_all_companies') do %&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Name&lt;/th&gt;
+      &lt;th&gt;Number of employees&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+
+  &lt;tbody&gt;
+    &lt;% @companies.each do |company| %&gt;
+      &lt;tr&gt;
+        &lt;td&gt;&lt;%= company.name %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= company.employees.count %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to 'Show', company %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to 'Edit', edit_company_path(company) %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to 'Destroy', company, method: :delete, data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;% end %&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;% end %&gt;
+
+&lt;br /&gt;
+
+&lt;%= link_to 'New Company', new_company_path %&gt;</programlisting></para>
+
+      <para>Then you can start the Rails server with <command>rails
+      server</command> and go to the URL <uri
+      xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>.
+      In the development log, you will now see the following entry:<screen>Write fragment views/table_of_all_companies (2.9ms)
+  Rendered companies/index.html.erb within layouts/application (119.8ms)
+Completed 200 OK in 209ms (Views: 143.1ms | ActiveRecord: 15.0ms)</screen></para>
+
+      <para>Writing the cache took 2.9 ms. In total, rendering the page took
+      209 ms.</para>
+
+      <para>If you repeatedly go to the same page, you will get a different
+      result in the log:<screen>Read fragment views/table_of_all_companies (0.2ms)
+  Rendered companies/index.html.erb within layouts/application (0.8ms)
+Completed 200 OK in 37ms (Views: 34.6ms | ActiveRecord: 0.3ms)</screen></para>
+
+      <para>Reading the cache took 0.2 ms and rendering the page in total
+      37ms. Only a fifth of the processing time!</para>
+    </section>
+
+    <section xml:id="fragment_cache_loeschen">
+      <title xml:id="fragment_cache_loeschen.title">Deleting Fragment
+      Cache</title>
+
+      <indexterm>
+        <primary>caching</primary>
+
+        <secondary>fragment caching</secondary>
+
+        <tertiary>deleting cache</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>caching</primary>
+
+        <secondary>fragment caching</secondary>
+
+        <tertiary>expire_fragment</tertiary>
+      </indexterm>
+
+      <para>With the method <methodname>expire_fragment</methodname> you can
+      clear specific fragment caches. Basically, we can build this idea into
+      the model in the same way as shown in <xref
+      linkend="page_caches_automatisch_loeschen"/>.</para>
+
+      <para>The model file <filename>app/models/company.rb</filename> would
+      then look like this:<programlisting>class Company &lt; ActiveRecord::Base
+  validates :name,
+            presence: true,
+            uniqueness: true
+
+  has_many :employees, dependent: :destroy
+
+  after_create   :expire_cache
+  after_update   :expire_cache
+  before_destroy :expire_cache
+
+  def to_s
+    name
+  end
+
+  def expire_cache
+    ActionController::Base.new.expire_fragment('table_of_all_companies')
+  end
+end</programlisting></para>
+
+      <para>As the number of employees also has an effect on this table, we
+      would also have to expand the file
+      <filename>app/models/employees.rb</filename>
+      accordingly:<programlisting>class Employee &lt; ActiveRecord::Base
+  belongs_to :company, touch: true
+
+  validates :first_name,
+            presence: true
+
+  validates :last_name,
+            presence: true
+
+  validates :company,
+            presence: true
+
+  after_create   :expire_cache
+  after_update   :expire_cache
+  before_destroy :expire_cache
+
+  def to_s
+    "#{first_name} #{last_name}"
+  end
+
+  def expire_cache
+    ActionController::Base.new.expire_fragment('table_of_all_companies')
+  end  
+end</programlisting></para>
+
+      <para>Deleting specific fragment caches often involves a lot of effort
+      in terms of programming. One, you often miss things and two, in big
+      projects it's not easy to keep track of all the different cache names.
+      Often it is easier to automatically create names via the method
+      <methodname>cache_key</methodname>. These then expire automatically in
+      the cache (see <xref linkend="fragment_auto_expiring"/>).</para>
+    </section>
+
+    <section xml:id="fragment_auto_expiring">
+      <title xml:id="fragment_auto_expiring.title">Auto-Expiring
+      Caches</title>
+
+      <indexterm>
+        <primary>caching</primary>
+
+        <secondary>fragment caching</secondary>
+
+        <tertiary>cache_key</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>caching</primary>
+
+        <secondary>fragment caching</secondary>
+
+        <tertiary>auto-expiring</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>cache_key</primary>
+      </indexterm>
+
+      <para>Managing fragment caching is rather complex with the naming
+      convention used in <xref linkend="fragment_caching_tabelle_cachen"/>. On
+      the one hand, you can be sure that the cache does not have any
+      superfluous ballast if you have programmed neatly, but on the other, it
+      does not really matter. A cache is structured in such a way that it
+      deletes old and no longer required elements on its own. If we use a
+      mechanism that gives a fragment cache a unique name, as in the asset
+      pipeline (see <xref linkend="asset_pipeline"/>), then we would not need
+      to go to all the trouble of deleting fragment caches.</para>
+
+      <para>That is precisely what the method
+      <methodname>cache_key</methodname> is for.
+      <methodname>cache_key</methodname> gives you a unique name for an
+      element. Let's try it in the console. First, we get the always identical
+      <methodname>cache_key</methodname> of the first company item two times
+      in a row ("companies/1-20130717215001729269000"), then we touch the item
+      (a <methodname>touch</methodname> sets the attribute
+      <varname>updated_at</varname> to the current time) and finally we output
+      the new <methodname>cache_key</methodname>
+      ("companies/1-20130718081128853737000"):<screen>$ rails console
+Loading development environment (Rails 4.0.0)
+&gt;&gt; Company.first.cache_key
+  Company Load (0.1ms)  SELECT "companies".* FROM "companies" ORDER BY "companies"."id" ASC LIMIT 1
+=&gt; "companies/1-20130717215001729269000"
+&gt;&gt; Company.first.cache_key
+  Company Load (0.3ms)  SELECT "companies".* FROM "companies" ORDER BY "companies"."id" ASC LIMIT 1
+=&gt; "companies/1-20130717215001729269000"
+&gt;&gt; Company.first.touch
+  Company Load (0.2ms)  SELECT "companies".* FROM "companies" ORDER BY "companies"."id" ASC LIMIT 1
+  SQL (4.2ms)  UPDATE "companies" SET "updated_at" = '2013-07-18 08:11:28.853737' WHERE "companies"."id" = 1
+=&gt; true
+&gt;&gt; Company.first.cache_key
+  Company Load (0.4ms)  SELECT "companies".* FROM "companies" ORDER BY "companies"."id" ASC LIMIT 1
+=&gt; "companies/1-20130718081128853737000"
+&gt;&gt; exit
+$</screen></para>
+
+      <para>Let's use this knowledge to edit the index view in the file
+      <filename>app/views/companies/index.html.erb</filename>:<programlisting>&lt;h1&gt;Listing companies&lt;/h1&gt;
+
+&lt;% cache(@companies) do %&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Name&lt;/th&gt;
+      &lt;th&gt;Number of employees&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+
+  &lt;tbody&gt;
+    &lt;% @companies.each do |company| %&gt;
+      &lt;tr&gt;
+        &lt;td&gt;&lt;%= company.name %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= company.employees.count %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to 'Show', company %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to 'Edit', edit_company_path(company) %&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;%= link_to 'Destroy', company, method: :delete, data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;% end %&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;% end %&gt;
+
+&lt;br /&gt;
+
+&lt;%= link_to 'New Company', new_company_path %&gt;</programlisting></para>
+
+      <para>Here, we not only use a fragment cache for the whole table, but
+      also one for each line. So the initial call will take longer than
+      before. But if any individual companies change, only one line has to be
+      re-rendered in each case.</para>
+
+      <note>
+        <para>There is no general answer to the question in how much detail
+        you should use fragment caching. Just go ahead and experiment with it,
+        then look in the log to see how long things take.</para>
+      </note>
+
+      <section>
+        <title>Change Code in the View results in an expired Cache</title>
+
+        <para>Rails tracks an MD5 sum of the view you use. So if you change
+        the file (e.g.
+        <filename>app/views/companies/index.html.erb</filename>) the MD5
+        changes and all old caches will expire.</para>
+      </section>
+    </section>
+
+    <section xml:id="fragment_cache_cache_store">
+      <title xml:id="fragment_cache_cache_store.title">Cache Store</title>
+
+      <indexterm>
+        <primary>caching</primary>
+
+        <secondary>fragment caching</secondary>
+
+        <tertiary>cache store</tertiary>
+      </indexterm>
+
+      <indexterm>
+        <primary>cache store</primary>
+      </indexterm>
+
+      <para>The cache store manages the stored fragment caches. If not
+      configured otherwise, this is the Rails MemoryStore. This cache store is
+      good for developing, but less suitable for a production system because
+      it acts independently for each Ruby on Rails process. So if you have
+      several Ruby on Rails processes running in parallel in the production
+      system, each process holds its own MemoryStore.</para>
+
+      <section xml:id="fragment_cache_memcachestore">
+        <title
+        xml:id="fragment_cache_memcachestore.title">MemCacheStore</title>
+
+        <indexterm>
+          <primary>cache store</primary>
+
+          <secondary>MemCacheStore</secondary>
+        </indexterm>
+
+        <indexterm>
+          <primary>memcached</primary>
+        </indexterm>
+
+        <para>Most production systems use memcached (<uri
+        xlink:href="http://memcached.org/">http://memcached.org/</uri>) as
+        cache store. To enable memcached as cache store in the production
+        system, you need to add the following line in the file
+        <filename>config/environments/production.rb</filename>:<programlisting>config.cache_store = :mem_cache_store</programlisting></para>
+
+        <para>The combination of appropriately used auto-expiring caches and
+        memcached is an excellent recipe for a successful web page.</para>
+
+        <para>For a description of how to install a Rails production system
+        with memcached, please read <xref
+        linkend="rails_production_webserver"/>.</para>
+      </section>
+
+      <section>
+        <title>Other Cache Stores</title>
+
+        <para>In the official Rails documentation you will find a list of
+        other cache stores at <uri
+        xlink:href="http://guides.rubyonrails.org/caching_with_rails.html#cache-stores">http://guides.rubyonrails.org/caching_with_rails.html#cache-stores</uri>.</para>
+      </section>
+    </section>
+  </section>
+
   <section xml:id="page_caching">
     <title xml:id="page_caching.title">Page Caching</title>
 
@@ -784,6 +1087,14 @@ Cache-Control: max-age=120, private
 
       <secondary>page caching</secondary>
     </indexterm>
+
+    <para>Page Caching is extrem and was removed from the core of Rails 4.0.
+    But it is still available as a gem.</para>
+
+    <important>
+      <para>You need quite a bit of knowledge to configure your Webserver
+      (e.g. Nginx or Apache).</para>
+    </important>
 
     <para>With page caching, it's all about placing a complete HTML page (in
     other words, the render result of a view) into a subdirectory of the
@@ -815,7 +1126,17 @@ Cache-Control: max-age=120, private
     </warning>
 
     <para>Please install a fresh example application (see <xref
-    linkend="caching_beispielapplikation"/>).</para>
+    linkend="caching_beispielapplikation"/>) and add the gem with the
+    following line in Gemfile.<programlisting>gem 'actionpack-page_caching'</programlisting></para>
+
+    <para>Now install it with the command <command>bundle
+    install</command>.<screen>$ bundle install
+[...]
+$</screen></para>
+
+    <para>Lastly you have to tell Rails where to store the cache files. Please
+    add the following line in your <filename>config/application.rb</filename>
+    file:<programlisting>config.action_controller.page_cache_directory = "#{Rails.root.to_s}/public/deploy"</programlisting></para>
 
     <section xml:id="page_caching_im_devel_modus_aktivieren">
       <title xml:id="page_caching_im_devel_modus_aktivieren.title">Activating
@@ -830,6 +1151,22 @@ Cache-Control: max-age=120, private
       production mode, page caching is enabled by default.</para>
     </section>
 
+    <section>
+      <title>Configure our Webserver</title>
+
+      <para>Know you have to tell your webserver (e.g. Nginx or Apache) that
+      it should check the <filename>/public/deploy</filename> directory first
+      before hitting the Rails application. You have to configure too, that it
+      will deliver a gz file if one is available.</para>
+
+      <para>There is no one perfect way of doing it. You have to find the best
+      way of doing it in your environment by youself.<tip>
+          <para>As a quick and dirty hack for development you can set the
+          <code>page_cache_directory</code> to public. Than your development
+          system will deliver the cached page.<programlisting>config.action_controller.page_cache_directory = "#{Rails.root.to_s}/public"</programlisting></para>
+        </tip></para>
+    </section>
+
     <section xml:id="page_caching_fuer_index_und_show">
       <title>Caching Company Index and Show View</title>
 
@@ -842,54 +1179,41 @@ Cache-Control: max-age=120, private
       </indexterm>
 
       <para>Enabling page caching happens in the controller. If we want to
-      cache the index and show views for Company, we need to go to the
-      controller <filename>app/controllers/companies_controller.rb</filename>
-      and enter the command <code>caches_page :index, :show</code> at the
-      top:<programlisting>class CompaniesController &lt; ApplicationController
-  caches_page :index, :show
-
-  # GET /companies
-  # GET /companies.json
-  def index
-    @companies = Company.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @companies }
-    end
-  end
+      cache the show view for Company, we need to go to the controller
+      <filename>app/controllers/companies_controller.rb</filename> and enter
+      the command <code>caches_page :show</code> at the top:<programlisting>class CompaniesController &lt; ApplicationController
+  caches_page :show
 
 [...]</programlisting></para>
 
       <para>Before starting the application, the <filename>public</filename>
       directory looks like this:<screen>public/
-|-- 404.html
-|-- 422.html
-|-- 500.html
-|-- favicon.ico
-|-- index.html
-`-- robots.txt</screen></para>
+├── 404.html
+├── 422.html
+├── 500.html
+├── favicon.ico
+└── robots.txt</screen></para>
 
       <para>After starting the appliation with <command>rails server</command>
       and going to the URLs <uri
       xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>
       and <uri
       xlink:href="http://0.0.0.0:3000/companies/1">http://0.0.0.0:3000/companies/1</uri>
-      via a web browser, it looks like this:<screen>public/
-|-- 404.html
-|-- 422.html
-|-- 500.html
-|-- companies
-|   `-- 1.html
-|-- companies.html
-|-- favicon.ico
-|-- index.html
-`-- robots.txt</screen></para>
+      via a web browser, it looks like this:<screen>public
+├── 404.html
+├── 422.html
+├── 500.html
+├── deploy
+│   └── companies
+│       └── 1.html
+├── favicon.ico
+└── robots.txt</screen></para>
 
-      <para>The files <filename>public/companies.html</filename> and
-      <filename>public/companies/1.html</filename> have been created by page
-      caching. From now on, the web server will only deliver the cached
-      versions when these pages are accessed.</para>
+      <para>The file <filename>public/deploy/companies/1.html</filename> has
+      been created by page caching.</para>
+
+      <para>From now on, the web server will only deliver the cached versions
+      when these pages are accessed.</para>
 
       <section xml:id="page_caching_gz_compression">
         <title>gz Versions</title>
@@ -910,34 +1234,21 @@ Cache-Control: max-age=120, private
         <para>The controller
         <filename>app/controllers/companies_controller.rb</filename> would
         then look like this at the beginning:<programlisting>class CompaniesController &lt; ApplicationController
-  caches_page :index, :show, :gzip =&gt; :best_compression
-
-  # GET /companies
-  # GET /companies.json
-  def index
-    @companies = Company.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @companies }
-    end
-  end
+  caches_page :show, gzip: true
 
 [...]</programlisting></para>
 
         <para>This automatically saves a compressed and an uncompressed
-        version of each page cache:<screen>public/
-|-- 404.html
-|-- 422.html
-|-- 500.html
-|-- companies
-|   |-- 1.html
-|   `-- 1.html.gz
-|-- companies.html
-|-- companies.html.gz
-|-- favicon.ico
-|-- index.html
-`-- robots.txt</screen></para>
+        version of each page cache:<screen>public
+├── 404.html
+├── 422.html
+├── 500.html
+├── deploy
+│   └── companies
+│       ├── 1.html
+│       └── 1.html.gz
+├── favicon.ico
+└── robots.txt</screen></para>
       </section>
 
       <section xml:id="page_caching_html_ending_nginx_rewrite">
@@ -1010,57 +1321,6 @@ Cache-Control: max-age=120, private
       when editing a company. When editing an employee, we also have to delete
       the corresponding cache for the relevant employee.</para>
 
-      <important>
-        <para>We need to ensure that we do not cache pages with a flash
-        message. Nor does it make sense to integrate a CSRF metatag in these
-        cached pages. In the following code, we take care of both these
-        issues.</para>
-      </important>
-
-      <section>
-        <title>Controllers</title>
-
-        <para>Let's start with the controllers. Please edit the beginning of
-        <filename>app/controllers/companies_controller.rb</filename> as
-        follows:<programlisting>class CompaniesController &lt; ApplicationController
-  caches_page :index, :show, :gzip =&gt; :best_compression, 
-                             :if =&gt; Proc.new { flash.count == 0 }
-  before_filter(only: [:index, :show]) { @page_caching_is_active = true if flash.count == 0 }
-
-  # GET /companies
-  # GET /companies.json
-  def index
-    @companies = Company.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @companies }
-    end
-  end
-
-[...]</programlisting></para>
-
-        <para>Please also insert the <methodname>cache_page</methodname>
-        instruction into the controller
-        <filename>app/controllers/employees_controller.rb</filename>:<programlisting>class EmployeesController &lt; ApplicationController
-  caches_page :index, :show, :gzip =&gt; :best_compression, 
-                             :if =&gt; Proc.new { flash.count == 0 }
-  before_filter(only: [:index, :show]) { @page_caching_is_active = true if flash.count == 0 }
-
-  # GET /employees
-  # GET /employees.json
-  def index
-    @employees = Employee.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @employees }
-    end
-  end
-
-[...]</programlisting></para>
-      </section>
-
       <section>
         <title>Models</title>
 
@@ -1069,13 +1329,11 @@ Cache-Control: max-age=120, private
         edited or deleted.</para>
 
         <para><filename>app/models/company.rb</filename><programlisting>class Company &lt; ActiveRecord::Base
-  attr_accessible :name
-
   validates :name,
-            :presence =&gt; true,
-            :uniqueness =&gt; true
+            presence: true,
+            uniqueness: true
 
-  has_many :employees, :dependent =&gt; :destroy
+  has_many :employees, dependent: :destroy
 
   after_create   :expire_cache
   after_update   :expire_cache
@@ -1093,18 +1351,16 @@ Cache-Control: max-age=120, private
 end</programlisting></para>
 
         <para><filename>app/models/employee.rb</filename><programlisting>class Employee &lt; ActiveRecord::Base
-  attr_accessible :company_id, :first_name, :last_name, :phone_number
-
-  belongs_to :company, :touch =&gt; true
+  belongs_to :company, touch: true
 
   validates :first_name,
-            :presence =&gt; true
+            presence: true
 
   validates :last_name,
-            :presence =&gt; true
+            presence: true
 
   validates :company,
-            :presence =&gt; true
+            presence: true
 
   after_create   :expire_cache
   after_update   :expire_cache
@@ -1121,427 +1377,6 @@ end</programlisting></para>
   end
 
 end</programlisting></para>
-      </section>
-
-      <section>
-        <title>application.html.erb</title>
-
-        <para>In the
-        <filename>app/views/layouts/application.html.erb</filename> we still
-        need to check if a CSRF metatag is present. This is not the case with
-        cached pages.<programlisting>&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-  &lt;title&gt;PhoneBook&lt;/title&gt;
-  &lt;%= stylesheet_link_tag    "application", :media =&gt; "all" %&gt;
-  &lt;%= javascript_include_tag "application" %&gt;
-  &lt;%= csrf_meta_tag unless @page_caching_is_active %&gt;
-&lt;/head&gt;
-&lt;body&gt;
-
-&lt;%= yield %&gt;
-
-&lt;/body&gt;
-&lt;/html&gt;
-</programlisting></para>
-      </section>
-    </section>
-  </section>
-
-  <section xml:id="fragment_caching">
-    <title xml:id="fragment_caching.title">Fragment Caching</title>
-
-    <indexterm>
-      <primary>caching</primary>
-
-      <secondary>fragment caching</secondary>
-    </indexterm>
-
-    <para>With fragment caching you can cache individual parts of a view. You
-    can safely use it in combination with <xref linkend="http_caching"/> and
-    <xref linkend="page_caching"/>. The advantages once again are a reduction
-    of server load and faster web page generation, which means increased
-    usability.</para>
-
-    <para>Please install a new example application (see <xref
-    linkend="caching_beispielapplikation"/>).</para>
-
-    <section xml:id="fragment_caching_im_devel_modus_aktivieren">
-      <title
-      xml:id="fragment_caching_im_devel_modus_aktivieren.title">Enabling
-      Fragment Caching in Development Mode</title>
-
-      <para>First, we need to go to the file
-      <filename>config/environments/development.rb</filename> and set the item
-      <code>config.action_controller.perform_caching</code> to
-      <code>true</code>:<programlisting>config.action_controller.perform_caching = true</programlisting></para>
-
-      <para>Otherwise, we cannot try out the fragment caching in development
-      mode. In production mode, fragment caching is enabled by default.</para>
-    </section>
-
-    <section xml:id="fragment_caching_tabelle_cachen">
-      <title xml:id="fragment_caching_tabelle_cachen.title">Caching Table of
-      Index View</title>
-
-      <para>On the page <uri
-      xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>,
-      a very computationally intensive table with all companies is rendered.
-      We can cache this table as a whole. To do so, we need to enclose the
-      table in a <code>&lt;% cache('name_of_cache') do %&gt; ... &lt;% end
-      %&gt;</code> block:<programlisting>&lt;% cache('name_of_cache') do %&gt;
-
-[...]
-
-&lt;% end %&gt;</programlisting></para>
-
-      <para>Please edit the file
-      <filename>app/views/companies/index.html.erb</filename> as
-      follows:<programlisting>&lt;h1&gt;Listing companies&lt;/h1&gt;
-
-&lt;% cache('table_of_all_companies') do %&gt;
-&lt;table&gt;
-  &lt;tr&gt;
-    &lt;th&gt;Name&lt;/th&gt;
-    &lt;th&gt;Number of employees&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-  &lt;/tr&gt;
-
-&lt;% @companies.each do |company| %&gt;
-  &lt;tr&gt;
-    &lt;td&gt;&lt;%= company.name %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= company.employees.count %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Show', company %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Edit', edit_company_path(company) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Destroy', company, method: :delete, data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
-  &lt;/tr&gt;
-&lt;% end %&gt;
-&lt;/table&gt;
-&lt;% end %&gt;
-
-&lt;br /&gt;
-
-&lt;%= link_to 'New Company', new_company_path %&gt;</programlisting></para>
-
-      <para>Then you can start the Rails server with <command>rails
-      server</command> and go to the URL <uri
-      xlink:href="http://0.0.0.0:3000/companies">http://0.0.0.0:3000/companies</uri>.
-      In the development log, you will now see the following entry:<screen>Write fragment views/table_of_all_companies (2.9ms)
-  Rendered companies/index.html.erb within layouts/application (119.8ms)
-Completed 200 OK in 209ms (Views: 143.1ms | ActiveRecord: 15.0ms)</screen></para>
-
-      <para>Writing the cache took 2.9 ms. In total, rendering the page took
-      209 ms.</para>
-
-      <para>If you repeatedly go to the same page, you will get a different
-      result in the log:<screen>Read fragment views/table_of_all_companies (0.2ms)
-  Rendered companies/index.html.erb within layouts/application (0.8ms)
-Completed 200 OK in 37ms (Views: 34.6ms | ActiveRecord: 0.3ms)</screen></para>
-
-      <para>Reading the cache took 0.2 ms and rendering the page in total
-      37ms. Only a fifth of the processing time!</para>
-    </section>
-
-    <section xml:id="fragment_cache_loeschen">
-      <title xml:id="fragment_cache_loeschen.title">Deleting Fragment
-      Cache</title>
-
-      <indexterm>
-        <primary>caching</primary>
-
-        <secondary>fragment caching</secondary>
-
-        <tertiary>deleting cache</tertiary>
-      </indexterm>
-
-      <indexterm>
-        <primary>caching</primary>
-
-        <secondary>fragment caching</secondary>
-
-        <tertiary>expire_fragment</tertiary>
-      </indexterm>
-
-      <para>With the method <methodname>expire_fragment</methodname> you can
-      clear specific fragment caches. Basically, we can build this idea into
-      the model in the same way as shown in <xref
-      linkend="page_caches_automatisch_loeschen"/>.</para>
-
-      <para>The model file <filename>app/models/company.rb</filename> would
-      then look like this:<programlisting>class Company &lt; ActiveRecord::Base
-  attr_accessible :name
-
-  validates :name,
-            :presence =&gt; true,
-            :uniqueness =&gt; true
-
-  has_many :employees, :dependent =&gt; :destroy
-
-  after_create   :expire_cache
-  after_update   :expire_cache
-  before_destroy :expire_cache
-
-  def to_s
-    name
-  end
-
-  def expire_cache
-    ActionController::Base.new.expire_fragment('table_of_all_companies')
-  end
-end</programlisting></para>
-
-      <para>As the number of employees also has an effect on this table, we
-      would also have to expand the file
-      <filename>app/models/employees.rb</filename>
-      accordingly:<programlisting>class Employee &lt; ActiveRecord::Base
-  attr_accessible :company_id, :first_name, :last_name, :phone_number
-
-  belongs_to :company, :touch =&gt; true
-
-  validates :first_name,
-            :presence =&gt; true
-
-  validates :last_name,
-            :presence =&gt; true
-
-  validates :company,
-            :presence =&gt; true
-
-  after_create   :expire_cache
-  after_update   :expire_cache
-  before_destroy :expire_cache
-
-  def to_s
-    "#{first_name} #{last_name}"
-  end
-
-  def expire_cache
-    ActionController::Base.new.expire_fragment('table_of_all_companies')
-  end  
-end</programlisting></para>
-
-      <para>Deleting specific fragment caches often involves a lot of effort
-      in terms of programming. One, you often miss things and two, in big
-      projects it's not easy to keep track of all the different cache names.
-      Often it is easier to automatically create names via the method
-      <methodname>cache_key</methodname>. These then expire automatically in
-      the cache (see <xref linkend="fragment_auto_expiring"/>).</para>
-    </section>
-
-    <section xml:id="fragment_auto_expiring">
-      <title xml:id="fragment_auto_expiring.title">Auto-Expiring
-      Caches</title>
-
-      <indexterm>
-        <primary>caching</primary>
-
-        <secondary>fragment caching</secondary>
-
-        <tertiary>cache_key</tertiary>
-      </indexterm>
-
-      <indexterm>
-        <primary>caching</primary>
-
-        <secondary>fragment caching</secondary>
-
-        <tertiary>auto-expiring</tertiary>
-      </indexterm>
-
-      <indexterm>
-        <primary>cache_key</primary>
-      </indexterm>
-
-      <para>Managing fragment caching is rather complex with the naming
-      convention used in <xref linkend="fragment_caching_tabelle_cachen"/>. On
-      the one hand, you can be sure that the cache does not have any
-      superfluous ballast if you have programmed neatly, but on the other, it
-      does not really matter. A cache is structured in such a way that it
-      deletes old and no longer required elements on its own. If we use a
-      mechanism that gives a fragment cache a unique name, as in the asset
-      pipeline (see <xref linkend="asset_pipeline"/>), then we would not need
-      to go to all the trouble of deleting fragment caches.</para>
-
-      <para>That is precisely what the method
-      <methodname>cache_key</methodname> is for.
-      <methodname>cache_key</methodname> gives you a unique name for an
-      element. Let's try it in the console. First, we get the always identical
-      <methodname>cache_key</methodname> of the first company item three times
-      in a row ("companies/2-20120716190032"), then we touch the item (a
-      <methodname>touch</methodname> sets the attribute
-      <varname>updated_at</varname> to the current time) and finally we output
-      the new <methodname>cache_key</methodname> again three times in a row
-      ("companies/2-20120716192035"):<screen>$ rails console
-Loading development environment (Rails 3.2.9)
-1.9.3p194 :001 &gt; Company.first.cache_key
-  Company Load (0.1ms)  SELECT "companies".* FROM "companies" LIMIT 1
- =&gt; "companies/2-20120716190032" 
-1.9.3p194 :002 &gt; Company.first.cache_key
-  Company Load (0.3ms)  SELECT "companies".* FROM "companies" LIMIT 1
- =&gt; "companies/2-20120716190032" 
-1.9.3p194 :003 &gt; Company.first.cache_key
-  Company Load (0.3ms)  SELECT "companies".* FROM "companies" LIMIT 1
- =&gt; "companies/2-20120716190032" 
-1.9.3p194 :004 &gt; Company.first.touch
-  Company Load (0.3ms)  SELECT "companies".* FROM "companies" LIMIT 1
-  SQL (2.0ms)  UPDATE "companies" SET "updated_at" = '2012-07-16 19:20:35.223146' WHERE "companies"."id" = 2
- =&gt; true 
-1.9.3p194 :005 &gt; Company.first.cache_key
-  Company Load (0.3ms)  SELECT "companies".* FROM "companies" LIMIT 1
- =&gt; "companies/2-20120716192035" 
-1.9.3p194 :006 &gt; Company.first.cache_key
-  Company Load (0.3ms)  SELECT "companies".* FROM "companies" LIMIT 1
- =&gt; "companies/2-20120716192035" 
-1.9.3p194 :007 &gt; Company.first.cache_key
-  Company Load (0.3ms)  SELECT "companies".* FROM "companies" LIMIT 1
- =&gt; "companies/2-20120716192035" 
-1.9.3p194 :008 &gt; exit
-$</screen></para>
-
-      <para>Let's use this knowledge to edit the index view in the file
-      <filename>app/views/companies/index.html.erb</filename>:<programlisting>&lt;h1&gt;Listing companies&lt;/h1&gt;
-
-&lt;% cache(@companies) do %&gt;
-&lt;table&gt;
-  &lt;tr&gt;
-    &lt;th&gt;Name&lt;/th&gt;
-    &lt;th&gt;Number of employees&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;&lt;/th&gt;
-  &lt;/tr&gt;
-
-&lt;% @companies.each do |company| %&gt;
-  &lt;% cache(company) do %&gt;
-  &lt;tr&gt;
-    &lt;td&gt;&lt;%= company.name %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= company.employees.count %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Show', company %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Edit', edit_company_path(company) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to 'Destroy', company, method: :delete, data: { confirm: 'Are you sure?' } %&gt;&lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;% end %&gt;
-&lt;% end %&gt;
-&lt;/table&gt;
-&lt;% end %&gt;
-
-&lt;br /&gt;
-
-&lt;%= link_to 'New Company', new_company_path %&gt;</programlisting></para>
-
-      <para>Here, we not only use a fragment cache for the whole table, but
-      also one for each line. So the initial call will take longer than
-      before. But if any individual companies change, only one line has to be
-      re-rendered in each case.</para>
-
-      <note>
-        <para>There is no general answer to the question in how much detail
-        you should use fragment caching. Just go ahead and experiment with it,
-        then look in the log to see how long things take.</para>
-      </note>
-    </section>
-
-    <section xml:id="fragment_cache_software_version">
-      <title xml:id="fragment_cache_software_version.title">Software
-      Versioning and current_user</title>
-
-      <para>As developer, you should always include the version in the code
-      when using fragment caches. Then you don't risk serving out an old cache
-      with old content for a new software version. You can specify the name of
-      a fragment cache as array instead of as string. Example:<programlisting>&lt;% cache(['V3.23', @companies]) do %&gt;
-
-[...]
-
-&lt;% end %&gt;</programlisting></para>
-
-      <para>Via this mechanism, you can also implement caches for individual
-      users. If you have a user object with the name
-      <code>current_user</code>, you can use the following code for fragment
-      caching:<programlisting>&lt;% cache(['V3.23', current_user, @companies]) do %&gt;
-
-[...]
-
-&lt;% end %&gt;</programlisting></para>
-
-      <para>If no user is logged in, then <code>current_user</code> is nil and
-      works for all not logged in users.</para>
-
-      <tip>
-        <para>It would take us beyond the scope of this book, but when using a
-        file version management system (such as git) it can be useful to
-        integrate a constant instead of the 'V3.23' and to set it in an
-        initializer with the current commit SHA from the used
-        repository.</para>
-      </tip>
-    </section>
-
-    <section xml:id="fragment_cache_cache_store">
-      <title xml:id="fragment_cache_cache_store.title">Cache Store</title>
-
-      <indexterm>
-        <primary>caching</primary>
-
-        <secondary>fragment caching</secondary>
-
-        <tertiary>cache store</tertiary>
-      </indexterm>
-
-      <indexterm>
-        <primary>cache store</primary>
-      </indexterm>
-
-      <para>The cache store manages the stored fragment caches. If not
-      configured otherwise, this is the Rails MemoryStore. This cache store is
-      good for developing, but less suitable for a production system because
-      it acts independently for each Ruby on Rails process. So if you have
-      several Ruby on Rails processes running in parallel in the production
-      system, each process holds its own MemoryStore.</para>
-
-      <section xml:id="fragment_cache_memcachestore">
-        <title
-        xml:id="fragment_cache_memcachestore.title">MemCacheStore</title>
-
-        <indexterm>
-          <primary>cache store</primary>
-
-          <secondary>MemCacheStore</secondary>
-        </indexterm>
-
-        <indexterm>
-          <primary>memcached</primary>
-        </indexterm>
-
-        <para>Most production systems use memcached (<uri
-        xlink:href="http://memcached.org/">http://memcached.org/</uri>) as
-        cache store. To enable memcached as cache store in the production
-        system, you need to add the following line in the file
-        <filename>config/environments/production.rb</filename>:<programlisting>config.cache_store = :mem_cache_store</programlisting></para>
-
-        <para>Additionally, you need to go to the file Gemfile and add an
-        entry for loading the memcache-client gem:<programlisting>group :production do
-  gem 'memcache-client'
-end</programlisting></para>
-
-        <para>Then you need to do a <command>bundle install</command>:<screen>$ bundle install
-[...]
-$</screen></para>
-
-        <para>The combination of appropriately used auto-expiring caches and
-        memcached is an excellent recipe for a successful web page.</para>
-
-        <para>For a description of how to install a Rails production system
-        with memcached, please read <xref
-        linkend="rails_production_webserver"/>.</para>
-      </section>
-
-      <section>
-        <title>Other Cache Stores</title>
-
-        <para>In the official Rails documentation you will find a list of
-        other cache stores at <uri
-        xlink:href="http://guides.rubyonrails.org/caching_with_rails.html#cache-stores">http://guides.rubyonrails.org/caching_with_rails.html#cache-stores</uri>.</para>
       </section>
     </section>
   </section>
