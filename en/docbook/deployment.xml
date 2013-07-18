@@ -27,16 +27,15 @@
   <section xml:id="production_webserver_einleitung">
     <title xml:id="production_webserver_einleitung.title">Introduction</title>
 
-    <para>In the rest of the book, we are always working with the development
-    system. So we start Rails with <command>rails server</command>. Let's have
-    another close look at the output:<screen>$ rails server
+    <para>Until now we were working with the development system. Let's have
+    another close look at the output of that development system:<screen>$ rails server
 =&gt; Booting WEBrick
-=&gt; Rails 3.2.6 application starting in development on http://0.0.0.0:3000
-=&gt; Call with -d to detach
+=&gt; Rails 4.0.0 application starting in development on http://0.0.0.0:3000
+=&gt; Run `rails server -h` for more startup options
 =&gt; Ctrl-C to shutdown server
-[2012-07-09 12:19:40] INFO  WEBrick 1.3.1
-[2012-07-09 12:19:40] INFO  ruby 1.9.3 (2012-04-20) [x86_64-darwin11.4.0]
-[2012-07-09 12:19:40] INFO  WEBrick::HTTPServer#start: pid=86773 port=3000</screen></para>
+[2013-07-18 10:20:30] INFO  WEBrick 1.3.1
+[2013-07-18 10:20:30] INFO  ruby 2.0.0 (2013-06-27) [x86_64-darwin12.4.0]
+[2013-07-18 10:20:30] INFO  WEBrick::HTTPServer#start: pid=43853 port=3000</screen></para>
 
     <para>The second line tells us that we are in "development" mode and that
     the application can be accessed at the URL <uri
@@ -57,56 +56,50 @@
     xlink:href="http://code.macournoyer.com/thin/">http://code.macournoyer.com/thin/</uri>)
     or Puma (<uri xlink:href="http://puma.io/">http://puma.io/</uri>).</para>
 
-    <para>For a typical PHP project, you can just place the PHP code in a
-    certain directory and in 9 out of 10 cases the available Apache web server
-    can already process PHP code automatically (the corresponding module is
-    almost always installed). With Rails, it's a different story,
-    unfortunately. The obstacles are much bigger and more effort is involved.
-    There is a large number of possible combinations (for example, "Apache,
-    lighttpd or Nginx?" and "Unicorn, Thin, Puma or Mongrel?"). It is
-    impossible to describe all variations in detail here. I decided to pick my
-    favorite combination of Nginx and Unicorn. But that does not mean that
-    other combinations are worse. It's purely a matter of personal
-    choice.</para>
+    <para>This chapter walks you through the setup process of a production
+    server which runs Nginx as a reverse proxy webserver and unicorn as the
+    Ruby on Rails webserver behind the Nginx. We start with a fresh Debian
+    system and install all the software we need. The Rails project will be run
+    with Ruby 2.0.0 which gets installed with RVM and runs for the user
+    deployer. Feel free to customize the directorystructure once everything is
+    up and running.</para>
 
-    <section xml:id="production_webserver_debian6">
-      <title xml:id="production_webserver_debian6.title">Debian 6</title>
+    <para>The example Rails application we use is called
+    <code>blog</code>.</para>
 
-      <para>We build our production web server on a minimal Debian 6
-      system.</para>
-
-      <note>
-        <para>This description assumes that you have a freshly installed
-        Debian GNU/Linux 6.0 (<quote>Squeeze</quote>). You will find an ISO
-        image for the installation at <uri
-        xlink:href="http://www.debian.org/releases/squeeze/debian-installer/">http://www.debian.org/releases/squeeze/debian-installer/</uri>.
-        I recommend the approximately 160 MB net installation CD image. For
-        instructions on how to install Debian-GNU/Linux, please go to <uri
-        xlink:href="http://www.debian.org/releases/squeeze/i386/">http://www.debian.org/releases/squeeze/i386/</uri>.</para>
-      </note>
-
-      <para>We install Ruby 1.9.3 via RVM with the new user
-      <code>deployer</code>. The Rails application we use is called
-      <code>blog</code>.</para>
-
-      <important>
-        <para>To carry out this installation, you need to have root rights on
-        the web server!</para>
-      </important>
-    </section>
+    <warning>
+      <para>If you have never set up a Nginx or Apache webserver by yourself
+      before you will get lost somewhere in this chapter. You probably get it
+      up and running but without understanding how things work. </para>
+    </warning>
   </section>
 
-  <section xml:id="deployment_grundinstallation_webserver">
-    <title xml:id="deployment_grundinstallation_webserver.title">Basic
-    Installation Web Server</title>
+  <section xml:id="production_webserver_debian6">
+    <title xml:id="production_webserver_debian6.title">Debian 7.1</title>
 
-    <para>Please log in as <code>root</code> on the web server.</para>
+    <para>We build our production web server on a minimal Debian 7.1 system.
+    To carry out this installation, you need to have root rights on the web
+    server!</para>
+
+    <para>This description assumes that you have a freshly installed Debian
+    GNU/Linux 7.1 (<quote>Wheeze</quote>). You will find an ISO image for the
+    installation at <uri
+    xlink:href="http://www.debian.org">http://www.debian.org</uri>. I
+    recommend the approximately 250 MB net installation CD image. For
+    instructions on how to install Debian-GNU/Linux, please go to <uri
+    xlink:href="http://www.debian.org/distrib/netinst">http://www.debian.org/distrib/netinst</uri>.</para>
+
+    <note>
+      <para>VMware or any other virtual PC system is a nice playground to get
+      a feeling how this works.</para>
+    </note>
 
     <section xml:id="deployment_grundinstallation_webserver_buildsystem">
       <title
       xml:id="deployment_grundinstallation_webserver_buildsystem.title">Buildsystem</title>
 
-      <para>First, we install a few packages we are going to need.<screen>root@debian:~# <command>apt-get -y install build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion python</command>
+      <para>First, we install a few debian packages we are going to
+      need.<screen>root@debian:~# <command>apt-get -y install gawk libgdbm-dev pkg-config libffi-dev build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion python</command>
 [...]
 root@debian:~# </screen></para>
     </section>
@@ -118,19 +111,19 @@ root@debian:~# </screen></para>
       <para>To make the most of the asset pipeline, we install Node.js. Please
       go to the homepage of Node.js (<uri
       xlink:href="http://nodejs.org/">http://nodejs.org/</uri>), search for
-      the current stable release and adapt the commands listed here
-      accordingly.<screen>root@debian:~# <command>cd /usr/src</command>
-root@debian:/usr/src# <command>wget http://nodejs.org/dist/v0.8.1/node-v0.8.1.tar.gz</command>
+      the current stable release and adapt the version numbers in the commands
+      listed here accordingly.<screen>root@debian:~# <command>cd /usr/src</command>
+root@debian:/usr/src# <command>wget http://nodejs.org/dist/v0.10.13/node-v0.10.13.tar.gz</command>
 [...]
-root@debian:/usr/src# <command>tar xzf node-v0.8.1.tar.gz</command> 
-root@debian:/usr/src# <command>cd node-v0.8.1</command>
-root@debian:/usr/src/node-v0.8.1# <command>./configure</command> 
+root@debian:/usr/src# <command>tar xzf node-v0.10.13.tar.gz</command> 
+root@debian:/usr/src# <command>cd node-v0.10.13</command>
+root@debian:/usr/src/node-v0.10.13# <command>./configure</command> 
 [...]
-root@debian:/usr/src/node-v0.8.1# <command>make</command>
+root@debian:/usr/src/node-v0.10.13# <command>make</command>
 [...]
-root@debian:/usr/src/node-v0.8.1# <command>make install</command>
+root@debian:/usr/src/node-v0.10.13# <command>make install</command>
 [...]
-root@debian:/usr/src/node-v0.8.1# <command>cd</command>
+root@debian:/usr/src/node-v0.10.13# <command>cd</command>
 [...]
 root@debian:~# </screen></para>
     </section>
@@ -139,27 +132,15 @@ root@debian:~# </screen></para>
       <title
       xml:id="deployment_grundinstallation_webserver_nginx.title">nginx</title>
 
-      <para>Nginx will be our web server to the outside world. It acts as
-      proxy and load balancer. As the Debian distribution includes a rather
-      old Nginx version, we install the packages distributed by Nginx directly
-      as well.<screen>root@debian:~# <command>curl http://nginx.org/keys/nginx_signing.key | apt-key add -</command>
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100  1561  100  1561    0     0   3887      0 --:--:-- --:--:-- --:--:--  8819
-OK
-root@debian:~# <command>echo 'deb http://nginx.org/packages/debian/ squeeze nginx' &gt;&gt; /etc/apt/sources.list</command>
-root@debian:~# <command>echo 'deb-src http://nginx.org/packages/debian/ squeeze nginx' &gt;&gt; /etc/apt/sources.list</command>
-root@debian:~# <command>apt-get update</command>
-[...]
-root@debian:~# <command>apt-get -y install nginx</command>
+      <para>Nginx will be our web server to the outside world. <screen>root@debian:~# <command>apt-get -y install nginx</command>
 [...]
 root@debian:~# </screen></para>
     </section>
 
     <section xml:id="deployment_grundinstallation_webserver_deployer_anlegen">
       <title
-      xml:id="deployment_grundinstallation_webserver_deployer_anlegen.title">Creating
-      User Deployer</title>
+      xml:id="deployment_grundinstallation_webserver_deployer_anlegen.title">User
+      Deployer</title>
 
       <para>Our Rails project is going to run within a Ruby and Rails
       installed via RVM in the user space. So we create a new user with the
@@ -181,54 +162,40 @@ Geben Sie einen neuen Wert an oder drücken Sie ENTER für den Standardwert
  Sonstiges []: 
 Sind die Informationen korrekt? [J/n] J
 root@debian:~#</screen></para>
-    </section>
 
-    <section xml:id="deployment_grundinstallation_webserver_verzeichnisstruktur_anlegen">
-      <title
-      xml:id="deployment_grundinstallation_webserver_verzeichnisstruktur_anlegen.title">Create
-      Directory Structure</title>
+      <section xml:id="deployment_grundinstallation_webserver_rails_umgebung_deployer">
+        <title
+        xml:id="deployment_grundinstallation_webserver_rails_umgebung_deployer.title">Setting
+        up Rails Environment for User Deployer</title>
 
-      <para>We now create a directory <filename>/var/www</filename> and set
-      the user rights for it:<screen>root@debian:~# <command>mkdir -p /var/www</command>
-root@debian:~# <command>usermod -a -G www-data nginx</command>
-root@debian:~# <command>usermod -a -G www-data deployer</command>
-root@debian:~# <command>chgrp -R www-data /var/www</command>
-root@debian:~# <command>chmod -R 775 /var/www</command>
-root@debian:~#</screen></para>
-    </section>
-
-    <section xml:id="deployment_grundinstallation_webserver_rails_umgebung_deployer">
-      <title
-      xml:id="deployment_grundinstallation_webserver_rails_umgebung_deployer.title">Setting
-      up Rails Environment for User Deployer</title>
-
-      <para>Next, the user <code>deployer</code>:<screen>root@debian:~# <command>su - deployer</command>
+        <para>With <command>su - deployer</command> we'll become the user
+        deployer:<screen>root@debian:~# <command>su - deployer</command>
 deployer@debian:~$ </screen></para>
 
-      <para>As user <code>deployer</code>, please carry out the steps
-      described in <xref linkend="rails3-install-debian"/> for installing Ruby
-      1.9.3 and Rails 3.2 via rvm. Here is the single line cut-and-paste short
-      version:<screen>deployer@debian:~$ <command>curl -L https://get.rvm.io | bash -s stable &amp;&amp; source ~/.rvm/scripts/'rvm' &amp;&amp; rvm install 1.9.3 &amp;&amp; gem install rails</command>
+        <para>As user <code>deployer</code>, please carry out the steps for
+        installing Ruby 2.0.0 and Rails 4.0 via RVM.<screen>deployer@debian:~$ <command>curl -L https://get.rvm.io | bash -s stable --rails</command>
+[...]
+deployer@debian:~$ <command>source /home/deployer/.rvm/scripts/rvm</command>
 [...]
 deployer@debian:~$</screen></para>
 
-      <para>To be able to start Unicorn with the RVM environment from within
-      an Init.d script, we now need to generate a corresponding
-      wrapper:<screen>deployer@debian:~$ <command>gem install unicorn</command>
+        <para>To be able to start Unicorn with the RVM environment from within
+        an Init.d script, we now need to generate a corresponding
+        wrapper:<screen>deployer@debian:~$ <command>gem install unicorn</command>
 [...]
-deployer@debian:~$ <command>rvm wrapper 1.9.3 bootup unicorn</command>
+deployer@debian:~$ <command>rvm wrapper 2.0.0 bootup unicorn</command>
 deployer@debian:~$ <command>exit</command>
 root@debian:~$</screen></para>
+      </section>
     </section>
 
     <section xml:id="deployment_grundinstallation_webserver_datenbank">
       <title
       xml:id="deployment_grundinstallation_webserver_datenbank.title">Database</title>
 
-      <para>Usually, you want to use a "large" database in a production
-      system, such as PostgreSQL or MySQL. So here is how to install a MySQL
-      database on this system and what you need to adapt in the Rails
-      project.</para>
+      <para>Usually, you want to use a "big" database in a production system,
+      such as PostgreSQL or MySQL. So here is how to install a MySQL database
+      on this system and what you need to adapt in the Rails project.</para>
 
       <section xml:id="deployment_grundinstallation_webserver_mysql_installation">
         <title
@@ -275,13 +242,17 @@ Query OK, 0 rows affected (0.00 sec)
 mysql&gt; <command>exit</command>;
 Bye
 deployer@debian:~$</screen></para>
+
+        <warning>
+          <para>Please DO CHANGE THE PASSWORD! Otherwise it will be the same
+          password for everybody who read this book.</para>
+        </warning>
       </section>
     </section>
 
     <section xml:id="deployment_grundinstallation_webserver_memcached">
       <title
-      xml:id="deployment_grundinstallation_webserver_memcached.title">Installing
-      Memcache</title>
+      xml:id="deployment_grundinstallation_webserver_memcached.title">Memcache</title>
 
       <para>If you are working with a cache server (highly recommended), you
       of course have to install the appropriate software. For memcached (<uri
@@ -292,26 +263,13 @@ root@debian:~#</screen></para>
     </section>
   </section>
 
-  <section xml:id="webserver_ohne_deployment">
-    <title xml:id="webserver_ohne_deployment.title">Webserver Without
-    Deployment</title>
+  <section xml:id="webserver_ohne_deployment_neues_rails_projekt">
+    <title
+    xml:id="webserver_ohne_deployment_neues_rails_projekt.title">Setting Up a
+    New Rails Project</title>
 
-    <para>Please log in as <code>root</code> on the web server.</para>
-
-    <warning>
-      <para>When using this installation guide for other Rails projects,
-      please note that you need to replace the name "blog" (for the relevant
-      Rails application) with the appropriate project name in all
-      configuration files and scripts.</para>
-    </warning>
-
-    <section xml:id="webserver_ohne_deployment_neues_rails_projekt">
-      <title
-      xml:id="webserver_ohne_deployment_neues_rails_projekt.title">Setting Up
-      New Rails Project</title>
-
-      <para>To keep this guide as simple as possible, we create a simple blog
-      directly on the server as user <code>deployer</code>.<screen>root@debian:~# <command>su - deployer</command>
+    <para>To keep this guide as simple as possible, we create a simple blog in
+    the homedirectory of the user <code>deployer</code>.<screen>root@debian:~# <command>su - deployer</command>
 deployer@debian:~$ <command>rails new blog</command>
 [...]
 deployer@debian:~$ <command>cd blog</command>
@@ -319,56 +277,33 @@ deployer@debian:~/blog$ <command>rails generate scaffold post subject content:te
 [...]
 deployer@debian:~/blog$</screen></para>
 
-      <section>
-        <title>Adapting Gemfile</title>
+    <section>
+      <title>Adapting Gemfile</title>
 
-        <para>Please write the following content into the file
-        <filename>Gemfile</filename>:<programlisting>source 'https://rubygems.org'
+      <para>Please add the following content into the file
+      <filename>Gemfile</filename>:<programlisting>gem 'mysql', group: :production
+gem 'unicorn', group: :production</programlisting></para>
 
-gem 'rails', '3.2.6'
-
-gem 'sqlite3'
-
-# Gems used only for assets and not required
-# in production environments by default.
-group :assets do
-  gem 'sass-rails',   '~&gt; 3.2.3'
-  gem 'coffee-rails', '~&gt; 3.2.1'
-
-  # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-  # gem 'therubyracer', :platforms =&gt; :ruby
-
-  gem 'uglifier', '&gt;= 1.0.3'
-end
-
-gem 'jquery-rails'
-
-# To use ActiveModel has_secure_password
-# gem 'bcrypt-ruby', '~&gt; 3.0.0'
-
-group :production do
-  # Use MySQL as the production database
-  gem 'mysql'
-
-  # Use unicorn as the app server
-  gem 'unicorn'
-end
-</programlisting></para>
-
-        <para>Then install all gems with <command>bundle
-        install</command>:<screen>deployer@debian:~/blog$ <command>bundle install</command>
+      <para>Then install all gems with <command>bundle
+      install</command>:<screen>deployer@debian:~/blog$ <command>bundle install</command>
 [...]
 deployer@debian:~/blog$</screen></para>
-      </section>
 
-      <section xml:id="production_webserver_database_yml">
-        <title xml:id="production_webserver_database_yml.title">Production
-        Database Configuration</title>
+      <para>To get a root URL we'll change to
+      <filename>config/routes.rb</filename> file to this:<programlisting>Blog::Application.routes.draw do
+  resources :posts
+  root 'posts#index'
+end</programlisting></para>
+    </section>
 
-        <para>In the file<filename> config/database.yml</filename> you need to
-        enter the database configuration for the MySQL database for the
-        production system. Please make sure you enter the correct
-        password.<programlisting># SQLite version 3.x
+    <section xml:id="production_webserver_database_yml">
+      <title xml:id="production_webserver_database_yml.title">Production
+      Database Configuration</title>
+
+      <para>In the file<filename> config/database.yml</filename> you need to
+      enter the database configuration for the MySQL database for the
+      production system. Please make sure you enter the correct
+      password.<programlisting># SQLite version 3.x
 #   gem install sqlite3
 #
 #   Ensure the SQLite 3 gem is defined in your Gemfile
@@ -394,18 +329,32 @@ test:
   database: blog
   username: deployer
   password: YourFavoritePassword</emphasis></programlisting></para>
-      </section>
 
-      <section xml:id="production_webserver_unicorn_gem_installieren">
-        <title
-        xml:id="production_webserver_unicorn_gem_installieren.title">Unicorn
-        Configuration</title>
+      <warning>
+        <para>Again: Please change the password!</para>
+      </warning>
+    </section>
 
-        <para>For the Unicorn configuration, we use the file <uri
-        xlink:href="https://raw.github.com/defunkt/unicorn/master/examples/unicorn.conf.rb">https://raw.github.com/defunkt/unicorn/master/examples/unicorn.conf.rb</uri>
-        as basis and save it as follows in the file
-        <filename>config/unicorn.rb</filename> after we adapt it to our
-        server:<programlisting># Use at least one worker per core if you're on a dedicated server,
+    <section xml:id="production_webserver_unicorn_gem_installieren">
+      <title
+      xml:id="production_webserver_unicorn_gem_installieren.title">Unicorn
+      Configuration</title>
+
+      <para>For the Unicorn configuration, we use the file <uri
+      xlink:href="https://raw.github.com/defunkt/unicorn/master/examples/unicorn.conf.rb">https://raw.github.com/defunkt/unicorn/master/examples/unicorn.conf.rb</uri>
+      as basis and save it as follows in the file
+      <filename>config/unicorn.rb</filename> after we adapt it to our
+      server:<programlisting># Sample verbose configuration file for Unicorn (not Rack)
+#
+# This configuration file documents many features of Unicorn
+# that may not be needed for some applications. See
+# http://unicorn.bogomips.org/examples/unicorn.conf.minimal.rb
+# for a much simpler configuration file.
+#
+# See http://unicorn.bogomips.org/Unicorn/Configurator.html for complete
+# documentation.
+
+# Use at least one worker per core if you're on a dedicated server,
 # more will usually help for _short_ waits on databases/caches.
 worker_processes 4
 
@@ -418,99 +367,124 @@ user "deployer", "www-data"
 
 # Help ensure your application will always spawn in the symlinked
 # "current" directory that Capistrano sets up.
-APP_PATH = "/var/www/blog/current"
-working_directory APP_PATH
+APP_PATH = "/home/deployer/blog"
+working_directory APP_PATH # available in 0.94.0+
 
 # listen on both a Unix domain socket and a TCP port,
 # we use a shorter backlog for quicker failover when busy
-listen "/tmp/unicorn.blog.sock", :backlog =&gt; 64
+listen "/tmp/.unicorn_blog.sock", :backlog =&gt; 64
 listen 8080, :tcp_nopush =&gt; true
 
 # nuke workers after 30 seconds instead of 60 seconds (the default)
 timeout 30
 
 # feel free to point this anywhere accessible on the filesystem
-pid APP_PATH + "/tmp/pids/unicorn.pid"
+pid "/var/run/unicorn_blog.pid"
 
 # By default, the Unicorn logger will write to stderr.
-# Additionally, some applications/frameworks log to stderr or stdout,
+# Additionally, ome applications/frameworks log to stderr or stdout,
 # so prevent them from going to /dev/null when daemonized here:
-stderr_path APP_PATH + "/log/unicorn.blog.stderr.log"
-stdout_path APP_PATH + "/log/unicorn.blog.stdout.log"
+stderr_path APP_PATH + "/log/unicorn_blog.stderr.log"
+stdout_path APP_PATH + "/log/unicorn_blog.stdout.log"
+
+# combine Ruby 2.0.0dev or REE with "preload_app true" for memory savings
+# http://rubyenterpriseedition.com/faq.html#adapt_apps_for_cow
+preload_app true
+GC.respond_to?(:copy_on_write_friendly=) and
+  GC.copy_on_write_friendly = true
+
+# Enable this flag to have unicorn test client connections by writing the
+# beginning of the HTTP headers before calling the application.  This
+# prevents calling the application for connections that have disconnected
+# while queued.  This is only guaranteed to detect clients on the same
+# host unicorn runs on, and unlikely to detect disconnects even on a
+# fast LAN.
+check_client_connection false
 
 before_fork do |server, worker|
   # the following is highly recomended for Rails + "preload_app true"
   # as there's no need for the master process to hold a connection
-  if defined?(ActiveRecord::Base)
+  defined?(ActiveRecord::Base) and
     ActiveRecord::Base.connection.disconnect!
-  end
 
-  # Before forking, kill the master process that belongs to the .oldbin PID.
-  # This enables 0 downtime deploys.
-  old_pid = "/tmp/unicorn.my_site.pid.oldbin"
-  if File.exists?(old_pid) &amp;&amp; server.pid != old_pid
-    begin
-      Process.kill("QUIT", File.read(old_pid).to_i)
-    rescue Errno::ENOENT, Errno::ESRCH
-      # someone else did our job for us
-    end
-  end
+  # The following is only recommended for memory/DB-constrained
+  # installations.  It is not needed if your system can house
+  # twice as many worker_processes as you have configured.
+  #
+  # # This allows a new master process to incrementally
+  # # phase out the old master process with SIGTTOU to avoid a
+  # # thundering herd (especially in the "preload_app false" case)
+  # # when doing a transparent upgrade.  The last worker spawned
+  # # will then kill off the old master process with a SIGQUIT.
+  # old_pid = "#{server.config[:pid]}.oldbin"
+  # if old_pid != server.pid
+  #   begin
+  #     sig = (worker.nr + 1) &gt;= server.worker_processes ? :QUIT : :TTOU
+  #     Process.kill(sig, File.read(old_pid).to_i)
+  #   rescue Errno::ENOENT, Errno::ESRCH
+  #   end
+  # end
+  #
+  # Throttle the master from forking too quickly by sleeping.  Due
+  # to the implementation of standard Unix signal handlers, this
+  # helps (but does not completely) prevent identical, repeated signals
+  # from being lost when the receiving process is busy.
+  # sleep 1
 end
 
 after_fork do |server, worker|
+  # per-process listener ports for debugging/admin/migrations
+  # addr = "127.0.0.1:#{9293 + worker.nr}"
+  # server.listen(addr, :tries =&gt; -1, :delay =&gt; 5, :tcp_nopush =&gt; true)
+
   # the following is *required* for Rails + "preload_app true",
-  if defined?(ActiveRecord::Base)
+  defined?(ActiveRecord::Base) and
     ActiveRecord::Base.establish_connection
-  end
 
   # if preload_app is true, then you may also want to check and
   # restart any other shared sockets/descriptors such as Memcached,
   # and Redis.  TokyoCabinet file handles are safe to reuse
   # between any number of forked children (assuming your kernel
   # correctly implements pread()/pwrite() system calls)
-end
-
-before_exec do |server|
-  ENV["BUNDLE_GEMFILE"] = "/var/www/blog/current/Gemfile"
 end</programlisting></para>
-      </section>
+    </section>
 
-      <section>
-        <title>rake db:migration</title>
+    <section>
+      <title>rake db:migration</title>
 
-        <para>We still need to create the database:<screen>deployer@debian:~/blog$ <command>rake db:migrate RAILS_ENV=production</command>
+      <para>We still need to create the database:<screen>deployer@debian:~/blog$ <command>rake db:migrate RAILS_ENV=production</command>
 [...]
 deployer@debian:~/blog$ </screen></para>
 
-        <important>
-          <para>Please ensure that the <command>rake db:migrate</command>
-          concludes with a <command>RAILS_ENV=production</command>. This is to
-          migrate the production database.</para>
-        </important>
-      </section>
+      <important>
+        <para>Please ensure that the <command>rake db:migrate</command>
+        concludes with a <command>RAILS_ENV=production</command>. This is to
+        migrate the production database.</para>
+      </important>
+    </section>
 
-      <section>
-        <title>rake assets:precompile</title>
+    <section>
+      <title>rake assets:precompile</title>
 
-        <para><command>rake assets:precompile</command> ensures that all
-        assets in the asset pipeline are made available for the production
-        environment (see <xref linkend="asset_pipeline"/>).<screen>deployer@debian:~/blog$ <command>rake assets:precompile</command>
-/home/deployer/.rvm/rubies/ruby-1.9.3-p194/bin/ruby /home/deployer/.rvm/gems/ruby-1.9.3-p194@global/bin/rake assets:precompile:all RAILS_ENV=production RAILS_GROUPS=assets
+      <para><command>rake assets:precompile</command> ensures that all assets
+      in the asset pipeline are made available for the production environment
+      (see <xref linkend="asset_pipeline"/>).<screen>deployer@debian:~/blog$ <command>rake assets:precompile</command>
+[...]
 deployer@debian:~/blog$</screen></para>
-      </section>
+    </section>
 
-      <section xml:id="production_webserver_unicorn_init_script">
-        <title xml:id="production_webserver_unicorn_init_script.title">Unicorn
-        Init Script</title>
+    <section xml:id="production_webserver_unicorn_init_script">
+      <title xml:id="production_webserver_unicorn_init_script.title">Unicorn
+      Init Script</title>
 
-        <para>Now you need to continue working as user
-        <code>root</code>:<screen>deployer@debian:~$ <command>exit</command>
+      <para>Now you need to continue working as user
+      <code>root</code>:<screen>deployer@debian:~$ <command>exit</command>
 Abgemeldet
 root@debian:~# </screen></para>
 
-        <para>Create the init script
-        <filename>/etc/init.d/unicorn_blog</filename> with the following
-        content:<programlisting>#!/bin/bash
+      <para>Create the init script
+      <filename>/etc/init.d/unicorn_blog</filename> with the following
+      content:<programlisting>#!/bin/bash
 
 ### BEGIN INIT INFO
 # Provides:          unicorn
@@ -525,7 +499,7 @@ root@debian:~# </screen></para>
 UNICORN=/home/deployer/.rvm/bin/bootup_unicorn
 UNICORN_ARGS="-D -c /home/deployer/blog/config/unicorn.rb -E production"
 KILL=/bin/kill
-PID=/home/deployer/tmp/unicorn.pid
+PID=/var/run/unicorn_blog.pid
 
 sig () {
   test -s "$PID" &amp;&amp; kill -$1 `cat $PID`
@@ -551,25 +525,25 @@ case "$1" in
                 ;;
 esac</programlisting></para>
 
-        <para>You still have to activate the init script and start
-        Unicorn:<screen>root@debian:~# <command>chmod +x /etc/init.d/unicorn_blog</command> 
+      <para>You still have to activate the init script and start
+      Unicorn:<screen>root@debian:~# <command>chmod +x /etc/init.d/unicorn_blog</command> 
 root@debian:~# <command>update-rc.d -f unicorn_blog defaults</command>
 update-rc.d: using dependency based boot sequencing
 root@debian:~# <command>/etc/init.d/unicorn_blog start</command>
 root@debian:~# </screen></para>
 
-        <para>Your Rails project is now accessible via the IP address of the
-        web server.</para>
-      </section>
+      <para>Your Rails project is now accessible via the IP address of the web
+      server.</para>
+    </section>
 
-      <section xml:id="production_webserver_nginx_konfiguration">
-        <title xml:id="production_webserver_nginx_konfiguration.title">nginx
-        Configuration</title>
+    <section xml:id="production_webserver_nginx_konfiguration">
+      <title xml:id="production_webserver_nginx_konfiguration.title">nginx
+      Configuration</title>
 
-        <para>For the Rails project, we add a new configuration file
-        <filename>/etc/nginx/conf.d/blog.conf</filename> with the following
-        content:<programlisting>upstream unicorn {
-  server unix:/tmp/unicorn.blog.sock fail_timeout=0;
+      <para>For the Rails project, we add a new configuration file
+      <filename>/etc/nginx/sites-available/blog.conf</filename> with the
+      following content:<programlisting>upstream unicorn {
+  server unix:/tmp/.unicorn_blog.sock fail_timeout=0;
 }
 
 server {
@@ -600,29 +574,27 @@ server {
   keepalive_timeout 10;
 }</programlisting></para>
 
-        <para>We rename the default configuration file to make sure it is no
-        longer executed. Then we restart nginx.<screen>root@debian:~# <command>mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.backup</command>
+      <para>We link this configuration file into the /etc/nginx/sites-enabled
+      directory to have it loaded by Nginx. The default file can be deleted.
+      After that we restart Nginx and are all set. You can access the Rails
+      application through the IP address of this server.<screen>root@debian:~# <command>ln -s /etc/nginx/sites-available/blog /etc/nginx/sites-enabled/</command>
+root@debian:~# <command>rm /etc/nginx/sites-enabled/default</command>
 root@debian:~# <command>/etc/init.d/nginx restart</command>
 Restarting nginx: nginx.
 root@debian:~#</screen></para>
-      </section>
     </section>
 
     <section xml:id="webserver_ohne_deployment_neues_version_des_rails_projekts_einspielen">
       <title
       xml:id="webserver_ohne_deployment_neues_version_des_rails_projekts_einspielen.title">Loading
-      New Version of Rails Project</title>
+      Updated Versions of the Rails Project</title>
 
-      <para>As you can see from this heading, we do not have automatic
-      deployment mechanisms in this variation. But you can easily implement
-      automatic deployment by using a script.</para>
-
-      <para>If you want to activate changes to the Rails project, you need to
-      log in as user <code>deployer</code> and use <command>rake
-      assets:precompile</command> after a code update to ensure that all
-      assets in the asset pipeline are made available once more for the
-      production environment (see <xref linkend="asset_pipeline"/>).<screen>deployer@debian:~/blog$ <command>rake assets:precompile</command>
-/home/deployer/.rvm/rubies/ruby-1.9.3-p194/bin/ruby /home/deployer/.rvm/gems/ruby-1.9.3-p194@global/bin/rake assets:precompile:all RAILS_ENV=production RAILS_GROUPS=assets
+      <para>If you want to activate Updates to the Rails project, you need to
+      copy them into the directory <filename>/home/deployer/blog</filename>
+      and log in as user <code>deployer</code> to run <command>rake
+      assets:precompile</command> (see <xref
+      linkend="asset_pipeline"/>).<screen>deployer@debian:~/blog$ <command>rake assets:precompile</command>
+[...]
 deployer@debian:~/blog$</screen></para>
 
       <para>If you bring in new migrations, you of course also need to do a
@@ -633,571 +605,23 @@ deployer@debian:~/blog$ </screen></para>
       <para>Then you need to restart Unicorn as user
       <code>root</code>:<screen>root@debian:~# <command>/etc/init.d/unicorn_blog restart</command>
 root@debian:~# </screen></para>
-
-      <tip>
-        <para>In most cases, it makes more sense to use an installation with
-        Capistrano deployment. Initially, this involves a tiny bit more effort
-        (see <xref linkend="webserver_mit_capistrano"/>), but then it offers
-        greater comfort and security.</para>
-      </tip>
-    </section>
-  </section>
-
-  <section xml:id="webserver_mit_capistrano">
-    <title xml:id="webserver_mit_capistrano.title">Web Server with Capistrano
-    Deployment</title>
-
-    <indexterm>
-      <primary>deployment</primary>
-    </indexterm>
-
-    <indexterm>
-      <primary>Capistrano</primary>
-    </indexterm>
-
-    <para>In <xref linkend="webserver_ohne_deployment"/>, we have created a
-    new Rails project on the production system. Logically, this is not the
-    normal approach. Normally, one or several developers would develop the
-    Rails project on their own computers and then upload it to the production
-    server later.</para>
-
-    <para>Especially if you are working with several developers, it makes
-    sense to use a version management system. With Capistrano, you can then
-    use this version management to distribute updates of the Rails project to
-    one or several web servers. In this chapter, we are using Git as
-    distributed version management and Github (<uri
-    xlink:href="http://github.com">http://github.com</uri>) as server for
-    hosting Git.</para>
-
-    <para>For this tutorial, you will need a ready installed production server
-    with nginx and a Ruby 1.9.3 and Rails 3.2 installed with RVM with the user
-    <code>deployer</code> (for a detailled guide, please read <xref
-    linkend="deployment_grundinstallation_webserver"/>).</para>
-
-    <section xml:id="webserver_mit_capistrano_entwicklungssystem">
-      <title
-      xml:id="webserver_mit_capistrano_entwicklungssystem.title">Development
-      System</title>
-
-      <para>We start again with a new Rails application. Please create this
-      application on your development computer.</para>
-
-      <section>
-        <title>rails new blog</title>
-
-        <para>We create the mini blog Rails application:<screen>Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>rails new blog</command>
-[...]
-Stefan-Wintermeyers-MacBook-Air:~ xyz$ <command>cd blog</command>
-Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rails generate scaffold post subject content:text</command>
-[...]
-Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
-
-        <note>
-          <para>If you want to work with this system in the development
-          environment, you still need a <screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>rake db:migrate</command>
-==  CreatePosts: migrating ====================================================
--- create_table(:posts)
-   -&gt; 0.0015s
-==  CreatePosts: migrated (0.0016s) ===========================================
-
-Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
-        </note>
-
-        <section>
-          <title>Required Gems for Deployment</title>
-
-          <para>For the deployment and the web server, we need some gems.
-          Please insert this configuration into the file
-          <filename>Gemfile</filename>:<programlisting>source 'https://rubygems.org'
-
-gem 'rails', '3.2.6'
-
-gem 'sqlite3'
-
-# Gems used only for assets and not required
-# in production environments by default.
-group :assets do
-  gem 'sass-rails',   '~&gt; 3.2.3'
-  gem 'coffee-rails', '~&gt; 3.2.1'
-
-  # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-  # gem 'therubyracer', :platforms =&gt; :ruby
-
-  gem 'uglifier', '&gt;= 1.0.3'
-end
-
-gem 'jquery-rails'
-
-# To use ActiveModel has_secure_password
-# gem 'bcrypt-ruby', '~&gt; 3.0.0'
-
-group :production do
-  # Use MySQL as the production database
-  gem 'mysql'
-
-  # Use unicorn as the app server
-  gem 'unicorn'
-end
-
-
-group :development do
-  # Use Capistrano for the deployment
-  gem 'capistrano'
-  gem 'rvm-capistrano'
-end
-</programlisting></para>
-
-          <para>Then execute a <command>bundle install</command>:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>bundle install</command>
-[...]
-Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
-        </section>
-      </section>
-
-      <section>
-        <title>Unicorn Configuration</title>
-
-        <para>For the Unicorn configuration, we use the file <uri
-        xlink:href="https://raw.github.com/defunkt/unicorn/master/examples/unicorn.conf.rb">https://raw.github.com/defunkt/unicorn/master/examples/unicorn.conf.rb</uri>
-        as basis, adapt it to our server as follows and save it in the file
-        <filename>config/unicorn.rb</filename>:<programlisting># Use at least one worker per core if you're on a dedicated server,
-# more will usually help for _short_ waits on databases/caches.
-worker_processes 4
-
-# Since Unicorn is never exposed to outside clients, it does not need to
-# run on the standard HTTP port (80), there is no reason to start Unicorn
-# as root unless it's from system init scripts.
-# If running the master process as root and the workers as an unprivileged
-# user, do this to switch euid/egid in the workers (also chowns logs):
-user "deployer", "www-data"
-
-# Help ensure your application will always spawn in the symlinked
-# "current" directory that Capistrano sets up.
-APP_PATH = "/var/www/blog/current"
-working_directory APP_PATH
-
-# listen on both a Unix domain socket and a TCP port,
-# we use a shorter backlog for quicker failover when busy
-listen "/tmp/unicorn.blog.sock", :backlog =&gt; 64
-listen 8080, :tcp_nopush =&gt; true
-
-# nuke workers after 30 seconds instead of 60 seconds (the default)
-timeout 30
-
-# feel free to point this anywhere accessible on the filesystem
-pid APP_PATH + "/tmp/pids/unicorn.pid"
-
-# By default, the Unicorn logger will write to stderr.
-# Additionally, ome applications/frameworks log to stderr or stdout,
-# so prevent them from going to /dev/null when daemonized here:
-stderr_path APP_PATH + "/log/unicorn.blog.stderr.log"
-stdout_path APP_PATH + "/log/unicorn.blog.stdout.log"
-
-before_fork do |server, worker|
-  # the following is highly recomended for Rails + "preload_app true"
-  # as there's no need for the master process to hold a connection
-  if defined?(ActiveRecord::Base)
-    ActiveRecord::Base.connection.disconnect!
-  end
-
-  # Before forking, kill the master process that belongs to the .oldbin PID.
-  # This enables 0 downtime deploys.
-  old_pid = "/tmp/unicorn.my_site.pid.oldbin"
-  if File.exists?(old_pid) &amp;&amp; server.pid != old_pid
-    begin
-      Process.kill("QUIT", File.read(old_pid).to_i)
-    rescue Errno::ENOENT, Errno::ESRCH
-      # someone else did our job for us
-    end
-  end
-end
-
-after_fork do |server, worker|
-  # the following is *required* for Rails + "preload_app true",
-  if defined?(ActiveRecord::Base)
-    ActiveRecord::Base.establish_connection
-  end
-
-  # if preload_app is true, then you may also want to check and
-  # restart any other shared sockets/descriptors such as Memcached,
-  # and Redis.  TokyoCabinet file handles are safe to reuse
-  # between any number of forked children (assuming your kernel
-  # correctly implements pread()/pwrite() system calls)
-end
-
-before_exec do |server|
-  ENV["BUNDLE_GEMFILE"] = "/var/www/blog/current/Gemfile"
-end</programlisting></para>
-      </section>
-
-      <section>
-        <title>Capistrano Configuration</title>
-
-        <para>We set up a Capistrano standard configuration:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>capify .</command>  
-[add] writing './Capfile'
-[add] writing './config/deploy.rb'
-[done] capified!
-Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
-
-        <para>Then we set up the <filename>config/deploy.rb</filename> with
-        the following content. Please remember to replace the text
-        ip.address.of.server with the IP address of your web
-        server!<programlisting>require "bundler/capistrano"
-require "rvm/capistrano"
-set :rvm_ruby_string, '1.9.3'
-
-server "ip.address.of.server", :web, :app, :db, primary: true
-
-set :application, "blog"
-set :user, "deployer"
-set :deploy_to, "/var/www/#{application}"
-set :deploy_via, :remote_cache
-set :use_sudo, false
-
-set :scm, "git"
-set :repository, "git@github.com:your_github_account/#{application}.git"
-set :branch, "master"
-
-default_run_options[:pty] = true
-ssh_options[:forward_agent] = true
-
-after 'deploy', 'deploy:cleanup'
-after 'deploy', 'deploy:migrate'
-
-namespace :deploy do
-  %w[start stop restart reload].each do |command|
-    desc "#{command} unicorn server"
-    task command, roles: :app, except: {no_release: true} do
-      run "sudo /etc/init.d/unicorn_#{application} #{command}"
-    end
-  end
-
-  # Use this if you know what you are doing.
-  #
-  # desc "Zero-Downtime restart of Unicorn"
-  # task :restart, :except =&gt; { :no_release =&gt; true } do
-  #   run "sudo /etc/init.d/unicorn_#{application} reload"
-  # end
-end</programlisting></para>
-
-        <para>Now change the file <filename>Capfile</filename> as
-        follows:<programlisting>load 'deploy'
-# Uncomment if you are using Rails' asset pipeline
-<emphasis>load 'deploy/assets'</emphasis>
-Dir['vendor/gems/*/recipes/*.rb','vendor/plugins/*/recipes/*.rb'].each { |plugin| load(plugin) }
-load 'config/deploy' # remove this line to skip loading any of the default tasks
-</programlisting></para>
-      </section>
-
-      <section>
-        <title>Setting Up Github as Repository</title>
-
-        <para>Please create a new account at <uri
-        xlink:href="https://github.com">https://github.com</uri> or use an
-        existing Github account. Use this account to create a new repository
-        with the name "<code>blog</code>".</para>
-
-        <tip>
-          <para>To simplify your work, I recommend that you enter your SSH key
-          in your Github account at <uri
-          xlink:href="https://github.com/settings/ssh">https://github.com/settings/ssh</uri>.</para>
-        </tip>
-
-        <para>Now you can commit and push your project. Of course, you need to
-        replace <code>your_github_account</code> with your own Github
-        account:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>git init</command>
-Initialized empty Git repository in /Users/xyz/blog/.git/
-Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>git add .</command>
-Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>git commit -m 'first commit'</command>
-[...]
-Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>git remote add origin git@github.com:your_github_account/blog.git</command>
-Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>git push -u origin master</command>
-[...]
-Stefan-Wintermeyers-MacBook-Air:blog xyz$</screen></para>
-
-        <para>Your Rails project is now hosted in a Github repository and you
-        can view it at <uri
-        xlink:href="https://github.com/ihr_github_account/blog">https://github.com/your_github_account/blog</uri>.</para>
-      </section>
-    </section>
-
-    <section>
-      <title>Web Server</title>
-
-      <para>You need to carry out the following steps on the web server
-      system.</para>
-
-      <section>
-        <title>Generate SSH Key</title>
-
-        <para>We create a public SSH key for the user <code>deployer</code>.
-        Please log in to the web server as user <code>deployer</code>.
-        Deployment is easier later on if you use an empty pass phrase.<screen>deployer@debian:~$ <command>ssh-keygen</command>
-Generating public/private rsa key pair.
-Enter file in which to save the key (/home/deployer/.ssh/id_rsa): 
-Enter passphrase (empty for no passphrase): 
-Enter same passphrase again: 
-Your identification has been saved in /home/deployer/.ssh/id_rsa.
-Your public key has been saved in /home/deployer/.ssh/id_rsa.pub.
-The key fingerprint is:
-ba:11:90:2a:e3:8f:5b:2e:70:99:50:86:a1:9a:2c:b7 deployer@debian
-The key's randomart image is:
-+--[ RSA 2048]----+
-|.o               |
-|o o  .           |
-|.o  o            |
-|+. . .           |
-|*ooo  . S        |
-|+++.   o         |
-|.oE.  o          |
-| .=    o         |
-| ooo  .          |
-+-----------------+
-deployer@debian:~$ <command>cat .ssh/id_rsa.pub</command> 
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDJEGixOcPRdBMry7PPG/Rgla50EM+JPKGYGD/yJ8v7bdrfT68t2/eVbj6+YebWh1tRebE3qqouqmZjIlocr1j67SmfXZ/sswBT/pXOhP89JtHPMolx7rUQ8wQF3aDrnVDJG0gdvRm212vN2bou3N5dzhekmWmbS3R0ZGNM9ZgTw8rhTOd1M2QVTzyV1i1PehoFxOu1WIc1gN5C42zihbJ6fGgVb45WeKzXSi6bQ6PMKD1gAMJpXHPvKLhi0wLN0wNOJwa6BKR3pmgICSBuoziAhhCS/7gBDJnqRmx1zax/1CShJD3QEGHvofA9okYuYVqyrJi1hdF8ZgMnQCb31I21 deployer@debian
-deployer@debian:~$</screen></para>
-
-        <para>The generated key is located in the file
-        <filename>/home/deployer/.ssh/id_rsa.pub</filename>.</para>
-
-        <important>
-          <para>Please now log in to your Github account and add this key
-          under Deploy Keys in the admin area of your Github project. See <uri
-          xlink:href="https://github.com/ihr_github_account/blog/admin/keys">https://github.com/your_github_account/blog/admin/keys</uri></para>
-        </important>
-
-        <para>Then use ssh to connect on the console with the Github SSH
-        server and confirm the question "Are you sure you want to continue
-        connection (yes/no)?" with yes. <screen>deployer@debian:~$ <command>ssh git@github.com</command>
-The authenticity of host 'github.com (207.97.227.239)' can't be established.
-RSA key fingerprint is 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48.
-Are you sure you want to continue connecting (yes/no)? <command>yes</command>
-Warning: Permanently added 'github.com,207.97.227.239' (RSA) to the list of known hosts.
-PTY allocation request failed on channel 0
-Hi your_github_account/blog! You've successfully authenticated, but GitHub does not provide shell access.
-                 Connection to github.com closed.
-deployer@debian:~$</screen></para>
-
-        <para>Now you can start deploying on your development system.</para>
-      </section>
-    </section>
-
-    <section>
-      <title>cap deploy:setup</title>
-
-      <para>With <command>cap deploy:setup</command> we can set up the
-      necessary directory structure on the target system. If you have not
-      stored your SSH key on the target system, the script will ask you for
-      the password for the user <code>deployer</code>. Depending on your
-      connection and CPU power, this initial setup step may take
-      longer.<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>cap deploy:setup</command>
-[...]
-Stefan-Wintermeyers-MacBook-Air:blog xyz$ </screen></para>
-
-      <para>After the <command>cap deploy:setup</command>, you will find the
-      following directory structure on your web server:<screen>/var/www/blog
-├── releases
-└── shared
-    ├── log
-    ├── pids
-    └── system</screen></para>
-
-      <para>We can start the first deploy with <command>cap
-      deploy</command>:<screen>Stefan-Wintermeyers-MacBook-Air:blog xyz$ <command>cap deploy</command>
-[...]
-Stefan-Wintermeyers-MacBook-Air:blog xyz$ </screen></para>
-
-      <para>We then see the result of the deploy in the web server's directory
-      structure:<screen>/var/www/blog
-├── current -&gt; /var/www/blog/releases/20120711131031
-├── releases
-│   └── 20120711131031
-└── shared
-    ├── assets
-    ├── bundle
-    ├── cached-copy
-    ├── log
-    ├── pids
-    └── system</screen></para>
-
-      <para>Capistrano has created a new directory for the new application
-      version in the subdirectory <filename>/var/www/blog/releases</filename>
-      and linked this new directory to the directory
-      <filename>/var/www/blog/current</filename>.</para>
-    </section>
-
-    <section xml:id="webserver_mit_capistrano_webserver_konfiguration">
-      <title
-      xml:id="webserver_mit_capistrano_webserver_konfiguration.title">Web
-      Server Configuration</title>
-
-      <para>Now we still need to write and activate an init script and
-      configuration file on the web server.</para>
-
-      <section xml:id="production_webserver_capistrano_unicorn_init_script">
-        <title
-        xml:id="production_webserver_capistrano_unicorn_init_script.title">Unicorn
-        Init Script</title>
-
-        <para>Please log in to the web server as user <code>root</code> and
-        create the init script <filename>/etc/init.d/unicorn_blog</filename>
-        with the following content:<programlisting>#!/bin/bash
-
-### BEGIN INIT INFO
-# Provides:          unicorn
-# Required-Start:    $remote_fs $syslog
-# Required-Stop:     $remote_fs $syslog
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Unicorn webserver
-# Description:       Unicorn webserver for the blog
-### END INIT INFO
-
-UNICORN=/home/deployer/.rvm/bin/bootup_unicorn
-UNICORN_ARGS="-D -c /var/www/blog/current/config/unicorn.rb -E production"
-KILL=/bin/kill
-PID=/var/www/blog/shared/pids/unicorn.pid
-
-sig () {
-  test -s "$PID" &amp;&amp; kill -$1 `cat $PID`
-}
-
-case "$1" in
-        start)
-                echo "Starting unicorn..."
-                $UNICORN $UNICORN_ARGS
-                ;;
-        stop)
-                sig QUIT &amp;&amp; exit 0
-                echo &gt;&amp;2 "Not running"
-                ;;
-        reload)
-                sig USR2 &amp;&amp; exit 0
-                ;;
-        restart)
-                $0 stop
-                $0 start
-                ;;
-        status)
-                ;;
-        *)
-                echo "Usage: $0 {start|stop|reload|restart|status}"
-                ;;
-esac</programlisting></para>
-
-        <para>Now we need to activate the init script and start
-        Unicorn:<screen>root@debian:~# <command>chmod +x /etc/init.d/unicorn_blog</command> 
-root@debian:~# <command>update-rc.d -f unicorn_blog defaults</command>
-update-rc.d: using dependency based boot sequencing
-root@debian:~# <command>/etc/init.d/unicorn_blog start</command>
-root@debian:~# </screen></para>
-
-        <para>Your Rails project is now accessible via the web server's IP
-        address.</para>
-      </section>
-
-      <section xml:id="production_webserver_capistrano_nginx_konfiguration">
-        <title
-        xml:id="production_webserver_capistrano_nginx_konfiguration.title">nginx
-        Configuration</title>
-
-        <para>For the Rails project, we add a new configuration file
-        <filename>/etc/nginx/conf.d/blog.conf</filename> with the following
-        content:<programlisting>upstream unicorn {
-  server unix:/tmp/unicorn.blog.sock fail_timeout=0;
-}
-
-server {
-  listen 80 default deferred;
-  # server_name example.com;
-  root /var/www/blog/current/public;
-
-  location / {
-    gzip_static on;
-  }
-
-  location ^~ /assets/ {
-    gzip_static on;
-    expires max;
-    add_header Cache-Control public;
-  }
-
-  try_files $uri/index.html $uri @unicorn;
-  location @unicorn {
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header Host $http_host;
-    proxy_redirect off;
-    proxy_pass http://unicorn;
-  }
-
-  error_page 500 502 503 504 /500.html;
-  client_max_body_size 4G;
-  keepalive_timeout 10;
-}</programlisting></para>
-
-        <para>We rename the default configuration file to make sure it is no
-        longer executed. Then we restart nginx.<screen>root@debian:~# <command>mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.backup</command>
-root@debian:~# <command>/etc/init.d/nginx restart</command>
-Restarting nginx: nginx.
-root@debian:~#</screen></para>
-      </section>
-    </section>
-
-    <section>
-      <title>sudo</title>
-
-      <para>In the Capistrano deploy script, we need a way of stopping and
-      starting Unicorn via init script. So we need to install sudo on the web
-      server:<screen>root@debian:~# <command>apt-get install sudo</command>
-[...]
-root@debian:~# </screen></para>
-
-      <para>And in the file <filename>/etc/sudoers</filename> we need to add
-      the following line:<programlisting>deployer ALL= NOPASSWD: /etc/init.d/unicorn_blog</programlisting></para>
-    </section>
-
-    <section xml:id="webserver_mit_capistrano_webserver_deployment">
-      <title
-      xml:id="webserver_mit_capistrano_webserver_deployment.title">Deployment</title>
-
-      <para>The big advantage of working with Capistrano is that it makes it
-      so easy to install new versions (deployment). You can simply do it from
-      the development system via the command <command>cap deploy</command>.
-      After a second <command>cap deploy</command>, the directory structure
-      looks like this:<screen>/var/www/blog
-├── current -&gt; /var/www/blog/releases/20120711132357
-├── releases
-│   ├── 20120711131031
-│   └── 20120711132357
-└── shared
-    ├── assets
-    ├── bundle
-    ├── cached-copy
-    ├── log
-    ├── pids
-    └── system</screen></para>
-
-      <para>So the relevant releases are always saved in the directory
-      <filename>/var/www/blog/releases</filename>.</para>
-
-      <para>In the directory <filename>/var/www/blog/shared</filename> you
-      will find directories that are shared by the relevant release. These are
-      always linked automatically within
-      <filename>/var/www/blog/current</filename>.</para>
-
-      <para>In the configuration we are using, the last 5 releases are
-      automatically saved, any older releases are deleted.</para>
-
-      <tip>
-        <para>Capistrano is a very powerful tool. It is well worth it for any
-        admin to have a look at the Capistrano Wiki (<uri
-        xlink:href="https://github.com/capistrano/capistrano/wiki">https://github.com/capistrano/capistrano/wiki</uri>)
-        zu werfen.</para>
-      </tip>
     </section>
   </section>
 
   <section xml:id="production_webserver_sonstiges">
-    <title xml:id="production_webserver_sonstiges.title">Other Issues</title>
+    <title xml:id="production_webserver_sonstiges.title">Misc</title>
+
+    <section>
+      <title>Alternative Setups</title>
+
+      <para>The RVM, unicorn and Nginx way is fast and makes it possible to
+      setup different Ruby versions on one server. But many admins prefer an
+      easier installation process which is promised by Phusion Passenger. Have
+      a look at <uri
+      xlink:href="https://www.phusionpassenger.com">https://www.phusionpassenger.com</uri>
+      for more information about Passenger. It is a very good and reliable
+      solution.</para>
+    </section>
 
     <section xml:id="production_webserver_was_noch_zu_tun_ist">
       <title xml:id="production_webserver_was_noch_zu_tun_ist.title">What Else
