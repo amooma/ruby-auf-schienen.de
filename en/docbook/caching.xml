@@ -506,7 +506,7 @@ Completed 304 Not Modified in 4ms (ActiveRecord: 0.3ms)</screen></para>
         <para>As basis for generating an etag, we can not just pass an object,
         but also an array of objects. This way, we can solve the problem with
         the logged-in user. Let's assume that a logged-in user is output with
-        the method <methodname>current_user</methodname>. </para>
+        the method <methodname>current_user</methodname>.</para>
 
         <para>We only have to add <code>etag { current_user.try :id }</code>
         in the <filename>app/controllers/application_controller.rb</filename>
@@ -559,10 +559,7 @@ end</programlisting></para>
       example) as well and want to deliver it via HTTP caching, we need to use
       the method <methodname>stale?</methodname>. Using
       <methodname>stale?</methodname> resembles using the method
-      <methodname>fresh_when</methodname>. The example of <xref
-      linkend="http_caching_etag_and_last_modified"/> would then look like
-      this if we use <methodname>stale?</methodname> and additionally render
-      JSON:<programlisting>def show
+      <methodname>fresh_when</methodname>. Example:<programlisting>def show
   @company = Company.find(params[:id])
 
   if stale? @company
@@ -592,9 +589,9 @@ end</programlisting></para>
       book, then we could activate the free services of the proxies with the
       parameter <code>public: true</code> in
       <methodname>fresh_when</methodname> or <methodname>stale?</methodname>.
-      The example of <xref linkend="http_caching_etag_and_last_modified"/>
-      would then look like this if using <code>public:
-      true</code>:<programlisting># GET /companies/1
+      </para>
+
+      <para>Example:<programlisting># GET /companies/1
 # GET /companies/1.json
 def show
   @company = Company.find(params[:id])
@@ -675,9 +672,8 @@ Cache-Control: public
       the way are not permitted to cache this page.</para>
 
       <para>If we decide for our phone book that the web page is going to stay
-      unchanged for at least 2 minutes, then we can expand the example <xref
-      linkend="http_caching_etag_and_last_modified"/> by adding the method
-      <methodname>expires_in</methodname>. The controller
+      unchanged for at least 2 minutes, then we can expand the code example by
+      adding the method <methodname>expires_in</methodname>. The controller
       <filename>app/controllers/companies.rb</filename> would then contain the
       following code for the method
       <methodname>show</methodname>:<programlisting># GET /companies/1
@@ -713,7 +709,7 @@ Cache-Control: max-age=120, public
         by the checksum in the file name and can be cached for a very long
         time both in the web browser and in public proxies. That's why we have
         the following section in the nginx configuration file in <xref
-        linkend="production_webserver_capistrano_nginx_konfiguration"/>:<programlisting>location ^~ /assets/ {
+        linkend="rails_production_webserver"/>:<programlisting>location ^~ /assets/ {
   gzip_static on;
   expires max;
   add_header Cache-Control public;
