@@ -27,6 +27,7 @@ procedure before
 <xsl:param name="doc.url" select="'http://fedorahosted.org/publican'"/>-->
 
 <xsl:param name="generate.section.toc.level" select="0"/>
+<xsl:param name="toc.section.depth">1</xsl:param>
 <xsl:param name="qanda.defaultlabel">qanda</xsl:param>
 
 <xsl:template name="user.preroot">
