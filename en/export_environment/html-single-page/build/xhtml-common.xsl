@@ -54,24 +54,24 @@
 <xsl:param name="use.embed.for.svg" select="0"/>
 
 <!-- TOC -->
-<xsl:param name="section.autolabel" select="1"/>
-<xsl:param name="section.label.includes.component.label" select="1"/>
+<xsl:param name="section.autolabel" select="0"/>
+<xsl:param name="section.label.includes.component.label" select="0"/>
 
-<!-- <xsl:param name="generate.toc">
-set toc
+<xsl:param name="generate.toc">
+set nop
 book toc
 article nop
-chapter toc
-qandadiv toc
-qandaset toc
+chapter nop
+qandadiv nop
+qandaset nop
 sect1 nop
 sect2 nop
 sect3 nop
 sect4 nop
 sect5 nop
-section toc
-part toc
-</xsl:param> -->
+section nop
+part nop
+</xsl:param> 
 
 <xsl:param name="suppress.navigation" select="0"/>
 <xsl:param name="suppress.header.navigation" select="0"/>
