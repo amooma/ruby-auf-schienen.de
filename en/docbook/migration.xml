@@ -27,12 +27,12 @@
   a model with <command>rails generate model</command>, a corresponding
   migration file is automatically created in the directory
   <filename>db/migrate/</filename>. I am going to show you the principle using
-  the example of a shop application. Let's create one first:<screen>$ rails new shop
+  the example of a shop application. Let's create one first:<screen>$ <command>rails new shop</command>
   [...]
-$ cd shop
+$ <command>cd shop</command>
 $</screen></para>
 
-  <para>Then we create a <classname>Product</classname> model:<screen>$ rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date
+  <para>Then we create a <classname>Product</classname> model:<screen>$ <command>rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
       invoke  active_record
       create    db/migrate/20121119143522_create_products.rb
       create    app/models/product.rb
@@ -61,7 +61,7 @@ end</programlisting></para>
   database table in case of a rollback. The migration files have embedded the
   current time in the file name and are processed in chronological order
   during a migration (in other words, when you call <command>rake
-  db:migrate</command>).<screen>$ rake db:migrate
+  db:migrate</command>).<screen>$ <command>rake db:migrate</command>
 ==  CreateProducts: migrating =================================================
 -- create_table(:products)
    -&gt; 0.0017s
@@ -71,13 +71,13 @@ $ </screen></para>
 
   <para>Only those migrations that have not been executed yet are processed.
   If we call <command>rake db:migrate</command> again, nothing happens,
-  because the corresponding migration has already been executed:<screen>$ rake db:migrate
+  because the corresponding migration has already been executed:<screen>$ <command>rake db:migrate</command>
 $</screen></para>
 
   <para>But if we manually delete the database with <command>rm</command> and
   then call <command>rake db:migrate</command> again, the migration is
-  repeated:<screen>$ rm db/development.sqlite3 
-$ rake db:migrate
+  repeated:<screen>$ <command>rm db/development.sqlite3</command> 
+$ <command>rake db:migrate</command>
 ==  CreateProducts: migrating =================================================
 -- create_table(:products)
    -&gt; 0.0016s
@@ -88,7 +88,7 @@ $  </screen></para>
   <para>After a while we realise that we want to save not just the weight for
   some products, but also the height. So we need another database field. There
   is an easy to remember syntax for this, <command>rails generate migration
-  add_*</command>:<screen>$ rails generate migration add_height_to_product height:integer
+  add_*</command>:<screen>$ <command>rails generate migration add_height_to_product height:integer</command>
       invoke  active_record
       create    db/migrate/20121119143758_add_height_to_product.rb
 $</screen></para>
@@ -102,7 +102,7 @@ $</screen></para>
 end</programlisting></para>
 
   <para>With <command>rake db:migrate</command> we can start in the new
-  migration:<screen>$ rake db:migrate
+  migration:<screen>$ <command>rake db:migrate</command>
 ==  AddHeightToProduct: migrating =============================================
 -- add_column(:products, :height, :integer)
    -&gt; 0.0007s
@@ -112,11 +112,11 @@ $</screen></para>
 
   <para>In the <foreignphrase xml:lang="en">console</foreignphrase> we can
   look at the new field. It was added after the field
-  <literal>updated_at</literal>:<screen>$ rails console
+  <literal>updated_at</literal>:<screen>$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; Product
+&gt;&gt; <command>Product</command>
 =&gt; Product(id: integer, name: string, price: decimal, weight: integer, in_stock: boolean, expiration_date: date, created_at: datetime, updated_at: datetime, height: integer)
-&gt;&gt; exit
+&gt;&gt; <command>exit</command>
 $</screen></para>
 
   <warning>
@@ -128,7 +128,7 @@ $</screen></para>
 
   <para>What if you want to look at the previous state of things? No problem.
   You can easily go back to the previous version with <command>rake
-  db:rollback</command>:<screen>$ rake db:rollback
+  db:rollback</command>:<screen>$ <command>rake db:rollback</command>
 ==  AddHeightToProduct: reverting =============================================
 -- remove_column("products", :height)
    -&gt; 0.0151s
@@ -138,7 +138,7 @@ $</screen></para>
 
   <para>Each migration has its own version number. You can find out the
   version number of the current status via <command>rake
-  db:version</command>:<screen>$ rake db:version
+  db:version</command>:<screen>$ <command>rake db:version</command>
 Current version: 20121119143522
 $</screen></para>
 
@@ -149,7 +149,7 @@ $</screen></para>
   </important>
 
   <para>You will find the corresponding version in the directory
-  <filename>db/migrate</filename>:<screen>$ ls db/migrate/
+  <filename>db/migrate</filename>:<screen>$ <command>ls db/migrate/</command>
 20121119143522_create_products.rb
 20121119143758_add_height_to_product.rb
 $</screen></para>
@@ -157,7 +157,7 @@ $</screen></para>
   <para>You can go to a specific migration via <command>rake db:migrate
   VERSION=</command> and add the appropriate version number after the equals
   sign. The zero represents the version zero, in other words the start. Let's
-  try it out:<screen>$ rake db:migrate VERSION=0
+  try it out:<screen>$ <command>rake db:migrate VERSION=0</command>
 ==  CreateProducts: reverting =================================================
 -- drop_table("products")
    -&gt; 0.0005s
@@ -221,17 +221,17 @@ production:
       </footnote></para>
 
     <para>To satisfy your curiosity, we have a quick look at the database with
-    the command line tool <command>sqlite3</command>:<screen>$ sqlite3 db/development.sqlite3 
+    the command line tool <command>sqlite3</command>:<screen>$ <command>sqlite3 db/development.sqlite3</command> 
 SQLite version 3.7.12 2012-04-03 19:43:07
 Enter ".help" for instructions
 Enter SQL statements terminated with a ";"
-sqlite&gt; .tables
+sqlite&gt; <command>.tables</command>
 schema_migrations
-sqlite&gt; .quit
+sqlite&gt; <command>.quit</command>
 $</screen></para>
 
     <para>Nothing in it. Of course not, as we have not yet run the
-    migration:<screen>$ rake db:migrate
+    migration:<screen>$ <command>rake db:migrate</command>
 ==  CreateProducts: migrating =================================================
 -- create_table(:products)
    -&gt; 0.0142s
@@ -242,15 +242,15 @@ $</screen></para>
    -&gt; 0.0011s
 ==  AddHeightToProduct: migrated (0.0012s) ====================================
 
-$ sqlite3 db/development.sqlite3 
+$ <command>sqlite3 db/development.sqlite3</command> 
 SQLite version 3.7.12 2012-04-03 19:43:07
 Enter ".help" for instructions
 Enter SQL statements terminated with a ";"
-sqlite&gt; .tables
+sqlite&gt; <command>.tables</command>
 products           schema_migrations
-sqlite&gt; .schema products
+sqlite&gt; <command>.schema products</command>
 CREATE TABLE "products" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar(255), "price" decimal(7,2), "weight" integer, "in_stock" boolean, "expiration_date" date, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "height" integer);
-sqlite&gt; .quit
+sqlite&gt; <command>.quit</command>
 $</screen></para>
 
     <para>The table <literal>schema_migrations</literal> is used for the
@@ -269,7 +269,7 @@ $</screen></para>
 
     <para>In our production database, we should index the field
     <literal>name</literal> in the <literal>products</literal> table. We
-    create a new migration for that purpose:<screen>$ rails generate migration create_index
+    create a new migration for that purpose:<screen>$ <command>rails generate migration create_index</command>
       invoke  active_record
       create    db/migrate/20121120142002_create_index.rb
 $</screen></para>
@@ -289,7 +289,7 @@ $</screen></para>
   end
 end</programlisting></para>
 
-    <para>With <command>rake db:migrate</command> we create the index:<screen>$ rake db:migrate
+    <para>With <command>rake db:migrate</command> we create the index:<screen>$ <command>rake db:migrate</command>
 ==  CreateIndex: migrating ====================================================
 -- add_index(:products, :name)
    -&gt; 0.0010s
@@ -309,14 +309,14 @@ end</programlisting></para>
     <tip>
       <para>You can also create an index directly when you generate the model.
       In our case (an index for the attribute <code>name</code>) the command
-      would look like this:<screen>$ rails generate model product name:string:index 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date
+      would look like this:<screen>$ <command>rails generate model product name:string:index 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
       invoke  active_record
       create    db/migrate/20121120142344_create_products.rb
       create    app/models/product.rb
       invoke    test_unit
       create      test/unit/product_test.rb
       create      test/fixtures/products.yml
-$ cat db/migrate/20121120142344_create_products.rb
+$ <command>cat db/migrate/20121120142344_create_products.rb</command>
 class CreateProducts &lt; ActiveRecord::Migration
   def change
     create_table :products do |t|

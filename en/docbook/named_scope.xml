@@ -24,12 +24,12 @@
   <section xml:id="named_scopes_vorbereitung">
     <title xml:id="named_scopes_vorbereitung.title">Preparation</title>
 
-    <para>We are building our own little online shop:<screen>$ rails new shop
+    <para>We are building our own little online shop:<screen>$ <command>rails new shop</command>
   [...]
-$ cd shop
-$ rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date
+$ <command>cd shop</command>
+$ <command>rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
   [...]
-$ rake db:migrate
+$ <command>rake db:migrate</command>
   [...]
 $</screen></para>
 
@@ -43,7 +43,7 @@ Product.create(name: 'Eggs (12)', in_stock: true, price: 2, expiration_date: Dat
 Product.create(name: 'Peanuts (8 x 200 g bag)', in_stock: false, weight: 1600, price: 17.49, expiration_date: Date.today + 1.year)</programlisting></para>
 
     <para>Now drop the database and repopulate it with the
-    <filename>db/seeds.rb</filename>:<screen>$ rake db:reset
+    <filename>db/seeds.rb</filename>:<screen>$ <command>rake db:reset</command>
   [...]
 $ </screen></para>
   </section>
@@ -52,12 +52,12 @@ $ </screen></para>
     <title xml:id="einfache_named_scopes.title">Defining a Scope</title>
 
     <para>If we want to count products that are in stock in our online shop,
-    then we can use the following query each time:<screen>$ rails console
+    then we can use the following query each time:<screen>$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; Product.where(in_stock: true).count
+&gt;&gt; <command>Product.where(in_stock: true).count</command>
    (0.1ms)  SELECT COUNT(*) FROM "products" WHERE "products"."in_stock" = 't'
 =&gt; 5
-&gt;&gt; exit
+&gt;&gt; <command>exit</command>
 $</screen></para>
 
     <para>But we could also define a NamedScope <code>available</code> in the
@@ -65,12 +65,12 @@ $</screen></para>
   scope :available, -&gt; { where(in_stock: true) }
 end</programlisting></para>
 
-    <para>And then use it:<screen>$ rails console
+    <para>And then use it:<screen>$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; Product.available.count
+&gt;&gt; <command>Product.available.count</command>
    (0.2ms)  SELECT COUNT(*) FROM "products" WHERE "products"."in_stock" = 't'
 =&gt; 5
-&gt;&gt; exit
+&gt;&gt; <command>exit</command>
 $</screen></para>
 
     <para>Let's define a second NamedScope for this example in the
@@ -80,16 +80,15 @@ $</screen></para>
 end</programlisting></para>
 
     <para>Now we can chain both named scopes to output all cheap products that
-    are in stock:<screen>$ rails console
+    are in stock:<screen>$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; Product.cheap.count
+&gt;&gt; <command>Product.cheap.count</command>
    (0.1ms)  SELECT COUNT(*) FROM "products" WHERE ("products"."price" BETWEEN 0 AND 1)
 =&gt; 3
-&gt;&gt; Product.cheap.available.count
+&gt;&gt; <command>Product.cheap.available.count</command>
    (0.2ms)  SELECT COUNT(*) FROM "products" WHERE "products"."in_stock" = 't' AND ("products"."price" BETWEEN 0 AND 1)
 =&gt; 2
-&gt;&gt; exit
-&gt;&gt; exit
+&gt;&gt; <command>exit</command>
 $</screen></para>
   </section>
 
@@ -104,12 +103,12 @@ $</screen></para>
   scope :cheaper_than, -&gt;(price) { where("price &lt; ?", price) }
 end</programlisting></para>
 
-    <para>Now we can count all products that cost less than 50 cent:<screen>$ rails console
+    <para>Now we can count all products that cost less than 50 cent:<screen>$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; Product.cheaper_than(0.5).count
+&gt;&gt; <command>Product.cheaper_than(0.5).count</command>
    (0.2ms)  SELECT COUNT(*) FROM "products" WHERE (price &lt; 0.5)
 =&gt; 2
-&gt;&gt; exit
+&gt;&gt; <command>exit</command>
 $</screen></para>
   </section>
 
@@ -124,13 +123,13 @@ end</programlisting></para>
 
     <para>With this NamedScope we can not only find all products that are in
     stock, but also create new products that contain the value
-    <code>true</code> in the field <varname>in_stock</varname>:<screen>$ rails console
+    <code>true</code> in the field <varname>in_stock</varname>:<screen>$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; product = Product.available.build
+&gt;&gt; <command>product = Product.available.build</command>
 =&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: true, expiration_date: nil, created_at: nil, updated_at: nil&gt;
-&gt;&gt; product.in_stock
+&gt;&gt; <command>product.in_stock</command>
 =&gt; true
-&gt;&gt; exit
+&gt;&gt; <command>exit</command>
 $ </screen></para>
 
     <para>This works with the method <methodname>build</methodname> (see <xref
