@@ -14,14 +14,14 @@
   quite easy to confuse these two terms, but they are different and after a
   while you get used to it.</para>
 
-  <para>As an example, we use the following Rails application:<screen>$ rails new bookshelf
+  <para>As an example, we use the following Rails application:<screen>$ <command>rails new bookshelf</command>
   [...]
-$ cd bookshelf
-$ rails generate model book title
+$ <command>cd bookshelf</command>
+$ <command>rails generate model book title</command>
   [...]
-$ rails generate model author book_id:integer first_name last_name
+$ <command>rails generate model author book_id:integer first_name last_name</command>
   [...]
-$ rake db:migrate
+$ <command>rake db:migrate</command>
   [...]
 $</screen></para>
 
@@ -51,29 +51,29 @@ end</programlisting></para>
     it's better to use <methodname>destroy</methodname> because then the Rails
     system does more for you.</para>
 
-    <para>Let's create a record and then destroy it again:<screen>$ rails console
+    <para>Let's create a record and then destroy it again:<screen>$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; book = Book.create(title: 'Homo faber')
+&gt;&gt; <command>book = Book.create(title: 'Homo faber')</command>
    (0.1ms)  begin transaction
   SQL (2.2ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:30:24 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 16 Jul 2013 13:30:24 UTC +00:00]]
    (2.2ms)  commit transaction
 =&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2013-07-16 13:30:24", updated_at: "2013-07-16 13:30:24"&gt;
-&gt;&gt; Book.count
+&gt;&gt; <command>Book.count</command>
    (0.3ms)  SELECT COUNT(*) FROM "books"
 =&gt; 1
-&gt;&gt; book.destroy
+&gt;&gt; <command>book.destroy</command>
    (0.2ms)  begin transaction
   Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = ?  [["book_id", 1]]
   SQL (0.3ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 1]]
    (0.6ms)  commit transaction
 =&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2013-07-16 13:30:24", updated_at: "2013-07-16 13:30:24"&gt;
-&gt;&gt; Book.count
+&gt;&gt; <command>Book.count</command>
    (0.4ms)  SELECT COUNT(*) FROM "books"
 =&gt; 0
 &gt;&gt;</screen></para>
 
     <para>As we are using the option <code>dependent: :destroy</code> in the
-    Book model, we can also automatically remove all authors:<screen>&gt;&gt; Book.create(title: 'Homo faber').authors.create(first_name: 'Max', last_name: 'Frisch')
+    Book model, we can also automatically remove all authors:<screen>&gt;&gt; <command>Book.create(title: 'Homo faber').authors.create(first_name: 'Max', last_name: 'Frisch')</command>
    (0.1ms)  begin transaction
   SQL (0.6ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:31:11 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 16 Jul 2013 13:31:11 UTC +00:00]]
    (1.9ms)  commit transaction
@@ -81,10 +81,10 @@ Loading development environment (Rails 4.0.0)
   SQL (0.5ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 2], ["created_at", Tue, 16 Jul 2013 13:31:11 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Tue, 16 Jul 2013 13:31:11 UTC +00:00]]
    (1.0ms)  commit transaction
 =&gt; #&lt;Author id: 1, book_id: 2, first_name: "Max", last_name: "Frisch", created_at: "2013-07-16 13:31:11", updated_at: "2013-07-16 13:31:11"&gt;
-&gt;&gt; Author.count
+&gt;&gt; <command>Author.count</command>
    (0.4ms)  SELECT COUNT(*) FROM "authors"
 =&gt; 1
-&gt;&gt; Book.first.destroy
+&gt;&gt; <command>Book.first.destroy</command>
   Book Load (0.3ms)  SELECT "books".* FROM "books" ORDER BY "books"."id" ASC LIMIT 1
    (0.1ms)  begin transaction
   Author Load (0.1ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = ?  [["book_id", 2]]
@@ -92,7 +92,7 @@ Loading development environment (Rails 4.0.0)
   SQL (0.1ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 2]]
    (2.1ms)  commit transaction
 =&gt; #&lt;Book id: 2, title: "Homo faber", created_at: "2013-07-16 13:31:11", updated_at: "2013-07-16 13:31:11"&gt;
-&gt;&gt; Author.count
+&gt;&gt; <command>Author.count</command>
    (0.4ms)  SELECT COUNT(*) FROM "authors"
 =&gt; 0
 &gt;&gt;</screen></para>
@@ -105,35 +105,35 @@ Loading development environment (Rails 4.0.0)
     can no longer be modified there. It is read-only. To check, you can use
     the method <indexterm>
         <primary>frozen?()</primary>
-      </indexterm><methodname>frozen?</methodname>:<screen>&gt;&gt; book = Book.create(title: 'Homo faber')
+      </indexterm><methodname>frozen?</methodname>:<screen>&gt;&gt; <command>book = Book.create(title: 'Homo faber')</command>
    (0.1ms)  begin transaction
   SQL (0.6ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:32:30 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 16 Jul 2013 13:32:30 UTC +00:00]]
    (2.0ms)  commit transaction
 =&gt; #&lt;Book id: 3, title: "Homo faber", created_at: "2013-07-16 13:32:30", updated_at: "2013-07-16 13:32:30"&gt;
-&gt;&gt; book.destroy
+&gt;&gt; <command>book.destroy</command>
    (0.1ms)  begin transaction
   Author Load (0.2ms)  SELECT "authors".* FROM "authors" WHERE "authors"."book_id" = ?  [["book_id", 3]]
   SQL (0.4ms)  DELETE FROM "books" WHERE "books"."id" = ?  [["id", 3]]
    (1.9ms)  commit transaction
 =&gt; #&lt;Book id: 3, title: "Homo faber", created_at: "2013-07-16 13:32:30", updated_at: "2013-07-16 13:32:30"&gt;
-&gt;&gt; Book.count
+&gt;&gt; <command>Book.count</command>
    (0.2ms)  SELECT COUNT(*) FROM "books"
 =&gt; 0
-&gt;&gt; book
+&gt;&gt; <command>book</command>
 =&gt; #&lt;Book id: 3, title: "Homo faber", created_at: "2013-07-16 13:32:30", updated_at: "2013-07-16 13:32:30"&gt;
-&gt;&gt; book.frozen?
+&gt;&gt; <command>book.frozen?</command>
 =&gt; true
 &gt;&gt; </screen></para>
 
     <para>The record has been removed from the database, but the object with
     all its data is still present in the running Ruby program. So could we
     then revive the entire record? The answer is yes, but it will then be a
-    new record:<screen>&gt;&gt; Book.create(title: book.title)
+    new record:<screen>&gt;&gt; <command>Book.create(title: book.title)</command>
    (0.1ms)  begin transaction
   SQL (0.5ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:33:31 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 16 Jul 2013 13:33:31 UTC +00:00]]
    (1.7ms)  commit transaction
 =&gt; #&lt;Book id: 4, title: "Homo faber", created_at: "2013-07-16 13:33:31", updated_at: "2013-07-16 13:33:31"&gt;
-&gt;&gt; exit
+&gt;&gt; <command>exit</command>
 $</screen></para>
   </section>
 
@@ -155,11 +155,11 @@ $</screen></para>
     row in the database and nothing else.</para>
 
     <para>Let's create a book with one author and then remove the book with
-    <methodname>delete</methodname>:<screen>$ rake db:reset
+    <methodname>delete</methodname>:<screen>$ <command>rake db:reset</command>
   [...]
-$ rails console
+$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; Book.create(title: 'Homo faber').authors.create(first_name: 'Max', last_name: 'Frisch')
+&gt;&gt; <command>Book.create(title: 'Homo faber').authors.create(first_name: 'Max', last_name: 'Frisch')</command>
    (0.1ms)  begin transaction
   SQL (2.2ms)  INSERT INTO "books" ("created_at", "title", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:35:49 UTC +00:00], ["title", "Homo faber"], ["updated_at", Tue, 16 Jul 2013 13:35:49 UTC +00:00]]
    (2.5ms)  commit transaction
@@ -167,20 +167,20 @@ Loading development environment (Rails 4.0.0)
   SQL (0.4ms)  INSERT INTO "authors" ("book_id", "created_at", "first_name", "last_name", "updated_at") VALUES (?, ?, ?, ?, ?)  [["book_id", 1], ["created_at", Tue, 16 Jul 2013 13:35:49 UTC +00:00], ["first_name", "Max"], ["last_name", "Frisch"], ["updated_at", Tue, 16 Jul 2013 13:35:49 UTC +00:00]]
    (0.9ms)  commit transaction
 =&gt; #&lt;Author id: 1, book_id: 1, first_name: "Max", last_name: "Frisch", created_at: "2013-07-16 13:35:49", updated_at: "2013-07-16 13:35:49"&gt;
-&gt;&gt; Author.count
+&gt;&gt; <command>Author.count</command>
    (0.3ms)  SELECT COUNT(*) FROM "authors"
 =&gt; 1
-&gt;&gt; Book.last.delete
+&gt;&gt; <command>Book.last.delete</command>
   Book Load (0.2ms)  SELECT "books".* FROM "books" ORDER BY "books"."id" DESC LIMIT 1
   SQL (2.9ms)  DELETE FROM "books" WHERE "books"."id" = 1
 =&gt; #&lt;Book id: 1, title: "Homo faber", created_at: "2013-07-16 13:35:49", updated_at: "2013-07-16 13:35:49"&gt;
-&gt;&gt; Author.count
+&gt;&gt; <command>Author.count</command>
    (0.4ms)  SELECT COUNT(*) FROM "authors"
 =&gt; 1
-&gt;&gt; Book.count
+&gt;&gt; <command>Book.count</command>
    (0.4ms)  SELECT COUNT(*) FROM "books"
 =&gt; 0
-&gt;&gt; exit
+&gt;&gt; <command>exit</command>
 $</screen></para>
 
     <para>The record of the book 'Homo faber' is deleted, but the author is
