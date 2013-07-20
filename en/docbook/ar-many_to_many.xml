@@ -44,23 +44,23 @@
   <section xml:id="many_to_many_vorbereitung">
     <title>Preparation</title>
 
-    <para>Create the shop application:<screen>$ rails new shop
+    <para>Create the shop application:<screen>$ <command>rails new shop</command>
   [...]
-$ cd shop</screen></para>
+$ <command>cd shop</command></screen></para>
 
-    <para>A model for products:<screen>$ rails generate model product name 'price:decimal{7,2}'
-  [...]
-$</screen></para>
-
-    <para>A model for an order:<screen>$ rails generate model order delivery_address
+    <para>A model for products:<screen>$ <command>rails generate model product name 'price:decimal{7,2}'</command>
   [...]
 $</screen></para>
 
-    <para>And a model for individual items of an order:<screen>$ rails generate model line_item order_id:integer product_id:integer quantity:integer
+    <para>A model for an order:<screen>$ <command>rails generate model order delivery_address</command>
+  [...]
+$</screen></para>
+
+    <para>And a model for individual items of an order:<screen>$ <command>rails generate model line_item order_id:integer product_id:integer quantity:integer</command>
   [...]
 $ </screen></para>
 
-    <para>Then, create the database:<screen>$ rake db:migrate
+    <para>Then, create the database:<screen>$ <command>rake db:migrate</command>
   [...]
 $</screen></para>
   </section>
@@ -106,19 +106,19 @@ end</programlisting></para>
     linkend="activerecord_has_many"/>.</para>
 
     <para>First we populate our product database with the following
-    values:<screen>$ rails console
+    values:<screen>$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; milk = Product.create(name: 'Milk (1 liter)', price: 0.45)
+&gt;&gt; <command>milk = Product.create(name: 'Milk (1 liter)', price: 0.45)</command>
    (0.1ms)  begin transaction
   SQL (2.2ms)  INSERT INTO "products" ("created_at", "name", "price", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Tue, 16 Jul 2013 12:30:29 UTC +00:00], ["name", "Milk (1 liter)"], ["price", #&lt;BigDecimal:7fb985120d18,'0.45E0',9(45)&gt;], ["updated_at", Tue, 16 Jul 2013 12:30:29 UTC +00:00]]
    (2.5ms)  commit transaction
 =&gt; #&lt;Product id: 1, name: "Milk (1 liter)", price: #&lt;BigDecimal:7fb985120d18,'0.45E0',9(45)&gt;, created_at: "2013-07-16 12:30:29", updated_at: "2013-07-16 12:30:29"&gt;
-&gt;&gt; butter = Product.create(name: 'Butter (250 gr)', price: 0.75)
+&gt;&gt; <command>butter = Product.create(name: 'Butter (250 gr)', price: 0.75)</command>
    (0.1ms)  begin transaction
   SQL (0.9ms)  INSERT INTO "products" ("created_at", "name", "price", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Tue, 16 Jul 2013 12:30:36 UTC +00:00], ["name", "Butter (250 gr)"], ["price", #&lt;BigDecimal:7fb98281fe28,'0.75E0',9(45)&gt;], ["updated_at", Tue, 16 Jul 2013 12:30:36 UTC +00:00]]
    (2.3ms)  commit transaction
 =&gt; #&lt;Product id: 2, name: "Butter (250 gr)", price: #&lt;BigDecimal:7fb98281fe28,'0.75E0',9(45)&gt;, created_at: "2013-07-16 12:30:36", updated_at: "2013-07-16 12:30:36"&gt;
-&gt;&gt; flour = Product.create(name: 'Flour (1 kg)', price: 0.45)
+&gt;&gt; <command>flour = Product.create(name: 'Flour (1 kg)', price: 0.45)</command>
    (0.1ms)  begin transaction
   SQL (0.5ms)  INSERT INTO "products" ("created_at", "name", "price", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Tue, 16 Jul 2013 12:30:43 UTC +00:00], ["name", "Flour (1 kg)"], ["price", #&lt;BigDecimal:7fb98520b9f8,'0.45E0',9(45)&gt;], ["updated_at", Tue, 16 Jul 2013 12:30:43 UTC +00:00]]
    (2.0ms)  commit transaction
@@ -126,36 +126,36 @@ Loading development environment (Rails 4.0.0)
 &gt;&gt;  </screen></para>
 
     <para>Now we create a new <classname>Order</classname> object with the
-    name <varname>order</varname>:<screen>&gt;&gt; order = Order.new(delivery_address: '123 Acme Street, ACME STATE 12345')
+    name <varname>order</varname>:<screen>&gt;&gt; <command>order = Order.new(delivery_address: '123 Acme Street, ACME STATE 12345')</command>
 =&gt; #&lt;Order id: nil, delivery_address: "123 Acme Street, ACME STATE 12345", created_at: nil, updated_at: nil&gt;
 &gt;&gt; </screen></para>
 
-    <para>Logically, this new order does not yet contain any products:<screen>&gt;&gt; order.products.count
+    <para>Logically, this new order does not yet contain any products:<screen>&gt;&gt; <command>order.products.count</command>
 =&gt; 0
 &gt;&gt;</screen></para>
 
     <para>As often, there are several ways of adding products to the order.
     The simplest way: as the products are integrated as array, you can simply
-    insert them as elements of an array:<screen>&gt;&gt; order.products &lt;&lt; milk
+    insert them as elements of an array:<screen>&gt;&gt; <command>order.products &lt;&lt; milk</command>
 =&gt; #&lt;ActiveRecord::Associations::CollectionProxy [#&lt;Product id: 1, name: "Milk (1 liter)", price: #&lt;BigDecimal:7fb985120d18,'0.45E0',9(45)&gt;, created_at: "2013-07-16 12:30:29", updated_at: "2013-07-16 12:30:29"&gt;]&gt;
 &gt;&gt;</screen></para>
 
     <para>But if the customer wants to buy three liters of milk instead of one
     liter, we need to enter it in the <classname>LineItem</classname> (in the
     linking element) table. ActiveRecord already build an object for
-    us:<screen>&gt;&gt; order.line_items
+    us:<screen>&gt;&gt; <command>order.line_items</command>
 =&gt; #&lt;ActiveRecord::Associations::CollectionProxy [#&lt;LineItem id: nil, order_id: nil, product_id: 1, quantity: nil, created_at: nil, updated_at: nil&gt;]&gt;
 &gt;&gt;</screen></para>
 
     <para>But the object is not yet saved in the database. After we do this
     via <methodname>save</methodname>, we can change the quantity in the
-    <classname>LineItem</classname> object:<screen>&gt;&gt; order.save
+    <classname>LineItem</classname> object:<screen>&gt;&gt; <command>order.save</command>
    (0.1ms)  begin transaction
   SQL (0.9ms)  INSERT INTO "orders" ("created_at", "delivery_address", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 12:34:08 UTC +00:00], ["delivery_address", "123 Acme Street, ACME STATE 12345"], ["updated_at", Tue, 16 Jul 2013 12:34:08 UTC +00:00]]
   SQL (0.3ms)  INSERT INTO "line_items" ("created_at", "order_id", "product_id", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Tue, 16 Jul 2013 12:34:08 UTC +00:00], ["order_id", 1], ["product_id", 1], ["updated_at", Tue, 16 Jul 2013 12:34:08 UTC +00:00]]
    (2.6ms)  commit transaction
 =&gt; true
-&gt;&gt; order.line_items.first.update_attributes(quantity: 3)
+&gt;&gt; <command>order.line_items.first.update_attributes(quantity: 3)</command>
    (0.2ms)  begin transaction
   SQL (1.0ms)  UPDATE "line_items" SET "quantity" = ?, "updated_at" = ? WHERE "line_items"."id" = 1  [["quantity", 3], ["updated_at", Tue, 16 Jul 2013 12:34:49 UTC +00:00]]
    (3.0ms)  commit transaction
@@ -163,7 +163,7 @@ Loading development environment (Rails 4.0.0)
 &gt;&gt;</screen></para>
 
     <para>Alternatively, we can also buy butter twice directly by adding a
-    <classname>LineItem</classname>:<screen>&gt;&gt; order.line_items.create(product_id: butter.id, quantity: 2)
+    <classname>LineItem</classname>:<screen>&gt;&gt; <command>order.line_items.create(product_id: butter.id, quantity: 2)</command>
    (0.1ms)  begin transaction
   SQL (0.6ms)  INSERT INTO "line_items" ("created_at", "order_id", "product_id", "quantity", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Tue, 16 Jul 2013 12:35:38 UTC +00:00], ["order_id", 1], ["product_id", 2], ["quantity", 2], ["updated_at", Tue, 16 Jul 2013 12:35:38 UTC +00:00]]
    (2.3ms)  commit transaction
@@ -173,33 +173,33 @@ Loading development environment (Rails 4.0.0)
     <warning>
       <para>When creating a line_item we bypass the has_many: ... :through ..
       logic. The database table contains all the correct information but order
-      hasn't been updated: <screen>&gt;&gt; order.products
+      hasn't been updated: <screen>&gt;&gt; <command>order.products</command>
 =&gt; #&lt;ActiveRecord::Associations::CollectionProxy [#&lt;Product id: 1, name: "Milk (1 liter)", price: #&lt;BigDecimal:7fb985120d18,'0.45E0',9(45)&gt;, created_at: "2013-07-16 12:30:29", updated_at: "2013-07-16 12:30:29"&gt;]&gt;
 &gt;&gt;</screen></para>
 
-      <para>But in the database table, it is of course correct:<screen>&gt;&gt; Order.first.products
+      <para>But in the database table, it is of course correct:<screen>&gt;&gt; <command>Order.first.products</command>
   Order Load (0.3ms)  SELECT "orders".* FROM "orders" ORDER BY "orders"."id" ASC LIMIT 1
   Product Load (0.2ms)  SELECT "products".* FROM "products" INNER JOIN "line_items" ON "products"."id" = "line_items"."product_id" WHERE "line_items"."order_id" = ?  [["order_id", 1]]
 =&gt; #&lt;ActiveRecord::Associations::CollectionProxy [#&lt;Product id: 1, name: "Milk (1 liter)", price: #&lt;BigDecimal:7fb985148ac0,'0.45E0',9(45)&gt;, created_at: "2013-07-16 12:30:29", updated_at: "2013-07-16 12:30:29"&gt;, #&lt;Product id: 2, name: "Butter (250 gr)", price: #&lt;BigDecimal:7fb985153c90,'0.75E0',9(45)&gt;, created_at: "2013-07-16 12:30:36", updated_at: "2013-07-16 12:30:36"&gt;]&gt;
 &gt;&gt; </screen></para>
 
       <para>In this specific case, you would need to reload the object from
-      the database via the method <methodname>reload</methodname>:<screen>&gt;&gt; order.reload
+      the database via the method <methodname>reload</methodname>:<screen>&gt;&gt; <command>order.reload</command>
   Order Load (0.4ms)  SELECT "orders".* FROM "orders" WHERE "orders"."id" = ? LIMIT 1  [["id", 1]]
 =&gt; #&lt;Order id: 1, delivery_address: "123 Acme Street, ACME STATE 12345", created_at: "2013-07-16 12:34:08", updated_at: "2013-07-16 12:34:08"&gt;
-&gt;&gt; order.products
+&gt;&gt; <command>order.products</command>
   Product Load (0.3ms)  SELECT "products".* FROM "products" INNER JOIN "line_items" ON "products"."id" = "line_items"."product_id" WHERE "line_items"."order_id" = ?  [["order_id", 1]]
 =&gt; #&lt;ActiveRecord::Associations::CollectionProxy [#&lt;Product id: 1, name: "Milk (1 liter)", price: #&lt;BigDecimal:7fb98516a2d8,'0.45E0',9(45)&gt;, created_at: "2013-07-16 12:30:29", updated_at: "2013-07-16 12:30:29"&gt;, #&lt;Product id: 2, name: "Butter (250 gr)", price: #&lt;BigDecimal:7fb985169540,'0.75E0',9(45)&gt;, created_at: "2013-07-16 12:30:36", updated_at: "2013-07-16 12:30:36"&gt;]&gt;
 &gt;&gt; </screen></para>
     </warning>
 
     <para>Let's enter a second order with all available products into the
-    system:<screen>&gt;&gt; order2 = Order.create(delivery_address: '2, Test Road')
+    system:<screen>&gt;&gt; <command>order2 = Order.create(delivery_address: '2, Test Road')</command>
    (0.1ms)  begin transaction
   SQL (0.6ms)  INSERT INTO "orders" ("created_at", "delivery_address", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 12:39:27 UTC +00:00], ["delivery_address", "2, Test Road"], ["updated_at", Tue, 16 Jul 2013 12:39:27 UTC +00:00]]
    (2.7ms)  commit transaction
 =&gt; #&lt;Order id: 2, delivery_address: "2, Test Road", created_at: "2013-07-16 12:39:27", updated_at: "2013-07-16 12:39:27"&gt;
-&gt;&gt; order2.products &lt;&lt; Product.all
+&gt;&gt; <command>order2.products &lt;&lt; Product.all</command>
   Product Load (0.3ms)  SELECT "products".* FROM "products"
    (0.1ms)  begin transaction
   SQL (0.5ms)  INSERT INTO "line_items" ("created_at", "order_id", "product_id", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Tue, 16 Jul 2013 12:39:33 UTC +00:00], ["order_id", 2], ["product_id", 1], ["updated_at", Tue, 16 Jul 2013 12:39:33 UTC +00:00]]
@@ -208,7 +208,7 @@ Loading development environment (Rails 4.0.0)
    (2.6ms)  commit transaction
   Product Load (0.1ms)  SELECT "products".* FROM "products" INNER JOIN "line_items" ON "products"."id" = "line_items"."product_id" WHERE "line_items"."order_id" = ?  [["order_id", 2]]
 =&gt; #&lt;ActiveRecord::Associations::CollectionProxy [#&lt;Product id: 1, name: "Milk (1 liter)", price: #&lt;BigDecimal:7fb9851c32c0,'0.45E0',9(45)&gt;, created_at: "2013-07-16 12:30:29", updated_at: "2013-07-16 12:30:29"&gt;, #&lt;Product id: 2, name: "Butter (250 gr)", price: #&lt;BigDecimal:7fb9851c1538,'0.75E0',9(45)&gt;, created_at: "2013-07-16 12:30:36", updated_at: "2013-07-16 12:30:36"&gt;, #&lt;Product id: 3, name: "Flour (1 kg)", price: #&lt;BigDecimal:7fb9851cafe8,'0.45E0',9(45)&gt;, created_at: "2013-07-16 12:30:43", updated_at: "2013-07-16 12:30:43"&gt;]&gt;
-&gt;&gt; order2.save
+&gt;&gt; <command>order2.save</command>
    (0.1ms)  begin transaction
    (0.1ms)  commit transaction
 =&gt; true
@@ -216,7 +216,7 @@ Loading development environment (Rails 4.0.0)
 
     <para>Now we can try out the oposite direction of this many-to-many
     association. Let's search for all orders that contain the first
-    product:<screen>&gt;&gt; Product.first.orders
+    product:<screen>&gt;&gt; <command>Product.first.orders</command>
   Product Load (0.3ms)  SELECT "products".* FROM "products" ORDER BY "products"."id" ASC LIMIT 1
   Order Load (0.2ms)  SELECT "orders".* FROM "orders" INNER JOIN "line_items" ON "orders"."id" = "line_items"."order_id" WHERE "line_items"."product_id" = ?  [["product_id", 1]]
 =&gt; #&lt;ActiveRecord::Associations::CollectionProxy [#&lt;Order id: 1, delivery_address: "123 Acme Street, ACME STATE 12345", created_at: "2013-07-16 12:34:08", updated_at: "2013-07-16 12:34:08"&gt;, #&lt;Order id: 2, delivery_address: "2, Test Road", created_at: "2013-07-16 12:39:27", updated_at: "2013-07-16 12:39:27"&gt;]&gt;
@@ -224,10 +224,10 @@ Loading development environment (Rails 4.0.0)
 
     <para>Of course, we can also work with a <methodname>joins</methodname>
     (see <xref linkend="activerecord_1n_joins"/>) and search for all orders
-    that contain the product "Milk (1 liter)":<screen>&gt;&gt; Order.joins(:products).where(:products =&gt; {name: 'Milk (1 liter)'})
+    that contain the product "Milk (1 liter)":<screen>&gt;&gt; <command>Order.joins(:products).where(:products =&gt; {name: 'Milk (1 liter)'})</command>
   Order Load (0.2ms)  SELECT "orders".* FROM "orders" INNER JOIN "line_items" ON "line_items"."order_id" = "orders"."id" INNER JOIN "products" ON "products"."id" = "line_items"."product_id" WHERE "products"."name" = 'Milk (1 liter)'
 =&gt; #&lt;ActiveRecord::Relation [#&lt;Order id: 1, delivery_address: "123 Acme Street, ACME STATE 12345", created_at: "2013-07-16 12:34:08", updated_at: "2013-07-16 12:34:08"&gt;, #&lt;Order id: 2, delivery_address: "2, Test Road", created_at: "2013-07-16 12:39:27", updated_at: "2013-07-16 12:39:27"&gt;]&gt;
-&gt;&gt; exit
+&gt;&gt; <command>exit</command>
 $</screen></para>
   </section>
 </section>

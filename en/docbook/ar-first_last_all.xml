@@ -36,17 +36,17 @@
   <para>In certain cases, you may need the first record, or the last one, or
   perhaps even all records. Conveniently, there is a ready-made method for
   each case. Let's start with the easiest ones: <methodname>first</methodname>
-  and <methodname>last</methodname>.<screen>$ rails console
+  and <methodname>last</methodname>.<screen>$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; Country.first
+&gt;&gt; <command>Country.first</command>
   Country Load (0.1ms)  SELECT "countries".* FROM "countries" ORDER BY "countries"."id" ASC LIMIT 1
 =&gt; #&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2013-07-15 18:03:20", updated_at: "2013-07-15 18:03:20"&gt;
-&gt;&gt; Country.last
+&gt;&gt; <command>Country.last</command>
   Country Load (0.3ms)  SELECT "countries".* FROM "countries" ORDER BY "countries"."id" DESC LIMIT 1
 =&gt; #&lt;Country id: 4, name: "Netherlands", population: nil, created_at: "2013-07-15 18:08:52", updated_at: "2013-07-15 18:08:52"&gt;
 &gt;&gt;</screen></para>
 
-  <para>And now all at once with <methodname>all</methodname>:<screen>&gt;&gt; Country.all
+  <para>And now all at once with <methodname>all</methodname>:<screen>&gt;&gt; <command>Country.all</command>
   Country Load (0.2ms)  SELECT "countries".* FROM "countries"
 =&gt; #&lt;ActiveRecord::Relation [#&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2013-07-15 18:03:20", updated_at: "2013-07-15 18:03:20"&gt;, #&lt;Country id: 2, name: "France", population: 65447374, created_at: "2013-07-15 18:07:03", updated_at: "2013-07-15 18:07:03"&gt;, #&lt;Country id: 3, name: "Belgium", population: 10839905, created_at: "2013-07-15 18:08:07", updated_at: "2013-07-15 18:08:07"&gt;, #&lt;Country id: 4, name: "Netherlands", population: nil, created_at: "2013-07-15 18:08:52", updated_at: "2013-07-15 18:08:52"&gt;]&gt;
 &gt;&gt;</screen></para>
@@ -56,16 +56,16 @@ Loading development environment (Rails 4.0.0)
   different. <methodname>first</methodname> and <methodname>last</methodname>
   return an object of the class <classname>Country</classname> and
   <methodname>all</methodname> of course returns an array of such
-  objects:<screen>&gt;&gt; Country.first.class
+  objects:<screen>&gt;&gt; <command>Country.first.class</command>
   Country Load (0.3ms)  SELECT "countries".* FROM "countries" ORDER BY "countries"."id" ASC LIMIT 1
 =&gt; Country(id: integer, name: string, population: integer, created_at: datetime, updated_at: datetime)
-&gt;&gt; Country.all.class
+&gt;&gt; <command>Country.all.class</command>
 =&gt; ActiveRecord::Relation::ActiveRecord_Relation_Country
 &gt;&gt;</screen></para>
 
   <para>So <code>Country.first</code> is a <classname>Country</classname>
   which makes sense. But <code>Country.all</code> is something we haven't had
-  yet. Let's use the console to get a better idea of it:<screen>&gt;&gt; puts Country.all.to_yaml
+  yet. Let's use the console to get a better idea of it:<screen>&gt;&gt; <command>puts Country.all.to_yaml</command>
   Country Load (0.4ms)  SELECT "countries".* FROM "countries"
 ---
 - !ruby/object:Country
@@ -105,7 +105,7 @@ Loading development environment (Rails 4.0.0)
   better for ActiveRecord to wait till the very last second which it does. It
   only requests the data from the SQL database when it has to do it. Until
   than it stores the request in a
-  <classname>ActiveRecord::Relation</classname>. </para>
+  <classname>ActiveRecord::Relation</classname>.</para>
 
   <para>The result of <code>Country.all</code> is actually an
   <classname>Array</classname> of <classname>Country</classname>.</para>
@@ -114,9 +114,9 @@ Loading development environment (Rails 4.0.0)
   should also be able to use iterators (see <xref linkend="iterator"/> and
   <xref linkend="array_iterator"/>), right? Yes, of course! That is the beauty
   of it. Here is a little experiment with
-  <methodname>each</methodname>:<screen>&gt;&gt; Country.all.each do |country|
-?&gt; puts country.name
-&gt;&gt; end
+  <methodname>each</methodname>:<screen>&gt;&gt; <command>Country.all.each do |country|</command>
+?&gt; <command>puts country.name</command>
+&gt;&gt; <command>end</command>
   Country Load (0.3ms)  SELECT "countries".* FROM "countries"
 Germany
 France
@@ -127,10 +127,10 @@ Netherlands
 
   <para>So can we also use <code>.all.first</code> as an alternative for
   <code>.first</code>? Yes, but it does not make much sense. Have a look for
-  yourself:<screen>&gt;&gt; Country.first
+  yourself:<screen>&gt;&gt; <command>Country.first</command>
   Country Load (0.3ms)  SELECT "countries".* FROM "countries" ORDER BY "countries"."id" ASC LIMIT 1
 =&gt; #&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2013-07-15 18:03:20", updated_at: "2013-07-15 18:03:20"&gt;
-&gt;&gt; Country.all.first
+&gt;&gt; <command>Country.all.first</command>
   Country Load (0.4ms)  SELECT "countries".* FROM "countries" ORDER BY "countries"."id" ASC LIMIT 1
 =&gt; #&lt;Country id: 1, name: "Germany", population: 81831000, created_at: "2013-07-15 18:03:20", updated_at: "2013-07-15 18:03:20"&gt;
 &gt;&gt; </screen></para>

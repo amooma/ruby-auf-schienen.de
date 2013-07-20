@@ -27,18 +27,18 @@
   (<classname>Car</classname>) and a model for bicycles
   (<classname>Bike</classname>). To describe a car or bike, we use a model to
   tag it (<classname>Tag</classname>). A car and a bike can have any number of
-  <methodname>tags</methodname>. The application:<screen>$ rails new example
+  <methodname>tags</methodname>. The application:<screen>$ <command>rails new example</command>
   [...]
-$ cd example 
+$ <command>cd example</command> 
 $</screen></para>
 
-  <para>Now the three required models:<screen>$ rails generate model Car name
+  <para>Now the three required models:<screen>$ <command>rails generate model Car name</command>
   [...]
-$ rails generate model Bike name
+$ <command>rails generate model Bike name</command>
   [...]
-$ rails generate model Tag name taggable:references{polymorphic}
+$ <command>rails generate model Tag name taggable:references{polymorphic}</command>
   [...]
-$ rake db:migrate
+$ <command>rake db:migrate</command>
   [...]
 $</screen></para>
 
@@ -87,14 +87,14 @@ end
   </tip>
 
   <para>Let's go into the <foreignphrase xml:lang="en">console</foreignphrase>
-  and create a car and a bike:<screen>$ rails console
+  and create a car and a bike:<screen>$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; beetle = Car.create(name: 'Beetle')
+&gt;&gt; <command>beetle = Car.create(name: 'Beetle')</command>
    (0.1ms)  begin transaction
   SQL (2.2ms)  INSERT INTO "cars" ("created_at", "name", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:04:50 UTC +00:00], ["name", "Beetle"], ["updated_at", Tue, 16 Jul 2013 13:04:50 UTC +00:00]]
    (0.9ms)  commit transaction
 =&gt; #&lt;Car id: 1, name: "Beetle", created_at: "2013-07-16 13:04:50", updated_at: "2013-07-16 13:04:50"&gt;
-&gt;&gt; mountainbike = Bike.create(name: 'Mountainbike')
+&gt;&gt; <command>mountainbike = Bike.create(name: 'Mountainbike')</command>
    (0.1ms)  begin transaction
   SQL (0.4ms)  INSERT INTO "bikes" ("created_at", "name", "updated_at") VALUES (?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:04:57 UTC +00:00], ["name", "Mountainbike"], ["updated_at", Tue, 16 Jul 2013 13:04:57 UTC +00:00]]
    (2.5ms)  commit transaction
@@ -102,12 +102,12 @@ Loading development environment (Rails 4.0.0)
 &gt;&gt;</screen></para>
 
   <para>Now we define for each a tag with the color of the corresponding
-  object:<screen>&gt;&gt; beetle.tags.create(name: 'blue')
+  object:<screen>&gt;&gt; <command>beetle.tags.create(name: 'blue')</command>
    (0.0ms)  begin transaction
   SQL (0.5ms)  INSERT INTO "tags" ("created_at", "name", "taggable_id", "taggable_type", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:05:19 UTC +00:00], ["name", "blue"], ["taggable_id", 1], ["taggable_type", "Car"], ["updated_at", Tue, 16 Jul 2013 13:05:19 UTC +00:00]]
    (3.0ms)  commit transaction
 =&gt; #&lt;Tag id: 1, name: "blue", taggable_id: 1, taggable_type: "Car", created_at: "2013-07-16 13:05:19", updated_at: "2013-07-16 13:05:19"&gt;
-&gt;&gt; mountainbike.tags.create(name: 'black')
+&gt;&gt; <command>mountainbike.tags.create(name: 'black')</command>
    (0.1ms)  begin transaction
   SQL (0.4ms)  INSERT INTO "tags" ("created_at", "name", "taggable_id", "taggable_type", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:05:27 UTC +00:00], ["name", "black"], ["taggable_id", 1], ["taggable_type", "Bike"], ["updated_at", Tue, 16 Jul 2013 13:05:27 UTC +00:00]]
    (2.3ms)  commit transaction
@@ -115,29 +115,29 @@ Loading development environment (Rails 4.0.0)
 &gt;&gt; </screen></para>
 
   <para>For the <varname>beetle</varname>, we add another
-  <classname>Tag</classname>:<screen>&gt;&gt; beetle.tags.create(name: 'Automatic')
+  <classname>Tag</classname>:<screen>&gt;&gt; <command>beetle.tags.create(name: 'Automatic')</command>
    (0.1ms)  begin transaction
   SQL (0.6ms)  INSERT INTO "tags" ("created_at", "name", "taggable_id", "taggable_type", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Tue, 16 Jul 2013 13:05:56 UTC +00:00], ["name", "Automatic"], ["taggable_id", 1], ["taggable_type", "Car"], ["updated_at", Tue, 16 Jul 2013 13:05:56 UTC +00:00]]
    (2.1ms)  commit transaction
 =&gt; #&lt;Tag id: 3, name: "Automatic", taggable_id: 1, taggable_type: "Car", created_at: "2013-07-16 13:05:56", updated_at: "2013-07-16 13:05:56"&gt;
 &gt;&gt;</screen></para>
 
-  <para>Let's have a look at all <classname>Tag</classname> items:<screen>&gt;&gt; Tag.all
+  <para>Let's have a look at all <classname>Tag</classname> items:<screen>&gt;&gt; <command>Tag.all</command>
   Tag Load (0.3ms)  SELECT "tags".* FROM "tags"
 =&gt; #&lt;ActiveRecord::Relation [#&lt;Tag id: 1, name: "blue", taggable_id: 1, taggable_type: "Car", created_at: "2013-07-16 13:05:19", updated_at: "2013-07-16 13:05:19"&gt;, #&lt;Tag id: 2, name: "black", taggable_id: 1, taggable_type: "Bike", created_at: "2013-07-16 13:05:27", updated_at: "2013-07-16 13:05:27"&gt;, #&lt;Tag id: 3, name: "Automatic", taggable_id: 1, taggable_type: "Car", created_at: "2013-07-16 13:05:56", updated_at: "2013-07-16 13:05:56"&gt;]&gt;
 &gt;&gt;</screen></para>
 
-  <para>And now all tags of the beetle:<screen>&gt;&gt; beetle.tags
+  <para>And now all tags of the beetle:<screen>&gt;&gt; <command>beetle.tags</command>
   Tag Load (0.4ms)  SELECT "tags".* FROM "tags" WHERE "tags"."taggable_id" = ? AND "tags"."taggable_type" = ?  [["taggable_id", 1], ["taggable_type", "Car"]]
 =&gt; #&lt;ActiveRecord::Associations::CollectionProxy [#&lt;Tag id: 1, name: "blue", taggable_id: 1, taggable_type: "Car", created_at: "2013-07-16 13:05:19", updated_at: "2013-07-16 13:05:19"&gt;, #&lt;Tag id: 3, name: "Automatic", taggable_id: 1, taggable_type: "Car", created_at: "2013-07-16 13:05:56", updated_at: "2013-07-16 13:05:56"&gt;]&gt;
 &gt;&gt;</screen></para>
 
   <para>Of course you can also check which object the last
-  <classname>Tag</classname> belongs to:<screen>&gt;&gt; Tag.last.taggable
+  <classname>Tag</classname> belongs to:<screen>&gt;&gt; <command>Tag.last.taggable</command>
   Tag Load (0.3ms)  SELECT "tags".* FROM "tags" ORDER BY "tags"."id" DESC LIMIT 1
   Car Load (0.2ms)  SELECT "cars".* FROM "cars" WHERE "cars"."id" = ? ORDER BY "cars"."id" ASC LIMIT 1  [["id", 1]]
 =&gt; #&lt;Car id: 1, name: "Beetle", created_at: "2013-07-16 13:04:50", updated_at: "2013-07-16 13:04:50"&gt;
-&gt;&gt; exit
+&gt;&gt; <command>exit</command>
 $</screen></para>
 
   <para>Polymorphic associations are always useful if you want to normalize
