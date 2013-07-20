@@ -24,12 +24,12 @@
     <title
     xml:id="activerecord_validation_vorbereitung.title">Preparation</title>
 
-    <para>Let's create a new application for this chapter:<screen>$ rails new shop
+    <para>Let's create a new application for this chapter:<screen>$ <command>rails new shop</command>
   [...]
-$ cd shop
-$ rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date
+$ <command>cd shop</command>
+$ <command>rails generate model product name 'price:decimal{7,2}' weight:integer in_stock:boolean expiration_date:date</command>
   [...]
-$ rake db:migrate
+$ <command>rake db:migrate</command>
   [...]
 $</screen></para>
   </section>
@@ -43,14 +43,14 @@ $</screen></para>
     advantage: Every programmer knows where to find it.</para>
 
     <para>Without any validation, we can create an empty record in a model
-    without a problem:<screen>$ rails console
+    without a problem:<screen>$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; Product.create
+&gt;&gt; <command>Product.create</command>
    (0.1ms)  begin transaction
   SQL (2.6ms)  INSERT INTO "products" ("created_at", "updated_at") VALUES (?, ?)  [["created_at", Tue, 16 Jul 2013 17:50:34 UTC +00:00], ["updated_at", Tue, 16 Jul 2013 17:50:34 UTC +00:00]]
    (3.4ms)  commit transaction
 =&gt; #&lt;Product id: 1, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: "2013-07-16 17:50:34", updated_at: "2013-07-16 17:50:34"&gt;
-&gt;&gt; puts Product.first.to_yaml
+&gt;&gt; <command>puts Product.first.to_yaml</command>
   Product Load (0.3ms)  SELECT "products".* FROM "products" ORDER BY "products"."id" ASC LIMIT 1
 --- !ruby/object:Product
 attributes:
@@ -63,7 +63,7 @@ attributes:
   created_at: 2013-07-16 17:50:34.791368000 Z
   updated_at: 2013-07-16 17:50:34.791368000 Z
 =&gt; nil
-&gt;&gt; exit
+&gt;&gt; <command>exit</command>
 $</screen></para>
 
     <para>But in practice, this record with no content doesn't make any sense.
@@ -83,9 +83,9 @@ $</screen></para>
             presence: true
 end</programlisting></para>
 
-    <para>Now we try again to create an empty record in the console:<screen>$ rails console
+    <para>Now we try again to create an empty record in the console:<screen>$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; product = Product.create
+&gt;&gt; <command>product = Product.create</command>
    (0.1ms)  begin transaction
    (0.1ms)  rollback transaction
 =&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;
@@ -101,9 +101,9 @@ Loading development environment (Rails 4.0.0)
     <para>Can we access the errors? Yes, via the method
     <methodname>errors</methodname> or with
     <methodname>errors.messages</methodname> we can look at the errors that
-    occurred:<screen>&gt;&gt; product.errors
+    occurred:<screen>&gt;&gt; <command>product.errors</command>
 =&gt; #&lt;ActiveModel::Errors:0x007fec75067a20 @base=#&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;, @messages={:name=&gt;["can't be blank"], :price=&gt;["can't be blank"]}&gt;
-&gt;&gt; product.errors.messages
+&gt;&gt; <command>product.errors.messages</command>
 =&gt; {:name=&gt;["can't be blank"], :price=&gt;["can't be blank"]}
 &gt;&gt; </screen></para>
 
@@ -113,11 +113,11 @@ Loading development environment (Rails 4.0.0)
 
     <para>Only once we assign a value to the attributes
     <varname>name</varname> and <methodname>price</methodname>, we can save
-    the object:<screen>&gt;&gt; product.name = 'Milk (1 liter)'
+    the object:<screen>&gt;&gt; <command>product.name = 'Milk (1 liter)'</command>
 =&gt; "Milk (1 liter)"
-&gt;&gt; product.price = 0.45
+&gt;&gt; <command>product.price = 0.45</command>
 =&gt; 0.45
-&gt;&gt; product.save
+&gt;&gt; <command>product.save</command>
    (0.2ms)  begin transaction
   SQL (2.9ms)  INSERT INTO "products" ("created_at", "name", "price", "updated_at") VALUES (?, ?, ?, ?)  [["created_at", Tue, 16 Jul 2013 17:52:50 UTC +00:00], ["name", "Milk (1 liter)"], ["price", #&lt;BigDecimal:7fec739394c0,'0.45E0',9(45)&gt;], ["updated_at", Tue, 16 Jul 2013 17:52:50 UTC +00:00]]
    (2.9ms)  commit transaction
@@ -137,9 +137,9 @@ Loading development environment (Rails 4.0.0)
 
       <para>The method <methodname>valid?</methodname> indicates in boolean
       form if an object is valid. So you can check the validity already before
-      you save:<screen>&gt;&gt; product = Product.new
+      you save:<screen>&gt;&gt; <command>product = Product.new</command>
 =&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;
-&gt;&gt; product.valid?
+&gt;&gt; <command>product.valid?</command>
 =&gt; false
 &gt;&gt;</screen></para>
     </section>
@@ -159,20 +159,20 @@ Loading development environment (Rails 4.0.0)
       <para>As so often in life, you can find a way around everything. If you
       pass the parameter <code>:validate =&gt; false</code> to the method
       <methodname>save</methodname>, the data of <code>Validation</code> is
-      saved:<screen>&gt;&gt; product = Product.new
+      saved:<screen>&gt;&gt; <command>product = Product.new</command>
 =&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;
-&gt;&gt; product.valid?
+&gt;&gt; <command>product.valid?</command>
 =&gt; false
-&gt;&gt; product.save
+&gt;&gt; <command>product.save</command>
    (0.1ms)  begin transaction
    (0.1ms)  rollback transaction
 =&gt; false
-&gt;&gt; product.save(validate: false)
+&gt;&gt; <command>product.save(validate: false)</command>
    (0.1ms)  begin transaction
   SQL (0.8ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Mon, 19 Nov 2012 09:28:29 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", nil], ["price", nil], ["updated_at", Mon, 19 Nov 2012 09:28:29 UTC +00:00], ["weight", nil]]
    (2.3ms)  commit transaction
 =&gt; true
-&gt;&gt; exit
+&gt;&gt; <command>exit</command>
 $ </screen></para>
 
       <warning>
@@ -216,27 +216,27 @@ end
 </programlisting></para>
 
     <para>If we try to create an empty user record with this, we get lots of
-    validation errors:<screen>$ rails console
+    validation errors:<screen>$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; product = Product.create
+&gt;&gt; <command>product = Product.create</command>
    (0.1ms)  begin transaction
    (0.1ms)  rollback transaction
 =&gt; #&lt;Product id: nil, name: nil, price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;
-&gt;&gt; product.errors.messages
+&gt;&gt; <command>product.errors.messages</command>
 =&gt; {:name=&gt;["can't be blank"], :price=&gt;["can't be blank"]}
 &gt;&gt;</screen></para>
 
     <para>Only once we have entered all the data, the record can be
-    saved:<screen>&gt;&gt; product.name = 'Milk (1 liter)'
+    saved:<screen>&gt;&gt; <command>product.name = 'Milk (1 liter)'</command>
 =&gt; "Milk (1 liter)"
-&gt;&gt; product.price = 0.45
+&gt;&gt; <command>product.price = 0.45</command>
 =&gt; 0.45
-&gt;&gt; product.save
+&gt;&gt; <command>product.save</command>
    (0.2ms)  begin transaction
   SQL (6.3ms)  INSERT INTO "products" ("created_at", "expiration_date", "in_stock", "name", "price", "updated_at", "weight") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", Mon, 19 Nov 2012 09:30:21 UTC +00:00], ["expiration_date", nil], ["in_stock", nil], ["name", "Milk (1 liter)"], ["price", #&lt;BigDecimal:7fc7044fad08,'0.45E0',9(45)&gt;], ["updated_at", Mon, 19 Nov 2012 09:30:21 UTC +00:00], ["weight", nil]]
    (2.5ms)  commit transaction
 =&gt; true
-&gt;&gt; exit
+&gt;&gt; <command>exit</command>
 $</screen></para>
   </section>
 
@@ -275,15 +275,15 @@ end
 
     <para>If we now try to save a <classname>Product</classname> with a
     <methodname>name</methodname> that consists in one letter, we get an error
-    message:<screen>$ rails console
+    message:<screen>$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; product = Product.create(:name =&gt; 'M', :price =&gt; 0.45)
+&gt;&gt; <command>product = Product.create(:name =&gt; 'M', :price =&gt; 0.45)</command>
    (0.1ms)  begin transaction
    (0.1ms)  rollback transaction
 =&gt; #&lt;Product id: nil, name: "M", price: #&lt;BigDecimal:7f9f3d0943c0,'0.45E0',9(45)&gt;, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;
-&gt;&gt; product.errors.messages
+&gt;&gt; <command>product.errors.messages</command>
 =&gt; {:name=&gt;["is too short (minimum is 2 characters)"]}
-&gt;&gt; exit
+&gt;&gt; <command>exit</command>
 $</screen></para>
 
     <section xml:id="validates_length_of_optionen">
@@ -411,15 +411,15 @@ end
 
     <para>If we now use a <varname>weight</varname> that consists of letters
     or contains letters instead of numbers, we will get an error
-    message:<screen>$ rails console
+    message:<screen>$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; product = Product.create(name: 'Milk (1 liter)', price: 0.45, weight: 'abc') 
+&gt;&gt; <command>product = Product.create(name: 'Milk (1 liter)', price: 0.45, weight: 'abc')</command> 
    (0.1ms)  begin transaction
    (0.1ms)  rollback transaction
 =&gt; #&lt;Product id: nil, name: "Milk (1 liter)", price: #&lt;BigDecimal:7ff4a4380b30,'0.45E0',9(45)&gt;, weight: 0, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;
-&gt;&gt; product.errors.messages
+&gt;&gt; <command>product.errors.messages</command>
 =&gt; {:weight=&gt;["is not a number"]}
-&gt;&gt; exit
+&gt;&gt; <command>exit</command>
 $ </screen></para>
 
     <tip>
@@ -541,19 +541,19 @@ end
 
     <para>If we now try to create a new <classname>Product</classname> with a
     <methodname>name</methodname> that already exists, then we get an error
-    message:<screen>$ rails console
+    message:<screen>$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; Product.last
+&gt;&gt; <command>Product.last</command>
   Product Load (1.9ms)  SELECT "products".* FROM "products" ORDER BY "products"."id" DESC LIMIT 1
 =&gt; #&lt;Product id: 4, name: "Milk (1 liter)", price: #&lt;BigDecimal:7f90649840a8,'0.45E0',9(45)&gt;, weight: nil, in_stock: nil, expiration_date: nil, created_at: "2012-11-19 09:30:21", updated_at: "2012-11-19 09:30:21"&gt;
-&gt;&gt; product = Product.create(name: 'Milk (1 liter)')
+&gt;&gt; <command>product = Product.create(name: 'Milk (1 liter)')</command>
    (0.1ms)  begin transaction
   Product Exists (0.1ms)  SELECT 1 AS one FROM "products" WHERE "products"."name" = 'Milk (1 liter)' LIMIT 1
    (0.1ms)  rollback transaction
 =&gt; #&lt;Product id: nil, name: "Milk (1 liter)", price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;
-&gt;&gt; product.errors.messages
+&gt;&gt; <command>product.errors.messages</command>
 =&gt; {:name=&gt;["has already been taken"]}
-&gt;&gt; exit
+&gt;&gt; <command>exit</command>
 $</screen></para>
 
     <warning>
@@ -635,15 +635,15 @@ end</programlisting></para>
     <code>true</code> or <code>false</code> for
     <methodname>in_stock</methodname> (there must not be a nil). If we enter a
     different value than <code>true</code> or <code>false</code>, a validation
-    error is returned:<screen>$ rails console
+    error is returned:<screen>$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; product = Product.create(name: 'Milk low-fat (1 liter)')
+&gt;&gt; <command>product = Product.create(name: 'Milk low-fat (1 liter)')</command>
    (0.1ms)  begin transaction
    (0.1ms)  rollback transaction
 =&gt; #&lt;Product id: nil, name: "Milk low-fat (1 liter)", price: nil, weight: nil, in_stock: nil, expiration_date: nil, created_at: nil, updated_at: nil&gt;
-&gt;&gt; product.errors.messages
+&gt;&gt; <command>product.errors.messages</command>
 =&gt; {:in_stock=&gt;["is not included in the list"]}
-&gt;&gt; exit
+&gt;&gt; <command>exit</command>
 $</screen></para>
 
     <tip>
@@ -937,12 +937,12 @@ end
       <title>Defining Validations with Your Own Methods</title>
 
       <para>Let's assume you are a big shot hotel mogul and need a reservation
-      system. <screen>$ rails new my_hotel
+      system. <screen>$ <command>rails new my_hotel</command>
   [...]
-$ cd my_hotel 
-$ rails generate model reservation start_date:date end_date:date room_type
+$ <command>cd my_hotel</command> 
+$ <command>rails generate model reservation start_date:date end_date:date room_type</command>
   [...]
-$ rake db:migrate
+$ <command>rake db:migrate</command>
   [...]
 $ </screen></para>
 
@@ -974,24 +974,24 @@ end</programlisting></para>
       <methodname>errors.add_to_base</methodname> you can add error messages
       for the whole object.</para>
 
-      <para>Let's test the validation in the console:<screen>$ rails console
+      <para>Let's test the validation in the console:<screen>$ <command>rails console</command>
 Loading development environment (Rails 4.0.0)
-&gt;&gt; reservation = Reservation.new(start_date: Date.today, end_date: Date.today)
+&gt;&gt; <command>reservation = Reservation.new(start_date: Date.today, end_date: Date.today)</command>
 =&gt; #&lt;Reservation id: nil, start_date: "2012-11-19", end_date: "2012-11-19", room_type: nil, created_at: nil, updated_at: nil&gt;
-&gt;&gt; reservation.valid?
+&gt;&gt; <command>reservation.valid?</command>
 =&gt; false
-&gt;&gt; reservation.errors.messages
+&gt;&gt; <command>reservation.errors.messages</command>
 =&gt; {:start_date=&gt;["has to be before the end date"]}
-&gt;&gt; reservation.end_date = Date.today + 1.day
+&gt;&gt; <command>reservation.end_date = Date.today + 1.day</command>
 =&gt; Tue, 20 Nov 2012
-&gt;&gt; reservation.valid?
+&gt;&gt; <command>reservation.valid?</command>
 =&gt; true
-&gt;&gt; reservation.save
+&gt;&gt; <command>reservation.save</command>
    (0.1ms)  begin transaction
   SQL (8.7ms)  INSERT INTO "reservations" ("created_at", "end_date", "room_type", "start_date", "updated_at") VALUES (?, ?, ?, ?, ?)  [["created_at", Mon, 19 Nov 2012 14:00:50 UTC +00:00], ["end_date", Tue, 20 Nov 2012], ["room_type", nil], ["start_date", Mon, 19 Nov 2012], ["updated_at", Mon, 19 Nov 2012 14:00:50 UTC +00:00]]
    (3.4ms)  commit transaction
 =&gt; true
-&gt;&gt; exit
+&gt;&gt; <command>exit</command>
 $</screen></para>
     </section>
   </section>
