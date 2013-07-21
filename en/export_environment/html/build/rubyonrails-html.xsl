@@ -301,18 +301,11 @@ Version:
         <div id="container-fluid">
           <div id="row-fluid">
             <div id="adsense-leaderboard" class="span12">
-              <script type="text/javascript">
-                <xsl:text disable-output-escaping="yes">
-<![CDATA[<!--]]>
-google_ad_client = "ca-pub-9538764634478220";
-/* Ruby on Rails 3.2 - en - Leaderboard */
-google_ad_slot = "5381627926";
-google_ad_width = 728;
-google_ad_height = 90;
-<![CDATA[//-->]]>
-               </xsl:text>
-              </script>
-              <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+              <p>
+                <a href="http://www.amazon.com/Ruby-on-Rails-4-0-ebook/dp/B00E25KVLW">
+                Get the new Ruby on Rails 4.0 version of this book at Amazon.com!
+                </a>
+              </p>
             </div>
 
             <div class="span9">
