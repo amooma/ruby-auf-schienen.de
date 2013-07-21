@@ -301,11 +301,11 @@ Version:
         <div id="container-fluid">
           <div id="row-fluid">
             <div id="adsense-leaderboard" class="span12">
-              <p>
+              <h2>
                 <a href="http://www.amazon.com/Ruby-on-Rails-4-0-ebook/dp/B00E25KVLW">
                 Get the new Ruby on Rails 4.0 version of this book at Amazon.com!
                 </a>
-              </p>
+              </h2>
             </div>
 
             <div class="span9">
