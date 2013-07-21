@@ -303,7 +303,7 @@ Version:
             <div id="adsense-leaderboard" class="span12">
               <h2>
                 <a href="http://www.amazon.com/Ruby-on-Rails-4-0-ebook/dp/B00E25KVLW">
-                Get the new Ruby on Rails 4.0 version of this book at Amazon.com!
+                Get the new Ruby on Rails 4.0 version of this book!
                 </a>
               </h2>
             </div>
