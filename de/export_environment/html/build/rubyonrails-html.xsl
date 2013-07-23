@@ -300,35 +300,9 @@ Version:
         
         <div id="container-fluid">
           <div id="row-fluid">
-            <div id="rails-training" class="span12">
+            <div id="announcement" class="span12">
               <div class="well">
-                <table class='table table-striped'>
-                  <theader>
-                    <tr>
-                      <td>Termin</td>
-                      <td>Schulung</td>
-                      <td>Ort</td>
-                      <td>Dauer</td>
-                      <td>Preis (plus MwSt.)</td>
-                    </tr>
-                  </theader>
-                  <tbody>
-                    <tr>
-                      <td>01.07.2013</td>
-                      <td><a href="http://amooma.de/training/ruby_on_rails">Ruby on Rails</a></td>
-                      <td>Berlin</td>
-                      <td>3 Tage</td>
-                      <td>1.500 Euro</td>
-                    </tr>
-                    <tr>
-                      <td>04.07.2013</td>
-                      <td><a href="http://amooma.de/training/emberjs">Ember.js</a></td>
-                      <td>Berlin</td>
-                      <td>2 Tage</td>
-                      <td>1.000 Euro</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <h2><a href="http://www.amazon.de/Ruby-Rails-4-0-Guide-ebook/dp/B00E25KVLW/">Das englische Ruby on Rails 4.0 Kindle Buch.</a></h2>
               </div>
             </div>
 
