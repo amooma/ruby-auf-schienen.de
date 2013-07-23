@@ -302,7 +302,7 @@ Version:
           <div id="row-fluid">
             <div id="announcement" class="span12">
               <div class="well">
-                <h2><a href="http://www.amazon.de/Ruby-Rails-4-0-Guide-ebook/dp/B00E25KVLW/">Das englische Ruby on Rails 4.0 Kindle Buch.</a></h2>
+                <h2>Neu: Das englische <a href="http://www.amazon.de/Ruby-Rails-4-0-Guide-ebook/dp/B00E25KVLW/">Ruby on Rails 4.0 Buch</a>.</h2>
               </div>
             </div>
 
