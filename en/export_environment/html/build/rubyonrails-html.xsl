@@ -316,13 +316,11 @@ Version:
             </div>
 
             <div class="span3">
-              <xsl:text disable-output-escaping="yes">
                   <iframe
-                      src="http://rcm-na.amazon-adsystem.com/e/cm?t=xyzpubcom-20&o=1&p=8&l=as1&asins=B00E25KVLW&ref=tf_til&fc1=000000&IS2=1&lt1=_blank&m=amazon&lc1=0000FF&bc1=000000&bg1=FFFFFF&f=ifr"
+                      src="http://rcm-na.amazon-adsystem.com/e/cm?t=xyzpubcom-20&amp;o=1&amp;p=8&amp;l=as1&amp;asins=B00E25KVLW&amp;ref=tf_til&amp;fc1=000000&amp;IS2=1&amp;lt1=_blank&amp;m=amazon&amp;lc1=0000FF&amp;bc1=000000&amp;bg1=FFFFFF&amp;f=ifr"
                       style="width:120px;height:240px;" scrolling="no"
                       marginwidth="0" marginheight="0"
                       frameborder="0"></iframe>
-              </xsl:text>
               <div class="well">
                 <h3>Training</h3>
                 <p>
