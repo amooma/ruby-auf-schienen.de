@@ -291,7 +291,7 @@ Version:
               </div>
               <div class="nav-collapse collapse">
                 <p class="navbar-text pull-right">
-                  <a href="http://www.amazon.com/Ruby-Rails-3-2-Step-ebook/dp/B00AE6OJ3E?tag=wwwamoomade-21" class="navbar-link">Buy this book as a Kindle version.</a>
+                  <a href="http://www.amazon.com/Ruby-Rails-3-2-Step-ebook/dp/B00AE6OJ3E?tag=xyzpubcom-20" class="navbar-link">Buy this book as a Kindle version.</a>
                 </p>
               </div><!--/.nav-collapse -->
             </div>
@@ -300,12 +300,15 @@ Version:
         
         <div id="container-fluid">
           <div id="row-fluid">
-            <div id="adsense-leaderboard" class="span12">
-              <h2>
-                <a href="http://www.amazon.com/Ruby-on-Rails-4-0-ebook/dp/B00E25KVLW">
-                Get the new Ruby on Rails 4.0 version of this book!
-                </a>
-              </h2>
+            <div id="announcement" class="span12">
+              <div class="well">
+                <h2>
+                  New: 
+                  <a href="http://www.amazon.com/Ruby-on-Rails-4-0-ebook/dp/B00E25KVLW?tag=xyzpubcom-20">
+                  Ruby on Rails 4.0 version of this book!
+                  </a>
+                </h2>
+              </div>
             </div>
 
             <div class="span9">
@@ -313,9 +316,24 @@ Version:
             </div>
 
             <div class="span3">
+              <xsl:text disable-output-escaping="yes">
+                  <iframe
+                      src="http://rcm-na.amazon-adsystem.com/e/cm?t=xyzpubcom-20&o=1&p=8&l=as1&asins=B00E25KVLW&ref=tf_til&fc1=000000&IS2=1&lt1=_blank&m=amazon&lc1=0000FF&bc1=000000&bg1=FFFFFF&f=ifr"
+                      style="width:120px;height:240px;" scrolling="no"
+                      marginwidth="0" marginheight="0"
+                      frameborder="0"></iframe>
+              </xsl:text>
+              <div class="well">
+                <h3>Training</h3>
+                <p>
+                  Please contact me at sw@amooma.de if you need a customized
+                  Ruby on Rails training for your company.
+                </p>
+              </div>
               <div class="well">
                 <p>
-                  Thanks for your support and the visibility by linking to this website on Twitter and Facebook. That helps a lot!
+                  Updates about this book will be published on my Twitter
+                  feed.
                 </p>
                 <p>
                   <a href="https://twitter.com/wintermeyer" class="twitter-follow-button" data-show-count="false">Follow @wintermeyer</a>
