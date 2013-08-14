@@ -291,7 +291,7 @@ Version:
               </div>
               <div class="nav-collapse collapse">
                 <p class="navbar-text pull-right">
-                  <a href="http://www.amazon.com/Ruby-Rails-3-2-Step-ebook/dp/B00AE6OJ3E?tag=xyzpubcom-20" class="navbar-link">Buy this book as a Kindle version.</a>
+                  <a href="http://www.amazon.com/Ruby-Rails-3-2-Step-ebook/dp/B00AE6OJ3E?tag=xyzpubcom-20" class="navbar-link">Buy the Rails 3.2 book as a Kindle version.</a>
                 </p>
               </div><!--/.nav-collapse -->
             </div>
@@ -326,8 +326,8 @@ Version:
               <div class="well">
                 <h3>Rails Training</h3>
                 <p>
-                  I'm offering customized Ruby on Rails trainings for
-                  companies. Please send me an e-mail sw@amooma.de                </p>
+                  I offer customized Ruby on Rails trainings for
+                  companies. Please contact me by e-mail: sw@amooma.de                </p>
               </div>
               <div class="well">
                 <p>
