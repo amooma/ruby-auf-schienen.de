@@ -316,17 +316,18 @@ Version:
             </div>
 
             <div class="span3">
-                  <iframe
-                      src="http://rcm-na.amazon-adsystem.com/e/cm?t=xyzpubcom-20&amp;o=1&amp;p=8&amp;l=as1&amp;asins=B00E25KVLW&amp;ref=tf_til&amp;fc1=000000&amp;IS2=1&amp;lt1=_blank&amp;m=amazon&amp;lc1=0000FF&amp;bc1=000000&amp;bg1=FFFFFF&amp;f=ifr"
-                      style="width:120px;height:240px;" scrolling="no"
-                      marginwidth="0" marginheight="0"
-                      frameborder="0"></iframe>
               <div class="well">
-                <h3>Training</h3>
+                  <iframe
+                      src="http://rcm-na.amazon-adsystem.com/e/cm?lt1=_top&amp;bc1=FFFFFF&amp;IS2=1&amp;bg1=FFFFFF&amp;fc1=000000&amp;lc1=0000FF&amp;t=xyzpubcom-20&amp;o=1&amp;p=8&amp;l=as1&amp;m=amazon&amp;f=ifr&amp;ref=tf_til&amp;asins=B00E25KVLW"
+                       style="width:120px;height:240px;" scrolling="no"
+                       marginwidth="0" marginheight="0" frameborder="0">
+                   </iframe>
+              </div>
+              <div class="well">
+                <h3>Rails Training</h3>
                 <p>
-                  Please contact me at sw@amooma.de if you need a customized
-                  Ruby on Rails training for your company.
-                </p>
+                  I'm offering customized Ruby on Rails trainings for
+                  companies. Please send me an e-mail sw@amooma.de                </p>
               </div>
               <div class="well">
                 <p>
