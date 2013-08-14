@@ -16,7 +16,7 @@
 <xsl:param name="fop1.extensions" select="1"/>
 <xsl:param name="draft.mode">no</xsl:param>
 <xsl:param name="hyphenate">true</xsl:param>
-<xsl:param name="l10n.gentext.default.language">DE</xsl:param>
+<xsl:param name="l10n.gentext.default.language">EN</xsl:param>
 <xsl:param name="ulink.footnotes" select="1"/>
 <xsl:param name="ulink.show" select="1"/>
 <xsl:param name="table.footnote.number.format" select="'1'"/>
@@ -25,12 +25,12 @@
 <xsl:param name="line-height" select="1.3"/>
 <xsl:param name="qandadiv.autolabel" select="0"/>
 <xsl:param name="keep.relative.image.uris" select="1"/>
-<xsl:param name="paper.type" select="'A4'"/>
+<xsl:param name="paper.type" select="'letter'"/>
 
 <!-- Format Variable Lists as Blocks (prevents horizontal overflow). -->
 <xsl:param name="variablelist.as.blocks">1</xsl:param>
 
-<xsl:param name="default.image.width" select="'440'"/>
+<xsl:param name="default.image.width" select="'640'"/>
 <xsl:param name="body.font.master">9</xsl:param>
 
 <xsl:param name="title.font.family">
@@ -130,7 +130,7 @@
 
 <!--  Section, Chapter Numbering -->
 <!-- http://www.sagehill.net/docbookxsl/SectionNumbering.html -->
-<xsl:param name="toc.section.depth">3</xsl:param>
+<xsl:param name="toc.section.depth">1</xsl:param>
 <xsl:param name="appendix.autolabel" select="'A'"/>
 <xsl:param name="chapter.autolabel" select="1"/>
 <xsl:param name="part.autolabel" select="'I'"/>
