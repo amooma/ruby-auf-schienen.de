@@ -291,7 +291,7 @@ Version:
               </div>
               <div class="nav-collapse collapse">
                 <p class="navbar-text pull-right">
-                  <a href="http://www.amazon.com/Ruby-Rails-3-2-Step-ebook/dp/B00AE6OJ3E?tag=xyzpubcom-20" class="navbar-link">Buy the Rails 3.2 book as a Kindle version.</a>
+                  <a href="http://www.amazon.com/Ruby-Rails-3-2-Step-ebook/dp/B00AE6OJ3E?tag=xyzpubcom02-20" class="navbar-link">Buy the Rails 3.2 book as a Kindle version.</a>
                 </p>
               </div><!--/.nav-collapse -->
             </div>
@@ -304,7 +304,7 @@ Version:
               <div class="well">
                 <h2>
                   New: 
-                  <a href="http://www.amazon.com/Ruby-on-Rails-4-0-ebook/dp/B00E25KVLW?tag=xyzpubcom-20">
+                  <a href="http://www.amazon.com/Ruby-on-Rails-4-0-ebook/dp/B00E25KVLW?tag=xyzpubcom02-20">
                   Ruby on Rails 4.0 version of this book!
                   </a>
                 </h2>
@@ -318,7 +318,7 @@ Version:
             <div class="span3">
               <div class="well">
                   <iframe
-                      src="http://rcm-na.amazon-adsystem.com/e/cm?lt1=_top&amp;bc1=FFFFFF&amp;IS2=1&amp;bg1=FFFFFF&amp;fc1=000000&amp;lc1=0000FF&amp;t=xyzpubcom-20&amp;o=1&amp;p=8&amp;l=as1&amp;m=amazon&amp;f=ifr&amp;ref=tf_til&amp;asins=B00E25KVLW"
+                      src="http://rcm-na.amazon-adsystem.com/e/cm?lt1=_top&amp;bc1=FFFFFF&amp;IS2=1&amp;bg1=FFFFFF&amp;fc1=000000&amp;lc1=0000FF&amp;t=xyzpubcom02-20&amp;o=1&amp;p=8&amp;l=as1&amp;m=amazon&amp;f=ifr&amp;ref=tf_til&amp;asins=B00E25KVLW"
                        style="width:120px;height:240px;" scrolling="no"
                        marginwidth="0" marginheight="0" frameborder="0">
                    </iframe>
