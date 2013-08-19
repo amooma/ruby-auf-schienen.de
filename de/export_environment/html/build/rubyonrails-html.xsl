@@ -313,7 +313,8 @@ Version:
             <div class="span3">
 
               <div class="well">
-                <p>Ich biete auf Grundlage dieses Buches <a href="http://amooma.de/training/ruby_on_rails">Ruby on Rails Schulungen</a> an.</p>
+                <h3>Schulungen</h3>
+                <p>Am 02.09.13 findet die nächste <a href="http://amooma.de/training/ruby_on_rails">Ruby on Rails Schulungen</a> Schulung in Koblenz statt.</p>
                 <p>
                   <a href="https://twitter.com/wintermeyer" class="twitter-follow-button" data-show-count="false" data-lang="de">@wintermeyer folgen</a>
                   <script type="text/javascript">
