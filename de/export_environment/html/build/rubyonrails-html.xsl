@@ -313,8 +313,8 @@ Version:
             <div class="span3">
 
               <div class="well">
-                <h3>Schulungen</h3>
-                <p>Am 02.09.13 findet die nächste <a href="http://amooma.de/training/ruby_on_rails">Ruby on Rails Schulungen</a> Schulung in Koblenz statt.</p>
+                <h3>Autor</h3>
+                <p><a href="http://wintermeyer.de">Stefan Wintermeyer</a></p>
                 <p>
                   <a href="https://twitter.com/wintermeyer" class="twitter-follow-button" data-show-count="false" data-lang="de">@wintermeyer folgen</a>
                   <script type="text/javascript">
