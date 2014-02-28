@@ -292,7 +292,7 @@ Version:
               </div>
               <div class="nav-collapse collapse">
                 <p class="navbar-text pull-right">
-                  <a href="http://www.amazon.com/dp/B00E25KVLW?tag=xyzpubcom02-20&camp=14573&creative=327641&linkCode=as1&creativeASIN=B00E25KVLW&adid=01YCMG26M6ZB026NJAZZ&&ref-refURL=http%3A%2F%2Fxyzpub.com%2Fen%2Fruby-on-rails%2F4.0%2F" class="navbar-link">Kindle version.</a>
+                  <a href="http://www.amazon.com/Ruby-Rails-Guide-Stefan-Wintermeyer-ebook/dp/B00E25KVLW?tag=wwwamoomade-21" class="navbar-link">Kindle version.</a>
                 </p>
               </div><!--/.nav-collapse -->
             </div>
