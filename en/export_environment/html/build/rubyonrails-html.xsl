@@ -1,5 +1,5 @@
 <?xml version='1.0'?>
- 
+
 <!--
   Copyright (c) 2007-2009 Red Hat, Inc.
   License: GPLv2+ or Artistic
@@ -9,18 +9,18 @@
 -->
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="http://www.w3.org/1999/xhtml" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:d="http://docbook.org/ns/docbook" xmlns:suwl="http://nwalsh.com/xslt/ext/com.nwalsh.saxon.UnwrapLinks" xmlns:exsl="http://exslt.org/common" version="1.0" exclude-result-prefixes="exsl">
-  
+
   <xsl:import href="deps.xsl"/>
-  
+
   <xsl:include href="defaults.xsl"/>
   <xsl:include href="xhtml-common.xsl"/>
   <xsl:include href="breadcrumbs.xsl" />
-  
+
   <xsl:param name="generate.legalnotice.link" select="0"/>
   <xsl:param name="generate.revhistory.link" select="0"/>
   <xsl:param name="use.extensions" select="1"/>
   <xsl:param name="tablecolumns.extension" select="0"/>
-  
+
   <xsl:param name="chunk.section.depth" select="1"/>
   <xsl:param name="chunk.first.sections" select="1"/>
   <xsl:param name="section.autolabel.max.depth" select="1"/>
@@ -54,7 +54,7 @@ qandaset nop
   <xsl:param name="admon.graphics" select="1"/>
   <xsl:param name="admon.graphics.extension">.png</xsl:param>
   <xsl:param name="admon.graphics.path">custom-admons-callouts/</xsl:param>
-  
+
   <xsl:param name="callout.graphics" select="1"/>
   <xsl:param name="callout.graphics.extension">.png</xsl:param>
   <xsl:param name="callout.graphics.path">custom-admons-callouts/callouts/</xsl:param>
@@ -152,7 +152,7 @@ Version:
     <xsl:variable name="up" select="parent::*"/>
     <xsl:variable name="row1" select="count($prev) &gt; 0 or count($up) &gt; 0 or count($next) &gt; 0"/>
     <xsl:variable name="row2" select="($prev and $navig.showtitles != 0) or (generate-id($home) != generate-id(.) or $nav.context = 'toc') or ($chunk.tocs.and.lots != 0 and $nav.context != 'toc') or ($next and $navig.showtitles != 0)"/>
-    
+
     <xsl:if test="$suppress.navigation = '0' and $suppress.footer.navigation = '0'">
       <xsl:if test="$footer.rule != 0">
         <hr/>
@@ -269,35 +269,36 @@ Version:
     <xsl:param name="content">
       <xsl:apply-imports/>
     </xsl:param>
-    
+
     <xsl:call-template name="user.preroot"/>
 
-    <html lang="en">    
+    <html lang="en">
       <xsl:call-template name="html.head">
         <xsl:with-param name="prev" select="$prev"/>
         <xsl:with-param name="next" select="$next"/>
       </xsl:call-template>
-      
+
       <body>
         <div class="navbar navbar-inverse navbar-fixed-top">
           <div class="navbar-inner">
             <div class="container-fluid">
-              <a class="brand" href="index.html">Ruby on Rails 3.2 - Step by Step</a>
+              <a class="brand" href="index.html">Ruby on Rails 4.0 Guide</a>
 
               <div class="nav-collapse collapse">
                 <ul class="nav">
+                  <li><a href="/en/ruby-on-rails/3.2/">Rails 3.2</a></li>
                   <li><a href="http://ruby-auf-schienen.de/">Deutsche Version</a></li>
                 </ul>
               </div>
               <div class="nav-collapse collapse">
                 <p class="navbar-text pull-right">
-                  <a href="http://www.amazon.com/Ruby-Rails-3-2-Step-ebook/dp/B00AE6OJ3E?tag=wwwamoomade-21" class="navbar-link">Buy this book as a Kindle version.</a>
+                  <a href="http://www.amazon.com/dp/B00E25KVLW?tag=xyzpubcom02-20&camp=14573&creative=327641&linkCode=as1&creativeASIN=B00E25KVLW&adid=01YCMG26M6ZB026NJAZZ&&ref-refURL=http%3A%2F%2Fxyzpub.com%2Fen%2Fruby-on-rails%2F4.0%2F" class="navbar-link">Kindle version.</a>
                 </p>
               </div><!--/.nav-collapse -->
             </div>
           </div>
         </div>
-        
+
         <div id="container-fluid">
           <div id="row-fluid">
             <div id="adsense-leaderboard" class="span12">
@@ -354,19 +355,19 @@ google_ad_height = 600;
               </div>
 
             </div>
-          </div>  
+          </div>
 
           <div id="row-fluid">
             <div class="span12">
-              
+
               <xsl:call-template name="user.footer.content"/>
-              
+
               <xsl:call-template name="footer.navigation">
                 <xsl:with-param name="prev" select="$prev"/>
                 <xsl:with-param name="next" select="$next"/>
                 <xsl:with-param name="nav.context" select="$nav.context"/>
               </xsl:call-template>
-              
+
               <xsl:call-template name="user.footer.navigation"/>
             </div>
           </div>
@@ -379,7 +380,7 @@ google_ad_height = 600;
 
     <xsl:value-of select="$chunk.append"/>
   </xsl:template>
-  
+
   <xsl:template name="simple.xlink">
     <xsl:param name="node" select="."/>
     <xsl:param name="content">
@@ -396,7 +397,7 @@ google_ad_height = 600;
         <xsl:otherwise/>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:variable name="link">
       <xsl:choose>
         <xsl:when test="$xhref and (not($node/@xlink:type) or $node/@xlink:type='simple')">
@@ -420,29 +421,29 @@ google_ad_height = 600;
               <xsl:otherwise>0</xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
-          
+
           <xsl:choose>
             <xsl:when test="$is.olink = 1">
               <xsl:call-template name="olink">
                 <xsl:with-param name="content" select="$content"/>
               </xsl:call-template>
             </xsl:when>
-            
+
             <xsl:when test="$is.idref = 1">
-              
+
               <xsl:variable name="idref">
                 <xsl:call-template name="xpointer.idref">
                   <xsl:with-param name="xpointer" select="$xhref"/>
                 </xsl:call-template>
               </xsl:variable>
-              
+
               <xsl:variable name="targets" select="key('id',$idref)"/>
               <xsl:variable name="target" select="$targets[1]"/>
-              
+
               <xsl:call-template name="check.id.unique">
                 <xsl:with-param name="linkend" select="$idref"/>
               </xsl:call-template>
-              
+
               <xsl:choose>
                 <xsl:when test="count($target) = 0">
                   <xsl:message>
@@ -451,17 +452,17 @@ google_ad_height = 600;
                   </xsl:message>
                   <xsl:copy-of select="$content"/>
                 </xsl:when>
-                
+
                 <xsl:otherwise>
                   <a>
                     <xsl:apply-templates select="." mode="common.html.attributes"/>
-                    
+
                     <xsl:attribute name="href">
                       <xsl:call-template name="href.target">
                         <xsl:with-param name="object" select="$target"/>
                       </xsl:call-template>
                     </xsl:attribute>
-                    
+
                     <xsl:choose>
                       <xsl:when test="$node/@xlink:title">
                         <xsl:attribute name="title">
@@ -472,15 +473,15 @@ google_ad_height = 600;
                         <xsl:apply-templates select="$target" mode="html.title.attribute"/>
                       </xsl:otherwise>
                     </xsl:choose>
-                    
+
                     <xsl:if test="$target.show !=''">
                       <xsl:attribute name="target">
                         <xsl:value-of select="$target.show"/>
                       </xsl:attribute>
                     </xsl:if>
-                    
+
                     <xsl:copy-of select="$content"/>
-                  
+
                   </a>
                 </xsl:otherwise>
               </xsl:choose>
@@ -512,21 +513,21 @@ google_ad_height = 600;
                     </xsl:choose>
                   </xsl:attribute>
                 </xsl:if>
-                
+
                 <xsl:copy-of select="$content"/>
               </a>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
-        
+
         <xsl:when test="$linkend">
           <xsl:variable name="targets" select="key('id',$linkend)"/>
           <xsl:variable name="target" select="$targets[1]"/>
-          
+
           <xsl:call-template name="check.id.unique">
             <xsl:with-param name="linkend" select="$linkend"/>
           </xsl:call-template>
-          
+
           <a>
             <xsl:apply-templates select="." mode="common.html.attributes"/>
             <xsl:attribute name="href">
@@ -534,11 +535,11 @@ google_ad_height = 600;
                 <xsl:with-param name="object" select="$target"/>
               </xsl:call-template>
             </xsl:attribute>
-            
+
             <xsl:apply-templates select="$target" mode="html.title.attribute"/>
-            
+
             <xsl:copy-of select="$content"/>
-          
+
           </a>
         </xsl:when>
         <xsl:otherwise>
@@ -546,7 +547,7 @@ google_ad_height = 600;
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:choose>
       <xsl:when test="function-available('suwl:unwrapLinks')">
         <xsl:copy-of select="suwl:unwrapLinks($link)"/>
@@ -556,7 +557,7 @@ google_ad_height = 600;
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="process.image.attributes">
     <xsl:param name="alt"/>
     <xsl:param name="html.width"/>
@@ -567,7 +568,7 @@ google_ad_height = 600;
     <xsl:param name="scaled.contentdepth"/>
     <xsl:param name="scaled.contentwidth"/>
     <xsl:param name="viewport"/>
-    
+
     <xsl:choose>
       <xsl:when test="@contentwidth or @contentdepth">
       <!-- ignore @width/@depth, @scale, and @scalefit if specified -->
@@ -582,7 +583,7 @@ google_ad_height = 600;
           </xsl:attribute>
         </xsl:if>
       </xsl:when>
-      
+
       <xsl:when test="number($scale) != 1.0">
       <!-- scaling is always uniform, so we only have to specify one dimension -->
       <!-- ignore @scalefit if specified -->
@@ -590,7 +591,7 @@ google_ad_height = 600;
           <xsl:value-of select="$scaled.contentwidth"/>
         </xsl:attribute>
       </xsl:when>
-      
+
       <xsl:when test="$scalefit != 0">
         <xsl:choose>
           <xsl:when test="contains($html.width, '%')">
@@ -608,10 +609,10 @@ google_ad_height = 600;
               </xsl:otherwise>
             </xsl:choose>
           </xsl:when>
-          
+
           <xsl:when test="contains($html.depth, '%')">
           <!-- HTML doesn't deal with this case very well...do nothing --></xsl:when>
-          
+
           <xsl:when test="$scaled.contentwidth != '' and $html.width != '' and $scaled.contentdepth != '' and $html.depth != ''">
           <!-- scalefit should not be anamorphic; figure out which direction -->
           <!-- has the limiting scale factor and scale in that direction -->
@@ -628,13 +629,13 @@ google_ad_height = 600;
               </xsl:otherwise>
             </xsl:choose>
           </xsl:when>
-          
+
           <xsl:when test="$scaled.contentwidth != '' and $html.width != ''">
             <xsl:attribute name="width">
               <xsl:value-of select="$html.width"/>
             </xsl:attribute>
           </xsl:when>
-          
+
           <xsl:when test="$scaled.contentdepth != '' and $html.depth != ''">
             <xsl:attribute name="height">
               <xsl:value-of select="$html.depth"/>
@@ -643,7 +644,7 @@ google_ad_height = 600;
         </xsl:choose>
       </xsl:when>
     </xsl:choose>
-    
+
     <xsl:choose>
       <xsl:when test="$alt != ''">
         <xsl:attribute name="alt">
@@ -659,13 +660,13 @@ google_ad_height = 600;
         <xsl:attribute name="alt">image</xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>
-    
+
     <xsl:if test="$longdesc != ''">
       <xsl:attribute name="longdesc">
         <xsl:value-of select="$longdesc"/>
       </xsl:attribute>
     </xsl:if>
-    
+
     <xsl:if test="@align and $viewport = 0">
       <xsl:attribute name="style">
         <xsl:text>text-align: </xsl:text>
@@ -683,6 +684,6 @@ google_ad_height = 600;
   </xsl:template>
 
   <xsl:template name="dedication.titlepage">
-  </xsl:template> 
+  </xsl:template>
 
 </xsl:stylesheet>
