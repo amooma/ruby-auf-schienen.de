@@ -528,21 +528,25 @@ Now a little drum roll... dramatic suspense... launch the web browser
 and go to the URL `http://0.0.0.0:3000/products`{.uri}. You can see the
 list of products as simple web page.
 
-![](screenshots/products_index.jpg)
+Insert products_index.png
+Product index view
 
 If you now click the link "New Product", you will see an input form for
 a new record:
 
-![](screenshots/product_new.jpg)
+Insert product_new.png
+Product new view
 
 Use your browser's Back button to go back and click on the "Show" link
 in the first line. You will then see the following page:
 
-![](screenshots/product_show_1.jpg)
+Insert product_show_1.png
+Product show view of the first product
 
 If you now click "Edit", you will see the editing view for this record:
 
-![](screenshots/product_edit_1.jpg)
+Insert product_edit_1.png
+Product edit view of the first product
 
 And if you click "Destroy" on the Index page, you can delete a record
 after confirming the message that pops up. Isn't that cool?! Within less
@@ -781,7 +785,8 @@ end
 When ever somebody wants to save a product which doesn't have a name
 Rails will show this Flash Error:
 
-![](screenshots/product_error_flash.jpg)
+Insert product_error_flash.png
+Flash error message
 
 ## Access via JSON
 
@@ -837,7 +842,8 @@ You can use your browser to fetch the JSON output. Just open
 installed a JSON view extension in my Chrome browser to get a nicer
 format.
 
-![](screenshots/products_index_json.jpg)
+Insert products_index_json.png
+Product index as JSON
 
 If you do not want the JSON output, you need to delete the
 `json.jbuilder`{.filename} files.
@@ -997,7 +1003,8 @@ $
 If we now start the server **rails server** and go to the URL
 `http://0.0.0.0:3000/products`{.uri}, we get an error message.
 
-![](screenshots/products_routes_error.jpg)
+Insert products_routes_error.png
+Routing error
 
 The same message will be displayed in the log:
 
@@ -1086,7 +1093,8 @@ Now our application is finished. Start the Rails server with **rails
 server** and open the URL `http://0.0.0.0:3000/products`{.uri} in the
 browser.
 
-![](screenshots/read-only-products-index.jpg)
+Insert read-only-products-index.png
+Read Only Index view
 
 ### Note
 

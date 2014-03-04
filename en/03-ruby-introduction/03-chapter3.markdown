@@ -12,7 +12,7 @@ instead. One can only feel the magic of Rails after understanding the
 basics of Ruby.
 
 The inventor of Ruby, Yukihiro Matsumoto, states in his book “*The Ruby
-Programming Language*”^[[1](#ftn.idp1281296)]^ that:
+Programming Language*” that:
 
 “It is easy to program in Ruby, but Ruby is not a simple language.”
 
@@ -148,7 +148,7 @@ Hello World!
 $
 ```
 
-# Help via ri
+## Help via ri
 
 When programming, you do not always have a Ruby handbook available.
 Fortunately, the Ruby developers thought of this and provided a built-in
@@ -482,7 +482,7 @@ detail in [the section called “Class Methods and Instance
 Methods”](#class_methods_vs_instance_methods "Class Methods and Instance Methods").
 Another chicken and egg problem.
 
-# Private Methods
+## Private Methods
 
 Quite often it makes sense to only call a method within its own class or
 own instance. Such methods are referred to as private methods (as
@@ -516,7 +516,7 @@ NoMethodError: private method `b' called for #<Example:0x007ff1e10756b8>
 $
 ```
 
-# Method initialize()
+## Method initialize()
 
 If a new instance is created (by calling the method `new`{.methodname}),
 the method that is processed first and automatically is the method
@@ -687,7 +687,7 @@ there is an
 With that information you know that the Class Abc is missing the method
 d which you were trying to use.
 
-# Class Methods and Instance Methods
+## Class Methods and Instance Methods
 
 There are two important kinds of methods: class methods and instance
 methods.
@@ -946,7 +946,7 @@ into a string.
 
 `Fixnum`{.classname} and `Bignum`{.classname} are `Integer`{.classname}
 classes. A `Fixnum`{.classname} is an `Integer`{.classname} that can be
-saved in a “Word”.^[[2](#ftn.idp2247056)]^If a `Fixnum`{.classname} gets
+saved in a “Word”. If a `Fixnum`{.classname} gets
 bigger, it automatically becomes a `Bignum`{.classname}. Here is an
 example where a becomes larger and by that becomes a
 `Bignum`{.classname}.
@@ -1024,7 +1024,7 @@ $ irb --simple-prompt
 $
 ```
 
-# Boolean Values and nil
+## Boolean Values and nil
 
 For boolean values (`true`{.code} and `false`{.code}) and for
 `nil`{.code} (no value) there are separate classes:
@@ -1041,8 +1041,8 @@ $ irb --simple-prompt
 $
 ```
 
-`nil`{.literal} (no value ^[[3](#ftn.idp2283568)]^) is, by the way, the
-contraction of the Latin word *nihil* (nothing ^[[4](#ftn.idp2285664)]^)
+`nil`{.literal} (no value) is, by the way, the
+contraction of the Latin word *nihil* (nothing)
 or, if you look at it in terms of programming history, the term derives
 from “*not in list*” from the legacy of the programming language Lisp
 (the name is an acronym of *List Processing*).
@@ -1166,7 +1166,7 @@ In order to keep the amount of chicken and egg problems in this chapter
 at a manageable level, we need to go back to the topic Methods and
 combine what we have learned so far.
 
-# Getters and Setters
+## Getters and Setters
 
 As instance variables (“attributes”) only exist within the relevant
 instance, you always need to write a “getter” method for exporting such
@@ -1443,7 +1443,7 @@ $ irb --simple-prompt
 $
 ```
 
-# Method to\_s for Your Own Classes
+## Method to\_s for Your Own Classes
 
 You should always integrate a method `to_s`{.methodname}for your own
 custom classes, even if it is just for the sake of easier debugging.
@@ -1474,7 +1474,7 @@ Stefan Wintermeyer
 $
 ```
 
-# Is “+” a Method?
+## Is “+” a Method?
 
 Why is there also a plus symbol in the list of methods for
 `String`{.classname}? Let's find out by looking it up in `ri`{.literal}:
@@ -2078,7 +2078,7 @@ Of course, hashes can store not just strings as objects in the values,
 but - as with arrays - also classes that you define yourself (see [the
 section called “Arrays”](#ruby_array "Arrays")).
 
-# Symbols
+## Symbols
 
 *Symbols* are a strange concept and difficult to explain. But they are
 very useful and used frequently, amongst others with hashes. Normally,
@@ -2268,16 +2268,3 @@ not separated by two dots, but by a comma. This is what it looks like:
 >> exit
 $
 ```
-
-\
- \* \* \* \* \*
-
-^[[1](#idp1281296)]^The book is highly recommended for anyone who wants
-to understand Ruby. David Flanagan did great work together with Yukihiro
-Matsumoto (a.k.a. Matz).
-
-^[[2](#idp2247056)]^If you do not know what a “Word” is: never mind.
-
-^[[3](#idp2283568)]^`http://en.wikipedia.org/wiki/Nil`{.uri}
-
-^[[4](#idp2285664)]^`http://www.thefreedictionary.com/nil`{.uri}

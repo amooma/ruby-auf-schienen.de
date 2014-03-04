@@ -2,10 +2,10 @@
 
 ## Introduction
 
-Now that you have painstakingly read your way through [Chapter 2, *Ruby
-Basics*](#ruby-grundlagen "Chapter 2. Ruby Basics") we can move on to a
-more exciting bit. In this chapter, we will start our first Ruby on
-Rails project and find our way into the topic step by step.
+Now that you have painstakingly read your way through "Ruby Basics"
+we can move on to a more exciting bit. In this chapter, we will start
+our first Ruby on Rails project and find our way into the topic step
+by step.
 
 We will use Ruby on Rails version 4.0. Please update to this version in
 case have installed an older one.
@@ -17,17 +17,17 @@ more, there will be some typical chicken and egg problems.
 
 ## Environment (Development)
 
-By default a Rails project offers three different environments\*\*:
+By default a Rails project offers three different environments:
 
--   *Development*
--   *Test*
--   *Production*
+* Development
+* Test
+* Production
 
 In this chapter, we are only working with the Development environment.
 Once you have gained a better feeling for Rails, we will start using
 tests and then we will need the corresponding environment (where, for
 example, the Test database is populated when you start a test and then
-cleared). Later, I will exlain the various scenarios to show how you can
+cleared). Later, I will explain the various scenarios to show how you can
 roll out your Rails application from the Development environment to the
 Production environment.
 
@@ -62,8 +62,7 @@ singular forms of normal English words. If you get used to naming
 database fields and tables with English terms (even if you are
 programming in a different language), then you can make use of the whole
 power of this magic. This mechanism is referred to as `Inflector`{.code}
-^[[5](#ftn.idp1626704)]^ or *Inflections* (inflexions
-^[[6](#ftn.idp1628816)]^).
+or *Inflections* (inflexions).
 
 If you are programming in a language other than English, it still makes
 sense to use English names for variables, classes and methods. You can
@@ -157,8 +156,8 @@ Rails 4.0.0 application starting in development on http://0.0.0.0:3000
 So let's go to the URL `http://0.0.0.0:3000`{.uri} or
 `http://localhost:3000`{.uri} in the web browser.
 
-Insert virgin_rails_app.jpg
-Figure 3-1. Single commit repository data.
+Insert virgin_rails_app.png
+New Rails Application
 
 Looks good. Rails seems to be working fine. The log of it tells what
 just happend:
@@ -226,7 +225,8 @@ $ rails server
 We can have a look at this web page at the URL
 `http://0.0.0.0:3000/hello-world`{.uri}:
 
-![](screenshots/hello-world-html.jpg)
+Insert hello-world-html.png
+Hello World
 
 No output in the log means: This page was not handled by the Rails
 framework. It was delivered directly from the webserver.
@@ -256,7 +256,7 @@ The the content of an `erb`{.literal} file will propably seem familiar
 to you. It is a mixture of HTML and Ruby code (`erb`{.literal} stands
 for ***e**mbedded **R**u**b**y*). erb pages are rendered as Views. This
 is the first time for us to get in touch with the MVC
-model.^[[7](#ftn.idp1456352)]^ We need a controller to use a view. That
+model. We need a controller to use a view. That
 can be created it via the generator **rails generate controller**. Let's
 have a look at the onboard help of this generator:
 
@@ -356,7 +356,8 @@ $ rails server
 and have a look at the web page in the browser at the URL
 `http://0.0.0.0:3000/example/test`{.uri}:
 
-![](screenshots/example-test-erb.jpg)
+Insert example-test-erb.png
+Example Test ERB
 
 In the log `log/development.log`{.filename} we find the following lines:
 
@@ -493,7 +494,8 @@ $ rails server
 
 Visit that page with the URL `http://0.0.0.0:3000/example/test`{.uri}
 
-![](screenshots/erb_einfache_addition.jpg)
+Insert erb_einfache_addition.png
+Einfache Addition
 
 ## Important
 
@@ -533,7 +535,7 @@ $
 You are now going to learn the finer points of `erb`{.literal} step by
 step. Don't worry, it's neither magic nor rocket science.
 
-## \<% ... %\> vs. \<%= ... %\>
+## Syntax
 
 In a `.html.erb`{.filename}file, there are two kinds of Ruby code
 instructions in addition to the HTML elements:
@@ -565,7 +567,8 @@ as follows:
 
 Open this view In the browser:
 
-![](screenshots/erb_einfache_schleife.jpg)
+Insert erb_einfache_schleife.png
+Einfache Schleife
 
 Let's now have a look at the HTML source code in the browser:
 
@@ -700,7 +703,7 @@ that you understand the basic concept.
 
 # Passing Instance Variables from a Controller to a View
 
-One of the cardinal sins in the MVC model^[[8](#ftn.idp2617376)]^is to
+One of the cardinal sins in the MVC model is to
 put too much program logic into the view. That's more or less what used
 to be done frequently in PHP programming in the past. I'm guilty of
 having done it myself. But one of the aims of MVC is that any HTML
@@ -802,7 +805,8 @@ $
 
 The new web page now looks like this:
 
-![](screenshots/partials_footer.jpg)
+Insert partials_footer.png
+Partial Footer
 
 ### Important
 
@@ -853,7 +857,8 @@ follows:
 If we now go to the URL `http://0.0.0.0:3000/example/test`{.uri}, we see
 the 2000:
 
-![](screenshots/partial_start_year_2000.jpg)
+Insert partial_start_year_2000.png
+Partial Start Year
 
 Sometimes you need a partial that partially uses a local variable and
 somewhere else you may need the same partial, but without the local
@@ -1100,7 +1105,8 @@ expand `app/views/layouts/application.html.erb`{.filename}:
 Now we see the flash message at the top of the page when we go to
 `http://0.0.0.0:3000/game/ping`{.uri} in the browser:
 
-![](screenshots/flash_pong_notice.jpg)
+Insert flash_pong_notice.png
+Pong Flash Notice
 
 If we go to `http://0.0.0.0:3000/game/pong`{.uri} we still see the
 normal Pong page. But if we go to `http://0.0.0.0:3000/game/ping`{.uri}
@@ -1449,15 +1455,3 @@ starting a project and set these via configuration parameters. It
 specifies an underlying basic consensus and this is set by default. But
 if you want to work outside of this conventional basic consensus, then
 you will need to change the corresponding parameters.
-
-\
- \* \* \* \* \*
-
-^[[5](#idp1626704)]^see
-`http://api.rubyonrails.org/classes/ActiveSupport/Inflector.html`{.uri}
-
-^[[6](#idp1628816)]^see `http://en.wikipedia.org/wiki/Inflection`{.uri}
-
-^[[7](#idp1456352)]^`http://en.wikipedia.org/wiki/Model-view-controller`{.uri}
-
-^[[8](#idp2617376)]^`http://en.wikipedia.org/wiki/Model–view–controller`{.uri}

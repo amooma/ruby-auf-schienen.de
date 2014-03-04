@@ -4,7 +4,7 @@
 a SQL database. `ActiveRecord`{.literal} implements the architectural
 pattern *Active Record* ^[[9](#ftn.idp2940224)]^.
 
-### Note
+## Note
 
 This is referred to as *object-relational mapping*, *ORM*. I find it
 rather dry and boring, but in case you have trouble going to sleep
@@ -35,7 +35,7 @@ chapter!
 Rails newbies should read this chapter once from beginning to end.
 Please take your time. This chapter is important!
 
-## Note
+### Note
 
 This chapter is only about ActiveRecord. So I am not going to integrate
 any tests (see [Chapter 7, *Tests*](#testing "Chapter 7. Tests")), to
@@ -257,7 +257,7 @@ $ rake db:migrate
 $
 ```
 
-## Note
+### Note
 
 You will find more details on migrations in [the section called
 “Migrations”](#activerecord_migration "Migrations").
@@ -273,7 +273,7 @@ Hmmm … the class `Country`{.classname} is a child of
 `ActiveRecord::Base`{.classname}. Makes sense, as we are discussing
 ActiveRecord in this chapter. ;-)
 
-## The Attributes id, created\_at and updated\_at
+### The Attributes id, created\_at and updated\_at
 
 Even if you cannot see it in the migration, we also get the attributes
 `id`{.methodname}, `created_at`{.methodname} und
@@ -298,7 +298,7 @@ last update for this record.
 (primary key). The `id`{.methodname} is automatically incremented by 1
 for each record.
 
-## Getters and Setters
+### Getters and Setters
 
 To read and write values of a SQL table row you can use by ActiveRecord
 provided getters and setters ([the section called “Getters and
@@ -307,7 +307,7 @@ attr\_accessors are automatically created. The getter of the field
 `updated_at`{.methodname} for a given `Country`{.classname} with the
 name `germany`{.code} would be `germany.updated_at`{.code}.
 
-## Possible Data Types in ActiveRecord
+### Possible Data Types in ActiveRecord
 
 ActiveRecord is a *layer* between Ruby and various relational databases.
 Unfortunately, many SQL databases have different perspectives regarding
@@ -394,7 +394,7 @@ datatypes, please refer to the documentation listed in [Appendix A,
 *Further Rails
 Documentation*](#weiterfuehrende_doku "Appendix A. Further Rails Documentation").
 
-# Naming Conventions (Country vs. country vs. countries)
+## Naming Conventions (Country vs. country vs. countries)
 
 Rails newbies often find it hard to figure out when to use upper and
 lower case, for example, `Country`{.literal} or `country`{.literal} (one
@@ -444,26 +444,26 @@ xml:lang="en" lang="en"}. But I would recommend that, for now, you just
 go with the flow. If you are not sure, you can find out the correct
 notation with the methods shown above.
 
-## Database Configuration
+### Database Configuration
 
 Which database is used by default? Let's have a quick look at the
 configuration file for the database (`config/database.yml`{.filename}):
 
 ``` {.programlisting}
-## SQLite version 3.x
-#   gem install sqlite3
-##
-##   Ensure the SQLite 3 gem is defined in your Gemfile
-##   gem 'sqlite3'
+### SQLite version 3.x
+##   gem install sqlite3
+###
+###   Ensure the SQLite 3 gem is defined in your Gemfile
+###   gem 'sqlite3'
 development:
   adapter: sqlite3
   database: db/development.sqlite3
   pool: 5
   timeout: 5000
 
-## Warning: The database defined as "test" will be erased and
-## re-generated from your development database when you run "rake".
-## Do not set this db to the same as development or production.
+### Warning: The database defined as "test" will be erased and
+### re-generated from your development database when you run "rake".
+### Do not set this db to the same as development or production.
 test:
   adapter: sqlite3
   database: db/test.sqlite3
@@ -497,13 +497,13 @@ sqlite> .exit
 $
 ```
 
-## Adding Records
+### Adding Records
 
 Actually, I would like to show you first how to view records, but there
 we have another chicken and egg problem. So first, here is how you can
 create a new record with `ActiveRecord`{.classname}.
 
-## create
+### create
 
 The most frequently used method for creating a new record is
 `create`{.methodname}. Let's try creating a country in the console with
@@ -537,7 +537,7 @@ sqlite> .exit
 $
 ```
 
-## Syntax
+### Syntax
 
 The method `create`{.methodname} can handle a number of different syntax
 constructs. If you want to create a single record, you can do this with
@@ -559,7 +559,7 @@ this approach to create several records at once:
 Country.create([{name: 'Germany'}, {name: 'France'}])
 ```
 
-## new
+### new
 
 In addition to `create`{.methodname} there is also `new`{.methodname}.
 But you have to use `save`{.methodname} to save an object created with
@@ -599,7 +599,7 @@ You can also pass parameters for the new record directly to the method
 $
 ```
 
-# new\_record?
+## new\_record?
 
 With the method `new_record?`{.methodname} you can find out if a record
 has already been saved or not. If a new object has been created with
@@ -627,13 +627,13 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-## Tip
+### Tip
 
 For already existing records, you can also check for changes with the
 method `changed?`{.methodname} (see [the section called
 “changed?”](#activerecord_changed "changed?")).
 
-# first, last and all
+## first, last and all
 
 In certain cases, you may need the first record, or the last one, or
 perhaps even all records. Conveniently, there is a ready-made method for
@@ -762,7 +762,7 @@ yourself:
 `Country.first`{.code} and `Country.all.first`{.code} result in exact
 the same SQL query.
 
-# Populating the Database with seeds.rb
+## Populating the Database with seeds.rb
 
 With the file `db/seeds.rb`{.filename}, the Rails gods have given us a
 way of feeding default values easily and quickly to a fresh
@@ -805,7 +805,7 @@ a simple mechanism for filling an empty database with default values. In
 the course of this book, this will make it easier for us to set up quick
 example scenarios.
 
-## It's all just Ruby code
+### It's all just Ruby code
 
 The `db/seeds.rb`{.filename} is a Ruby program. Correspondingly, we can
 also use the following approach as an alternative:
@@ -827,7 +827,7 @@ The result is the same. I am showing you this example to make it clear
 that you can program completely normally within the file
 `db/seeds.rb`{.filename}.
 
-## Generating seeds.rb From Existing Data
+### Generating seeds.rb From Existing Data
 
 Sometimes it can be useful to export the current data pool of a Rails
 application into a `db/seeds.rb`{.filename}. While writing this book, I
@@ -872,7 +872,7 @@ $ rake export:seeds_format > db/seeds.rb
 $
 ```
 
-## Searching and Finding with Queries
+### Searching and Finding with Queries
 
 The methods `first`{.methodname} and `all`{.methodname} are already
 quite nice, but usually you want to search for something specific with a
@@ -919,7 +919,7 @@ db/development.sqlite3 already exists
 $
 ```
 
-## find
+### find
 
 The simplest case is searching for a record via a primary key (by
 default, the `id`{.varname} field in the database table). If I know the
@@ -952,14 +952,14 @@ pass an array as parameter:
 $
 ```
 
-## Warning
+### Warning
 
 The method`find`{.methodname} generates an exception if the ID you are
 searching for does not have a record in the database. If in doubt, you
 should use `where`{.methodname} (see [the section called
 “where”](#activerecord_where "where")).
 
-# where
+## where
 
 With the method `where`{.methodname}, you can search for specific values
 in the database. Let's search for all albums from the year 1966:
@@ -1024,7 +1024,7 @@ method `first`{.methodname}:
 $
 ```
 
-## SQL Queries with where
+### SQL Queries with where
 
 Sometimes there is no other way and you just have to define and execute
 your own SQL query. In ActiveRecord, there are two different ways of
@@ -1037,7 +1037,7 @@ fall victim to an *SQL injection* attack (see
 If you do not know much about SQL, you can safely skip this section. The
 SQL commands used here are not explained further.
 
-## Sanitized Queries
+### Sanitized Queries
 
 In this variant, all dynamic search parts are replaced by a question
 mark as placeholder and only listed as parameters after the SQL string.
@@ -1086,7 +1086,7 @@ you can search for it as follows:
 $
 ```
 
-## “Dangerous” SQL Queries
+### “Dangerous” SQL Queries
 
 If you really know what you are doing, you can of course also define the
 SQL query completely and forego the *sanitizing* of the query.
@@ -1107,7 +1107,7 @@ Please only use this variation if you know exactly what you are doing
 and once you have familiarized yourself with the topic SQL injections
 (see `http://en.wikipedia.org/wiki/Sql_injection`{.uri}).
 
-## Lazy Loading
+### Lazy Loading
 
 Lazy Loading is a mechanism that only carries out a database query if
 the program flow cannot be realised without the result of this query.
@@ -1145,7 +1145,7 @@ The console can be a bit tricky about this. It tries to help the
 developer by actually showing the result but in a non-console
 environment this would would only happen at the very last time.
 
-## Automatic Optimization
+### Automatic Optimization
 
 One of the great advantages of *lazy loading* is the automatic
 optimization of the SQL query through ActiveRecord.
@@ -1172,12 +1172,12 @@ thing is that ActiveRecord uses the same SQL code for both queries. It
 has detected that `order`{.methodname} is completely irrelevant for
 `sum`{.methodname} and therefore taken it out altogether.
 
-### Note
+#### Note
 
 In case you are asking yourself why the first query took 2.7ms and the
 second 0.2ms: ActiveRecord cached the results of the first SQL request.
 
-# order and reverse\_order
+## order and reverse\_order
 
 To sort a database query, you can use the method `order`{.methodname}.
 Example: all albums from the 60s, sorted by name:
@@ -1202,7 +1202,7 @@ defined via `order`{.methodname}:
 $
 ```
 
-# limit
+## limit
 
 The result of any search can be limited to a certain range via the
 method `limit`{.methodname}.
@@ -1228,7 +1228,7 @@ All albums sorted by name, then the first 5 of those:
 $
 ```
 
-# offset
+## offset
 
 With the method `offset`{.methodname}, you can define the starting
 position of the method `limit`{.methodname}.
@@ -1249,7 +1249,7 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-# group
+## group
 
 With the method `group`{.methodname}, you can return the result of a
 query in grouped form.
@@ -1266,7 +1266,7 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-## pluck
+### pluck
 
 Normally, ActiveRecord pulls all table columns from the database and
 leaves it up to the programmer to later pick out the components he is
@@ -1289,7 +1289,7 @@ $
 
 As a result, `pluck`{.methodname} returns an array.
 
-## first\_or\_create and first\_or\_initialize
+### first\_or\_create and first\_or\_initialize
 
 The methods `first_or_create`{.methodname} and
 `first_or_initialize`{.methodname} are create ways to search for a
@@ -1312,9 +1312,9 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-## Calculations
+### Calculations
 
-## average
+### average
 
 With the method `average`{.methodname}, you can calculate the average of
 the values in a particular column of the table. Our data material is of
@@ -1341,7 +1341,7 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-## count
+### count
 
 The name says it all: the method `count`{.methodname} counts the number
 of records.
@@ -1362,7 +1362,7 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-## maximum
+### maximum
 
 With the method `maximum`{.methodname}, you can output the item with the
 highest value within a query.
@@ -1379,7 +1379,7 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-## minimum
+### minimum
 
 With the method `minimum`{.methodname}, you can output the item with the
 lowest value within a query.
@@ -1396,7 +1396,7 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-## sum
+### sum
 
 With the method sum, you can calculate the sum of all items in a
 specific column of the database query.
@@ -1413,7 +1413,7 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-# SQL EXPLAIN
+## SQL EXPLAIN
 
 Most SQL databases can provide detailled information on a SQL query with
 the command EXPLAIN. This does not make much sense for our mini
@@ -1438,7 +1438,7 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-## Batches
+### Batches
 
 ActiveRecord stores the results of a query in Memory. With very large
 tables and results that can become a performance issue. To address this
@@ -1466,14 +1466,14 @@ THE BEATLES
 $
 ```
 
-## Editing a Record
+### Editing a Record
 
 Adding data is quite nice, but often you want to edit a record. To show
 how that's done I use the album database from [the section called
 “Searching and Finding with
 Queries”](#queries "Searching and Finding with Queries").
 
-# Simple Editing
+## Simple Editing
 
 Simple editing of a record takes place in the following steps:
 
@@ -1503,7 +1503,7 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-# changed?
+## changed?
 
 If you are not sure if a record has been changed and not yet saved, you
 can check via the method `changed?`{.methodname}:
@@ -1531,7 +1531,7 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-# update\_attributes
+## update\_attributes
 
 With the method `update_attributes`{.methodname} you can change several
 attributes of an object in one go and then immediately save them
@@ -1575,7 +1575,7 @@ method:
 $
 ```
 
-# Locking
+## Locking
 
 There are many ways of locking a database. By default, Rails uses
 “optimistic locking” of records. To activate locking you need to have an
@@ -1638,14 +1638,14 @@ conflict depending on your business logic. Please make sure to add a
 `lock_version`{.varname} hidden field in your forms while using this
 mechanism with a WebGUI.
 
-## has\_many – 1:n Association
+### has\_many – 1:n Association
 
 In order to explain `has_many`{.methodname}, let's create a bookshelf
 application. In this database, there is a model with books and a model
 with authors. As a book can have multiple authors, we need a 1:n
 association (*one-to-many association*) to represent it.
 
-### Note
+#### Note
 
 Associations are also sometimes referred to as *relations* or
 *relationships*.
@@ -1727,12 +1727,12 @@ These two simple definitions form the basis for a good deal of
 ActiveRecord magic. It will generate a bunch of cool new methods for us
 to link both models.
 
-## Creating Records
+### Creating Records
 
 In this example, we want to save a record for the book "Homo faber" by
 Max Frisch.
 
-## Manually
+### Manually
 
 We drop the database with **rake db:reset**
 
@@ -1767,7 +1767,7 @@ Entering the `book_id`{.literal} manually in this way is of course not
 very practical and susceptible to errors. That's why there is the method
 [the section called “create”](#activerecord_has_many_create "create").
 
-# create
+## create
 
 Now we try doing the same as in [the section called
 “Manually”](#activerecord_hinzufuegen_manuell "Manually"), but this time
@@ -1839,7 +1839,7 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-# build
+## build
 
 The method `build`{.methodname} resembles `create`{.methodname}. But the
 record is not saved. This only happens after a `save`{.methodname}:
@@ -1869,7 +1869,7 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-## Warning
+### Warning
 
 When using `create`{.methodname} and `build`{.methodname}, you of course
 have to observe logical dependencies, otherwise there will be an error.
@@ -1885,7 +1885,7 @@ NoMethodError: undefined method `build' for #<Class:0x007fcc6ce71ab8>
 $
 ```
 
-# Accessing Records
+## Accessing Records
 
 First we need example data. Please populate the file
 `db/seeds.rb`{.filename} with the following content:
@@ -1952,13 +1952,13 @@ Bingo! Accessing the associated `Book`{.classname} class is also very
 easy. And as it's only a single record (`belongs_to`{.methodname}), the
 singular form is used in this case.
 
-### Note
+#### Note
 
 If there was no author for this book, the result would be an empty
 array. If no book is associated with an author, then ActiveRecord
 outputs the value `nil`{.code} as `Book`{.classname}.
 
-## Searching For Records
+### Searching For Records
 
 Before we can start searching, we again need defined example data.
 Please fill the file `db/seeds.rb`{.filename} with the following content
@@ -2014,7 +2014,7 @@ And how many authors?
 $
 ```
 
-# joins
+## joins
 
 To find all books that have at least one author with the surname 'Mann'
 we use a *join*.
@@ -2045,7 +2045,7 @@ the author of the book 'Homo faber':
 $
 ```
 
-# includes
+## includes
 
 `includes`{.methodname} is very similar to the method
 `joins`{.methodname} (see [the section called
@@ -2071,7 +2071,7 @@ the `joins`{.methodname} query.
 As you can see even in our little example, this obviously takes longer
 (0.2 ms vs. 0.3 ms).
 
-## join vs. includes
+### join vs. includes
 
 Why would you want to use `includes`{.methodname} at all? Well, if you
 already know before the query that you will later need all author data,
@@ -2085,7 +2085,7 @@ are using `includes`{.methodname}, a lot more data is transported
 initially. This has to be cached and processed by ActiveRecord, which
 takes longer and requires more resources.
 
-## delete and destroy
+### delete and destroy
 
 With the methods `destroy`{.methodname}, `destroy_all`{.methodname},
 `delete`{.methodname} and `delete_all`{.methodname} you can delete
@@ -2119,18 +2119,18 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-## Options
+### Options
 
 I can't comment on all possible options at this point. But I'd like to
 show you the most often used ones. For all others, please refer to the
 Ruby on Rails documentation that you can find on the Internet at
 `http://rails.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html`{.uri}.
 
-## belongs\_to
+### belongs\_to
 
 The most important option for `belongs_to`{.methodname} is.
 
-## touch: true
+### touch: true
 
 It automatically sets the field `updated_at`{.literal} of the entry in
 the table `Book`{.classname} to the current time when an
@@ -2143,11 +2143,11 @@ class Author < ActiveRecord::Base
 end
 ```
 
-## has\_many
+### has\_many
 
 The most important options for `has_many are`{.code}.
 
-# order: :last\_name
+## order: :last\_name
 
 If you want to sort the authors by surname, you can do this via the
 following `app/models/book.rb`{.filename}:
@@ -2189,7 +2189,7 @@ And if we want to sort in descending order for a change:
 has_many :authors, :order => 'title DESC'
 ```
 
-# dependent: :destroy
+## dependent: :destroy
 
 If a book is removed, then it usually makes sense to also automatically
 remove all authors dependent on this book. This can be done via
@@ -2229,7 +2229,7 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-## Important
+### Important
 
 Please always remember the difference between the methods
 `destroy`{.methodname} (see [the section called
@@ -2237,7 +2237,7 @@ Please always remember the difference between the methods
 (see [the section called “delete”](#activerecord_delete "delete")). This
 association only works with the method `destroy`{.methodname}.
 
-# has\_many .., through: ..
+## has\_many .., through: ..
 
 Here I need to elaborate a bit: you will probably have noticed that in
 our book-author example we have sometimes been entering authors several
@@ -2251,7 +2251,7 @@ This kind of association is called Many-to-Many (n:n) and we'll discuss
 it in detail in [the section called “Many-to-Many – n:n
 Association”](#ar-many_to_many "Many-to-Many – n:n Association").
 
-## Many-to-Many – n:n Association
+### Many-to-Many – n:n Association
 
 Up to now, we have always associated a database table directly with
 another table. For many-to-many, we will associate two tables via a
@@ -2261,7 +2261,7 @@ very basic online shop. In this type of shop system, a
 and at the same time an order can contain several products. This is
 referred to as many-to-many. Let's recreate this scenario with code.
 
-## Preparation
+### Preparation
 
 Create the shop application:
 
@@ -2303,7 +2303,7 @@ $ rake db:migrate
 $
 ```
 
-## The Association
+### The Association
 
 An order (`Order`{.classname}) consists of one or several items
 (`LineItem`{.classname}). This `LineItem`{.classname} consists of the
@@ -2340,7 +2340,7 @@ class LineItem < ActiveRecord::Base
 end
 ```
 
-## The Association Works Transparent
+### The Association Works Transparent
 
 As we implement the associations via `has_many`{.methodname}, most
 things will already be familiar to you from [the section called
@@ -2441,7 +2441,7 @@ Alternatively, we can also buy butter twice directly by adding a
 >>
 ```
 
-## Warning
+### Warning
 
 When creating a line\_item we bypass the has\_many: ... :through ..
 logic. The database table contains all the correct information but order
@@ -2523,7 +2523,7 @@ all orders that contain the product "Milk (1 liter)":
 $
 ```
 
-# has\_one – 1:1 Association
+## has\_one – 1:1 Association
 
 Similar to `has_many`{.methodname} (see [the section called “has\_many –
 1:n Association”](#activerecord_has_many "has_many – 1:n Association")),
@@ -2535,7 +2535,7 @@ logically makes sense to put both into the same model and therefore the
 same database table, but for the sake of completeness I also want to
 discuss has\_one here.
 
-## Tip
+### Tip
 
 You can probably safely skip `has_one`{.methodname} without losing any
 sleep.
@@ -2547,7 +2547,7 @@ not going to explain methods like `build`{.methodname} ([the section
 called “build”](#activerecord_hinzufuegen_build "build")) again but
 assume that you already know the basics.
 
-## Preparation
+### Preparation
 
 We use the example from the Rails documentation (see
 `http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html`{.uri})
@@ -2573,7 +2573,7 @@ $ rake db:migrate
 $
 ```
 
-## Association
+### Association
 
 The association in the file `app/model/employee.rb:`{.filename}
 
@@ -2591,14 +2591,14 @@ class Office < ActiveRecord::Base
 end
 ```
 
-# Options
+## Options
 
 The options of `has_one`{.methodname} are similar to those of
 `has_many`{.methodname}. So for details, please refer to [the section
 called “Options”](#activerecord_1n_optionen "Options") or
 `http://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-has_one`{.uri}.
 
-# Console Examples
+## Console Examples
 
 Let's start the console and create two employees:
 
@@ -2676,7 +2676,7 @@ Removing is intuitively done via `destroy`{.methodname}:
 >>>>
 ```
 
-## Warning
+### Warning
 
 If you create a new `Office`{.classname} for an `Employee`{.classname}
 with an existing `Office`{.classname} then you will not get an error
@@ -2711,7 +2711,7 @@ The old `Office`{.classname} is even still in the database (the
 $
 ```
 
-## has\_one vs. belongs\_to
+### has\_one vs. belongs\_to
 
 Both `has_one`{.methodname} and `belongs_to`{.methodname} offer the
 option of representing a 1:1 relationship. The difference in practice is
@@ -2719,7 +2719,7 @@ in the programmer's personal preference and the location of the foreign
 key. In general, `has_one`{.methodname} tends to be used very rarely and
 depends on the degree of normalization of the data schema.
 
-## Polymorphic Associations
+### Polymorphic Associations
 
 Already the word "polymorphic" will probably make you tense up. What can
 it mean? Here is what the website
@@ -2797,7 +2797,7 @@ defining has\_many. For `Tag`{.classname} we use
 `belongs_to   :taggable, polymorphic: true`{.code} to indicate the
 polymorphic association to ActiveRecord.
 
-## Tip
+### Tip
 
 The suffix “*able*” in the name “*taggable*” is commonly used in Rails,
 but not obligatory. For creating the association we now not only need
@@ -2885,14 +2885,14 @@ database structure. In this example, we could also have defined a model
 is the same for both, a polymorphic association makes more sense in this
 case.
 
-# Options
+## Options
 
 Polymorphic associations can be configured with the same options as a
 normal [the section called “has\_many – 1:n
 Association”](#activerecord_has_many "has_many – 1:n Association")
 model.
 
-## Delete/Destroy a Record
+### Delete/Destroy a Record
 
 To remove a database record, you can use the methods
 `destroy`{.methodname} and `delete`{.methodname}. It's quite easy to
@@ -2930,7 +2930,7 @@ class Author < ActiveRecord::Base
 end
 ```
 
-## destroy
+### destroy
 
 With `destroy`{.methodname} you can remove a record and any existing
 dependencies are also taken into account (see for example
@@ -3037,7 +3037,7 @@ record:
 $
 ```
 
-# delete
+## delete
 
 With `delete`{.methodname} you can remove a record directly from the
 database. Any dependencies to other records in the *model* are not taken
@@ -3085,7 +3085,7 @@ As with `destroy`{.methodname}, an object also gets frozen when you use
 “destroy”](#activerecord_destroy "destroy")). The record is already
 removed from the database, but the object itself is still there.
 
-## Transactions
+### Transactions
 
 In the world of databases, the term transaction refers to a block of SQL
 statements that must be executed together and without interruption. If
@@ -3112,26 +3112,26 @@ Transactions are a complex topic. If you want to find out more, you can
 consult the ri help on the shell via **ri
 ActiveRecord::Transactions::ClassMethods**.
 
-### Important
+#### Important
 
 The methods `save`{.methodname} and `destroy`{.methodname} are
 automatically executed within the transaction *wrapper*. That way, Rails
 ensures that no undefined state can arise for these two methods.
 
-### Warning
+#### Warning
 
 Transactions are not natively supported by all databases. In that case,
 the code will still work, but you no longer have the security of the
 transaction.
 
-## Scopes
+### Scopes
 
 When programming Rails applications, it is sometimes clearer and simpler
 to define frequent searches as separate methods. In Rails speak, these
 are referred to as *NamedScope*. These NamedScopes can be chained, just
 like other methods.
 
-## Preparation
+### Preparation
 
 We are building our own little online shop:
 
@@ -3168,7 +3168,7 @@ $ rake db:reset
 $
 ```
 
-## Defining a Scope
+### Defining a Scope
 
 If we want to count products that are in stock in our online shop, then
 we can use the following query each time:
@@ -3230,7 +3230,7 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-## Passing in Arguments
+### Passing in Arguments
 
 If you need a NamedScope that can also process parameters, then that is
 no problem either. The following example outputs products that are
@@ -3255,7 +3255,7 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-## Creating New Records with Scopes
+### Creating New Records with Scopes
 
 Let's use the following `app/models/product.rb`{.filename}:
 
@@ -3285,14 +3285,14 @@ This works with the method `build`{.methodname} (see [the section called
 `create`{.methodname} (see [the section called
 “create”](#activerecord_create "create")).
 
-## Validation
+### Validation
 
 Non-valid records are frequently a source of errors in programs. With
 `validates`{.methodname}, Rails offers a quick and easy way of
 validating them. That way you can be sure that only meaningful records
 will find their way into your database.
 
-## Preparation
+### Preparation
 
 Let's create a new application for this chapter:
 
@@ -3307,7 +3307,7 @@ $ rake db:migrate
 $
 ```
 
-# The Basic Idea
+## The Basic Idea
 
 For each model, there is a matching model file in the directory
 `app/models/`{.filename}. In this Ruby code, we can not only define
@@ -3414,7 +3414,7 @@ Only once we assign a value to the attributes `name`{.varname} and
 >>
 ```
 
-# valid?
+## valid?
 
 The method `valid?`{.methodname} indicates in boolean form if an object
 is valid. So you can check the validity already before you save:
@@ -3427,7 +3427,7 @@ is valid. So you can check the validity already before you save:
 >>
 ```
 
-# save( validate: false )
+## save( validate: false )
 
 As so often in life, you can find a way around everything. If you pass
 the parameter `:validate => false`{.code} to the method
@@ -3451,13 +3451,13 @@ the parameter `:validate => false`{.code} to the method
 $
 ```
 
-### Warning
+#### Warning
 
 I assume that you understand the problems involved here. Please only use
 this option if there is a good reason to do so. Otherwise you might as
 well do without the whole validation process.
 
-## presence
+### presence
 
 In our model `product`{.varname} there are a few fields that must be
 filled in in any case. We can achieve this via `presence`{.methodname}.
@@ -3505,7 +3505,7 @@ Only once we have entered all the data, the record can be saved:
 $
 ```
 
-# length
+## length
 
 With `length`{.methodname} you can limit the length of a specific
 attribute. It's easiest to explain using an example. Let us limit the
@@ -3540,11 +3540,11 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-## Options
+### Options
 
 `length`{.methodname} can be called with the following options.
 
-## minimum
+### minimum
 
 The minimum length of an attribute. Example:
 
@@ -3554,7 +3554,7 @@ validates :name,
           length: { minimum: 2 }
 ```
 
-## too\_short
+### too\_short
 
 Defines the error message of `:minimum`{.methodname}. Default: "is too
 short (min is %d characters)". Example:
@@ -3566,12 +3566,12 @@ validates :name,
           too_short: "must have at least %{count} characters"}
 ```
 
-### Note
+#### Note
 
 For all error messages, please note [Chapter 10,
 *Internationalization*](#i18n "Chapter 10. Internationalization").
 
-## maximum
+### maximum
 
 The maximum length of an attribute. Example:
 
@@ -3581,7 +3581,7 @@ validates :name,
           length: { maximum: 20 }
 ```
 
-## too\_long
+### too\_long
 
 Defines the error message of `:maximum`{.methodname}. Default: "is too
 long (maximum is %d characters)". Example:
@@ -3593,12 +3593,12 @@ validates :name,
           too_long: "must have at most %{count} characters" }
 ```
 
-## Note
+### Note
 
 For all error messages, please note [Chapter 10,
 *Internationalization*](#i18n "Chapter 10. Internationalization").
 
-## is
+### is
 
 Is exactly the specified number of characters long. Example:
 
@@ -3608,7 +3608,7 @@ validates :name,
           length: { is: 8 }
 ```
 
-## :in or :within
+### :in or :within
 
 Defines a length interval. The first number specifies the minimum number
 of the range and the second the maximum. Example:
@@ -3619,7 +3619,7 @@ validates :name,
           length: { in: 2..20 }
 ```
 
-## tokenizer
+### tokenizer
 
 You can use this to define how the attribute should be split for
 counting. Default: `lambda{ |value| value.split(//) }`{.code}
@@ -3632,7 +3632,7 @@ validates :content,
           tokenizer: lambda {|str| str.scan(/\w+/)}
 ```
 
-## numericality
+### numericality
 
 With `numericality`{.methodname} you can check if an attribute is a
 number. It's easier to explain if we use an example.
@@ -3669,16 +3669,16 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-### Tip
+#### Tip
 
 You can use `numericality`{.methodname} to define the content as number
 even if an attribute is saved as string in the database.
 
-## Options
+### Options
 
 `numericality`{.methodname} can be called with the following options.
 
-## only\_integer
+### only\_integer
 
 The attribute can only contain an integer. Default: false. Example:
 
@@ -3687,7 +3687,7 @@ validates :weight,
           numericality: { only_integer: true }
 ```
 
-## greater\_than
+### greater\_than
 
 The number saved in the attribute must be greater than the specified
 value. Example:
@@ -3697,7 +3697,7 @@ validates :weight,
           numericality: { greater_than: 100 }
 ```
 
-## greater\_than\_or\_equal\_to
+### greater\_than\_or\_equal\_to
 
 The number saved in the attribute must be greater than or equal to the
 specified value. Example:
@@ -3707,7 +3707,7 @@ validates :weight,
           numericality: { greater_than_or_equal_to: 100 }
 ```
 
-## equal\_to
+### equal\_to
 
 Defines a specific value that the attribute must have. Example:
 
@@ -3716,7 +3716,7 @@ validates :weight,
           numericality: { equal_to: 100 }
 ```
 
-## less\_than
+### less\_than
 
 The number saved in the attribute must be less than the specified value.
 Example:
@@ -3726,7 +3726,7 @@ validates :weight,
           numericality: { less_than: 100 }
 ```
 
-## less\_than\_or\_equal\_to
+### less\_than\_or\_equal\_to
 
 The number saved in the attribute must be less than or equal to the
 specified value. Example:
@@ -3736,7 +3736,7 @@ validates :weight,
           numericality: { less_than_or_equal_to: 100 }
 ```
 
-## odd
+### odd
 
 The number saved in the attribute must be an odd number. Example:
 
@@ -3745,7 +3745,7 @@ validates :weight,
           numericality: { odd: true }
 ```
 
-## even
+### even
 
 The number saved in the attribute must be an even number. Example:
 
@@ -3754,7 +3754,7 @@ validates :weight,
           numericality: { even: true }
 ```
 
-# uniqueness
+## uniqueness
 
 With `uniqueness`{.methodname} you can define that the value of this
 attribute must be unique in the database. If you want a product in the
@@ -3791,7 +3791,7 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-### Warning
+#### Warning
 
 The validation via `uniqueness`{.methodname} is no absolute guarantee
 that the attribute is unique in the database. A race condition could
@@ -3799,11 +3799,11 @@ occur (see `http://en.wikipedia.org/wiki/Race_condition`{.uri}). A
 detailled discussion of this effect would go beyond the scope of book
 aimed at beginners (this phenomenon is extremely rare).
 
-## Options
+### Options
 
 `uniqueness`{.methodname} can be called with the following options.
 
-## scope
+### scope
 
 Defines a scope for the uniqueness. If we had a differently structured
 phone number database (with just one field for the phone number), then
@@ -3816,7 +3816,7 @@ validates :name,
           uniqueness: { scope: :user_id }
 ```
 
-## case\_sensitive
+### case\_sensitive
 
 Checks for uniqueness of upper and lower case as well. Default: false.
 Example:
@@ -3827,7 +3827,7 @@ validates :name,
           uniqueness: { case_sensitive: true }
 ```
 
-# inclusion
+## inclusion
 
 With `inclusion`{.methodname} you can define from which values the
 content of this attribute can be created. For our example, we can
@@ -3865,17 +3865,17 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-### Tip
+#### Tip
 
 Always remember the power of Ruby! For example, you can generate the
 enumerable object always live from another database. In other words, the
 validation is not defined statically.
 
-## Options
+### Options
 
 `inclusion`{.methodname} can be called with the following option.
 
-## message
+### message
 
 For outputting custom error messages. Default: "is not included in the
 list". Example:
@@ -3886,12 +3886,12 @@ validates :in_stock,
                           message: 'this one is not allowed' }
 ```
 
-### Note
+#### Note
 
 For all error messages, please note [Chapter 10,
 *Internationalization*](#i18n "Chapter 10. Internationalization").
 
-# exclusion
+## exclusion
 
 `exclusion`{.methodname} is the inversion of [the section called
 “inclusion”](#validates_inclusion_of "inclusion"). You can define from
@@ -3911,17 +3911,17 @@ class Product < ActiveRecord::Base
 end
 ```
 
-### Tip
+#### Tip
 
 Always remember the power of Ruby! For example, you can generate the
 enumerable object always live from another database. In other words, the
 validation does not have to be defined statically.
 
-## Options
+### Options
 
 `exclusion`{.methodname} can be called with the following option.
 
-## message
+### message
 
 For outputting custom error messages. Example:
 
@@ -3931,12 +3931,12 @@ validates :in_stock,
                           message: 'this one is not allowed' }
 ```
 
-### Note
+#### Note
 
 For all error messages, please note [Chapter 10,
 *Internationalization*](#i18n "Chapter 10. Internationalization").
 
-## format
+### format
 
 With `format`{.methodname} you can define via a regular expression (see
 `http://en.wikipedia.org/wiki/Regular_expression`{.uri}) how the content
@@ -3950,13 +3950,13 @@ validates :email,
           format: { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }
 ```
 
-### Warning
+#### Warning
 
 It should be obvious that the e-mail address validation shown here is
 not complete. It is just meant to be an example. You can only use it to
 check the syntactic correctness of an e-mail address.
 
-## Options
+### Options
 
 `validates_format_of`{.methodname} can be called with the following
 options:
@@ -3977,11 +3977,11 @@ options:
     For all error messages, please note [Chapter 10,
     *Internationalization*](#i18n "Chapter 10. Internationalization").
 
-## General Validation Options
+### General Validation Options
 
 There are some options that can be used for all validations.
 
-## allow\_nil
+### allow\_nil
 
 Allows the value `nil`{.code}. Example:
 
@@ -3991,7 +3991,7 @@ validates :email,
           allow_nil: true
 ```
 
-## allow\_blank
+### allow\_blank
 
 As `allow_nil`{.code}, but additionally with an empty string. Example:
 
@@ -4001,7 +4001,7 @@ validates :email,
           allow_blank: true
 ```
 
-## on
+### on
 
 With `on`{.code}, a validation can be limited to the events
 `create`{.code}, `update`{.code} or `safe`{.code}. In the following
@@ -4014,7 +4014,7 @@ validates :email,
           on: :create
 ```
 
-## `if`{.code} and `unless`{.code}
+### `if`{.code} and `unless`{.code}
 
 `if`{.code} or `unless`{.code} call the specified method and only
 execute the validation if the result of the method is true:
@@ -4029,7 +4029,7 @@ def today_is_monday?
 end
 ```
 
-## proc
+### proc
 
 `:`{.code}`proc`{.code} calls a `Proc`{.classname} object.
 
@@ -4039,12 +4039,12 @@ validates :name,
           if: Proc.new { |a| a.email == 'test@test.com' }
 ```
 
-## Writing Custom Validations
+### Writing Custom Validations
 
 Now and then, you want to do a validation where you need custom program
 logic. For such cases, you can define custom validations.
 
-## Defining Validations with Your Own Methods
+### Defining Validations with Your Own Methods
 
 Let's assume you are a big shot hotel mogul and need a reservation
 system.
@@ -4113,13 +4113,13 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-## Further Documentation
+### Further Documentation
 
 The topic validations is described very well in the official Rails
 documentation at
 `http://guides.rubyonrails.org/active_record_validations.html`{.uri}.
 
-## Migrations
+### Migrations
 
 SQL database tables are generated in Rails with *migrations* and they
 should also be changed with *migrations*. If you create a model with
@@ -4254,7 +4254,7 @@ Loading development environment (Rails 4.0.0)
 $
 ```
 
-### Warning
+#### Warning
 
 Please note that you need to add the new field in
 `attr_accessible`{.methodname} in `app/models/product.rb`{.filename},
@@ -4283,7 +4283,7 @@ Current version: 20121119143522
 $
 ```
 
-### Important
+#### Important
 
 Please note that all version numbers and timestamps only apply to the
 example printed here. If you recreate the example, you will of course
@@ -4315,7 +4315,7 @@ $
 
 The table was deleted with all data. We are back to square one.
 
-## Which Database is Used?
+### Which Database is Used?
 
 The database table is created through the migration. As you can see, the
 table names automatically get the plural of the *model*s
@@ -4324,20 +4324,20 @@ the tables created? This is defined in the configuration file
 `config/database.yml`{.filename}:
 
 ``` {.programlisting}
-## SQLite version 3.x
-#   gem install sqlite3
-##
-##   Ensure the SQLite 3 gem is defined in your Gemfile
-##   gem 'sqlite3'
+### SQLite version 3.x
+##   gem install sqlite3
+###
+###   Ensure the SQLite 3 gem is defined in your Gemfile
+###   gem 'sqlite3'
 development:
   adapter: sqlite3
   database: db/development.sqlite3
   pool: 5
   timeout: 5000
 
-## Warning: The database defined as "test" will be erased and
-## re-generated from your development database when you run "rake".
-## Do not set this db to the same as development or production.
+### Warning: The database defined as "test" will be erased and
+### re-generated from your development database when you run "rake".
+### Do not set this db to the same as development or production.
 test:
   adapter: sqlite3
   database: db/test.sqlite3
@@ -4406,7 +4406,7 @@ The table `schema_migrations`{.literal} is used for the versioning of
 the migrations. This table is created during the first migration carried
 out by Rails, if it does not yet exist.
 
-## Creating Index
+### Creating Index
 
 I assume that you know what a database index is. If not, you will find a
 brief introduction at
@@ -4465,7 +4465,7 @@ class CreateIndex < ActiveRecord::Migration
 end
 ```
 
-### Tip
+#### Tip
 
 You can also create an index directly when you generate the model. In
 our case (an index for the attribute `name`{.code}) the command would
@@ -4497,14 +4497,14 @@ end
 $
 ```
 
-## Miscellaneous
+### Miscellaneous
 
 This book is aimed at beginners, so I cannot discuss the topic
 migrations in great depth. The main focus is on understanding the
 mechanics in principle. But there are a few details that are so
 important that I want to mention them here.
 
-## Automatically Added Fields (id, created\_at and updated\_at)
+### Automatically Added Fields (id, created\_at and updated\_at)
 
 Rails kindly adds the following fields automatically in the default
 migration:
@@ -4524,7 +4524,7 @@ At first you may ask yourself: "Is that really necessary? Does it make
 sense?". But after a while you will learn to appreciate these automatic
 fields. Omitting them would usually be false economy.
 
-## Further Documentation
+### Further Documentation
 
 The following webpages provide excellent further information on the
 topic migration:
@@ -4536,14 +4536,14 @@ topic migration:
     if you are trying to understand the basics.
 -   `http://www.dizzy.co.uk/ruby_on_rails/cheatsheets/rails-migrations`{.uri}
 
-## Miscellaneous
+### Miscellaneous
 
 In this section, I am going to show you some examples of topics and
 questions that are important for your everyday work, but as a whole go
 beyond the scope of this book aimed at beginners. They provide recipes
 for solving specific ActiveRecord problems.
 
-# Callbacks
+## Callbacks
 
 Callbacks are defined programming hooks in the life of an ActiveRecord
 object. You can find a list of all callbacks at
@@ -4627,7 +4627,7 @@ Values”](#ar_default_werte "Default Values") you will find an example
 for defining a default value for a new object via an
 `after_initialize`{.methodname} callback.
 
-# Default Values
+## Default Values
 
 If you need specific default values for an ActiveRecord object, you can
 easily implement this with the `after_initialize`{.methodname} callback.
