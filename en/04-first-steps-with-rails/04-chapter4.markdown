@@ -1,7 +1,5 @@
 # First Steps with Rails
 
-## Introduction
-
 Now that you have painstakingly read your way through "Ruby Basics"
 we can move on to a more exciting bit. In this chapter, we will start
 our first Ruby on Rails project and find our way into the topic step
@@ -10,12 +8,12 @@ by step.
 We will use Ruby on Rails version 4.0. Please update to this version in
 case have installed an older one.
 
-### Note
+## Note
 
 In this chapter, we will also move on the double in some cases. Once
 more, there will be some typical chicken and egg problems.
 
-## Environment (Development)
+### Environment (Development)
 
 By default a Rails project offers three different environments:
 
@@ -41,7 +39,7 @@ Nginx. The same applies to the database.
 In order to work in the Development environment, you do not need to make
 any changes to start with - all commands work by default.
 
-## SQLite-3 Database
+### SQLite-3 Database
 
 In terms of the database, the main focus in this chapter is once more
 not on optimum performance, but on showing you a simple way of getting
@@ -50,7 +48,7 @@ everything you need fully installed and you don't need to worry about
 anything. Later I will explain how you can use other databases (for
 example MySQL).
 
-## Why Is It All in English?
+### Why Is It All in English?
 
 If you are a native English speaker, you may not find it surprising that
 Rails apparently loves the English language. Even if you are not a
@@ -71,13 +69,13 @@ international projects, you should obviously write the comments in
 English as well. Yeah, sure … well written code does not need any
 comments. ;-)
 
-## Static Content (HTML and Graphics Files)
+### Static Content (HTML and Graphics Files)
 
 If you are reading this text, you will already know that you can use
 Rails to somehow output web pages. The question is just how it's done.
 Let's first create a new Rails project.
 
-## Create Rails Project
+### Create Rails Project
 
 Before we even get going, please check that you are using Ruby version
 2.0:
@@ -115,7 +113,7 @@ $ rails new testproject
 $
 ```
 
-### Note
+#### Note
 
 In previous versions of Rails, you had to do a **bundle install** first.
 With Rails 3.2 onwards, this is done automatically when you create a new
@@ -127,7 +125,7 @@ wheel.
 Next, we check if the new Rails application is working by launching the
 integrated web server.
 
-### Tip
+#### Tip
 
 Depending on the operating system (for example, Mac OS X) and on your
 firewall settings, you may see a popup window when first starting a
@@ -172,11 +170,11 @@ Completed 200 OK in 21ms (Views: 5.3ms | ActiveRecord: 0.0ms)
 If we now click the link “*About your application's environment*”, we
 can more information on the current environment.
 
-### Important
+#### Important
 
 With **Ctrl**+**C** you can stop the web server.
 
-## Static Pages
+### Static Pages
 
 There are certain static pages, images and JavaScript files that are
 automatically output by Rails. Remember part of the output of the
@@ -231,7 +229,7 @@ Hello World
 No output in the log means: This page was not handled by the Rails
 framework. It was delivered directly from the webserver.
 
-## Note
+### Note
 
 We can of course also use the URL
 `http://0.0.0.0:3000/hello-world.html`{.uri}. But Rails regards HTML and
@@ -250,7 +248,7 @@ Mode*](#rails_production_webserver "Chapter 16. Web Server in Production Mode").
 
 With **Ctrl**+**C** you can stop the Rails server.
 
-# Creating HTML Dynamically with erb
+## Creating HTML Dynamically with erb
 
 The the content of an `erb`{.literal} file will propably seem familiar
 to you. It is a mixture of HTML and Ruby code (`erb`{.literal} stands
@@ -389,7 +387,7 @@ URI “`/example/test`{.literal}”. That was then apparently rendered as
 HTML by the controller `ExampleController`{.code} using the method
 `test`{.methodname}.
 
-## Note
+### Note
 
 The other lines tell us that a bunch of CSS and JavaScript files are
 compiled and than delivered. In production mode these would be
@@ -453,14 +451,14 @@ The `config/routes.rb`{.filename} file includes a lot of examples. Give
 it a read when you have time. We'll dive into that later ([Chapter 6,
 *Routes*](#routes "Chapter 6. Routes")).
 
-### Important
+#### Important
 
 A static file in the directory `public`{.filename} always has higher
 priority than a route in the `config/routes.rb`{.filename}! So if we
 were to save a static file `public/example/test`{.filename} that file
 will be delivered.
 
-## Programming in an erb File
+### Programming in an erb File
 
 `Erb`{.literal} pages can contain Ruby code. You can use it to program
 and give these page dynamic content.
@@ -497,7 +495,7 @@ Visit that page with the URL `http://0.0.0.0:3000/example/test`{.uri}
 Insert erb_einfache_addition.png
 Einfache Addition
 
-## Important
+### Important
 
 If you want to output the result of Ruby code, enclose the code within a
 `<%=`{.code} ... `%>`{.code}.
@@ -535,7 +533,7 @@ $
 You are now going to learn the finer points of `erb`{.literal} step by
 step. Don't worry, it's neither magic nor rocket science.
 
-## Syntax
+### Syntax
 
 In a `.html.erb`{.filename}file, there are two kinds of Ruby code
 instructions in addition to the HTML elements:
@@ -547,7 +545,7 @@ instructions in addition to the HTML elements:
     as a String. If is is not a String the methode `to_s`{.methodname}
     will be called.
 
-### Important
+#### Important
 
 The output of \<%= ... %\> is automatically escaped. So you don't need
 to worry about "dangerous" HTML.
@@ -605,7 +603,7 @@ Let's now have a look at the HTML source code in the browser:
 
 Now you have the important tools to use Ruby code in a view.
 
-# Q & A
+## Q & A
 
 Potentially, there are two open questions:
 
@@ -632,7 +630,7 @@ code. Where does it come from, and can I influence it?
 Excellent question! We will get to that next (see [the section called
 “Layouts”](#erb_layouts "Layouts")).
 
-# Layouts
+## Layouts
 
 The `erb`{.literal} file in the directory
 `app/views/example/`{.filename} only forms the core of the later HTML
@@ -701,7 +699,7 @@ You can also create other layouts in the directory
 relevant situation. But let's leave it for now. The important thing is
 that you understand the basic concept.
 
-# Passing Instance Variables from a Controller to a View
+## Passing Instance Variables from a Controller to a View
 
 One of the cardinal sins in the MVC model is to
 put too much program logic into the view. That's more or less what used
@@ -754,7 +752,7 @@ in accordance with MVC.” The above example is just the first small step
 in the right direction and shows how we can easily get values from the
 controller to the view with instance variables.
 
-## Partials
+### Partials
 
 Even with small web projects, there are often elements that appear
 repeatedly, for example a *footer* on the page with contact info or a
@@ -774,7 +772,7 @@ Copyright 2009 - <%= Date.today.year %> the Easter Bunny.
 </p>
 ```
 
-### Note
+#### Note
 
 Yes, this is not the MVC way of doing it. Date.today.year should be
 defined in the Controller. I'm glad that you caught this mistake. I made
@@ -808,7 +806,7 @@ The new web page now looks like this:
 Insert partials_footer.png
 Partial Footer
 
-### Important
+#### Important
 
 The name of a partial in the code is always specified *without* the
 preceding underscore (`_`{.literal}) and *without* the file extension
@@ -826,7 +824,7 @@ then integrate this file into the `erb`{.literal} code via the line:
 <%= render "shared/footer" %>
 ```
 
-## Passing Variables to a Partial
+### Passing Variables to a Partial
 
 Partials are great in the sense of the DRY (***D**on't **R**epeat
 **Y**ourself*) concept. But what makes them really useful is the option
@@ -875,7 +873,7 @@ the Easter Bunny.
 </p>
 ```
 
-### Note
+#### Note
 
 `defined?`{.methodname} can be used to check if an expression has been
 defined.
@@ -884,7 +882,7 @@ You can call this partial with
 `<%= render 'footer',         :start_year => '2000' %>`{.code} and with
 `<%= render         'footer' %>`{.code}.
 
-## Alternative Notation
+### Alternative Notation
 
 In [the section called “Passing Variables to a
 Partial”](#partials_locale_variables "Passing Variables to a Partial")
@@ -895,20 +893,20 @@ see this long version:
 <%= render :partial => "footer", :locals => { :start_year => '2000' } %>
 ```
 
-# Further Documentation on Partials
+## Further Documentation on Partials
 
 We have really only barely scratched the surface here. Partials are very
 powerful tools. You can find the official Ruby on Rails documentation on
 partials at
 `http://guides.rubyonrails.org/layouts_and_rendering.html#using-partials`{.uri}.
 
-## Redirects
+### Redirects
 
 The name says it all, really: *redirects* are commands that you can use
 within the controller to “skip”, i.e. redirect, to other to other web
 pages.
 
-### Note
+#### Note
 
 A redirect returns to the browser the response "302 Moved" with the new
 target. So each redirect does a roundtrip to the browser and back.
@@ -993,7 +991,7 @@ game_pong GET /game/pong(.:format) game#pong
 $
 ```
 
-## Note
+### Note
 
 As you can see, the route to the *action*`ping`{.literal} of the
 controller `GameController`{.literal} now gets the name
@@ -1027,14 +1025,14 @@ Processing by GameController#pong as HTML
 Completed 200 OK in 743ms (Views: 741.9ms | ActiveRecord: 0.0ms)
 ```
 
-## redirect\_to :back
+### redirect\_to :back
 
 If you want to redirect the user of your webapplication to the page he
 has just been you can use `redirect_to :back`{.code}. This is very
 useful in a scenario where your user first has to login to get access to
 a specific page.
 
-## Flash Messages
+### Flash Messages
 
 In my eyes, the term “*flash messages*” is somewhat misleading. Almost
 anyone would associate the term “*Flash*” with more or less colorful web
@@ -1113,19 +1111,19 @@ normal Pong page. But if we go to `http://0.0.0.0:3000/game/ping`{.uri}
 we are redirected to the Pong page and then the flash message is
 displayed at the top.
 
-### Tip
+#### Tip
 
 If you do not see a flash message that you were expecting, first check
 in the view to see if the flash message is output there.
 
-## Different Types of Flash Message
+### Different Types of Flash Message
 
 Flash messages are automagically passed to the view in a hash. By
 default, there are three different types: `error`{.literal},
 `warning`{.literal} and `notice`{.literal}. You can also invent your own
 category and then get it in the view later.
 
-# Different Syntaxes
+## Different Syntaxes
 
 Depending on the programmer's preferences, you will find different
 syntaxes of flash messages in practice. I am not going to take part in
@@ -1140,7 +1138,7 @@ Please have a look at the official documentation at
 `http://guides.rubyonrails.org/action_controller_overview.html#the-flash`{.uri}
 for more information.
 
-## Why Are There Flash Messages At All?
+### Why Are There Flash Messages At All?
 
 You may wonder why there are flash messages in the first place. Couldn't
 you just build them yourself if you need them? Yes, indeed. But flash
@@ -1148,7 +1146,7 @@ messages have the advantage that they offer a defined approach that is
 the same for any programmer. So you don't need to start from scratch
 every single time you need one.
 
-## The Rails Console
+### The Rails Console
 
 The *console* in Rails is nothing more than an `irb`{.literal} (see [the
 section called “irb”](#irb "irb")) built around the Rails environment.
@@ -1223,7 +1221,7 @@ Already in [Chapter 4,
 going to be working lots with the console and will soon begin to
 appreciate the possibilities it offers.
 
-### Tip
+#### Tip
 
 One of my best buddies when developing Rails applications is the Tab
 key. Whenever you are looking for a method for a particular problem,
@@ -1231,7 +1229,7 @@ recreate it in the Rails console and then press the Tab key twice to
 list all available methods. The names of the methods are usually
 self-exlanatory.
 
-## app
+### app
 
 **app** is useful if you want to analyze things to do with routing:
 
@@ -1260,14 +1258,14 @@ Completed 200 OK in 50ms (Views: 49.2ms | ActiveRecord: 0.0ms)
 $
 ```
 
-## Misc
+### Misc
 
 You have now already created a simple Rails application and in the next
 chapter you will dive deeply into the topic ActiveRecord. So now is a
 good time to very briefly introduce a few terms that often surface in
 the world of Rails.
 
-## "Model View Controller" Architecture (MVC)
+### "Model View Controller" Architecture (MVC)
 
 According to Wikipedia
 (`http://en.wikipedia.org/wiki/Model–view–controller`{.uri}), MVC is a
@@ -1281,7 +1279,7 @@ agreement has the enormous advantage that once you are used to this
 concept, you know exactly where you can find or need to integrate a
 certain functionaity in a Rails project.
 
-# Model
+## Model
 
 "Model" in this case means data model. By default, Rails applications
 are an ActiveRecord data model (see [Chapter 4,
@@ -1289,7 +1287,7 @@ are an ActiveRecord data model (see [Chapter 4,
 
 All models can be found in the directory `app/models/.`{.filename}
 
-## View
+### View
 
 The "view" is responsible for the presentation of the application. It
 takes care of rendering the web page, an XML or JSON file. A view could
@@ -1298,7 +1296,7 @@ application.
 
 You will find all the views in the directory `app/views/.`{.filename}
 
-## Controller
+### Controller
 
 Once a web page call has ended up in a route (see [Chapter 6,
 *Routes*](#routes "Chapter 6. Routes")), it goes from there to the
@@ -1310,7 +1308,7 @@ renders the desired view.
 All controllers can be found in the directory
 `app/controllers/.`{.filename}
 
-## What is a Generator?
+### What is a Generator?
 
 We have already used the command **rails generate controller**. It
 starts the generator with the name `controller`{.code}. There are other
@@ -1367,13 +1365,13 @@ same manually, without the generator. So you do not have to use a
 generator. It is primarily intended to save you work and avoid potential
 errors that can easily arise from mindless repetitive tasks.
 
-### Tip
+#### Tip
 
 Someday you might want to create your own generator. Have a look at
 `http://guides.rubyonrails.org/generators.html`{.uri} to find a
 description of how to do that.
 
-## Helper
+### Helper
 
 A helper method takes care of recurring tasks in a view. For example, if
 you want to display stars (\*) for rating a restaurant and not a number
@@ -1427,25 +1425,25 @@ only for this controller or for the views of this controller.
 
 All helpers are in the directory `app/helpers/.`{.filename}
 
-## Rails Lingo
+### Rails Lingo
 
 Here you find a couple of words which you'll often find in the Ruby on
 Rails universe.
 
-## DRY - Don't repeat yourself
+### DRY - Don't repeat yourself
 
 Many Rails programmers are big fans of DRY. DRY means purely and simply
 that you should try to place repeated programming logic into separate
 methods.
 
-## Refactoring
+### Refactoring
 
 You often hear the word refactoring in the context of DRY. This involves
 functioning applications that are further improved. The application in
 itself remains unchanged in its interface. But its core is optimized,
 amongst others through DRY.
 
-## Convention Over Configuration
+### Convention Over Configuration
 
 Convention over configuration (also known as coding by convention, see
 `http://en.wikipedia.org/wiki/Convention_over_configuration`{.uri}) is
