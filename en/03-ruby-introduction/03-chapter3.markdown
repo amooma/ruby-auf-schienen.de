@@ -1,9 +1,6 @@
 # Ruby Introduction
 
-This book requires basic knowledge of HTML, plus the reader - you, in
-other words - should also have a basic understanding of programming.
-
-A couple of years ago I made the mistake of trying to understand Ruby on
+A couple of years ago I made the mistake of starting with Ruby on
 Rails without knowing anything about Ruby. Ruby just looked so simple,
 so I didn't give it another thought. But because I did not have a basic
 understanding of Ruby, I was not able to understand Rails properly. So I
@@ -11,8 +8,8 @@ kept shunting it into a virtual corner and carried on working with PHP
 instead. One can only feel the magic of Rails after understanding the
 basics of Ruby.
 
-The inventor of Ruby, Yukihiro Matsumoto, states in his book “*The Ruby
-Programming Language*” that:
+The inventor of Ruby, Yukihiro Matsumoto, states in his book “The Ruby
+Programming Language” that:
 
 “It is easy to program in Ruby, but Ruby is not a simple language.”
 
@@ -20,23 +17,21 @@ This chapter is a tightrope walk between oversimplification and a degree
 of detail that is unnecessary for a Rails newbie. After all, the
 objective is not becoming a Ruby guru, but understanding Ruby on Rails.
 I am going to elaborate on the most important points. The rest is then
-up to you. If you would like to know more about Ruby, then I recommend
+up to you. If you would like to know more about Ruby, I recommend
 the book "The Ruby Programming Language" by David Flanagan and Yukihiro
 Matsumoto.
 
-Because Ruby version 2.0 is the way to go we use it. Please take care to
+Because Ruby version 2.1 is the way to go we use it. Please take care to
 update your current Ruby if you are running older versions. The command
 **ruby -v** will print the current running Ruby version:
 
 ``` {.screen}
-$ ruby -v
-ruby 2.0.0p247 (2013-06-27 revision 41674) [x86_64-darwin12.4.0]
-$
+xyz@debian:~$ ruby -v
+ruby 2.1.1p76 (2014-02-24 revision 45161) [i686-linux]
+xyz@debian:~$
 ```
 
-### Warning
-
-The beginning of this chaper is going to be a bit boring. Bear with me.
+The beginning of this chapter is going to be a bit boring. Bear with me.
 It is worth it.
 
 ## Hello World
@@ -47,7 +42,7 @@ but read by an interpreter and then processed line by line.
 A simple Ruby program `hello-world.rb`{.filename} consist of the
 following line:
 
-``` {.programlisting}
+```ruby
 puts 'Hello World!'
 ```
 
@@ -64,10 +59,9 @@ $
 A program line in a Ruby program does not have to end with a semicolon.
 The Ruby interpreter is even so intelligent that is recognizes if a
 program line was split over two or more lines for the sake of
-readability. I will spare you the corresponding examples and am only
-mentioning this so you don't say or think later, "is it okay like this?"
+readability.
 
-Indenting code is also not necessary. But it does make it much easier to
+Indenting code is not necessary. But it does make it much easier to
 read for human beings!
 
 ## puts and print
@@ -82,7 +76,7 @@ two typical ways of printing text on the screen:
 Example program (an extension of the program
 `hello-world.rb`{.filename}):
 
-``` {.programlisting}
+```ruby
 puts 'Hello World!'
 puts
 puts '------------'
@@ -108,18 +102,18 @@ A comment in a Ruby program starts with a `#`{.code}-sign and ends with
 a newline. As an example, I can add a comment to the
 `hello-world.rb`{.filename} above:
 
-``` {.programlisting}
-## Program for displaying "Hello World!"
-## by Stefan Wintermeyer
+```ruby
+# Program for displaying "Hello World!"
+# by Stefan Wintermeyer
 
 puts 'Hello World!'
 ```
 
 A comment can also follow a program line:
 
-``` {.programlisting}
-## Program for displaying "Hello World!"
-## by Stefan Wintermeyer
+```ruby
+# Program for displaying "Hello World!"
+# by Stefan Wintermeyer
 
 puts 'Hello World!'  # output
 ```
@@ -127,9 +121,9 @@ puts 'Hello World!'  # output
 A `#`{.code}-sign within strings in inverted commas is not treated as
 the start of a comment. Example program:
 
-``` {.programlisting}
-## Example program
-## by Stefan Wintermeyer
+```ruby
+# Example program
+# by Stefan Wintermeyer
 
 puts 'Hello World!'
 puts '############'
@@ -148,73 +142,6 @@ Hello World!
 $
 ```
 
-## Help via ri
-
-When programming, you do not always have a Ruby handbook available.
-Fortunately, the Ruby developers thought of this and provided a built-in
-help feature in form of the program `ri`{.literal} (of course only if
-you have installed the documentation). ri is the abbreviation for
-“**R**uby **I**ndex”. The output gets opend in a so called pager (z.B.
-**less**). The parameter *`-T`* sets the output directly to stdout.
-
-This is a typical chicken and egg situation. How can I explain the Ruby
-help feature, if we are only just getting started with Ruby? So I am
-going to jump ahead a little and show you how you can search for
-information on the class `String`{.classname}:
-
-``` {.screen}
-$ ri String
-String < Object
-
-------------------------------------------------------------------------------
-Includes:
-Comparable (from ruby site)
-
-(from ruby site)
-------------------------------------------------------------------------------
-
-
-Rake extension methods for String.
-
-A String object holds and manipulates an arbitrary sequence of bytes,
-typically representing characters. String objects may be created using
-String::new or as literals.
-
-Because of aliasing issues, users of strings should be aware of the methods
-that modify the contents of a String object.  Typically, methods with
-names ending in ``!'' modify their receiver, while those without a ``!''
-return a new String.  However, there are exceptions, such as
-String#[]=.
-------------------------------------------------------------------------------
-[...]
-$
-```
-
-If we are looking for information on a specific method (chicken-egg!),
-then we can also use `ri`{.literal}. Let's take `gsub`{.methodname} as
-an example. This is a method for replacing parts of a
-`String`{.classname} (that is useful now and again).
-
-``` {.screen}
-$ ri String.size
-= String.size
-
-(from ruby site)
-------------------------------------------------------------------------------
-  str.size     -> integer
-
-------------------------------------------------------------------------------
-
-Returns the character length of str.
-
-$
-```
-
-The program **ri** always prints the output in the pager program defined
-by the shell (for example **less**). You can also use the command option
-**-T** to output everything directly to STDOUT. In the book I am going
-to be using both variations.
-
 ## irb
 
 irb stands for “**I**nteractive **R**u**b**y” and is a kind of sandbox
@@ -224,21 +151,20 @@ entering **irb** on the shell and ends if you enter **exit**.
 An example is worth a thousand words:
 
 ``` {.screen}
-$ irb --simple-prompt
->> puts 'Hello World!'
+$ irb
+2.1.1 :001 > puts 'Hello World!'
 Hello World!
-=> nil
->> exit
+ => nil
+2.1.1 :002 > exit
 $
 ```
 
-### Note
+To save real estate on the screen I'll use the following .irbrc
+configuration to get rid of the '2.1.1 :001' part in each line.
 
-I use **irb --simple-prompt** to generate shorter lines which make it
-easier to read this book on mobile devises.
-
-In this chapter, we develop many examples within irb. It is so
-wonderfully quick and easy.
+```{.programlisting}
+IRB.conf[:PROMPT_MODE] = :SIMPLE
+```
 
 ## Comments in irb
 
@@ -261,11 +187,9 @@ mean? I cannot change any property of an object directly from the
 outside. The corresponding object has to offer a method with which I can
 do so.
 
-### Note
-
 Please do not panic if you have no idea what a class and an object is. I
 won't tell anyone and you can still work with it just fine without
-worrying too much. This topic alone could fill whole volumes. Roughly
+worrying too much. This topic alone could fill whole book shelfs. Roughly
 speaking, an object is a container for something and a method changes
 something in that container.
 
@@ -276,8 +200,6 @@ gradually get clearer.
 
 In other programming languages, the terms you would use for Ruby methods
 would be: functions, procedures, subroutines and of course methods.
-
-### Note
 
 Here we go with the oversimplification. We can not compare non-Object
 oriented programming languages with OO onces. Plus there are two kinds
@@ -294,7 +216,7 @@ So let's assume that we use the following code sequence repeatedly - for
 whatever reason:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> puts 'Hello World!'
 Hello World!
 => nil
@@ -308,30 +230,28 @@ Hello World!
 $
 ```
 
-So we want to output the string “Hello World!” three times in a row. As
-this makes our daily work routine much longer, we are now going to
-define a method (with the meaningless name `three_times`{.methodname}),
-with which this can all be done in one go.
+So we want to print the string “Hello World!” three times in a row. As this
+makes work routine much longer, we can define a method (with the
+meaningless name `three_times`{.methodname}), with which this can all be
+done in one go.
 
-### Important
-
-Names of methods are always written in lower case.
+_Names of methods are always written in lower case._
 
 ``` {.screen}
-$ irb --simple-prompt
+xyz@debian:~$ irb
 >> def three_times
 >>   puts 'Hello World!'
 >>   puts 'Hello World!'
 >>   puts 'Hello World!'
 >> end
-=> nil
+=> :three_times
 >> three_times
 Hello World!
 Hello World!
 Hello World!
 => nil
 >> exit
-$
+xyz@debian:~$
 ```
 
 When defining a method, you can define required parameters and use them
@@ -339,13 +259,13 @@ within the method. This enables us to create a method to which we pass a
 string as parameter and we can then output it three times.
 
 ``` {.screen}
-$ irb --simple-prompt
+xyz@debian:~$ irb
 >> def three_times(value)
 >>   puts value
 >>   puts value
 >>   puts value
 >> end
-=> nil
+=> :three_times
 >> three_times('Hello World!')
 Hello World!
 Hello World!
@@ -354,7 +274,7 @@ Hello World!
 >>
 ```
 
-Incidentally, you can omit the brackets when calling the method.
+You can omit the brackets when calling the method.
 
 ``` {.screen}
 >> three_times 'Hello World!'
@@ -365,44 +285,36 @@ Hello World!
 >>
 ```
 
-### Tip
-
 Ruby gurus and would-be gurus are going to turn up their noses on the
 subject of “unnecessary” brackets in your programs and will probably
 pepper you with more or less stupid comments with comparisons to Java
 and other programming languages.
 
 There is one simple rule in the Ruby community: the fewer brackets, the
-cooler you are! `;-)`{.literal}
-
-But you won't get a medal for using fewer brackets. Decide for yourself
-what makes you happy.
+cooler you are. But you won't get a medal for using fewer brackets.
 
 If you do not specify a parameter with the above method, you will get
 the error message:
-“`wrong number of arguments (0 for       1)`{.literal}”:
+`wrong number of arguments (0 for 1)`
 
 ``` {.screen}
 >> three_times
 ArgumentError: wrong number of arguments (0 for 1)
- from (irb):1:in `three_times'
- from (irb):7
- from /Users/xyz/.rvm/rubies/ruby-2.0.0-p247/bin/irb:16:in `<main>'
->> exit
-$
+	from (irb):1:in `three_times'
+	from (irb):8
+	from /home/xyz/.rvm/rubies/ruby-2.1.1/bin/irb:11:in `<main>'
+>>
 ```
 
-You can give the variable `value`{.varname} a default value and then you
-can also call the method without parameter:
+You can set a default value to the variable `value`{.varname}:
 
 ``` {.screen}
-$ irb --simple-prompt
 >> def three_times(value = 'blue')
 >>   puts value
 >>   puts value
 >>   puts value
 >> end
-=> nil
+=> :three_times
 >> three_times('Hello World!')
 Hello World!
 Hello World!
@@ -413,8 +325,7 @@ blue
 blue
 blue
 => nil
->> exit
-$
+>>
 ```
 
 ## Classes
@@ -424,7 +335,7 @@ with an upper case letter. Let's assume that the method belongs to the
 new class `This_and_that`{.classname}. It would then be defined as
 follows in a Ruby program:
 
-``` {.programlisting}
+```ruby
 class This_and_that
   def three_times
     puts 'Hello World!'
@@ -437,7 +348,7 @@ end
 Let's play it through in `irb`{.literal}:
 
 ``` {.screen}
-$ irb --simple-prompt
+xyz@debian:~$ irb
 >> class This_and_that
 >>   def three_times
 >>     puts 'Hello World!'
@@ -445,7 +356,7 @@ $ irb --simple-prompt
 >>     puts 'Hello World!'
 >>   end
 >> end
-=> nil
+=> :three_times
 >>
 ```
 
@@ -454,8 +365,8 @@ Now we try to call the method `three_times`{.methodname}:
 ``` {.screen}
 >> This_and_that.three_times
 NoMethodError: undefined method `three_times' for This_and_that:Class
- from (irb):8
- from /Users/xyz/.rvm/rubies/ruby-2.0.0-p247/bin/irb:16:in `<main>'
+	from (irb):8
+	from /home/xyz/.rvm/rubies/ruby-2.1.1/bin/irb:11:in `<main>'
 >>
 ```
 
@@ -467,7 +378,7 @@ class `This_and_that`{.classname} with the class method
 
 ``` {.screen}
 >> abc = This_and_that.new
-=> #<This_and_that:0x007f819412c768>
+=> #<This_and_that:0x9901b00>
 >> abc.three_times
 Hello World!
 Hello World!
@@ -492,7 +403,7 @@ opposed to public methods), and they are listed below the keyword
 irb example:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> class Example
 >>   def a
 >>     puts 'a'
@@ -511,7 +422,7 @@ a
 >> test.b
 NoMethodError: private method `b' called for #<Example:0x007ff1e10756b8>
  from (irb):12
- from /Users/xyz/.rvm/rubies/ruby-2.0.0-p247/bin/irb:16:in `<main>'
+ from /home/xyz/.rvm/rubies/ruby-2.1.1/bin/irb:11:in `<main>'
 >> exit
 $
 ```
@@ -526,7 +437,7 @@ even if it not listed explicitly under `private`{.literal}.
 irb example:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> class Room
 >>   def initialize
 >>     puts 'abc'
@@ -547,7 +458,7 @@ The method `new`{.methodname} accepts the parameters specified for the
 method `initialize`{.methodname}:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> class Example
 >>   def initialize(value)
 >>     puts value
@@ -568,7 +479,7 @@ need a way to return the result of something. The `return`{.code}
 statement can be used for that:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> def area_of_a_cirle(radius)
 >>   pi = 3.14
 >>   area = pi * radius * radius
@@ -585,7 +496,7 @@ But it wouldn't be Ruby if you couldn't do it shorter. You can simply
 skip return:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> def area_of_a_cirle(radius)
 >>   pi = 3.14
 >>   area = pi * radius * radius
@@ -602,7 +513,7 @@ You can actually even skip the last line because Ruby returns the value
 of the last expression as a default:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> def area_of_a_cirle(radius)
 >>   pi = 3.14
 >>   area = pi * radius * radius
@@ -622,7 +533,7 @@ you don't have to use it in case you feel more comfortable with out.
 A class can inherit from another class. When defining the class, the
 parent class must be added with a `<`{.literal} (smaller than) sign:
 
-``` {.programlisting}
+```ruby
 class Example < ParentClass
 ```
 
@@ -641,7 +552,7 @@ that `example2`{.varname} has access to the methods `a`{.methodname},
 `c`{.methodname}.
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> class Abc
 >>   def a
 >>     'a'
@@ -671,19 +582,17 @@ $ irb --simple-prompt
 >> example1.d
 NoMethodError: undefined method `d' for #<Abc:0x007fb463023928>
  from (irb):21
- from /Users/xyz/.rvm/rubies/ruby-2.0.0-p247/bin/irb:16:in `<main>'
+ from /home/xyz/.rvm/rubies/ruby-2.1.1/bin/irb:16:in `<main>'
 >> example1.a
 => "a"
 >> exit
 $
 ```
 
-## Tip
-
 It is important to read the Error-Messages. They tell you what happend
 and where to search for the problem. In this example Ruby said that
 there is an
-`` undefined method `d' for             #<Abc:0x007fb463023928> ``{.code}.
+`` undefined method `d' for #<Abc:0x007fb463023928> ``{.code}.
 With that information you know that the Class Abc is missing the method
 d which you were trying to use.
 
@@ -702,7 +611,7 @@ that only works with an instance. So you cannot apply the method
 Let's first try to call an instance method as class method:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> class Knowledge
 >>   def pi
 >>     3.14
@@ -712,7 +621,7 @@ $ irb --simple-prompt
 >> Knowledge.pi
 NoMethodError: undefined method `pi' for Knowledge:Class
  from (irb):6
- from /Users/xyz/.rvm/rubies/ruby-2.0.0-p247/bin/irb:16:in `<main>'
+ from /home/xyz/.rvm/rubies/ruby-2.1.1/bin/irb:16:in `<main>'
 >>
 ```
 
@@ -734,7 +643,7 @@ and pick out examples from the ActiveRecord. I will spare you this and
 show an abstract example:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> class Knowledge
 >>   def self.pi
 >>     3.14
@@ -754,7 +663,7 @@ And the proof to the contrary:
 >> example.pi
 NoMethodError: undefined method `pi' for #<Knowledge:0x007fb339078d90>
  from (irb):8
- from /Users/xyz/.rvm/rubies/ruby-2.0.0-p247/bin/irb:16:in `<main>'
+ from /home/xyz/.rvm/rubies/ruby-2.1.1/bin/irb:16:in `<main>'
 >> exit
 $
 ```
@@ -762,42 +671,38 @@ $
 There are different notations for defining class methods. The two most
 common ones are:
 
--   `self.xyz`{.code}
+```ruby
+# Variant 1
+# with self.xyz
+#
+class Knowledge
+  def self.pi
+    3.14
+  end
+end
+```
 
-    ``` {.programlisting}
-    # Variant 1
-    # with self.xyz
-    #
-    class Knowledge
-      def self.pi
-        3.14
-      end
+```ruby
+# Variant 2
+# with class << self
+#
+class Knowledge
+  class << self
+    def pi
+      3.14
     end
-    ```
+  end
+end
+```
 
--   `class << self`{.code}
-
-    ``` {.programlisting}
-    # Variant 2
-    # with class << self
-    #
-    class Knowledge
-      class << self
-        def pi
-          3.14
-        end
-      end
-    end
-    ```
-
-The result is always the same.
+The result is obviously the same.
 
 Of course you can use the same methodname for a class and an instance
 method. Obviously that doesn't make any code easier to understand. Here
 is an example with `pi`{.methodname} as a class and an instance method:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> class Knowledge
 >>   def pi
 >>     3.14
@@ -824,7 +729,7 @@ You can read out all defined methods for a class with the method
 `This_and_that`{.classname} (first we create it once again in the irb):
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> class Knowledge
 >>   def pi
 >>     3.14
@@ -852,23 +757,19 @@ $
 You already know that everything in Ruby is an object. So a variable
 must also be an object.
 
-## Naming Conventions
-
 Normal variables are written in lower case. Constants start with an
 upper case letter.
-
-### Important
 
 A constant can also be overwritten with a new value in Ruby (but you
 will get a warning message). So please do not rely on the constancy of a
 constant.
 
-You are on the safe side if you are using only ASCII symbols. But with
-Ruby 1.9 and the right encoding, you could also use special characters
-(for example German umlauts) more or less without any problems in a
-variable name. But if you want to be polite towards other programmers
-who probably do not have those characters directly available on their
-keyboards, it is better to use only pure ASCII.
+You are on the safe side if you are using only ASCII symbols. With Ruby 2.1
+and the right encoding, you could also use special characters (for example
+German umlauts) without any problems in a variable name. But if you want to
+be polite towards other programmers who probably do not have those
+characters directly available on their keyboards, it is better to use only
+ASCII.
 
 ## Strings
 
@@ -876,7 +777,7 @@ Let's experiment a little bit in the `irb`{.literal}. The method
 `.class`{.methodname} tells us which class we are dealing with.
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> a = 'First test'
 => "First test"
 >> a.class
@@ -908,9 +809,7 @@ $
 
 ## Single and Double Quotations Marks
 
-## Note
-
-Please note: if we mention single or double quotation marks in the
+If we mention single or double quotation marks in the
 context of strings, we do not mean typographically correct curly
 quotation marks (see
 `http://en.wikipedia.org/wiki/Quotation_mark`{.uri}), but the ASCII
@@ -925,7 +824,7 @@ automatically inserted in the corresponding place in the string.
 Example:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> a = 'blue'
 => "blue"
 >> b = "Color: #{a}"
@@ -940,9 +839,7 @@ If the result of the expression is not a string, Ruby tries to apply the
 method `to_s`{.methodname} in order to convert the value of the object
 into a string.
 
-## Integers
-
-## Fixnum and Bignum
+## Integers - Fixnum and Bignum
 
 `Fixnum`{.classname} and `Bignum`{.classname} are `Integer`{.classname}
 classes. A `Fixnum`{.classname} is an `Integer`{.classname} that can be
@@ -952,7 +849,7 @@ example where a becomes larger and by that becomes a
 `Bignum`{.classname}.
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> 20.class
 => Fixnum
 >> a = 20
@@ -961,10 +858,6 @@ $ irb --simple-prompt
 => Fixnum
 >> a = a * 5555555555
 => 111111111100
->> a.class
-=> Fixnum
->> a = a * 5555555555
-=> 617283950493827160500
 >> a.class
 => Bignum
 >> exit
@@ -978,7 +871,7 @@ numbers”). The decimal separator is a point (not a comma, as in some
 European countries).
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> a = 20.424
 => 20.424
 >> a.class
@@ -995,7 +888,7 @@ Calculating with integers and floats is so easy that you can describe
 everything with just a few lines of code in the `irb`{.literal}:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> a = 10
 => 10
 >> b = 23
@@ -1030,7 +923,7 @@ For boolean values (`true`{.code} and `false`{.code}) and for
 `nil`{.code} (no value) there are separate classes:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> true.class
 => TrueClass
 >> false.class
@@ -1041,23 +934,20 @@ $ irb --simple-prompt
 $
 ```
 
-`nil`{.literal} (no value) is, by the way, the
-contraction of the Latin word *nihil* (nothing)
-or, if you look at it in terms of programming history, the term derives
-from “*not in list*” from the legacy of the programming language Lisp
-(the name is an acronym of *List Processing*).
+`nil`{.literal} (no value) is, by the way, the contraction of the Latin
+word *nihil* (nothing) or, if you look at it in terms of programming
+history, the term derives from “*not in list*” from the legacy of the
+programming language Lisp (the name is an acronym of *List Processing*).
 
 ## Scope of Variables
 
 Variables have a different scope (or “reach”) within the Ruby
 application and therefore also within a Ruby on Rails application.
 
-### Important
-
 You need to keep this scope in mind while programming. Otherwise you can
 end up with odd effects.
 
-## Local Variables (aaa or \_aaa)
+### Local Variables (aaa or \_aaa)
 
 Local variables either start with a lower case letter or an underscore
 (`_`{.literal}). Their scope is limited to the current environment (for
@@ -1066,7 +956,7 @@ which use the same local variable radius. Because they are local they
 don't interact with each other:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> def area(radius)
 >>   3.14 * radius * radius
 >> end
@@ -1083,13 +973,13 @@ $ irb --simple-prompt
 $
 ```
 
-## Global Variables (\$aaa)
+### Global Variables (\$aaa)
 
 A global variable starts with a `$`{.literal}-sign and is accessible in
 the entire programm. Example:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> $value = 10
 => 10
 >> puts $value
@@ -1113,7 +1003,7 @@ $
 
 Global variables are used very rarely.
 
-## Instance Variables (@aaa)
+### Instance Variables (@aaa)
 
 Instance variables (“**A**ttributes”, hence the `@`{.literal}) only
 apply within a class, but everywhere in it – a mini version of global
@@ -1121,7 +1011,7 @@ variables, so to speak. Unlike global variables, you will find instance
 variables all over the place in a Rails application. Let's tackle them
 in form of an example program with the name `color.rb`{.filename}:
 
-``` {.programlisting}
+```ruby
 class Wall
   def initialize
     @color = 'white'
@@ -1166,7 +1056,7 @@ In order to keep the amount of chicken and egg problems in this chapter
 at a manageable level, we need to go back to the topic Methods and
 combine what we have learned so far.
 
-## Getters and Setters
+### Getters and Setters
 
 As instance variables (“attributes”) only exist within the relevant
 instance, you always need to write a “getter” method for exporting such
@@ -1176,7 +1066,7 @@ number of doors and windows in the room), then we can create the getter
 methods `doors`{.methodname} und `windows`{.methodname} (example program
 `room.rb`{.filename}):
 
-``` {.programlisting}
+```ruby
 class Room
   def initialize
     @doors  = 1
@@ -1212,7 +1102,7 @@ is so common, there is already a ready-made getter method for it with
 the name `attr_reader`{.methodname}, which you would apply as follows in
 the program `room.rb`{.filename}:
 
-``` {.programlisting}
+```ruby
 class Room
   def initialize
     @doors  = 1
@@ -1233,8 +1123,6 @@ puts "W: #{kitchen.windows}"
 :doors and :windows) instead of variables (e.g. @doors and @windows) as
 parameter.
 
-## Note
-
 `attr_reader`{.methodname} is a good example for meta programming in
 Ruby. When working with Rails, you will frequently come across meta
 programming and be grateful for how it works automagically.
@@ -1242,7 +1130,7 @@ programming and be grateful for how it works automagically.
 If you want to change the number of doors or windows from the outside,
 you need a “setter” method. It can be implemented as follows:
 
-``` {.programlisting}
+```ruby
 class Room
   def initialize
     @doors  = 1
@@ -1282,7 +1170,7 @@ easier way of doing this. Via the setter method
 `attr_writer`{.methodname} you can simplify the code of
 `room.rb`{.filename} further:
 
-``` {.programlisting}
+```ruby
 class Room
   def initialize
     @doors  = 1
@@ -1305,7 +1193,7 @@ And (who would have thought!) there is even a method
 `attr_accessor`{.methodname} that combines getters and setters. The code
 for `room.rb`{.filename} would then look like this:
 
-``` {.screen}
+```ruby
 class Room
   def initialize
     @doors  = 1
@@ -1324,7 +1212,7 @@ puts "D: #{kitchen.doors}"
 puts "W: #{kitchen.windows}"
 ```
 
-## Built-In Methods for String
+### Built-In Methods for String
 
 Most classes already come with a bundle of very useful methods. These
 methods are always written after the relevant object, separated by a
@@ -1333,7 +1221,7 @@ point.
 Here are a few examples for methods of the class `String`{.classname}.
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> a = 'A dog'
 => "A dog"
 >> a.class
@@ -1354,51 +1242,30 @@ With `instance_methods(false)`{.methodname} you can get a list of the
 build in methods:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> String.instance_methods(false)
 => [:<=>, :==, :===, :eql?, :hash, :casecmp, :+, :*, :%, :[], :[]=, :insert, :length, :size, :bytesize, :empty?, :=~, :match, :succ, :succ!, :next, :next!, :upto, :index, :rindex, :replace, :clear, :chr, :getbyte, :setbyte, :byteslice, :to_i, :to_f, :to_s, :to_str, :inspect, :dump, :upcase, :downcase, :capitalize, :swapcase, :upcase!, :downcase!, :capitalize!, :swapcase!, :hex, :oct, :split, :lines, :bytes, :chars, :codepoints, :reverse, :reverse!, :concat, :<<, :prepend, :crypt, :intern, :to_sym, :ord, :include?, :start_with?, :end_with?, :scan, :ljust, :rjust, :center, :sub, :gsub, :chop, :chomp, :strip, :lstrip, :rstrip, :sub!, :gsub!, :chop!, :chomp!, :strip!, :lstrip!, :rstrip!, :tr, :tr_s, :delete, :squeeze, :count, :tr!, :tr_s!, :delete!, :squeeze!, :each_line, :each_byte, :each_char, :each_codepoint, :sum, :slice, :slice!, :partition, :rpartition, :encoding, :force_encoding, :valid_encoding?, :ascii_only?, :unpack, :encode, :encode!, :to_r, :to_c]
 >> exit
 $
 ```
 
-If you are not sure what one of these methods does you can use **ri** to
-look it up:
-
-``` {.screen}
-$ ri -T String.size
-String.size
-
-(from ruby site)
-------------------------------------------------------------------------------
-  str.length   -> integer
-  str.size     -> integer
-
-
-------------------------------------------------------------------------------
-
-Returns the character length of str.
-
-
-$
-```
-
-## Method Chaining
+### Method Chaining
 
 You may not think of it straight away, but once you have got used to
 working with Ruby, then it makes perfect sense (and is perfectly
 logical) to chain different methods.
 
 ``` {.screen}
-$ irb --simple-prompt
->> a = 'A dog'
-=> "A dog"
+$ irb
+>> a = 'A house'
+=> "A house"
 >> a.upcase.reverse
-=> "GOD A"
+=> "ESUOH A"
 >> exit
 $
 ```
 
-## Converting from One to the Other: Casting
+### Converting from One to the Other: Casting
 
 There is a whole range of useful instance methods for converting
 (“casting”) objects from one class to another. First, let's use the
@@ -1406,7 +1273,7 @@ method `.to_s`{.methodname} to convert a `Fixnum`{.classname} to a
 `String`{.classname}.
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> a = 10
 => 10
 >> a.class
@@ -1419,8 +1286,6 @@ $ irb --simple-prompt
 $
 ```
 
-### Note
-
 Incidentally, that is exactly what `puts`{.code} does if you use
 `puts`{.code} to output a `Fixnum`{.classname} or a `Float`{.classname}
 (for non-strings, it simply implicitly adds the method
@@ -1430,7 +1295,7 @@ Now we use the method `.to_i`{.methodname} to change a
 `Float`{.classname} to a `Fixnum`{.classname}.
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> c = 10.0
 => 10.0
 >> c.class
@@ -1443,7 +1308,7 @@ $ irb --simple-prompt
 $
 ```
 
-## Method to\_s for Your Own Classes
+### Method to\_s for Your Own Classes
 
 You should always integrate a method `to_s`{.methodname}for your own
 custom classes, even if it is just for the sake of easier debugging.
@@ -1454,7 +1319,7 @@ Then you can simply output a corresponding object via `puts`{.code}
 Here is an example:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> class Person
 >>   def initialize(first_name, last_name)
 >>     @first_name = first_name
@@ -1474,58 +1339,15 @@ Stefan Wintermeyer
 $
 ```
 
-## Is “+” a Method?
+### Is “+” a Method?
 
-Why is there also a plus symbol in the list of methods for
-`String`{.classname}? Let's find out by looking it up in `ri`{.literal}:
-
-``` {.screen}
-$ ri -T String.+
-String.+
-
-(from ruby site)
-------------------------------------------------------------------------------
-  str + other_str   -> new_str
-
-
-------------------------------------------------------------------------------
-
-Concatenation---Returns a new String containing other_str
-concatenated to str.
-
-  "Hello from " + self.to_s   #=> "Hello from main"
-
-
-$
-```
-
-hmmm … Let's see what it says for `Fixnum`{.classname}:
+Yes, '+' is a method. Let's have a go and play around with this in
+`irb`{.literal}. So we should be able to add the `+`{.methodname} to an
+object, just as any other method, separated by a dot and add the second
+number in brackets as parameter:
 
 ``` {.screen}
-$ ri -T Fixnum.+
-Fixnum.+
-
-(from ruby site)
-------------------------------------------------------------------------------
-  fix + numeric  ->  numeric_result
-
-
-------------------------------------------------------------------------------
-
-Performs addition: the class of the resulting object depends on the class of
-numeric and on the magnitude of the result.
-
-
-$
-```
-
-Let's have a go and play around with this in `irb`{.literal}. So we
-should be able to add the `+`{.methodname} to an object, just as any
-other method, separated by a dot and add the second number in brackets
-as parameter:
-
-``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> 10 + 10
 => 20
 >> 10+10
@@ -1542,7 +1364,7 @@ Aha! The plus symbol is indeed a method, and this method takes the next
 value as parameter. Really we should put this value in brackets, but
 thanks to Ruby's well thought-out syntax this is not necessary.
 
-## Can I Overwrite the Method +?
+### Can I Overwrite the Method +?
 
 Yes, you can overwrite any method. Logically, this does not make much
 sense for methods such as `+`{.methodname}, unless you want to drive
@@ -1554,7 +1376,7 @@ The aim is overwriting the method `+`{.methodname} for
 number 42.
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> 10 + 10
 => 20
 >> class Fixnum
@@ -1577,7 +1399,7 @@ do the calculation again. But this time, with different results.
 
 An abstract `if`{.literal}-condition looks like this:
 
-``` {.programlisting}
+```ruby
 if expression
   program
 end
@@ -1587,11 +1409,9 @@ The program between the expression and `end`{.code} is executed if the
 result of the expression is not `false`{.literal} and not
 `nil`{.literal}.
 
-### Note
-
 You can also use a `then`{.code} after the expression:
 
-``` {.programlisting}
+```ruby
 if expression then
   program
 end
@@ -1600,7 +1420,7 @@ end
 The construct for a simple `if`{.literal}-branch in a Ruby program looks
 like the following example program:
 
-``` {.programlisting}
+```ruby
 a = 10
 
 if a == 10
@@ -1608,15 +1428,13 @@ if a == 10
 end
 ```
 
-### Note
-
 The '==' is used to compare two values. Please don't mix it up with the
 single '='.
 
 You can try an *expression* really well in `irb`{.literal}:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> a = 10
 => 10
 >> a == 10
@@ -1625,12 +1443,12 @@ $ irb --simple-prompt
 $
 ```
 
-## Shorthand
+### Shorthand
 
 A frequently used shorthand notation of an `if`{.literal}-condition can
 be found in the following code:
 
-``` {.programlisting}
+```ruby
 a = 10
 
 ## long version
@@ -1644,12 +1462,12 @@ end
 puts 'a is 10' if a == 10
 ```
 
-## else
+### else
 
 You can probably imagine how this works, but for the sake of
 completeness, here is a little example:
 
-``` {.programlisting}
+```ruby
 a = 10
 
 if a == 10 then
@@ -1659,11 +1477,11 @@ else
 end
 ```
 
-## elsif
+### elsif
 
 Again, most programmers will know what this is all about. Example:
 
-``` {.programlisting}
+```ruby
 a = 10
 
 if a == 10 then
@@ -1678,22 +1496,20 @@ end
 There are different ways of implementing loops in Ruby. The iterator
 variation is used particularly often in the Rails environment.
 
-## while and until
+### while and until
 
 An abstract while loop looks like this:
 
-``` {.programlisting}
+```ruby
 while expression do
   program
 end
 ```
 
-### Note
-
 The `do`{.code} that follows the `expression`{.code} is optional. Often
 you will also see this:
 
-``` {.programlisting}
+```ruby
 while expression
   program
 end
@@ -1702,7 +1518,7 @@ end
 Here is a practical `irb`{.literal} example:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> i = 0
 => 0
 >> while i < 3 do
@@ -1719,7 +1535,7 @@ $
 
 Until loops are built similarly:
 
-``` {.programlisting}
+```ruby
 until expression
   program
 end
@@ -1728,7 +1544,7 @@ end
 Again, here is the corresponding `irb`{.literal} example:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> i = 5
 => 5
 >> until i == 0
@@ -1752,7 +1568,7 @@ programmers. Now I am going to show you why.
 
 In the loop
 
-``` {.programlisting}
+```ruby
 5.times { |i| puts i }
 ```
 
@@ -1760,13 +1576,13 @@ In the loop
 
 You can also express the whole thing in the following syntax:
 
-``` {.programlisting}
+```ruby
 5.times do |i|
   puts i
 end
 ```
 
-## Iterators
+### Iterators
 
 Iterators are just a specific type of method. As you probably know, the
 word “*iterate*” means to repeat something. For example, the class
@@ -1806,7 +1622,7 @@ $
 And it also gives a nice example that we are going to try out in irb:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> 5.times do |i|
 ?>   puts i
 >> end
@@ -1823,7 +1639,7 @@ $
 There is also a single-line notation for small blocks:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> 5.times { |i| puts i }
 0
 1
@@ -1839,7 +1655,7 @@ By the way, an iterator does not necessarily have to pass a variable to
 the block:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> 5.times { puts 'example' }
 example
 example
@@ -1851,7 +1667,7 @@ example
 $
 ```
 
-## Blocks
+### Blocks
 
 A block is the code that is triggered by an iterator. In the block, you
 have access to the local variable(s) passed by the iterator.
@@ -1895,12 +1711,12 @@ $
 As in many programming languages, *arrays* and *hashes* are popular
 structures in Ruby for storing data.
 
-## Arrays
+### Arrays
 
 An array is a list of objects. Let's play around in `irb:`{.literal}
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> a = [1,2,3,4,5]
 => [1, 2, 3, 4, 5]
 >> a.class
@@ -1914,7 +1730,7 @@ That is simple and easy to understand.
 Let's see if it also works with strings in the array:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> a = ['Test', 'Banana', 'blue']
 => ["Test", "Banana", "blue"]
 >> a.class
@@ -1936,7 +1752,7 @@ matter which kind of objects they are (i.e. `String`{.classname},
 hurt:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> a = [1, 2.2, 'House', nil]
 => [1, 2.2, "House", nil]
 >> a.class
@@ -1953,50 +1769,13 @@ $ irb --simple-prompt
 $
 ```
 
-Next, let's have a look at what the `ri`{.literal} help page says for
-`Array`{.classname}:
-
-``` {.screen}
-$ ri -T Array
-Array < Object
-
-------------------------------------------------------------------------------
-Includes:
-Enumerable (from ruby site)
-
-(from ruby site)
-------------------------------------------------------------------------------
-Arrays are ordered, integer-indexed collections of any object. Array indexing
-starts at 0, as in C or Java.  A negative index is assumed to be relative to
-the end of the array---that is, an index of -1 indicates the last element of
-the array, -2 is the next to last element in the array, and so on.
-------------------------------------------------------------------------------
-Class methods:
-
-  []
-  new
-  try_convert
-
-Instance methods:
-
-  &
-  *
-  +
-  -
-  <<
-
-[...]
-
-$
-```
-
-As you can see, arrays can also be created via the method
+Arrays can also be created via the method
 `new`{.methodname} (like any class). Individual new elements can then be
 added at the end of an array via the method `<<`{.methodname}. Here is
 the corresponding example:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> a = Array.new
 => []
 >> a << 'first item'
@@ -2007,13 +1786,13 @@ $ irb --simple-prompt
 $
 ```
 
-## Iterator each
+### Iterator each
 
 You can work your way through an array piece by piece via the method
 `each`{.methodname}. Example:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> cart = ['eggs', 'butter']
 => ["eggs", "butter"]
 >> cart.each do |item|
@@ -2026,44 +1805,13 @@ butter
 $
 ```
 
-Once more, `ri`{.literal} provides help and an example in case you
-forget how to use `each`{.methodname}:
-
-``` {.screen}
-$ ri -T Array.each
-Array.each
-
-(from ruby site)
-------------------------------------------------------------------------------
-  ary.each {|item| block }   -> ary
-  ary.each                   -> an_enumerator
-
-
-------------------------------------------------------------------------------
-
-Calls block once for each element in self, passing that element
-as a parameter.
-
-If no block is given, an enumerator is returned instead.
-
-  a = [ "a", "b", "c" ]
-  a.each {|x| print x, " -- " }
-
-produces:
-
-  a -- b -- c --
-
-
-$
-```
-
-## Hashes
+### Hashes
 
 A “*Hash*” is a list of *key/value pairs*. Here is an example with
 strings as keys:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> prices = { 'egg' => 0.1, 'butter' => 0.99 }
 => {"egg"=>0.1, "butter"=>0.99}
 >> prices['egg']
@@ -2078,14 +1826,14 @@ Of course, hashes can store not just strings as objects in the values,
 but - as with arrays - also classes that you define yourself (see [the
 section called “Arrays”](#ruby_array "Arrays")).
 
-## Symbols
+### Symbols
 
 *Symbols* are a strange concept and difficult to explain. But they are
 very useful and used frequently, amongst others with hashes. Normally,
 variables always create new objects:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> a = 'Example 1'
 => "Example 1"
 >> a.object_id
@@ -2109,7 +1857,7 @@ values itself, but it always has the same object ID, so it is very well
 suited to be a *key*:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> :a.class
 => Symbol
 >> :a.object_id
@@ -2125,7 +1873,7 @@ a row and then the symbol `:white`{.literal} three times in a row. For
 `:white`{.literal}, only the first time:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> 'white'.object_id
 => 70209583052020
 >> 'white'.object_id
@@ -2145,7 +1893,7 @@ $
 Using symbols as key for hashes is much more memory efficient:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> colors = { black: '#000000', white: '#FFFFFFFF' }
 => {:black=>"#000000", :white=>"#FFFFFFFF"}
 >> puts colors[:white]
@@ -2159,13 +1907,13 @@ You will frequently see symbols in Rails. If you want to find out more
 about symbols, go to the help page about the class `Symbol`{.classname}
 via **ri Symbol**.
 
-## Iterator each
+### Iterator each
 
 With the method `each`{.methodname} you can work your way through a
 `Hash`{.classname} step by step. Example:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> colors = { black: '#000000', white: '#FFFFFFFF' }
 => {:black=>"#000000", :white=>"#FFFFFFFF"}
 >> colors.each do |key,value|
@@ -2178,42 +1926,6 @@ white #FFFFFFFF
 $
 ```
 
-Again, **ri** offers help and an example, in case you cannot remember
-one day how to use `each`{.methodname}:
-
-``` {.screen}
-$ ri -T Hash.each
-Hash.each
-
-(from ruby site)
-------------------------------------------------------------------------------
-  hsh.each      {| key, value | block } -> hsh
-  hsh.each_pair {| key, value | block } -> hsh
-  hsh.each                              -> an_enumerator
-  hsh.each_pair                         -> an_enumerator
-
-
-------------------------------------------------------------------------------
-
-Calls block once for each key in hsh, passing the key-value pair
-as parameters.
-
-If no block is given, an enumerator is returned instead.
-
-  h = { "a" => 100, "b" => 200 }
-  h.each {|key, value| puts "#{key} is #{value}" }
-
-produces:
-
-  a is 100
-  b is 200
-
-
-$
-```
-
-## Miscellaneous
-
 ## Range
 
 The class `Range`{.classname} represents an interval. The start and end
@@ -2222,7 +1934,7 @@ separated by two dots in between them. Here is an example in which we
 use a range like an iterator with `each`{.methodname}:
 
 ``` {.screen}
-$ irb --simple-prompt
+$ irb
 >> (0..3)
 => 0..3
 >> (0..3).class
