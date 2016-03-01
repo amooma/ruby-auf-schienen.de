@@ -292,7 +292,7 @@ Version:
               </div>
               <div class="nav-collapse collapse">
                 <p class="navbar-text pull-right">
-                  <a href="http://www.amazon.com/Ruby-Rails-Guide-Stefan-Wintermeyer-ebook/dp/B00E25KVLW?tag=wwwamoomade-21" class="navbar-link">Kindle version.</a>
+                  <a href="http://www.amazon.com/Ruby-Rails-5-0-Autodidacts-Learn-ebook/dp/B01BKFPTJ0?tag=wwwamoomade-21" class="navbar-link">Rails 5.0 version.</a>
                 </p>
               </div><!--/.nav-collapse -->
             </div>
